@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Zenix - ویرایش کیف پول</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+<style>
+.card{background:rgba(30,41,59,0.8);border:1px solid rgba(56,189,248,0.3);border-radius:12px;padding:20px;margin-top:20px;}.fg{margin-bottom:15px;}.fl{display:block;font-size:14px;color:#94a3b8;margin-bottom:6px;}.fi{width:100%;padding:10px 14px;background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#f8fafc;font-size:14px;outline:none;}.fi:focus{border-color:#38bdf8;}.fi.error{border-color:#ef4444!important;}.err-msg{color:#ef4444;font-size:12px;margin-top:4px;display:none;}.success-msg{color:#22c55e;font-size:13px;margin-top:10px;display:none;text-align:center;font-weight:bold;}.bs{display:block;width:100%;background:#38bdf8;color:#0f172a;border:none;padding:10px;font-weight:bold;border-radius:8px;cursor:pointer;font-size:14px;text-align:center;}.bs:hover{background:#0ea5e9;}
+</style>
+</head>
+<body>
+<header>
+<div class="logo"><h2>ZENIX</h2></div>
+<div class="hr">
+<a href="profile.html" class="lb"><i class="fas fa-arrow-right"></i></a>
+</div>
+</header>
+<div class="c">
+<div class="wel"><div><h1 style="font-size:22px;">ویرایش آدرس‌های کیف پول</h1><p style="font-size:15px;">تغییر امن آدرس‌های TRX و BEP20</p></div></div>
+<div class="card">
+<div class="fg"><label class="fl">آدرس کیف پول TRX</label><input type="text" class="fi" id="trx-in" value="TW9xyzAbc123TokenSample" placeholder="T..."><div class="err-msg" id="trx-err">آدرس TRX نامعتبر است</div></div>
+<div class="fg"><label class="fl">آدرس کیف پول BEP20</label><input type="text" class="fi" id="bep-in" value="0x71C...329Bsample" placeholder="0x..."><div class="err-msg" id="bep-err">آدرس BEP20 نامعتبر است</div></div>
+<div class="fg"><label class="fl">ایمیل (جمیل)</label>
+<div style="display:flex;gap:8px;"><input type="email" class="fi" id="wal-email" placeholder="example@gmail.com"><button type="button" class="bs" style="width:130px;font-size:12px;white-space:nowrap;">ارسال کد</button></div>
+<div class="err-msg" id="wal-email-err">ایمیل نامعتبر است</div></div>
+<div class="fg"><label class="fl">کد تأیید ۶ رقمی</label><input type="text" class="fi" id="wal-code" maxlength="6" placeholder="123456"><div class="err-msg" id="wal-code-err">کد تأیید ۶ رقمی را وارد کنید</div></div>
+<button type="button" class="bs" onclick="saveWalletForm(this)">ذخیره تغییرات</button>
+<div class="success-msg" id="wallet-success">آدرس‌های کیف پول با موفقیت بروز شدند</div>
+</div></div>
+<footer><p>&copy; 2026 Zenix</p></footer>
+<script src="script.js"></script>
+<script>
+function saveWalletForm(btn){const bd=btn.closest('.card'),trx=bd.querySelector('#trx-in'),bep=bd.querySelector('#bep-in'),email=bd.querySelector('#wal-email'),code=bd.querySelector('#wal-code'),success=bd.querySelector('#wallet-success');let err=false;if(!trx.value.trim()){trx.classList.add('error');bd.querySelector('#trx-err').style.display='block';err=true;}else{trx.classList.remove('error');bd.querySelector('#trx-err').style.display='none';}if(!bep.value.trim()){bep.classList.add('error');bd.querySelector('#bep-err').style.display='block';err=true;}else{bep.classList.remove('error');bd.querySelector('#bep-err').style.display='none';}if(!email.value.includes('@')){email.classList.add('error');bd.querySelector('#wal-email-err').style.display='block';err=true;}else{email.classList.remove('error');bd.querySelector('#wal-email-err').style.display='none';}if(code.value.length<6){code.classList.add('error');bd.querySelector('#wal-code-err').style.display='block';err=true;}else{code.classList.remove('error');bd.querySelector('#wal-code-err').style.display='none';}if(!err){success.style.display='block';setTimeout(()=>success.style.display='none',3000);}}
+</script>
+</body>
+</html>

@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Zenix - واریز هوشمند</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
+body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
+header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1);padding:10px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#0ea5e9,#9333ea);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;font-style:italic;transform:skewX(-6deg);box-shadow:0 0 15px rgba(14,165,233,.4)}
+.logo-text{font-family:'Orbitron',sans-serif;font-size:19px;font-weight:900;letter-spacing:2px;font-style:italic;transform:skewX(-6deg);background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 20px rgba(56,189,248,.4)}
+.hr{display:flex;align-items:center;gap:8px}
+.wrap{position:relative}
+.lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none}
+.badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;font-weight:700}
+.badge.show{display:flex}
+.menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;width:max-content;padding:6px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8)}
+[dir="rtl"] .wrap .menu{left:0}
+[dir="ltr"] .wrap .menu{right:0}
+.menu.show{display:block}
+.mi{padding:7px 10px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap}
+.mi:hover{background:rgba(56,189,248,.2);color:#38bdf8}
+.mi.active{background:rgba(56,189,248,.15);color:#38bdf8;font-weight:700}
+.c{max-width:800px;width:100%;margin:15px auto;padding:0 12px;flex:1}
+.wel{background:linear-gradient(135deg,rgba(2,132,199,.15),rgba(147,51,234,.15));border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.wel h1{font-size:16px;margin-bottom:3px}
+.wel p{color:#94a3b8;font-size:11px}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
+.modal.show{display:flex}
+.modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(56,189,248,.3);border-radius:20px;width:100%;max-width:460px;max-height:85vh;display:flex;flex-direction:column;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.9)}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;color:#38bdf8;font-weight:800;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px}
+.modal-close{background:rgba(255,255,255,.05);border:none;color:#94a3b8;cursor:pointer;font-size:14px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:rgba(239,68,68,.2);color:#ef4444}
+
+/* اصلاح استایل تب‌های اعلان */
+.notif-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08)}
+.notif-tab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#94a3b8;padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;white-space:nowrap;transition:0.2s;display:flex;align-items:center;justify-content:center;gap:5px;flex:1 1 auto}
+.notif-tab:hover{background:rgba(56,189,248,.15);color:#38bdf8}
+.notif-tab.active{background:#38bdf8;color:#0f172a;font-weight:bold;border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.3)}
+
+#modal-msg-container{overflow-y:auto;padding-right:6px}
+.msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px;transition:0.2s}
+.msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:4px}
+.msg-desc-text{font-size:12px;color:#cbd5e1;line-height:1.5}
+
+/* اسکرول‌‌بار سفارشی تاریک و نئونی */
+#modal-msg-container::-webkit-scrollbar,
+.modal-content div::-webkit-scrollbar {
+  width: 5px;
+}
+#modal-msg-container::-webkit-scrollbar-track,
+.modal-content div::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 10px;
+}
+#modal-msg-container::-webkit-scrollbar-thumb,
+.modal-content div::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.35);
+  border-radius: 10px;
+}
+#modal-msg-container::-webkit-scrollbar-thumb:hover,
+.modal-content div::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.7);
+}
+#modal-msg-container, .modal-content div {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(56, 189, 248, 0.35) rgba(15, 23, 42, 0.6);
+}
+
+/* استایل فیلدهای غیرقابل ویرایش (قفل‌شده) */
+input[readonly] {
+  background: rgba(15, 23, 42, 0.5) !important;
+  color: #94a3b8 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  cursor: not-allowed;
+}
+
+footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:800px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
+</style>
+</head>
+<body>
+<header>
+<div class="logo"><div class="logo-icon">Z</div><div class="logo-text">ZENIX</div></div>
+<div class="hr">
+<div class="wrap"><button type="button" class="lb" id="bell-btn"><i class="fas fa-bell" style="color:#fbbf24"></i><span class="badge" id="bell-badge">0</span></button></div>
+<div class="wrap"><button type="button" class="lb" id="help-btn" title="راهنمای صفحه واریز"><i class="fas fa-circle-question" style="color:#38bdf8"></i></button></div>
+<a href="support.html" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);" class="lb"><i class="fas fa-headset" style="color:#a855f7"></i></a>
+<div class="wrap"><button type="button" class="lb" id="lang-btn"><i class="fas fa-globe" style="color:#22c55e"></i></button>
+<div class="menu" id="lang-menu">
+<div class="mi" data-lang="fa">فارسی</div><div class="mi" data-lang="en">English</div><div class="mi" data-lang="ar">العربية</div><div class="mi" data-lang="tr">Türkçe</div><div class="mi" data-lang="ru">Русский</div><div class="mi" data-lang="es">Español</div><div class="mi" data-lang="fr">Français</div><div class="mi" data-lang="de">Deutsch</div>
+</div></div>
+<div class="wrap"><button type="button" class="lb" id="menu-btn"><i class="fas fa-bars" style="color:#f43f5e"></i></button>
+<div class="menu" id="nav-menu">
+<a href="dashboard.html" class="mi"><i class="fas fa-home" style="color:#38bdf8"></i><span id="m1" data-i18n="home">صفحه اصلی</span></a>
+<a href="quantification.html" class="mi"><i class="fas fa-robot" style="color:#a855f7"></i><span id="m2" data-i18n="quantification">کوانتیفیکیشن</span></a>
+<a href="deposit.html" class="mi active"><i class="fas fa-arrow-down" style="color:#22c55e"></i><span id="m3" data-i18n="deposit">واریز</span></a>
+<a href="receive.html" class="mi"><i class="fas fa-arrow-up" style="color:#fbbf24"></i><span id="m4" data-i18n="receive">برداشت</span></a>
+<a href="transactions.html" class="mi"><i class="fas fa-history" style="color:#06b6d4"></i><span id="m5" data-i18n="transactions">تراکنش</span></a>
+<a href="profile.html" class="mi"><i class="fas fa-user-cog" style="color:#ec4899"></i><span id="m6" data-i18n="profile">پروفایل</span></a>
+<a href="support.html" class="mi" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);"><i class="fas fa-headset" style="color:#a855f7"></i><span id="m7" data-i18n="support">پشتیبانی</span></a>
+<a href="#" class="mi" onclick="window.openAboutModal();return false;"><i class="fas fa-info-circle" style="color:#38bdf8"></i><span id="m_about" data-i18n="m_about">درباره پلتفرم</span></a>
+<a href="index.html" class="mi" id="logout-btn" style="color:#ef4444"><i class="fas fa-power-off"></i><span id="m8" data-i18n="logout">خروج</span></a>
+</div></div></div>
+</header>
+
+<div class="c">
+<div class="wel">
+<div><h1 data-i18n="depositTitle">واریز</h1><p data-i18n="depositSub">شارژ حساب از شبکه بلاکچین</p></div>
+<div style="font-size:11px;background:rgba(34,197,94,.1);border:1px solid #22c55e;padding:4px 8px;border-radius:6px;color:#22c55e;font-weight:600;"><i class="fas fa-bolt"></i> <span data-i18n="activeStatus">فعال</span></div>
+</div>
+
+<div style="background:rgba(30,41,59,0.8);border:1px solid rgba(56,189,248,0.3);border-radius:12px;padding:16px;margin-top:12px;">
+<div id="status-box" style="display:none;padding:12px;border-radius:8px;font-size:12px;margin-bottom:12px;text-align:center;font-weight:600;"></div>
+
+<div style="font-size:13px;color:#38bdf8;font-weight:bold;margin-bottom:12px;"><i class="fas fa-network-wired"></i> <span data-i18n="selectNetwork">انتخاب شبکه و آدرس</span></div>
+<div style="display:flex;gap:10px;margin-bottom:14px;">
+<div id="net-trc20" onclick="setNetwork('TRC20')" style="flex:1;background:rgba(56,189,248,0.15);border:1px solid #38bdf8;padding:10px;border-radius:8px;text-align:center;font-size:12px;color:#f8fafc;font-weight:bold;cursor:pointer;">USDT (TRC20)</div>
+<div id="net-bep20" onclick="setNetwork('BEP20')" style="flex:1;background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.1);padding:10px;border-radius:8px;text-align:center;font-size:12px;color:#94a3b8;cursor:pointer;">USDT (BEP20)</div>
+</div>
+<div style="text-align:center;margin:16px 0;">
+<div style="background:#fff;display:inline-block;padding:10px;border-radius:8px;margin-bottom:8px;">
+<img id="qr-code-img" src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=TMkUAe5kzL3PdfkwV2vKot3dL3kkDD9z4Y" alt="QR Code" style="display:block;">
+</div>
+<div style="font-size:11px;color:#94a3b8;" data-i18n="scanQr">اسکن جهت واریز مستقیم</div>
+</div>
+
+<div style="margin-bottom:16px;">
+<label id="wallet-label" style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;">آدرس کیف پول (TRC20):</label>
+<div style="display:flex;background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:8px;overflow:hidden;">
+<input type="text" id="wallet-address" value="" placeholder="ابتدا مبلغ واریزی را وارد کنید..." readonly style="width:100%;background:transparent;border:none;color:#f8fafc;padding:10px;font-size:12px;outline:none;direction:ltr;text-align:left;user-select:none;-webkit-user-select:none;">
+<button type="button" id="copy-btn" onclick="copyAddress()" disabled style="background:#475569;border:none;color:#94a3b8;padding:0 14px;cursor:not-allowed;font-weight:bold;font-size:12px;transition:0.3s;"><i class="fas fa-copy"></i> <span data-i18n="copyBtn">کپی</span></button>
+</div>
+<div id="copy-warning" style="font-size:10px;color:#ef4444;margin-top:4px;" data-i18n="copyWarning">⚠️ برای نمایش و کپی آدرس کیف پول، ابتدا مبلغ واریزی را وارد کنید.</div>
+</div>
+
+<div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;margin-bottom:16px;">
+<div style="font-size:12px;color:#38bdf8;font-weight:bold;margin-bottom:8px;"><i class="fas fa-wallet"></i> <span data-i18n="calcTitle">محاسبه مبلغ واریزی</span> <span style="color:#ef4444;">*</span></div>
+<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+<input type="number" id="calc-input" placeholder="مبلغ به USDT" oninput="calculateDeposit()" style="flex:1;background:rgba(15,23,42,0.9);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#f8fafc;padding:8px 10px;font-size:12px;outline:none;">
+<div style="font-size:11px;color:#94a3b8;white-space:nowrap;">USDT</div>
+</div>
+
+<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#cbd5e1;background:rgba(56,189,248,0.08);padding:8px 10px;border-radius:6px;margin-bottom:12px;">
+<span data-i18n="finalCalcText">مبلغ واریزی نهایی:</span>
+<div style="display:flex;align-items:center;gap:6px;">
+<span id="calc-result" style="color:#22c55e;font-weight:bold;">0.00 USDT</span>
+<button type="button" id="copy-final-btn" onclick="copyFinalAmount()" title="کپی مبلغ نهایی" style="background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.3);color:#38bdf8;padding:3px 7px;border-radius:5px;cursor:pointer;font-size:11px;display:inline-flex;align-items:center;gap:4px;transition:0.2s;">
+<i class="fas fa-copy"></i>
+</button>
+</div>
+</div>
+
+<div style="font-size:12px;color:#38bdf8;font-weight:bold;margin-bottom:6px;"><i class="fas fa-receipt"></i> <span data-i18n="txHashTitle">هش تراکنش (TxID)</span> <span style="color:#ef4444;">*</span></div>
+<input type="text" id="tx-hash-input" placeholder="مثال: 5f4d11... یا آدرس تراکنش" oninput="checkInputs()" style="width:100%;background:rgba(15,23,42,0.9);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#f8fafc;padding:8px 10px;font-size:12px;outline:none;direction:ltr;text-align:left;">
+
+<div style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:11px;color:#38bdf8;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);padding:6px 10px;border-radius:6px;">
+<i class="fas fa-clock" style="color:#38bdf8;"></i>
+<span>تایید تراکنش و شارژ حساب معمولاً بین <strong>۵ الی ۱۵ دقیقه</strong> زمان میبرد.</span>
+</div>
+
+</div>
+
+<button type="button" id="inquiry-btn" onclick="checkAutoDeposit()" disabled style="width:100%;background:#475569;color:#94a3b8;border:none;padding:12px;border-radius:8px;font-weight:bold;cursor:not-allowed;font-size:13px;transition:0.3s;"><i class="fas fa-sync-alt"></i> <span data-i18n="inquiryBtn">استعلام و واریزی</span></button>
+</div>
+
+<div style="margin-top:16px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:14px;font-size:11px;color:#cbd5e1;line-height:1.6;">
+<div style="color:#ef4444;font-weight:bold;margin-bottom:6px;"><i class="fas fa-exclamation-triangle"></i> راهنمای امنیتی مهم:</div>
+<span style="color:#f8fafc;font-weight:bold;">* حتماً مبلغ واریزی با مبلغ محاسبه‌شده یکی باشد؛ در غیر این صورت کل مبلغ واریزی بلوکه شده و به هیچ عنوان قابل بازگشت نیست.</span><br>
+<span data-i18n="sec1">* لطفاً از واریز هرگونه ارزی غیر از USDT خودداری فرمایید.</span><br>
+<span data-i18n="sec2">* تراکنش‌ها به صورت خودکار پس از تایید گره‌های شبکه اعمال می‌شوند.</span>
+</div>
+</div>
+
+<!-- مودال صندوق پیام‌ها -->
+<div class="modal" id="m-msg">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span id="t-modal-title"><i class="fas fa-bell"></i> صندوق پیام‌ها و اعلان‌ها</span>
+            <button class="modal-close" onclick="window.closeMessageModal()"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div class="notif-tabs" id="notif-tabs">
+            <button type="button" class="notif-tab active" onclick="window.setNotifFilter('all', this)"><i class="fas fa-list"></i> همه</button>
+            <button type="button" class="notif-tab" onclick="window.setNotifFilter('approved', this)"><i class="fas fa-check-circle" style="color:#22c55e"></i> تایید درخواست</button>
+            <button type="button" class="notif-tab" onclick="window.setNotifFilter('rejected', this)"><i class="fas fa-times-circle" style="color:#ef4444"></i> لغو درخواست</button>
+            <button type="button" class="notif-tab" onclick="window.setNotifFilter('admin_message', this)"><i class="fas fa-bullhorn" style="color:#38bdf8"></i> پیام مدیریت</button>
+        </div>
+
+        <div id="modal-msg-container"><div style="text-align:center;padding:20px;color:#94a3b8">هیچ پیام جدیدی وجود ندارد.</div></div>
+    </div>
+</div>
+
+<div class="modal" id="m-help">
+    <div class="modal-content">
+        <div class="modal-header"><span>راهنمای صفحه واریز</span><button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button></div>
+        <div style="overflow-y:auto;padding-right:4px">
+            <div class="msg-body-box" style="background:rgba(239,68,68,0.15);border:1px solid #ef4444;">
+                <div class="msg-title-text" style="color:#ef4444;"><i class="fas fa-exclamation-triangle"></i> راهنمای امنیتی مهم:</div>
+                <div class="msg-desc-text" style="color:#f8fafc;font-weight:bold;">حتماً مبلغ واریزی با مبلغ محاسبه‌شده یکی باشد؛ در غیر این صورت کل مبلغ واریزی بلوکه شده و به هیچ عنوان قابل بازگشت نیست.</div>
+            </div>
+            <div class="msg-body-box">
+                <div class="msg-title-text"><i class="fas fa-network-wired" style="color:#38bdf8"></i> انتخاب شبکه و آدرس</div>
+                <div class="msg-desc-text">ابتدا شبکه انتقال خود (مانند TRC20 یا BEP20) را انتخاب کنید. آدرس کیف پول مقصد بر اساس شبکه انتخابی تغییر خواهد کرد.</div>
+            </div>
+            <div class="msg-body-box">
+                <div class="msg-title-text"><i class="fas fa-wallet" style="color:#38bdf8"></i> محاسبه مبلغ واریزی</div>
+                <div class="msg-desc-text">با وارد کردن مبلغ مد نظر به USDT، آدرس کیف پول آزاد شده و می‌توانید آن را کپی کنید. همچنین محاسبه نهایی با احتساب کارمزد نمایش داده می‌شود.</div>
+            </div>
+            <div class="msg-body-box">
+                <div class="msg-title-text"><i class="fas fa-receipt" style="color:#22c55e"></i> ثبت هش تراکنش (TxID)</div>
+                <div class="msg-desc-text">پس از انجام تراکنش در کیف پول شخصی خود، هش تراکنش (TxID) را در فیلد مربوطه وارد کرده و دکمه استعلام و واریز را بزنید تا موجودی شما شارژ شود.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="m-about">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span id="t-about-title">درباره پلتفرم Zenix (هدف، ماهیت و ساختار)</span>
+            <button class="modal-close" onclick="window.closeAboutModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div style="overflow-y:auto;padding-right:4px">
+            <p style="font-size:13px;color:#cbd5e1;line-height:1.7;margin-bottom:10px;" id="t-ab-m-desc">پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.</p>
+            <ul style="font-size:12px;color:#94a3b8;padding-right:18px;line-height:1.7;margin-bottom:0;">
+                <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l1t">هدف اصلی:</strong> <span id="t-ab-m-l1d">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li>
+                <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l2t">امنیت و زیرساخت:</strong> <span id="t-ab-m-l2d">متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Firebase).</span></li>
+                <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l3t">ساختار چندسطحی (Referral & Team):</strong> <span id="t-ab-m-l3d">ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.</span></li>
+                <li><strong style="color:#f8fafc;" id="t-ab-m-l4t">احساس واقع‌‌گرایی:</strong> <span id="t-ab-m-l4d">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.</span></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<footer>
+<p>&copy; 2026 Zenix. All rights reserved.</p>
+<p style="color:#22c55e;"><i class="fas fa-circle" style="font-size:6px;"></i> <span id="t-node">سرور فعال (US-East)</span></p>
+</footer>
+
+<script>
+const wallets={
+  TRC20:"TMkUAe5kzL3PdfkwV2vKot3dL3kkDD9z4Y",
+  BEP20:"0x9eA4B9aCa9B7505E63BA436d3240718A21574dc4"
+};
+window.currentNetwork='TRC20';
+
+const LD={
+  fa:{dir:'rtl',adminMsg:'پیام مدیریت',welcomeText:'به پلتفرم زنیکس خوش آمدید.',home:'صفحه اصلی',quantification:'کوانتیفیکیشن',deposit:'واریز',receive:'برداشت',transactions:'تراکنش',profile:'پروفایل',support:'پشتیبانی',m_about:'درباره پلتفرم',logout:'خروج',depositTitle:'واریز',depositSub:'شارژ حساب از شبکه بلاکچین',activeStatus:'فعال',calcTitle:'محاسبه مبلغ واریزی',finalCalcText:'مبلغ واریزی نهایی:',txHashTitle:'هش تراکنش (TxID)',selectNetwork:'انتخاب شبکه و آدرس',scanQr:'اسکن جهت واریز مستقیم',copyBtn:'کپی',copyWarning:'⚠️ برای نمایش و کپی آدرس کیف پول، ابتدا مبلغ واریزی را وارد کنید.',inquiryBtn:'استعلام و واریزی',securityGuide:'راهنمای امنیتی:',sec1:'* لطفاً از واریز هرگونه ارزی غیر از USDT خودداری فرمایید.',sec2:'* تراکنش‌ها به صورت خودکار پس از تایید گره‌های شبکه اعمال می‌شوند.',copiedMsg:'📋 آدرس کیف پول با موفقیت در کلیپ‌بورد کپی شد.',loginErr:'❌ لطفاً ابتدا وارد حساب کاربری خود شوید.',fillReqErr:'❌ لطفاً مبلغ و هش تراکنش را به طور کامل وارد کنید.',pendingSentMsg:'⏳ درخواست واریز شما ثبت شد و جهت بررسی به مدیریت ارسال گردید.',netLbl:'آدرس کیف پول',modalTitle:'صندوق پیام‌ها و اعلان‌ها',noMsg:'هیچ پیام جدیدی وجود ندارد.',tNode:'سرور فعال (US-East)'},
+  en:{dir:'ltr',adminMsg:'Admin Message',welcomeText:'Welcome to Zenix platform.',home:'Home',quantification:'Quantification',deposit:'Deposit',receive:'Withdraw',transactions:'Transactions',profile:'Profile',support:'Support',m_about:'About Platform',logout:'Logout',depositTitle:'Deposit',depositSub:'Top-up account from blockchain network',activeStatus:'Active',calcTitle:'Deposit Calculator',finalCalcText:'Final deposit amount:',txHashTitle:'Transaction Hash (TxID)',selectNetwork:'Select Network & Address',scanQr:'Scan for direct deposit',copyBtn:'Copy',copyWarning:'⚠ Please enter the deposit amount first to display and copy the wallet address.',inquiryBtn:'Inquire & Deposit',securityGuide:'Security Guide:',sec1:'* Please refrain from depositing any currency other than USDT.',sec2:'* Transactions are automatically processed after network node confirmation.',copiedMsg:'📋 Wallet address successfully copied to clipboard.',loginErr:'❌ Please log in to your account first.',fillReqErr:'❌ Please fill in both the amount and transaction hash.',pendingSentMsg:'⏳ Your deposit request has been submitted and sent to admin for review.',netLbl:'Wallet Address',modalTitle:'Notifications & Messages',noMsg:'No new messages found.',tNode:'Node Active (US-East)'},
+  ar:{dir:'rtl',adminMsg:'رسالة الإدارة',welcomeText:'مرحباً بكم في منصة زينکس.',home:'الرئيسية',quantification:'التداول الكمي',deposit:'إيداع',receive:'سحب',transactions:'المعاملات',profile:'الملف الشخصي',support:'الدعم',m_about:'حول المنصة',logout:'تسجيل خروج',depositTitle:'إيداع',depositSub:'شحن الرصيد من شبكة البلوكشين',activeStatus:'نشط',calcTitle:'حاسبة مبلغ الإيداع',finalCalcText:'مبلغ الإيداع النهائي:',txHashTitle:'هش تراکنش (TxID)',selectNetwork:'اختر الشبكة والعنوان',scanQr:'امحُ للإيداع المباشر',copyBtn:'نسخ',copyWarning:'⚠️️ يرجى إدخال مبلغ الإيداع أولاً لعرض ونسخ عنوان المحفظة.',inquiryBtn:'استعلام و واریزی',securityGuide:'دليل الأمان:',sec1:'* يرجى عدم إيداع أي عملة أخرى غیر USDT.',sec2:'* تتم المعاملات تلقائياً بعد تأكيد عقد الشبكة.',copiedMsg:'📋 تم نسخ عنوان المحفظة بنجاح.',loginErr:'❌ يرجى تسجيل الدخول أولاً.',fillReqErr:'❌ يرجى ملء مبلغ الإيداع وهش المعاملة.',pendingSentMsg:'⏳ تم تقديم طلب الإيداع وإرساله إلى الإدارة للمراجعة.',netLbl:'عنوان المحفظة',modalTitle:'صندوق الرسائل والإشعارات',noMsg:'لا توجد رسائل جديدة.',tNode:'خادم نشط'}
+};
+
+let currLang = localStorage.getItem('zenix_lang') || 'fa';
+
+function setLang(l){
+  currLang = l;
+  const t=LD[l]||LD.fa;document.documentElement.dir=t.dir;document.documentElement.lang=l;localStorage.setItem('zenix_lang',l);
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(t[k])el.innerText=t[k];});
+  
+  document.querySelectorAll('#lang-menu .mi').forEach(el=>{
+    if(el.getAttribute('data-lang') === l){
+      el.classList.add('active');
+    } else {
+      el.classList.remove('active');
+    }
+  });
+
+  window.currentLangData=t;
+  const net=window.currentNetwork||'TRC20';
+  const lbl=document.getElementById('wallet-label');
+  if(lbl) lbl.textContent = `${t.netLbl} (${net}):`;
+  const mTitle = document.getElementById('t-modal-title');
+  if(mTitle) mTitle.innerHTML = `<i class="fas fa-bell"></i> ${t.modalTitle}`;
+  const nodeEl = document.getElementById('t-node');
+  if(nodeEl) nodeEl.textContent = t.tNode;
+}
+setLang(currLang);
+
+function calculateDeposit(){
+  const val = parseFloat(document.getElementById('calc-input').value) || 0;
+  const result = val * 1.025; 
+  document.getElementById('calc-result').innerText = result.toFixed(2) + ' USDT';
+  checkInputs();
+}
+
+function checkInputs(){
+  const calcInput = document.getElementById('calc-input');
+  const txInput = document.getElementById('tx-hash-input');
+  
+  if(calcInput.readOnly || txInput.readOnly) return;
+
+  const calcVal = parseFloat(calcInput.value) || 0;
+  const txVal = txInput.value.trim();
+  
+  const copyBtn = document.getElementById('copy-btn');
+  const walletInput = document.getElementById('wallet-address');
+  const copyWarning = document.getElementById('copy-warning');
+  const inquiryBtn = document.getElementById('inquiry-btn');
+
+  if(calcVal > 0){
+    walletInput.value = wallets[window.currentNetwork];
+    copyBtn.disabled = false;
+    copyBtn.style.background = '#38bdf8';
+    copyBtn.style.color = '#0f172a';
+    copyBtn.style.cursor = 'pointer';
+    walletInput.style.userSelect = 'text';
+    walletInput.style.webkitUserSelect = 'text';
+    copyWarning.style.display = 'none';
+  } else {
+    walletInput.value = "";
+    copyBtn.disabled = true;
+    copyBtn.style.background = '#475569';
+    copyBtn.style.color = '#94a3b8';
+    copyBtn.style.cursor = 'not-allowed';
+    walletInput.style.userSelect = 'none';
+    walletInput.style.webkitUserSelect = 'none';
+    copyWarning.style.display = 'block';
+  }
+
+  if(calcVal > 0 && txVal.length > 0){
+    inquiryBtn.disabled = false;
+    inquiryBtn.style.background = '#22c55e';
+    inquiryBtn.style.color = '#fff';
+    inquiryBtn.style.cursor = 'pointer';
+  } else {
+    inquiryBtn.disabled = true;
+    inquiryBtn.style.background = '#475569';
+    inquiryBtn.style.color = '#94a3b8';
+    inquiryBtn.style.cursor = 'not-allowed';
+  }
+}
+
+window.setNetwork=function(net){
+  window.currentNetwork=net;
+  const trc=document.getElementById('net-trc20'),bep=document.getElementById('net-bep20'),addr=document.getElementById('wallet-address'),lbl=document.getElementById('wallet-label'),qr=document.getElementById('qr-code-img');
+  const t=window.currentLangData||LD.fa;
+  if(net==='TRC20'){
+    trc.style.background='rgba(56,189,248,0.15)';trc.style.borderColor='#38bdf8';trc.style.color='#f8fafc';
+    bep.style.background='rgba(15,23,42,0.6)';bep.style.borderColor='rgba(255,255,255,0.1)';bep.style.color='#94a3b8';
+  }else{
+    bep.style.background='rgba(56,189,248,0.15)';bep.style.borderColor='#38bdf8';bep.style.color='#f8fafc';
+    trc.style.background='rgba(15,23,42,0.6)';trc.style.borderColor='rgba(255,255,255,0.1)';trc.style.color='#94a3b8';
+  }
+  lbl.textContent=`${t.netLbl} (${net}):`;
+  qr.src=`https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=${wallets[net]}`;
+  
+  const calcVal = parseFloat(document.getElementById('calc-input').value) || 0;
+  if(calcVal > 0){
+    addr.value = wallets[net];
+  }
+}
+
+window.copyAddress=function(){
+  const calcVal = parseFloat(document.getElementById('calc-input').value) || 0;
+  if(calcVal <= 0) return;
+  const c=document.getElementById("wallet-address");
+  c.select();navigator.clipboard.writeText(c.value);
+  const t=window.currentLangData||LD.fa;
+  const box=document.getElementById('status-box');
+  box.style.display='block';
+  box.style.background='rgba(34,197,94,0.15)';
+  box.style.border='1px solid #22c55e';
+  box.style.color='#22c55e';
+  box.innerHTML=t.copiedMsg;
+}
+
+window.copyFinalAmount = function(){
+  const resEl = document.getElementById('calc-result');
+  if(!resEl) return;
+  const amountOnly = resEl.innerText.replace(' USDT', '').trim();
+  if(!amountOnly || amountOnly === '0.00') return;
+
+  navigator.clipboard.writeText(amountOnly);
+
+  const btn = document.getElementById('copy-final-btn');
+  if(btn){
+    const origHTML = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-check" style="color:#22c55e;"></i>';
+    setTimeout(() => {
+      btn.innerHTML = origHTML;
+    }, 1500);
+  }
+};
+
+window.openHelpModal = () => document.getElementById('m-help')?.classList.add('show');
+window.closeHelpModal = () => document.getElementById('m-help')?.classList.remove('show');
+window.openMessageModal = () => document.getElementById('m-msg')?.classList.add('show');
+window.closeMessageModal = () => document.getElementById('m-msg')?.classList.remove('show');
+window.openAboutModal = () => document.getElementById('m-about')?.classList.add('show');
+window.closeAboutModal = () => document.getElementById('m-about')?.classList.remove('show');
+
+document.getElementById('help-btn')?.addEventListener('click', e => { e.stopPropagation(); window.openHelpModal(); });
+document.getElementById('bell-btn')?.addEventListener('click', e => { e.stopPropagation(); window.openMessageModal(); });
+
+const mB=document.getElementById('menu-btn'),nM=document.getElementById('nav-menu'),lB=document.getElementById('lang-btn'),lMenu=document.getElementById('lang-menu');
+document.querySelectorAll('#lang-menu .mi').forEach(el=>{el.onclick=(e)=>{e.stopPropagation();setLang(el.dataset.lang);lMenu.classList.remove('show');};});
+function tM(o,e){e.stopPropagation();[nM,lMenu].forEach(m=>{if(m!==o)m.classList.remove('show');});o.classList.toggle('show');}
+if(mB)mB.onclick=(e)=>tM(nM,e);if(lB)lB.onclick=(e)=>tM(lMenu,e);
+document.onclick=()=>{[nM,lMenu].forEach(m=>m.classList.remove('show'));};document.querySelectorAll('.menu').forEach(m=>m.onclick=(e)=>e.stopPropagation());
+</script>
+
+<script async type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import{getFirestore,doc,setDoc,collection,onSnapshot}from"https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const app=initializeApp({apiKey:"AIzaSyAqIksPfjCCQZNQDVx3MEdDyJyNMaTvtlk",authDomain:"zenix-platform.firebaseapp.com",projectId:"zenix-platform",storageBucket:"zenix-platform.firebasestorage.app",messagingSenderId:"594936010622",appId:"1:594936010622:web:9f4159c80111245062052f",measurementId:"G-LXSGYB8WKM"}),auth=getAuth(app),db=getFirestore(app);
+
+let timerInterval = null;
+
+function startTimer(startTimeISO) {
+  if (timerInterval) clearInterval(timerInterval);
+  const startTime = new Date(startTimeISO).getTime();
+  
+  function update() {
+    const now = new Date().getTime();
+    const diff = Math.max(0, Math.floor((now - startTime) / 1000));
+    const mins = String(Math.floor(diff / 60)).padStart(2, '0');
+    const secs = String(diff % 60).padStart(2, '0');
+    
+    const timerEl = document.getElementById('timer-display');
+    if (timerEl) {
+      timerEl.textContent = `${mins}:${secs}`;
+    }
+  }
+  update();
+  timerInterval = setInterval(update, 1000);
+}
+
+function stopTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+
+function showMsg(text, isErr, showTimer = false) {
+  const box = document.getElementById('status-box');
+  box.style.display = 'block';
+  box.style.background = isErr ? 'rgba(239,68,68,0.15)' : 'rgba(34,197,94,0.15)';
+  box.style.border = isErr ? '1px solid #ef4444' : '1px solid #22c55e';
+  box.style.color = isErr ? '#ef4444' : '#22c55e';
+  
+  if (showTimer) {
+    box.innerHTML = `<div>${text}</div><div style="margin-top:8px;font-size:12px;color:#38bdf8;font-weight:bold;background:rgba(15,23,42,0.6);padding:6px 12px;border-radius:6px;display:inline-block;border:1px solid rgba(56,189,248,0.3);"><i class="fas fa-stopwatch" style="color:#fbbf24;"></i> زمان سپری‌شده: <span id="timer-display" style="font-family:monospace;font-size:14px;color:#fbbf24;margin-right:4px;">00:00</span></div>`;
+  } else {
+    box.innerHTML = text;
+  }
+}
+
+window.checkAutoDeposit=async function(){
+  const t=window.currentLangData||LD.fa;
+  const user=auth.currentUser;
+  if(!user){
+    showMsg(t.loginErr,true);
+    return;
+  }
+  const calcVal=parseFloat(document.getElementById('calc-input').value)||0;
+  const txVal=document.getElementById('tx-hash-input').value.trim();
+  if(calcVal<=0 || !txVal){
+    showMsg(t.fillReqErr,true);
+    return;
+  }
+
+  const inquiryBtn=document.getElementById('inquiry-btn');
+  inquiryBtn.disabled=true;
+  inquiryBtn.style.background='#475569';
+  inquiryBtn.style.cursor='not-allowed';
+  inquiryBtn.innerHTML='<i class="fas fa-spinner fa-spin"></i> در حال ثبت درخواست...';
+
+  const nowISO = new Date().toISOString();
+
+  try{
+    const amountWithFee=calcVal*1.025;
+    await setDoc(doc(db,"users",user.uid),{
+      pendingDeposit:{
+        rawAmount:calcVal,
+        amount:amountWithFee,
+        network:window.currentNetwork||'TRC20',
+        txHash:txVal,
+        status:'pending',
+        createdAt:nowISO
+      }
+    },{merge:true});
+
+    showMsg(t.pendingSentMsg, false, true);
+    startTimer(nowISO);
+
+    const calcInput = document.getElementById('calc-input');
+    const txInput = document.getElementById('tx-hash-input');
+    if(calcInput) calcInput.readOnly = true;
+    if(txInput) txInput.readOnly = true;
+
+  }catch(err){
+    console.error("Deposit error:",err);
+    showMsg("❌ خطا در ثبت درخواست واریز: "+err.message,true);
+    inquiryBtn.disabled=false;
+    inquiryBtn.style.background='#22c55e';
+    inquiryBtn.style.cursor='pointer';
+    inquiryBtn.innerHTML='<i class="fas fa-sync-alt"></i> <span>'+(t.inquiryBtn||'استعلام و واریزی')+'</span>';
+  }
+};
+
+window.cachedNotifications = [];
+window.activeNotifFilter = 'all';
+
+window.setNotifFilter = function(filter, btnElement) {
+  window.activeNotifFilter = filter;
+  document.querySelectorAll('.notif-tab').forEach(t => t.classList.remove('active'));
+  if(btnElement) btnElement.classList.add('active');
+  window.renderNotifications();
+};
+
+window.getNotifCategory = function(n) {
+  const type = (n.type || '').toLowerCase();
+  const title = (n.title || '').toLowerCase();
+
+  if (type.includes('approved') || type.includes('confirm') || title.includes('تایید') || title.includes('موفق') || title.includes('شارژ شد')) {
+    return 'approved';
+  }
+  if (type.includes('rejected') || type.includes('canceled') || type.includes('cancel') || title.includes('رد') || title.includes('لغو') || title.includes('ناموفق')) {
+    return 'rejected';
+  }
+  return 'admin_message';
+};
+
+window.renderNotifications = function() {
+  const container = document.getElementById('modal-msg-container');
+  if (!container) return;
+
+  const filter = window.activeNotifFilter;
+  const filtered = window.cachedNotifications.filter(n => {
+    if (filter === 'all') return true;
+    return window.getNotifCategory(n) === filter;
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div style="text-align:center;padding:25px;color:#94a3b8;font-size:12px;"><i class="fas fa-inbox" style="font-size:24px;margin-bottom:8px;display:block;opacity:0.5;"></i>هیچ پیامی در این دسته‌‌بندی وجود ندارد.</div>`;
+    return;
+  }
+
+  let html = '';
+  filtered.forEach(n => {
+    const title = n.title || 'پیام سیستم';
+    const msg = n.message || n.text || '';
+    const category = window.getNotifCategory(n);
+
+    let borderStyle = "border:1px solid rgba(255,255,255,.08);";
+    let bgStyle = "background:rgba(255,255,255,.03);";
+    let icon = '<i class="fas fa-bullhorn" style="color:#38bdf8"></i>';
+    let tagHtml = '<span style="font-size:10px;background:rgba(56,189,248,0.2);color:#38bdf8;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">پیام مدیریت</span>';
+    let supportBtn = '';
+
+    if (category === 'approved') {
+      borderStyle = "border:1px solid rgba(34, 197, 94, 0.4);";
+      bgStyle = "background:rgba(34, 197, 94, 0.08);";
+      icon = '<i class="fas fa-check-circle" style="color:#22c55e"></i>';
+      tagHtml = '<span style="font-size:10px;background:rgba(34,197,94,0.2);color:#22c55e;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">تایید درخواست</span>';
+    } else if (category === 'rejected') {
+      borderStyle = "border:1px solid rgba(239, 68, 68, 0.4);";
+      bgStyle = "background:rgba(239, 68, 68, 0.08);";
+      icon = '<i class="fas fa-times-circle" style="color:#ef4444"></i>';
+      tagHtml = '<span style="font-size:10px;background:rgba(239,68,68,0.2);color:#ef4444;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">لغو درخواست</span>';
+      
+      supportBtn = `
+        <div style="margin-top:10px;padding-top:8px;border-top:1px dashed rgba(239,68,68,0.2);display:flex;justify-content:flex-end;">
+          <a href="support.html" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);" style="display:inline-flex;align-items:center;gap:6px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f8fafc;padding:5px 10px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:600;transition:0.2s;">
+            <i class="fas fa-headset" style="color:#ef4444;"></i>
+            <span>پیگیری از طریق پشتیبانی</span>
+          </a>
+        </div>
+      `;
+    }
+
+    html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle}">
+      <div class="msg-title-text" style="display:flex;align-items:center;gap:8px;">
+        ${icon}
+        <span>${title}</span>
+        ${tagHtml}
+      </div>
+      <div class="msg-desc-text" style="margin-top:6px;">${msg}</div>
+      ${supportBtn}
+    </div>`;
+  });
+
+  container.innerHTML = html;
+};
+
+onAuthStateChanged(auth,user=>{
+  if(!user){
+    window.location.href='index.html';
+    return;
+  }
+
+  onSnapshot(doc(db, "users", user.uid), (snapshot) => {
+    if (snapshot.exists()) {
+      const data = snapshot.data();
+      const calcInput = document.getElementById('calc-input');
+      const txInput = document.getElementById('tx-hash-input');
+      const inquiryBtn = document.getElementById('inquiry-btn');
+
+      if (data.pendingDeposit && data.pendingDeposit.status === 'pending') {
+        const t = window.currentLangData || LD.fa;
+        showMsg(t.pendingSentMsg || '⏳ درخواست واریز شما ثبت شده و در حال بررسی توسط مدیریت می‌باشد.', false, true);
+        startTimer(data.pendingDeposit.createdAt);
+        
+        if (calcInput && txInput) {
+          calcInput.value = data.pendingDeposit.rawAmount || '';
+          txInput.value = data.pendingDeposit.txHash || '';
+          calcInput.readOnly = true;
+          txInput.readOnly = true;
+          
+          const val = parseFloat(data.pendingDeposit.rawAmount) || 0;
+          document.getElementById('calc-result').innerText = (val * 1.025).toFixed(2) + ' USDT';
+          
+          const walletInput = document.getElementById('wallet-address');
+          const copyBtn = document.getElementById('copy-btn');
+          const copyWarning = document.getElementById('copy-warning');
+          if (walletInput && copyBtn) {
+            walletInput.value = wallets[window.currentNetwork];
+            copyBtn.disabled = false;
+            copyBtn.style.background = '#38bdf8';
+            copyBtn.style.color = '#0f172a';
+            copyBtn.style.cursor = 'pointer';
+            if (copyWarning) copyWarning.style.display = 'none';
+          }
+        }
+
+        if (inquiryBtn) {
+          inquiryBtn.disabled = true;
+          inquiryBtn.style.background = '#475569';
+          inquiryBtn.style.cursor = 'not-allowed';
+          inquiryBtn.innerHTML = '<i class="fas fa-hourglass-half"></i> درخواست در حال بررسی...';
+        }
+      } else {
+        stopTimer();
+        if (calcInput && calcInput.readOnly) {
+          calcInput.readOnly = false;
+          txInput.readOnly = false;
+          calcInput.value = '';
+          txInput.value = '';
+          document.getElementById('calc-result').innerText = '0.00 USDT';
+          
+          const box = document.getElementById('status-box');
+          if (box) box.style.display = 'none';
+
+          if (inquiryBtn) {
+            inquiryBtn.disabled = true;
+            inquiryBtn.style.background = '#475569';
+            inquiryBtn.style.cursor = 'not-allowed';
+            const t = window.currentLangData || LD.fa;
+            inquiryBtn.innerHTML = '<i class="fas fa-sync-alt"></i> <span>' + (t.inquiryBtn || 'استعلام و واریزی') + '</span>';
+          }
+
+          const walletInput = document.getElementById('wallet-address');
+          const copyBtn = document.getElementById('copy-btn');
+          const copyWarning = document.getElementById('copy-warning');
+          if (walletInput && copyBtn) {
+            walletInput.value = '';
+            copyBtn.disabled = true;
+            copyBtn.style.background = '#475569';
+            copyBtn.style.color = '#94a3b8';
+            copyBtn.style.cursor = 'not-allowed';
+            if (copyWarning) copyWarning.style.display = 'block';
+          }
+        }
+      }
+    }
+  });
+
+  onSnapshot(collection(db,`users/${user.uid}/notifications`),(snapshot)=>{
+    const badge=document.getElementById('bell-badge');
+    if(snapshot.empty){
+      window.cachedNotifications = [];
+      window.renderNotifications();
+      if(badge){ badge.innerText='0'; badge.classList.remove('show'); }
+      return;
+    }
+    
+    let list = [];
+    let unreadCount = 0;
+    snapshot.forEach(docSnap=>{
+      const n = docSnap.data();
+      list.push(n);
+      if(!n.read && !n.isRead) unreadCount++;
+    });
+
+    window.cachedNotifications = list;
+    window.renderNotifications();
+
+    if(badge){
+      badge.innerText = unreadCount;
+      if(unreadCount > 0) badge.classList.add('show');
+      else badge.classList.remove('show');
+    }
+  });
+});
+
+document.getElementById('logout-btn')?.addEventListener('click',async(e)=>{
+  e.preventDefault();
+  await signOut(auth);
+  window.location.href='index.html';
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Zenix Platform - Login</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>(function(){var s=localStorage.getItem('zenix_lang')||'en',r=['fa','ar'];document.documentElement.setAttribute('dir',r.includes(s)?'rtl':'ltr');document.documentElement.setAttribute('lang',s);})();</script>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;font-family:'Vazirmatn',system-ui,sans-serif}body{background:#030712;min-height:100vh;display:flex;justify-content:center;align-items:center;color:#f8fafc;padding:15px;position:relative;overflow-x:hidden}.glow-1,.glow-2{position:absolute;border-radius:50%;filter:blur(80px);opacity:.35;pointer-events:none;z-index:1}.glow-1{width:250px;height:250px;background:#0ea5e9;top:10%;left:10%}.glow-2{width:250px;height:250px;background:#a855f7;bottom:10%;right:10%}.auth-card{width:100%;max-width:400px;background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:24px 22px;box-shadow:0 20px 50px rgba(0,0,0,.7);position:relative;z-index:10;backdrop-filter:blur(10px);opacity:0;transition:opacity .2s ease-in-out}.auth-card.ready{opacity:1}.header-actions{position:relative;z-index:20;display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-bottom:12px}.wrap{position:relative}.lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none;transition:.2s}.lb:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.3)}.menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;width:max-content;padding:5px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8)}[dir="rtl"] .wrap .menu{left:0}[dir="ltr"] .wrap .menu{right:0}.menu.show{display:block!important}.mi{padding:6px 12px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap;transition:.2s}.mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}.logo{text-align:center;margin-bottom:20px}.logo-header{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;margin-bottom:8px}.logo-icon{width:46px;height:46px;background:linear-gradient(135deg,#0ea5e9,#9333ea);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:24px;font-weight:900;font-style:italic;transform:skewX(-6deg);box-shadow:0 0 18px rgba(14,165,233,.45)}.logo-text{font-family:'Orbitron',sans-serif;font-size:26px;font-weight:900;letter-spacing:3px;font-style:italic;transform:skewX(-6deg);background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 20px rgba(56,189,248,.4)}.logo p{color:#94a3b8;font-size:12px;margin-top:4px}.group{margin-bottom:14px}.group label{display:block;margin-bottom:6px;font-size:12px;color:#cbd5e1}.req{color:#ef4444;font-weight:700;margin-inline-start:3px}.wrap-input{position:relative;display:flex;align-items:center}.wrap-input i.f-icon{position:absolute;color:#64748b;font-size:14px;z-index:2}html[dir="rtl"] .wrap-input i.f-icon{right:14px}html[dir="ltr"] .wrap-input i.f-icon{left:14px}.eye-btn{position:absolute;background:none;border:none;color:#64748b;cursor:pointer;font-size:14px;padding:4px;z-index:2}html[dir="rtl"] .eye-btn{left:12px}html[dir="ltr"] .eye-btn{right:12px}.group input{width:100%;padding:12px 14px;background:rgba(10,15,30,.7)!important;border:1px solid rgba(255,255,255,.1);border-radius:12px;color:#fff!important;font-size:13px;outline:0;-webkit-text-fill-color:#fff!important;transition:background-color 5000s ease-in-out 0s}html[dir="rtl"] .group input{padding-right:40px;padding-left:40px}html[dir="ltr"] .group input{padding-left:40px;padding-right:40px}.group input:-webkit-autofill,.group input:-webkit-autofill:hover,.group input:-webkit-autofill:focus,.group input:-webkit-autofill:active{-webkit-box-shadow:0 0 0 30px rgba(10,15,30,.95) inset!important;-webkit-text-fill-color:#fff!important;caret-color:#fff}.group input:focus{border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.2)}.cap-box{background:rgba(10,15,30,.5);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;margin-bottom:14px}.cap-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px}#c-canvas{border-radius:12px;background:#050811;border:1px solid rgba(56,189,248,.3);cursor:pointer;box-shadow:0 6px 25px rgba(0,0,0,.7),inset 0 0 15px rgba(56,189,248,.05)}.ref-btn{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.4);border-radius:10px;color:#38bdf8;width:42px;height:42px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}.ref-btn:hover{background:rgba(56,189,248,.25);transform:rotate(180deg)}.cap-input{text-align:center;letter-spacing:normal;font-weight:400;font-size:13px!important;padding:8px!important;font-family:'Vazirmatn',system-ui,sans-serif!important}.extra-links{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;font-size:11px}.extra-links a{color:#38bdf8;text-decoration:none}.extra-links a:hover{text-decoration:underline}.btn{width:100%;padding:12px;background:linear-gradient(135deg,#0284c7,#9333ea);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;transition:all .3s ease}.btn:disabled{background:rgba(255,255,255,.1);color:#64748b;cursor:not-allowed;box-shadow:none}.footer{text-align:center;margin-top:16px;font-size:12px;color:#94a3b8}.footer a{color:#38bdf8;text-decoration:none;font-weight:700}#msg{margin-top:12px;font-size:12px;text-align:center;font-weight:500;padding:12px;border-radius:12px;display:none}#msg.show{display:block}.err{color:#f87171;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3)}.succ{color:#4ade80;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3)}
+    </style>
+</head>
+<body>
+    <div class="glow-1"></div>
+    <div class="glow-2"></div>
+    <div class="auth-card" id="auth-card">
+        <div class="header-actions">
+            <a href="support.html" onclick="window.location.href='support.html';return false;" class="lb" id="btn-support"><i class="fas fa-headset" style="color:#a855f7"></i></a>
+            <div class="wrap">
+                <button type="button" class="lb" id="lang-btn"><i class="fas fa-globe" style="color:#22c55e"></i></button>
+                <div class="menu" id="lang-menu">
+                    <div class="mi" data-lang="en">English</div>
+                    <div class="mi" data-lang="fa">فارسی</div>
+                    <div class="mi" data-lang="ar">العربية</div>
+                    <div class="mi" data-lang="tr">Türkçe</div>
+                    <div class="mi" data-lang="ru">Русский</div>
+                    <div class="mi" data-lang="es">Español</div>
+                    <div class="mi" data-lang="fr">Français</div>
+                    <div class="mi" data-lang="de">Deutsch</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="logo">
+            <div class="logo-header">
+                <div class="logo-icon">Z</div>
+                <div class="logo-text">ZENIX</div>
+            </div>
+            <p id="t-wel"></p>
+        </div>
+
+        <form id="form" novalidate>
+            <div class="group">
+                <label id="l-user"><i class="fas fa-envelope"></i> <span id="txt-user"></span> <span class="req">*</span></label>
+                <div class="wrap-input">
+                    <i class="fas fa-envelope f-icon"></i>
+                    <input type="email" id="user" autocomplete="email" required>
+                </div>
+            </div>
+            <div class="group">
+                <label id="l-pass"><i class="fas fa-lock"></i> <span id="txt-pass"></span> <span class="req">*</span></label>
+                <div class="wrap-input">
+                    <i class="fas fa-key f-icon"></i>
+                    <input type="password" id="pass" autocomplete="current-password" required>
+                    <button type="button" class="eye-btn" onclick="togglePassword('pass',this)"><i class="fas fa-eye"></i></button>
+                </div>
+            </div>
+            <div class="group">
+                <label id="l-cap"><i class="fas fa-shield-alt"></i> <span id="txt-cap"></span> <span class="req">*</span></label>
+                <div class="cap-box">
+                    <div class="cap-row">
+                        <canvas id="c-canvas" width="165" height="44"></canvas>
+                        <button type="button" class="ref-btn" id="ref-btn"><i class="fas fa-sync-alt"></i></button>
+                    </div>
+                    <input type="text" id="cap-in" class="cap-input" maxlength="5" autocomplete="off" required>
+                </div>
+            </div>
+
+            <div class="extra-links">
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:#cbd5e1;">
+                    <input type="checkbox" id="remember-me" checked style="accent-color:#38bdf8;cursor:pointer;">
+                    <span id="t-remember"></span>
+                </label>
+                <a href="forgot-password.html" id="t-forgot"></a>
+            </div>
+
+            <button type="submit" id="t-btn" class="btn" disabled></button>
+        </form>
+
+        <div id="msg"></div>
+
+        <div class="footer">
+            <p id="t-foot"></p>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword(id,btn){
+            const input=document.getElementById(id);
+            if(input.type==='password'){input.type='text';btn.innerHTML='<i class="fas fa-eye-slash"></i>';}
+            else{input.type='password';btn.innerHTML='<i class="fas fa-eye"></i>';}
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, setPersistence, browserLocalPersistence, browserSessionPersistence, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const app = initializeApp({
+            apiKey: "AIzaSyAqIksPfjCCQZNQDVx3MEdDyJyNMaTvtlk",
+            authDomain: "zenix-platform.firebaseapp.com",
+            projectId: "zenix-platform",
+            storageBucket: "zenix-platform.firebasestorage.app",
+            messagingSenderId: "594936010622",
+            appId: "1:594936010622:web:9f4159c80111245062052f",
+            measurementId: "G-LXSGYB8WKM"
+        });
+
+        const auth = getAuth(app), db = getFirestore(app);
+
+        const langData = {
+            en:{dir:'ltr',wel:'Login to Your Account',user:'Email',userP:'Email address',pass:'Password',passP:'Password',cap:'Security Code',capP:'Enter code',forgot:'Forgot password?',remember:'Remember me',btn:'Login',noAcc:"Don't have an account?",reg:'Register',supTitle:'Support',langTitle:'Change Language',errCap:'Invalid security code!',errNoUser:'Invalid credentials or account does not exist.',errTooMany:'Too many failed attempts. Account temporarily locked.',errDisabled:'Your account has been disabled by administrator.',errNet:'Please check your internet connection!',succ:'Successfully logged in! Redirecting...'},
+            fa:{dir:'rtl',wel:'ورود به حساب کاربری',user:'ایمیل',userP:'آدرس ایمیل',pass:'رمز عبور',passP:'رمز عبور',cap:'کد امنیتی',capP:'کد را وارد کنید',forgot:'فراموشی رمز عبور؟',remember:'مرا به خاطر بسپار',btn:'ورود به حساب',noAcc:'حساب کاربری ندارید؟',reg:'ثبت‌نام کنید',supTitle:'پشتیبانی',langTitle:'تغییر زبان',errCap:'کد امنیتی وارد شده نادرست است!',errNoUser:'اطلاعات ورود نادرست است یا حساب کاربری وجود ندارد.',errTooMany:'به دلیل تلاش‌های ناموفق متعدد، حساب شما موقتاً قفل شده است.',errDisabled:'حساب کاربری شما توسط مدیریت مسدود شده است.',errNet:'اتصال اینترنت خود را بررسی کنید!',succ:'با موفقیت وارد شدید! در حال انتقال...'},
+            ar:{dir:'rtl',wel:'تسجيل الدخول إلى حسابك',user:'البريد الإلكتروني',userP:'عنوان البريد الإلكتروني',pass:'كلمة المرور',passP:'كلمة المرور',cap:'رمز التحقق',capP:'أدخل الرمز',forgot:'نسيت كلمة المرور؟',remember:'تذكرني',btn:'تسجيل الدخول',noAcc:'ليس لديك حساب؟',reg:'سجل الآن',supTitle:'الدعم الفني',langTitle:'تغيير اللغة',errCap:'رمز التحقق غير صحيح!',errNoUser:'بيانات الدخول غير صحيحة أو الحساب غير موجود.',errTooMany:'محاولات كثيرة خاطئة. تم قفل الحساب مؤقتاً.',errDisabled:'تم تعطيل حسابك من قبل الإدارة.',errNet:'يرجى التحقق من اتصالك بالإنترنت!',succ:'تم تسجيل الدخول بنجاح! جاري التوجيه...'},
+            tr:{dir:'ltr',wel:'Hesabınıza Giriş Yapın',user:'E-posta',userP:'E-posta adresi',pass:'Şifre',passP:'Şifre',cap:'Güvenlik Kodu',capP:'Kodu girin',forgot:'Şifrenizi mi unuttunuz?',remember:'Beni hatırla',btn:'Giriş Yap',noAcc:'Hesabınız yok mu?',reg:'Kayıt Olun',supTitle:'Destek',langTitle:'Dil Değiştir',errCap:'Geçersiz güvenlik kodu!',errNoUser:'Hatalı e-posta/şifre veya hesap bulunamadı.',errTooMany:'Çok fazla hatalı deneme. Hesap geçici olarak kilitlendi.',errDisabled:'Hesabınız yönetici tarafından askıya alındı.',errNet:'Lütfen internet bağlantınızı kontrol edin!',succ:'Giriş başarılı! Yönlendiriliyorsunuz...'},
+            ru:{dir:'ltr',wel:'Вход в аккаунт',user:'Email',userP:'Адрес Email',pass:'Пароль',passP:'Пароль',cap:'Защитный код',capP:'Введите код',forgot:'Забыли пароль?',remember:'Запомнить меня',btn:'Войти',noAcc:'Нет аккаунта?',reg:'Зарегистрироваться',supTitle:'Поддержка',langTitle:'Сменить язык',errCap:'Неверный защитный код!',errNoUser:'Неверные данные для входа или аккаунт не существует.',errTooMany:'Слишком много неудачных попыток. Аккаунт заблокирован.',errDisabled:'Ваш аккаунт заблокирован администратором.',errNet:'Пожалуйста, проверьте интернет-соединение!',succ:'Успешный вход! Перенаправление...'},
+            es:{dir:'ltr',wel:'Iniciar sesión en su cuenta',user:'Correo electrónico',userP:'Dirección de correo',pass:'Contraseña',passP:'Contraseña',cap:'Código de seguridad',capP:'Ingrese el código',forgot:'¿Olvidaste tu contraseña?',remember:'Recordarme',btn:'Iniciar sesión',noAcc:'¿No tienes una cuenta?',reg:'Regístrate',supTitle:'Soporte',langTitle:'Cambiar idioma',errCap:'¡Código de seguridad inválido!',errNoUser:'Credenciales inválidas o cuenta inexistente.',errTooMany:'Demasiados intentos fallidos. Cuenta bloqueada temporalmente.',errDisabled:'Su cuenta ha sido deshabilitada por el administrador.',errNet:'¡Por favor verifique su conexión a internet!',succ:'¡Inicio de sesión exitoso! Redirigiendo...'},
+            fr:{dir:'ltr',wel:'Connexion à votre compte',user:'E-mail',userP:'Adresse e-mail',pass:'Mot de passe',passP:'Mot de passe',cap:'Code de sécurité',capP:'Entrez le code',forgot:'Mot de passe oublié ?',remember:'Se souvenir de moi',btn:'Se connecter',noAcc:"Vous n'avez pas de compte ?",reg:'Inscrivez-vous',supTitle:'Support',langTitle:'Changer de langue',errCap:'Code de sécurité invalide !',errNoUser:'Identifiants invalides ou compte inexistant.',errTooMany:'Trop de tentatives échouées. Compte verrouillé.',errDisabled:'Votre compte a été désactivé par l\'administrateur.',errNet:'Veuillez vérifier votre connexion Internet !',succ:'Connexion réussie ! Redirection...'},
+            de:{dir:'ltr',wel:'Anmeldung bei Ihrem Konto',user:'E-Mail',userP:'E-Mail-Adresse',pass:'Passwort',passP:'Passwort',cap:'Sicherheitscode',capP:'Code eingeben',forgot:'Passwort vergessen?',remember:'Angemeldet bleiben',btn:'Anmelden',noAcc:'Noch kein Konto?',reg:'Registrieren',supTitle:'Support',langTitle:'Sprache ändern',errCap:'Ungültiger Sicherheitscode!',errNoUser:'Ungültige Anmeldedaten oder Konto existiert nicht.',errTooMany:'Zu viele fehlgeschlagene Versuche. Konto temporär gesperrt.',errDisabled:'Ihr Konto wurde vom Administrator deaktiviert.',errNet:'Bitte überprüfen Sie Ihre Internetverbindung!',succ:'Erfolgreich angemeldet! Weiterleitung...'}
+        };
+
+        let currentLang = localStorage.getItem('zenix_lang') || 'en', code = '';
+        const langBtn = document.getElementById('lang-btn'), langMenu = document.getElementById('lang-menu'), cv = document.getElementById('c-canvas'), capIn = document.getElementById('cap-in'), userIn = document.getElementById('user'), passIn = document.getElementById('pass'), submitBtn = document.getElementById('t-btn'), msg = document.getElementById('msg'), form = document.getElementById('form'), authCard = document.getElementById('auth-card');
+
+        onAuthStateChanged(auth, u => { if (u) window.location.replace('dashboard.html'); });
+        langBtn?.addEventListener('click', e => { e.stopPropagation(); langMenu?.classList.toggle('show'); });
+        document.addEventListener('click', e => { if (!e.target.closest('.menu') && !e.target.closest('#lang-btn')) langMenu?.classList.remove('show'); });
+
+        function setLang(l) {
+            currentLang = l; localStorage.setItem('zenix_lang', l); langMenu?.classList.remove('show');
+            const t = langData[l] || langData.en;
+            document.documentElement.setAttribute('dir', t.dir); document.documentElement.setAttribute('lang', l);
+            document.getElementById('t-wel').textContent = t.wel; document.getElementById('txt-user').textContent = t.user; userIn.placeholder = t.userP; document.getElementById('txt-pass').textContent = t.pass; passIn.placeholder = t.passP; document.getElementById('txt-cap').textContent = t.cap; capIn.placeholder = t.capP; document.getElementById('t-remember').textContent = t.remember; document.getElementById('t-forgot').textContent = t.forgot; submitBtn.textContent = t.btn; document.getElementById('t-foot').innerHTML = `${t.noAcc} <a href="register.html">${t.reg}</a>`;
+            document.getElementById('btn-support').setAttribute('title', t.supTitle); langBtn.setAttribute('title', t.langTitle);
+            document.querySelectorAll('#lang-menu .mi').forEach(i => i.classList.toggle('active', i.dataset.lang === l));
+            authCard.classList.add('ready');
+        }
+
+        document.querySelectorAll('#lang-menu .mi').forEach(i => i.addEventListener('click', () => { setLang(i.dataset.lang); clearError(); }));
+        function clearError() { if (msg) { msg.innerHTML = ''; msg.className = ''; } }
+        function checkInputs() { submitBtn.disabled = !(userIn.value.trim().length > 0 && passIn.value.trim().length >= 6 && capIn.value.trim().length === 5); }
+
+        userIn.addEventListener('focus', clearError); userIn.addEventListener('input', () => { clearError(); checkInputs(); });
+        passIn.addEventListener('focus', clearError); passIn.addEventListener('input', checkInputs);
+        capIn.addEventListener('focus', clearError); capIn.addEventListener('input', checkInputs);
+
+        function drawCap() {
+            if (!cv) return;
+            const ctx = cv.getContext('2d'), w = cv.width, h = cv.height;
+            code = '';
+            const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+            for (let i = 0; i < 5; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+
+            ctx.clearRect(0, 0, w, h);
+            const bgGrad = ctx.createLinearGradient(0, 0, w, h);
+            bgGrad.addColorStop(0, '#030712'); bgGrad.addColorStop(0.5, '#0b1329'); bgGrad.addColorStop(1, '#02050e');
+            ctx.fillStyle = bgGrad; ctx.fillRect(0, 0, w, h);
+
+            ctx.strokeStyle = 'rgba(56,189,248,0.12)'; ctx.lineWidth = 1;
+            for (let i = 0; i < 2; i++) {
+                ctx.beginPath(); ctx.moveTo(Math.random() * w, Math.random() * h);
+                ctx.lineTo(Math.random() * w, Math.random() * h); ctx.stroke();
+            }
+
+            const neonColors = ['#38bdf8', '#c084fc', '#34d399', '#f43f5e', '#fbbf24'];
+            const cw = w / 5;
+
+            for (let i = 0; i < 5; i++) {
+                const x = i * cw + cw / 2, y = h / 2 + (Math.random() - 0.5) * 4, color = neonColors[i % neonColors.length];
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate((Math.random() - 0.5) * 0.2);
+
+                ctx.font = '700 24px "Vazirmatn", system-ui, sans-serif';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.shadowColor = color; ctx.shadowBlur = 4;
+                ctx.strokeStyle = '#020617'; ctx.lineWidth = 2;
+                ctx.strokeText(code[i], 0, 0);
+                ctx.fillStyle = color;
+                ctx.fillText(code[i], 0, 0);
+                ctx.restore();
+            }
+        }
+
+        function showError(errKey, resetCaptcha = true) {
+            const t = langData[currentLang] || langData.en;
+            msg.innerHTML = `<div>${t[errKey] || errKey}</div>`; msg.className = 'err show';
+            if (resetCaptcha) { capIn.value = ''; drawCap(); }
+            checkInputs();
+        }
+
+        document.getElementById('ref-btn').addEventListener('click', () => { capIn.value = ''; drawCap(); checkInputs(); });
+        cv.addEventListener('click', () => { drawCap(); checkInputs(); });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (capIn.value.toUpperCase() !== code) return showError('errCap', true);
+            submitBtn.disabled = true;
+            const remember = document.getElementById('remember-me')?.checked;
+            try {
+                await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+                const u = (await signInWithEmailAndPassword(auth, userIn.value.trim(), passIn.value.trim())).user;
+                await setDoc(doc(db, "users", u.uid), { uid: u.uid, email: u.email, lastLogin: serverTimestamp() }, { merge: true });
+                const t = langData[currentLang] || langData.en;
+                msg.innerHTML = `<div>${t.succ}</div>`; msg.className = 'succ show';
+                setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+            } catch (error) {
+                console.error('Error:', error.code);
+                if (['auth/wrong-password','auth/user-not-found','auth/invalid-credential'].includes(error.code)) showError('errNoUser', true);
+                else if (error.code === 'auth/too-many-requests') showError('errTooMany', true);
+                else if (error.code === 'auth/user-disabled') showError('errDisabled', true);
+                else if (!navigator.onLine || error.code === 'auth/network-request-failed') showError('errNet', true);
+                else showError('errNoUser', true);
+            }
+        });
+
+        window.addEventListener('pageshow', () => { clearError(); drawCap(); checkInputs(); });
+        setLang(currentLang); drawCap();
+    </script>
+</body>
+</html>

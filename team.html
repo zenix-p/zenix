@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Zenix - تیم من</title>
+    <!-- جلوگیری از خطای 404 Favicon -->
+    <link rel="icon" href="data:image/x-icon;base64,=">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
+        body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
+        header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1);padding:10px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+        .logo{display:flex;align-items:center;gap:10px}
+        .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#0ea5e9,#9333ea);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;font-style:italic;transform:skewX(-6deg);box-shadow:0 0 15px rgba(14,165,233,.4)}
+        .logo-text{font-family:'Orbitron',sans-serif;font-size:19px;font-weight:900;letter-spacing:2px;font-style:italic;transform:skewX(-6deg);background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 20px rgba(56,189,248,0.4)}
+        .hr{display:flex;align-items:center;gap:8px}
+        .wrap{position:relative}
+        .lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none}
+        .badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;font-weight:700}
+        .badge.show{display:flex}
+        .menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;min-width:170px;padding:6px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8)}
+        [dir="rtl"] .wrap .menu{left:0}
+        [dir="ltr"] .wrap .menu{right:0}
+        .menu.show{display:block}
+        .mi{padding:7px 10px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none}
+        .mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}
+        .c{max-width:900px;width:100%;margin:15px auto;padding:0 12px;flex:1}
+        .wel{background:linear-gradient(135deg,rgba(2,132,199,.15),rgba(147,51,234,.15));border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+        .wel h1{font-size:16px;margin-bottom:3px}
+        .wel p{color:#94a3b8;font-size:11px}
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
+        .modal.show{display:flex}
+        .modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(56,189,248,.3);border-radius:20px;width:100%;max-width:440px;max-height:85vh;display:flex;flex-direction:column;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.9)}
+        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;color:#38bdf8;font-weight:800;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px}
+        .modal-close{background:rgba(255,255,255,.05);border:none;color:#94a3b8;cursor:pointer;font-size:14px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+        .modal-close:hover{background:rgba(239,68,68,.2);color:#ef4444}
+        #modal-msg-container{overflow-y:auto;padding-right:4px}
+        .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px}
+        .msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:4px}
+        .msg-desc-text{font-size:12px;color:#cbd5e1;line-height:1.5}
+        footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo"><div class="logo-icon">Z</div><div class="logo-text">ZENIX</div></div>
+        <div class="hr">
+            <div class="wrap"><button type="button" class="lb" id="bell-btn"><i class="fas fa-bell" style="color:#fbbf24"></i><span class="badge" id="bell-badge">0</span></button></div>
+            <div class="wrap"><button type="button" class="lb" id="help-btn" title="راهنمای صفحه تیم"><i class="fas fa-circle-question" style="color:#38bdf8"></i></button></div>
+            <a href="support.html" class="lb"><i class="fas fa-headset" style="color:#a855f7"></i></a>
+            <div class="wrap">
+                <button type="button" class="lb" id="lang-btn"><i class="fas fa-globe" style="color:#22c55e"></i></button>
+                <div class="menu" id="lang-menu">
+                    <div class="mi" data-lang="fa">فارسی</div><div class="mi" data-lang="en">English</div><div class="mi" data-lang="ar">العربية</div><div class="mi" data-lang="tr">Türkçe</div><div class="mi" data-lang="ru">Русский</div><div class="mi" data-lang="es">Español</div><div class="mi" data-lang="fr">Français</div><div class="mi" data-lang="de">Deutsch</div>
+                </div>
+            </div>
+            <div class="wrap">
+                <button type="button" class="lb" id="menu-btn"><i class="fas fa-bars" style="color:#f43f5e"></i></button>
+                <div class="menu" id="nav-menu">
+                    <a href="dashboard.html" class="mi"><i class="fas fa-home" style="color:#38bdf8"></i><span id="m1">صفحه اصلی</span></a>
+                    <a href="quantification.html" class="mi"><i class="fas fa-robot" style="color:#a855f7"></i><span id="m2">کوانتیفیکیشن</span></a>
+                    <a href="deposit.html" class="mi"><i class="fas fa-arrow-down" style="color:#22c55e"></i><span id="m3">واریز</span></a>
+                    <a href="receive.html" class="mi"><i class="fas fa-arrow-up" style="color:#fbbf24"></i><span id="m4">برداشت</span></a>
+                    <a href="team.html" class="mi active"><i class="fas fa-users" style="color:#ec4899"></i><span id="m_team">تیم من</span></a>
+                    <a href="transactions.html" class="mi"><i class="fas fa-history" style="color:#06b6d4"></i><span id="m5">تراکنش</span></a>
+                    <a href="profile.html" class="mi"><i class="fas fa-user-cog" style="color:#ec4899"></i><span id="m6">پروفایل</span></a>
+                    <a href="support.html" class="mi"><i class="fas fa-headset" style="color:#a855f7"></i><span id="m7">پشتیبانی</span></a>
+                    <a href="#" class="mi" onclick="window.openAboutModal();return false;"><i class="fas fa-info-circle" style="color:#38bdf8"></i><span id="m_about">درباره پلتفرم</span></a>
+                    <a href="index.html" class="mi" id="logout-btn" style="color:#ef4444"><i class="fas fa-power-off"></i><span id="m8">خروج</span></a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="c">
+        <div class="wel">
+            <div><h1 id="t-team-title">مدیریت تیم و پاداش</h1><p id="t-team-sub">دعوت از دوستان و کسب درآمد دلاری</p></div>
+            <div style="font-size:12px;background:rgba(56,189,248,.1);border:1px solid #38bdf8;padding:6px 10px;border-radius:6px;color:#38bdf8;font-weight:600;"><i class="fas fa-chart-line"></i> <span id="t-reward-lbl">کل پاداش:</span> <span id="total-commission">0.00</span> USDT</div>
+        </div>
+        
+        <div style="background:rgba(30,41,59,0.8);border:1px solid rgba(56,189,248,0.3);border-radius:12px;padding:16px;margin-top:12px;">
+            <div id="status-box" style="display:none;padding:12px;border-radius:8px;font-size:12px;margin-bottom:12px;text-align:center;font-weight:600;"></div>
+            
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;text-align:center;">
+                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;"><div style="font-size:11px;color:#94a3b8;margin-bottom:4px;" id="t-c1">اعضای کل تیم</div><div style="font-size:16px;color:#38bdf8;font-weight:bold;" id="team-count">0</div></div>
+                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;"><div style="font-size:11px;color:#94a3b8;margin-bottom:4px;" id="t-c2">حجم معاملات تیم</div><div style="font-size:16px;color:#22c55e;font-weight:bold;" id="team-volume">0.00$</div></div>
+                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;"><div style="font-size:11px;color:#94a3b8;margin-bottom:4px;" id="t-c3">کمیسیون امروز</div><div style="font-size:16px;color:#eab308;font-weight:bold;" id="team-daily">0.00$</div></div>
+            </div>
+
+            <div style="font-size:14px;color:#38bdf8;font-weight:bold;margin-bottom:10px;" id="t-gen-title"><i class="fas fa-layer-group"></i> آمار نسل‌های تیم</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;font-size:12px;">
+                    <div><span style="color:#38bdf8;font-weight:bold;" id="t-l1-lbl">نسل ۱ (۱۰٪):</span> <span id="lvl1-count">0</span> نفر</div>
+                    <div style="display:flex;align-items:center;gap:10px;"><div style="color:#22c55e;font-weight:bold;" id="lvl1-comm">0.00 USDT</div><a href="team-members.html?level=1" style="background:rgba(56,189,248,0.15);border:1px solid #38bdf8;color:#38bdf8;padding:4px 10px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:bold;"><i class="fas fa-eye"></i> مشاهده</a></div>
+                </div>
+                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;font-size:12px;">
+                    <div><span style="color:#38bdf8;font-weight:bold;" id="t-l2-lbl">نسل ۲ (۷٪):</span> <span id="lvl2-count">0</span> نفر</div>
+                    <div style="display:flex;align-items:center;gap:10px;"><div style="color:#22c55e;font-weight:bold;" id="lvl2-comm">0.00 USDT</div><a href="team-members.html?level=2" style="background:rgba(56,189,248,0.15);border:1px solid #38bdf8;color:#38bdf8;padding:4px 10px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:bold;"><i class="fas fa-eye"></i> مشاهده</a></div>
+                </div>
+                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;font-size:12px;">
+                    <div><span style="color:#38bdf8;font-weight:bold;" id="t-l3-lbl">نسل ۳ (۳٪):</span> <span id="lvl3-count">0</span> نفر</div>
+                    <div style="display:flex;align-items:center;gap:10px;"><div style="color:#22c55e;font-weight:bold;" id="lvl3-comm">0.00 USDT</div><a href="team-members.html?level=3" style="background:rgba(56,189,248,0.15);border:1px solid #38bdf8;color:#38bdf8;padding:4px 10px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:bold;"><i class="fas fa-eye"></i> مشاهده</a></div>
+                </div>
+            </div>
+
+            <div style="font-size:14px;color:#38bdf8;font-weight:bold;margin-bottom:10px;" id="t-invite-lbl"><i class="fas fa-link"></i> لینک دعوت اختصاصی شما</div>
+            <div style="display:flex;background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:8px;overflow:hidden;margin-bottom:16px;">
+                <input type="text" id="invite-link" value="" readonly style="width:100%;background:transparent;border:none;color:#f8fafc;padding:12px;font-size:13px;outline:none;direction:ltr;text-align:left;">
+                <button type="button" onclick="copyInviteLink()" style="background:linear-gradient(135deg,#38bdf8,#0284c7);border:none;color:#fff;padding:0 18px;cursor:pointer;font-weight:bold;font-size:13px;display:flex;align-items:center;gap:6px;white-space:nowrap;"><i class="fas fa-clone"></i> <span id="t-btn-copy">کپی لینک</span></button>
+            </div>
+
+            <div style="background:rgba(30,41,59,0.5);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;font-size:11px;color:#94a3b8;line-height:1.6;">
+                <div style="color:#38bdf8;font-weight:bold;margin-bottom:6px;" id="t-rules-title"><i class="fas fa-info-circle"></i> قوانین کمیسیون تیم:</div>
+                <span id="t-rules-desc">* کمیسیون نسل ۱ معادل ۱۰٪، نسل ۲ معادل ۷٪ و نسل ۳ معادل ۳٪ از سود معاملات تیم است.<br>* پاداش‌ها به صورت روزانه و خودکار به موجودی حساب شما افزوده می‌شوند.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- مدال پیام‌ها -->
+    <div class="modal" id="m-msg">
+        <div class="modal-content">
+            <div class="modal-header"><span id="t-modal-title">صندوق پیام‌های مدیریت</span><button class="modal-close" onclick="window.closeMessageModal()"><i class="fas fa-times"></i></button></div>
+            <div id="modal-msg-container"><div style="text-align:center;padding:20px;color:#94a3b8">هیچ پیام جدیدی وجود ندارد.</div></div>
+        </div>
+    </div>
+
+    <!-- مدال درباره پلتفرم -->
+    <div class="modal" id="m-about">
+        <div class="modal-content">
+            <div class="modal-header"><span id="t-about-title">درباره پلتفرم Zenix (هدف، ماهیت و ساختار)</span><button class="modal-close" onclick="window.closeAboutModal()"><i class="fas fa-times"></i></button></div>
+            <div style="overflow-y:auto;padding-right:4px">
+                <p style="font-size:13px;color:#cbd5e1;line-height:1.7;margin-bottom:10px;" id="t-ab-m-desc">پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.</p>
+                <ul style="font-size:12px;color:#94a3b8;padding-right:18px;line-height:1.7;margin-bottom:0;">
+                    <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l1t">هدف اصلی:</strong> <span id="t-ab-m-l1d">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li>
+                    <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l2t">امنیت و زیرساخت:</strong> <span id="t-ab-m-l2d">متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Firebase).</span></li>
+                    <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l3t">ساختار چندسطحی (Referral & Team):</strong> <span id="t-ab-m-l3d">ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.</span></li>
+                    <li><strong style="color:#f8fafc;" id="t-ab-m-l4t">احساس واقع‌گرایی:</strong> <span id="t-ab-m-l4d">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- مدال راهنما -->
+    <div class="modal" id="m-help">
+        <div class="modal-content">
+            <div class="modal-header"><span id="t-help-title">راهنمای صفحه تیم</span><button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button></div>
+            <div style="overflow-y:auto;padding-right:4px">
+                <div class="msg-body-box">
+                    <div class="msg-title-text" id="t-hp-t1"><i class="fas fa-users" style="color:#ec4899"></i> کاربرد این صفحه (مدیریت تیم) چیست؟</div>
+                    <div class="msg-desc-text" id="t-hp-d1">از این صفحه می‌توانید لینک دعوت اختصاصی خود را دریافت کرده و آمار و کمیسیون دریافتی از اعضای زیرمجموعه خود در ۳ نسل مختلف را مشاهده کنید.</div>
+                </div>
+                <div class="msg-body-box">
+                    <div class="msg-title-text" id="t-hp-t2"><i class="fas fa-layer-group" style="color:#38bdf8"></i> پاداش‌ها و نرخ کمیسیون نسل‌ها</div>
+                    <div class="msg-desc-text" id="t-hp-d2">سود دعوت دوستان در ۳ سطح محاسبه می‌شود: نسل اول ۱۰٪، نسل دوم ۷٪ و نسل سوم ۳٪ از سود معاملات زیرمجموعه‌ها می‌باشد.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Zenix. All rights reserved.</p>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const app = initializeApp({
+            apiKey: "AIzaSyAqIksPfjCCQZNQDVx3MEdDyJyNMaTvtlk",
+            authDomain: "zenix-platform.firebaseapp.com",
+            projectId: "zenix-platform",
+            storageBucket: "zenix-platform.firebasestorage.app",
+            messagingSenderId: "594936010622",
+            appId: "1:594936010622:web:9f4159c80111245062052f",
+            measurementId: "G-LXSGYB8WKM"
+        });
+
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currLang = localStorage.getItem('zenix_lang') || 'fa';
+        let allMessages = [];
+        let currentUserId = null;
+
+        const ld = {
+            fa: {
+                m1: 'صفحه اصلی', m2: 'کوانتیفیکیشن', m3: 'واریز', m4: 'برداشت', m_team: 'تیم من', m5: 'تراکنش', m6: 'پروفایل', m7: 'پشتیبانی',
+                m_about: 'درباره پلتفرم', m8: 'خروج', modalTitle: 'صندوق پیام‌های مدیریت', noMsg: 'هیچ پیام جدیدی از طرف مدیریت وجود ندارد.',
+                backMsg: 'بازگشت به لیست پیام‌ها', newBadge: 'جدید', helpTitle: 'راهنمای صفحه تیم', helpBtnTitle: 'راهنمای صفحه تیم',
+                teamTitle: 'مدیریت تیم و پاداش', teamSub: 'دعوت از دوستان و کسب درآمد دلاری', rewardLbl: 'کل پاداش:',
+                c1: 'اعضای کل تیم', c2: 'حجم معاملات تیم', c3: 'کمیسیون امروز', genTitle: 'آمار نسل‌های تیم',
+                l1Lbl: 'نسل ۱ (۱۰٪):', l2Lbl: 'نسل ۲ (۷٪):', l3Lbl: 'نسل ۳ (۳٪):', inviteLbl: 'لینک دعوت اختصاصی شما', btnCopy: 'کپی لینک',
+                rulesTitle: 'قوانین کمیسیون تیم:',
+                rulesDesc: '* کمیسیون نسل ۱ معادل ۱۰٪، نسل ۲ معادل ۷٪ و نسل ۳ معادل ۳٪ از سود معاملات تیم است.<br>* پاداش‌ها به صورت روزانه و خودکار به موجودی حساب شما افزوده می‌شوند.',
+                hpT1: 'کاربرد این صفحه (مدیریت تیم) چیست؟', hpD1: 'از این صفحه می‌توانید لینک دعوت اختصاصی خود را دریافت کرده و آمار و کمیسیون دریافتی از اعضای زیرمجموعه خود در ۳ نسل مختلف را مشاهده کنید.',
+                hpT2: 'پاداش‌ها و نرخ کمیسیون نسل‌ها', hpD2: 'سود دعوت دوستان در ۳ سطح محاسبه می‌شود: نسل اول ۱۰٪، نسل دوم ۷٪ و نسل سوم ۳٪ از سود معاملات زیرمجموعه‌ها می‌باشد.',
+                abTitle: 'درباره پلتفرم Zenix (هدف، ماهیت و ساختار)',
+                abDesc: 'پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.',
+                abL1T: 'هدف اصلی:', abL1D: 'اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.',
+                abL2T: 'امنیت و زیرساخت:', abL2D: 'متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Firebase).',
+                abL3T: 'ساختار چندسطحی (Referral & Team):', abL3D: 'ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.',
+                abL4T: 'احساس واقع‌گرایی:', abL4D: 'وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.'
+            },
+            en: {
+                m1: 'Home', m2: 'Quantification', m3: 'Deposit', m4: 'Withdraw', m_team: 'My Team', m5: 'Transactions', m6: 'Profile', m7: 'Support',
+                m_about: 'About Platform', m8: 'Logout', modalTitle: 'Admin Messages', noMsg: 'No new messages from admin.',
+                backMsg: 'Back to Messages List', newBadge: 'NEW', helpTitle: 'Team Page Guide', helpBtnTitle: 'Team Page Guide',
+                teamTitle: 'Team Management & Rewards', teamSub: 'Invite friends and earn USD passive income', rewardLbl: 'Total Rewards:',
+                c1: 'Total Team Members', c2: 'Team Trading Volume', c3: 'Today Commission', genTitle: 'Team Generations Stats',
+                l1Lbl: 'Gen 1 (10%):', l2Lbl: 'Gen 2 (7%):', l3Lbl: 'Gen 3 (3%):', inviteLbl: 'Your Exclusive Referral Link', btnCopy: 'Copy Link',
+                rulesTitle: 'Team Commission Rules:',
+                rulesDesc: '* Gen 1 commission is 10%, Gen 2 is 7%, and Gen 3 is 3% of team trading profit.<br>* Rewards are automatically added to your wallet balance daily.',
+                hpT1: 'What is this page for?', hpD1: 'From this page you can get your exclusive referral link and view member counts and commissions from 3 team generations.',
+                hpT2: 'Generation Commission Rates', hpD2: 'Referral rewards are calculated in 3 tiers: Gen 1 (10%), Gen 2 (7%), and Gen 3 (3%) of team trading profit.',
+                abTitle: 'About Zenix Platform (Goal, Nature & Structure)',
+                abDesc: 'Zenix Platform is an innovative financial ecosystem in cryptocurrency and trading processing designed for a secure, automated, and profitable user experience.',
+                abL1T: 'Main Goal:', abL1D: 'Automating trading processes via AI systems and quantification algorithms, enabling users to profit from market fluctuations without complex trading expertise.',
+                abL2T: 'Security & Infrastructure:', abL2D: 'Backed by advanced encryption protocols, high-speed cloud processing nodes, and secure Firebase database storage.',
+                abL3T: 'Multi-level Structure (Referral & Team):', abL3D: 'Creating a dynamic referral network so users receive multi-level rewards and sustainable passive income from team activity.',
+                abL4T: 'Realism & Live Data:', abL4D: 'Live crypto ticker, volume indicators, network gas fees, and system notices ensure users interact with an active global platform.'
+            }
+        };
+
+        async function fetchUserMessages(uid) {
+            try {
+                let snap = await getDocs(collection(db, "users", uid, "notifications"));
+                let messages = snap.docs.map(d => {
+                    let dt = d.data();
+                    return {
+                        id: d.id,
+                        subject: dt.title || dt.subject || 'Announcement',
+                        body: dt.message || dt.text || dt.body || '',
+                        time: dt.createdAt || dt.timestamp || dt.time || new Date().toISOString(),
+                        read: dt.read === true || dt.isRead === true
+                    };
+                });
+
+                messages.sort((a, b) => {
+                    const getTimeMs = (timeVal) => {
+                        if (!timeVal) return 0;
+                        if (typeof timeVal.toDate === 'function') return timeVal.toDate().getTime();
+                        if (typeof timeVal.seconds === 'number') return timeVal.seconds * 1000;
+                        const parsed = new Date(timeVal).getTime();
+                        return isNaN(parsed) ? 0 : parsed;
+                    };
+                    return getTimeMs(b.time) - getTimeMs(a.time);
+                });
+
+                return messages;
+            } catch (e) {
+                console.error("Error fetching messages:", e);
+                return [];
+            }
+        }
+
+        window.openMessageModal = async () => {
+            let c = document.getElementById('modal-msg-container'), t = ld[currLang] || ld.fa;
+            if (currentUserId) {
+                allMessages = await fetchUserMessages(currentUserId);
+                let unread = allMessages.filter(m => !m.read).length, b = document.getElementById('bell-badge');
+                if (b) { b.textContent = unread; b.classList.toggle('show', unread > 0); }
+            }
+            if (allMessages.length > 0) renderMessageList();
+            else c.innerHTML = `<div style="text-align:center;padding:20px;color:#94a3b8">${t.noMsg}</div>`;
+            document.getElementById('m-msg')?.classList.add('show');
+        };
+
+        function renderMessageList() {
+            let c = document.getElementById('modal-msg-container'), t = ld[currLang] || ld.fa, html = '<div style="display:flex;flex-direction:column;gap:10px;">';
+            allMessages.forEach((m, idx) => {
+                let dTime = '';
+                if (m.time) {
+                    let d = typeof m.time.toDate === 'function' ? m.time.toDate() : new Date(m.time);
+                    dTime = isNaN(d.getTime()) ? String(m.time) : d.toUTCString();
+                }
+                let unread = !m.read;
+                html += `<div class="msg-body-box" style="cursor:pointer;border-right:${unread ? '3px solid #38bdf8' : '1px solid rgba(255,255,255,.08)'};" onclick="window.readAdminMessage(${idx})">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <div class="msg-title-text" style="${unread ? 'color:#fff;font-weight:800;' : ''}"><i class="fas fa-envelope${unread ? '' : '-open'}-text" style="color:#38bdf8;margin-left:5px;"></i> ${m.subject}</div>
+                        ${unread ? `<span style="font-size:9px;background:#38bdf8;color:#0f172a;padding:2px 6px;border-radius:4px;font-weight:700;">${t.newBadge}</span>` : ''}
+                    </div>
+                    <div class="msg-desc-text" style="margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${m.body}</div>
+                    <div style="font-size:10px;color:#64748b;margin-top:6px;text-align:left" dir="ltr">${dTime}</div>
+                </div>`;
+            });
+            c.innerHTML = html + '</div>';
+        }
+
+        window.readAdminMessage = async idx => {
+            let m = allMessages[idx]; if (!m) return;
+            if (!m.read && currentUserId && m.id) {
+                allMessages[idx].read = true;
+                try {
+                    await updateDoc(doc(db, "users", currentUserId, "notifications", m.id), { read: true, isRead: true });
+                    let unread = allMessages.filter(i => !i.read).length, b = document.getElementById('bell-badge');
+                    if (b) { b.textContent = unread; b.classList.toggle('show', unread > 0); }
+                } catch (e) { console.error(e); }
+            }
+            let c = document.getElementById('modal-msg-container'), t = ld[currLang] || ld.fa, dTime = '';
+            if (m.time) {
+                let d = typeof m.time.toDate === 'function' ? m.time.toDate() : new Date(m.time);
+                dTime = isNaN(d.getTime()) ? String(m.time) : d.toUTCString();
+            }
+            c.innerHTML = `<button onclick="window.openMessageModal()" style="background:none;border:none;color:#38bdf8;cursor:pointer;font-size:12px;margin-bottom:12px;display:flex;align-items:center;gap:5px;padding:0;"><i class="fas fa-arrow-right"></i> ${t.backMsg}</button>
+            <div class="msg-body-box" style="padding:16px;">
+                <div class="msg-title-text" style="font-size:15px;margin-bottom:8px;"><i class="fas fa-envelope-open-text" style="color:#38bdf8;"></i> ${m.subject}</div>
+                <div class="msg-desc-text" style="font-size:13px;line-height:1.8;color:#f8fafc;white-space:pre-wrap;">${m.body}</div>
+                <div style="font-size:11px;color:#64748b;margin-top:14px;text-align:left;border-top:1px solid rgba(255,255,255,.05);padding-top:8px;" dir="ltr">${dTime}</div>
+            </div>`;
+        };
+
+        window.closeMessageModal = () => document.getElementById('m-msg')?.classList.remove('show');
+        window.closeHelpModal = () => document.getElementById('m-help')?.classList.remove('show');
+        window.closeAboutModal = () => document.getElementById('m-about')?.classList.remove('show');
+
+        window.openHelpModal = () => document.getElementById('m-help')?.classList.add('show');
+        window.openAboutModal = () => document.getElementById('m-about')?.classList.add('show');
+
+        document.getElementById('bell-btn')?.addEventListener('click', e => { e.stopPropagation(); window.openMessageModal(); });
+        document.getElementById('help-btn')?.addEventListener('click', e => { e.stopPropagation(); window.openHelpModal(); });
+
+        const mBtn = document.getElementById('menu-btn'), nMenu = document.getElementById('nav-menu'), lBtn = document.getElementById('lang-btn'), lMenu = document.getElementById('lang-menu');
+        function toggleM(m, e) { e?.stopPropagation(); [nMenu, lMenu].forEach(x => { if (x && x !== m) x.classList.remove('show'); }); m?.classList.toggle('show'); }
+        mBtn?.addEventListener('click', e => toggleM(nMenu, e));
+        lBtn?.addEventListener('click', e => toggleM(lMenu, e));
+        document.addEventListener('click', e => {
+            if (!e.target.closest('.menu') && !e.target.closest('#menu-btn') && !e.target.closest('#lang-btn')) {
+                [nMenu, lMenu].forEach(x => x?.classList.remove('show'));
+            }
+        });
+
+        // رصد و محاسبه زنده اعضای نسل ۱، ۲ و ۳ از روی فایربیس
+        async function loadTeamData(uid) {
+            try {
+                let userSnap = await getDoc(doc(db, "users", uid));
+                if (!userSnap.exists()) return;
+                let userData = userSnap.data();
+
+                let myRefCode = userData.referralCode || userData.inviteCode || userData.username;
+                if (!myRefCode) {
+                    let nums = uid.replace(/\D/g, '');
+                    if (nums.length < 6) nums = (nums + "123456789").padEnd(6, '0');
+                    myRefCode = `MS-${nums.substring(0, 6)}`;
+                }
+
+                const inviteInput = document.getElementById('invite-link');
+                if (inviteInput) {
+                    const fullInviteUrl = new URL(`register.html?ref=${myRefCode}`, window.location.href).href;
+                    inviteInput.value = fullInviteUrl;
+                }
+
+                // گرفتن کلیه کاربران برای تشکیل درخت زیرمجموعه
+                let snapAll = await getDocs(collection(db, "users"));
+                let allUsers = [];
+                snapAll.forEach(d => allUsers.push({ id: d.id, ...d.data() }));
+
+                // نسل ۱
+                let l1 = allUsers.filter(u => u.referredBy && u.referredBy === myRefCode);
+                let l1Codes = l1.map(u => u.referralCode || u.inviteCode || u.username).filter(Boolean);
+
+                // نسل ۲
+                let l2 = allUsers.filter(u => u.referredBy && l1Codes.includes(u.referredBy));
+                let l2Codes = l2.map(u => u.referralCode || u.inviteCode || u.username).filter(Boolean);
+
+                // نسل ۳
+                let l3 = allUsers.filter(u => u.referredBy && l2Codes.includes(u.referredBy));
+
+                // به‌روزرسانی اعداد شمارنده اعضا
+                document.getElementById('lvl1-count').textContent = l1.length;
+                document.getElementById('lvl2-count').textContent = l2.length;
+                document.getElementById('lvl3-count').textContent = l3.length;
+
+                let totalTeamCount = l1.length + l2.length + l3.length;
+                document.getElementById('team-count').textContent = totalTeamCount;
+
+                // محاسبه کمیسیون‌ها
+                let l1Comm = parseFloat(userData.lvl1Commission || userData.gen1Comm || 0);
+                let l2Comm = parseFloat(userData.lvl2Commission || userData.gen2Comm || 0);
+                let l3Comm = parseFloat(userData.lvl3Commission || userData.gen3Comm || 0);
+                let totalComm = l1Comm + l2Comm + l3Comm;
+
+                document.getElementById('lvl1-comm').textContent = `${l1Comm.toFixed(2)} USDT`;
+                document.getElementById('lvl2-comm').textContent = `${l2Comm.toFixed(2)} USDT`;
+                document.getElementById('lvl3-comm').textContent = `${l3Comm.toFixed(2)} USDT`;
+                document.getElementById('total-commission').textContent = totalComm.toFixed(2);
+
+                let volume = parseFloat(userData.teamVolume || 0);
+                let daily = parseFloat(userData.dailyCommission || 0);
+                document.getElementById('team-volume').textContent = `${volume.toFixed(2)}$`;
+                document.getElementById('team-daily').textContent = `${daily.toFixed(2)}$`;
+
+            } catch (err) {
+                console.error("Error loading team stats:", err);
+            }
+        }
+
+        onAuthStateChanged(auth, u => {
+            if (!u) { window.location.href = 'index.html'; return; }
+            currentUserId = u.uid;
+
+            loadTeamData(u.uid);
+
+            fetchUserMessages(u.uid).then(msgs => {
+                allMessages = msgs;
+                let unread = allMessages.filter(m => !m.read).length, b = document.getElementById('bell-badge');
+                if (b && unread > 0) { b.textContent = unread; b.classList.add('show'); }
+            });
+        });
+
+        function setLang(l) {
+            currLang = l;
+            localStorage.setItem('zenix_lang', l);
+            let t = ld[l] || ld.fa;
+            let r = l === 'fa' || l === 'ar';
+            
+            document.documentElement.setAttribute('dir', r ? 'rtl' : 'ltr');
+            document.documentElement.setAttribute('lang', l);
+
+            for (let i = 1; i <= 8; i++) {
+                let m = document.getElementById('m' + i);
+                if (m) m.textContent = t['m' + i] || '';
+            }
+
+            let mTeam = document.getElementById('m_team');
+            if (mTeam) mTeam.textContent = t.m_team;
+
+            let elModalTitle = document.getElementById('t-modal-title');
+            if (elModalTitle) elModalTitle.textContent = t.modalTitle;
+
+            let elAbout = document.getElementById('m_about');
+            if (elAbout) elAbout.textContent = t.m_about;
+
+            let helpBtn = document.getElementById('help-btn');
+            if (helpBtn) helpBtn.setAttribute('title', t.helpBtnTitle || '');
+
+            let elHelpTitle = document.getElementById('t-help-title');
+            if (elHelpTitle) elHelpTitle.textContent = t.helpTitle;
+
+            ['t-team-title', 't-team-sub', 't-reward-lbl', 't-c1', 't-c2', 't-c3', 't-gen-title', 't-l1-lbl', 't-l2-lbl', 't-l3-lbl', 't-invite-lbl', 't-btn-copy', 't-rules-title'].forEach(key => {
+                let shortKey = key.replace('t-', '').replace(/-([a-z])/g, g => g[1].toUpperCase());
+                let el = document.getElementById(key);
+                if (el && t[shortKey]) el.textContent = t[shortKey];
+            });
+
+            let elRulesDesc = document.getElementById('t-rules-desc');
+            if (elRulesDesc && t.rulesDesc) elRulesDesc.innerHTML = t.rulesDesc;
+
+            for (let i = 1; i <= 2; i++) {
+                let ht = document.getElementById('t-hp-t' + i);
+                let hd = document.getElementById('t-hp-d' + i);
+                if (ht && t['hpT' + i]) ht.innerHTML = `<i class="fas ${i===1?'fa-users':'fa-layer-group'}" style="color:${i===1?'#ec4899':'#38bdf8'}"></i> ` + t['hpT' + i];
+                if (hd && t['hpD' + i]) hd.textContent = t['hpD' + i];
+            }
+
+            ['t-about-title'].forEach(id => { let el = document.getElementById(id); if (el) el.textContent = t.abTitle; });
+            ['t-ab-m-desc'].forEach(id => { let el = document.getElementById(id); if (el) el.textContent = t.abDesc; });
+
+            for (let i = 1; i <= 4; i++) {
+                let elT = document.getElementById('t-ab-m-l' + i + 't');
+                let elD = document.getElementById('t-ab-m-l' + i + 'd');
+                if (elT) elT.textContent = t['abL' + i + 'T'];
+                if (elD) elD.textContent = t['abL' + i + 'D'];
+            }
+        }
+
+        document.querySelectorAll('#lang-menu .mi').forEach(i => i.addEventListener('click', () => setLang(i.dataset.lang)));
+
+        document.getElementById('logout-btn')?.addEventListener('click', async e => {
+            e.preventDefault(); try { await signOut(auth); } catch (e) {}
+            localStorage.clear(); window.location.href = 'index.html';
+        });
+
+        window.showMsg = function(text, isErr) {
+            const box = document.getElementById('status-box');
+            if(!box) return;
+            box.style.display = 'block';
+            box.style.background = isErr ? 'rgba(239,68,68,0.15)' : 'rgba(34,197,94,0.15)';
+            box.style.border = isErr ? '1px solid #ef4444' : '1px solid #22c55e';
+            box.style.color = isErr ? '#ef4444' : '#22c55e';
+            box.innerHTML = text;
+        };
+
+        window.copyInviteLink = function() {
+            const c = document.getElementById("invite-link");
+            if(!c || !c.value) return;
+            c.select();
+            navigator.clipboard.writeText(c.value);
+            window.showMsg("📋 لینک دعوت اختصاصی شما با موفقیت در کلیپ‌بورد کپی شد.", false);
+        };
+
+        setLang(currLang);
+    </script>
+</body>
+</html>

@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Zenix - تراکنش‌ها</title>
+    <!-- جلوگیری از خطای 404 Favicon -->
+    <link rel="icon" href="data:image/x-icon;base64,=">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
+        body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
+        header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1);padding:10px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+        .logo{display:flex;align-items:center;gap:10px}
+        .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#0ea5e9,#9333ea);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;font-style:italic;transform:skewX(-6deg);box-shadow:0 0 15px rgba(14,165,233,.4)}
+        .logo-text{font-family:'Orbitron',sans-serif;font-size:19px;font-weight:900;letter-spacing:2px;font-style:italic;transform:skewX(-6deg);background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 20px rgba(56,189,248,0.4)}
+        .hr{display:flex;align-items:center;gap:8px}
+        .wrap{position:relative}
+        .lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none}
+        .badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;font-weight:700}
+        .badge.show{display:flex}
+        .menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;min-width:170px;padding:6px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8)}
+        [dir="rtl"] .wrap .menu{left:0}
+        [dir="ltr"] .wrap .menu{right:0}
+        .menu.show{display:block}
+        .mi{padding:7px 10px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none}
+        .mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}
+        .c{max-width:900px;width:100%;margin:15px auto;padding:0 12px;flex:1}
+        .wel{background:linear-gradient(135deg,rgba(2,132,199,.15),rgba(147,51,234,.15));border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+        .wel h1{font-size:16px;margin-bottom:3px}
+        .wel p{color:#94a3b8;font-size:11px}
+        
+        .tx-card{background:rgba(15,23,42,.85);border:1px solid rgba(56,189,248,.3);border-radius:12px;padding:16px;margin-top:12px}
+        .filter-container{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px}
+        .filter-btn{background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);color:#cbd5e1;padding:8px 14px;border-radius:8px;font-size:12px;cursor:pointer;white-space:nowrap;transition:all .2s ease}
+        .filter-btn.active{background:#38bdf8;color:#0f172a;font-weight:bold;border:none}
+        .tx-list-title{font-size:15px;color:#38bdf8;font-weight:bold;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+        .tx-item{background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-bottom:10px;transition:all .2s ease}
+        .tx-item:hover{border-color:rgba(56,189,248,0.4);background:rgba(15,23,42,0.9)}
+        .tx-left{display:flex;align-items:center;gap:12px}
+        .tx-icon{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px}
+        .tx-icon.deposit{background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.3)}
+        .tx-icon.withdraw{background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3)}
+        .tx-icon.commission{background:rgba(56,189,248,0.15);color:#38bdf8;border:1px solid rgba(56,189,248,0.3)}
+        .tx-title{font-weight:bold;color:#f8fafc;margin-bottom:2px}
+        .tx-date{font-size:11px;color:#94a3b8}
+        .tx-right{text-align:left}
+        .tx-amount{font-weight:bold}
+        .tx-amount.positive{color:#22c55e}
+        .tx-amount.negative{color:#ef4444}
+        .tx-status{font-size:11px}
+        .status-success{color:#22c55e}
+        .status-failed{color:#ef4444}
+
+        /* Modal Styles */
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
+        .modal.show{display:flex}
+        .modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(56,189,248,.3);border-radius:20px;width:100%;max-width:440px;max-height:85vh;display:flex;flex-direction:column;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.9)}
+        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;color:#38bdf8;font-weight:800;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px}
+        .modal-close{background:rgba(255,255,255,.05);border:none;color:#94a3b8;cursor:pointer;font-size:14px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+        .modal-close:hover{background:rgba(239,68,68,.2);color:#ef4444}
+        #modal-msg-container{overflow-y:auto;padding-right:4px}
+        .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px}
+        .msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:4px}
+        .msg-desc-text{font-size:12px;color:#cbd5e1;line-height:1.5}
+        footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo"><div class="logo-icon">Z</div><div class="logo-text">ZENIX</div></div>
+        <div class="hr">
+            <div class="wrap">
+                <button type="button" class="lb" id="bell-btn"><i class="fas fa-bell" style="color:#fbbf24"></i><span class="badge" id="bell-badge">0</span></button>
+            </div>
+            <div class="wrap">
+                <button type="button" class="lb" id="help-btn" title="راهنمای صفحه تراکنش‌ها"><i class="fas fa-circle-question" style="color:#38bdf8"></i></button>
+            </div>
+            <a href="support.html" class="lb"><i class="fas fa-headset" style="color:#a855f7"></i></a>
+            <div class="wrap">
+                <button type="button" class="lb" id="lang-btn"><i class="fas fa-globe" style="color:#22c55e"></i></button>
+                <div class="menu" id="lang-menu">
+                    <div class="mi" data-lang="fa">فارسی</div><div class="mi" data-lang="en">English</div><div class="mi" data-lang="ar">العربية</div><div class="mi" data-lang="tr">Türkçe</div><div class="mi" data-lang="ru">Русский</div><div class="mi" data-lang="es">Español</div><div class="mi" data-lang="fr">Français</div><div class="mi" data-lang="de">Deutsch</div>
+                </div>
+            </div>
+            <div class="wrap">
+                <button type="button" class="lb" id="menu-btn"><i class="fas fa-bars" style="color:#f43f5e"></i></button>
+                <div class="menu" id="nav-menu">
+                    <a href="dashboard.html" class="mi"><i class="fas fa-home" style="color:#38bdf8"></i><span id="m1">صفحه اصلی</span></a>
+                    <a href="quantification.html" class="mi"><i class="fas fa-robot" style="color:#a855f7"></i><span id="m2">کوانتیفیکیشن</span></a>
+                    <a href="deposit.html" class="mi"><i class="fas fa-arrow-down" style="color:#22c55e"></i><span id="m3">واریز</span></a>
+                    <a href="receive.html" class="mi"><i class="fas fa-arrow-up" style="color:#fbbf24"></i><span id="m4">برداشت</span></a>
+                    <a href="team.html" class="mi"><i class="fas fa-users" style="color:#ec4899"></i><span id="m-team">تیم من</span></a>
+                    <a href="transactions.html" class="mi active"><i class="fas fa-history" style="color:#06b6d4"></i><span id="m5">تراکنش</span></a>
+                    <a href="profile.html" class="mi"><i class="fas fa-user-cog" style="color:#ec4899"></i><span id="m6">پروفایل</span></a>
+                    <a href="support.html" class="mi"><i class="fas fa-headset" style="color:#a855f7"></i><span id="m7">پشتیبانی</span></a>
+                    <a href="index.html" class="mi" id="logout-btn" style="color:#ef4444"><i class="fas fa-power-off"></i><span id="m8">خروج</span></a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="c">
+        <div class="wel">
+            <div>
+                <h1 id="t-tx-title">تاریخچه تراکنش‌ها</h1>
+                <p id="t-tx-sub">مشاهده و بررسی تمامی تراکنش‌های مالی و پاداش‌ها</p>
+            </div>
+            <div style="font-size:13px;background:rgba(56,189,248,.1);border:1px solid #38bdf8;padding:6px 10px;border-radius:6px;color:#38bdf8;font-weight:600;">
+                <i class="fas fa-wallet"></i> <span id="t-tot-bal">کل موجودی:</span> <span id="total-balance">$0.00</span>
+            </div>
+        </div>
+
+        <div class="tx-card">
+            <div class="filter-container">
+                <button type="button" class="filter-btn active" id="f-all" onclick="window.filterTx('all',this)">همه</button>
+                <button type="button" class="filter-btn" id="f-deposit" onclick="window.filterTx('deposit',this)">واریز</button>
+                <button type="button" class="filter-btn" id="f-withdraw" onclick="window.filterTx('withdraw',this)">برداشت</button>
+                <button type="button" class="filter-btn" id="f-commission" onclick="window.filterTx('commission',this)">کمیسیون</button>
+                <button type="button" class="filter-btn" id="f-failed" onclick="window.filterTx('failed',this)">تراکنش ناموفق</button>
+            </div>
+
+            <div class="tx-list-title"><i class="fas fa-list-ul"></i> <span id="t-list-title">لیست تراکنش‌ها</span></div>
+
+            <div id="tx-list">
+                <div style="text-align:center;padding:30px;color:#94a3b8;font-size:13px;" id="t-loading">در حال بارگذاری تراکنش‌ها...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- مدال پیام‌ها -->
+    <div class="modal" id="m-msg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="t-modal-title">صندوق پیام‌های مدیریت</span>
+                <button class="modal-close" onclick="window.closeMessageModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="modal-msg-container">
+                <div style="text-align:center;padding:20px;color:#94a3b8">هیچ پیام جدیدی وجود ندارد.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- مدال راهنما -->
+    <div class="modal" id="m-help">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="t-help-title">راهنمای صفحه تراکنش‌ها</span>
+                <button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div style="overflow-y:auto;padding-right:4px">
+                <div class="msg-body-box">
+                    <div class="msg-title-text" id="t-hp-t1"><i class="fas fa-history" style="color:#38bdf8"></i> کاربرد این صفحه چیست؟</div>
+                    <div class="msg-desc-text" id="t-hp-d1">در این صفحه می‌توانید تاریخچه تراکنش‌های حساب خود شامل واریزها، برداشت‌ها و کمیسیون‌های دریافتی را مشاهده و پیگیری کنید.</div>
+                </div>
+                <div class="msg-body-box">
+                    <div class="msg-title-text" id="t-hp-t2"><i class="fas fa-filter" style="color:#38bdf8"></i> فیلتر تراکنش‌ها</div>
+                    <div class="msg-desc-text" id="t-hp-d2">با استفاده از دکمه‌های فیلتر (همه، واریز، برداشت، کمیسیون، تراکنش ناموفق) می‌توانید تراکنش‌های مورد نظر خود را به تفکیک دسته‌بندی و بررسی نمایید.</div>
+                </div>
+                <div class="msg-body-box">
+                    <div class="msg-title-text" id="t-hp-t3"><i class="fas fa-wallet" style="color:#a855f7"></i> کارت کل موجودی</div>
+                    <div class="msg-desc-text" id="t-hp-d3">در بالای صفحه، مجموع کل موجودی کیف پول دلاری شما به صورت زنده نمایش داده می‌شود.</div>
+                </div>
+                <div class="msg-body-box">
+                    <div class="msg-title-text" id="t-hp-t4"><i class="fas fa-check-circle" style="color:#22c55e"></i> نمایش تراکنش‌ها</div>
+                    <div class="msg-desc-text" id="t-hp-d4">تراکنش‌های تاییدشده در بخش‌های مربوطه و تراکنش‌های ردشده توسط مدیریت در بخش «تراکنش ناموفق» قابل مشاهده هستند.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Zenix. All rights reserved.</p>
+        <p style="color:#22c55e;"><i class="fas fa-circle" style="font-size:6px;"></i> <span id="t-node">سرور فعال (US-East)</span></p>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const app = initializeApp({
+          apiKey: "AIzaSyAqIksPfjCCQZNQDVx3MEdDyJyNMaTvtlk",
+          authDomain: "zenix-platform.firebaseapp.com",
+          projectId: "zenix-platform",
+          storageBucket: "zenix-platform.firebasestorage.app",
+          messagingSenderId: "594936010622",
+          appId: "1:594936010622:web:9f4159c80111245062052f",
+          measurementId: "G-LXSGYB8WKM"
+        });
+
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currLang = localStorage.getItem('zenix_lang') || 'fa';
+        let allMessages = [];
+        let currentUserId = null;
+        let userTransactions = [];
+        let currentFilter = 'all';
+
+        const ld = {
+          fa: {
+            txTitle: 'تاریخچه تراکنش‌ها', txSub: 'مشاهده و بررسی تمامی تراکنش‌های مالی و پاداش‌ها',
+            totBal: 'کل موجودی:', listTitle: 'لیست تراکنش‌ها',
+            fAll: 'همه', fDep: 'واریز', fWith: 'برداشت', fComm: 'کمیسیون', fFailed: 'تراکنش ناموفق',
+            m1: 'صفحه اصلی', m2: 'کوانتیفیکیشن', m3: 'واریز', m4: 'برداشت', mTeam: 'تیم من', m5: 'تراکنش', m6: 'پروفایل', m7: 'پشتیبانی', m8: 'خروج',
+            tNode: 'سرور فعال (US-East)', modalTitle: 'صندوق پیام‌های مدیریت', noMsg: 'هیچ پیام جدیدی از طرف مدیریت وجود ندارد.',
+            backMsg: 'بازگشت به لیست پیام‌ها', newBadge: 'جدید',
+            typeDeposit: 'واریز تتر (USDT)', typeWithdraw: 'برداشت وجه', typeCommission: 'کمیسیون',
+            stSuccess: 'تایید شده', stFailed: 'رد شده',
+            noTx: 'هیچ تراکنشی یافت نشد.', loading: 'در حال بارگذاری تراکنش‌ها...',
+            helpTitle: 'راهنمای صفحه تراکنش‌ها', helpBtnTitle: 'راهنمای صفحه تراکنش‌ها',
+            hpT1: 'کاربرد این صفحه چیست؟', hpD1: 'در این صفحه می‌توانید تاریخچه تراکنش‌های حساب خود شامل واریزها، برداشت‌ها و کمیسیون‌های دریافتی را مشاهده و پیگیری کنید.',
+            hpT2: 'فیلتر تراکنش‌ها', hpD2: 'با استفاده از دکمه‌های فیلتر (همه، واریز، برداشت، کمیسیون، تراکنش ناموفق) می‌توانید تراکنش‌های مورد نظر خود را به تفکیک دسته‌بندی و بررسی نمایید.',
+            hpT3: 'کارت کل موجودی', hpD3: 'در بالای صفحه، مجموع کل موجودی کیف پول دلاری شما به صورت زنده نمایش داده می‌شود.',
+            hpT4: 'نمایش تراکنش‌ها', hpD4: 'تراکنش‌های تاییدشده در بخش‌های مربوطه و تراکنش‌های ردشده توسط مدیریت در بخش «تراکنش ناموفق» قابل مشاهده هستند.'
+          },
+          en: {
+            txTitle: 'Transactions History', txSub: 'View and review all financial transactions and rewards',
+            totBal: 'Total Balance:', listTitle: 'Transaction List',
+            fAll: 'All', fDep: 'Deposit', fWith: 'Withdraw', fComm: 'Commission', fFailed: 'Failed Transactions',
+            m1: 'Home', m2: 'Quantification', m3: 'Deposit', m4: 'Withdraw', mTeam: 'My Team', m5: 'Transactions', m6: 'Profile', m7: 'Support', m8: 'Logout',
+            tNode: 'Node Active (US-East)', modalTitle: 'Admin Messages', noMsg: 'No new messages from admin.',
+            backMsg: 'Back to Messages List', newBadge: 'NEW',
+            typeDeposit: 'Tether Deposit (USDT)', typeWithdraw: 'Withdrawal', typeCommission: 'Commission',
+            stSuccess: 'Approved', stFailed: 'Rejected',
+            noTx: 'No transactions found.', loading: 'Loading transactions...',
+            helpTitle: 'Transactions Guide', helpBtnTitle: 'Transactions Page Guide',
+            hpT1: 'What is the purpose of this page?', hpD1: 'On this page you can view and track a complete history of all financial transactions including deposits, withdrawals, and commissions.',
+            hpT2: 'Filter Transactions', hpD2: 'Use the filter buttons (All, Deposit, Withdraw, Commission, Failed) to easily categorize and inspect transactions.',
+            hpT3: 'Total Balance Card', hpD3: 'At the top of the page, your total live USD wallet balance is displayed in real time.',
+            hpT4: 'Transaction Status Display', hpD4: 'Approved transactions appear in their respective sections, while admin-rejected transactions are shown under "Failed Transactions".'
+          },
+          ar: {
+            txTitle: 'سجل المعاملات', txSub: 'عرض ومراجعة كافة المعاملات المالية والمكافآت',
+            totBal: 'إجمالي الرصيد:', listTitle: 'قائمة المعاملات',
+            fAll: 'الكل', fDep: 'إيداع', fWith: 'سحب', fComm: 'العمولة', fFailed: 'المعاملات الفاشلة',
+            m1: 'الرئيسية', m2: 'الكمية', m3: 'إيداع', m4: 'سحب', mTeam: 'فريقي', m5: 'المعاملات', m6: 'الملف الشخصي', m7: 'الدعم', m8: 'خروج',
+            tNode: 'خادم نشط (US-East)', modalTitle: 'رسائل الإدارة', noMsg: 'لا توجد رسائل جديدة من الإدارة.',
+            backMsg: 'العودة إلى قائمة الرسائل', newBadge: 'جديد',
+            typeDeposit: 'إيداع تتر (USDT)', typeWithdraw: 'سحب أموال', typeCommission: 'العمولة',
+            stSuccess: 'مؤكد', stFailed: 'مرفوض',
+            noTx: 'لم يتم العثور على أي معاملات.', loading: 'جاري تحميل المعاملات...',
+            helpTitle: 'دليل صفحة المعاملات', helpBtnTitle: 'دليل صفحة المعاملات',
+            hpT1: 'ما هو هدف هذه الصفحة؟', hpD1: 'يمكنك في هذه الصفحة عرض ومتابعة سجل كامل بجميع المعاملات المالية لحسابك.',
+            hpT2: 'تصفية المعاملات', hpD2: 'استخدم أزرار التصفية (الكل، إيداع، سحب، العمولة، المعاملات الفاشلة) لتصنيف وتدقيق المعاملات بسرعة.',
+            hpT3: 'بطاقة إجمالي الرصيد', hpD3: 'يتم عرض إجمالي رصيد محفظتك بالدولار بشكل مباشر في أعلى الصفحة.',
+            hpT4: 'عرض المعاملات', hpD4: 'تظهر المعاملات المؤكدة في أقسامها، وتظهر المعاملات المرفوضة في قسم "المعاملات الفاشلة".'
+          },
+          tr: {
+            txTitle: 'İşlem Geçmişi', txSub: 'Tüm finansal işlemleri ve ödülleri inceleyin',
+            totBal: 'Toplam Bakiye:', listTitle: 'İşlem Listesi',
+            fAll: 'Tümü', fDep: 'Yatırma', fWith: 'Çekim', fComm: 'Komisyon', fFailed: 'Başarısız İşlemler',
+            m1: 'Ana Sayfa', m2: 'Kantifikasyon', m3: 'Para Yatırma', m4: 'Çekim', mTeam: 'Takımım', m5: 'İşlemler', m6: 'Profil', m7: 'Destek', m8: 'Çıkış',
+            tNode: 'Sunucu Aktif (US-East)', modalTitle: 'Yönetici Mesajları', noMsg: 'Yöneticiden yeni mesaj yok.',
+            backMsg: 'Mesaj Listesine Dön', newBadge: 'YENİ',
+            typeDeposit: 'Tether Yatırma (USDT)', typeWithdraw: 'Para Çekme', typeCommission: 'Komisyon',
+            stSuccess: 'Onaylandı', stFailed: 'Reddedildi',
+            noTx: 'İşlem bulunamadı.', loading: 'İşlemler yükleniyor...',
+            helpTitle: 'İşlemler Sayfası Kılavuzu', helpBtnTitle: 'İşlemler Sayfası Kılavuzu',
+            hpT1: 'Bu sayfanın amacı nedir?', hpD1: 'Bu sayfada yatırımlar, çekimler ve komisyonlar dahil tüm finansal işlemlerinizin detaylı geçmişini inceleyebilirsiniz.',
+            hpT2: 'İşlem Filtreleme', hpD2: 'Filtre butonlarını (Tümü, Yatırma, Çekim, Komisyon, Başarısız İşlemler) kullanarak işlemleri inceleyebilirsiniz.',
+            hpT3: 'Toplam Bakiye Kartı', hpD3: 'Sayfanın üst kısmında canlı USD cüzdan bakiyeniz anlık olarak gösterilmektedir.',
+            hpT4: 'İşlem Durumları', hpD4: 'Onaylanan işlemler ilgili kategorilerde, reddedilen işlemler ise "Başarısız İşlemler" bölümünde yer alır.'
+          },
+          ru: {
+            txTitle: 'История транзакций', txSub: 'Просмотр всех финансовых операций и наград',
+            totBal: 'Общий баланс:', listTitle: 'Список транзакций',
+            fAll: 'Все', fDep: 'Депозит', fWith: 'Вывод', fComm: 'Комиссия', fFailed: 'Отклоненные',
+            m1: 'Главная', m2: 'Квантификация', m3: 'Депозит', m4: 'Вывод', mTeam: 'Моя команда', m5: 'Транзакции', m6: 'Профиль', m7: 'Поддержка', m8: 'Выйти',
+            tNode: 'Сервер активен (US-East)', modalTitle: 'Сообщения админа', noMsg: 'Нет новых сообщений от администратора.',
+            backMsg: 'Назад к списку сообщений', newBadge: 'НОВОЕ',
+            typeDeposit: 'Депозит Tether (USDT)', typeWithdraw: 'Вывод средств', typeCommission: 'Комиссия',
+            stSuccess: 'Одобрено', stFailed: 'Отклонено',
+            noTx: 'Транзакции не найдены.', loading: 'Загрузка транзакций...',
+            helpTitle: 'Руководство по транзакциям', helpBtnTitle: 'Справка по странице транзакций',
+            hpT1: 'Каково назначение этой страницы?', hpD1: 'На этой странице вы можете просмотреть всю историю финансовых операций.',
+            hpT2: 'Фильтрация транзакций', hpD2: 'Используйте кнопки фильтров (Все, Депозит, Вывод, Комиссия, Отклоненные) для быстрой сортировки.',
+            hpT3: 'Карточка общего баланса', hpD3: 'В верхней части страницы отображается ваш общий текущий баланс USD.',
+            hpT4: 'Отображение транзакций', hpD4: 'Одобренные операции отображаются в своих разделах, а отклоненные — в разделе "Отклоненные".'
+          },
+          es: {
+            txTitle: 'Historial de Transacciones', txSub: 'Ver y revisar todas las transacciones financieras y recompensas',
+            totBal: 'Saldo Total:', listTitle: 'Lista de Transacciones',
+            fAll: 'Todos', fDep: 'Depósito', fWith: 'Retiro', fComm: 'Comisión', fFailed: 'Transacciones Fallidas',
+            m1: 'Inicio', m2: 'Cuantificación', m3: 'Depósito', m4: 'Retiro', mTeam: 'Mi Equipo', m5: 'Transacciones', m6: 'Perfil', m7: 'Soporte', m8: 'Cerrar Sesión',
+            tNode: 'Servidor Activo (US-East)', modalTitle: 'Mensajes del Admin', noMsg: 'No hay mensajes nuevos del admin.',
+            backMsg: 'Volver a la Lista de Mensajes', newBadge: 'NUEVO',
+            typeDeposit: 'Depósito Tether (USDT)', typeWithdraw: 'Retiro de fondos', typeCommission: 'Comisión',
+            stSuccess: 'Aprobado', stFailed: 'Rechazado',
+            noTx: 'No se encontraron transacciones.', loading: 'Cargando transacciones...',
+            helpTitle: 'Guía de Transacciones', helpBtnTitle: 'Guía de la página de transacciones',
+            hpT1: '¿Cuál es el propósito de esta página?', hpD1: 'En esta página puede ver y rastrear el historial completo de sus transacciones financieras.',
+            hpT2: 'Filtrar Transacciones', hpD2: 'Utilice los botones de filtro (Todos, Depósito, Retiro, Comisión, Fallidas) para clasificar sus operaciones.',
+            hpT3: 'Tarjeta de Saldo Total', hpD3: 'En la parte superior se muestra el saldo total en tiempo real de su billetera USD.',
+            hpT4: 'Visualización de Transacciones', hpD4: 'Las transacciones aprobadas aparecen en sus secciones y las rechazadas en "Transacciones Fallidas".'
+          },
+          fr: {
+            txTitle: 'Historique des Transactions', txSub: 'Consultez toutes les transactions financières et récompenses',
+            totBal: 'Solde Total :', listTitle: 'Liste des Transactions',
+            fAll: 'Tous', fDep: 'Dépôt', fWith: 'Retrait', fComm: 'Commission', fFailed: 'Transactions Échouées',
+            m1: 'Accueil', m2: 'Quantification', m3: 'Dépôt', m4: 'Retrait', mTeam: 'Mon Équipe', m5: 'Transactions', m6: 'Profil', m7: 'Support', m8: 'Déconnexion',
+            tNode: 'Serveur Actif (US-East)', modalTitle: 'Messages Admin', noMsg: 'Aucun nouveau message de l’administrateur.',
+            backMsg: 'Retour à la Liste des Messages', newBadge: 'NOUVEAU',
+            typeDeposit: 'Dépôt Tether (USDT)', typeWithdraw: 'Retrait de fonds', typeCommission: 'Commission',
+            stSuccess: 'Approuvé', stFailed: 'Rejeté',
+            noTx: 'Aucune transaction trouvée.', loading: 'Chargement des transactions...',
+            helpTitle: 'Guide des Transactions', helpBtnTitle: 'Guide de la page des transactions',
+            hpT1: 'Quel est le rôle de cette page ?', hpD1: 'Sur cette page, vous pouvez consulter l’historique complet de vos transactions financières.',
+            hpT2: 'Filtrer les Transactions', hpD2: 'Utilisez les boutons de filtre (Tous, Dépôt, Retrait, Commission, Échouées) pour trier vos opérations.',
+            hpT3: 'Carte Solde Total', hpD3: 'En haut de la page, le solde total en direct de votre portefeuille USD est affiché en temps réel.',
+            hpT4: 'Affichage des Transactions', hpD4: 'Les transactions approuvées apparaissent dans leurs sections et les rejetées dans "Transactions Échouées".'
+          },
+          de: {
+            txTitle: 'Transaktionsverlauf', txSub: 'Alle Finanztransaktionen und Belohnungen einsehen',
+            totBal: 'Gesamtguthaben:', listTitle: 'Transaktionsliste',
+            fAll: 'Alle', fDep: 'Einzahlung', fWith: 'Auszahlung', fComm: 'Provision', fFailed: 'Fehlgeschlagen',
+            m1: 'Startseite', m2: 'Quantifizierung', m3: 'Einzahlung', m4: 'Auszahlung', mTeam: 'Mein Team', m5: 'Transaktionen', m6: 'Profil', m7: 'Support', m8: 'Abmelden',
+            tNode: 'Server Aktiv (US-East)', modalTitle: 'Admin-Nachrichten', noMsg: 'Keine neuen Nachrichten vom Admin.',
+            backMsg: 'Zurück zur Nachrichtenliste', newBadge: 'NEU',
+            typeDeposit: 'Tether Einzahlung (USDT)', typeWithdraw: 'Auszahlung', typeCommission: 'Provision',
+            stSuccess: 'Bestätigt', stFailed: 'Abgelehnt',
+            noTx: 'Keine Transaktionen gefunden.', loading: 'Transaktionen werden geladen...',
+            helpTitle: 'Transaktions-Anleitung', helpBtnTitle: 'Anleitung zur Transaktionsseite',
+            hpT1: 'Was ist der Zweck dieser Seite?', hpD1: 'Auf dieser Seite können Sie die vollständige Historie aller Finanztransaktionen einsehen.',
+            hpT2: 'Transaktionen Filtern', hpD2: 'Nutzen Sie die Filter-Buttons (Alle, Einzahlung, Auszahlung, Provision, Fehlgeschlagen) zur Kategorisierung.',
+            hpT3: 'Gesamtguthaben-Karte', hpD3: 'Oben auf der Seite wird Ihr Live-USD-Guthaben in Echtzeit angezeigt.',
+            hpT4: 'Anzeige der Transaktionen', hpD4: 'Bestätigte Transaktionen erscheinen in den jeweiligen Kategorien, abgelehnte unter "Fehlgeschlagen".'
+          }
+        };
+
+        // دریافت تراکنش‌های کاربر از دیتابیس
+        async function fetchUserTransactions(uid) {
+          try {
+            let snap = await getDocs(collection(db, "users", uid, "transactions"));
+            let list = snap.docs.map(docSnap => ({
+              id: docSnap.id,
+              ...docSnap.data()
+            }));
+
+            // جستجو در مجموعه‌کل در صورت عدم وجود در زیرمجموعه
+            if (list.length === 0) {
+              try {
+                let qSnap = await getDocs(query(collection(db, "transactions"), where("userId", "==", uid)));
+                qSnap.forEach(docSnap => {
+                  list.push({ id: docSnap.id, ...docSnap.data() });
+                });
+              } catch(err) {}
+            }
+
+            // مرتب‌سازی بر اساس تاریخ
+            list.sort((a, b) => {
+              const getTime = (val) => {
+                if (!val) return 0;
+                if (typeof val.toDate === 'function') return val.toDate().getTime();
+                if (typeof val.seconds === 'number') return val.seconds * 1000;
+                let parsed = new Date(val).getTime();
+                return isNaN(parsed) ? 0 : parsed;
+              };
+              return getTime(b.createdAt || b.timestamp || b.time || b.date) - getTime(a.createdAt || a.timestamp || a.time || a.date);
+            });
+
+            return list;
+          } catch (e) {
+            console.error("خطا در دریافت تراکنش‌ها:", e);
+            return [];
+          }
+        }
+
+        // رندر تراکنش‌ها روی صفحه
+        function renderTransactions() {
+          let container = document.getElementById('tx-list');
+          let t = ld[currLang] || ld.fa;
+          if (!container) return;
+
+          let filtered = userTransactions.filter(item => {
+            let rawSt = String(item.status || '').toLowerCase().trim();
+            let isApproved = rawSt === 'success' || rawSt === 'approved' || rawSt === 'completed' || rawSt === 'done' || rawSt === 'موفق' || rawSt === 'تایید شده';
+            let isFailed = rawSt.includes('fail') || rawSt.includes('reject') || rawSt.includes('cancel') || rawSt === 'ناموفق' || rawSt === 'رد شده';
+
+            // اگر زبا‌نه «تراکنش ناموفق» انتخاب شده باشد: فقط تراکنش‌های ردشده/ناموفق نمایش داده شوند
+            if (currentFilter === 'failed') {
+              return isFailed;
+            }
+
+            // برای سایر زبانه‌ها (همه، واریز، برداشت، کمیسیون): فقط تراکنش‌های تاییدشده نمایش داده شوند
+            if (!isApproved) return false;
+
+            if (currentFilter === 'all') return true;
+
+            let itemType = String(item.type || '').toLowerCase();
+            if (currentFilter === 'commission') {
+              return itemType.includes('comm') || itemType.includes('ref') || itemType === 'commission';
+            }
+            return itemType === currentFilter;
+          });
+
+          if (filtered.length === 0) {
+            container.innerHTML = `<div style="text-align:center;padding:35px 15px;color:#94a3b8;font-size:13px;"><i class="fas fa-receipt" style="font-size:24px;color:#64748b;margin-bottom:10px;display:block;"></i>${t.noTx}</div>`;
+            return;
+          }
+
+          let html = '';
+          filtered.forEach(tx => {
+            let rawType = String(tx.type || 'deposit').toLowerCase();
+            let isDeposit = rawType.includes('dep') || rawType === 'deposit';
+            let isWithdraw = rawType.includes('with') || rawType === 'withdraw' || rawType === 'receive';
+            let isComm = rawType.includes('comm') || rawType === 'commission' || rawType.includes('ref');
+
+            let typeClass = isWithdraw ? 'withdraw' : (isComm ? 'commission' : 'deposit');
+            let iconClass = isWithdraw ? 'fa-arrow-up' : (isComm ? 'fa-users' : 'fa-arrow-down');
+
+            // عنوان
+            let titleText = tx.title || tx.description;
+            if (!titleText) {
+              if (isWithdraw) titleText = t.typeWithdraw;
+              else if (isComm) titleText = t.typeCommission;
+              else titleText = t.typeDeposit;
+            }
+
+            // تاریخ
+            let timeVal = tx.createdAt || tx.timestamp || tx.time || tx.date;
+            let dateStr = '';
+            if (timeVal) {
+              let d = typeof timeVal.toDate === 'function' ? timeVal.toDate() : new Date(timeVal);
+              dateStr = isNaN(d.getTime()) ? String(timeVal) : d.toLocaleString(currLang === 'fa' ? 'fa-IR' : 'en-US');
+            } else {
+              dateStr = '---';
+            }
+
+            // مبلغ
+            let numAmt = parseFloat(tx.amount || 0);
+            let sign = isWithdraw ? '-' : '+';
+            let amtClass = isWithdraw ? 'negative' : 'positive';
+            let formattedAmt = `${sign}${Math.abs(numAmt).toFixed(2)} ${tx.currency || 'USDT'}`;
+
+            // وضعیت
+            let rawSt = String(tx.status || '').toLowerCase().trim();
+            let isFailed = rawSt.includes('fail') || rawSt.includes('reject') || rawSt.includes('cancel') || rawSt === 'ناموفق' || rawSt === 'رد شده';
+            let stText = isFailed ? t.stFailed : t.stSuccess;
+            let stClass = isFailed ? 'status-failed' : 'status-success';
+
+            html += `
+            <div class="tx-item" data-type="${typeClass}">
+                <div class="tx-left">
+                    <div class="tx-icon ${typeClass}"><i class="fas ${iconClass}"></i></div>
+                    <div>
+                        <div class="tx-title">${titleText}</div>
+                        <div class="tx-date" dir="ltr" style="text-align:right;">${dateStr}</div>
+                    </div>
+                </div>
+                <div class="tx-right">
+                    <div class="tx-amount ${amtClass}">${formattedAmt}</div>
+                    <div class="tx-status ${stClass}">${stText}</div>
+                </div>
+            </div>`;
+          });
+
+          container.innerHTML = html;
+        }
+
+        async function fetchUserMessages(uid) {
+          try {
+            let snap = await getDocs(collection(db, "users", uid, "notifications"));
+            let messages = snap.docs.map(d => {
+              let dt = d.data();
+              return {
+                id: d.id,
+                subject: dt.title || dt.subject || 'Announcement',
+                body: dt.message || dt.text || dt.body || '',
+                time: dt.createdAt || dt.timestamp || dt.time || new Date().toISOString(),
+                read: dt.read === true || dt.isRead === true
+              };
+            });
+
+            messages.sort((a, b) => {
+              const getTimeMs = (timeVal) => {
+                if (!timeVal) return 0;
+                if (typeof timeVal.toDate === 'function') return timeVal.toDate().getTime();
+                if (typeof timeVal.seconds === 'number') return timeVal.seconds * 1000;
+                const parsed = new Date(timeVal).getTime();
+                return isNaN(parsed) ? 0 : parsed;
+              };
+              return getTimeMs(b.time) - getTimeMs(a.time);
+            });
+
+            return messages;
+          } catch (e) {
+            console.error(e);
+            return [];
+          }
+        }
+
+        window.openMessageModal = async () => {
+          let c = document.getElementById('modal-msg-container'), t = ld[currLang] || ld.fa;
+          if (currentUserId) {
+            allMessages = await fetchUserMessages(currentUserId);
+            let unread = allMessages.filter(m => !m.read).length, b = document.getElementById('bell-badge');
+            if (b) { b.textContent = unread; b.classList.toggle('show', unread > 0); }
+          }
+          if (allMessages.length > 0) renderMessageList();
+          else c.innerHTML = `<div style="text-align:center;padding:20px;color:#94a3b8">${t.noMsg}</div>`;
+          document.getElementById('m-msg')?.classList.add('show');
+        };
+
+        function renderMessageList() {
+          let c = document.getElementById('modal-msg-container'), t = ld[currLang] || ld.fa, html = '<div style="display:flex;flex-direction:column;gap:10px;">';
+          allMessages.forEach((m, idx) => {
+            let dTime = '';
+            if (m.time) {
+              let d = typeof m.time.toDate === 'function' ? m.time.toDate() : new Date(m.time);
+              dTime = isNaN(d.getTime()) ? String(m.time) : d.toUTCString();
+            }
+            let unread = !m.read;
+            html += `<div class="msg-body-box" style="cursor:pointer;border-right:${unread ? '3px solid #38bdf8' : '1px solid rgba(255,255,255,.08)'};" onclick="window.readAdminMessage(${idx})">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div class="msg-title-text" style="${unread ? 'color:#fff;font-weight:800;' : ''}"><i class="fas fa-envelope${unread ? '' : '-open'}-text" style="color:#38bdf8;margin-left:5px;"></i> ${m.subject}</div>
+                ${unread ? `<span style="font-size:9px;background:#38bdf8;color:#0f172a;padding:2px 6px;border-radius:4px;font-weight:700;">${t.newBadge}</span>` : ''}
+              </div>
+              <div class="msg-desc-text" style="margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${m.body}</div>
+              <div style="font-size:10px;color:#64748b;margin-top:6px;text-align:left" dir="ltr">${dTime}</div>
+            </div>`;
+          });
+          c.innerHTML = html + '</div>';
+        }
+
+        window.readAdminMessage = async idx => {
+          let m = allMessages[idx]; if (!m) return;
+          if (!m.read && currentUserId && m.id) {
+            allMessages[idx].read = true;
+            try {
+              await updateDoc(doc(db, "users", currentUserId, "notifications", m.id), { read: true, isRead: true });
+              let unread = allMessages.filter(i => !i.read).length, b = document.getElementById('bell-badge');
+              if (b) { b.textContent = unread; b.classList.toggle('show', unread > 0); }
+            } catch (e) { console.error(e); }
+          }
+          let c = document.getElementById('modal-msg-container'), t = ld[currLang] || ld.fa, dTime = '';
+          if (m.time) {
+            let d = typeof m.time.toDate === 'function' ? m.time.toDate() : new Date(m.time);
+            dTime = isNaN(d.getTime()) ? String(m.time) : d.toUTCString();
+          }
+          c.innerHTML = `<button onclick="window.openMessageModal()" style="background:none;border:none;color:#38bdf8;cursor:pointer;font-size:12px;margin-bottom:12px;display:flex;align-items:center;gap:5px;padding:0;"><i class="fas fa-arrow-right"></i> ${t.backMsg}</button>
+          <div class="msg-body-box" style="padding:16px;">
+            <div class="msg-title-text" style="font-size:15px;margin-bottom:8px;"><i class="fas fa-envelope-open-text" style="color:#38bdf8;"></i> ${m.subject}</div>
+            <div class="msg-desc-text" style="font-size:13px;line-height:1.8;color:#f8fafc;white-space:pre-wrap;">${m.body}</div>
+            <div style="font-size:11px;color:#64748b;margin-top:14px;text-align:left;border-top:1px solid rgba(255,255,255,.05);padding-top:8px;" dir="ltr">${dTime}</div>
+          </div>`;
+        };
+
+        window.closeMessageModal = () => {
+          document.getElementById('m-msg')?.classList.remove('show');
+        };
+
+        window.openHelpModal = () => document.getElementById('m-help')?.classList.add('show');
+        window.closeHelpModal = () => document.getElementById('m-help')?.classList.remove('show');
+
+        window.filterTx = (type, btn) => {
+          currentFilter = type;
+          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          if (btn) btn.classList.add('active');
+          renderTransactions();
+        };
+
+        document.getElementById('bell-btn')?.addEventListener('click', e => { e.stopPropagation(); window.openMessageModal(); });
+        document.getElementById('help-btn')?.addEventListener('click', e => { e.stopPropagation(); window.openHelpModal(); });
+
+        onAuthStateChanged(auth, async u => {
+          if (!u) { window.location.href = 'index.html'; return; }
+          currentUserId = u.uid;
+          try {
+            let d = await getDoc(doc(db, "users", u.uid));
+            if (d.exists()) {
+              let data = d.data();
+              let rawBalance = data.balance ?? data.depositAmount ?? data.wallet ?? data.amount ?? 0;
+              let numericBalance = parseFloat(rawBalance);
+              if (isNaN(numericBalance)) numericBalance = 0;
+              
+              let elBal = document.getElementById('total-balance');
+              if (elBal) elBal.textContent = `$${numericBalance.toFixed(2)}`;
+
+              allMessages = await fetchUserMessages(u.uid);
+              let unread = allMessages.filter(m => !m.read).length, b = document.getElementById('bell-badge');
+              if (b && unread > 0) { b.textContent = unread; b.classList.add('show'); }
+            }
+
+            // دریافت و نمایش تراکنش‌های واقعی کاربر
+            userTransactions = await fetchUserTransactions(u.uid);
+            renderTransactions();
+
+          } catch (e) {
+            console.error("خطا در دریافت اطلاعات کاربر:", e);
+            renderTransactions();
+          }
+        });
+
+        const mBtn = document.getElementById('menu-btn'), nMenu = document.getElementById('nav-menu'), lBtn = document.getElementById('lang-btn'), lMenu = document.getElementById('lang-menu');
+        function toggleM(m, e) { e?.stopPropagation(); [nMenu, lMenu].forEach(x => { if (x && x !== m) x.classList.remove('show'); }); m?.classList.toggle('show'); }
+        mBtn?.addEventListener('click', e => toggleM(nMenu, e));
+        lBtn?.addEventListener('click', e => toggleM(lMenu, e));
+        document.addEventListener('click', e => {
+          if (!e.target.closest('.menu') && !e.target.closest('#menu-btn') && !e.target.closest('#lang-btn')) {
+            [nMenu, lMenu].forEach(x => x?.classList.remove('show'));
+          }
+        });
+        window.addEventListener('scroll', () => [nMenu, lMenu].forEach(x => x?.classList.remove('show')));
+
+        function setLang(l) {
+          currLang = l;
+          localStorage.setItem('zenix_lang', l);
+          [nMenu, lMenu].forEach(x => x?.classList.remove('show'));
+          let t = ld[l] || ld.fa;
+          let r = l === 'fa' || l === 'ar';
+          
+          document.documentElement.setAttribute('dir', r ? 'rtl' : 'ltr');
+          document.documentElement.setAttribute('lang', l);
+
+          let map = {
+            't-tx-title': t.txTitle, 't-tx-sub': t.txSub, 't-tot-bal': t.totBal,
+            't-list-title': t.listTitle, 'f-all': t.fAll, 'f-deposit': t.fDep,
+            'f-withdraw': t.fWith, 'f-commission': t.fComm, 'f-failed': t.fFailed,
+            'm1': t.m1, 'm2': t.m2, 'm3': t.m3, 'm4': t.m4, 'm-team': t.mTeam,
+            'm5': t.m5, 'm6': t.m6, 'm7': t.m7, 'm8': t.m8, 't-node': t.tNode,
+            't-modal-title': t.modalTitle, 't-help-title': t.helpTitle
+          };
+
+          Object.keys(map).forEach(id => {
+            let el = document.getElementById(id);
+            if (el && map[id]) el.textContent = map[id];
+          });
+
+          let helpBtn = document.getElementById('help-btn');
+          if (helpBtn) helpBtn.setAttribute('title', t.helpBtnTitle || '');
+
+          for (let i = 1; i <= 4; i++) {
+            let ht = document.getElementById('t-hp-t' + i);
+            let hd = document.getElementById('t-hp-d' + i);
+            if (ht) {
+              const icons = ['fa-history', 'fa-filter', 'fa-wallet', 'fa-check-circle'];
+              const colors = ['#38bdf8', '#38bdf8', '#a855f7', '#22c55e'];
+              ht.innerHTML = `<i class="fas ${icons[i-1]}" style="color:${colors[i-1]}"></i> ` + (t['hpT' + i] || '');
+            }
+            if (hd) hd.textContent = t['hpD' + i] || '';
+          }
+
+          renderTransactions();
+        }
+
+        document.querySelectorAll('#lang-menu .mi').forEach(i => i.addEventListener('click', () => setLang(i.dataset.lang)));
+
+        document.getElementById('logout-btn')?.addEventListener('click', async e => {
+          e.preventDefault(); try { await signOut(auth); } catch (e) {}
+          localStorage.clear(); window.location.href = 'index.html';
+        });
+
+        setLang(currLang);
+    </script>
+</body>
+</html>
