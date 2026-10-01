@@ -337,13 +337,13 @@
                 if (authError) throw authError;
 
                 if (authData?.user) {
-                    // ۴. درج اطلاعات کامل در جدول users دیتابیس
+                    // ۴. درج اطلاعات کامل در جدول users دیتابیس (منطبق با Display name در Supabase)
                     const { error: dbError } = await supabaseClient
                         .from('users')
                         .upsert({
                             id: authData.user.id,
                             email: emailValue,
-                            display_name: fullNameValue,
+                            "Display name": fullNameValue,
                             full_name: fullNameValue,
                             fullname: fullNameValue,
                             referred_by: referrerFinalValue,
