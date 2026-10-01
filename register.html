@@ -44,10 +44,8 @@
         [dir="ltr"] input{padding-left:36px;padding-right:36px}
         input:focus{border-color:#38bdf8}
 
-        /* قفل کامل فیلد Readonly و جلوگیری از نوشتن و فوکوس */
         input[readonly]{background:rgba(15,23,42,.6)!important;color:#94a3b8!important;border-color:rgba(255,255,255,.08)!important;cursor:not-allowed!important;user-select:none;pointer-events:none}
 
-        /* استایل کپچا */
         .cap-box{background:rgba(10,15,30,.5);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;margin-bottom:14px}
         .cap-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px}
         #c-canvas{border-radius:12px;background:#050811;border:1px solid rgba(56,189,248,.3);cursor:pointer;box-shadow:0 6px 25px rgba(0,0,0,.7),inset 0 0 15px rgba(56,189,248,.05)}
@@ -159,7 +157,7 @@
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-        // اطلاعات پروژه سوپابیس شما
+        // تنظیمات سوپابیس
         const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -296,12 +294,13 @@
                 // ۲. ایجاد کد معرف جدید برای کاربر ثبت‌نامی
                 const userOwnRefCode = Math.random().toString(36).substring(2, 8).toUpperCase();
 
-                // ۳. ثبت‌نام در Supabase Auth همراه با متادیتا
+                // ۳. ثبت‌نام در Supabase Auth همراه با display_name جهت نمایش در پنل سوپابیس
                 const { data: authData, error: authError } = await supabaseClient.auth.signUp({
                     email: emailValue,
                     password: passIn.value,
                     options: {
                         data: {
+                            display_name: fullNameValue,
                             full_name: fullNameValue,
                             fullname: fullNameValue,
                             referred_by: refCodeValue,
@@ -319,6 +318,7 @@
                         .upsert({
                             id: authData.user.id,
                             email: emailValue,
+                            display_name: fullNameValue,
                             full_name: fullNameValue,
                             fullname: fullNameValue,
                             referred_by: refCodeValue,
