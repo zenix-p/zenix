@@ -362,6 +362,7 @@
         let currentUser = null;
         let allMessages = [];
         let currentUserId = null;
+        let userRealtimeChannel = null;
 
         function lockPhoneInput(phoneNumber) {
             const phoneInput = document.getElementById('user-phone-input');
@@ -396,7 +397,7 @@
               .eq('user_id', uid)
               .order('created_at', { ascending: false });
 
-            if (error) throw error;
+            if (error) return [];
 
             return (data || []).map(dt => ({
               id: dt.id,
@@ -406,7 +407,6 @@
               read: dt.read === true || dt.is_read === true
             }));
           } catch (e) {
-            console.error(e);
             return [];
           }
         }
@@ -626,8 +626,11 @@
 
             await loadUserData(session.user);
 
-            supabaseClient
-              .channel('public:users')
+            if (userRealtimeChannel) {
+                supabaseClient.removeChannel(userRealtimeChannel);
+            }
+            userRealtimeChannel = supabaseClient
+              .channel(`public:users:${session.user.id}`)
               .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${session.user.id}` }, payload => {
                 loadUserData(session.user);
               })
@@ -638,7 +641,6 @@
           }
         });
 
-        // اکشن ذخیره‌سازی شماره تماس - به‌روزرسانی‌شده جهت جلوگیری از خطای RLS/Upsert
         window.savePhone = async function() {
           const phoneInput = document.getElementById('user-phone-input');
           const errEl = document.getElementById('phone-err-msg');
@@ -676,14 +678,12 @@
             const fullPhone = code + phone;
 
             try {
-              // روش اول: آپدیت رکورد بر اساس آیدی کاربر لاگین شده
               let { data, error } = await supabaseClient
                 .from('users')
                 .update({ phone: fullPhone })
                 .eq('id', currentUser.id)
                 .select();
 
-              // روش دوم: اگر هنوز رکوردی در جدول ثبت نشده، یک رکورد جدید بساز (upsert)
               if (!error && (!data || data.length === 0)) {
                 const upsertRes = await supabaseClient
                   .from('users')
