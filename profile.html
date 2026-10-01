@@ -1,8 +1,9 @@
+// === فقط این تابع را جایگزین savePhone قبلی کنید ===
 window.savePhone = async function() {
   const phoneInput = document.getElementById('user-phone-input');
   let phone = phoneInput ? phoneInput.value.trim() : '';
   
-  // حذف خودکار صفر اول شماره
+  // حذف صفر اول شماره در صورت ورود اشتباه
   if (phone.startsWith('0')) {
     phone = phone.replace(/^0+/, '');
     phoneInput.value = phone;
@@ -13,7 +14,7 @@ window.savePhone = async function() {
   const succEl = document.getElementById('phone-success');
   const saveBtn = document.getElementById('save-phone-btn');
 
-  // اگر کد کشور انتخاب نشده بود، پیش‌فرض +98 قرار داده می‌شود
+  // انتخاب خودکار کد ایران در صورت خالی بودن
   if (!code) {
     code = '+98';
     document.getElementById('country-code').value = '+98';
@@ -23,17 +24,17 @@ window.savePhone = async function() {
     }
   }
 
-  // بررسی ورود کاربر
+  // بررسی وضعیت ورود کاربر
   if (!currentUser) {
     if (errEl) {
-      errEl.textContent = 'نشست کاری شما منقضی شده است. لطفاً دوباره وارد شوید.';
+      errEl.textContent = 'نشست کاربر یافت نشد. لطفاً دوباره وارد شوید.';
       errEl.style.display = 'block';
     }
-    alert('خطا: کاربر وارد سیستم نشده است (currentUser یافت نشد).');
+    alert('خطا: کاربر وارد سیستم نشده است (currentUser مقدار ندارد).');
     return;
   }
 
-  // بررسی ۱۰ رقمی بودن شماره
+  // اعتبارسنجی ۱۰ رقمی بودن
   if (phone.length === 10 && /^\d+$/.test(phone)) {
     if (saveBtn) {
       saveBtn.disabled = true;
@@ -43,15 +44,14 @@ window.savePhone = async function() {
     const fullPhone = code + phone;
 
     try {
-      // تلاش برای به‌روزرسانی
+      // ۱. تلاش برای به‌روزرسانی (Update)
       let { error } = await supabase
         .from('users')
         .update({ phone: fullPhone })
         .eq('id', currentUser.id);
 
-      // اگر رکوردی یافت نشد، ایجاد رکورد جدید (upsert)
+      // ۲. در صورت عدم وجود رکورد، ساخت رکورد جدید (Upsert)
       if (error) {
-        console.warn('تلاش مجدد با upsert به دلیل خطا:', error);
         const { error: upsertErr } = await supabase
           .from('users')
           .upsert({ id: currentUser.id, phone: fullPhone, email: currentUser.email });
@@ -69,24 +69,22 @@ window.savePhone = async function() {
         lockPhoneInput(fullPhone);
         alert('شماره تماس با موفقیت ذخیره شد.');
       } else {
-        console.error('خطای Supabase:', error);
         if (errEl) {
-          errEl.textContent = 'خطا در دیتابیس: ' + error.message;
+          errEl.textContent = 'خطا در ذخیره‌سازی: ' + error.message;
           errEl.style.display = 'block';
         }
-        alert('خطای دیتابیس Supabase:\n' + error.message);
+        alert('پاسخ دیتابیس Supabase:\n' + error.message);
       }
     } catch (e) {
-      console.error(e);
       if (saveBtn) {
         saveBtn.disabled = false;
         saveBtn.innerText = 'ذخیره';
       }
-      alert('خطای غیرمنتظره: ' + e.message);
+      alert('خطای اجرای کد: ' + e.message);
     }
   } else {
     if (errEl) {
-      errEl.textContent = 'شماره باید ۱۰ رقم و بدون صفر باشد (مانند: 9123456789)';
+      errEl.textContent = 'شماره باید ۱۰ رقم و بدون صفر باشد (مثال: 9123456789)';
       errEl.style.display = 'block';
     }
   }
