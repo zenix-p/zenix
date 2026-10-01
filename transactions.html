@@ -100,7 +100,7 @@
                     <a href="transactions.html" class="mi active"><i class="fas fa-history" style="color:#06b6d4"></i><span id="m5">تراکنش</span></a>
                     <a href="profile.html" class="mi"><i class="fas fa-user-cog" style="color:#ec4899"></i><span id="m6">پروفایل</span></a>
                     <a href="support.html" class="mi"><i class="fas fa-headset" style="color:#a855f7"></i><span id="m7">پشتیبانی</span></a>
-                    <a href="index.html" class="mi" id="logout-btn" style="color:#ef4444"><i class="fas fa-power-off"></i><span id="m8">خروج</span></a>
+                    <a href="#" class="mi" id="logout-btn" style="color:#ef4444"><i class="fas fa-power-off"></i><span id="m8">خروج</span></a>
                 </div>
             </div>
         </div>
@@ -181,22 +181,11 @@
     </footer>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-        const app = initializeApp({
-          apiKey: "AIzaSyAqIksPfjCCQZNQDVx3MEdDyJyNMaTvtlk",
-          authDomain: "zenix-platform.firebaseapp.com",
-          projectId: "zenix-platform",
-          storageBucket: "zenix-platform.firebasestorage.app",
-          messagingSenderId: "594936010622",
-          appId: "1:594936010622:web:9f4159c80111245062052f",
-          measurementId: "G-LXSGYB8WKM"
-        });
-
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        const SUPABASE_URL = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currLang = localStorage.getItem('zenix_lang') || 'fa';
         let allMessages = [];
@@ -236,136 +225,17 @@
             hpT2: 'Filter Transactions', hpD2: 'Use the filter buttons (All, Deposit, Withdraw, Commission, Failed) to easily categorize and inspect transactions.',
             hpT3: 'Total Balance Card', hpD3: 'At the top of the page, your total live USD wallet balance is displayed in real time.',
             hpT4: 'Transaction Status Display', hpD4: 'Approved transactions appear in their respective sections, while admin-rejected transactions are shown under "Failed Transactions".'
-          },
-          ar: {
-            txTitle: 'سجل المعاملات', txSub: 'عرض ومراجعة كافة المعاملات المالية والمكافآت',
-            totBal: 'إجمالي الرصيد:', listTitle: 'قائمة المعاملات',
-            fAll: 'الكل', fDep: 'إيداع', fWith: 'سحب', fComm: 'العمولة', fFailed: 'المعاملات الفاشلة',
-            m1: 'الرئيسية', m2: 'الكمية', m3: 'إيداع', m4: 'سحب', mTeam: 'فريقي', m5: 'المعاملات', m6: 'الملف الشخصي', m7: 'الدعم', m8: 'خروج',
-            tNode: 'خادم نشط (US-East)', modalTitle: 'رسائل الإدارة', noMsg: 'لا توجد رسائل جديدة من الإدارة.',
-            backMsg: 'العودة إلى قائمة الرسائل', newBadge: 'جديد',
-            typeDeposit: 'إيداع تتر (USDT)', typeWithdraw: 'سحب أموال', typeCommission: 'العمولة',
-            stSuccess: 'مؤكد', stFailed: 'مرفوض',
-            noTx: 'لم يتم العثور على أي معاملات.', loading: 'جاري تحميل المعاملات...',
-            helpTitle: 'دليل صفحة المعاملات', helpBtnTitle: 'دليل صفحة المعاملات',
-            hpT1: 'ما هو هدف هذه الصفحة؟', hpD1: 'يمكنك في هذه الصفحة عرض ومتابعة سجل كامل بجميع المعاملات المالية لحسابك.',
-            hpT2: 'تصفية المعاملات', hpD2: 'استخدم أزرار التصفية (الكل، إيداع، سحب، العمولة، المعاملات الفاشلة) لتصنيف وتدقيق المعاملات بسرعة.',
-            hpT3: 'بطاقة إجمالي الرصيد', hpD3: 'يتم عرض إجمالي رصيد محفظتك بالدولار بشكل مباشر في أعلى الصفحة.',
-            hpT4: 'عرض المعاملات', hpD4: 'تظهر المعاملات المؤكدة في أقسامها، وتظهر المعاملات المرفوضة في قسم "المعاملات الفاشلة".'
-          },
-          tr: {
-            txTitle: 'İşlem Geçmişi', txSub: 'Tüm finansal işlemleri ve ödülleri inceleyin',
-            totBal: 'Toplam Bakiye:', listTitle: 'İşlem Listesi',
-            fAll: 'Tümü', fDep: 'Yatırma', fWith: 'Çekim', fComm: 'Komisyon', fFailed: 'Başarısız İşlemler',
-            m1: 'Ana Sayfa', m2: 'Kantifikasyon', m3: 'Para Yatırma', m4: 'Çekim', mTeam: 'Takımım', m5: 'İşlemler', m6: 'Profil', m7: 'Destek', m8: 'Çıkış',
-            tNode: 'Sunucu Aktif (US-East)', modalTitle: 'Yönetici Mesajları', noMsg: 'Yöneticiden yeni mesaj yok.',
-            backMsg: 'Mesaj Listesine Dön', newBadge: 'YENİ',
-            typeDeposit: 'Tether Yatırma (USDT)', typeWithdraw: 'Para Çekme', typeCommission: 'Komisyon',
-            stSuccess: 'Onaylandı', stFailed: 'Reddedildi',
-            noTx: 'İşlem bulunamadı.', loading: 'İşlemler yükleniyor...',
-            helpTitle: 'İşlemler Sayfası Kılavuzu', helpBtnTitle: 'İşlemler Sayfası Kılavuzu',
-            hpT1: 'Bu sayfanın amacı nedir?', hpD1: 'Bu sayfada yatırımlar, çekimler ve komisyonlar dahil tüm finansal işlemlerinizin detaylı geçmişini inceleyebilirsiniz.',
-            hpT2: 'İşlem Filtreleme', hpD2: 'Filtre butonlarını (Tümü, Yatırma, Çekim, Komisyon, Başarısız İşlemler) kullanarak işlemleri inceleyebilirsiniz.',
-            hpT3: 'Toplam Bakiye Kartı', hpD3: 'Sayfanın üst kısmında canlı USD cüzdan bakiyeniz anlık olarak gösterilmektedir.',
-            hpT4: 'İşlem Durumları', hpD4: 'Onaylanan işlemler ilgili kategorilerde, reddedilen işlemler ise "Başarısız İşlemler" bölümünde yer alır.'
-          },
-          ru: {
-            txTitle: 'История транзакций', txSub: 'Просмотр всех финансовых операций и наград',
-            totBal: 'Общий баланс:', listTitle: 'Список транзакций',
-            fAll: 'Все', fDep: 'Депозит', fWith: 'Вывод', fComm: 'Комиссия', fFailed: 'Отклоненные',
-            m1: 'Главная', m2: 'Квантификация', m3: 'Депозит', m4: 'Вывод', mTeam: 'Моя команда', m5: 'Транзакции', m6: 'Профиль', m7: 'Поддержка', m8: 'Выйти',
-            tNode: 'Сервер активен (US-East)', modalTitle: 'Сообщения админа', noMsg: 'Нет новых сообщений от администратора.',
-            backMsg: 'Назад к списку сообщений', newBadge: 'НОВОЕ',
-            typeDeposit: 'Депозит Tether (USDT)', typeWithdraw: 'Вывод средств', typeCommission: 'Комиссия',
-            stSuccess: 'Одобрено', stFailed: 'Отклонено',
-            noTx: 'Транзакции не найдены.', loading: 'Загрузка транзакций...',
-            helpTitle: 'Руководство по транзакциям', helpBtnTitle: 'Справка по странице транзакций',
-            hpT1: 'Каково назначение этой страницы?', hpD1: 'На этой странице вы можете просмотреть всю историю финансовых операций.',
-            hpT2: 'Фильтрация транзакций', hpD2: 'Используйте кнопки фильтров (Все, Депозит, Вывод, Комиссия, Отклоненные) для быстрой сортировки.',
-            hpT3: 'Карточка общего баланса', hpD3: 'В верхней части страницы отображается ваш общий текущий баланс USD.',
-            hpT4: 'Отображение транзакций', hpD4: 'Одобренные операции отображаются в своих разделах, а отклоненные — в разделе "Отклоненные".'
-          },
-          es: {
-            txTitle: 'Historial de Transacciones', txSub: 'Ver y revisar todas las transacciones financieras y recompensas',
-            totBal: 'Saldo Total:', listTitle: 'Lista de Transacciones',
-            fAll: 'Todos', fDep: 'Depósito', fWith: 'Retiro', fComm: 'Comisión', fFailed: 'Transacciones Fallidas',
-            m1: 'Inicio', m2: 'Cuantificación', m3: 'Depósito', m4: 'Retiro', mTeam: 'Mi Equipo', m5: 'Transacciones', m6: 'Perfil', m7: 'Soporte', m8: 'Cerrar Sesión',
-            tNode: 'Servidor Activo (US-East)', modalTitle: 'Mensajes del Admin', noMsg: 'No hay mensajes nuevos del admin.',
-            backMsg: 'Volver a la Lista de Mensajes', newBadge: 'NUEVO',
-            typeDeposit: 'Depósito Tether (USDT)', typeWithdraw: 'Retiro de fondos', typeCommission: 'Comisión',
-            stSuccess: 'Aprobado', stFailed: 'Rechazado',
-            noTx: 'No se encontraron transacciones.', loading: 'Cargando transacciones...',
-            helpTitle: 'Guía de Transacciones', helpBtnTitle: 'Guía de la página de transacciones',
-            hpT1: '¿Cuál es el propósito de esta página?', hpD1: 'En esta página puede ver y rastrear el historial completo de sus transacciones financieras.',
-            hpT2: 'Filtrar Transacciones', hpD2: 'Utilice los botones de filtro (Todos, Depósito, Retiro, Comisión, Fallidas) para clasificar sus operaciones.',
-            hpT3: 'Tarjeta de Saldo Total', hpD3: 'En la parte superior se muestra el saldo total en tiempo real de su billetera USD.',
-            hpT4: 'Visualización de Transacciones', hpD4: 'Las transacciones aprobadas aparecen en sus secciones y las rechazadas en "Transacciones Fallidas".'
-          },
-          fr: {
-            txTitle: 'Historique des Transactions', txSub: 'Consultez toutes les transactions financières et récompenses',
-            totBal: 'Solde Total :', listTitle: 'Liste des Transactions',
-            fAll: 'Tous', fDep: 'Dépôt', fWith: 'Retrait', fComm: 'Commission', fFailed: 'Transactions Échouées',
-            m1: 'Accueil', m2: 'Quantification', m3: 'Dépôt', m4: 'Retrait', mTeam: 'Mon Équipe', m5: 'Transactions', m6: 'Profil', m7: 'Support', m8: 'Déconnexion',
-            tNode: 'Serveur Actif (US-East)', modalTitle: 'Messages Admin', noMsg: 'Aucun nouveau message de l’administrateur.',
-            backMsg: 'Retour à la Liste des Messages', newBadge: 'NOUVEAU',
-            typeDeposit: 'Dépôt Tether (USDT)', typeWithdraw: 'Retrait de fonds', typeCommission: 'Commission',
-            stSuccess: 'Approuvé', stFailed: 'Rejeté',
-            noTx: 'Aucune transaction trouvée.', loading: 'Chargement des transactions...',
-            helpTitle: 'Guide des Transactions', helpBtnTitle: 'Guide de la page des transactions',
-            hpT1: 'Quel est le rôle de cette page ?', hpD1: 'Sur cette page, vous pouvez consulter l’historique complet de vos transactions financières.',
-            hpT2: 'Filtrer les Transactions', hpD2: 'Utilisez les boutons de filtre (Tous, Dépôt, Retrait, Commission, Échouées) pour trier vos opérations.',
-            hpT3: 'Carte Solde Total', hpD3: 'En haut de la page, le solde total en direct de votre portefeuille USD est affiché en temps réel.',
-            hpT4: 'Affichage des Transactions', hpD4: 'Les transactions approuvées apparaissent dans leurs sections et les rejetées dans "Transactions Échouées".'
-          },
-          de: {
-            txTitle: 'Transaktionsverlauf', txSub: 'Alle Finanztransaktionen und Belohnungen einsehen',
-            totBal: 'Gesamtguthaben:', listTitle: 'Transaktionsliste',
-            fAll: 'Alle', fDep: 'Einzahlung', fWith: 'Auszahlung', fComm: 'Provision', fFailed: 'Fehlgeschlagen',
-            m1: 'Startseite', m2: 'Quantifizierung', m3: 'Einzahlung', m4: 'Auszahlung', mTeam: 'Mein Team', m5: 'Transaktionen', m6: 'Profil', m7: 'Support', m8: 'Abmelden',
-            tNode: 'Server Aktiv (US-East)', modalTitle: 'Admin-Nachrichten', noMsg: 'Keine neuen Nachrichten vom Admin.',
-            backMsg: 'Zurück zur Nachrichtenliste', newBadge: 'NEU',
-            typeDeposit: 'Tether Einzahlung (USDT)', typeWithdraw: 'Auszahlung', typeCommission: 'Provision',
-            stSuccess: 'Bestätigt', stFailed: 'Abgelehnt',
-            noTx: 'Keine Transaktionen gefunden.', loading: 'Transaktionen werden geladen...',
-            helpTitle: 'Transaktions-Anleitung', helpBtnTitle: 'Anleitung zur Transaktionsseite',
-            hpT1: 'Was ist der Zweck dieser Seite?', hpD1: 'Auf dieser Seite können Sie die vollständige Historie aller Finanztransaktionen einsehen.',
-            hpT2: 'Transaktionen Filtern', hpD2: 'Nutzen Sie die Filter-Buttons (Alle, Einzahlung, Auszahlung, Provision, Fehlgeschlagen) zur Kategorisierung.',
-            hpT3: 'Gesamtguthaben-Karte', hpD3: 'Oben auf der Seite wird Ihr Live-USD-Guthaben in Echtzeit angezeigt.',
-            hpT4: 'Anzeige der Transaktionen', hpD4: 'Bestätigte Transaktionen erscheinen in den jeweiligen Kategorien, abgelehnte unter "Fehlgeschlagen".'
           }
         };
 
-        // دریافت تراکنش‌های کاربر از دیتابیس
+        // دریافت تراکنش‌های کاربر از دیتابیس Supabase
         async function fetchUserTransactions(uid) {
           try {
-            let snap = await getDocs(collection(db, "users", uid, "transactions"));
-            let list = snap.docs.map(docSnap => ({
-              id: docSnap.id,
-              ...docSnap.data()
-            }));
+            const { data, error } = await supabase.from('transactions').select('*').eq('user_id', uid);
+            if (error || !data) return [];
 
-            // جستجو در مجموعه‌کل در صورت عدم وجود در زیرمجموعه
-            if (list.length === 0) {
-              try {
-                let qSnap = await getDocs(query(collection(db, "transactions"), where("userId", "==", uid)));
-                qSnap.forEach(docSnap => {
-                  list.push({ id: docSnap.id, ...docSnap.data() });
-                });
-              } catch(err) {}
-            }
-
-            // مرتب‌سازی بر اساس تاریخ
-            list.sort((a, b) => {
-              const getTime = (val) => {
-                if (!val) return 0;
-                if (typeof val.toDate === 'function') return val.toDate().getTime();
-                if (typeof val.seconds === 'number') return val.seconds * 1000;
-                let parsed = new Date(val).getTime();
-                return isNaN(parsed) ? 0 : parsed;
-              };
-              return getTime(b.createdAt || b.timestamp || b.time || b.date) - getTime(a.createdAt || a.timestamp || a.time || a.date);
-            });
-
+            let list = [...data];
+            list.sort((a, b) => new Date(b.created_at || b.createdAt || 0) - new Date(a.created_at || a.createdAt || 0));
             return list;
           } catch (e) {
             console.error("خطا در دریافت تراکنش‌ها:", e);
@@ -384,14 +254,11 @@
             let isApproved = rawSt === 'success' || rawSt === 'approved' || rawSt === 'completed' || rawSt === 'done' || rawSt === 'موفق' || rawSt === 'تایید شده';
             let isFailed = rawSt.includes('fail') || rawSt.includes('reject') || rawSt.includes('cancel') || rawSt === 'ناموفق' || rawSt === 'رد شده';
 
-            // اگر زبا‌نه «تراکنش ناموفق» انتخاب شده باشد: فقط تراکنش‌های ردشده/ناموفق نمایش داده شوند
             if (currentFilter === 'failed') {
               return isFailed;
             }
 
-            // برای سایر زبانه‌ها (همه، واریز، برداشت، کمیسیون): فقط تراکنش‌های تاییدشده نمایش داده شوند
             if (!isApproved) return false;
-
             if (currentFilter === 'all') return true;
 
             let itemType = String(item.type || '').toLowerCase();
@@ -416,7 +283,6 @@
             let typeClass = isWithdraw ? 'withdraw' : (isComm ? 'commission' : 'deposit');
             let iconClass = isWithdraw ? 'fa-arrow-up' : (isComm ? 'fa-users' : 'fa-arrow-down');
 
-            // عنوان
             let titleText = tx.title || tx.description;
             if (!titleText) {
               if (isWithdraw) titleText = t.typeWithdraw;
@@ -424,23 +290,20 @@
               else titleText = t.typeDeposit;
             }
 
-            // تاریخ
-            let timeVal = tx.createdAt || tx.timestamp || tx.time || tx.date;
+            let timeVal = tx.created_at || tx.createdAt || tx.timestamp || tx.time;
             let dateStr = '';
             if (timeVal) {
-              let d = typeof timeVal.toDate === 'function' ? timeVal.toDate() : new Date(timeVal);
+              let d = new Date(timeVal);
               dateStr = isNaN(d.getTime()) ? String(timeVal) : d.toLocaleString(currLang === 'fa' ? 'fa-IR' : 'en-US');
             } else {
               dateStr = '---';
             }
 
-            // مبلغ
             let numAmt = parseFloat(tx.amount || 0);
             let sign = isWithdraw ? '-' : '+';
             let amtClass = isWithdraw ? 'negative' : 'positive';
             let formattedAmt = `${sign}${Math.abs(numAmt).toFixed(2)} ${tx.currency || 'USDT'}`;
 
-            // وضعیت
             let rawSt = String(tx.status || '').toLowerCase().trim();
             let isFailed = rawSt.includes('fail') || rawSt.includes('reject') || rawSt.includes('cancel') || rawSt === 'ناموفق' || rawSt === 'رد شده';
             let stText = isFailed ? t.stFailed : t.stSuccess;
@@ -467,29 +330,18 @@
 
         async function fetchUserMessages(uid) {
           try {
-            let snap = await getDocs(collection(db, "users", uid, "notifications"));
-            let messages = snap.docs.map(d => {
-              let dt = d.data();
-              return {
-                id: d.id,
-                subject: dt.title || dt.subject || 'Announcement',
-                body: dt.message || dt.text || dt.body || '',
-                time: dt.createdAt || dt.timestamp || dt.time || new Date().toISOString(),
-                read: dt.read === true || dt.isRead === true
-              };
-            });
+            const { data, error } = await supabase.from('notifications').select('*').eq('user_id', uid);
+            if (error || !data) return [];
 
-            messages.sort((a, b) => {
-              const getTimeMs = (timeVal) => {
-                if (!timeVal) return 0;
-                if (typeof timeVal.toDate === 'function') return timeVal.toDate().getTime();
-                if (typeof timeVal.seconds === 'number') return timeVal.seconds * 1000;
-                const parsed = new Date(timeVal).getTime();
-                return isNaN(parsed) ? 0 : parsed;
-              };
-              return getTimeMs(b.time) - getTimeMs(a.time);
-            });
+            let messages = data.map(d => ({
+              id: d.id,
+              subject: d.title || d.subject || 'Announcement',
+              body: d.message || d.text || d.body || '',
+              time: d.created_at || d.createdAt || new Date().toISOString(),
+              read: d.read === true || d.isRead === true
+            }));
 
+            messages.sort((a, b) => new Date(b.time) - new Date(a.time));
             return messages;
           } catch (e) {
             console.error(e);
@@ -514,7 +366,7 @@
           allMessages.forEach((m, idx) => {
             let dTime = '';
             if (m.time) {
-              let d = typeof m.time.toDate === 'function' ? m.time.toDate() : new Date(m.time);
+              let d = new Date(m.time);
               dTime = isNaN(d.getTime()) ? String(m.time) : d.toUTCString();
             }
             let unread = !m.read;
@@ -535,14 +387,14 @@
           if (!m.read && currentUserId && m.id) {
             allMessages[idx].read = true;
             try {
-              await updateDoc(doc(db, "users", currentUserId, "notifications", m.id), { read: true, isRead: true });
+              await supabase.from("notifications").update({ read: true, isRead: true }).eq('id', m.id);
               let unread = allMessages.filter(i => !i.read).length, b = document.getElementById('bell-badge');
               if (b) { b.textContent = unread; b.classList.toggle('show', unread > 0); }
             } catch (e) { console.error(e); }
           }
           let c = document.getElementById('modal-msg-container'), t = ld[currLang] || ld.fa, dTime = '';
           if (m.time) {
-            let d = typeof m.time.toDate === 'function' ? m.time.toDate() : new Date(m.time);
+            let d = new Date(m.time);
             dTime = isNaN(d.getTime()) ? String(m.time) : d.toUTCString();
           }
           c.innerHTML = `<button onclick="window.openMessageModal()" style="background:none;border:none;color:#38bdf8;cursor:pointer;font-size:12px;margin-bottom:12px;display:flex;align-items:center;gap:5px;padding:0;"><i class="fas fa-arrow-right"></i> ${t.backMsg}</button>
@@ -570,32 +422,38 @@
         document.getElementById('bell-btn')?.addEventListener('click', e => { e.stopPropagation(); window.openMessageModal(); });
         document.getElementById('help-btn')?.addEventListener('click', e => { e.stopPropagation(); window.openHelpModal(); });
 
-        onAuthStateChanged(auth, async u => {
-          if (!u) { window.location.href = 'index.html'; return; }
-          currentUserId = u.uid;
+        async function loadUserData(user) {
+          currentUserId = user.id;
           try {
-            let d = await getDoc(doc(db, "users", u.uid));
-            if (d.exists()) {
-              let data = d.data();
-              let rawBalance = data.balance ?? data.depositAmount ?? data.wallet ?? data.amount ?? 0;
+            const { data: userData } = await supabase.from('users').select('*').eq('id', user.id).single();
+            if (userData) {
+              let rawBalance = userData.balance ?? userData.depositAmount ?? userData.wallet ?? userData.amount ?? 0;
               let numericBalance = parseFloat(rawBalance);
               if (isNaN(numericBalance)) numericBalance = 0;
               
               let elBal = document.getElementById('total-balance');
               if (elBal) elBal.textContent = `$${numericBalance.toFixed(2)}`;
 
-              allMessages = await fetchUserMessages(u.uid);
+              allMessages = await fetchUserMessages(user.id);
               let unread = allMessages.filter(m => !m.read).length, b = document.getElementById('bell-badge');
               if (b && unread > 0) { b.textContent = unread; b.classList.add('show'); }
             }
 
-            // دریافت و نمایش تراکنش‌های واقعی کاربر
-            userTransactions = await fetchUserTransactions(u.uid);
+            userTransactions = await fetchUserTransactions(user.id);
             renderTransactions();
 
           } catch (e) {
             console.error("خطا در دریافت اطلاعات کاربر:", e);
             renderTransactions();
+          }
+        }
+
+        // بررسی هوشمند وضعیت لاگین بدون هدایت اشتباه
+        supabase.auth.onAuthStateChange((event, session) => {
+          if (session && session.user) {
+            loadUserData(session.user);
+          } else {
+            window.location.href = 'index.html';
           }
         });
 
@@ -654,8 +512,10 @@
         document.querySelectorAll('#lang-menu .mi').forEach(i => i.addEventListener('click', () => setLang(i.dataset.lang)));
 
         document.getElementById('logout-btn')?.addEventListener('click', async e => {
-          e.preventDefault(); try { await signOut(auth); } catch (e) {}
-          localStorage.clear(); window.location.href = 'index.html';
+          e.preventDefault();
+          await supabase.auth.signOut();
+          localStorage.clear();
+          window.location.href = 'index.html';
         });
 
         setLang(currLang);
