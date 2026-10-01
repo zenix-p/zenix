@@ -1,9 +1,8 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-// آدرس پایه پروژه Supabase شما
+// آدرس پایه و کلید عمومی پروژه Supabase شما
 const SUPABASE_URL = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
-// ⚠️ کلید anon پروژه خود را (از بخش Project Settings > API) به جای مقدار زیر قرار دهید
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
 
 let supabase = null;
 if (SUPABASE_URL && SUPABASE_URL.startsWith('http')) {
