@@ -73,7 +73,6 @@ function setLang(lang) {
   currLang = lang;
   localStorage.setItem('zenix_lang', lang);
 
-  // فعال‌سازی کلاس active و رنگ آبی برای زبان انتخابی
   document.querySelectorAll('#lang-menu .mi').forEach(item => {
     if (item.getAttribute('data-lang') === lang) {
       item.classList.add('active');
@@ -139,78 +138,72 @@ function setLang(lang) {
 // دریافت و رندر قیمت زنده ۳ ارز برتر بازار
 // ==========================================
 async function fetchCryptoMarket() {
-  const container = document.getElementById('crypto-market-list') || 
-                    document.getElementById('mkt-list') || 
-                    document.getElementById('crypto-list');
+  // جستجو بر اساس شناسه صحیح موجود در فایل HTML
+  const container = document.getElementById('crypto-ticker-list') || 
+                    document.getElementById('crypto-market-list') || 
+                    document.getElementById('mkt-list');
+
   if (!container) return;
 
   const fallbackCoins = [
-    { symbol: 'BTCUSDT', name: 'Bitcoin', code: 'BTC', price: '64820.50', change: '+2.15' },
-    { symbol: 'ETHUSDT', name: 'Ethereum', code: 'ETH', price: '3450.80', change: '-0.65' },
-    { symbol: 'SOLUSDT', name: 'Solana', code: 'SOL', price: '148.30', change: '+4.80' }
+    { code: 'BTC', price: '64,820.50', change: '+2.15%' },
+    { code: 'ETH', price: '3,450.80', change: '-0.65%' },
+    { code: 'SOL', price: '148.30', change: '+4.80%' }
   ];
 
+  function renderCoins(coins) {
+    let html = '';
+    coins.forEach(coin => {
+      const isPos = !coin.change.startsWith('-');
+      const changeClass = isPos ? 'price-up' : 'price-down';
+
+      html += `
+        <div class="crypto-row">
+          <div class="crypto-info">
+            <div class="crypto-icon" style="background: rgba(255,255,255,0.08);">
+              ${coin.code.slice(0, 1)}
+            </div>
+            <div>
+              <div style="color:#fff; font-weight:bold; font-size: 0.9rem;">${coin.code}</div>
+              <div style="color:#a1a1aa; font-size:0.7rem;">USDT</div>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <div style="color:#fff; font-weight:bold; font-size: 0.9rem;">$${coin.price}</div>
+            <div class="${changeClass}" style="font-size:0.8rem;">${coin.change}</div>
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+  // ۱. رندر آنی داده‌ها جهت جلوگیری از دیر بارگذاری شدن
+  if (!container.children.length) {
+    renderCoins(fallbackCoins);
+  }
+
+  // ۲. دریافت اطلاعات آنلاین از API
   try {
     const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbols=["BTCUSDT","ETHUSDT","SOLUSDT"]');
     if (!res.ok) throw new Error('Network error fetching crypto prices');
     
     const data = await res.json();
-    let html = '';
-
-    data.forEach(item => {
+    const liveCoins = data.map(item => {
       const code = item.symbol.replace('USDT', '');
       const price = parseFloat(item.lastPrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       const changeVal = parseFloat(item.priceChangePercent);
       const isPositive = changeVal >= 0;
-      const changeStr = (isPositive ? '+' : '') + changeVal.toFixed(2) + '%';
-      const color = isPositive ? '#22c55e' : '#ef4444';
-
-      html += `
-        <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 16px; margin-bottom: 8px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
-          <div style="display:flex; align-items:center; gap: 10px;">
-            <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; font-weight:bold; color:#fff;">
-              ${code.slice(0, 1)}
-            </div>
-            <div>
-              <div style="color:#fff; font-weight:bold; font-size: 0.95rem;">${code}</div>
-              <div style="color:#a1a1aa; font-size:0.75rem;">USDT</div>
-            </div>
-          </div>
-          <div style="text-align: right;">
-            <div style="color:#fff; font-weight:bold; font-size: 0.95rem;">$${price}</div>
-            <div style="color:${color}; font-size:0.82rem; font-weight:600; direction:ltr;">${changeStr}</div>
-          </div>
-        </div>
-      `;
+      return {
+        code: code,
+        price: price,
+        change: (isPositive ? '+' : '') + changeVal.toFixed(2) + '%'
+      };
     });
 
-    container.innerHTML = html;
+    renderCoins(liveCoins);
   } catch (err) {
     console.warn('استفاده از داده‌های پشتیبان بازار به دلیل عدم دسترسی به API:', err);
-    let html = '';
-    fallbackCoins.forEach(coin => {
-      const isPositive = coin.change.startsWith('+');
-      const color = isPositive ? '#22c55e' : '#ef4444';
-
-      html += `
-        <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 16px; margin-bottom: 8px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
-          <div style="display:flex; align-items:center; gap: 10px;">
-            <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; font-weight:bold; color:#fff;">
-              ${coin.code.slice(0, 1)}
-            </div>
-            <div>
-              <div style="color:#fff; font-weight:bold; font-size: 0.95rem;">${coin.code}</div>
-              <div style="color:#a1a1aa; font-size:0.75rem;">USDT</div>
-            </div>
-          </div>
-          <div style="text-align: right;">
-            <div style="color:#fff; font-weight:bold; font-size: 0.95rem;">$${Number(coin.price).toLocaleString('en-US')}</div>
-            <div style="color:${color}; font-size:0.82rem; font-weight:600; direction:ltr;">${coin.change}%</div>
-          </div>
-        </div>
-      `;
-    });
-    container.innerHTML = html;
   }
 }
 
