@@ -27,7 +27,7 @@ const ld = {
     c4: 'تیم', d4: 'زیرمجموعه‌ها',
     c5: 'تراکنش‌ها', d5: 'تاریخچه مالی',
     c6: 'پروفایل', d6: 'تنظیمات امنیت',
-    tMkt: 'بازار ارزهای دیجیتال (۳ ارز برتر از ۳۰ ارز رصد شده)', tLive: 'زنده',
+    tMkt: 'بازار ارزهای دیجیتال (۳ ارز برتر منبع زنده)', tLive: 'زنده',
     tAbTitle: 'درباره پلتفرم Zenix (هدف، ماهیت و ساختار)',
     tAbDesc: 'پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.',
     tAbL1t: 'هدف اصلی:', tAbL1d: 'اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.',
@@ -52,7 +52,7 @@ const ld = {
     c4: 'Team', d4: 'Referral Network',
     c5: 'Transactions', d5: 'Financial History',
     c6: 'Profile', d6: 'Security Settings',
-    tMkt: 'Cryptocurrency Market (Top 3 of 30 tracked coins)', tLive: 'LIVE',
+    tMkt: 'Cryptocurrency Market (Top 3 Tracked Coins)', tLive: 'LIVE',
     tAbTitle: 'About Zenix Platform (Goal, Nature & Structure)',
     tAbDesc: 'Zenix Platform is an advanced and intelligent financial ecosystem in cryptocurrency and trading processing, designed to provide a secure, automated, and profitable platform for users.',
     tAbL1t: 'Main Goal:', tAbL1d: 'Automation of trading processes through AI systems and quantification algorithms, allowing users to profit from market fluctuations without complex trading expertise.',
@@ -73,7 +73,7 @@ function setLang(lang) {
   currLang = lang;
   localStorage.setItem('zenix_lang', lang);
 
-  // تغییر رنگ زبان فعال در منو
+  // فعال‌سازی کلاس active و رنگ آبی برای زبان انتخابی
   document.querySelectorAll('#lang-menu .mi').forEach(item => {
     if (item.getAttribute('data-lang') === lang) {
       item.classList.add('active');
@@ -135,9 +135,93 @@ function setLang(lang) {
   }
 }
 
+// ==========================================
+// دریافت و رندر قیمت زنده ۳ ارز برتر بازار
+// ==========================================
+async function fetchCryptoMarket() {
+  const container = document.getElementById('crypto-market-list') || 
+                    document.getElementById('mkt-list') || 
+                    document.getElementById('crypto-list');
+  if (!container) return;
+
+  const fallbackCoins = [
+    { symbol: 'BTCUSDT', name: 'Bitcoin', code: 'BTC', price: '64820.50', change: '+2.15' },
+    { symbol: 'ETHUSDT', name: 'Ethereum', code: 'ETH', price: '3450.80', change: '-0.65' },
+    { symbol: 'SOLUSDT', name: 'Solana', code: 'SOL', price: '148.30', change: '+4.80' }
+  ];
+
+  try {
+    const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbols=["BTCUSDT","ETHUSDT","SOLUSDT"]');
+    if (!res.ok) throw new Error('Network error fetching crypto prices');
+    
+    const data = await res.json();
+    let html = '';
+
+    data.forEach(item => {
+      const code = item.symbol.replace('USDT', '');
+      const price = parseFloat(item.lastPrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const changeVal = parseFloat(item.priceChangePercent);
+      const isPositive = changeVal >= 0;
+      const changeStr = (isPositive ? '+' : '') + changeVal.toFixed(2) + '%';
+      const color = isPositive ? '#22c55e' : '#ef4444';
+
+      html += `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 16px; margin-bottom: 8px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+          <div style="display:flex; align-items:center; gap: 10px;">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; font-weight:bold; color:#fff;">
+              ${code.slice(0, 1)}
+            </div>
+            <div>
+              <div style="color:#fff; font-weight:bold; font-size: 0.95rem;">${code}</div>
+              <div style="color:#a1a1aa; font-size:0.75rem;">USDT</div>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <div style="color:#fff; font-weight:bold; font-size: 0.95rem;">$${price}</div>
+            <div style="color:${color}; font-size:0.82rem; font-weight:600; direction:ltr;">${changeStr}</div>
+          </div>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+  } catch (err) {
+    console.warn('استفاده از داده‌های پشتیبان بازار به دلیل عدم دسترسی به API:', err);
+    let html = '';
+    fallbackCoins.forEach(coin => {
+      const isPositive = coin.change.startsWith('+');
+      const color = isPositive ? '#22c55e' : '#ef4444';
+
+      html += `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 16px; margin-bottom: 8px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+          <div style="display:flex; align-items:center; gap: 10px;">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; font-weight:bold; color:#fff;">
+              ${coin.code.slice(0, 1)}
+            </div>
+            <div>
+              <div style="color:#fff; font-weight:bold; font-size: 0.95rem;">${coin.code}</div>
+              <div style="color:#a1a1aa; font-size:0.75rem;">USDT</div>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <div style="color:#fff; font-weight:bold; font-size: 0.95rem;">$${Number(coin.price).toLocaleString('en-US')}</div>
+            <div style="color:${color}; font-size:0.82rem; font-weight:600; direction:ltr;">${coin.change}%</div>
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   setLang(currLang);
   setupEventListeners();
+  
+  // بارگذاری داده‌های بازار ارز دیجیتال
+  fetchCryptoMarket();
+  setInterval(fetchCryptoMarket, 10000); // به‌‌روزرسانی هر ۱۰ ثانیه
+
   if (!supabase) return;
   await checkUserSession();
 });
