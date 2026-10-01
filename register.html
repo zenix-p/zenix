@@ -164,7 +164,7 @@
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const langData = {
-            fa:{dir:'rtl',wel:'ثبت‌نام حساب کاربری جدید',email:'ایمیل',emailP:'ایمیل',name:'نام و نام خانوادگی',nameP:'نام و نام خانوادگی',pass:'رمز عبور',passP:'رمز عبور',confirmPass:'تکرار رمز عبور',confirmPassP:'تکرار رمز عبور',ref:'کد معرف',refP:'کد معرف',cap:'کد امنیتی',capP:'کد را وارد کنید',btn:'ثبت‌نام در زنیکس',back:'بازگشت به صفحه اصلی',succ:'ثبت‌نام با موفقیت انجام شد!',err:'کد امنیتی اشتباه است!',refErr:'کد معرف معتبر نیست یا وجود ندارد!',passErr:'رمز عبور و تکرار آن مطابقت ندارند!',lenErr:'رمز عبور باید حداقل ۶ کاراکتر باشد!',existErr:'این ایمیل قبلاً ثبت شده است!',supTitle:'پشتیبانی',langTitle:'تغییر زبان'},
+            fa:{dir:'rtl',wel:'ثبت‌نام حساب کاربری جدید',email:'ایمیل',emailP:'ایمیل',name:'نام و نام خانوادگی',nameP:'نام و نام خانوادگی',pass:'رمز عبور',passP:'رمز عبور',confirmPass:'تکرار رمز عبور',confirmPassP:'تکرار رمز عبور',ref:'کد معرف',refP:'کد معرف',cap:'کد امنیتی',capP:'کد را وارد کنید',btn:'ثبت‌‌نام در زنیکس',back:'بازگشت به صفحه اصلی',succ:'ثبت‌نام با موفقیت انجام شد!',err:'کد امنیتی اشتباه است!',refErr:'کد معرف معتبر نیست یا وجود ندارد!',passErr:'رمز عبور و تکرار آن مطابقت ندارند!',lenErr:'رمز عبور باید حداقل ۶ کاراکتر باشد!',existErr:'این ایمیل قبلاً ثبت شده است!',supTitle:'پشتیبانی',langTitle:'تغییر زبان'},
             en:{dir:'ltr',wel:'Register New Account',email:'Email',emailP:'Email',name:'Full Name',nameP:'Full Name',pass:'Password',passP:'Password',confirmPass:'Confirm Password',confirmPassP:'Confirm Password',ref:'Referral Code',refP:'Referral Code',cap:'Security Code',capP:'Enter code',btn:'Sign Up',back:'Back to Main Page',succ:'Successfully registered!',err:'Invalid security code!',refErr:'Invalid or non-existent referral code!',passErr:'Passwords do not match!',lenErr:'Password must be at least 6 characters!',existErr:'Email already registered!',supTitle:'Support',langTitle:'Change Language'},
             ar:{dir:'rtl',wel:'تسجيل حساب جديد',email:'البريد الإلكتروني',emailP:'البريد الإلكتروني',name:'الاسم الكامل',nameP:'الاسم الكامل',pass:'كلمة المرور',passP:'كلمة المرور',confirmPass:'تأكيد كلمة المرور',confirmPassP:'تأكيد كلمة المرور',ref:'رمز الإحالة',refP:'رمز الإحالة',cap:'رمز التحقق',capP:'أدخل الرمز',btn:'التسجيل في Zenix',back:'العودة للصفحة الرئيسية',succ:'تم التسجيل بنجاح!',err:'رمز التحقق غير صحيح!',refErr:'رمز الإحالة غير صالح أو غير موجود!',passErr:'كلمتا المرور غير متطابقتين!',lenErr:'يجب أن تكون كلمة المرور 6 أحرف على الأقل!',existErr:'هذا البريد الإلكتروني مسجل بالفعل!',supTitle:'Destek',langTitle:'Dil Değiştir'},
             tr:{dir:'ltr',wel:'Yeni Hesap Oluştur',email:'E-posta',emailP:'E-posta',name:'Ad Soyad',nameP:'Ad Soyad',pass:'Şifre',passP:'Şifre',confirmPass:'Şifreyi Tekrarla',confirmPassP:'Şifreyi Tekrarla',ref:'Referans Kodu',refP:'Referans Kodu',cap:'Güvenlik Kodu',capP:'Kodu girin',btn:'Zenix\'e Kayıt Ol',back:'Ana Sayfaya Dön',succ:'Kayıt başarılı!',err:'Geçersiz güvenlik kodu!',refErr:'Geçersiz veya bulunmayan referans kodu!',passErr:'Şifreler eşleşmiyor!',lenErr:'Şifre en az 6 karakter olmalıdır!',existErr:'Bu e-posta zaten kayıtlı!',supTitle:'Destek',langTitle:'Dil Değiştir'},
@@ -286,7 +286,7 @@
 
             btn.disabled = true;
             const emailValue = emailIn.value.trim().toLowerCase();
-            const fullNameValue = nameIn.value.trim(); // مقدار نام دریافت می‌شود
+            const fullNameValue = nameIn.value.trim();
             const refCodeValue = refIn.value.trim().toUpperCase();
 
             try {
@@ -334,7 +334,7 @@
 
                 if (authError) throw authError;
 
-                // ۴. ثبت اطلاعات در جدول users (فعلاً fullname به دیتابیس ارسال نمی‌شود)
+                // ۴. ثبت اطلاعات در جدول users
                 if (authData?.user) {
                     const userPayload = {
                         id: authData.user.id,
@@ -353,6 +353,9 @@
                         console.error('Supabase DB Insert Error:', dbError);
                     }
                 }
+
+                // ۵. خروج بلافاصله کاربر از Supabase جهت پاکسازی نشست و جلوگیری از ورود خودکار به داشبورد
+                await supabaseClient.auth.signOut();
 
                 msg.textContent = t.succ;
                 msg.className = 'succ';
