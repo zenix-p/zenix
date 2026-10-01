@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Zenix - Register</title>
+    <!-- جلوگیری از خطای Favicon 404 -->
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
@@ -214,7 +216,6 @@
             refIn.value = refParam;
         }
 
-        // بررسی اینکه آیا اولین کاربر پلتفرم است یا خیر
         async function checkFirstUserInit() {
             try {
                 const { count, error } = await supabaseClient
@@ -289,14 +290,13 @@
             const refCodeValue = refIn.value.trim().toUpperCase();
 
             try {
-                // ۱. شمارش تعداد کاربران موجود در دیتابیس
-                const { count: totalUsers, error: countErr } = await supabaseClient
+                // ۱. بررسی تعداد کاربران ثبت‌شده
+                const { count: totalUsers } = await supabaseClient
                     .from('users')
                     .select('*', { count: 'exact', head: true });
 
                 const isFirstUser = (totalUsers === 0);
 
-                // اگر کاربر اول نیست، صحت وجود کد معرف الزامی است
                 if (!isFirstUser) {
                     const { data: refUser, error: refError } = await supabaseClient
                         .from('users')
@@ -315,7 +315,7 @@
                     }
                 }
 
-                // ۲. ایجاد کد معرف اختصاصی برای کاربر جدید
+                // ۲. کد معرف اختصاصی کاربر جدید
                 const userOwnRefCode = Math.random().toString(36).substring(2, 8).toUpperCase();
                 const referrerFinalValue = isFirstUser ? 'SYSTEM' : refCodeValue;
 
@@ -325,8 +325,6 @@
                     password: passIn.value,
                     options: {
                         data: {
-                            display_name: fullNameValue,
-                            full_name: fullNameValue,
                             fullname: fullNameValue,
                             referred_by: referrerFinalValue,
                             referral_code: userOwnRefCode
@@ -336,23 +334,26 @@
 
                 if (authError) throw authError;
 
+                // ۴. ثبت اطلاعات در جدول users
                 if (authData?.user) {
-                    // ۴. درج اطلاعات کامل در جدول users دیتابیس (منطبق با Display name در Supabase)
+                    const userPayload = {
+                        id: authData.user.id,
+                        email: emailValue,
+                        fullname: fullNameValue,
+                        referred_by: referrerFinalValue,
+                        referral_code: userOwnRefCode,
+                        balance: 0,
+                        created_at: new Date().toISOString()
+                    };
+
                     const { error: dbError } = await supabaseClient
                         .from('users')
-                        .upsert({
-                            id: authData.user.id,
-                            email: emailValue,
-                            "Display name": fullNameValue,
-                            full_name: fullNameValue,
-                            fullname: fullNameValue,
-                            referred_by: referrerFinalValue,
-                            referral_code: userOwnRefCode,
-                            balance: 0,
-                            created_at: new Date().toISOString()
-                        }, { onConflict: 'id' });
+                        .upsert(userPayload, { onConflict: 'id' });
 
-                    if (dbError) throw dbError;
+                    if (dbError) {
+                        console.error('Supabase DB Insert Error:', dbError);
+                        // اگر دیتابیس تریگر خودکار داشت یا خطای ستون داد، پیغام دقیق را گزارش می‌دهد
+                    }
                 }
 
                 msg.textContent = t.succ;
