@@ -73,6 +73,15 @@ function setLang(lang) {
   currLang = lang;
   localStorage.setItem('zenix_lang', lang);
 
+  // تغییر رنگ زبان فعال در منو
+  document.querySelectorAll('#lang-menu .mi').forEach(item => {
+    if (item.getAttribute('data-lang') === lang) {
+      item.classList.add('active');
+    } else {
+      item.classList.remove('active');
+    }
+  });
+
   const navMenu = document.getElementById('nav-menu');
   const langMenu = document.getElementById('lang-menu');
   if (navMenu) navMenu.classList.remove('show');
@@ -309,7 +318,7 @@ window.switchNotifTab = function(tabName) {
 };
 
 /**
- * ذخیره و به‌‌روزرسانی اطلاعات پروفایل
+ * ذخیره و به‌روزرسانی اطلاعات پروفایل
  */
 async function handleProfileUpdate(e) {
   e.preventDefault();
