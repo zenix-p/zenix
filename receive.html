@@ -72,7 +72,7 @@
                     <a href="profile.html" class="mi"><i class="fas fa-user-cog" style="color:#ec4899"></i><span id="m6">پروفایل</span></a>
                     <a href="support.html" class="mi"><i class="fas fa-headset" style="color:#a855f7"></i><span id="m7">پشتیبانی</span></a>
                     <a href="#" class="mi" onclick="window.openAboutModal();return false;"><i class="fas fa-info-circle" style="color:#38bdf8"></i><span id="m_about">درباره پلتفرم</span></a>
-                    <a href="index.html" class="mi" id="logout-btn" style="color:#ef4444"><i class="fas fa-power-off"></i><span id="m8">خروج</span></a>
+                    <a href="#" class="mi" id="logout-btn" style="color:#ef4444"><i class="fas fa-power-off"></i><span id="m8">خروج</span></a>
                 </div>
             </div>
         </div>
@@ -145,7 +145,7 @@
                 <p style="font-size:13px;color:#cbd5e1;line-height:1.7;margin-bottom:10px;" id="t-ab-m-desc">پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.</p>
                 <ul style="font-size:12px;color:#94a3b8;padding-right:18px;line-height:1.7;margin-bottom:0;">
                     <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l1t">هدف اصلی:</strong> <span id="t-ab-m-l1d">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li>
-                    <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l2t">امنیت و زیرساخت:</strong> <span id="t-ab-m-l2d">متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Firebase).</span></li>
+                    <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l2t">امنیت و زیرساخت:</strong> <span id="t-ab-m-l2d">متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).</span></li>
                     <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l3t">ساختار چندسطحی (Referral & Team):</strong> <span id="t-ab-m-l3d">ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.</span></li>
                     <li><strong style="color:#f8fafc;" id="t-ab-m-l4t">احساس واقع‌گرایی:</strong> <span id="t-ab-m-l4d">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.</span></li>
                 </ul>
@@ -175,29 +175,18 @@
     </footer>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, collection, getDocs, addDoc, increment, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-        const app = initializeApp({
-            apiKey: "AIzaSyAqIksPfjCCQZNQDVx3MEdDyJyNMaTvtlk",
-            authDomain: "zenix-platform.firebaseapp.com",
-            projectId: "zenix-platform",
-            storageBucket: "zenix-platform.firebasestorage.app",
-            messagingSenderId: "594936010622",
-            appId: "1:594936010622:web:9f4159c80111245062052f",
-            measurementId: "G-LXSGYB8WKM"
-        });
-
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        const SUPABASE_URL = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currLang = localStorage.getItem('zenix_lang') || 'fa';
         let allMessages = [];
+        let currentUser = null;
         let currentUserId = null;
         let currentNetwork = 'TRC20';
         let userBalance = 0;
-        let unsubscribeUserDoc = null;
         let timerInterval = null;
 
         const ld = {
@@ -216,7 +205,7 @@
                 abTitle: 'درباره پلتفرم Zenix (هدف، ماهیت و ساختار)',
                 abDesc: 'پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.',
                 abL1T: 'هدف اصلی:', abL1D: 'اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.',
-                abL2T: 'امنیت و زیرساخت:', abL2D: 'متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Firebase).',
+                abL2T: 'امنیت و زیرساخت:', abL2D: 'متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).',
                 abL3T: 'ساختار چندسطحی (Referral & Team):', abL3D: 'ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.',
                 abL4T: 'احساس واقع‌گرایی:', abL4D: 'وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.'
             },
@@ -235,7 +224,7 @@
                 abTitle: 'About Zenix Platform (Goal, Nature & Structure)',
                 abDesc: 'Zenix Platform is an innovative financial ecosystem in cryptocurrency and trading processing designed for a secure, automated, and profitable user experience.',
                 abL1T: 'Main Goal:', abL1D: 'Automating trading processes via AI systems and quantification algorithms, enabling users to profit from market fluctuations without complex trading expertise.',
-                abL2T: 'Security & Infrastructure:', abL2D: 'Backed by advanced encryption protocols, high-speed cloud processing nodes, and secure Firebase database storage.',
+                abL2T: 'Security & Infrastructure:', abL2D: 'Backed by advanced encryption protocols, high-speed cloud processing nodes, and secure Supabase database storage.',
                 abL3T: 'Multi-level Structure (Referral & Team):', abL3D: 'Creating a dynamic referral network so users receive multi-level rewards and sustainable passive income from team activity.',
                 abL4T: 'Realism & Live Data:', abL4D: 'Live crypto ticker, volume indicators, network gas fees, and system notices ensure users interact with an active global platform.'
             }
@@ -259,14 +248,8 @@
 
             let startTime = Date.now();
             if (createdAt) {
-                if (typeof createdAt.toDate === 'function') {
-                    startTime = createdAt.toDate().getTime();
-                } else if (typeof createdAt.seconds === 'number') {
-                    startTime = createdAt.seconds * 1000;
-                } else {
-                    const parsed = new Date(createdAt).getTime();
-                    if (!isNaN(parsed)) startTime = parsed;
-                }
+                const parsed = new Date(createdAt).getTime();
+                if (!isNaN(parsed)) startTime = parsed;
             }
 
             function updateClock() {
@@ -349,29 +332,18 @@
 
         async function fetchUserMessages(uid) {
             try {
-                let snap = await getDocs(collection(db, "users", uid, "notifications"));
-                let messages = snap.docs.map(d => {
-                    let dt = d.data();
-                    return {
-                        id: d.id,
-                        subject: dt.title || dt.subject || 'Announcement',
-                        body: dt.message || dt.text || dt.body || '',
-                        time: dt.createdAt || dt.timestamp || dt.time || new Date().toISOString(),
-                        read: dt.read === true || dt.isRead === true
-                    };
-                });
+                const { data, error } = await supabase.from("notifications").select("*").eq("user_id", uid);
+                if (error || !data) return [];
 
-                messages.sort((a, b) => {
-                    const getTimeMs = (timeVal) => {
-                        if (!timeVal) return 0;
-                        if (typeof timeVal.toDate === 'function') return timeVal.toDate().getTime();
-                        if (typeof timeVal.seconds === 'number') return timeVal.seconds * 1000;
-                        const parsed = new Date(timeVal).getTime();
-                        return isNaN(parsed) ? 0 : parsed;
-                    };
-                    return getTimeMs(b.time) - getTimeMs(a.time);
-                });
+                let messages = data.map(d => ({
+                    id: d.id,
+                    subject: d.title || d.subject || 'Announcement',
+                    body: d.message || d.text || d.body || '',
+                    time: d.created_at || d.createdAt || d.timestamp || d.time || new Date().toISOString(),
+                    read: d.read === true || d.isRead === true
+                }));
 
+                messages.sort((a, b) => new Date(b.time) - new Date(a.time));
                 return messages;
             } catch (e) {
                 console.error("Error fetching messages:", e);
@@ -396,7 +368,7 @@
             allMessages.forEach((m, idx) => {
                 let dTime = '';
                 if (m.time) {
-                    let d = typeof m.time.toDate === 'function' ? m.time.toDate() : new Date(m.time);
+                    let d = new Date(m.time);
                     dTime = isNaN(d.getTime()) ? String(m.time) : d.toUTCString();
                 }
                 let unread = !m.read;
@@ -417,14 +389,14 @@
             if (!m.read && currentUserId && m.id) {
                 allMessages[idx].read = true;
                 try {
-                    await updateDoc(doc(db, "users", currentUserId, "notifications", m.id), { read: true, isRead: true });
+                    await supabase.from("notifications").update({ read: true, isRead: true }).eq("id", m.id);
                     let unread = allMessages.filter(i => !i.read).length, b = document.getElementById('bell-badge');
                     if (b) { b.textContent = unread; b.classList.toggle('show', unread > 0); }
                 } catch (e) { console.error(e); }
             }
             let c = document.getElementById('modal-msg-container'), t = ld[currLang] || ld.fa, dTime = '';
             if (m.time) {
-                let d = typeof m.time.toDate === 'function' ? m.time.toDate() : new Date(m.time);
+                let d = new Date(m.time);
                 dTime = isNaN(d.getTime()) ? String(m.time) : d.toUTCString();
             }
             c.innerHTML = `<button onclick="window.openMessageModal()" style="background:none;border:none;color:#38bdf8;cursor:pointer;font-size:12px;margin-bottom:12px;display:flex;align-items:center;gap:5px;padding:0;"><i class="fas fa-arrow-right"></i> ${t.backMsg}</button>
@@ -455,17 +427,14 @@
             }
         });
 
-        onAuthStateChanged(auth, async u => {
-            if (!u) { window.location.href = 'index.html'; return; }
-            currentUserId = u.uid;
+        async function loadUserData(user) {
+            currentUser = user;
+            currentUserId = user.id;
 
-            if (unsubscribeUserDoc) unsubscribeUserDoc();
-
-            // رصد زنده تغییرات سند کاربر (تایید/رد درخواست از سمت ادمین)
-            unsubscribeUserDoc = onSnapshot(doc(db, "users", u.uid), (docSnap) => {
-                if (docSnap.exists()) {
-                    let data = docSnap.data();
-                    let rawBalance = data.balance ?? data.depositAmount ?? data.wallet ?? data.amount ?? 0;
+            try {
+                const { data: userData } = await supabase.from('users').select('*').eq('id', user.id).single();
+                if (userData) {
+                    let rawBalance = userData.balance ?? userData.depositAmount ?? userData.wallet ?? userData.amount ?? 0;
                     userBalance = parseFloat(rawBalance);
                     if (isNaN(userBalance)) userBalance = 0;
                     
@@ -473,25 +442,36 @@
                     if (elBal) elBal.textContent = userBalance.toFixed(2);
                     localStorage.setItem('zenix_balance', userBalance);
 
-                    if (data.pendingWithdrawal && data.pendingWithdrawal.status === 'pending') {
+                    if (userData.pendingWithdrawal && userData.pendingWithdrawal.status === 'pending') {
                         lockForm(
                             true, 
-                            `⚠️ شما یک درخواست برداشت معلق به مبلغ $${Number(data.pendingWithdrawal.amount||0).toFixed(2)} دارید که در انتظار بررسی مدیریت است.`,
-                            data.pendingWithdrawal.createdAt,
-                            data.pendingWithdrawal
+                            `⚠️ شما یک درخواست برداشت معلق به مبلغ $${Number(userData.pendingWithdrawal.amount||0).toFixed(2)} دارید که در انتظار بررسی مدیریت است.`,
+                            userData.pendingWithdrawal.createdAt,
+                            userData.pendingWithdrawal
                         );
                     } else {
                         lockForm(false);
                     }
                 }
-            }, (e) => console.error("Error watching user document:", e));
+            } catch (e) {
+                console.error("Error watching user document:", e);
+            }
 
             try {
-                allMessages = await fetchUserMessages(u.uid);
+                allMessages = await fetchUserMessages(user.id);
                 let unread = allMessages.filter(m => !m.read).length, b = document.getElementById('bell-badge');
                 if (b && unread > 0) { b.textContent = unread; b.classList.add('show'); }
             } catch (e) {
                 console.error("خطا در دریافت اطلاعات کاربر:", e);
+            }
+        }
+
+        // بررسی هوشمند وضعیت لاگین بدون هدایت اشتباه
+        supabase.auth.onAuthStateChange((event, session) => {
+            if (session && session.user) {
+                loadUserData(session.user);
+            } else {
+                window.location.href = 'index.html';
             }
         });
 
@@ -537,14 +517,14 @@
                 showMsg("⚠️ خطا: ورود رمز عبور امنیتی برای تایید برداشت الزامی است.", true);
                 return;
             }
-            if(!currentUserId){
+            if(!currentUser){
                 showMsg("⚠️ خطا: عدم احراز هویت کاربری. لطفاً مجدداً وارد حساب شوید.", true);
                 return;
             }
 
             const fee = amt * 0.009; // کارمزد 0.9%
             const netAmt = amt - fee;
-            const nowTimestamp = new Date();
+            const nowISO = new Date().toISOString();
 
             const pendingData = {
                 amount: amt,
@@ -554,18 +534,23 @@
                 wallet: addr,
                 network: currentNetwork,
                 status: 'pending',
-                createdAt: serverTimestamp()
+                createdAt: nowISO
             };
 
             try {
-                // ثبت درخواست و کسر موجودی در فایربیس
-                await updateDoc(doc(db, "users", currentUserId), {
-                    balance: increment(-amt),
-                    pendingWithdrawal: pendingData
-                });
+                const newBalance = userBalance - amt;
 
-                // ثبت تراکنش در تاریخچه
-                await addDoc(collection(db, `users/${currentUserId}/transactions`), {
+                // ثبت درخواست برداشت معلق و بروزرسانی موجودی کاربر
+                const { error: updateErr } = await supabase.from("users").update({
+                    balance: newBalance,
+                    pendingWithdrawal: pendingData
+                }).eq('id', currentUser.id);
+
+                if (updateErr) throw updateErr;
+
+                // ثبت تراکنش در جدول transactions
+                await supabase.from('transactions').insert([{
+                    user_id: currentUser.id,
                     type: 'withdrawal',
                     amount: amt,
                     fee: fee,
@@ -573,14 +558,13 @@
                     address: addr,
                     network: currentNetwork,
                     status: 'pending',
-                    createdAt: serverTimestamp()
-                });
+                    created_at: nowISO
+                }]);
 
                 document.getElementById('withdraw-pass').value = '';
 
                 // قفل فرم و نمایش اطلاعات ذخیره‌شده
-                pendingData.createdAt = nowTimestamp;
-                lockForm(true, `🎉 درخواست برداشت مبلغ ${amt} USDT (مبلغ خالص دریافتی: ${netAmt.toFixed(2)} USDT) با موفقیت ثبت شد و در انتظار تایید مدیریت است.`, nowTimestamp, pendingData);
+                lockForm(true, `🎉 درخواست برداشت مبلغ ${amt} USDT (مبلغ خالص دریافتی: ${netAmt.toFixed(2)} USDT) با موفقیت ثبت شد و در انتظار تایید مدیریت است.`, nowISO, pendingData);
             } catch(err) {
                 console.error("Error submitting withdrawal:", err);
                 showMsg("⚠️ خطا در ثبت درخواست: " + err.message, true);
@@ -589,6 +573,7 @@
 
         function showMsg(text,isErr){
             const box=document.getElementById('status-box');
+            if(!box) return;
             box.style.display='block';
             box.style.background=isErr?'rgba(239,68,68,0.15)':'rgba(34,197,94,0.15)';
             box.style.border=isErr?'1px solid #ef4444':'1px solid #22c55e';
@@ -658,8 +643,10 @@
         document.querySelectorAll('#lang-menu .mi').forEach(i => i.addEventListener('click', () => setLang(i.dataset.lang)));
 
         document.getElementById('logout-btn')?.addEventListener('click', async e => {
-            e.preventDefault(); try { await signOut(auth); } catch (e) {}
-            localStorage.clear(); window.location.href = 'index.html';
+            e.preventDefault();
+            await supabase.auth.signOut();
+            localStorage.clear();
+            window.location.href = 'index.html';
         });
 
         setLang(currLang);
