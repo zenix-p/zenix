@@ -144,7 +144,7 @@
         </form>
 
         <div class="footer">
-            <p><a href="index.html" id="t-back"><i class="fas fa-arrow-left"></i> Back to Main Page</a></p>
+            <p><a href="login.html" id="t-back"><i class="fas fa-arrow-left"></i> Back to Login Page</a></p>
         </div>
     </div>
 
@@ -164,14 +164,14 @@
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const langData = {
-            fa:{dir:'rtl',wel:'ثبت‌نام حساب کاربری جدید',email:'ایمیل',emailP:'ایمیل',name:'نام و نام خانوادگی',nameP:'نام و نام خانوادگی',pass:'رمز عبور',passP:'رمز عبور',confirmPass:'تکرار رمز عبور',confirmPassP:'تکرار رمز عبور',ref:'کد معرف',refP:'کد معرف',cap:'کد امنیتی',capP:'کد را وارد کنید',btn:'ثبت‌نام در زنیکس',back:'بازگشت به صفحه اصلی',succ:'ثبت‌نام با موفقیت انجام شد!',err:'کد امنیتی اشتباه است!',refErr:'کد معرف معتبر نیست یا وجود ندارد!',passErr:'رمز عبور و تکرار آن مطابقت ندارند!',lenErr:'رمز عبور باید حداقل ۶ کاراکتر باشد!',existErr:'این ایمیل قبلاً ثبت شده است!',supTitle:'پشتیبانی',langTitle:'تغییر زبان'},
-            en:{dir:'ltr',wel:'Register New Account',email:'Email',emailP:'Email',name:'Full Name',nameP:'Full Name',pass:'Password',passP:'Password',confirmPass:'Confirm Password',confirmPassP:'Confirm Password',ref:'Referral Code',refP:'Referral Code',cap:'Security Code',capP:'Enter code',btn:'Sign Up',back:'Back to Main Page',succ:'Successfully registered!',err:'Invalid security code!',refErr:'Invalid or non-existent referral code!',passErr:'Passwords do not match!',lenErr:'Password must be at least 6 characters!',existErr:'Email already registered!',supTitle:'Support',langTitle:'Change Language'},
-            ar:{dir:'rtl',wel:'تسجيل حساب جديد',email:'البريد الإلكتروني',emailP:'البريد الإلكتروني',name:'الاسم الكامل',nameP:'الاسم الكامل',pass:'كلمة المرور',passP:'كلمة المرور',confirmPass:'تأكيد كلمة المرور',confirmPassP:'تأكيد كلمة المرور',ref:'رمز الإحالة',refP:'رمز الإحالة',cap:'رمز التحقق',capP:'أدخل الرمز',btn:'التسجيل في Zenix',back:'العودة للصفحة الرئيسية',succ:'تم التسجيل بنجاح!',err:'رمز التحقق غير صحيح!',refErr:'رمز الإحالة غير صالح أو غير موجود!',passErr:'كلمتا المرور غير متطابقتين!',lenErr:'يجب أن تكون كلمة المرور 6 أحرف على الأقل!',existErr:'هذا البريد الإلكتروني مسجل بالفعل!',supTitle:'Destek',langTitle:'Dil Değiştir'},
-            tr:{dir:'ltr',wel:'Yeni Hesap Oluştur',email:'E-posta',emailP:'E-posta',name:'Ad Soyad',nameP:'Ad Soyad',pass:'Şifre',passP:'Şifre',confirmPass:'Şifreyi Tekrarla',confirmPassP:'Şifreyi Tekrarla',ref:'Referans Kodu',refP:'Referans Kodu',cap:'Güvenlik Kodu',capP:'Kodu girin',btn:'Zenix\'e Kayıt Ol',back:'Ana Sayfaya Dön',succ:'Kayıt başarılı!',err:'Geçersiz güvenlik kodu!',refErr:'Geçersiz veya bulunmayan referans kodu!',passErr:'Şifreler eşleşmiyor!',lenErr:'Şifre en az 6 karakter olmalıdır!',existErr:'Bu e-posta zaten kayıtlı!',supTitle:'Destek',langTitle:'Dil Değiştir'},
-            ru:{dir:'ltr',wel:'Регистрация аккаунта',email:'Эл. почта',emailP:'Эл. почта',name:'ФИО',nameP:'Введите ФИО',pass:'Пароль',passP:'Пароль',confirmPass:'Повторите пароль',confirmPassP:'Повторите пароль',ref:'Реферальный код',refP:'Реферальный код',cap:'Защитный код',capP:'Введите код',btn:'Зарегистрироваться',back:'На главную',succ:'Успешная регистрация!',err:'Неверный защитный код!',refErr:'Неверный реферальный код!',passErr:'Пароли не совпадают!',lenErr:'Пароль должен быть не менее 6 символов!',existErr:'Этот email уже зарегистрирован!',supTitle:'Поддержка',langTitle:'Сменить язык'},
-            es:{dir:'ltr',wel:'Registrar nueva cuenta',email:'Correo electrónico',emailP:'Correo electrónico',name:'Nombre completo',nameP:'Nombre completo',pass:'Contraseña',passP:'Contraseña',confirmPass:'Confirmar contraseña',confirmPassP:'Confirmar contraseña',ref:'Código de referencia',refP:'Código de referencia',cap:'Código de seguridad',capP:'Ingrese el código',btn:'Registrarse en Zenix',back:'Volver al inicio',succ:'¡Registro exitoso!',err:'¡Código inválido!',refErr:'¡Código de referencia inválido!',passErr:'¡Las contraseñas no coinciden!',lenErr:'¡La contraseña debe tener al menos 6 caracteres!',existErr:'¡Este correo ya está registrado!',supTitle:'Soporte',langTitle:'Cambiar idioma'},
-            fr:{dir:'ltr',wel:'Créer un compte',email:'E-mail',emailP:'E-mail',name:'Nom complet',nameP:'Nom complet',pass:'Mot de passe',passP:'Mot de passe',confirmPass:'Confirmer',confirmPassP:'Confirmer',ref:'Code de parrainage',refP:'Code',cap:'Code de sécurité',capP:'Entrez le code',btn:'S\'inscrire',back:'Retour',succ:'Inscription réussie !',err:'Code invalide !',refErr:'Code de parrainage invalide !',passErr:'Mots de passe разных !',lenErr:'Le mot de passe doit contenir au moins 6 caractères !',existErr:'E-mail déjà enregistré !',supTitle:'Support',langTitle:'Changer de langue'},
-            de:{dir:'ltr',wel:'Konto erstellen',email:'E-Mail',emailP:'E-Mail',name:'Vollständiger Name',nameP:'Vollständiger Name',pass:'Passwort',passP:'Passwort',confirmPass:'Passwort bestätigen',confirmPassP:'Passwort bestätigen',ref:'Empfehlungscode',refP:'Empfehlungscode',cap:'Sicherheitscode',capP:'Code eingeben',btn:'Registrieren',back:'Zurück',succ:'Erfolgreich!',err:'Ungültiger Code!',refErr:'Ungültiger Empfehlungscode!',passErr:'Passwörter stimmen nicht überein!',lenErr:'Das Passwort muss mindestens 6 Zeichen lang sein!',existErr:'E-Mail bereits registriert!',supTitle:'Support',langTitle:'Sprache ändern'}
+            fa:{dir:'rtl',wel:'ثبت‌نام حساب کاربری جدید',email:'ایمیل',emailP:'ایمیل',name:'نام و نام خانوادگی',nameP:'نام و نام خانوادگی',pass:'رمز عبور',passP:'رمز عبور',confirmPass:'تکرار رمز عبور',confirmPassP:'تکرار رمز عبور',ref:'کد معرف',refP:'کد معرف',cap:'کد امنیتی',capP:'کد را وارد کنید',btn:'ثبت‌نام در زنیکس',back:'ورود به حساب کاربری',succ:'ثبت‌نام با موفقیت انجام شد! در حال انتقال به صفحه ورود...',err:'کد امنیتی اشتباه است!',refErr:'کد معرف معتبر نیست یا وجود ندارد!',passErr:'رمز عبور و تکرار آن مطابقت ندارند!',lenErr:'رمز عبور باید حداقل ۶ کاراکتر باشد!',existErr:'این ایمیل قبلاً ثبت شده است!',supTitle:'پشتیبانی',langTitle:'تغییر زبان'},
+            en:{dir:'ltr',wel:'Register New Account',email:'Email',emailP:'Email',name:'Full Name',nameP:'Full Name',pass:'Password',passP:'Password',confirmPass:'Confirm Password',confirmPassP:'Confirm Password',ref:'Referral Code',refP:'Referral Code',cap:'Security Code',capP:'Enter code',btn:'Sign Up',back:'Back to Login Page',succ:'Successfully registered! Redirecting to login...',err:'Invalid security code!',refErr:'Invalid or non-existent referral code!',passErr:'Passwords do not match!',lenErr:'Password must be at least 6 characters!',existErr:'Email already registered!',supTitle:'Support',langTitle:'Change Language'},
+            ar:{dir:'rtl',wel:'تسجيل حساب جديد',email:'البريد الإلكتروني',emailP:'البريد الإلكتروني',name:'الاسم الكامل',nameP:'الاسم الكامل',pass:'كلمة المرور',passP:'كلمة المرور',confirmPass:'تأكيد كلمة المرور',confirmPassP:'تأكيد كلمة المرور',ref:'رمز الإحالة',refP:'رمز الإحالة',cap:'رمز التحقق',capP:'أدخل الرمز',btn:'التسجيل في Zenix',back:'العودة لصفحة الدخول',succ:'تم التسجيل بنجاح! جاري التوجيه لتسجيل الدخول...',err:'رمز التحقق غير صحيح!',refErr:'رمز الإحالة غير صالح أو غير موجود!',passErr:'كلمتا المرور غير متطابقتين!',lenErr:'يجب أن تكون كلمة المرور 6 أحرف على الأقل!',existErr:'هذا البريد الإلكتروني مسجل بالفعل!',supTitle:'الدعم',langTitle:'تغيير اللغة'},
+            tr:{dir:'ltr',wel:'Yeni Hesap Oluştur',email:'E-posta',emailP:'E-posta',name:'Ad Soyad',nameP:'Ad Soyad',pass:'Şifre',passP:'Şifre',confirmPass:'Şifreyi Tekrarla',confirmPassP:'Şifreyi Tekrarla',ref:'Referans Kodu',refP:'Referans Kodu',cap:'Güvenlik Kodu',capP:'Kodu girin',btn:'Zenix\'e Kayıt Ol',back:'Giriş Sayfasına Dön',succ:'Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...',err:'Geçersiz güvenlik kodu!',refErr:'Geçersiz veya bulunmayan referans kodu!',passErr:'Şifreler eşleşmiyor!',lenErr:'Şifre en az 6 karakter olmalıdır!',existErr:'Bu e-posta zaten kayıtlı!',supTitle:'Destek',langTitle:'Dil Değiştir'},
+            ru:{dir:'ltr',wel:'Регистрация аккаунта',email:'Эл. почта',emailP:'Эл. почта',name:'ФИО',nameP:'Введите ФИО',pass:'Пароль',passP:'Пароль',confirmPass:'Повторите пароль',confirmPassP:'Повторите пароль',ref:'Реферальный код',refP:'Реферальный код',cap:'Защитный код',capP:'Введите код',btn:'Зарегистрироваться',back:'На страницу входа',succ:'Успешная регистрация! Перенаправление...',err:'Неверный защитный код!',refErr:'Неверный реферальный код!',passErr:'Пароли не совпадают!',lenErr:'Пароль должен быть не менее 6 символов!',existErr:'Этот email уже зарегистрирован!',supTitle:'Поддержка',langTitle:'Сменить язык'},
+            es:{dir:'ltr',wel:'Registrar nueva cuenta',email:'Correo electrónico',emailP:'Correo electrónico',name:'Nombre completo',nameP:'Nombre completo',pass:'Contraseña',passP:'Contraseña',confirmPass:'Confirmar contraseña',confirmPassP:'Confirmar contraseña',ref:'Código de referencia',refP:'Código de referencia',cap:'Código de seguridad',capP:'Ingrese el código',btn:'Registrarse en Zenix',back:'Volver al inicio de sesión',succ:'¡Registro exitoso! Redirigiendo...',err:'¡Código inválido!',refErr:'¡Código de referencia inválido!',passErr:'¡Las contraseñas no coinciden!',lenErr:'¡La contraseña debe tener al menos 6 caracteres!',existErr:'¡Este correo ya está registrado!',supTitle:'Soporte',langTitle:'Cambiar idioma'},
+            fr:{dir:'ltr',wel:'Créer un compte',email:'E-mail',emailP:'E-mail',name:'Nom complet',nameP:'Nom complet',pass:'Mot de passe',passP:'Mot de passe',confirmPass:'Confirmer',confirmPassP:'Confirmer',ref:'Code de parrainage',refP:'Code',cap:'Code de sécurité',capP:'Entrez le code',btn:'S\'inscrire',back:'Retour à la connexion',succ:'Inscription réussie ! Redirection...',err:'Code invalide !',refErr:'Code de parrainage invalide !',passErr:'Mots de passe différents !',lenErr:'Le mot de passe doit contenir au moins 6 caractères !',existErr:'E-mail déjà enregistré !',supTitle:'Support',langTitle:'Changer de langue'},
+            de:{dir:'ltr',wel:'Konto erstellen',email:'E-Mail',emailP:'E-Mail',name:'Vollständiger Name',nameP:'Vollständiger Name',pass:'Passwort',passP:'Passwort',confirmPass:'Passwort bestätigen',confirmPassP:'Passwort bestätigen',ref:'Empfehlungscode',refP:'Empfehlungscode',cap:'Sicherheitscode',capP:'Code eingeben',btn:'Registrieren',back:'Zurück zum Login',succ:'Erfolgreich! Weiterleitung...',err:'Ungültiger Code!',refErr:'Ungültiger Empfehlungscode!',passErr:'Passwörter stimmen nicht überein!',lenErr:'Das Passwort muss mindestens 6 Zeichen lang sein!',existErr:'E-Mail bereits registriert!',supTitle:'Support',langTitle:'Sprache ändern'}
         };
         
         let currentLang = localStorage.getItem('zenix_lang') || 'en', code = '';
@@ -286,7 +286,7 @@
 
             btn.disabled = true;
             const emailValue = emailIn.value.trim().toLowerCase();
-            const fullNameValue = nameIn.value.trim(); // مقدار نام دریافت می‌شود
+            const fullNameValue = nameIn.value.trim();
             const refCodeValue = refIn.value.trim().toUpperCase();
 
             try {
@@ -334,7 +334,7 @@
 
                 if (authError) throw authError;
 
-                // ۴. ثبت اطلاعات در جدول users (فعلاً fullname به دیتابیس ارسال نمی‌شود)
+                // ۴. ثبت اطلاعات در جدول users
                 if (authData?.user) {
                     const userPayload = {
                         id: authData.user.id,
@@ -354,9 +354,14 @@
                     }
                 }
 
+                // ۵. خروج فوری از نشست جهت جلوگیری از ورود مستقیم به داشبورد
+                await supabaseClient.auth.signOut();
+
                 msg.textContent = t.succ;
                 msg.className = 'succ';
-                setTimeout(() => window.location.href = 'index.html', 1500);
+
+                // ۶. هدایت کاربر به صفحه لاگین
+                setTimeout(() => window.location.href = 'login.html', 1500);
 
             } catch (error) {
                 btn.disabled = false;
