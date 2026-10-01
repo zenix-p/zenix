@@ -12,13 +12,125 @@ if (SUPABASE_URL && SUPABASE_URL.startsWith('http')) {
 }
 
 // ==========================================
-// نام فایل: dashboard.js
+// دیکشنری زبان‌ها و سیستم ترجمه
 // ==========================================
+let currLang = localStorage.getItem('zenix_lang') || 'fa';
+
+const ld = {
+  fa: {
+    m1: 'صفحه اصلی', m2: 'کوانتیفیکیشن', m3: 'واریز', m4: 'برداشت', m5: 'تراکنش', m6: 'پروفایل', m7: 'پشتیبانی', mAbout: 'درباره پلتفرم', m8: 'خروج',
+    wel: 'خوش آمدید', sub: 'پنل مدیریت کاربری', st: 'تایید شده',
+    ts1: 'موجودی', ts2: 'زیرمجموعه',
+    c1: 'کوانتیفیکیشن', d1: 'معاملات هوشمند',
+    c2: 'واریز', d2: 'شارژ حساب',
+    c3: 'برداشت', d3: 'برداشت دارایی',
+    c4: 'تیم', d4: 'زیرمجموعه‌ها',
+    c5: 'تراکنش‌ها', d5: 'تاریخچه مالی',
+    c6: 'پروفایل', d6: 'تنظیمات امنیت',
+    tMkt: 'بازار ارزهای دیجیتال (۳ ارز برتر از ۳۰ ارز رصد شده)', tLive: 'زنده',
+    tAbTitle: 'درباره پلتفرم Zenix (هدف، ماهیت و ساختار)',
+    tAbDesc: 'پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.',
+    tAbL1t: 'هدف اصلی:', tAbL1d: 'اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.',
+    tAbL2t: 'امنیت و زیرساخت:', tAbL2d: 'متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).',
+    tAbL3t: 'ساختار چندسطحی (Referral & Team):', tAbL3d: 'ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.',
+    tAbL4t: 'احساس واقع‌گرایی:', tAbL4d: 'وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.',
+    modalTitle: 'صندوق پیام‌ها و اطلاعیه‌ها', tabAll: 'همه', tabSys: 'اطلاعیه‌ها', tabPers: 'پیام‌های شخصی',
+    node: 'سرور فعال (US-East)',
+    helpTitle: 'راهنمای صفحه داشبورد',
+    hpT1: 'کاربرد این صفحه (داشبورد) چیست؟', hpD1: 'داشبورد مرکز کنترل و خانه اصلی حساب کاربری شماست. از این صفحه می‌توانید کل دارایی‌ها، وضعیت حساب و وضعیت تیم خود را بررسی کنید و به تمام بخش‌های اصلی پلتفرم دسترسی سریع داشته باشید.',
+    hpT2: 'کارت موجودی و زیرمجموعه‌ها', hpD2: 'در این قسمت می‌توانید مجموع کل دارایی‌های دلاری و تعداد اعضای تیم زیرمجموعه خود را به صورت لحظه‌ای مشاهده کنید.',
+    hpT3: 'بخش‌های دسترسی سریع', hpD3: 'دکمه‌های میانبر (کوانتیفیکیشن، واریز، برداشت، تیم، تراکنش‌ها و پروفایل) برای ورود آنی به بخش‌های مختلف پلتفرم تعبیه شده‌اند.',
+    hpT4: 'بازار زنده ارزهای دیجیتال', hpD4: 'نمایش لحظه‌ای تغییرات قیمت و درصد سود برترین ارزهای دیجیتال برای رصد بازار جهانی در یک نگاه.'
+  },
+  en: {
+    m1: 'Home', m2: 'Quantification', m3: 'Deposit', m4: 'Withdraw', m5: 'Transactions', m6: 'Profile', m7: 'Support', mAbout: 'About Platform', m8: 'Logout',
+    wel: 'Welcome', sub: 'User Dashboard Panel', st: 'Verified',
+    ts1: 'Balance', ts2: 'Referrals',
+    c1: 'Quantification', d1: 'Smart Trading',
+    c2: 'Deposit', d2: 'Account Recharge',
+    c3: 'Withdraw', d3: 'Asset Withdrawal',
+    c4: 'Team', d4: 'Referral Network',
+    c5: 'Transactions', d5: 'Financial History',
+    c6: 'Profile', d6: 'Security Settings',
+    tMkt: 'Cryptocurrency Market (Top 3 of 30 tracked coins)', tLive: 'LIVE',
+    tAbTitle: 'About Zenix Platform (Goal, Nature & Structure)',
+    tAbDesc: 'Zenix Platform is an advanced and intelligent financial ecosystem in cryptocurrency and trading processing, designed to provide a secure, automated, and profitable platform for users.',
+    tAbL1t: 'Main Goal:', tAbL1d: 'Automation of trading processes through AI systems and quantification algorithms, allowing users to profit from market fluctuations without complex trading expertise.',
+    tAbL2t: 'Security & Infrastructure:', tAbL2d: 'Relies on advanced encryption protocols, high-speed cloud node connections, and unified asset management on Supabase secure cloud database.',
+    tAbL3t: 'Multi-level Structure (Referral & Team):', tAbL3d: 'Creates a dynamic referral network enabling users to earn passive rewards from sub-level activities.',
+    tAbL4t: 'Realism & Live Data:', tAbL4d: 'Live market rates, trading volumes, and network indicators ensure transparency and real-time reliability.',
+    modalTitle: 'Inbox & Notifications', tabAll: 'All', tabSys: 'Announcements', tabPers: 'Personal Messages',
+    node: 'Active Server (US-East)',
+    helpTitle: 'Dashboard Guide',
+    hpT1: 'What is the purpose of this page?', hpD1: 'The dashboard is your main control center. Here you can inspect total assets, account status, team metrics, and access all core features quickly.',
+    hpT2: 'Balance & Team Cards', hpD2: 'View your live USD balance and team member count in real-time.',
+    hpT3: 'Quick Access Grid', hpD3: 'Shortcuts (Quantification, Deposit, Withdraw, Team, Transactions, Profile) for instant navigation.',
+    hpT4: 'Live Crypto Market', hpD4: 'Real-time price changes and trends of top cryptocurrencies at a glance.'
+  }
+};
+
+function setLang(lang) {
+  currLang = lang;
+  localStorage.setItem('zenix_lang', lang);
+
+  const navMenu = document.getElementById('nav-menu');
+  const langMenu = document.getElementById('lang-menu');
+  if (navMenu) navMenu.classList.remove('show');
+  if (langMenu) langMenu.classList.remove('show');
+
+  const t = ld[lang] || ld.fa;
+  const isRtl = lang === 'fa' || lang === 'ar';
+
+  document.documentElement.setAttribute('dir', isRtl ? 'rtl' : 'ltr');
+  document.documentElement.setAttribute('lang', lang);
+
+  const map = {
+    'm1': t.m1, 'm2': t.m2, 'm3': t.m3, 'm4': t.m4, 'm5': t.m5, 'm6': t.m6, 'm7': t.m7, 'm_about': t.mAbout, 'm8': t.m8,
+    't-wel': t.wel, 't-sub': t.sub, 't-st': t.st,
+    'ts1': t.ts1, 'ts2': t.ts2,
+    'c1': t.c1, 'd1': t.d1, 'c2': t.c2, 'd2': t.d2, 'c3': t.c3, 'd3': t.d3,
+    'c4': t.c4, 'd4': t.d4, 'c5': t.c5, 'd5': t.d5, 'c6': t.c6, 'd6': t.d6,
+    't-live': t.tLive,
+    't-ab-title': t.tAbTitle, 't-ab-desc': t.tAbDesc,
+    't-ab-l1t': t.tAbL1t, 't-ab-l1d': t.tAbL1d,
+    't-ab-l2t': t.tAbL2t, 't-ab-l2d': t.tAbL2d,
+    't-ab-l3t': t.tAbL3t, 't-ab-l3d': t.tAbL3d,
+    't-ab-l4t': t.tAbL4t, 't-ab-l4d': t.tAbL4d,
+    't-about-title': t.tAbTitle, 't-ab-m-desc': t.tAbDesc,
+    't-ab-m-l1t': t.tAbL1t, 't-ab-m-l1d': t.tAbL1d,
+    't-ab-m-l2t': t.tAbL2t, 't-ab-m-l2d': t.tAbL2d,
+    't-ab-m-l3t': t.tAbL3t, 't-ab-m-l3d': t.tAbL3d,
+    't-ab-m-l4t': t.tAbL4t, 't-ab-m-l4d': t.tAbL4d,
+    't-modal-title': t.modalTitle, 't-tab-all': t.tabAll, 't-tab-system': t.tabSys, 't-tab-personal': t.tabPers,
+    't-node': t.node, 't-help-title': t.helpTitle,
+    't-hp-d1': t.hpD1, 't-hp-d2': t.hpD2, 't-hp-d3': t.hpD3, 't-hp-d4': t.hpD4
+  };
+
+  Object.keys(map).forEach(id => {
+    const el = document.getElementById(id);
+    if (el && map[id]) el.textContent = map[id];
+  });
+
+  const mktHeader = document.getElementById('t-mkt');
+  if (mktHeader) {
+    mktHeader.innerHTML = `<i class="fas fa-chart-line" style="color:#22c55e"></i> ${t.tMkt}`;
+  }
+
+  for (let i = 1; i <= 4; i++) {
+    const ht = document.getElementById('t-hp-t' + i);
+    if (ht && t['hpT' + i]) {
+      const icons = ['fa-home', 'fa-wallet', 'fa-th-large', 'fa-chart-line'];
+      const colors = ['#38bdf8', '#38bdf8', '#a855f7', '#22c55e'];
+      ht.innerHTML = `<i class="fas ${icons[i - 1]}" style="color:${colors[i - 1]}"></i> ${t['hpT' + i]}`;
+    }
+  }
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
+  setLang(currLang);
+  setupEventListeners();
   if (!supabase) return;
   await checkUserSession();
-  setupEventListeners();
 });
 
 /**
@@ -26,10 +138,8 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 async function checkUserSession() {
   try {
-    // ۱. دریافت نشست فعال کاربر از Supabase
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
     
-    // اگر کاربر وارد نشده باشد، به صفحه ورود هدایت می‌شود
     if (sessionError || !session || !session.user) {
       window.location.href = 'index.html';
       return;
@@ -37,7 +147,6 @@ async function checkUserSession() {
 
     const user = session.user;
 
-    // ۲. دریافت اطلاعات تکمیلی کاربر از جدول users
     const { data: userData, error: dbError } = await supabase
       .from('users')
       .select('*')
@@ -50,7 +159,6 @@ async function checkUserSession() {
     }
 
     if (userData) {
-      // مقداردهی عناصر رابط کاربری
       const fullNameElem = document.getElementById('user-fullname');
       const userIdElem = document.getElementById('user-id');
       const phoneInput = document.getElementById('user-phone-input');
@@ -92,7 +200,7 @@ function setupEventListeners() {
   const langBtn = document.getElementById('lang-btn');
   const langMenu = document.getElementById('lang-menu');
 
-  // ۱. باز و بستن منوی اصلی (همبرگری)
+  // ۱. باز و بستن منوی اصلی
   if (menuBtn && navMenu) {
     menuBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -109,6 +217,14 @@ function setupEventListeners() {
       if (navMenu) navMenu.classList.remove('show');
     });
   }
+
+  // اضافه کردن رویداد کلیک به گزینه‌های زبان
+  document.querySelectorAll('#lang-menu .mi').forEach(item => {
+    item.addEventListener('click', () => {
+      const selectedLang = item.getAttribute('data-lang');
+      if (selectedLang) setLang(selectedLang);
+    });
+  });
 
   // بستن منوها هنگام کلیک در خارج از آن‌ها
   document.addEventListener('click', (e) => {
@@ -150,7 +266,7 @@ function setupEventListeners() {
     });
   }
 
-  // ۶. شنونده فرم پروفایل (در صورت وجود)
+  // ۶. شنونده فرم پروفایل
   const profileForm = document.getElementById('profile-form');
   if (profileForm) {
     profileForm.addEventListener('submit', handleProfileUpdate);
@@ -158,7 +274,7 @@ function setupEventListeners() {
 }
 
 // ==========================================
-// توابع عمومی مدیریت مودال‌ها (برای فراخوانی از HTML)
+// توابع عمومی مدیریت مودال‌ها
 // ==========================================
 
 window.openAboutModal = function() {
@@ -193,7 +309,7 @@ window.switchNotifTab = function(tabName) {
 };
 
 /**
- * ذخیره و به‌روزرسانی اطلاعات پروفایل
+ * ذخیره و به‌‌روزرسانی اطلاعات پروفایل
  */
 async function handleProfileUpdate(e) {
   e.preventDefault();
