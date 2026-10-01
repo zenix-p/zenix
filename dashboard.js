@@ -1,15 +1,23 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-// آدرس URL و کلید Anon پروژه سوپابیس خود را در مقادیر زیر قرار دهید
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+// آدرس پایه پروژه Supabase شما
+const SUPABASE_URL = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
+// ⚠️ کلید anon پروژه خود را (از بخش Project Settings > API) به جای مقدار زیر قرار دهید
 const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let supabase = null;
+if (SUPABASE_URL && SUPABASE_URL.startsWith('http')) {
+  supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+} else {
+  console.error('لطفاً آدرس معتبر Supabase را در فایل dashboard.js وارد کنید.');
+}
 
 // ==========================================
-// نام فایل: profile.js
+// نام فایل: dashboard.js
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', async () => {
+  if (!supabase) return;
   await checkUserSession();
   setupEventListeners();
 });
@@ -61,12 +69,6 @@ async function checkUserSession() {
       if (phoneInput && phone) {
         phoneInput.value = phone;
       }
-
-      /* 
-        ❌ کد حذف‌شده:
-        در این بخش هیچ دستور هدایتی مانند (window.location.href = 'dashboard.html') 
-        نباید وجود داشته باشد تا کاربر بتواند در صفحه پروفایل بماند.
-      */
     }
   } catch (err) {
     console.error('خطای غیرمنتظره در بررسی نشست:', err);
@@ -88,6 +90,8 @@ function setupEventListeners() {
  */
 async function handleProfileUpdate(e) {
   e.preventDefault();
+
+  if (!supabase) return;
 
   const phoneInput = document.getElementById('user-phone-input');
   const newPhone = phoneInput ? phoneInput.value.trim() : '';
