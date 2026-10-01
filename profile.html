@@ -133,6 +133,7 @@
             <div style="display:flex;align-items:center;gap:15px;margin-bottom:20px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:15px;">
                 <div style="width:50px;height:50px;background:rgba(56,189,248,0.2);border:1px solid #38bdf8;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#38bdf8;"><i class="fas fa-user"></i></div>
                 <div>
+                    <!-- نمایش نام و نام خانوادگی به جای ایمیل -->
                     <div style="font-size:16px;font-weight:bold;color:#f8fafc;" id="user-fullname">در حال بارگذاری...</div>
                     <div style="font-size:12px;color:#94a3b8;display:flex;align-items:center;gap:6px;margin-top:2px;">
                         <span id="user-id">UID: MS-000000</span>
@@ -141,6 +142,16 @@
                 </div>
             </div>
             
+            <!-- ورودی ویرایش نام و نام خانوادگی -->
+            <div class="fg">
+                <label class="fl">نام و نام خانوادگی</label>
+                <div style="display:flex;gap:8px;">
+                    <input type="text" class="fi" id="user-fullname-input" placeholder="نام و نام خانوادگی خود را وارد کنید">
+                    <button type="button" id="save-name-btn" onclick="window.saveFullName()" class="bs" style="width:120px;font-size:13px;">ذخیره نام</button>
+                </div>
+                <div class="success-msg" id="name-success" style="font-size:11px;margin-top:4px;">نام و نام خانوادگی با موفقیت ثبت شد</div>
+            </div>
+
             <div class="ibox">
                 <span style="color:#94a3b8;font-size:13px;">وضعیت حساب:</span>
                 <span id="account-status" style="font-weight:bold;font-size:13px;">در حال بررسی...</span>
@@ -362,7 +373,7 @@
         let currentUser = null;
         let allMessages = [];
         let currentUserId = null;
-        let userChannel = null; // نگهدارنده کانال Realtime
+        let userChannel = null;
 
         function lockPhoneInput(phoneNumber) {
             const phoneInput = document.getElementById('user-phone-input');
@@ -556,6 +567,59 @@
           }
         };
 
+        // ذخیره‌سازی نام و نام خانوادگی در دیتابیس سوپابیس و متادیتای کاربر
+        window.saveFullName = async function() {
+          const nameInput = document.getElementById('user-fullname-input');
+          const succEl = document.getElementById('name-success');
+          const saveBtn = document.getElementById('save-name-btn');
+          const newName = nameInput ? nameInput.value.trim() : '';
+
+          if (!newName) {
+            alert('لطفاً نام و نام خانوادگی خود را وارد کنید.');
+            return;
+          }
+
+          if (!currentUser) return;
+
+          if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.innerText = 'در حال ذخیره...';
+          }
+
+          try {
+            // بروزرسانی در جدول users
+            let { error } = await supabaseClient
+              .from('users')
+              .update({ full_name: newName })
+              .eq('id', currentUser.id);
+
+            // بروزرسانی در Auth Metadata
+            await supabaseClient.auth.updateUser({
+              data: { full_name: newName }
+            });
+
+            if (saveBtn) {
+              saveBtn.disabled = false;
+              saveBtn.innerText = 'ذخیره نام';
+            }
+
+            if (!error) {
+              const fullNameEl = document.getElementById('user-fullname');
+              if (fullNameEl) fullNameEl.textContent = newName;
+              if (succEl) succEl.style.display = 'block';
+              setTimeout(() => { if (succEl) succEl.style.display = 'none'; }, 3000);
+            } else {
+              alert('خطا در ذخیره‌سازی نام: ' + error.message);
+            }
+          } catch (e) {
+            if (saveBtn) {
+              saveBtn.disabled = false;
+              saveBtn.innerText = 'ذخیره نام';
+            }
+            alert('خطا: ' + e.message);
+          }
+        };
+
         async function loadUserData(user) {
           const { data, error } = await supabaseClient
             .from('users')
@@ -564,6 +628,16 @@
             .single();
 
           if (data) {
+            // دریافت و تنظیم نام و نام خانوادگی به جای ایمیل
+            const fullName = data.full_name || user.user_metadata?.full_name || 'ثبت نشده (نام مشخص نیست)';
+            const fullNameEl = document.getElementById('user-fullname');
+            if (fullNameEl) fullNameEl.textContent = fullName;
+
+            const nameInput = document.getElementById('user-fullname-input');
+            if (nameInput && (data.full_name || user.user_metadata?.full_name)) {
+              nameInput.value = data.full_name || user.user_metadata?.full_name;
+            }
+
             const userIdEl = document.getElementById('user-id');
             if (userIdEl) {
                 let displayId = data.referral_code || data.custom_id;
@@ -599,6 +673,11 @@
 
             if(data.trx_address) document.getElementById('trx-in').value = data.trx_address;
             if(data.bep20_address) document.getElementById('bep-in').value = data.bep20_address;
+          } else {
+            // اگر هنوز رکوردی در جدول ثبت نشده، از متادیتای اکانت استفاده کن
+            const fullName = user.user_metadata?.full_name || 'ثبت نشده (نام مشخص نیست)';
+            const fullNameEl = document.getElementById('user-fullname');
+            if (fullNameEl) fullNameEl.textContent = fullName;
           }
         }
 
@@ -620,8 +699,11 @@
                 if (el) el.value = session.user.email || '';
             });
 
+            // تنظیم اولیه نام و نام خانوادگی به جای ایمیل
             const fullNameEl = document.getElementById('user-fullname');
-            if(fullNameEl) fullNameEl.textContent = session.user.user_metadata?.full_name || session.user.email;
+            if(fullNameEl) {
+                fullNameEl.textContent = session.user.user_metadata?.full_name || 'در حال دریافت...';
+            }
 
             await loadUserData(session.user);
 
@@ -646,7 +728,6 @@
           }
         });
 
-        // اکشن ذخیره‌سازی شماره تماس - به‌روزرسانی‌شده جهت جلوگیری از خطای RLS/Upsert
         window.savePhone = async function() {
           const phoneInput = document.getElementById('user-phone-input');
           const errEl = document.getElementById('phone-err-msg');
@@ -684,14 +765,12 @@
             const fullPhone = code + phone;
 
             try {
-              // روش اول: آپدیت رکورد بر اساس آیدی کاربر لاگین شده
               let { data, error } = await supabaseClient
                 .from('users')
                 .update({ phone: fullPhone })
                 .eq('id', currentUser.id)
                 .select();
 
-              // روش دوم: اگر هنوز رکوردی در جدول ثبت نشده، یک رکورد جدید بساز (upsert)
               if (!error && (!data || data.length === 0)) {
                 const upsertRes = await supabaseClient
                   .from('users')
