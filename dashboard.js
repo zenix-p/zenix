@@ -1,19 +1,9 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-const app = initializeApp({
-  apiKey: "AIzaSyAqIksPfjCCQZNQDVx3MEdDyJyNMaTvtlk",
-  authDomain: "zenix-platform.firebaseapp.com",
-  projectId: "zenix-platform",
-  storageBucket: "zenix-platform.firebasestorage.app",
-  messagingSenderId: "594936010622",
-  appId: "1:594936010622:web:9f4159c80111245062052f",
-  measurementId: "G-LXSGYB8WKM"
-});
+const SUPABASE_URL = "https://YOUR_SUPABASE_PROJECT_ID.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
 
-const auth = getAuth(app);
-const db = getFirestore(app);
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let uName = "";
 let currLang = localStorage.getItem('zenix_lang') || 'fa';
@@ -39,7 +29,7 @@ const ld = {
     abTitle: 'درباره پلتفرم Zenix (هدف، ماهیت و ساختار)',
     abDesc: 'پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.',
     abL1T: 'هدف اصلی:', abL1D: 'اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.',
-    abL2T: 'امنیت و زیرساخت:', abL2D: 'متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Firebase).',
+    abL2T: 'امنیت و زیرساخت:', abL2D: 'متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).',
     abL3T: 'ساختار چندسطحی (Referral & Team):', abL3D: 'ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.',
     abL4T: 'احساس واقع‌گرایی:', abL4D: 'وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.'
   },
@@ -60,7 +50,7 @@ const ld = {
     abTitle: 'About Zenix Platform (Goal, Nature & Structure)',
     abDesc: 'Zenix Platform is an innovative financial ecosystem in cryptocurrency and trading processing designed for a secure, automated, and profitable user experience.',
     abL1T: 'Main Goal:', abL1D: 'Automating trading processes via AI systems and quantification algorithms, enabling users to profit from market fluctuations without complex trading expertise.',
-    abL2T: 'Security & Infrastructure:', abL2D: 'Backed by advanced encryption protocols, high-speed cloud processing nodes, and secure Firebase database storage.',
+    abL2T: 'Security & Infrastructure:', abL2D: 'Backed by advanced encryption protocols, high-speed cloud processing nodes, and secure Supabase database storage.',
     abL3T: 'Multi-level Structure (Referral & Team):', abL3D: 'Creating a dynamic referral network so users receive multi-level rewards and sustainable passive income from team activity.',
     abL4T: 'Realism & Live Data:', abL4D: 'Live crypto ticker, volume indicators, network gas fees, and system notices ensure users interact with an active global platform.'
   },
@@ -80,7 +70,7 @@ const ld = {
     abTitle: 'عن منصة Zenix (الهدف والطبيعة والهيكل)',
     abDesc: 'منصة Zenix هي بيئة مالية مبتكرة وذكية في مجال العملات الرقمية صُممت لتقديم تجربة آمنة وآلية ومربحة للمستخدمين.',
     abL1T: 'الهدف الرئيسي:', abL1D: 'أتمتة عمليات التداول عبر الذكاء الاصطناعي وخوارزميات الكمية لتمكين المستخدمين من تحقيق أرباح دون الحاجة لخبرة تداول معقدة.',
-    abL2T: 'الأمان والبنية التحتية:', abL2D: 'تعتمد على بروتوكولات تشفير متقدمة وعقد معالجة سحابية سريعة وقاعدة بيانات Firebase آمنة.',
+    abL2T: 'الأمان والبنية التحتية:', abL2D: 'تعتمد على بروتوكولات تشفير متقدمة وعقد معالجة سحابية سريعة وقاعدة بيانات Supabase آمنة.',
     abL3T: 'الهيكل متعدد المستويات:', abL3D: 'إنشاء شبكة إحالة ديناميكية لتمكين المستخدمين من الحصول على مكافآت مستمرة من نشاط فريقهم.',
     abL4T: 'بيانات حية وواقعية:', abL4D: 'مؤشرات أسعار وحجم تداول ورسوم شبكة حية تضمن التفاعل مع منصة عالمية حقيقية.'
   },
@@ -100,7 +90,7 @@ const ld = {
     abTitle: 'Zenix Platformu Hakkında (Amaç, Yapı ve Detaylar)',
     abDesc: 'Zenix Platformu, kripto para ticaretinde güvenli, otomatik ve kazançlı bir deneyim sunmak için tasarlanmış yenilikçi bir finansal ekosistemdir.',
     abL1T: 'Ana Amaç:', abL1D: 'Yapay zeka ve nicel ticaret algoritmaları ile işlem süreçlerini otomatikleştirmek, karmaşık analiz bilgisine gerek kalmadan kazanç sağlamak.',
-    abL2T: 'Güvenlik ve Altyapı:', abL2D: 'Gelişmiş şifreleme protokolleri, hızlı bulut işleme düğümleri ve güvenli Firebase veritabanı altyapısı.',
+    abL2T: 'Güvenlik ve Altyapı:', abL2D: 'Gelişmiş şifreleme protokolleri, hızlı bulut işleme düğümleri ve güvenli Supabase veritabanı altyapısı.',
     abL3T: 'Çok Seviyeli Ekip Yapısı:', abL3D: 'Kullanıcıların alt ekiplerinin faaliyetlerinden sürekli ödül ve pasif gelir elde edebileceği dinamik davet ağı.',
     abL4T: 'Gerçek Zamanlı Veriler:', abL4D: 'Canlı kripto fiyatları, işlem hacmi göstergeleri ve sistem bildirimleri ile şeffaf platform tecrübesi.'
   },
@@ -120,7 +110,7 @@ const ld = {
     abTitle: 'О платформе Zenix (Цель, суть и структура)',
     abDesc: 'Платформа Zenix — это инновационная финансовая экосистема в сфере криптовалют, созданная для безопасной, автоматизированной и прибыльной торговли.',
     abL1T: 'Главная цель:', abL1D: 'Автоматизация торговли с помощью ИИ и квантитативных алгоритмов, позволяющая получать прибыль без сложных навыков трейдинга.',
-    abL2T: 'Безопасность и инфраструктура:', abL2D: 'Продвинутые протоколы шифрования, высокоскоростные облачные узлы и надежное хранилище Firebase.',
+    abL2T: 'Безопасность и инфраструктура:', abL2D: 'Продвинутые протоколы шифрования, высокоскоростные облачные узлы и надежное хранилище Supabase.',
     abL3T: 'Многоуровневая структура:', abL3D: 'Динамичная реферальная сеть для получения стабильного дохода от активности вашей команды на нескольких уровнях.',
     abL4T: 'Реалистичность и данные:', abL4D: 'Живые котировки, индикаторы объема и уведомления гарантируют работу с современной международной платформой.'
   },
@@ -140,7 +130,7 @@ const ld = {
     abTitle: 'Acerca de la Plataforma Zenix (Objetivo y Estructura)',
     abDesc: 'La Plataforma Zenix es un ecosistema financiero innovador diseñado para ofrecer una experiencia de trading segura, automatizada y rentable.',
     abL1T: 'Objetivo Principal:', abL1D: 'Automatizar los procesos de trading mediante IA y algoritmos de cuantificación, permitiendo obtener ganancias sin necesidad de experiencia previa.',
-    abL2T: 'Seguridad e Infraestructura:', abL2D: 'Respaldado por protocolos de encriptación avanzados, nodos en la nube de alta velocidad y almacenamiento seguro en Firebase.',
+    abL2T: 'Seguridad e Infraestructura:', abL2D: 'Respaldado por protocolos de encriptación avanzados, nodos en la nube de alta velocidad y almacenamiento seguro en Supabase.',
     abL3T: 'Estructura Multinivel:', abL3D: 'Red de referidos dinámica para recibir comisiones e ingresos pasivos continuos por la actividad del equipo.',
     abL4T: 'Datos en Tiempo Real:', abL4D: 'Precios en vivo, volumen de operaciones y alertas del sistema que garantizan transparencia constante.'
   },
@@ -160,7 +150,7 @@ const ld = {
     abTitle: 'À propos de Zenix (Objectif, Nature & Structure)',
     abDesc: 'La plateforme Zenix est un écosystème financier moderne conçu pour offrir une expérience de trading automatisée, sécurisée et profitable.',
     abL1T: 'Objectif Principal :', abL1D: 'Automatiser le trading grâce à l’IA et à la quantification pour générer des profits sans compétences complexes.',
-    abL2T: 'Sécurité & Infrastructure :', abL2D: 'Basé sur des protocoles de cryptage avancés, des nœuds cloud rapides et une base de données Firebase sécurisée.',
+    abL2T: 'Sécurité & Infrastructure :', abL2D: 'Basé sur des protocoles de cryptage avancés, des nœuds cloud rapides et une base de données Supabase sécurisée.',
     abL3T: 'Structure Multiniveau :', abL3D: 'Réseau de parrainage dynamique permettant de percevoir des commissions régulières basées sur l’activité de votre équipe.',
     abL4T: 'Données en Temps Réel :', abL4D: 'Cours en direct, indicateurs de volume et notifications assurant une transparence totale.'
   },
@@ -180,7 +170,7 @@ const ld = {
     abTitle: 'Über die Zenix Platform (Ziel, Natur & Struktur)',
     abDesc: 'Zenix ist ein modernes Finanz-Ökosystem für Kryptowährungen, das für sicheres, automatisiertes und profitables Trading entwickelt wurde.',
     abL1T: 'Hauptziel:', abL1D: 'Automatisierung von Handelsprozessen durch KI und Quantifizierungs-Algorithmen für Erträge ohne komplexes Fachwissen.',
-    abL2T: 'Sicherheit & Infrastruktur:', abL2D: 'Unterstützt durch fortgeschrittene Verschlüsselung, schnelle Cloud-Knoten und sichere Firebase-Datenbanken.',
+    abL2T: 'Sicherheit & Infrastruktur:', abL2D: 'Unterstützt durch fortgeschrittene Verschlüsselung, schnelle Cloud-Knoten und sichere Supabase-Datenbanken.',
     abL3T: 'Mehrstufige Teamstruktur:', abL3D: 'Dynamisches Empfehlungsnetzwerk für nachhaltige Belohnungen und passives Einkommen durch Teamaktivitäten.',
     abL4T: 'Echtzeit-Transparenz:', abL4D: 'Live-Kurse, Handelsvolumen-Indikatoren und Systemnachrichten für eine aktive globale Plattform.'
   }
@@ -189,20 +179,30 @@ const ld = {
 async function fetchUserMessages(uid) {
   try {
     let messages = [];
-    let snap = await getDocs(collection(db, "users", uid, "notifications"));
-    snap.docs.forEach(d => {
-      let dt = d.data();
-      let typeVal = dt.type || dt.category || (dt.isGlobal ? 'system' : 'personal');
-      messages.push({
-        id: d.id,
-        subject: dt.title || dt.subject || 'Announcement',
-        body: dt.message || dt.text || dt.body || '',
-        time: dt.createdAt || dt.timestamp || dt.time || new Date().toISOString(),
-        read: dt.read === true || dt.isRead === true,
-        type: typeVal,
-        isGlobal: dt.isGlobal === true
+    const { data, error } = await supabase
+      .from("notifications")
+      .select("*")
+      .eq("user_id", uid);
+
+    if (error) {
+      console.error("خطا در دریافت اعلانات:", error);
+      return [];
+    }
+
+    if (data) {
+      data.forEach(dt => {
+        let typeVal = dt.type || dt.category || (dt.isGlobal || dt.is_global ? 'system' : 'personal');
+        messages.push({
+          id: dt.id,
+          subject: dt.title || dt.subject || 'Announcement',
+          body: dt.message || dt.text || dt.body || '',
+          time: dt.createdAt || dt.created_at || dt.timestamp || dt.time || new Date().toISOString(),
+          read: dt.read === true || dt.isRead === true || dt.is_read === true,
+          type: typeVal,
+          isGlobal: dt.isGlobal === true || dt.is_global === true
+        });
       });
-    });
+    }
 
     messages.sort((a, b) => {
       const getTimeMs = (timeVal) => {
@@ -286,7 +286,12 @@ window.readAdminMessage = async idx => {
   if (!m.read && currentUserId && m.id) {
     allMessages[idx].read = true;
     try {
-      await updateDoc(doc(db, "users", currentUserId, "notifications", m.id), { read: true, isRead: true });
+      await supabase
+        .from('notifications')
+        .update({ read: true, is_read: true, isRead: true })
+        .eq('id', m.id)
+        .eq('user_id', currentUserId);
+
       let unread = allMessages.filter(i => !i.read).length, b = document.getElementById('bell-badge');
       if (b) { b.textContent = unread; b.classList.toggle('show', unread > 0); }
     } catch (e) { console.error(e); }
@@ -320,18 +325,32 @@ document.getElementById('bell-btn')?.addEventListener('click', e => { e.stopProp
 document.getElementById('help-btn')?.addEventListener('click', e => { e.stopPropagation(); window.openHelpModal(); });
 window.addEventListener('pageshow', () => document.querySelectorAll('.menu').forEach(x => x.classList.remove('show')));
 
-onAuthStateChanged(auth, async u => {
-  if (!u) { window.location.href = 'index.html'; return; }
-  currentUserId = u.uid;
+supabase.auth.onAuthStateChange(async (event, session) => {
+  if (!session || !session.user) { 
+    window.location.href = 'index.html'; 
+    return; 
+  }
+  
+  const u = session.user;
+  currentUserId = u.id;
+  
   try {
-    let d = await getDoc(doc(db, "users", u.uid));
-    if (d.exists()) {
-      let data = d.data();
-      
-      uName = data.fullName || data.fullname || data.name || "";
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', u.id)
+      .single();
+
+    if (error) {
+      console.error("خطا در دریافت اطلاعات کاربر:", error);
+      return;
+    }
+
+    if (data) {
+      uName = data.fullName || data.fullname || data.full_name || data.name || "";
       setLang(currLang);
 
-      let rawBalance = data.balance ?? data.depositAmount ?? data.wallet ?? data.amount ?? 0;
+      let rawBalance = data.balance ?? data.depositAmount ?? data.deposit_amount ?? data.wallet ?? data.amount ?? 0;
       let numericBalance = parseFloat(rawBalance);
       if (isNaN(numericBalance)) numericBalance = 0;
       
@@ -339,29 +358,28 @@ onAuthStateChanged(auth, async u => {
       if (elBal) elBal.textContent = `$${numericBalance.toFixed(2)}`;
 
       let totalRef = 0;
-      let refCode = data.referralCode;
+      let refCode = data.referralCode || data.referral_code;
 
       if (refCode) {
         try {
-          let snapAll = await getDocs(collection(db, "users"));
-          let allUsers = [];
-          snapAll.forEach(ds => allUsers.push(ds.data()));
-          
-          let l1 = allUsers.filter(i => i.referredBy === refCode),
-              l1c = l1.map(i => i.referralCode).filter(Boolean),
-              l2 = allUsers.filter(i => l1c.includes(i.referredBy)),
-              l2c = l2.map(i => l1c.includes(i.referredBy)),
-              l3 = allUsers.filter(i => l2c.includes(i.referredBy));
-          
-          totalRef = l1.length + l2.length + l3.length;
+          const { data: allUsers } = await supabase.from('users').select('*');
+          if (allUsers) {
+            let l1 = allUsers.filter(i => (i.referredBy || i.referred_by) === refCode),
+                l1c = l1.map(i => i.referralCode || i.referral_code).filter(Boolean),
+                l2 = allUsers.filter(i => l1c.includes(i.referredBy || i.referred_by)),
+                l2c = l2.map(i => i.referralCode || i.referral_code).filter(Boolean),
+                l3 = allUsers.filter(i => l2c.includes(i.referredBy || i.referred_by));
+            
+            totalRef = l1.length + l2.length + l3.length;
+          }
         } catch (refErr) {
-          totalRef = Number(data.totalReferrals || data.refCount || 0) ||
+          totalRef = Number(data.totalReferrals || data.total_referrals || data.refCount || 0) ||
                      (Number(data.gen1Count || data.generation1 || 0) + 
                       Number(data.gen2Count || data.generation2 || 0) + 
                       Number(data.gen3Count || data.generation3 || 0));
         }
       } else {
-        totalRef = Number(data.totalReferrals || data.refCount || 0) ||
+        totalRef = Number(data.totalReferrals || data.total_referrals || data.refCount || 0) ||
                    (Number(data.gen1Count || data.generation1 || 0) + 
                     Number(data.gen2Count || data.generation2 || 0) + 
                     Number(data.gen3Count || data.generation3 || 0));
@@ -370,11 +388,11 @@ onAuthStateChanged(auth, async u => {
       let elRef = document.getElementById('val-ref'); 
       if (elRef) elRef.textContent = totalRef;
 
-      allMessages = await fetchUserMessages(u.uid);
+      allMessages = await fetchUserMessages(u.id);
       let unread = allMessages.filter(m => !m.read).length, b = document.getElementById('bell-badge');
       if (b && unread > 0) { b.textContent = unread; b.classList.add('show'); }
 
-      let phone = data.phone || data.phoneNumber;
+      let phone = data.phone || data.phoneNumber || data.phone_number;
       if (!phone) {
         localStorage.setItem('profile_error', (ld[currLang] || ld.fa).phoneErr);
         window.location.replace('profile.html'); 
@@ -382,7 +400,7 @@ onAuthStateChanged(auth, async u => {
       }
     }
   } catch (e) { 
-    console.error("خطا در دریافت اطلاعات کاربر:", e); 
+    console.error("خطا در پردازش اطلاعات کاربر:", e); 
   }
 });
 
@@ -499,8 +517,10 @@ function setLang(l) {
 document.querySelectorAll('#lang-menu .mi').forEach(i => i.addEventListener('click', () => setLang(i.dataset.lang)));
 
 document.getElementById('logout-btn')?.addEventListener('click', async e => {
-  e.preventDefault(); try { await signOut(auth); } catch (e) {}
-  localStorage.clear(); window.location.href = 'index.html';
+  e.preventDefault(); 
+  try { await supabase.auth.signOut(); } catch (e) {}
+  localStorage.clear(); 
+  window.location.href = 'index.html';
 });
 setLang(currLang);
 
