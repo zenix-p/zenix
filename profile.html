@@ -362,7 +362,6 @@
         let currentUser = null;
         let allMessages = [];
         let currentUserId = null;
-        let userRealtimeChannel = null;
 
         function lockPhoneInput(phoneNumber) {
             const phoneInput = document.getElementById('user-phone-input');
@@ -397,7 +396,7 @@
               .eq('user_id', uid)
               .order('created_at', { ascending: false });
 
-            if (error) return [];
+            if (error) throw error;
 
             return (data || []).map(dt => ({
               id: dt.id,
@@ -407,6 +406,7 @@
               read: dt.read === true || dt.is_read === true
             }));
           } catch (e) {
+            console.error(e);
             return [];
           }
         }
@@ -565,12 +565,10 @@
           if (data) {
             const userIdEl = document.getElementById('user-id');
             if (userIdEl) {
-                let displayId = data.referral_code || data.id || data.user_id || data.custom_id;
+                let displayId = data.referral_code || data.custom_id;
                 if (!displayId) {
-                    let nums = user.id.replace(/\D/g, '');
-                    if (nums.length < 6) nums = (nums + '482910').substring(0, 6);
-                    else nums = nums.substring(0, 6);
-                    displayId = 'MS-' + nums;
+                    let randomNum = Math.floor(100000 + Math.random() * 900000);
+                    displayId = 'MS-' + randomNum;
                 }
                 userIdEl.textContent = 'UID: ' + displayId;
             }
@@ -626,11 +624,8 @@
 
             await loadUserData(session.user);
 
-            if (userRealtimeChannel) {
-                supabaseClient.removeChannel(userRealtimeChannel);
-            }
-            userRealtimeChannel = supabaseClient
-              .channel(`public:users:${session.user.id}`)
+            supabaseClient
+              .channel('public:users')
               .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${session.user.id}` }, payload => {
                 loadUserData(session.user);
               })
@@ -641,6 +636,7 @@
           }
         });
 
+        // اکشن ذخیره‌سازی شماره تماس - به‌روزرسانی‌شده جهت جلوگیری از خطای RLS/Upsert
         window.savePhone = async function() {
           const phoneInput = document.getElementById('user-phone-input');
           const errEl = document.getElementById('phone-err-msg');
@@ -678,12 +674,14 @@
             const fullPhone = code + phone;
 
             try {
+              // روش اول: آپدیت رکورد بر اساس آیدی کاربر لاگین شده
               let { data, error } = await supabaseClient
                 .from('users')
                 .update({ phone: fullPhone })
                 .eq('id', currentUser.id)
                 .select();
 
+              // روش دوم: اگر هنوز رکوردی در جدول ثبت نشده، یک رکورد جدید بساز (upsert)
               if (!error && (!data || data.length === 0)) {
                 const upsertRes = await supabaseClient
                   .from('users')
