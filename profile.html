@@ -372,17 +372,23 @@
             const dropdownBtn = document.getElementById('c-select-btn');
 
             if (phoneNumber) {
-                let matchedCountry = countries.find(c => phoneNumber.startsWith(c.c));
+                // مرتب‌سازی کدهای کشور بر اساس طول پیش‌شماره جهت تطابق دقیق‌تر
+                let sortedCountries = [...countries].sort((a, b) => b.c.length - a.c.length);
+                let matchedCountry = sortedCountries.find(c => phoneNumber.startsWith(c.c));
                 if (matchedCountry) {
                     document.getElementById('country-code').value = matchedCountry.c;
-                    dropdownBtn.querySelector('span').innerText = `${matchedCountry.f} ${matchedCountry.c}`;
-                    phoneInput.value = phoneNumber.replace(matchedCountry.c, '');
+                    if (dropdownBtn && dropdownBtn.querySelector('span')) {
+                        dropdownBtn.querySelector('span').innerText = `${matchedCountry.f} ${matchedCountry.c}`;
+                    }
+                    if (phoneInput) phoneInput.value = phoneNumber.replace(matchedCountry.c, '');
                 } else {
-                    phoneInput.value = phoneNumber;
+                    if (phoneInput) phoneInput.value = phoneNumber;
                 }
 
-                phoneInput.readOnly = true;
-                phoneInput.disabled = true;
+                if (phoneInput) {
+                    phoneInput.readOnly = true;
+                    phoneInput.disabled = true;
+                }
                 if (saveBtn) saveBtn.style.display = 'none';
                 if (dropdownBtn) {
                     dropdownBtn.style.pointerEvents = 'none';
@@ -651,22 +657,63 @@
 
         // اکشن‌های ذخیره‌سازی
         window.savePhone = async function() {
-          const phone = document.getElementById('user-phone-input').value.trim();
+          const phoneInput = document.getElementById('user-phone-input');
+          let phone = phoneInput ? phoneInput.value.trim() : '';
+          
+          // حذف خودکار صفر اول شماره در صورت وارد شدن توسط کاربر
+          if (phone.startsWith('0')) {
+            phone = phone.replace(/^0+/, '');
+            phoneInput.value = phone;
+          }
+
           const code = document.getElementById('country-code').value;
-          if (phone.length === 10 && currentUser) {
+          const errEl = document.getElementById('phone-err-msg');
+          const succEl = document.getElementById('phone-success');
+          const saveBtn = document.getElementById('save-phone-btn');
+
+          if (!code) {
+            if (errEl) {
+              errEl.textContent = 'لطفاً کد کشور را انتخاب کنید.';
+              errEl.style.display = 'block';
+            }
+            return;
+          }
+
+          if (phone.length === 10 && /^\d+$/.test(phone) && currentUser) {
+            if (saveBtn) saveBtn.disabled = true;
             const fullPhone = code + phone;
-            const { error } = await supabase
+
+            // تلاش برای بروزرسانی و استفاده از upsert در صورت نساخته شدن رکورد کاربر
+            let { error } = await supabase
               .from('users')
               .update({ phone: fullPhone })
               .eq('id', currentUser.id);
 
+            if (error) {
+              const { error: upsertErr } = await supabase
+                .from('users')
+                .upsert({ id: currentUser.id, phone: fullPhone, email: currentUser.email });
+              error = upsertErr;
+            }
+
+            if (saveBtn) saveBtn.disabled = false;
+
             if (!error) {
-              document.getElementById('phone-success').style.display = 'block';
-              document.getElementById('phone-err-msg').style.display = 'none';
+              if (succEl) succEl.style.display = 'block';
+              if (errEl) errEl.style.display = 'none';
               lockPhoneInput(fullPhone);
+            } else {
+              console.error('Error updating phone:', error);
+              if (errEl) {
+                errEl.textContent = 'خطا در ذخیره‌سازی شماره در دیتابیس';
+                errEl.style.display = 'block';
+              }
             }
           } else {
-            document.getElementById('phone-err-msg').style.display = 'block';
+            if (errEl) {
+              errEl.textContent = 'شماره باید ۱۰ رقم و بدون صفر باشد';
+              errEl.style.display = 'block';
+            }
           }
         };
 
