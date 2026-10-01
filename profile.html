@@ -28,7 +28,6 @@
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
         body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
         
-        /* هدر کاملاً هماهنگ با داشبورد */
         header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1);padding:10px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
         .logo{display:flex;align-items:center;gap:10px}
         .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#0ea5e9,#9333ea);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;transform:skewX(-6deg);box-shadow:0 0 15px rgba(14,165,233,.4)}
@@ -73,7 +72,6 @@
         .c-option{padding:6px 8px;font-size:11px;color:#cbd5e1;cursor:pointer;display:flex;align-items:center;gap:6px}
         .c-option:hover{background:rgba(56,189,248,.2);color:#38bdf8}
 
-        /* Modal Styles */
         .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
         .modal.show{display:flex}
         .modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(56,189,248,.3);border-radius:20px;width:100%;max-width:440px;max-height:85vh;display:flex;flex-direction:column;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.9)}
@@ -89,7 +87,6 @@
     </style>
 </head>
 <body>
-    <!-- هدر کاملاً یکسان با داشبورد -->
     <header>
         <div class="logo"><div class="logo-icon">Z</div><div class="logo-text">ZENIX</div></div>
         <div class="hr">
@@ -360,14 +357,12 @@
         const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
         
-        // استفاده از نام supabaseClient برای جلوگیری از تداخل با متغیر کتابخانه اصلی
         var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentUser = null;
         let allMessages = [];
         let currentUserId = null;
 
-        // تابع قفل کردن فیلد شماره تماس در صورت موجود بودن
         function lockPhoneInput(phoneNumber) {
             const phoneInput = document.getElementById('user-phone-input');
             const saveBtn = document.getElementById('save-phone-btn');
@@ -393,7 +388,6 @@
             }
         }
 
-        // دریافت پیام‌های اعلان از سوپابیس
         async function fetchUserMessages(uid) {
           try {
             const { data, error } = await supabaseClient
@@ -417,7 +411,6 @@
           }
         }
 
-        // باز کردن مدال صندوق پیام‌ها
         window.openMessageModal = async () => {
           let c = document.getElementById('modal-msg-container');
           if (currentUserId) {
@@ -437,7 +430,6 @@
           document.getElementById('m-msg')?.classList.add('show');
         };
 
-        // رندر کردن لیست پیام‌ها
         function renderMessageList() {
           let c = document.getElementById('modal-msg-container');
           let html = '<div style="display:flex;flex-direction:column;gap:10px;">';
@@ -460,7 +452,6 @@
           c.innerHTML = html + '</div>';
         }
 
-        // مشاهده متن کامل پیام و علامت‌گذاری به عنوان خوانده‌شده
         window.readAdminMessage = async idx => {
           let m = allMessages[idx]; 
           if (!m) return;
@@ -498,7 +489,6 @@
           document.getElementById('m-msg')?.classList.remove('show');
         };
 
-        // تابع کامل ارسال کد ایمیل
         window.sendEmailCode = async function(emailInputId, btnEl) {
           const emailInput = document.getElementById(emailInputId);
           const email = emailInput && emailInput.value ? emailInput.value.trim() : (currentUser ? currentUser.email : '');
@@ -565,7 +555,6 @@
           }
         };
 
-        // تابع دریافت داده‌های کاربر از Supabase
         async function loadUserData(user) {
           const { data, error } = await supabaseClient
             .from('users')
@@ -614,7 +603,6 @@
           }
         }
 
-        // مدیریت وضعیت نشست کاربر با Supabase Auth
         supabaseClient.auth.onAuthStateChange(async (event, session) => {
           if (session && session.user) {
             currentUser = session.user;
@@ -638,7 +626,6 @@
 
             await loadUserData(session.user);
 
-            // شنود لایو تغییرات جدول کاربر در سوپابیس
             supabaseClient
               .channel('public:users')
               .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${session.user.id}` }, payload => {
@@ -651,7 +638,7 @@
           }
         });
 
-        // اکشن‌های ذخیره‌سازی
+        // اکشن ذخیره‌سازی شماره تماس - به‌روزرسانی‌شده جهت جلوگیری از خطای RLS/Upsert
         window.savePhone = async function() {
           const phoneInput = document.getElementById('user-phone-input');
           const errEl = document.getElementById('phone-err-msg');
@@ -660,13 +647,11 @@
 
           let phone = phoneInput ? phoneInput.value.trim() : '';
 
-          // ۱. حذف خودکار صفر اول شماره در صورت ورود
           if (phone.startsWith('0')) {
             phone = phone.substring(1);
             phoneInput.value = phone;
           }
 
-          // ۲. تعیین پیش‌فرض کد کشور در صورت عدم انتخاب
           let code = document.getElementById('country-code').value;
           if (!code) {
             code = '+98';
@@ -677,13 +662,11 @@
             }
           }
 
-          // ۳. بررسی وضعیت لاگین کاربر
           if (!currentUser) {
             alert('خطا: نشست کاری شما یافت نشد. لطفاً مجدداً وارد شوید.');
             return;
           }
 
-          // ۴. اعتبارسنجی ۱۰ رقمی بودن شماره
           if (phone.length === 10 && /^\d+$/.test(phone)) {
             if (saveBtn) {
               saveBtn.disabled = true;
@@ -693,14 +676,24 @@
             const fullPhone = code + phone;
 
             try {
-              // ۵. ذخیره یا بروزرسانی در سوپابیس (Upsert)
-              const { error } = await supabaseClient
+              // روش اول: آپدیت رکورد بر اساس آیدی کاربر لاگین شده
+              let { data, error } = await supabaseClient
                 .from('users')
-                .upsert({ 
-                  id: currentUser.id, 
-                  phone: fullPhone,
-                  email: currentUser.email 
-                }, { onConflict: 'id' });
+                .update({ phone: fullPhone })
+                .eq('id', currentUser.id)
+                .select();
+
+              // روش دوم: اگر هنوز رکوردی در جدول ثبت نشده، یک رکورد جدید بساز (upsert)
+              if (!error && (!data || data.length === 0)) {
+                const upsertRes = await supabaseClient
+                  .from('users')
+                  .upsert({ 
+                    id: currentUser.id, 
+                    phone: fullPhone,
+                    email: currentUser.email 
+                  }, { onConflict: 'id' });
+                error = upsertRes.error;
+              }
 
               if (saveBtn) {
                 saveBtn.disabled = false;
@@ -713,12 +706,13 @@
                 lockPhoneInput(fullPhone);
                 alert('شماره تماس با موفقیت ذخیره شد.');
               } else {
-                console.error('خطای سوپابیس:', error);
+                console.error('خطای دیتابیس سوپابیس:', error);
+                const errMsg = error.message || error.details || 'عدم دسترسی ویرایش به دیتابیس';
                 if (errEl) {
-                  errEl.textContent = 'خطا در دیتابیس: ' + error.message;
+                  errEl.textContent = 'خطا: ' + errMsg;
                   errEl.style.display = 'block';
                 }
-                alert('خطای ذخیره‌سازی سوپابیس:\n' + error.message);
+                alert('خطای ذخیره‌سازی سوپابیس:\n' + errMsg);
               }
             } catch (e) {
               if (saveBtn) {
