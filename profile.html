@@ -313,7 +313,7 @@
         <p style="color:#22c55e;"><i class="fas fa-circle" style="font-size:6px;"></i> <span>سرور فعال (US-East)</span></p>
     </footer>
 
-    <!-- کدهای اسکریپت اصلی -->
+    <!-- کدهای اسکریپت اصلی UI -->
     <script>
         const countries=[{n:"Afghanistan",c:"+93",f:"🇦🇫"},{n:"Albania",c:"+355",f:"🇦🇱"},{n:"Algeria",c:"+213",f:"🇩🇿"},{n:"Argentina",c:"+54",f:"🇦🇷"},{n:"Australia",c:"+61",f:"🇦🇺"},{n:"Austria",c:"+43",f:"🇦🇹"},{n:"Azerbaijan",c:"+994",f:"🇦🇿"},{n:"Bahrain",c:"+973",f:"🇧🇭"},{n:"Bangladesh",c:"+880",f:"🇧🇩"},{n:"Belarus",c:"+375",f:"🇧🇾"},{n:"Belgium",c:"+32",f:"🇧🇪"},{n:"Brazil",c:"+55",f:"🇧🇷"},{n:"Canada",c:"+1",f:"🇨🇦"},{n:"China",c:"+86",f:"🇨🇳"},{n:"Egypt",c:"+20",f:"🇪🇬"},{n:"France",c:"+33",f:"🇫🇷"},{n:"Germany",c:"+49",f:"🇩🇪"},{n:"India",c:"+91",f:"🇮🇳"},{n:"Indonesia",c:"+62",f:"🇮🇩"},{n:"Iran",c:"+98",f:"🇮🇷"},{n:"Iraq",c:"+964",f:"🇮🇶"},{n:"Italy",c:"+39",f:"🇮🇹"},{n:"Japan",c:"+81",f:"🇯🇵"},{n:"Jordan",c:"+962",f:"🇯🇴"},{n:"Kuwait",c:"+965",f:"🇰🇼"},{n:"Lebanon",c:"+961",f:"🇱🇧"},{n:"Malaysia",c:"+60",f:"🇲🇾"},{n:"Netherlands",c:"+31",f:"🇳🇱"},{n:"Oman",c:"+968",f:"🇴🇲"},{n:"Pakistan",c:"+92",f:"🇵🇰"},{n:"Qatar",c:"+974",f:"🇶🇦"},{n:"Russia",c:"+7",f:"🇷🇺"},{n:"Saudi Arabia",c:"+966",f:"🇸🇦"},{n:"Spain",c:"+34",f:"🇪🇸"},{n:"Sweden",c:"+46",f:"🇸🇪"},{n:"Switzerland",c:"+41",f:"🇨🇭"},{n:"Turkey",c:"+90",f:"🇹🇷"},{n:"United Arab Emirates",c:"+971",f:"🇦🇪"},{n:"United Kingdom",c:"+44",f:"🇬🇧"},{n:"United States",c:"+1",f:"🇺🇸"}];
 
@@ -359,7 +359,9 @@
     <script>
         const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // استفاده از نام supabaseClient برای جلوگیری از تداخل با متغیر کتابخانه اصلی
+        var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentUser = null;
         let allMessages = [];
@@ -394,7 +396,7 @@
         // دریافت پیام‌های اعلان از سوپابیس
         async function fetchUserMessages(uid) {
           try {
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
               .from('notifications')
               .select('*')
               .eq('user_id', uid)
@@ -465,7 +467,7 @@
           if (!m.read && currentUserId && m.id) {
             allMessages[idx].read = true;
             try {
-              await supabase
+              await supabaseClient
                 .from('notifications')
                 .update({ read: true, is_read: true })
                 .eq('id', m.id);
@@ -528,7 +530,7 @@
             });
 
             if (currentUser) {
-              await supabase
+              await supabaseClient
                 .from('users')
                 .update({ 
                   active_otp: otpCode, 
@@ -565,7 +567,7 @@
 
         // تابع دریافت داده‌های کاربر از Supabase
         async function loadUserData(user) {
-          const { data, error } = await supabase
+          const { data, error } = await supabaseClient
             .from('users')
             .select('*')
             .eq('id', user.id)
@@ -613,7 +615,7 @@
         }
 
         // مدیریت وضعیت نشست کاربر با Supabase Auth
-        supabase.auth.onAuthStateChange(async (event, session) => {
+        supabaseClient.auth.onAuthStateChange(async (event, session) => {
           if (session && session.user) {
             currentUser = session.user;
             currentUserId = session.user.id;
@@ -637,7 +639,7 @@
             await loadUserData(session.user);
 
             // شنود لایو تغییرات جدول کاربر در سوپابیس
-            supabase
+            supabaseClient
               .channel('public:users')
               .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${session.user.id}` }, payload => {
                 loadUserData(session.user);
@@ -692,7 +694,7 @@
 
             try {
               // ۵. ذخیره یا بروزرسانی در سوپابیس (Upsert)
-              const { error } = await supabase
+              const { error } = await supabaseClient
                 .from('users')
                 .upsert({ 
                   id: currentUser.id, 
@@ -759,7 +761,7 @@
           const trx = document.getElementById('trx-in').value.trim();
           const bep = document.getElementById('bep-in').value.trim();
           if (currentUser) {
-            const { error } = await supabase
+            const { error } = await supabaseClient
               .from('users')
               .update({ trx_address: trx, bep20_address: bep })
               .eq('id', currentUser.id);
@@ -780,7 +782,7 @@
         document.getElementById('menu-btn').onclick = () => document.getElementById('nav-menu').classList.toggle('show');
         document.getElementById('lang-btn').onclick = () => document.getElementById('lang-menu').classList.toggle('show');
         document.getElementById('logout-btn').onclick = async () => {
-            await supabase.auth.signOut();
+            await supabaseClient.auth.signOut();
             window.location.href = "index.html";
         };
     </script>
