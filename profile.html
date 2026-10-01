@@ -362,6 +362,7 @@
         let currentUser = null;
         let allMessages = [];
         let currentUserId = null;
+        let userChannel = null; // نگهدارنده کانال Realtime
 
         function lockPhoneInput(phoneNumber) {
             const phoneInput = document.getElementById('user-phone-input');
@@ -624,14 +625,23 @@
 
             await loadUserData(session.user);
 
-            supabaseClient
-              .channel('public:users')
+            // پاکسازی کانال قبلی در صورت وجود برای جلوگیری از خطای Re-subscribe
+            if (userChannel) {
+              supabaseClient.removeChannel(userChannel);
+            }
+
+            userChannel = supabaseClient
+              .channel(`user-changes-${session.user.id}`)
               .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${session.user.id}` }, payload => {
                 loadUserData(session.user);
               })
               .subscribe();
 
           } else {
+            if (userChannel) {
+              supabaseClient.removeChannel(userChannel);
+              userChannel = null;
+            }
             window.location.href = "index.html";
           }
         });
