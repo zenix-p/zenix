@@ -20,7 +20,7 @@ self.addEventListener('install', (e) => {
   );
 });
 
-// فعال‌سازی و پاک‌سازی کش‌های قدیمی
+// فعال‌سازی و پاک‌‌سازی کش‌های قدیمی
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then((keys) => {
