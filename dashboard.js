@@ -34,7 +34,7 @@ const ld = {
     tAbL2t: 'امنیت و زیرساخت:', tAbL2d: 'متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).',
     tAbL3t: 'ساختار چندسطحی (Referral & Team):', tAbL3d: 'ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.',
     tAbL4t: 'احساس واقع‌گرایی:', tAbL4d: 'وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.',
-    modalTitle: 'صندوق پیام‌ها و اطلاعیه‌ها', tabAll: 'همه', tabSys: 'اطلاعیه‌ها', tabPers: 'پیام‌های شخصی',
+    modalTitle: 'صندوق پیام‌ها و اعلان‌ها', tabAll: 'همه', tabApproved: 'تایید درخواست', tabRejected: 'لغو درخواست', tabAdmin: 'پیام مدیریت',
     node: 'سرور فعال (US-East)',
     helpTitle: 'راهنمای صفحه داشبورد',
     hpT1: 'کاربرد این صفحه (داشبورد) چیست؟', hpD1: 'داشبورد مرکز کنترل و خانه اصلی حساب کاربری شماست. از این صفحه می‌توانید کل دارایی‌ها، وضعیت حساب و وضعیت تیم خود را بررسی کنید و به تمام بخش‌های اصلی پلتفرم دسترسی سریع داشته باشید.',
@@ -59,7 +59,7 @@ const ld = {
     tAbL2t: 'Security & Infrastructure:', tAbL2d: 'Relies on advanced encryption protocols, high-speed cloud node connections, and unified asset management on Supabase secure cloud database.',
     tAbL3t: 'Multi-level Structure (Referral & Team):', tAbL3d: 'Creates a dynamic referral network enabling users to earn passive rewards from sub-level activities.',
     tAbL4t: 'Realism & Live Data:', tAbL4d: 'Live market rates, trading volumes, and network indicators ensure transparency and real-time reliability.',
-    modalTitle: 'Inbox & Notifications', tabAll: 'All', tabSys: 'Announcements', tabPers: 'Personal Messages',
+    modalTitle: 'Inbox & Notifications', tabAll: 'All', tabApproved: 'Approved Requests', tabRejected: 'Rejected Requests', tabAdmin: 'Admin Messages',
     node: 'Active Server (US-East)',
     helpTitle: 'Dashboard Guide',
     hpT1: 'What is the purpose of this page?', hpD1: 'The dashboard is your main control center. Here you can inspect total assets, account status, team metrics, and access all core features quickly.',
@@ -109,7 +109,7 @@ function setLang(lang) {
     't-ab-m-l2t': t.tAbL2t, 't-ab-m-l2d': t.tAbL2d,
     't-ab-m-l3t': t.tAbL3t, 't-ab-m-l3d': t.tAbL3d,
     't-ab-m-l4t': t.tAbL4t, 't-ab-m-l4d': t.tAbL4d,
-    't-modal-title': t.modalTitle, 't-tab-all': t.tabAll, 't-tab-system': t.tabSys, 't-tab-personal': t.tabPers,
+    't-tab-all': t.tabAll, 't-tab-approved': t.tabApproved, 't-tab-rejected': t.tabRejected, 't-tab-admin': t.tabAdmin,
     't-node': t.node, 't-help-title': t.helpTitle,
     't-hp-d1': t.hpD1, 't-hp-d2': t.hpD2, 't-hp-d3': t.hpD3, 't-hp-d4': t.hpD4
   };
@@ -118,6 +118,11 @@ function setLang(lang) {
     const el = document.getElementById(id);
     if (el && map[id]) el.textContent = map[id];
   });
+
+  const modalTitleElem = document.getElementById('t-modal-title');
+  if (modalTitleElem) {
+    modalTitleElem.innerHTML = `<i class="fas fa-bell"></i> ${t.modalTitle}`;
+  }
 
   const mktHeader = document.getElementById('t-mkt');
   if (mktHeader) {
@@ -138,7 +143,6 @@ function setLang(lang) {
 // دریافت و رندر قیمت زنده ۳ ارز برتر بازار
 // ==========================================
 async function fetchCryptoMarket() {
-  // جستجو بر اساس شناسه صحیح موجود در فایل HTML
   const container = document.getElementById('crypto-ticker-list') || 
                     document.getElementById('crypto-market-list') || 
                     document.getElementById('mkt-list');
@@ -178,12 +182,10 @@ async function fetchCryptoMarket() {
     container.innerHTML = html;
   }
 
-  // ۱. رندر آنی داده‌ها جهت جلوگیری از دیر بارگذاری شدن
   if (!container.children.length) {
     renderCoins(fallbackCoins);
   }
 
-  // ۲. دریافت اطلاعات آنلاین از API
   try {
     const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbols=["BTCUSDT","ETHUSDT","SOLUSDT"]');
     if (!res.ok) throw new Error('Network error fetching crypto prices');
@@ -211,17 +213,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   setLang(currLang);
   setupEventListeners();
   
-  // بارگذاری داده‌های بازار ارز دیجیتال
   fetchCryptoMarket();
-  setInterval(fetchCryptoMarket, 10000); // به‌‌روزرسانی هر ۱۰ ثانیه
+  setInterval(fetchCryptoMarket, 10000);
 
   if (!supabase) return;
   await checkUserSession();
 });
 
-/**
- * بررسی وضعیت ورود و بارگذاری اطلاعات کاربر
- */
 async function checkUserSession() {
   try {
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -277,16 +275,12 @@ async function checkUserSession() {
   }
 }
 
-/**
- * تنظیم رویدادهای هدر، منوها، مودال‌ها و فرم‌ها
- */
 function setupEventListeners() {
   const menuBtn = document.getElementById('menu-btn');
   const navMenu = document.getElementById('nav-menu');
   const langBtn = document.getElementById('lang-btn');
   const langMenu = document.getElementById('lang-menu');
 
-  // ۱. باز و بستن منوی اصلی
   if (menuBtn && navMenu) {
     menuBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -295,7 +289,6 @@ function setupEventListeners() {
     });
   }
 
-  // ۲. باز و بستن منوی انتخاب زبان
   if (langBtn && langMenu) {
     langBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -304,7 +297,6 @@ function setupEventListeners() {
     });
   }
 
-  // اضافه کردن رویداد کلیک به گزینه‌های زبان
   document.querySelectorAll('#lang-menu .mi').forEach(item => {
     item.addEventListener('click', () => {
       const selectedLang = item.getAttribute('data-lang');
@@ -312,7 +304,6 @@ function setupEventListeners() {
     });
   });
 
-  // بستن منوها هنگام کلیک در خارج از آن‌ها
   document.addEventListener('click', (e) => {
     if (navMenu && !navMenu.contains(e.target) && e.target !== menuBtn) {
       navMenu.classList.remove('show');
@@ -322,7 +313,6 @@ function setupEventListeners() {
     }
   });
 
-  // ۳. دکمه اعلانات (زنگوله)
   const bellBtn = document.getElementById('bell-btn');
   if (bellBtn) {
     bellBtn.addEventListener('click', () => {
@@ -331,7 +321,6 @@ function setupEventListeners() {
     });
   }
 
-  // ۴. دکمه راهنمای صفحه
   const helpBtn = document.getElementById('help-btn');
   if (helpBtn) {
     helpBtn.addEventListener('click', () => {
@@ -340,7 +329,6 @@ function setupEventListeners() {
     });
   }
 
-  // ۵. دکمه خروج از حساب کاربری
   const logoutBtn = document.getElementById('logout-btn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', async (e) => {
@@ -352,7 +340,6 @@ function setupEventListeners() {
     });
   }
 
-  // ۶. شنونده فرم پروفایل
   const profileForm = document.getElementById('profile-form');
   if (profileForm) {
     profileForm.addEventListener('submit', handleProfileUpdate);
@@ -360,7 +347,7 @@ function setupEventListeners() {
 }
 
 // ==========================================
-// توابع عمومی مدیریت مودال‌ها
+// توابع مدیریت مودال‌ها و فیلتر پیام‌ها (هماهنگ با کوانتیفیکیشن)
 // ==========================================
 
 window.openAboutModal = function() {
@@ -383,20 +370,23 @@ window.closeMessageModal = function() {
   if (modal) modal.classList.remove('show');
 };
 
-window.switchNotifTab = function(tabName) {
-  const tabs = document.querySelectorAll('.notif-tab');
-  tabs.forEach(tab => {
-    if (tab.getAttribute('data-tab') === tabName) {
-      tab.classList.add('active');
-    } else {
-      tab.classList.remove('active');
-    }
-  });
+window.setNotifFilter = function(filter, element) {
+  const tabs = document.querySelectorAll('#notif-tabs .notif-tab');
+  tabs.forEach(tab => tab.classList.remove('active'));
+  
+  if (element) {
+    element.classList.add('active');
+  }
+  
+  if (typeof window.renderNotifications === 'function') {
+    window.renderNotifications(filter);
+  }
 };
 
-/**
- * ذخیره و به‌روزرسانی اطلاعات پروفایل
- */
+window.switchNotifTab = function(tabName) {
+  window.setNotifFilter(tabName, document.querySelector(`.notif-tab[data-tab="${tabName}"]`));
+};
+
 async function handleProfileUpdate(e) {
   e.preventDefault();
 
