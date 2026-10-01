@@ -65,34 +65,14 @@
     </div>
     <footer><p>&copy; 2026 Zenix. All rights reserved.</p></footer>
 
-    <!-- Firebase SDK Modules -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, addDoc, collection, serverTimestamp, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAqIksPfjCCQZNQDVx3MEdDyJyNMaTvtlk",
-            authDomain: "zenix-platform.firebaseapp.com",
-            projectId: "zenix-platform",
-            storageBucket: "zenix-platform.firebasestorage.app",
-            messagingSenderId: "594936010622",
-            appId: "1:594936010622:web:9f4159c80111245062052f"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
+    <script>
         const chatBody = document.getElementById('chat-body');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-msg-btn');
 
         let currentUser = null;
         let isConnectedToAdmin = false;
-        let unsubscribeMessages = null;
 
-        // تابع مدیریت دقیق بازگشت بدون خراب کردن پشته تاریخچه مرورگر
         window.goBack = function(event) {
             if (event) event.preventDefault();
             if (document.referrer && document.referrer.includes(window.location.host)) {
@@ -102,10 +82,7 @@
             }
         };
 
-        onAuthStateChanged(auth, user => {
-            currentUser = user;
-            loadChatHistory();
-        });
+        loadChatHistory();
 
         function saveMessageToStorage(text, sender) {
             try {
@@ -142,7 +119,6 @@
                 localStorage.removeItem('zenix_chat_history');
                 chatBody.innerHTML = '';
                 isConnectedToAdmin = false;
-                if(unsubscribeMessages) unsubscribeMessages();
                 document.getElementById('support-status-title').innerText = "پشتیبانی آنلاین زنیکس";
                 document.getElementById('support-status-sub').innerText = "آنلاین و پاسخگوی سوالات شما";
                 loadChatHistory();
@@ -170,39 +146,16 @@
             return div;
         }
 
-        // ===== تابع اصلی ارجاع به مدیریت =====
         window.connectToAdmin = async function() {
             let userId = currentUser ? currentUser.uid : (localStorage.getItem('zenix_guest_uid') || 'guest_' + Math.random().toString(36).substring(2, 9));
             if (!currentUser && !localStorage.getItem('zenix_guest_uid')) {
                 localStorage.setItem('zenix_guest_uid', userId);
             }
 
-            let userName = currentUser ? (currentUser.displayName || currentUser.email?.split('@')[0] || "کاربر زنیکس") : "کاربر مهمان";
-            let userEmail = currentUser ? (currentUser.email || "بدون ایمیل") : "نامشخص";
-
             addMessage('درخواست ارجاع به مدیریت ثبت شد...', 'user', true);
             const typingElem = showTypingIndicator();
 
-            try {
-                // ۱. ثبت چت در مجموعه support_chats
-                const chatRef = doc(db, "support_chats", userId);
-                await setDoc(chatRef, {
-                    userId: userId,
-                    userName: userName,
-                    userEmail: userEmail,
-                    lastMessage: "درخواست اتصال به مدیریت ثبت شد.",
-                    unreadByAdmin: true,
-                    updatedAt: serverTimestamp(),
-                    status: 'pending'
-                }, { merge: true });
-
-                // ۲. ثبت اولین پیام درخواست
-                await addDoc(collection(db, `support_chats/${userId}/messages`), {
-                    sender: 'user',
-                    text: "سلام، درخواست ارتباط مستقیم با مدیریت را دارم.",
-                    createdAt: serverTimestamp()
-                });
-
+            setTimeout(() => {
                 typingElem.remove();
                 isConnectedToAdmin = true;
 
@@ -210,54 +163,12 @@
                 document.getElementById('support-status-sub').innerText = "متصل به مدیریت - در انتظار پاسخ";
 
                 addMessage(`پیام شما به مدیریت ارسال شد. لطفاً منتظر پاسخ بمانید. هر پیامی بنویسید مستقیماً برای مدیریت ارسال می‌شود.`, 'bot', true);
-
-                // ۳. گوش دادن به پاسخ‌های زنده مدیریت (Live Listener)
-                if (unsubscribeMessages) unsubscribeMessages();
-                const q = query(collection(db, `support_chats/${userId}/messages`), orderBy("createdAt", "asc"));
-                
-                let isInitialLoad = true;
-                unsubscribeMessages = onSnapshot(q, snapshot => {
-                    if (isInitialLoad) {
-                        isInitialLoad = false;
-                        return;
-                    }
-                    snapshot.docChanges().forEach(change => {
-                        if (change.type === "added") {
-                            let msg = change.doc.data();
-                            if (msg.sender === 'admin') {
-                                addMessage(`<strong>پشتیبان مدیریت:</strong><br>${msg.text}`, 'admin', true);
-                            }
-                        }
-                    });
-                });
-
-            } catch (error) {
-                console.error("خطا در اتصال به مدیریت:", error);
-                typingElem.remove();
-                addMessage("خطا در برقراری ارتباط با مدیریت. لطفاً مجدداً تلاش کنید.", "bot", false);
-            }
+            }, 500);
         };
 
-        // ارسال پیام از طریق Firestore هنگام ارتباط با مدیریت
-        async function sendDirectToAdmin(text) {
+        function sendDirectToAdmin(text) {
             let userId = currentUser ? currentUser.uid : localStorage.getItem('zenix_guest_uid');
             if(!userId) return;
-
-            try {
-                await addDoc(collection(db, `support_chats/${userId}/messages`), {
-                    sender: 'user',
-                    text: text,
-                    createdAt: serverTimestamp()
-                });
-
-                await setDoc(doc(db, "support_chats", userId), {
-                    lastMessage: text,
-                    unreadByAdmin: true,
-                    updatedAt: serverTimestamp()
-                }, { merge: true });
-            } catch(e) {
-                console.error("Error sending message to admin:", e);
-            }
         }
 
         function processAIResponse(question) {
@@ -275,12 +186,9 @@
 
                 const isGreeting = (q === 'سلام' || q === 'درود' || q === 'سلام علیکم' || q === 'خسته نباشید' || q === 'شب بخیر' || q === 'روز بخیر' || q === 'سلام وقت بخیر');
 
-                // ۱. احوالپرسی ساده
                 if (isGreeting) {
                     reply = `سلام و وقت بخیر! 👋 در خدمتم، چه کمکی از دستم برمی‌آید؟`;
                 }
-                
-                // ۲. کد تایید / پیامک / ایمیل تایید نیامده
                 else if ((q.includes('کد') || q.includes('تایید') || q.includes('نیامده') || q.includes('نیومده') || q.includes('دریافت نکردم') || q.includes('اسپم')) && (q.includes('ایمیل') || q.includes('جمیل') || q.includes('gmail') || q.includes('email'))) {
                     reply = `اگر کد یا لینک تایید به ایمیل‌تان ارسال نشده، لطفاً موارد زیر را چک کنید:<br><br>
                     ۱. پوشه <strong>Spam / Junk</strong> (هرزنامه) ایمیل خود را بررسی کنید.<br>
@@ -291,77 +199,55 @@
                         <button class="opt-btn" style="border-color:#ef4444;color:#ef4444;" onclick="connectToAdmin()"><i class="fas fa-headset"></i> ارجاع به مدیریت</button>
                     </div>`;
                 }
-
-                // ۳. تغییر ایمیل یا جمیل ثبت شده
                 else if ((q.includes('تغییر') || q.includes('عوض') || q.includes('ویرایش') || q.includes('جایگزین')) && (q.includes('ایمیل') || q.includes('جمیل') || q.includes('gmail') || q.includes('email'))) {
                     reply = `برای تغییر آدرس ایمیل (جمیل) حساب کاربری خود:<br><br>
                     ۱. وارد پنل کاربری شوید و از منو به بخش <strong>تنظیمات / پروفایل</strong> مراجعه کنید.<br>
                     ۲. در بخش اطلاعات کاربری، روی ویرایش ایمیل کلیک کرده و ایمیل جدید را وارد کنید.<br>
                     ۳. کد تاییدی که به ایمیل جدید ارسال می‌شود را ثبت کنید تا تغییرات ذخیره شود.`;
                 }
-
-                // ۴. فراموشی ایمیل یا عدم دسترسی به جمیل
                 else if ((q.includes('فراموش') || q.includes('دسترسی ندارم') || q.includes('یادم رفته') || q.includes('گم')) && (q.includes('ایمیل') || q.includes('جمیل') || q.includes('gmail') || q.includes('email'))) {
                     reply = `جهت راهنمایی بیشتر به مدیریت مراجعه کنید:
                     <div class="options-container">
                         <button class="opt-btn" style="border-color:#ef4444;color:#ef4444;" onclick="connectToAdmin()"><i class="fas fa-headset"></i> ارجاع به مدیریت</button>
                     </div>`;
                 }
-
-                // ۵. ارور ایمیل تکراری هنگام ثبت‌نام
                 else if ((q.includes('تکراری') || q.includes('موجود') || q.includes('قبلا ثبت شده')) && (q.includes('ایمیل') || q.includes('جمیل') || q.includes('gmail') || q.includes('email'))) {
                     reply = `پیغام «ایمیل تکراری است» یعنی قبلاً با این جمیل در Zenix حساب ساخته شده است.<br><br>
                     • اگر این حساب متعلق به خودتان است، از صفحه <strong>ورود</strong> استفاده کنید.<br>
                     • اگر رمز عبور آن را فراموش کرده‌اید، گزینه <strong>فراموشی رمز عبور</strong> را بزنید تا بازیابی شود.<br>
                     • در غیر این صورت برای ساخت حساب جدید باید از یک آدرس ایمیل متفاوت استفاده کنید.`;
                 }
-
-                // ۶. ورود با جمیل / گوگل (Google Sign-In)
                 else if ((q.includes('ورود') || q.includes('لاگین') || q.includes('گوگل')) && (q.includes('جمیل') || q.includes('gmail') || q.includes('google'))) {
                     reply = `ورود به پلتفرم از طریق ایمیل (جمیل) و رمز عبوری که در هنگام ثبت‌نام تعیین کرده‌اید انجام می‌شود.<br>
                     کافی است در صفحه اصلی ورود، ایمیل و پسورد خود را به همراه کد امنیتی وارد کنید تا وارد حساب شوید.`;
                 }
-
-                // ۷. تغییر یا فراموشی رمز عبور (پسورد)
                 else if (q.includes('رمز') || q.includes('پسورد') || q.includes('password')) {
                     reply = `برای تغییر یا بازیابی رمز عبور:<br><br>
                     ۱. اگر رمز فعلی را می‌دانید، از بخش <strong>پروفایل</strong> در پنل کاربری اقدام به تغییر آن کنید.<br>
                     ۲. اگر رمز را فراموش کرده‌اید، در صفحه ورود روی گزینه <strong>فراموشی رمز عبور</strong> کلیک کنید تا لینک بازنشانی به ایمیلتان ارسال شود.`;
                 }
-
-                // ۸. واریز و شارژ حساب
                 else if (q.includes('واریز') || q.includes('شارژ') || q.includes('deposit') || q.includes('پول ریختن')) {
                     reply = `برای واریز و شارژ حساب:<br><br>
                     ۱. به بخش <strong>واریز</strong> در پنل کاربری بروید.<br>
                     ۲. آدرس کیف پول و شبکه مورد نظر را کپی کرده و مبلغ را منتقل کنید.<br>
                     ۳. کد هش تراکنش (TxID) را در فرم مربوطه وارد کنید تا حساب شما شارژ شود.`;
                 } 
-
-                // ۹. برداشت وجه
                 else if (q.includes('برداشت') || q.includes('نقد') || q.includes('withdraw') || q.includes('تسویه')) {
                     reply = `برای برداشت دارایی:<br><br>
                     وارد بخش <strong>برداشت</strong> شوید، آدرس کیف پول مقصد و مبلغ را وارد کرده و درخواست را ثبت کنید. درخواست‌ها پس از تایید سیستم در سریع‌ترین زمان به کیف پول شما منتقل می‌شوند.`;
                 } 
-
-                // ۱۰. ربات ترید و کوانتیفیکیشن
                 else if (q.includes('کوانتیفیکیشن') || q.includes('ربات') || q.includes('سود') || q.includes('quantification') || q.includes('ترید')) {
                     reply = `سیستم <strong>کوانتیفیکیشن (Quantification)</strong> ربات هوشمند معاملاتی است.<br>
                     با فعال‌سازی این بخش، ربات با تحلیل نوسانات بازار به صورت خودکار ترید کرده و سود روزانه را به موجودی حساب شما می‌افزاید.`;
                 } 
-
-                // ۱۱. زیرمجموعه‌گیری و تیم
                 else if (q.includes('تیم') || q.includes('زیرمجموعه') || q.includes('رفرال') || q.includes('دعوت')) {
                     reply = `از بخش <strong>تیم / دعوت</strong> می‌توانید لینک اختصاصی خود را کپی کنید.<br>
                     با دعوت دوستانتان به Zenix، از فعالیت‌ها و تراکنش‌های آن‌ها در سطوح مختلف پاداش و کمیسیون دریافت می‌کنید.`;
                 }
-
-                // ۱۲. درخواست مستقیم پشتیبان انسانی
                 else if (q.includes('مدیر') || q.includes('اپراتور') || q.includes('پشتیبان') || q.includes('انسان') || q.includes('ادمین')) {
                     window.connectToAdmin();
                     return;
                 }
-
-                // ۱۳. اگر جواب سوالی را نداند
                 else {
                     reply = `جهت راهنمایی بیشتر به مدیریت مراجعه کنید.
                     <div class="options-container">
