@@ -294,32 +294,12 @@
             const refCodeValue = refIn.value.trim().toUpperCase();
 
             try {
-                // ۱. بررسی تعداد کاربران ثبت‌شده
-                let isFirstUser = false;
-                try {
-                    const { count: totalUsers } = await supabaseClient
-                        .from('users')
-                        .select('*', { count: 'exact', head: true });
-                    isFirstUser = (totalUsers === 0);
-                } catch (cErr) {
-                    console.warn('Count check ignored:', cErr);
-                }
-
-                if (!isFirstUser && !refCodeValue) {
-                    btn.disabled = false;
-                    msg.textContent = t.refErr;
-                    msg.className = 'err';
-                    capIn.value = '';
-                    drawCap();
-                    chk();
-                    return;
-                }
-
-                // ۲. ساخت کد معرف ۶ رقمی عددی اختصاصی برای کاربر جدید
+                // ۱. تعیین کد معرف اولیه و اختصاصی
+                const isFirstUser = (refCodeValue === '123456');
                 const userOwnRefCode = Math.floor(100000 + Math.random() * 900000).toString();
                 const referrerFinalValue = isFirstUser ? '123456' : refCodeValue;
 
-                // ۳. ثبت‌نام در Supabase Auth همراه با متادیتا کامل کاربر
+                // ۲. ثبت‌نام در Supabase Auth همراه با متادیتا کامل کاربر
                 const { data: authData, error: authError } = await supabaseClient.auth.signUp({
                     email: emailValue,
                     password: passIn.value,
@@ -334,18 +314,7 @@
 
                 if (authError) throw authError;
 
-                // ۴. همگام‌سازی پایه بدون توقف فرآیند در صورت وجود محدودیت‌های REST
-                if (authData?.user) {
-                    try {
-                        await supabaseClient
-                            .from('users')
-                            .upsert({ id: authData.user.id, email: emailValue }, { onConflict: 'id' });
-                    } catch (dbErr) {
-                        console.warn('Users table direct sync skipped:', dbErr);
-                    }
-                }
-
-                // ۵. خروج از سیستم جهت عدم ایجاد نشست و هدایت مستقیم به صفحه لاگین
+                // ۳. خروج از سیستم جهت عدم ایجاد نشست و هدایت مستقیم به صفحه لاگین
                 await supabaseClient.auth.signOut();
 
                 msg.textContent = t.succ;
