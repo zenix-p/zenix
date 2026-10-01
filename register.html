@@ -286,7 +286,7 @@
 
             btn.disabled = true;
             const emailValue = emailIn.value.trim().toLowerCase();
-            const fullNameValue = nameIn.value.trim();
+            const fullNameValue = nameIn.value.trim(); // مقدار نام دریافت می‌شود
             const refCodeValue = refIn.value.trim().toUpperCase();
 
             try {
@@ -334,12 +334,11 @@
 
                 if (authError) throw authError;
 
-                // ۴. ثبت اطلاعات در جدول users
+                // ۴. ثبت اطلاعات در جدول users (فعلاً fullname به دیتابیس ارسال نمی‌شود)
                 if (authData?.user) {
                     const userPayload = {
                         id: authData.user.id,
                         email: emailValue,
-                        fullname: fullNameValue,
                         referred_by: referrerFinalValue,
                         referral_code: userOwnRefCode,
                         balance: 0,
@@ -352,7 +351,6 @@
 
                     if (dbError) {
                         console.error('Supabase DB Insert Error:', dbError);
-                        // اگر دیتابیس تریگر خودکار داشت یا خطای ستون داد، پیغام دقیق را گزارش می‌دهد
                     }
                 }
 
