@@ -21,6 +21,9 @@
         })();
     </script>
 
+    <!-- Supabase JS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
         body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
@@ -352,23 +355,11 @@
         });
     </script>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const app = initializeApp({
-          apiKey: "AIzaSyAqIksPfjCCQZNQDVx3MEdDyJyNMaTvtlk",
-          authDomain: "zenix-platform.firebaseapp.com",
-          projectId: "zenix-platform",
-          storageBucket: "zenix-platform.firebasestorage.app",
-          messagingSenderId: "594936010622",
-          appId: "1:594936010622:web:9f4159c80111245062052f",
-          measurementId: "G-LXSGYB8WKM"
-        });
-
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    <!-- پیکربندی و کدهای اختصاصی Supabase -->
+    <script>
+        const SUPABASE_URL = "YOUR_SUPABASE_URL";
+        const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentUser = null;
         let allMessages = [];
@@ -381,7 +372,6 @@
             const dropdownBtn = document.getElementById('c-select-btn');
 
             if (phoneNumber) {
-                // اگر شماره به صورت کامل (شامل کد کشور) ذخیره شده باشد
                 let matchedCountry = countries.find(c => phoneNumber.startsWith(c.c));
                 if (matchedCountry) {
                     document.getElementById('country-code').value = matchedCountry.c;
@@ -391,7 +381,6 @@
                     phoneInput.value = phoneNumber;
                 }
 
-                // قفل کردن اینپوت و غیرفعال‌سازی تغییرات
                 phoneInput.readOnly = true;
                 phoneInput.disabled = true;
                 if (saveBtn) saveBtn.style.display = 'none';
@@ -402,33 +391,24 @@
             }
         }
 
-        // دریافت پیام‌های اعلان از فایربیس
+        // دریافت پیام‌های اعلان از سوپابیس
         async function fetchUserMessages(uid) {
           try {
-            let snap = await getDocs(collection(db, "users", uid, "notifications"));
-            let messages = snap.docs.map(d => {
-              let dt = d.data();
-              return {
-                id: d.id,
-                subject: dt.title || dt.subject || 'Announcement',
-                body: dt.message || dt.text || dt.body || '',
-                time: dt.createdAt || dt.timestamp || dt.time || new Date().toISOString(),
-                read: dt.read === true || dt.isRead === true
-              };
-            });
+            const { data, error } = await supabase
+              .from('notifications')
+              .select('*')
+              .eq('user_id', uid)
+              .order('created_at', { ascending: false });
 
-            messages.sort((a, b) => {
-              const getTimeMs = (timeVal) => {
-                if (!timeVal) return 0;
-                if (typeof timeVal.toDate === 'function') return timeVal.toDate().getTime();
-                if (typeof timeVal.seconds === 'number') return timeVal.seconds * 1000;
-                const parsed = new Date(timeVal).getTime();
-                return isNaN(parsed) ? 0 : parsed;
-              };
-              return getTimeMs(b.time) - getTimeMs(a.time);
-            });
+            if (error) throw error;
 
-            return messages;
+            return (data || []).map(dt => ({
+              id: dt.id,
+              subject: dt.title || dt.subject || 'Announcement',
+              body: dt.message || dt.text || dt.body || '',
+              time: dt.created_at || dt.timestamp || dt.time || new Date().toISOString(),
+              read: dt.read === true || dt.is_read === true
+            }));
           } catch (e) {
             console.error(e);
             return [];
@@ -462,7 +442,7 @@
           allMessages.forEach((m, idx) => {
             let dTime = '';
             if (m.time) {
-              let d = typeof m.time.toDate === 'function' ? m.time.toDate() : new Date(m.time);
+              let d = new Date(m.time);
               dTime = isNaN(d.getTime()) ? String(m.time) : d.toUTCString();
             }
             let unread = !m.read;
@@ -485,7 +465,11 @@
           if (!m.read && currentUserId && m.id) {
             allMessages[idx].read = true;
             try {
-              await updateDoc(doc(db, "users", currentUserId, "notifications", m.id), { read: true, isRead: true });
+              await supabase
+                .from('notifications')
+                .update({ read: true, is_read: true })
+                .eq('id', m.id);
+
               let unread = allMessages.filter(i => !i.read).length;
               let b = document.getElementById('bell-badge');
               if (b) { 
@@ -497,7 +481,7 @@
           let c = document.getElementById('modal-msg-container');
           let dTime = '';
           if (m.time) {
-            let d = typeof m.time.toDate === 'function' ? m.time.toDate() : new Date(m.time);
+            let d = new Date(m.time);
             dTime = isNaN(d.getTime()) ? String(m.time) : d.toUTCString();
           }
           c.innerHTML = `<button onclick="window.openMessageModal()" style="background:none;border:none;color:#38bdf8;cursor:pointer;font-size:12px;margin-bottom:12px;display:flex;align-items:center;gap:5px;padding:0;"><i class="fas fa-arrow-right"></i> بازگشت به لیست پیام‌ها</button>
@@ -544,10 +528,13 @@
             });
 
             if (currentUser) {
-              await updateDoc(doc(db, "users", currentUser.uid), { 
-                activeOtp: otpCode, 
-                otpCreatedAt: Date.now() 
-              });
+              await supabase
+                .from('users')
+                .update({ 
+                  active_otp: otpCode, 
+                  otp_created_at: new Date().toISOString()
+                })
+                .eq('id', currentUser.id);
             }
 
             alert(`کد تایید به ایمیل ${email} ارسال شد.\n(کد تست جهت اطمینان: ${otpCode})`);
@@ -576,92 +563,108 @@
           }
         };
 
-        // چک کردن وضعیت ورود و خواندن مشخصات از فایربیس
-        onAuthStateChanged(auth, async (user) => {
-          if (user) {
-            currentUser = user;
-            currentUserId = user.uid;
-            
-            // دریافت و محاسبه تعداد پیام‌های خوانده‌نشده برای بج زنگوله
-            allMessages = await fetchUserMessages(user.uid);
+        // تابع دریافت داده‌های کاربر از Supabase
+        async function loadUserData(user) {
+          const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+
+          if (data) {
+            const userIdEl = document.getElementById('user-id');
+            if (userIdEl) {
+                let displayId = data.referral_code || data.id || data.user_id || data.custom_id;
+                if (!displayId) {
+                    let nums = user.id.replace(/\D/g, '');
+                    if (nums.length < 6) nums = (nums + '482910').substring(0, 6);
+                    else nums = nums.substring(0, 6);
+                    displayId = 'MS-' + nums;
+                }
+                userIdEl.textContent = 'UID: ' + displayId;
+            }
+
+            if (data.phone) {
+                lockPhoneInput(data.phone);
+            }
+
+            const statusEl = document.getElementById('account-status');
+            if(statusEl) {
+                const isAccountActive = data.verified === true || 
+                                       data.status === 'active' || 
+                                       data.active === true || 
+                                       data.is_activated === true || 
+                                       (Number(data.total_deposit) > 0) || 
+                                       (Number(data.deposit) > 0) ||
+                                       (Number(data.balance) > 0);
+
+                if (isAccountActive) {
+                    statusEl.textContent = 'فعال';
+                    statusEl.style.color = '#22c55e';
+                } else {
+                    statusEl.textContent = 'غیرفعال';
+                    statusEl.style.color = '#ef4444';
+                }
+            }
+
+            if(data.trx_address) document.getElementById('trx-in').value = data.trx_address;
+            if(data.bep20_address) document.getElementById('bep-in').value = data.bep20_address;
+          }
+        }
+
+        // مدیریت وضعیت نشست کاربر با Supabase Auth
+        supabase.auth.onAuthStateChange(async (event, session) => {
+          if (session && session.user) {
+            currentUser = session.user;
+            currentUserId = session.user.id;
+
+            allMessages = await fetchUserMessages(session.user.id);
             let unread = allMessages.filter(m => !m.read).length;
             let b = document.getElementById('bell-badge');
             if (b) { 
                 b.textContent = unread; 
                 b.classList.toggle('show', unread > 0); 
             }
-            
-            // پر کردن و قفل‌کردن ایمیل ثبت‌شده در تمام بخش‌ها
+
             ['email-curr', 'pwd-email', 'tr-email', 'wal-email'].forEach(id => {
                 const el = document.getElementById(id);
-                if (el) el.value = user.email || '';
+                if (el) el.value = session.user.email || '';
             });
-            
+
             const fullNameEl = document.getElementById('user-fullname');
-            if(fullNameEl) fullNameEl.textContent = user.displayName || user.email;
+            if(fullNameEl) fullNameEl.textContent = session.user.user_metadata?.full_name || session.user.email;
 
-            onSnapshot(doc(db, "users", user.uid), (docSnap) => {
-              if (docSnap.exists()) {
-                const data = docSnap.data();
-                
-                // خواندن صحیح شناسه از فیلد referralCode در فایربیس
-                const userIdEl = document.getElementById('user-id');
-                if (userIdEl) {
-                    let displayId = data.referralCode || data.uid || data.userId || data.customId;
-                    if (!displayId) {
-                        let nums = user.uid.replace(/\D/g, '');
-                        if (nums.length < 6) nums = (nums + '482910').substring(0, 6);
-                        else nums = nums.substring(0, 6);
-                        displayId = 'MS-' + nums;
-                    }
-                    userIdEl.textContent = 'UID: ' + displayId;
-                }
-                
-                // خواندن و قفل کردن شماره تماس در صورت وجود
-                if (data.phone) {
-                    lockPhoneInput(data.phone);
-                }
-                
-                // بررسی دقیق‌تر وضعیت حساب بر اساس تایید، واریزی، یا فعال بودن
-                const statusEl = document.getElementById('account-status');
-                if(statusEl) {
-                    const isAccountActive = data.verified === true || 
-                                           data.status === 'active' || 
-                                           data.active === true || 
-                                           data.isActivated === true || 
-                                           (Number(data.totalDeposit) > 0) || 
-                                           (Number(data.deposit) > 0) ||
-                                           (Number(data.balance) > 0);
+            await loadUserData(session.user);
 
-                    if (isAccountActive) {
-                        statusEl.textContent = 'فعال';
-                        statusEl.style.color = '#22c55e';
-                    } else {
-                        statusEl.textContent = 'غیرفعال';
-                        statusEl.style.color = '#ef4444';
-                    }
-                }
-                
-                if(data.trxAddress) document.getElementById('trx-in').value = data.trxAddress;
-                if(data.bep20Address) document.getElementById('bep-in').value = data.bep20Address;
-              }
-            });
+            // شنود لایو تغییرات جدول کاربر در سوپابیس
+            supabase
+              .channel('public:users')
+              .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${session.user.id}` }, payload => {
+                loadUserData(session.user);
+              })
+              .subscribe();
+
           } else {
             window.location.href = "index.html";
           }
         });
 
-        // اکشن‌های ذخیره‌سازی و مدیریت
+        // اکشن‌های ذخیره‌سازی
         window.savePhone = async function() {
           const phone = document.getElementById('user-phone-input').value.trim();
           const code = document.getElementById('country-code').value;
           if (phone.length === 10 && currentUser) {
             const fullPhone = code + phone;
-            await updateDoc(doc(db, "users", currentUser.uid), { phone: fullPhone });
-            document.getElementById('phone-success').style.display = 'block';
-            document.getElementById('phone-err-msg').style.display = 'none';
-            // قفل کردن فرم پس از ذخیره موفق
-            lockPhoneInput(fullPhone);
+            const { error } = await supabase
+              .from('users')
+              .update({ phone: fullPhone })
+              .eq('id', currentUser.id);
+
+            if (!error) {
+              document.getElementById('phone-success').style.display = 'block';
+              document.getElementById('phone-err-msg').style.display = 'none';
+              lockPhoneInput(fullPhone);
+            }
           } else {
             document.getElementById('phone-err-msg').style.display = 'block';
           }
@@ -693,8 +696,14 @@
           const trx = document.getElementById('trx-in').value.trim();
           const bep = document.getElementById('bep-in').value.trim();
           if (currentUser) {
-            await updateDoc(doc(db, "users", currentUser.uid), { trxAddress: trx, bep20Address: bep });
-            document.getElementById('wal-success').style.display = 'block';
+            const { error } = await supabase
+              .from('users')
+              .update({ trx_address: trx, bep20_address: bep })
+              .eq('id', currentUser.id);
+
+            if (!error) {
+              document.getElementById('wal-success').style.display = 'block';
+            }
           }
         };
 
@@ -707,7 +716,10 @@
         };
         document.getElementById('menu-btn').onclick = () => document.getElementById('nav-menu').classList.toggle('show');
         document.getElementById('lang-btn').onclick = () => document.getElementById('lang-menu').classList.toggle('show');
-        document.getElementById('logout-btn').onclick = () => signOut(auth);
+        document.getElementById('logout-btn').onclick = async () => {
+            await supabase.auth.signOut();
+            window.location.href = "index.html";
+        };
     </script>
 </body>
 </html>
