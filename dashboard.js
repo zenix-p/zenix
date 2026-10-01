@@ -231,26 +231,27 @@ async function checkUserSession() {
 
     const user = session.user;
 
+    // استفاده از maybeSingle() جهت جلوگیری از خطای PGRST116 در صورت نبودن ردیف
     const { data: userData, error: dbError } = await supabase
       .from('users')
       .select('*')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
     if (dbError) {
       console.error('خطا در دریافت اطلاعات کاربر:', dbError);
       return;
     }
 
-    if (userData) {
-      const fullNameElem = document.getElementById('user-fullname');
-      const userIdElem = document.getElementById('user-id');
-      const phoneInput = document.getElementById('user-phone-input');
-      const balanceElem = document.getElementById('val-balance');
-      const refElem = document.getElementById('val-ref');
+    const fullNameElem = document.getElementById('user-fullname');
+    const userIdElem = document.getElementById('user-id');
+    const phoneInput = document.getElementById('user-phone-input');
+    const balanceElem = document.getElementById('val-balance');
+    const refElem = document.getElementById('val-ref');
 
+    if (userData) {
       if (fullNameElem) {
-        fullNameElem.textContent = userData.full_name || userData.fullName || 'کاربر Zenix';
+        fullNameElem.textContent = userData.full_name || userData.fullname || userData.fullName || user.user_metadata?.fullname || 'کاربر Zenix';
       }
       
       if (userIdElem) {
@@ -268,6 +269,20 @@ async function checkUserSession() {
 
       if (refElem && userData.referrals_count !== undefined) {
         refElem.textContent = userData.referrals_count;
+      }
+    } else {
+      // مقداردهی جایگزین در صورتی که کاربر هنوز در جدول users ثبت نشده است
+      if (fullNameElem) {
+        fullNameElem.textContent = user.user_metadata?.fullname || user.email?.split('@')[0] || 'کاربر Zenix';
+      }
+      if (userIdElem) {
+        userIdElem.textContent = `UID: ${user.id.slice(0, 8)}`;
+      }
+      if (balanceElem) {
+        balanceElem.textContent = '$0.00';
+      }
+      if (refElem) {
+        refElem.textContent = '0';
       }
     }
   } catch (err) {
