@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Zenix Platform - Login</title>
+    <!-- جلوگیری از خطای 404 Favicon -->
+    <link rel="icon" href="data:image/x-icon;base64,=">
     <link rel="manifest" href="manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -97,13 +99,21 @@
     </script>
 
     <script type="module">
-        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, setPersistence, browserLocalPersistence, browserSessionPersistence, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // تنظیمات پروژه Supabase شما
-        const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
-        const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
+        const app = initializeApp({
+            apiKey: "AIzaSyAqIksPfjCCQZNQDVx3MEdDyJyNMaTvtlk",
+            authDomain: "zenix-platform.firebaseapp.com",
+            projectId: "zenix-platform",
+            storageBucket: "zenix-platform.firebasestorage.app",
+            messagingSenderId: "594936010622",
+            appId: "1:594936010622:web:9f4159c80111245062052f",
+            measurementId: "G-LXSGYB8WKM"
+        });
 
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const auth = getAuth(app), db = getFirestore(app);
 
         const langData = {
             en:{dir:'ltr',wel:'Login to Your Account',user:'Email',userP:'Email address',pass:'Password',passP:'Password',cap:'Security Code',capP:'Enter code',forgot:'Forgot password?',remember:'Remember me',btn:'Login',noAcc:"Don't have an account?",reg:'Register',supTitle:'Support',langTitle:'Change Language',errCap:'Invalid security code!',errNoUser:'Invalid credentials or account does not exist.',errTooMany:'Too many failed attempts. Account temporarily locked.',errDisabled:'Your account has been disabled by administrator.',errNet:'Please check your internet connection!',succ:'Successfully logged in! Redirecting...'},
@@ -119,15 +129,7 @@
         let currentLang = localStorage.getItem('zenix_lang') || 'en', code = '';
         const langBtn = document.getElementById('lang-btn'), langMenu = document.getElementById('lang-menu'), cv = document.getElementById('c-canvas'), capIn = document.getElementById('cap-in'), userIn = document.getElementById('user'), passIn = document.getElementById('pass'), submitBtn = document.getElementById('t-btn'), msg = document.getElementById('msg'), form = document.getElementById('form'), authCard = document.getElementById('auth-card');
 
-        // بررسی وضعیت لاگین جهت هدایت خودکار کاربر لاگین‌شده به داشبورد
-        async function checkSession() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                window.location.replace('dashboard.html');
-            }
-        }
-        checkSession();
-
+        onAuthStateChanged(auth, u => { if (u) window.location.replace('dashboard.html'); });
         langBtn?.addEventListener('click', e => { e.stopPropagation(); langMenu?.classList.toggle('show'); });
         document.addEventListener('click', e => { if (!e.target.closest('.menu') && !e.target.closest('#lang-btn')) langMenu?.classList.remove('show'); });
 
@@ -201,48 +203,21 @@
             e.preventDefault();
             if (capIn.value.toUpperCase() !== code) return showError('errCap', true);
             submitBtn.disabled = true;
-
-            const email = userIn.value.trim();
-            const password = passIn.value.trim();
-
+            const remember = document.getElementById('remember-me')?.checked;
             try {
-                // احراز هویت کاربر در Supabase
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
-
-                if (error) throw error;
-
-                if (data?.user) {
-                    // بروزرسانی زمان آخرین ورود
-                    await supabase
-                        .from('users')
-                        .upsert({ 
-                            id: data.user.id, 
-                            email: data.user.email, 
-                            last_login: new Date().toISOString() 
-                        }, { onConflict: 'id' });
-
-                    const t = langData[currentLang] || langData.en;
-                    msg.innerHTML = `<div>${t.succ}</div>`; msg.className = 'succ show';
-                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
-                }
+                await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+                const u = (await signInWithEmailAndPassword(auth, userIn.value.trim(), passIn.value.trim())).user;
+                await setDoc(doc(db, "users", u.uid), { uid: u.uid, email: u.email, lastLogin: serverTimestamp() }, { merge: true });
+                const t = langData[currentLang] || langData.en;
+                msg.innerHTML = `<div>${t.succ}</div>`; msg.className = 'succ show';
+                setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
             } catch (error) {
-                console.error('Supabase Login Error:', error);
-                const errMessage = error.message ? error.message.toLowerCase() : '';
-
-                if (errMessage.includes('invalid login credentials')) {
-                    showError('errNoUser', true);
-                } else if (error.status === 429 || errMessage.includes('rate limit')) {
-                    showError('errTooMany', true);
-                } else if (errMessage.includes('user disabled') || errMessage.includes('banned')) {
-                    showError('errDisabled', true);
-                } else if (!navigator.onLine) {
-                    showError('errNet', true);
-                } else {
-                    showError('errNoUser', true);
-                }
+                console.error('Error:', error.code);
+                if (['auth/wrong-password','auth/user-not-found','auth/invalid-credential'].includes(error.code)) showError('errNoUser', true);
+                else if (error.code === 'auth/too-many-requests') showError('errTooMany', true);
+                else if (error.code === 'auth/user-disabled') showError('errDisabled', true);
+                else if (!navigator.onLine || error.code === 'auth/network-request-failed') showError('errNet', true);
+                else showError('errNoUser', true);
             }
         });
 
