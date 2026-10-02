@@ -628,7 +628,7 @@
             isMuted = !isMuted;
             localStorage.setItem('zenix_admin_muted', isMuted);
             updateSoundUI();
-            showToast(isMuted ? 'صدای هشدار بی‌صدا شد.' : 'صدای هشدار فعال شد.', isMuted ? 'error' : 'success');
+            showToast(isMuted ? 'صدای هشدار بی‌‌صدا شد.' : 'صدای هشدار فعال شد.', isMuted ? 'error' : 'success');
         });
 
         let audioCtx = null;
@@ -1291,13 +1291,18 @@
                 let newBal = Number(u?.balance || 0) + rawAmount;
                 let newDep = Number(u?.depositAmount || u?.deposit_amount || 0) + rawAmount;
 
-                await supabaseClient.from('users').update({ 
-                    balance: newBal, 
-                    depositAmount: newDep,
-                    deposit_amount: newDep,
-                    pendingDeposit: null,
-                    pending_deposit: null 
-                }).eq('id', uid);
+                // به‌روزرسانی موجودی کاربر
+                try {
+                    await supabaseClient.from('users').update({ 
+                        balance: newBal, 
+                        depositAmount: newDep,
+                        deposit_amount: newDep
+                    }).eq('id', uid);
+                } catch(e) {}
+
+                // پاک کردن واریز معلق در جدول کاربر به صورت تک‌تک جهت جلوگیری از خطای ۴۰۰
+                try { await supabaseClient.from('users').update({ pending_deposit: null }).eq('id', uid); } catch(e) {}
+                try { await supabaseClient.from('users').update({ pendingDeposit: null }).eq('id', uid); } catch(e) {}
 
                 if (txId) {
                     await supabaseClient.from('transactions').update({ status: 'success', title: 'واریز تایید شده' }).eq('id', txId);
@@ -1319,13 +1324,21 @@
                 showToast(`واریزی تایید شد. مبلغ $${rawAmount.toFixed(2)} به کاربر اضافه شد.`);
             } else {
                 if (!confirm(`رد درخواست واریز به مبلغ $${rawAmount.toFixed(2)}؟`)) return;
-                await supabaseClient.from('users').update({ pendingDeposit: null, pending_deposit: null }).eq('id', uid);
 
-                if (txId) {
-                    await supabaseClient.from('transactions').update({ status: 'failed', title: 'واریز رد شده' }).eq('id', txId);
-                } else {
-                    await supabaseClient.from('transactions').update({ status: 'failed' }).eq('user_id', uid).eq('type', 'deposit').eq('status', 'pending');
+                // ۱. تغییر وضعیت تراکنش به "رد شده" (بخش اصلی فرآیند)
+                try {
+                    if (txId) {
+                        await supabaseClient.from('transactions').update({ status: 'failed', title: 'واریز رد شده' }).eq('id', txId);
+                    } else {
+                        await supabaseClient.from('transactions').update({ status: 'failed' }).eq('user_id', uid).eq('type', 'deposit').eq('status', 'pending');
+                    }
+                } catch (txErr) {
+                    console.error("Error updating transaction status:", txErr);
                 }
+
+                // ۲. پاک کردن فیلدهای معلق احتمالاً موجود در جدول users به‌صورت ایمن
+                try { await supabaseClient.from('users').update({ pending_deposit: null }).eq('id', uid); } catch(e) {}
+                try { await supabaseClient.from('users').update({ pendingDeposit: null }).eq('id', uid); } catch(e) {}
 
                 await sendNotificationToUser(uid, 'رد درخواست واریزی', `درخواست واریز شما به مبلغ $${rawAmount.toFixed(2)} توسط مدیریت رد شد.`);
                 showToast('درخواست واریز رد شد.');
