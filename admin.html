@@ -654,7 +654,7 @@
             isMuted = !isMuted;
             localStorage.setItem('zenix_admin_muted', isMuted);
             updateSoundUI();
-            showToast(isMuted ? 'صدای هشدار بی‌‌صدا شد.' : 'صدای هشدار فعال شد.', isMuted ? 'error' : 'success');
+            showToast(isMuted ? 'صدای هشدار بی‌صدا شد.' : 'صدای هشدار فعال شد.', isMuted ? 'error' : 'success');
         });
 
         // ===== تولید و پخش صدای هشدار =====
@@ -1014,9 +1014,6 @@
                 // دریافت کامل کاربران از دیتابیس Supabase
                 try {
                     const { data: supaUsers, error: supaErr } = await supabaseClient.from('users').select('*');
-                    
-                    // لاگ‌‌گیری در کنسول جهت عیب‌یابی (اصلاح گزینه سوم)
-                    console.log("کاربران دریافت شده از سوپابیس:", supaUsers, "خطای احتمالی:", supaErr);
 
                     if (supaErr) {
                         console.error("خطا در فراخوانی کاربران از سوپابیس:", supaErr);
