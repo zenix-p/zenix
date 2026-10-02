@@ -142,7 +142,7 @@
             <div style="overflow-y:auto;padding-right:4px">
                 <p style="font-size:13px;color:#cbd5e1;line-height:1.7;margin-bottom:10px;" id="t-ab-m-desc">پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.</p>
                 <ul style="font-size:12px;color:#94a3b8;padding-right:18px;line-height:1.7;margin-bottom:0;">
-                    <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l1t">هدف اصلی:</strong> <span id="t-ab-m-l1d">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li>
+                    <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l1t">هدف اصلی:</strong> <span id="t-ab-m-l1d">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌‌‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li>
                     <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l2t">امنیت و زیرساخت:</strong> <span id="t-ab-m-l2d">متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن.</span></li>
                     <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l3t">ساختار چندسطحی (Referral & Team):</strong> <span id="t-ab-m-l3d">ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.</span></li>
                     <li><strong style="color:#f8fafc;" id="t-ab-m-l4t">احساس واقع‌گرایی:</strong> <span id="t-ab-m-l4d">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.</span></li>
@@ -314,7 +314,7 @@
             }
         });
 
-        async function loadTeamData(uid) {
+        async function loadTeamData(uid, sessionUser) {
             try {
                 // تنظیم لینک دعوت کاملاً دقیق و هماهنگ با پروفایل (فرمت SM-123456)
                 let codeDigits = generateUIDDigits(uid);
@@ -327,16 +327,29 @@
                 }
 
                 let allProfiles = [];
-                // بررسی جداول احتمالی کاربران
-                const targetTables = ['profiles', 'users', 'user_profiles'];
-                for (let tName of targetTables) {
-                    try {
-                        const { data, error } = await supabaseClient.from(tName).select('*');
-                        if (!error && data) {
-                            allProfiles = data;
-                            break;
+
+                // استعلام یک‌باره از جدول profiles با مدیریت خطای تک درخواستی
+                try {
+                    const { data: profiles, error } = await supabaseClient.from('profiles').select('*');
+                    if (!error && Array.isArray(profiles)) {
+                        allProfiles = profiles;
+                    }
+                } catch (e) {}
+
+                // در صورت عدم دریافت داده از دیتابیس، بررسی متاداده کاربر و حافظه محلی
+                if (allProfiles.length === 0) {
+                    if (sessionUser && sessionUser.user_metadata) {
+                        let metaTeam = sessionUser.user_metadata.team_members || sessionUser.user_metadata.referrals || sessionUser.user_metadata.subordinates;
+                        if (Array.isArray(metaTeam)) {
+                            allProfiles = metaTeam;
                         }
-                    } catch (e) {}
+                    }
+                    if (allProfiles.length === 0) {
+                        let localTeam = JSON.parse(localStorage.getItem('zenix_team_' + uid) || '[]');
+                        if (Array.isArray(localTeam)) {
+                            allProfiles = localTeam;
+                        }
+                    }
                 }
 
                 function isReferredBy(u, refUid) {
@@ -417,7 +430,7 @@
         supabaseClient.auth.onAuthStateChange(async (event, session) => {
             if (session && session.user) {
                 currentUserId = session.user.id;
-                loadTeamData(session.user.id);
+                loadTeamData(session.user.id, session.user);
 
                 fetchUserMessages(session.user.id).then(msgs => {
                     allMessages = msgs;
