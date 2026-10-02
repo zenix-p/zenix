@@ -613,7 +613,7 @@
             if (isMuted) {
                 soundIcon.className = 'fas fa-volume-xmark';
                 soundIcon.style.color = '#ef4444';
-                soundText.innerText = 'بی‌صدا';
+                soundText.innerText = 'بی‌‌صدا';
                 soundBtn.style.borderColor = 'rgba(239,68,68,.3)';
                 soundBtn.style.background = 'rgba(239,68,68,.1)';
             } else {
@@ -1040,13 +1040,11 @@
                                 status: u.status || 'active',
                                 isBanned: u.isBanned || u.is_banned || u.status === 'banned' || u.status === 'cancelled',
                                 createdAt: u.created_at || u.createdAt || new Date().toISOString(),
-                                pendingDeposit: u.pendingDeposit || u.pending_deposit,
                                 pendingWithdrawal: u.pendingWithdrawal || u.pending_withdrawal,
                                 pendingEmail: u.pendingEmail || u.pending_email,
                                 newEmail: u.newEmail || u.new_email,
                                 selfieImage: u.selfieImage || u.selfie_image,
-                                adminApprovalStatus: u.adminApprovalStatus || u.admin_approval_status,
-                                _pendingTxMap: {}
+                                adminApprovalStatus: u.adminApprovalStatus || u.admin_approval_status
                             };
                         });
                     }
@@ -1057,7 +1055,7 @@
                 let depositList = [];
                 let seenDepositKeys = new Set();
 
-                // ۲. استعلام جامع و کامل تمام تراکنش‌های واریزی از جدول transactions
+                // ۲. دریافت تراکنش‌های واریزی معلق
                 try {
                     const { data: txData, error: txErr } = await supabaseClient
                         .from('transactions')
@@ -1074,7 +1072,6 @@
                             if (st === 'pending' && isDeposit) {
                                 let uid = tx.user_id || tx.userId || tx.user_id_fk || 'unknown';
 
-                                // ایجاد اکانت موقت در صورت عدم وجود کاربر در uMap تا درخواست ناپدید نشود
                                 if (!uMap[uid]) {
                                     uMap[uid] = {
                                         id: uid,
@@ -1119,31 +1116,6 @@
                 } catch(txErr) {
                     console.warn("Transactions fetch warning:", txErr);
                 }
-
-                // ۳. بررسی و بازیابی درخواست‌های واریزی معلق موجود در جدول users (پشتیبانی کامل از درخواست‌های قدیمی)
-                Object.keys(uMap).forEach(uid => {
-                    let u = uMap[uid];
-                    let pDep = u.pendingDeposit || u.pending_deposit;
-                    if (pDep) {
-                        let pStatus = String(pDep.status || 'pending').toLowerCase();
-                        if (pStatus === 'pending') {
-                            let key = pDep.txId ? `tx_${pDep.txId}` : (pDep.txHash ? `hash_${pDep.txHash}` : `user_${uid}`);
-                            if (!seenDepositKeys.has(key)) {
-                                seenDepositKeys.add(key);
-                                let idCode = getUserIdCode(uid);
-                                let nameStr = getName(u);
-                                depositList.push({
-                                    uid: uid,
-                                    u: u,
-                                    idCode: idCode,
-                                    nameStr: nameStr,
-                                    data: pDep,
-                                    txId: pDep.txId || null
-                                });
-                            }
-                        }
-                    }
-                });
 
                 let tbAct=document.getElementById('tb-act'), tbPend=document.getElementById('tb-pend'), tbBan=document.getElementById('tb-ban'), tbW=document.getElementById('tb-withdraw'), tbD=document.getElementById('tb-deposit');
                 if(tbAct) tbAct.innerHTML=""; 
@@ -1306,10 +1278,6 @@
             let u = (item && item.u) ? item.u : uMap[uid];
             let dData = item ? item.data : null;
 
-            if (!dData && u) {
-                dData = u.pendingDeposit || u.pending_deposit;
-            }
-
             if (!dData) return;
 
             let idCode = getUserIdCode(uid);
@@ -1347,27 +1315,28 @@
                 if (!confirm(`تایید واریز و شارژ حساب به مبلغ درخواستی $${rawAmount.toFixed(2)} (سود ادمین: $${adminProfitFee.toFixed(2)})؟`)) return;
                 
                 let newBal = Number(u?.balance || 0) + rawAmount;
-                let newDep = Number(u?.depositAmount || u?.deposit_amount || 0) + rawAmount;
 
-                // به‌روزرسانی موجودی کاربر
+                // ۱. به‌روزرسانی موجودی کاربر در جدول users
                 try {
                     await supabaseClient.from('users').update({ 
-                        balance: newBal, 
-                        depositAmount: newDep,
-                        deposit_amount: newDep
+                        balance: newBal 
                     }).eq('id', uid);
-                } catch(e) {}
-
-                // پاک کردن واریز معلق در جدول کاربر به صورت ایمن
-                try { await supabaseClient.from('users').update({ pending_deposit: null }).eq('id', uid); } catch(e) {}
-                try { await supabaseClient.from('users').update({ pendingDeposit: null }).eq('id', uid); } catch(e) {}
-
-                if (txId && txId !== 'null') {
-                    await supabaseClient.from('transactions').update({ status: 'success', title: 'واریز تایید شده' }).eq('id', txId);
-                } else {
-                    await supabaseClient.from('transactions').update({ status: 'success' }).eq('user_id', uid).eq('type', 'deposit').eq('status', 'pending');
+                } catch(e) {
+                    console.warn("User balance update warning:", e);
                 }
 
+                // ۲. تغییر وضعیت تراکنش به "success" در جدول transactions
+                try {
+                    if (txId && txId !== 'null') {
+                        await supabaseClient.from('transactions').update({ status: 'success', title: 'واریز تایید شده' }).eq('id', txId);
+                    } else {
+                        await supabaseClient.from('transactions').update({ status: 'success' }).eq('user_id', uid).eq('type', 'deposit').eq('status', 'pending');
+                    }
+                } catch(txErr) {
+                    console.error("Error updating transaction status:", txErr);
+                }
+
+                // ۳. محاسبه و ثبت سود ادمین
                 try {
                     const { data: statsData } = await supabaseClient.from('system_stats').select('id, total_admin_profit').maybeSingle();
                     let currentProfit = statsData ? Number(statsData.total_admin_profit || 0) : 0;
@@ -1383,7 +1352,7 @@
             } else {
                 if (!confirm(`رد درخواست واریز به مبلغ $${rawAmount.toFixed(2)}؟`)) return;
 
-                // ۱. تغییر وضعیت تراکنش به "رد شده"
+                // تغییر وضعیت تراکنش به "failed" در جدول transactions بدون ارسال هیچ درخواستی به جدول users
                 try {
                     if (txId && txId !== 'null') {
                         await supabaseClient.from('transactions').update({ status: 'failed', title: 'واریز رد شده' }).eq('id', txId);
@@ -1393,10 +1362,6 @@
                 } catch (txErr) {
                     console.error("Error updating transaction status:", txErr);
                 }
-
-                // ۲. پاک کردن فیلدهای معلق در جدول users به‌صورت ایمن
-                try { await supabaseClient.from('users').update({ pending_deposit: null }).eq('id', uid); } catch(e) {}
-                try { await supabaseClient.from('users').update({ pendingDeposit: null }).eq('id', uid); } catch(e) {}
 
                 await sendNotificationToUser(uid, 'رد درخواست واریزی', `درخواست واریز شما به مبلغ $${rawAmount.toFixed(2)} توسط مدیریت رد شد.`);
                 showToast('درخواست واریز رد شد.');
@@ -1449,13 +1414,14 @@
             let u = uMap[uid];
             if(approve){
                 if(!confirm(`تایید برداشت به مبلغ $${amount}؟`)) return;
-                await supabaseClient.from('users').update({ pendingWithdrawal: null, pending_withdrawal: null }).eq('id', uid);
+                await supabaseClient.from('transactions').update({ status: 'success' }).eq('user_id', uid).eq('type', 'withdraw').eq('status', 'pending');
                 await sendNotificationToUser(uid, 'تایید برداشت وجه', `درخواست برداشت شما به مبلغ $${amount.toLocaleString()} با موفقیت تایید و واریز شد.`);
                 showToast('تایید برداشت با موفقیت انجام شد.');
             } else {
                 if(!confirm(`لغو برداشت و بازگشت مبلغ $${amount} به موجودی؟`)) return;
                 let newBal = Number(u?.balance || 0) + amount;
-                await supabaseClient.from('users').update({ balance: newBal, pendingWithdrawal: null, pending_withdrawal: null }).eq('id', uid);
+                await supabaseClient.from('users').update({ balance: newBal }).eq('id', uid);
+                await supabaseClient.from('transactions').update({ status: 'failed' }).eq('user_id', uid).eq('type', 'withdraw').eq('status', 'pending');
                 await sendNotificationToUser(uid, 'رد درخواست برداشت', `درخواست برداشت شما به مبلغ $${amount.toLocaleString()} رد شد و مبلغ به موجودی حساب شما بازگشت.`);
                 showToast('برداشت لغو و مبلغ به کاربر عودت داده شد.');
             }
@@ -1506,8 +1472,7 @@
             if(!confirm(ban?'مسدودسازی این حساب؟':'فعال‌‌سازی مجدد حساب؟'))return;
             await supabaseClient.from('users').update({
                 status: ban ? "cancelled" : "active",
-                isBanned: ban,
-                is_banned: ban
+                isBanned: ban
             }).eq('id', uid);
             showToast(ban ? 'حساب کاربر مسدود شد.' : 'حساب کاربر فعال شد.');
             loadData();
@@ -1515,15 +1480,7 @@
 
         window.appEm=async(uid,email)=>{
             await supabaseClient.from('users').update({
-                email: email,
-                pendingEmail: "",
-                pending_email: "",
-                newEmail: "",
-                new_email: "",
-                selfieImage: "",
-                selfie_image: "",
-                adminApprovalStatus: "approved",
-                admin_approval_status: "approved"
+                email: email
             }).eq('id', uid);
             
             await sendNotificationToUser(uid, 'تایید اطلاعات حساب', 'درخواست ویرایش / احراز اطلاعات شما توسط مدیریت تایید شد.');
@@ -1532,11 +1489,6 @@
         };
 
         window.rejEm=async(uid)=>{
-            await supabaseClient.from('users').update({
-                adminApprovalStatus: "rejected",
-                admin_approval_status: "rejected"
-            }).eq('id', uid);
-            
             await sendNotificationToUser(uid, 'رد درخواست احراز', 'درخواست ویرایش / احراز اطلاعات شما توسط مدیریت رد شد.');
             showToast('درخواست رد شد.');
             loadData();
@@ -1565,7 +1517,6 @@
             let emailVal = document.getElementById('e-email').value.trim();
             let phoneVal = document.getElementById('e-phone').value.trim();
             let balVal = parseFloat(document.getElementById('e-bal').value) || 0;
-            let profitVal = parseFloat(document.getElementById('e-profit').value) || 0;
 
             let payload = {};
 
@@ -1578,14 +1529,8 @@
             if ('phone' in raw) payload.phone = phoneVal;
             if ('phone_number' in raw) payload.phone_number = phoneVal;
             if ('mobile' in raw) payload.mobile = phoneVal;
-            if (!('phone' in raw || 'phone_number' in raw || 'mobile' in raw)) {
-                payload.phone = phoneVal;
-            }
 
-            if ('balance' in raw) payload.balance = balVal;
-
-            if ('platform_profit' in raw) payload.platform_profit = profitVal;
-            else if ('profit' in raw) payload.profit = profitVal;
+            payload.balance = balVal;
 
             try {
                 let { error } = await supabaseClient
@@ -1594,23 +1539,12 @@
                     .eq('id', uid);
 
                 if (error) {
-                    const fallbackPayload1 = {
+                    const fallbackPayload = {
                         fullname: nameVal,
                         email: emailVal,
-                        phone: phoneVal,
                         balance: balVal
                     };
-                    let res1 = await supabaseClient.from('users').update(fallbackPayload1).eq('id', uid);
-                    if (res1.error) {
-                        const fallbackPayload2 = {
-                            fullname: nameVal,
-                            email: emailVal,
-                            phone_number: phoneVal,
-                            balance: balVal
-                        };
-                        let res2 = await supabaseClient.from('users').update(fallbackPayload2).eq('id', uid);
-                        if (res2.error) throw res2.error;
-                    }
+                    await supabaseClient.from('users').update(fallbackPayload).eq('id', uid);
                 }
 
                 closeModal('m-edit'); 
