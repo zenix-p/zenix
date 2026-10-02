@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <title>Zenix - پوکر چندنفره زنده (Multiplayer Hold'em)</title>
-    <link rel="icon" href="data:image/x-icon;base64,=">
+    <title>Zenix - پوکر زنده با دیلر انسان (Live Dealer Poker)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
@@ -15,319 +13,109 @@
         body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
         header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1);padding:10px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
         .logo{display:flex;align-items:center;gap:10px}
-        .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#0ea5e9,#9333ea);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;font-style:italic;transform:skewX(-6deg);box-shadow:0 0 15px rgba(14,165,233,.4)}
-        .logo-text{font-family:'Orbitron',sans-serif;font-size:19px;font-weight:900;letter-spacing:2px;font-style:italic;transform:skewX(-6deg);background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 20px rgba(56,189,248,0.4)}
-        .hr{display:flex;align-items:center;gap:8px}
-        .wrap{position:relative}
-        .lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none}
-        .menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;min-width:max-content;padding:6px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8)}
-        [dir="rtl"] .wrap .menu{left:0}[dir="ltr"] .wrap .menu{right:0}
-        .menu.show{display:block}
-        .mi{padding:7px 10px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap}
-        .mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}
+        .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#0ea5e9,#9333ea);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;font-style:italic;transform:skewX(-6deg)}
+        .logo-text{font-family:'Orbitron',sans-serif;font-size:19px;font-weight:900;letter-spacing:2px;font-style:italic;transform:skewX(-6deg);background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
         
-        .c{max-width:1100px;width:100%;margin:15px auto;padding:0 12px;flex:1}
-        .wel{background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(14,165,233,.15));border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 18px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
-        .wel h1{font-size:15px;color:#22c55e}
-        .wel p{color:#94a3b8;font-size:11px}
+        .c{max-width:1150px;width:100%;margin:15px auto;padding:0 12px;flex:1}
         
-        /* میز پوکر چندنفره */
-        .poker-table{background:radial-gradient(circle,#064e3b,#022c22);border:12px solid #5d2b09;border-radius:200px;padding:20px;min-height:460px;display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative;box-shadow:inset 0 0 60px rgba(0,0,0,0.9), 0 15px 35px rgba(0,0,0,0.6);margin-bottom:15px}
+        /* کانتینر اصلی استریم زنده دیلر */
+        .live-casino-container{position:relative;width:100%;height:520px;background:#000;border-radius:20px;overflow:hidden;border:2px solid rgba(255,255,255,0.15);box-shadow:0 20px 50px rgba(0,0,0,0.8);margin-bottom:15px}
         
-        /* پات اصلی در مرکز میز */
-        .pot-container{position:absolute;top:32%;background:rgba(0,0,0,0.6);border:1px solid rgba(255,215,0,0.4);border-radius:20px;padding:6px 18px;text-align:center;box-shadow:0 0 15px rgba(255,215,0,0.2)}
-        .pot-label{font-size:10px;color:#facc15;text-transform:uppercase;letter-spacing:1px}
-        .pot-amount{font-size:18px;font-weight:900;color:#fff;font-family:'Orbitron',sans-serif}
+        /* ویدیو زنده دیلر انسان */
+        .dealer-video{width:100%;height:100%;object-fit:cover;filter:brightness(0.9)}
+        
+        /* نشانگر زنده بودن (LIVE Badge) */
+        .live-badge{position:absolute;top:15px;right:15px;background:rgba(239,68,68,0.9);color:#fff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:bold;display:flex;align-items:center;gap:6px;box-shadow:0 0 10px rgba(239,68,68,0.6)}
+        .live-dot{width:8px;height:8px;background:#fff;border-radius:50%;animation:blink 1s infinite}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 
-        /* کارت‌های مشترک */
-        .community-cards-container{position:absolute;top:48%;display:flex;gap:6px;justify-content:center;min-height:65px}
+        /* لایه گرافیکی روی تصویر زنده (Overlay) */
+        .casino-overlay{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-between;padding:15px;pointer-events:none}
+        .casino-overlay * {pointer-events:auto}
 
-        /* صندلی‌های بازیکنان دور میز */
-        .seat{position:absolute;width:100px;display:flex;flex-direction:column;align-items:center;gap:4px;z-index:10}
-        .seat-0{bottom:10px;left:50%;transform:translateX(-50%)} /* بازیکن کنونی (پایین) */
-        .seat-1{left:15px;bottom:25%}
-        .seat-2{left:15px;top:20%}
-        .seat-3{top:10px;left:50%;transform:translateX(-50%)}
-        .seat-4{right:15px;top:20%}
-        .seat-5{right:15px;bottom:25%}
+        /* پات زنده روی تصویر */
+        .live-pot{align-self:center;background:rgba(15,23,42,0.85);border:1px solid rgba(250,204,21,0.5);backdrop-filter:blur(8px);border-radius:30px;padding:6px 20px;text-align:center;box-shadow:0 0 20px rgba(0,0,0,0.6)}
+        .live-pot-title{font-size:10px;color:#facc15;text-transform:uppercase}
+        .live-pot-val{font-size:20px;font-weight:900;color:#fff;font-family:'Orbitron',sans-serif}
 
-        .player-badge{background:rgba(15,23,42,0.9);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:5px;width:100%;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,0.5);transition:0.3s}
-        .seat.active .player-badge{border-color:#22c55e;box-shadow:0 0 15px rgba(34,197,94,0.6);animation:pulseTurn 1.5s infinite}
-        @keyframes pulseTurn{0%,100%{box-shadow:0 0 10px rgba(34,197,94,0.4)}50%{box-shadow:0 0 20px rgba(34,197,94,0.9)}}
-
-        .player-name{font-size:11px;font-weight:bold;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .player-chips{font-size:10px;color:#38bdf8;font-family:'Orbitron',sans-serif}
-        .player-cards{display:flex;gap:2px;justify-content:center;margin-bottom:-10px}
-
-        /* کارت‌های بازی */
-        .card{width:38px;height:54px;background:#fff;border-radius:4px;display:flex;flex-direction:column;justify-content:space-between;padding:3px;font-weight:bold;font-size:11px;box-shadow:0 3px 6px rgba(0,0,0,0.4)}
+        /* کارت‌های مشترک اسکن شده توسط دیلر */
+        .scanned-cards-bar{align-self:center;display:flex;gap:8px;background:rgba(0,0,0,0.6);padding:8px 16px;border-radius:12px;backdrop-filter:blur(5px)}
+        .card{width:42px;height:60px;background:#fff;border-radius:6px;display:flex;flex-direction:column;justify-content:space-between;padding:3px;font-weight:bold;font-size:12px;box-shadow:0 4px 8px rgba(0,0,0,0.5)}
         .card.red{color:#ef4444}
         .card.black{color:#0f172a}
-        .card.back{background:linear-gradient(135deg,#2563eb,#1e40af);border:1px solid #60a5fa;color:#fff;justify-content:center;align-items:center;font-size:14px}
+        .card.scanned-placeholder{background:rgba(255,255,255,0.1);border:1px dashed rgba(255,255,255,0.3);color:#94a3b8;justify-content:center;align-items:center;font-size:16px}
 
-        /* دکمه نشستن روی صندلی خالی */
-        .empty-seat-btn{background:rgba(255,255,255,0.1);border:1px dashed rgba(255,255,255,0.3);color:#94a3b8;border-radius:50%;width:50px;height:50px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;transition:0.2s}
-        .empty-seat-btn:hover{background:rgba(34,197,94,0.2);border-color:#22c55e;color:#fff}
-
-        /* پنل کنترلی اکشن‌ها (پایین صفحه) */
+        /* پنل اکشن در پایین استریم */
         .action-panel{background:rgba(15,23,42,.95);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
         .action-grid{display:grid;grid-template-columns:1fr 1fr 1.5fr;gap:10px;align-items:center}
-        .btn-action{padding:12px;border:none;border-radius:10px;font-weight:bold;font-size:14px;cursor:pointer;transition:0.2s;color:#fff}
+        .btn-action{padding:14px;border:none;border-radius:10px;font-weight:bold;font-size:14px;cursor:pointer;color:#fff;transition:0.2s}
         .btn-fold{background:#ef4444}
-        .btn-fold:hover{background:#dc2626}
         .btn-call{background:#0ea5e9}
-        .btn-call:hover{background:#0284c7}
         .btn-raise{background:#22c55e}
-        .btn-raise:hover{background:#16a34a}
-        .btn-action:disabled{background:#334155;color:#64748b;cursor:not-allowed}
 
-        .raise-slider-group{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.1)}
+        .raise-slider-group{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);padding:8px;border-radius:10px}
         .raise-slider-group input[type=range]{flex:1;accent-color:#22c55e}
-        .raise-val{font-family:'Orbitron',sans-serif;font-weight:bold;color:#22c55e;font-size:13px;width:55px;text-align:center}
-
-        .game-status-bar{text-align:center;font-size:12px;color:#94a3b8;margin-top:8px}
-
-        footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:1100px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
     </style>
 </head>
 <body>
     <header>
-        <div class="logo"><div class="logo-icon">Z</div><div class="logo-text">ZENIX</div></div>
-        <div class="hr">
-            <a href="dashboard.html" class="lb"><i class="fas fa-home" style="color:#38bdf8"></i></a>
-            <div class="wrap">
-                <button type="button" class="lb" id="menu-btn"><i class="fas fa-bars" style="color:#f43f5e"></i></button>
-                <div class="menu" id="nav-menu">
-                    <a href="dashboard.html" class="mi"><i class="fas fa-home" style="color:#38bdf8"></i><span>صفحه اصلی</span></a>
-                    <a href="quantification.html" class="mi"><i class="fas fa-robot" style="color:#a855f7"></i><span>کوانتیفیکیشن</span></a>
-                    <a href="poker.html" class="mi active"><i class="fas fa-diamond" style="color:#22c55e"></i><span>پوکر چندنفره (Multiplayer)</span></a>
-                    <a href="deposit.html" class="mi"><i class="fas fa-arrow-down" style="color:#22c55e"></i><span>واریز</span></a>
-                    <a href="receive.html" class="mi"><i class="fas fa-arrow-up" style="color:#fbbf24"></i><span>برداشت</span></a>
-                    <a href="transactions.html" class="mi"><i class="fas fa-history" style="color:#06b6d4"></i><span>تراکنش</span></a>
-                    <a href="profile.html" class="mi"><i class="fas fa-user-cog" style="color:#ec4899"></i><span>پروفایل</span></a>
-                    <a href="index.html" class="mi" style="color:#ef4444"><i class="fas fa-power-off"></i><span>خروج</span></a>
-                </div>
-            </div>
+        <div class="logo"><div class="logo-icon">Z</div><div class="logo-text">ZENIX LIVE</div></div>
+        <div style="font-size:12px;color:#22c55e;font-weight:bold;">
+            موجودی شما: <span id="user-balance">$0.00</span>
         </div>
     </header>
 
     <div class="c">
-        <div class="wel">
-            <div>
-                <h1>میز پوکر آنلاین تگزاس هولدم (Multiplayer Texas Hold'em)</h1>
-                <p>رقابت زنده با سایر بازیکنان حقیقی - کارمزد واسطه‌گری پلتفرم: ۳٪</p>
-            </div>
-            <div style="font-size:12px;background:rgba(34,197,94,.15);border:1px solid #22c55e;padding:6px 12px;border-radius:8px;color:#22c55e;font-weight:bold;">
-                موجودی شما: <span id="user-balance">$0.00</span>
-            </div>
-        </div>
+        <!-- کانتینر لایو استریم دیلر -->
+        <div class="live-casino-container">
+            <!-- استریم زنده (می‌تواند از طریق WebRTC یا HLS بارگذاری شود) -->
+            <video class="dealer-video" id="live-dealer-stream" autoplay muted playsinline poster="https://images.unsplash.com/photo-1511193311914-0346f16efe90?auto=format&fit=crop&w=1200&q=80">
+                <!-- آدرس استریم زنده استودیو -->
+                <source src="" type="application/x-mpegURL">
+            </video>
 
-        <!-- میز پوکر -->
-        <div class="poker-table">
-            <!-- پات اصلی -->
-            <div class="pot-container">
-                <div class="pot-label">مجموع پات (POT)</div>
-                <div class="pot-amount" id="total-pot">$0</div>
+            <div class="live-badge">
+                <div class="live-dot"></div>
+                <span>پخش زنده - میز شماره ۱</span>
             </div>
 
-            <!-- کارت‌های مشترک روی میز -->
-            <div class="community-cards-container" id="community-cards">
-                <div class="card back"><i class="fas fa-layer-group"></i></div>
-                <div class="card back"><i class="fas fa-layer-group"></i></div>
-                <div class="card back"><i class="fas fa-layer-group"></i></div>
-                <div class="card back"><i class="fas fa-layer-group"></i></div>
-                <div class="card back"><i class="fas fa-layer-group"></i></div>
-            </div>
+            <!-- لایه تعاملی روی ویدیو -->
+            <div class="casino-overlay">
+                <!-- پات -->
+                <div class="live-pot">
+                    <div class="live-pot-title">مجموع پات زنده</div>
+                    <div class="live-pot-val" id="total-pot">$150.00</div>
+                </div>
 
-            <!-- صندلی‌های دور میز (۶ صندلی) -->
-            <div class="seat seat-0" id="seat-0">
-                <button class="empty-seat-btn" onclick="sitOnSeat(0)"><i class="fas fa-plus"></i></button>
-            </div>
-            <div class="seat seat-1" id="seat-1">
-                <button class="empty-seat-btn" onclick="sitOnSeat(1)"><i class="fas fa-plus"></i></button>
-            </div>
-            <div class="seat seat-2" id="seat-2">
-                <button class="empty-seat-btn" onclick="sitOnSeat(2)"><i class="fas fa-plus"></i></button>
-            </div>
-            <div class="seat seat-3" id="seat-3">
-                <button class="empty-seat-btn" onclick="sitOnSeat(3)"><i class="fas fa-plus"></i></button>
-            </div>
-            <div class="seat seat-4" id="seat-4">
-                <button class="empty-seat-btn" onclick="sitOnSeat(4)"><i class="fas fa-plus"></i></button>
-            </div>
-            <div class="seat seat-5" id="seat-5">
-                <button class="empty-seat-btn" onclick="sitOnSeat(5)"><i class="fas fa-plus"></i></button>
-            </div>
-        </div>
-
-        <!-- پنل اکشن و شرط‌بندی -->
-        <div class="action-panel">
-            <div class="action-grid">
-                <button class="btn-action btn-fold" id="btn-fold" disabled onclick="sendPlayerAction('fold')">انصراف (Fold)</button>
-                <button class="btn-action btn-call" id="btn-call" disabled onclick="sendPlayerAction('call')">چک / کال ($0)</button>
-                
-                <div class="raise-slider-group">
-                    <input type="range" id="raise-range" min="10" max="500" value="20" oninput="updateRaiseLabel(this.value)">
-                    <span class="raise-val" id="raise-val-text">$20</span>
-                    <button class="btn-action btn-raise" id="btn-raise" disabled onclick="sendPlayerAction('raise')">ریز (Raise)</button>
+                <!-- کارت‌های رو شده توسط دیلر انسان روی میز -->
+                <div class="scanned-cards-bar" id="community-cards">
+                    <div class="card red"><span>A</span><span style="text-align:center">♥</span></div>
+                    <div class="card black"><span>K</span><span style="text-align:center">♠</span></div>
+                    <div class="card red"><span>10</span><span style="text-align:center">♦</span></div>
+                    <div class="card scanned-placeholder"><i class="fas fa-lock"></i></div>
+                    <div class="card scanned-placeholder"><i class="fas fa-lock"></i></div>
                 </div>
             </div>
-            <div class="game-status-bar" id="status-text">جهت شروع بازی روی یکی از صندلی‌های خالی کلیک کنید.</div>
+        </div>
+
+        <!-- پنل شرط‌بندی زنده -->
+        <div class="action-panel">
+            <div class="action-grid">
+                <button class="btn-action btn-fold" onclick="sendAction('fold')">انصراف (Fold)</button>
+                <button class="btn-action btn-call" onclick="sendAction('call')">کال ($20)</button>
+                
+                <div class="raise-slider-group">
+                    <input type="range" id="raise-range" min="20" max="500" value="40" oninput="document.getElementById('rv').textContent='$'+this.value">
+                    <span id="rv" style="font-family:'Orbitron';color:#22c55e;font-weight:bold">$40</span>
+                    <button class="btn-action btn-raise" onclick="sendAction('raise')">افزایش (Raise)</button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <footer>
-        <p>&copy; 2026 Zenix. All rights reserved.</p>
-        <p style="color:#22c55e;"><i class="fas fa-circle" style="font-size:6px;"></i> سرور زنده چندنفره (WebSocket Connected)</p>
-    </footer>
-
-    <!-- کتابخانه Supabase و Socket.io برای ارتباط زنده با سرور -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script>
-        const SUPABASE_URL = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // آدرس سرور زنده چندنفره (وقتی سرور Node.js آماده شد این آدرس ست می‌شود)
-        const SOCKET_SERVER_URL = "http://localhost:3000"; 
-        let socket = null;
-
-        let currentUserId = null;
-        let currentUserData = null;
-        let userBalance = 0;
-        let mySeatIndex = null;
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session || !session.user) {
-                window.location.href = 'index.html';
-                return;
-            }
-            currentUserId = session.user.id;
-            await fetchUserData();
-
-            // فعال‌سازی منو
-            const menuBtn = document.getElementById('menu-btn');
-            const navMenu = document.getElementById('nav-menu');
-            if (menuBtn && navMenu) {
-                menuBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    navMenu.classList.toggle('show');
-                });
-                document.addEventListener('click', () => navMenu.classList.remove('show'));
-            }
-
-            // راه اندازی اتصال Socket.io به سرور
-            initSocketConnection();
-        });
-
-        async function fetchUserData() {
-            const { data } = await supabase.from('users').select('id, email, balance').eq('id', currentUserId).maybeSingle();
-            if (data) {
-                currentUserData = data;
-                userBalance = Number(data.balance || 0);
-                document.getElementById('user-balance').textContent = `$${userBalance.toFixed(2)}`;
-            }
-        }
-
-        function initSocketConnection() {
-            try {
-                socket = io(SOCKET_SERVER_URL, { autoConnect: false });
-
-                // گوش دادن به رویدادهای سرور
-                socket.on('connect', () => {
-                    document.getElementById('status-text').textContent = "به سرور زنده پوکر متصل شدید.";
-                });
-
-                socket.on('table_update', (tableState) => {
-                    renderTableState(tableState);
-                });
-
-                socket.on('your_turn', (data) => {
-                    enableActionButtons(data);
-                });
-
-            } catch (err) {
-                console.log("Socket connection error:", err);
-            }
-        }
-
-        // نشستن روی صندلی
-        window.sitOnSeat = function(seatIdx) {
-            if (userBalance < 10) {
-                alert("موجودی شما برای ورود به میز کافی نیست (حداقل ۱۰ دلار).");
-                return;
-            }
-            mySeatIndex = seatIdx;
-            
-            // اگر سوکت متصل است پیام نشستن ارسال می‌شود
-            if (socket && socket.connected) {
-                socket.emit('join_seat', {
-                    seatIndex: seatIdx,
-                    userId: currentUserId,
-                    username: currentUserData.email ? currentUserData.email.split('@')[0] : 'Player',
-                    chips: userBalance
-                });
-            } else {
-                // نمایش ظاهری تستی روی کلاینت
-                renderSeat(seatIdx, {
-                    name: currentUserData.email ? currentUserData.email.split('@')[0] : 'شما',
-                    chips: userBalance,
-                    isMe: true
-                });
-                document.getElementById('status-text').textContent = "منتظر ورود سایر بازیکنان...";
-            }
-        };
-
-        function renderSeat(seatIdx, player) {
-            const seatEl = document.getElementById(`seat-${seatIdx}`);
-            seatEl.innerHTML = `
-                <div class="player-cards">
-                    <div class="card back"></div>
-                    <div class="card back"></div>
-                </div>
-                <div class="player-badge">
-                    <div class="player-name">${player.name}</div>
-                    <div class="player-chips">$${player.chips.toFixed(0)}</div>
-                </div>
-            `;
-        }
-
-        window.updateRaiseLabel = function(val) {
-            document.getElementById('raise-val-text').textContent = `$${val}`;
-        };
-
-        window.sendPlayerAction = function(actionType) {
-            const raiseVal = parseFloat(document.getElementById('raise-range').value);
-            
-            if (socket && socket.connected) {
-                socket.emit('player_action', {
-                    action: actionType,
-                    amount: actionType === 'raise' ? raiseVal : 0
-                });
-            } else {
-                alert(`حرکت ${actionType} ثبت شد (نیاز به اتصال سرور Node.js)`);
-            }
-
-            disableActionButtons();
-        };
-
-        function enableActionButtons(data) {
-            document.getElementById('btn-fold').disabled = false;
-            document.getElementById('btn-call').disabled = false;
-            document.getElementById('btn-raise').disabled = false;
-            document.getElementById('status-text').textContent = "نوبت شماست! یک حرکت را انتخاب کنید.";
-            document.getElementById('status-text').style.color = "#22c55e";
-        }
-
-        function disableActionButtons() {
-            document.getElementById('btn-fold').disabled = true;
-            document.getElementById('btn-call').disabled = true;
-            document.getElementById('btn-raise').disabled = true;
-            document.getElementById('status-text').textContent = "منتظر حرکت سایر بازیکنان...";
-            document.getElementById('status-text').style.color = "#94a3b8";
-        }
+        // کدهای مربوط به اتصال استریم زنده و ثبت شرط در دیتابیس Supabase
     </script>
 </body>
 </html>
