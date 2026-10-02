@@ -1053,31 +1053,35 @@
                     console.warn("Supabase users fetch warning:", sErr);
                 }
 
-                // دریافت واریزی‌های معلق از جدول transactions برای اطمینان کامل
+                // دریافت و پردازش کامل واریزی‌های معلق از جدول transactions
                 try {
-                    const { data: txDeposits } = await supabaseClient
+                    const { data: txDeposits, error: txErr } = await supabaseClient
                         .from('transactions')
                         .select('*')
-                        .ilike('type', '%deposit%')
                         .eq('status', 'pending');
+
+                    if (txErr) console.error("خطا در دریافت تراکنش‌ها:", txErr);
 
                     if (txDeposits && txDeposits.length > 0) {
                         txDeposits.forEach(tx => {
-                            let uid = tx.user_id || tx.userId;
-                            if (uMap[uid]) {
+                            let uid = tx.user_id || tx.userId || tx.user_id_fk;
+                            let typeStr = String(tx.type || tx.title || '').toLowerCase();
+                            let isDeposit = typeStr.includes('deposit') || typeStr.includes('deposit_request') || typeStr.includes('واریز');
+
+                            if (isDeposit && uid && uMap[uid]) {
+                                let rawAmt = tx.amount ? (Number(tx.amount) / 1.025) : 0;
                                 let txObj = {
                                     txId: tx.id,
-                                    rawAmount: tx.amount ? (tx.amount / 1.025) : 0,
-                                    amount: tx.amount,
-                                    network: tx.title ? tx.title.replace('واریز ', '') : 'TRC20',
-                                    txHash: tx.description ? tx.description.replace('TxID: ', '') : (tx.tx_hash || tx.txHash || '-'),
+                                    rawAmount: rawAmt,
+                                    amount: Number(tx.amount || 0),
+                                    network: tx.network || (tx.title ? tx.title.replace('واریز ', '') : 'TRC20'),
+                                    txHash: tx.tx_hash || tx.txHash || (tx.description ? tx.description.replace('TxID: ', '') : '-'),
                                     status: 'pending',
                                     createdAt: tx.created_at || tx.createdAt
                                 };
+                                
                                 uMap[uid]._pendingTxMap[tx.id] = txObj;
-                                if (!uMap[uid].pendingDeposit) {
-                                    uMap[uid].pendingDeposit = txObj;
-                                }
+                                uMap[uid].pendingDeposit = txObj;
                             }
                         });
                     }
@@ -1108,14 +1112,17 @@
                     let isBanned = (u.status==='cancelled'||u.status==='banned'||u.isBanned===true);
                     let hasPend = (u.pendingEmail||u.newEmail||u.selfieImage||u.adminApprovalStatus==='pending');
 
-                    // افزودن واریزهای معلق
-                    if (u.pendingDeposit && u.pendingDeposit.status === 'pending') {
-                        totD++;
-                        depositList.push({ uid, u, idCode, nameStr, data: u.pendingDeposit, txId: u.pendingDeposit.txId || null });
+                    // افزودن واریزهای معلق با شرط انعطاف‌پذیر
+                    if (u.pendingDeposit) {
+                        let pStatus = String(u.pendingDeposit.status || 'pending').toLowerCase();
+                        if (pStatus === 'pending') {
+                            totD++;
+                            depositList.push({ uid, u, idCode, nameStr, data: u.pendingDeposit, txId: u.pendingDeposit.txId || null });
+                        }
                     }
 
                     // افزودن برداشت‌های معلق
-                    if (u.pendingWithdrawal && u.pendingWithdrawal.status === 'pending') {
+                    if (u.pendingWithdrawal && String(u.pendingWithdrawal.status || 'pending').toLowerCase() === 'pending') {
                         totW++;
                         withdrawList.push({ uid, u, idCode, nameStr, data: u.pendingWithdrawal });
                     }
