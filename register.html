@@ -1,504 +1,384 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZENIX - ثبت‌نام حساب کاربر جدید</title>
-    
-    <!-- Google Fonts & Font Awesome -->
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Zenix - Register</title>
+    <!-- جلوگیری از خطای Favicon 404 -->
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Supabase JS Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <style>
-        :root {
-            --bg-primary: #0b0e14;
-            --bg-card: rgba(22, 27, 38, 0.75);
-            --border-color: rgba(255, 255, 255, 0.08);
-            --accent-gold: #f3ba2f;
-            --accent-gold-hover: #ffca3a;
-            --accent-green: #0ecb81;
-            --accent-red: #f6465d;
-            --text-main: #f0f4f8;
-            --text-muted: #848e9c;
-            --input-bg: rgba(13, 16, 23, 0.8);
-            --shadow-glow: 0 0 25px rgba(243, 186, 47, 0.15);
-        }
+        *{box-sizing:border-box;margin:0;padding:0;font-family:'Vazirmatn',system-ui,sans-serif}
+        body{background:#030712;min-height:100vh;display:flex;justify-content:center;align-items:center;color:#f8fafc;padding:15px}
+        .card{width:100%;max-width:400px;background:rgba(15,23,42,.9);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:24px;box-shadow:0 20px 40px rgba(0,0,0,.6);position:relative;overflow:visible}
+        .header-actions{position:relative;z-index:20;display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-bottom:12px}
+        .wrap{position:relative}
+        .lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none;transition:.2s}
+        .lb:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.3)}
+        .menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;width:max-content;padding:5px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8)}
+        [dir="rtl"] .wrap .menu{left:0}
+        [dir="ltr"] .wrap .menu{right:0}
+        .menu.show{display:block!important}
+        .mi{padding:6px 12px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap;transition:.2s}
+        .mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}
+        
+        .logo{text-align:center;margin-bottom:20px}
+        .logo-header{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;margin-bottom:8px}
+        .logo-icon{width:46px;height:46px;background:linear-gradient(135deg,#0ea5e9,#9333ea);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:24px;font-weight:900;font-style:italic;transform:skewX(-6deg);box-shadow:0 0 18px rgba(14,165,233,.45)}
+        .logo-text{font-family:'Orbitron',sans-serif;font-size:26px;font-weight:900;letter-spacing:3px;font-style:italic;transform:skewX(-6deg);background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 20px rgba(56,189,248,.4)}
+        .logo p{color:#94a3b8;font-size:12px;margin-top:4px}
+        
+        .group{margin-bottom:12px}
+        .group label{display:block;margin-bottom:5px;font-size:12px;color:#cbd5e1}
+        .req{color:#ef4444}
+        .wrap-input{position:relative;display:flex;align-items:center}
+        .wrap-input i:not(.eye-icon){position:absolute;color:#64748b;font-size:13px}
+        [dir="rtl"] .wrap-input i:not(.eye-icon){right:12px}
+        [dir="ltr"] .wrap-input i:not(.eye-icon){left:12px}
+        .eye-btn{position:absolute;background:none;border:none;color:#64748b;cursor:pointer;font-size:13px;padding:4px}
+        [dir="rtl"] .eye-btn{left:10px}
+        [dir="ltr"] .eye-btn{right:10px}
+        input{width:100%;padding:10px 12px;background:rgba(10,15,30,.7);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:13px;outline:none;transition:all .2s}
+        [dir="rtl"] input{padding-right:36px;padding-left:36px}
+        [dir="ltr"] input{padding-left:36px;padding-right:36px}
+        input:focus{border-color:#38bdf8}
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Vazirmatn', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+        input[readonly]{background:rgba(15,23,42,.6)!important;color:#94a3b8!important;border-color:rgba(255,255,255,.08)!important;cursor:not-allowed!important;user-select:none;pointer-events:none}
 
-        body {
-            background-color: var(--bg-primary);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(243, 186, 47, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(14, 203, 129, 0.05) 0%, transparent 40%);
-            padding: 20px 10px;
-            overflow-x: hidden;
-        }
+        .cap-box{background:rgba(10,15,30,.5);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;margin-bottom:14px}
+        .cap-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px}
+        #c-canvas{border-radius:12px;background:#050811;border:1px solid rgba(56,189,248,.3);cursor:pointer;box-shadow:0 6px 25px rgba(0,0,0,.7),inset 0 0 15px rgba(56,189,248,.05)}
+        .ref-btn{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.4);border-radius:10px;color:#38bdf8;width:42px;height:42px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+        .ref-btn:hover{background:rgba(56,189,248,.25);transform:rotate(180deg)}
+        .cap-input{text-align:center;letter-spacing:6px;font-weight:700;padding:8px!important;font-family:'Orbitron',sans-serif!important}
 
-        .auth-container {
-            width: 100%;
-            max-width: 440px;
-            background: var(--bg-card);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
-            padding: 35px 28px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), var(--shadow-glow);
-            position: relative;
-            z-index: 1;
-        }
-
-        .brand-header {
-            text-align: center;
-            margin-bottom: 28px;
-        }
-
-        .brand-logo {
-            font-size: 2rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            background: linear-gradient(135deg, #ffffff 0%, var(--accent-gold) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: inline-block;
-            margin-bottom: 6px;
-        }
-
-        .brand-subtitle {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            font-weight: 400;
-        }
-
-        .form-group {
-            margin-bottom: 18px;
-            position: relative;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 0.82rem;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-
-        .input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .input-icon {
-            position: absolute;
-            right: 14px;
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            transition: color 0.3s ease;
-            pointer-events: none;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 13px 42px 13px 16px;
-            background: var(--input-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            color: var(--text-main);
-            font-size: 0.92rem;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        .form-input:focus {
-            border-color: var(--accent-gold);
-            box-shadow: 0 0 12px rgba(243, 186, 47, 0.2);
-        }
-
-        .form-input:focus + .input-icon {
-            color: var(--accent-gold);
-        }
-
-        .toggle-password {
-            position: absolute;
-            left: 14px;
-            color: var(--text-muted);
-            cursor: pointer;
-            font-size: 1rem;
-            padding: 4px;
-            transition: color 0.3s ease;
-        }
-
-        .toggle-password:hover {
-            color: var(--text-main);
-        }
-
-        .password-input {
-            padding-left: 42px !important;
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, var(--accent-gold) 0%, #e0a800 100%);
-            border: none;
-            border-radius: 12px;
-            color: #000;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-            box-shadow: 0 4px 15px rgba(243, 186, 47, 0.3);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-submit:hover {
-            background: linear-gradient(135deg, var(--accent-gold-hover) 0%, var(--accent-gold) 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(243, 186, 47, 0.4);
-        }
-
-        .btn-submit:active {
-            transform: translateY(0);
-        }
-
-        .btn-submit:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .auth-footer {
-            text-align: center;
-            margin-top: 24px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            border-top: 1px solid var(--border-color);
-            padding-top: 20px;
-        }
-
-        .auth-link {
-            color: var(--accent-gold);
-            text-decoration: none;
-            font-weight: 700;
-            margin-right: 4px;
-            transition: color 0.3s ease;
-        }
-
-        .auth-link:hover {
-            color: var(--accent-gold-hover);
-            text-decoration: underline;
-        }
-
-        .alert-box {
-            padding: 12px 16px;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            margin-bottom: 20px;
-            display: none;
-            align-items: center;
-            gap: 10px;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .alert-error {
-            background: rgba(246, 70, 93, 0.15);
-            border: 1px solid rgba(246, 70, 93, 0.4);
-            color: #ff6b81;
-        }
-
-        .alert-success {
-            background: rgba(14, 203, 129, 0.15);
-            border: 1px solid rgba(14, 203, 129, 0.4);
-            color: var(--accent-green);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .spinner {
-            width: 20px;
-            height: 20px;
-            border: 2px solid #000;
-            border-bottom-color: transparent;
-            border-radius: 50%;
-            display: inline-block;
-            box-sizing: border-box;
-            animation: rotation 1s linear infinite;
-        }
-
-        @keyframes rotation {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .ref-badge {
-            display: inline-block;
-            background: rgba(243, 186, 47, 0.1);
-            color: var(--accent-gold);
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            margin-top: 4px;
-            border: 1px dashed rgba(243, 186, 47, 0.3);
-        }
+        .btn{width:100%;padding:12px;background:linear-gradient(135deg,#0284c7,#9333ea);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:bold;cursor:pointer}
+        .btn:disabled{background:rgba(255,255,255,.1);color:#64748b;cursor:not-allowed}
+        .footer{text-align:center;margin-top:14px;font-size:12px;color:#94a3b8}
+        .footer a{color:#38bdf8;text-decoration:none}
+        #msg{margin-top:8px;font-size:12px;text-align:center;font-weight:bold;padding:6px;border-radius:6px}
+        .err{color:#ef4444;background:rgba(239,68,68,.1)}
+        .succ{color:#22c55e;background:rgba(34,197,94,.1)}
     </style>
 </head>
 <body>
-
-    <div class="auth-container">
-        <div class="brand-header">
-            <div class="brand-logo">ZENIX</div>
-            <p class="brand-subtitle">ایجاد حساب کاربری در پلتفرم سرمایه‌گذاری</p>
+    <div class="card">
+        <div class="header-actions">
+            <a href="support.html" onclick="window.location.href='support.html';return false;" class="lb" id="btn-support"><i class="fas fa-headset" style="color:#a855f7"></i></a>
+            <div class="wrap">
+                <button type="button" class="lb" id="lang-btn"><i class="fas fa-globe" style="color:#22c55e"></i></button>
+                <div class="menu" id="lang-menu">
+                    <div class="mi" data-lang="en">English</div>
+                    <div class="mi" data-lang="fa">فارسی</div>
+                    <div class="mi" data-lang="ar">العربية</div>
+                    <div class="mi" data-lang="tr">Türkçe</div>
+                    <div class="mi" data-lang="ru">Русский</div>
+                    <div class="mi" data-lang="es">Español</div>
+                    <div class="mi" data-lang="fr">Français</div>
+                    <div class="mi" data-lang="de">Deutsch</div>
+                </div>
+            </div>
         </div>
 
-        <div id="alertBox" class="alert-box"></div>
+        <div class="logo">
+            <div class="logo-header">
+                <div class="logo-icon">Z</div>
+                <div class="logo-text">ZENIX</div>
+            </div>
+            <p id="t-wel">Register New Account</p>
+        </div>
 
-        <form id="registerForm" onsubmit="handleRegister(event)">
-            <div class="form-group">
-                <label class="form-label" for="fullName">نام و نام خانوادگی</label>
-                <div class="input-wrapper">
-                    <input type="text" id="fullName" class="form-input" placeholder="مثال: علی محمدی" required autocomplete="name">
-                    <i class="fa-regular fa-user input-icon"></i>
+        <form id="form">
+            <div class="group">
+                <label id="l-email"><i class="fas fa-envelope"></i> Email <span class="req">*</span></label>
+                <div class="wrap-input">
+                    <i class="fas fa-at"></i>
+                    <input type="email" id="email" placeholder="Email" required>
                 </div>
             </div>
-
-            <div class="form-group">
-                <label class="form-label" for="email">آدرس ایمیل</label>
-                <div class="input-wrapper">
-                    <input type="email" id="email" class="form-input" dir="ltr" placeholder="name@example.com" required autocomplete="email">
-                    <i class="fa-regular fa-envelope input-icon"></i>
+            <div class="group">
+                <label id="l-name"><i class="fas fa-id-card"></i> Full Name <span class="req">*</span></label>
+                <div class="wrap-input">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="fullname" placeholder="Full Name" required>
                 </div>
             </div>
-
-            <div class="form-group">
-                <label class="form-label" for="password">کلمه عبور</label>
-                <div class="input-wrapper">
-                    <input type="password" id="password" class="form-input password-input" dir="ltr" placeholder="حداقل ۶ کاراکتر" required minlength="6" autocomplete="new-password">
-                    <i class="fa-solid fa-lock input-icon"></i>
-                    <i class="fa-regular fa-eye toggle-password" onclick="togglePasswordVisibility('password', this)"></i>
+            <div class="group">
+                <label id="l-pass"><i class="fas fa-lock"></i> Password <span class="req">*</span></label>
+                <div class="wrap-input">
+                    <i class="fas fa-key"></i>
+                    <input type="password" id="pass" placeholder="Password" required>
+                    <button type="button" class="eye-btn" onclick="togglePassword('pass',this)"><i class="fas fa-eye eye-icon"></i></button>
                 </div>
             </div>
-
-            <div class="form-group">
-                <label class="form-label" for="confirmPassword">تکرار کلمه عبور</label>
-                <div class="input-wrapper">
-                    <input type="password" id="confirmPassword" class="form-input password-input" dir="ltr" placeholder="بازتکرار کلمه عبور" required autocomplete="new-password">
-                    <i class="fa-solid fa-shield-halved input-icon"></i>
-                    <i class="fa-regular fa-eye toggle-password" onclick="togglePasswordVisibility('confirmPassword', this)"></i>
+            <div class="group">
+                <label id="l-confirm-pass"><i class="fas fa-lock"></i> Confirm Password <span class="req">*</span></label>
+                <div class="wrap-input">
+                    <i class="fas fa-key"></i>
+                    <input type="password" id="confirm-pass" placeholder="Confirm Password" required>
+                    <button type="button" class="eye-btn" onclick="togglePassword('confirm-pass',this)"><i class="fas fa-eye eye-icon"></i></button>
                 </div>
             </div>
-
-            <div class="form-group">
-                <label class="form-label" for="referralCode">
-                    کد دعوت (اختیاری)
-                </label>
-                <div class="input-wrapper">
-                    <input type="text" id="referralCode" class="form-input" dir="ltr" placeholder="مثال: REF123456" style="text-transform: uppercase;">
-                    <i class="fa-solid fa-user-plus input-icon"></i>
-                </div>
-                <div id="refAppliedBadge" style="display: none;" class="ref-badge">
-                    <i class="fa-solid fa-check-circle"></i> کد معرف شناسایی شد
+            <div class="group">
+                <label id="l-ref"><i class="fas fa-ticket"></i> Referral Code <span class="req">*</span></label>
+                <div class="wrap-input">
+                    <i class="fas fa-lock" id="ref-icon"></i>
+                    <input type="text" id="ref-in" placeholder="Referral Code" readonly required tabindex="-1">
                 </div>
             </div>
-
-            <button type="submit" id="submitBtn" class="btn-submit">
-                <span>ثبت‌نام و ایجاد حساب</span>
-            </button>
+            <div class="group">
+                <label id="l-cap"><i class="fas fa-shield-alt"></i> Security Code <span class="req">*</span></label>
+                <div class="cap-box">
+                    <div class="cap-row">
+                        <canvas id="c-canvas" width="165" height="44"></canvas>
+                        <button type="button" class="ref-btn" id="ref-btn"><i class="fas fa-sync-alt"></i></button>
+                    </div>
+                    <input type="text" id="cap-in" class="cap-input" placeholder="Enter code" maxlength="5" autocomplete="off" required>
+                </div>
+            </div>
+            <button type="submit" id="t-btn" class="btn" disabled>Sign Up</button>
+            <div id="msg"></div>
         </form>
 
-        <div class="auth-footer">
-            قبلاً ثبت‌نام کرده‌اید؟ 
-            <a href="login.html" class="auth-link">وارد شوید</a>
+        <div class="footer">
+            <p><a href="index.html" id="t-back"><i class="fas fa-arrow-left"></i> Back to Main Page</a></p>
         </div>
     </div>
 
     <script>
-        // --- پیکربندی Supabase ---
-        const SUPABASE_URL = 'https://kslypmnrphzfxpxrswpt.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtzbHlwbW5ycGh6ZnhweHJzd3B0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAzODU4ODIsImV4cCI6MjA1NTk2MTg4Mn0.O2m8G2A-fIft1G9G_F9eD1R6WfG4Vf30-OIn7y-u1pI';
+        function togglePassword(id,btn){
+            const input=document.getElementById(id);
+            if(input.type==='password'){input.type='text';btn.innerHTML='<i class="fas fa-eye-slash eye-icon"></i>';}
+            else{input.type='password';btn.innerHTML='<i class="fas fa-eye eye-icon"></i>';}
+        }
+    </script>
 
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-        // --- بررسی و دریافت کد معرف از URL ---
-        window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const refParam = urlParams.get('ref') || urlParams.get('referral');
-            
-            if (refParam) {
-                const refInput = document.getElementById('referralCode');
-                refInput.value = refParam.trim().toUpperCase();
-                document.getElementById('refAppliedBadge').style.display = 'inline-block';
-            }
-        });
+        const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // --- نمایش / مخفی‌سازی رمز عبور ---
-        function togglePasswordVisibility(inputId, iconEl) {
-            const input = document.getElementById(inputId);
-            if (input.type === 'password') {
-                input.type = 'text';
-                iconEl.classList.remove('fa-eye');
-                iconEl.classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                iconEl.classList.remove('fa-eye-slash');
-                iconEl.classList.add('fa-eye');
+        const langData = {
+            fa:{dir:'rtl',wel:'ثبت‌نام حساب کاربری جدید',email:'ایمیل',emailP:'ایمیل',name:'نام و نام خانوادگی',nameP:'نام و نام خانوادگی',pass:'رمز عبور',passP:'رمز عبور',confirmPass:'تکرار رمز عبور',confirmPassP:'تکرار رمز عبور',ref:'کد معرف',refP:'کد معرف',cap:'کد امنیتی',capP:'کد را وارد کنید',btn:'ثبت‌نام در زنیکس',back:'بازگشت به صفحه اصلی',succ:'ثبت‌نام با موفقیت انجام شد!',err:'کد امنیتی اشتباه است!',refErr:'کد معرف معتبر نیست یا وجود ندارد!',passErr:'رمز عبور و تکرار آن مطابقت ندارند!',lenErr:'رمز عبور باید حداقل ۶ کاراکتر باشد!',existErr:'این ایمیل قبلاً ثبت شده است!',supTitle:'پشتیبانی',langTitle:'تغییر زبان'},
+            en:{dir:'ltr',wel:'Register New Account',email:'Email',emailP:'Email',name:'Full Name',nameP:'Full Name',pass:'Password',passP:'Password',confirmPass:'Confirm Password',confirmPassP:'Confirm Password',ref:'Referral Code',refP:'Referral Code',cap:'Security Code',capP:'Enter code',btn:'Sign Up',back:'Back to Main Page',succ:'Successfully registered!',err:'Invalid security code!',refErr:'Invalid or non-existent referral code!',passErr:'Passwords do not match!',lenErr:'Password must be at least 6 characters!',existErr:'Email already registered!',supTitle:'Support',langTitle:'Change Language'},
+            ar:{dir:'rtl',wel:'تسجيل حساب جديد',email:'البريد الإلكتروني',emailP:'البريد الإلكتروني',name:'الاسم الكامل',nameP:'الاسم الكامل',pass:'كلمة المرور',passP:'كلمة المرور',confirmPass:'تأكيد كلمة المرور',confirmPassP:'تأكيد كلمة المرور',ref:'رمز الإحالة',refP:'رمز الإحالة',cap:'رمز التحقق',capP:'أدخل الرمز',btn:'التسجيل في Zenix',back:'العودة للصفحة الرئيسية',succ:'تم التسجيل بنجاح!',err:'رمز التحقق غير صحيح!',refErr:'رمز الإحالة غير صالح أو غير موجود!',passErr:'كلمتا المرور غير متطابقتين!',lenErr:'يجب أن تكون كلمة المرور 6 أحرف على الأقل!',existErr:'هذا البريد الإلكتروني مسجل بالفعل!',supTitle:'Destek',langTitle:'Dil Değiştir'},
+            tr:{dir:'ltr',wel:'Yeni Hesap Oluştur',email:'E-posta',emailP:'E-posta',name:'Ad Soyad',nameP:'Ad Soyad',pass:'Şifre',passP:'Şifre',confirmPass:'Şifreyi Tekrarla',confirmPassP:'Şifreyi Tekrarla',ref:'Referans Kodu',refP:'Referans Kodu',cap:'Güvenlik Kodu',capP:'Kodu girin',btn:'Zenix\'e Kayıt Ol',back:'Ana Sayfaya Dön',succ:'Kayıt başarılı!',err:'Geçersiz güvenlik kodu!',refErr:'Geçersiz veya bulunmayan referans kodu!',passErr:'Şifreler eşleşmiyor!',lenErr:'Şifre en az 6 karakter olmalıdır!',existErr:'Bu e-posta zaten kayıtlı!',supTitle:'Destek',langTitle:'Dil Değiştir'},
+            ru:{dir:'ltr',wel:'Регистрация аккаунта',email:'Эл. почта',emailP:'Эл. почта',name:'ФИО',nameP:'Введите ФИО',pass:'Пароль',passP:'Пароль',confirmPass:'Повторите пароль',confirmPassP:'Повторите пароль',ref:'Реферальный код',refP:'Реферальный код',cap:'Защитный код',capP:'Введите код',btn:'Зарегистрироваться',back:'На главную',succ:'Успешная регистрация!',err:'Неверный защитный код!',refErr:'Неверный реферальный код!',passErr:'Пароли не совпадают!',lenErr:'Пароль должен быть не менее 6 символов!',existErr:'Этот email уже зарегистрирован!',supTitle:'Поддержка',langTitle:'Сменить язык'},
+            es:{dir:'ltr',wel:'Registrar nueva cuenta',email:'Correo electrónico',emailP:'Correo electrónico',name:'Nombre completo',nameP:'Nombre completo',pass:'Contraseña',passP:'Contraseña',confirmPass:'Confirmar contraseña',confirmPassP:'Confirmar contraseña',ref:'Código de referencia',refP:'Código de referencia',cap:'Código de seguridad',capP:'Ingrese el código',btn:'Registrarse en Zenix',back:'Volver al inicio',succ:'¡Registro exitoso!',err:'¡Código inválido!',refErr:'¡Código de referencia inválido!',passErr:'¡Las contraseñas no coinciden!',lenErr:'¡La contraseña debe tener al menos 6 caracteres!',existErr:'¡Este correo ya está registrado!',supTitle:'Soporte',langTitle:'Cambiar idioma'},
+            fr:{dir:'ltr',wel:'Créer un compte',email:'E-mail',emailP:'E-mail',name:'Nom complet',nameP:'Nom complet',pass:'Mot de passe',passP:'Mot de passe',confirmPass:'Confirmer',confirmPassP:'Confirmer',ref:'Code de parrainage',refP:'Code',cap:'Code de sécurité',capP:'Entrez le code',btn:'S\'inscrire',back:'Retour',succ:'Inscription réussie !',err:'Code invalide !',refErr:'Code de parrainage invalide !',passErr:'Mots de passe разных !',lenErr:'Le mot de passe doit contenir au moins 6 caractères !',existErr:'E-mail déjà enregistré !',supTitle:'Support',langTitle:'Changer de langue'},
+            de:{dir:'ltr',wel:'Konto erstellen',email:'E-Mail',emailP:'E-Mail',name:'Vollständiger Name',nameP:'Vollständiger Name',pass:'Passwort',passP:'Passwort',confirmPass:'Passwort bestätigen',confirmPassP:'Passwort bestätigen',ref:'Empfehlungscode',refP:'Empfehlungscode',cap:'Sicherheitscode',capP:'Code eingeben',btn:'Registrieren',back:'Zurück',succ:'Erfolgreich!',err:'Ungültiger Code!',refErr:'Ungültiger Empfehlungscode!',passErr:'Passwörter stimmen nicht überein!',lenErr:'Das Passwort muss mindestens 6 Zeichen lang sein!',existErr:'E-Mail bereits registriert!',supTitle:'Support',langTitle:'Sprache ändern'}
+        };
+        
+        let currentLang = localStorage.getItem('zenix_lang') || 'en', code = '';
+        const langBtn = document.getElementById('lang-btn'), langMenu = document.getElementById('lang-menu');
+        
+        langBtn.onclick = e => { e.stopPropagation(); langMenu.classList.toggle('show'); };
+        document.onclick = e => { if (!e.target.closest('.menu') && !e.target.closest('#lang-btn')) langMenu.classList.remove('show'); };
+        
+        function setLang(l) {
+            currentLang = l;
+            localStorage.setItem('zenix_lang', l);
+            langMenu?.classList.remove('show');
+            const t = langData[l] || langData.en;
+            document.documentElement.setAttribute('dir', t.dir);
+            document.documentElement.setAttribute('lang', l);
+            document.getElementById('t-wel').textContent = t.wel;
+            document.getElementById('l-email').innerHTML = `<i class="fas fa-envelope"></i> ${t.email} <span class="req">*</span>`;
+            document.getElementById('email').placeholder = t.emailP;
+            document.getElementById('l-name').innerHTML = `<i class="fas fa-id-card"></i> ${t.name} <span class="req">*</span>`;
+            document.getElementById('fullname').placeholder = t.nameP;
+            document.getElementById('l-pass').innerHTML = `<i class="fas fa-lock"></i> ${t.pass} <span class="req">*</span>`;
+            document.getElementById('pass').placeholder = t.passP;
+            document.getElementById('l-confirm-pass').innerHTML = `<i class="fas fa-lock"></i> ${t.confirmPass} <span class="req">*</span>`;
+            document.getElementById('confirm-pass').placeholder = t.confirmPassP;
+            document.getElementById('l-ref').innerHTML = `<i class="fas fa-ticket"></i> ${t.ref} <span class="req">*</span>`;
+            document.getElementById('ref-in').placeholder = t.refP;
+            document.getElementById('l-cap').innerHTML = `<i class="fas fa-shield-alt"></i> ${t.cap} <span class="req">*</span>`;
+            document.getElementById('cap-in').placeholder = t.capP;
+            document.getElementById('t-btn').textContent = t.btn;
+            const arrowIcon = t.dir === 'rtl' ? 'fa-arrow-right' : 'fa-arrow-left';
+            document.getElementById('t-back').innerHTML = `<i class="fas ${arrowIcon}"></i> ${t.back}`;
+            document.getElementById('btn-support')?.setAttribute('title', t.supTitle);
+            langBtn?.setAttribute('title', t.langTitle);
+            document.querySelectorAll('#lang-menu .mi').forEach(i => i.classList.toggle('active', i.dataset.lang === l));
+        }
+        
+        document.querySelectorAll('#lang-menu .mi').forEach(i => i.onclick = () => setLang(i.dataset.lang));
+        
+        const cv = document.getElementById('c-canvas'), emailIn = document.getElementById('email'), nameIn = document.getElementById('fullname'), passIn = document.getElementById('pass'), confirmPassIn = document.getElementById('confirm-pass'), refIn = document.getElementById('ref-in'), capIn = document.getElementById('cap-in'), btn = document.getElementById('t-btn'), msg = document.getElementById('msg'), form = document.getElementById('form'), urlParams = new URLSearchParams(window.location.search), refParam = urlParams.get('ref');
+        
+        if (refParam) {
+            refIn.value = refParam;
+        }
+
+        async function checkFirstUserInit() {
+            try {
+                const { count, error } = await supabaseClient
+                    .from('users')
+                    .select('*', { count: 'exact', head: true });
+                
+                if (!error && count === 0 && !refIn.value) {
+                    refIn.value = 'ADMIN';
+                    chk();
+                }
+            } catch (e) {
+                console.error(e);
             }
         }
 
-        // --- نمایش پیام‌های هشدار ---
-        function showAlert(message, type = 'error') {
-            const alertBox = document.getElementById('alertBox');
-            alertBox.className = `alert-box alert-${type}`;
-            
-            const icon = type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-check';
-            alertBox.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
-            alertBox.style.display = 'flex';
+        function chk() {
+            btn.disabled = !(emailIn.value.trim() && nameIn.value.trim() && passIn.value.trim() && confirmPassIn.value.trim() && refIn.value.trim() && capIn.value.length === 5);
         }
+        [emailIn, nameIn, passIn, confirmPassIn, refIn, capIn].forEach(i => i.oninput = chk);
+        
+        function drawCap() {
+            if (!cv) return;
+            const ctx = cv.getContext('2d'), w = cv.width, h = cv.height;
+            code = '';
+            const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+            for (let i = 0; i < 5; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
 
-        function hideAlert() {
-            document.getElementById('alertBox').style.display = 'none';
+            ctx.clearRect(0, 0, w, h);
+            const bgGrad = ctx.createLinearGradient(0, 0, w, h);
+            bgGrad.addColorStop(0, '#030712'); bgGrad.addColorStop(0.5, '#0b1329'); bgGrad.addColorStop(1, '#02050e');
+            ctx.fillStyle = bgGrad; ctx.fillRect(0, 0, w, h);
+
+            ctx.strokeStyle = 'rgba(56,189,248,0.12)'; ctx.lineWidth = 1;
+            for (let i = 0; i < 2; i++) {
+                ctx.beginPath(); ctx.moveTo(Math.random() * w, Math.random() * h);
+                ctx.lineTo(Math.random() * w, Math.random() * h); ctx.stroke();
+            }
+
+            const neonColors = ['#38bdf8', '#c084fc', '#34d399', '#f43f5e', '#fbbf24'];
+            const cw = w / 5;
+
+            for (let i = 0; i < 5; i++) {
+                const x = i * cw + cw / 2, y = h / 2 + (Math.random() - 0.5) * 4, color = neonColors[i % neonColors.length];
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate((Math.random() - 0.5) * 0.2);
+
+                ctx.font = '700 24px "Vazirmatn", system-ui, sans-serif';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.shadowColor = color; ctx.shadowBlur = 4;
+                ctx.strokeStyle = '#020617'; ctx.lineWidth = 2;
+                ctx.strokeText(code[i], 0, 0);
+                ctx.fillStyle = color;
+                ctx.fillText(code[i], 0, 0);
+                ctx.restore();
+            }
         }
+        
+        document.getElementById('ref-btn').onclick = () => { capIn.value = ''; drawCap(); chk(); };
+        cv.onclick = () => { drawCap(); chk(); };
+        
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const t = langData[currentLang] || langData.en;
+            if (passIn.value.length < 6) { msg.textContent = t.lenErr; msg.className = 'err'; return; }
+            if (passIn.value !== confirmPassIn.value) { msg.textContent = t.passErr; msg.className = 'err'; return; }
+            if (capIn.value.toUpperCase() !== code) { msg.textContent = t.err; msg.className = 'err'; capIn.value = ''; drawCap(); chk(); return; }
 
-        // --- تولید کد معرف اختصاصی برای کاربر جدید ---
-        function generateRandomReferralCode(length = 6) {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let result = 'ZX';
-            for (let i = 0; i < length; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return result;
-        }
-
-        // --- مدیریت فرایند ثبت‌نام ---
-        async function handleRegister(event) {
-            event.preventDefault();
-            hideAlert();
-
-            const fullNameValue = document.getElementById('fullName').value.trim();
-            const emailValue = document.getElementById('email').value.trim().toLowerCase();
-            const passwordValue = document.getElementById('password').value;
-            const confirmPasswordValue = document.getElementById('confirmPassword').value;
-            const referralCodeValue = document.getElementById('referralCode').value.trim().toUpperCase();
-
-            // اعتبارسنجی ورودی‌ها
-            if (!fullNameValue) {
-                showAlert('لطفا نام و نام خانوادگی خود را وارد کنید.');
-                return;
-            }
-
-            if (passwordValue.length < 6) {
-                showAlert('کلمه عبور باید حداقل ۶ کاراکتر باشد.');
-                return;
-            }
-
-            if (passwordValue !== confirmPasswordValue) {
-                showAlert('کلمه عبور و تکرار آن با یکدیگر مطابقت ندارند.');
-                return;
-            }
-
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = `<span class="spinner"></span> <span>در حال ثبت‌نام...</span>`;
+            btn.disabled = true;
+            const emailValue = emailIn.value.trim().toLowerCase();
+            const fullNameValue = nameIn.value.trim();
+            const refCodeValue = refIn.value.trim().toUpperCase();
 
             try {
-                // ۱. ثبت‌نام کاربر در سیستم Auth
+                // ۱. بررسی تعداد کاربران ثبت‌شده
+                const { count: totalUsers } = await supabaseClient
+                    .from('users')
+                    .select('*', { count: 'exact', head: true });
+
+                const isFirstUser = (totalUsers === 0);
+
+                if (!isFirstUser) {
+                    const { data: refUser, error: refError } = await supabaseClient
+                        .from('users')
+                        .select('referral_code, custom_id')
+                        .or(`referral_code.eq.${refCodeValue},custom_id.eq.${refCodeValue}`)
+                        .maybeSingle();
+
+                    if (refError || !refUser) {
+                        btn.disabled = false;
+                        msg.textContent = t.refErr;
+                        msg.className = 'err';
+                        capIn.value = '';
+                        drawCap();
+                        chk();
+                        return;
+                    }
+                }
+
+                // ۲. کد معرف اختصاصی کاربر جدید
+                const userOwnRefCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+                const referrerFinalValue = isFirstUser ? 'SYSTEM' : refCodeValue;
+
+                // ۳. ثبت‌نام در Supabase Auth (ذخیره fullname و full_name در متادیتا)
                 const { data: authData, error: authError } = await supabaseClient.auth.signUp({
                     email: emailValue,
-                    password: passwordValue,
+                    password: passIn.value,
                     options: {
                         data: {
+                            fullname: fullNameValue,
                             full_name: fullNameValue,
-                            fullname: fullNameValue
+                            referred_by: referrerFinalValue,
+                            referral_code: userOwnRefCode
                         }
                     }
                 });
 
-                if (authError) {
-                    throw authError;
-                }
+                if (authError) throw authError;
 
-                if (!authData.user) {
-                    throw new Error('خطا در ثبت‌نام کاربر. لطفا مجددا تلاش کنید.');
-                }
+                // ۴. ثبت کامل اطلاعات به همراه نام و نام خانوادگی در جدول users
+                if (authData?.user) {
+                    const userPayload = {
+                        id: authData.user.id,
+                        email: emailValue,
+                        fullname: fullNameValue,
+                        full_name: fullNameValue,
+                        referred_by: referrerFinalValue,
+                        referral_code: userOwnRefCode,
+                        balance: 0,
+                        created_at: new Date().toISOString()
+                    };
 
-                // ۲. پردازش کد معرف ورودی (در صورت وجود)
-                let referrerFinalValue = null;
-                if (referralCodeValue) {
-                    const { data: referrerUser } = await supabaseClient
+                    const { error: dbError } = await supabaseClient
                         .from('users')
-                        .select('id, referral_code')
-                        .eq('referral_code', referralCodeValue)
-                        .maybeSingle();
+                        .upsert(userPayload, { onConflict: 'id' });
 
-                    if (referrerUser) {
-                        referrerFinalValue = referrerUser.referral_code;
+                    if (dbError) {
+                        console.error('Supabase DB Insert Error:', dbError);
                     }
                 }
 
-                // ۳. ایجاد کد معرف اختصاصی کاربر
-                const userOwnRefCode = generateRandomReferralCode(6);
+                msg.textContent = t.succ;
+                msg.className = 'succ';
+                setTimeout(() => window.location.href = 'index.html', 1500);
 
-                // ۴. درج اطلاعات کاربر در جدول عمومی users
-                const userPayload = {
-                    id: authData.user.id,
-                    email: emailValue,
-                    full_name: fullNameValue, // اضافه شدن نام و نام خانوادگی به دیتابیس
-                    referred_by: referrerFinalValue,
-                    referral_code: userOwnRefCode,
-                    balance: 0,
-                    created_at: new Date().toISOString()
-                };
-
-                const { error: dbError } = await supabaseClient
-                    .from('users')
-                    .insert([userPayload]);
-
-                if (dbError) {
-                    console.warn('DB Insert Warning:', dbError.message);
+            } catch (error) {
+                btn.disabled = false;
+                if (error.message?.toLowerCase().includes('already registered') || error.status === 400) {
+                    msg.textContent = t.existErr;
+                } else {
+                    msg.textContent = error.message || 'خطایی رخ داده است';
                 }
-
-                showAlert('ثبت‌نام با موفقیت انجام شد! در حال انتقال...', 'success');
-
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1500);
-
-            } catch (err) {
-                console.error('Register Error:', err);
-                let msg = err.message || 'خطایی در ثبت‌نام رخ داد.';
-                if (msg.includes('already registered')) {
-                    msg = 'این ایمیل قبلاً ثبت شده است. لطفا وارد شوید.';
-                }
-                showAlert(msg, 'error');
-                
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = `<span>ثبت‌نام و ایجاد حساب</span>`;
+                msg.className = 'err';
+                capIn.value = '';
+                drawCap();
+                chk();
             }
-        }
+        };
+        
+        setLang(currentLang);
+        drawCap();
+        checkFirstUserInit();
+        chk();
     </script>
 </body>
 </html>
