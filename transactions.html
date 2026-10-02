@@ -202,7 +202,7 @@
             m1: 'صفحه اصلی', m2: 'کوانتیفیکیشن', m3: 'واریز', m4: 'برداشت', mTeam: 'تیم من', m5: 'تراکنش', m6: 'پروفایل', m7: 'پشتیبانی', m8: 'خروج',
             tNode: 'سرور فعال (US-East)', modalTitle: 'صندوق پیام‌های مدیریت', noMsg: 'هیچ پیام جدیدی از طرف مدیریت وجود ندارد.',
             backMsg: 'بازگشت به لیست پیام‌ها', newBadge: 'جدید',
-            typeDeposit: 'واریز تتر (USDT)', typeWithdraw: 'برداشت وجه', typeCommission: 'کمیسیون', typeBonus: 'پاداش ثبت‌نام',
+            typeDeposit: 'واریز تتر (USDT)', typeWithdraw: 'برداشت وجه', typeCommission: 'کمیسیون', typeBonus: 'پاداش ثبت‌‌نام',
             stSuccess: 'تایید شده', stFailed: 'رد شده',
             noTx: 'هیچ تراکنشی یافت نشد.', loading: 'در حال بارگذاری تراکنش‌ها...',
             helpTitle: 'راهنمای صفحه تراکنش‌ها', helpBtnTitle: 'راهنمای صفحه تراکنش‌ها',
@@ -271,7 +271,7 @@
           }
         }
 
-        // رندر تراکنش‌ها با فرمت تاریخ YYYY/MM/DD و تفکیک واریز از پاداش
+        // رندر تراکنش‌ها با فرمت تاریخ و ساعت (YYYY/MM/DD HH:mm)
         function renderTransactions() {
           let container = document.getElementById('tx-list');
           let t = ld[currLang] || ld.fa;
@@ -327,7 +327,7 @@
               else titleText = t.typeDeposit;
             }
 
-            // محاسبه و فرمت تاریخ میلادی به فرمت YYYY/MM/DD
+            // محاسبه و فرمت تاریخ و ساعت به فرمت YYYY/MM/DD HH:mm
             let timeVal = tx.created_at || tx.createdAt || tx.timestamp || tx.time;
             let dateStr = '';
             if (timeVal) {
@@ -338,7 +338,9 @@
                 let y = d.getFullYear();
                 let m = String(d.getMonth() + 1).padStart(2, '0');
                 let day = String(d.getDate()).padStart(2, '0');
-                dateStr = `${y}/${m}/${day}`;
+                let hh = String(d.getHours()).padStart(2, '0');
+                let mm = String(d.getMinutes()).padStart(2, '0');
+                dateStr = `${y}/${m}/${day} ${hh}:${mm}`;
               }
             } else {
               dateStr = '---';
