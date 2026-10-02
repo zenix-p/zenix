@@ -441,6 +441,7 @@
         let allMessages = [];
         let currentUserId = null;
         let userRealtimeChannel = null;
+        let hasShownWelcomeToast = false;
 
         function generateUIDDigits(userId) {
             let hash = 5381;
@@ -664,6 +665,11 @@
 
             if (data.phone) {
                 lockPhoneInput(data.phone);
+            } else if (!hasShownWelcomeToast) {
+                hasShownWelcomeToast = true;
+                setTimeout(() => {
+                    window.showToast('به Zenix خوش آمدید! جهت دسترسی کامل و استفاده از امکانات پلتفرم، لطفاً شماره موبایل خود را وارد نمایید.', 'info');
+                }, 500);
             }
 
             const statusEl = document.getElementById('account-status');
@@ -687,6 +693,11 @@
 
             if(data.trx_address) document.getElementById('trx-in').value = data.trx_address;
             if(data.bep20_address) document.getElementById('bep-in').value = data.bep20_address;
+          } else if (!hasShownWelcomeToast) {
+            hasShownWelcomeToast = true;
+            setTimeout(() => {
+                window.showToast('به Zenix خوش آمدید! جهت دسترسی کامل و استفاده از امکانات پلتفرم، لطفاً شماره موبایل خود را وارد نمایید.', 'info');
+            }, 500);
           }
         }
 
