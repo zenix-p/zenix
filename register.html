@@ -302,7 +302,6 @@
                     options: {
                         data: {
                             fullname: fullNameValue,
-                            full_name: fullNameValue,
                             referred_by: referrerFinalValue
                         }
                     }
@@ -310,7 +309,7 @@
 
                 if (authError) throw authError;
 
-                // ۲. ذخیره کامل اطلاعات کاربر و اعطای ۲ دلار پاداش اولیه ثبت‌نام
+                // ۲. ذخیره اطلاعات کاربر در دیتابیس با ۲ دلار پاداش ثبت‌نام
                 if (authData?.user) {
                     const userUidDigits = generateUIDDigits(authData.user.id);
                     const userOwnRefCode = 'SM-' + userUidDigits;
@@ -319,16 +318,14 @@
                         id: authData.user.id,
                         email: emailValue,
                         fullname: fullNameValue,
-                        full_name: fullNameValue,
                         referred_by: referrerFinalValue,
                         referral_code: userOwnRefCode,
-                        balance: 2,
-                        created_at: new Date().toISOString()
+                        balance: 2
                     };
 
                     const { error: dbError } = await supabaseClient
                         .from('users')
-                        .upsert(userPayload, { onConflict: 'id' });
+                        .upsert(userPayload);
 
                     if (dbError) {
                         console.error('Supabase DB Insert Error:', dbError);
