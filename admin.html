@@ -756,7 +756,6 @@
         async function sendNotificationToUser(uid, title, message) {
             const now = new Date().toISOString();
             try {
-                // درج با ساختار استاندارد snake_case
                 const { error } = await supabaseClient.from('notifications').insert([{
                     user_id: uid,
                     title: title,
@@ -766,7 +765,6 @@
                 }]);
 
                 if (error) {
-                    // در صورت خطای نام ستون، تست با فیلدهای جایگزین
                     await supabaseClient.from('notifications').insert([{
                         userId: uid,
                         title: title,
@@ -1018,12 +1016,9 @@
 
                 uMap={};
 
+                // دریافت لیست کاربران
                 try {
                     const { data: supaUsers, error: supaErr } = await supabaseClient.from('users').select('*');
-
-                    if (supaErr) {
-                        console.error("خطا در فراخوانی کاربران از سوپابیس:", supaErr);
-                    }
 
                     if (!supaErr && supaUsers && supaUsers.length > 0) {
                         supaUsers.forEach(u => {
@@ -1049,12 +1044,45 @@
                                 pendingEmail: u.pendingEmail || u.pending_email,
                                 newEmail: u.newEmail || u.new_email,
                                 selfieImage: u.selfieImage || u.selfie_image,
-                                adminApprovalStatus: u.adminApprovalStatus || u.admin_approval_status
+                                adminApprovalStatus: u.adminApprovalStatus || u.admin_approval_status,
+                                _pendingTxMap: {}
                             };
                         });
                     }
                 } catch(sErr) {
                     console.warn("Supabase users fetch warning:", sErr);
+                }
+
+                // دریافت واریزی‌های معلق از جدول transactions برای اطمینان کامل
+                try {
+                    const { data: txDeposits } = await supabaseClient
+                        .from('transactions')
+                        .select('*')
+                        .ilike('type', '%deposit%')
+                        .eq('status', 'pending');
+
+                    if (txDeposits && txDeposits.length > 0) {
+                        txDeposits.forEach(tx => {
+                            let uid = tx.user_id || tx.userId;
+                            if (uMap[uid]) {
+                                let txObj = {
+                                    txId: tx.id,
+                                    rawAmount: tx.amount ? (tx.amount / 1.025) : 0,
+                                    amount: tx.amount,
+                                    network: tx.title ? tx.title.replace('واریز ', '') : 'TRC20',
+                                    txHash: tx.description ? tx.description.replace('TxID: ', '') : (tx.tx_hash || tx.txHash || '-'),
+                                    status: 'pending',
+                                    createdAt: tx.created_at || tx.createdAt
+                                };
+                                uMap[uid]._pendingTxMap[tx.id] = txObj;
+                                if (!uMap[uid].pendingDeposit) {
+                                    uMap[uid].pendingDeposit = txObj;
+                                }
+                            }
+                        });
+                    }
+                } catch(txErr) {
+                    console.warn("Transactions fetch warning:", txErr);
                 }
 
                 let tbAct=document.getElementById('tb-act'), tbPend=document.getElementById('tb-pend'), tbBan=document.getElementById('tb-ban'), tbW=document.getElementById('tb-withdraw'), tbD=document.getElementById('tb-deposit');
@@ -1080,12 +1108,14 @@
                     let isBanned = (u.status==='cancelled'||u.status==='banned'||u.isBanned===true);
                     let hasPend = (u.pendingEmail||u.newEmail||u.selfieImage||u.adminApprovalStatus==='pending');
 
-                    if(u.pendingDeposit && u.pendingDeposit.status === 'pending'){
+                    // افزودن واریزهای معلق
+                    if (u.pendingDeposit && u.pendingDeposit.status === 'pending') {
                         totD++;
-                        depositList.push({ uid, u, idCode, nameStr, data: u.pendingDeposit });
+                        depositList.push({ uid, u, idCode, nameStr, data: u.pendingDeposit, txId: u.pendingDeposit.txId || null });
                     }
 
-                    if(u.pendingWithdrawal && u.pendingWithdrawal.status === 'pending'){
+                    // افزودن برداشت‌های معلق
+                    if (u.pendingWithdrawal && u.pendingWithdrawal.status === 'pending') {
                         totW++;
                         withdrawList.push({ uid, u, idCode, nameStr, data: u.pendingWithdrawal });
                     }
@@ -1198,27 +1228,33 @@
             if(list.length===0){box.innerHTML=`<tr><td colspan="2" style="text-align:center;padding:20px;color:#94a3b8">هیچ درخواست واریزی وجود ندارد.</td></tr>`;return;}
             let html='';
             list.forEach(i=>{
-                let dt = formatDate(i.data.createdAt || i.data.timestamp);
+                let dt = formatDate(i.data.createdAt || i.data.created_at || i.data.timestamp);
+                let txIdAttr = i.txId ? `'${i.txId}'` : 'null';
                 html+=`<tr>
-                    <td><span class="badge-id" onclick="openDepositDetails('${i.uid}')">${i.idCode}</span></td>
+                    <td><span class="badge-id" onclick="openDepositDetails('${i.uid}', ${txIdAttr})">${i.idCode}</span></td>
                     <td>${dt}</td>
                 </tr>`;
             });
             box.innerHTML=html;
         }
 
-        window.openDepositDetails = uid => {
+        window.openDepositDetails = (uid, txId = null) => {
             let u = uMap[uid];
-            if (!u || !u.pendingDeposit) return;
-            let dData = u.pendingDeposit;
+            if (!u) return;
+            let dData = u.pendingDeposit || u.pending_deposit;
+            if (!dData && txId && u._pendingTxMap) {
+                dData = u._pendingTxMap[txId];
+            }
+            if (!dData) return;
+
             let idCode = getUserIdCode(uid);
             let nameStr = getName(u);
             let amtWithFee = Number(dData.amount||0);
-            let rawAmt = Number(dData.rawAmount || (amtWithFee / 1.025));
+            let rawAmt = Number(dData.rawAmount || (amtWithFee > 0 ? (amtWithFee / 1.025) : 0));
             let adminProfitFee = amtWithFee - rawAmt;
             let net = dData.network || 'TRC20';
-            let tx = dData.txHash || '-';
-            let dt = formatDate(dData.createdAt || dData.timestamp);
+            let tx = dData.txHash || (dData.description ? dData.description.replace('TxID: ', '') : '-');
+            let dt = formatDate(dData.createdAt || dData.created_at || dData.timestamp);
 
             document.getElementById('item-modal-title').innerText = 'جزئیات درخواست واریز وجه';
             document.getElementById('item-details-body').innerHTML = `
@@ -1232,27 +1268,35 @@
                 <div class="detail-row"><span>تاریخ و ساعت:</span><span>${dt}</span></div>
             `;
 
+            let safeTxId = txId ? `'${txId}'` : 'null';
             document.getElementById('item-modal-actions').innerHTML = `
-                <button class="btn-action btn-approve" style="flex:1;justify-content:center;padding:10px" onclick="closeModal('m-item-details');handleDeposit('${uid}', true, ${rawAmt}, ${adminProfitFee})"><i class="fas fa-check"></i> تایید و شارژ</button>
-                <button class="btn-action btn-reject" style="flex:1;justify-content:center;padding:10px" onclick="closeModal('m-item-details');handleDeposit('${uid}', false, ${rawAmt}, 0)"><i class="fas fa-times"></i> رد درخواست</button>
+                <button class="btn-action btn-approve" style="flex:1;justify-content:center;padding:10px" onclick="closeModal('m-item-details');handleDeposit('${uid}', true, ${rawAmt}, ${adminProfitFee}, ${safeTxId})"><i class="fas fa-check"></i> تایید و شارژ</button>
+                <button class="btn-action btn-reject" style="flex:1;justify-content:center;padding:10px" onclick="closeModal('m-item-details');handleDeposit('${uid}', false, ${rawAmt}, 0, ${safeTxId})"><i class="fas fa-times"></i> رد درخواست</button>
             `;
             document.getElementById('m-item-details').classList.add('show');
         };
 
-        window.handleDeposit=async(uid, approve, rawAmount, adminProfitFee)=>{
+        window.handleDeposit = async (uid, approve, rawAmount, adminProfitFee, txId = null) => {
             let u = uMap[uid];
-            if(approve){
-                if(!confirm(`تایید واریز و شارژ حساب به مبلغ درخواستی $${rawAmount.toFixed(2)} (سود ادمین: $${adminProfitFee.toFixed(2)})؟`)) return;
+            if (approve) {
+                if (!confirm(`تایید واریز و شارژ حساب به مبلغ درخواستی $${rawAmount.toFixed(2)} (سود ادمین: $${adminProfitFee.toFixed(2)})؟`)) return;
                 
                 let newBal = Number(u?.balance || 0) + rawAmount;
-                let newDep = Number(u?.depositAmount || 0) + rawAmount;
+                let newDep = Number(u?.depositAmount || u?.deposit_amount || 0) + rawAmount;
 
                 await supabaseClient.from('users').update({ 
                     balance: newBal, 
                     depositAmount: newDep,
+                    deposit_amount: newDep,
                     pendingDeposit: null,
                     pending_deposit: null 
                 }).eq('id', uid);
+
+                if (txId) {
+                    await supabaseClient.from('transactions').update({ status: 'success', title: 'واریز تایید شده' }).eq('id', txId);
+                } else {
+                    await supabaseClient.from('transactions').update({ status: 'success' }).eq('user_id', uid).eq('type', 'deposit').eq('status', 'pending');
+                }
 
                 try {
                     const { data: statsData } = await supabaseClient.from('system_stats').select('id, total_admin_profit').maybeSingle();
@@ -1267,8 +1311,14 @@
                 await sendNotificationToUser(uid, 'تایید واریزی', `درخواست واریز شما به مبلغ $${rawAmount.toFixed(2)} با موفقیت تایید شد و حساب شما شارژ گردید.`);
                 showToast(`واریزی تایید شد. مبلغ $${rawAmount.toFixed(2)} به کاربر اضافه شد.`);
             } else {
-                if(!confirm(`رد درخواست واریز به مبلغ $${rawAmount.toFixed(2)}؟`)) return;
+                if (!confirm(`رد درخواست واریز به مبلغ $${rawAmount.toFixed(2)}؟`)) return;
                 await supabaseClient.from('users').update({ pendingDeposit: null, pending_deposit: null }).eq('id', uid);
+
+                if (txId) {
+                    await supabaseClient.from('transactions').update({ status: 'failed', title: 'واریز رد شده' }).eq('id', txId);
+                } else {
+                    await supabaseClient.from('transactions').update({ status: 'failed' }).eq('user_id', uid).eq('type', 'deposit').eq('status', 'pending');
+                }
 
                 await sendNotificationToUser(uid, 'رد درخواست واریزی', `درخواست واریز شما به مبلغ $${rawAmount.toFixed(2)} توسط مدیریت رد شد.`);
                 showToast('درخواست واریز رد شد.');
@@ -1375,7 +1425,7 @@
         };
 
         window.toggleBan=async(uid,ban)=>{
-            if(!confirm(ban?'مسدودسازی این حساب؟':'فعال‌سازی مجدد حساب؟'))return;
+            if(!confirm(ban?'مسدودسازی این حساب؟':'فعال‌‌سازی مجدد حساب؟'))return;
             await supabaseClient.from('users').update({
                 status: ban ? "cancelled" : "active",
                 isBanned: ban,
@@ -1441,15 +1491,12 @@
 
             let payload = {};
 
-            // Fullname
             if ('full_name' in raw) payload.full_name = nameVal;
             if ('fullname' in raw) payload.fullname = nameVal;
             if (!('full_name' in raw || 'fullname' in raw)) payload.fullname = nameVal;
 
-            // Email
             payload.email = emailVal;
 
-            // Phone
             if ('phone' in raw) payload.phone = phoneVal;
             if ('phone_number' in raw) payload.phone_number = phoneVal;
             if ('mobile' in raw) payload.mobile = phoneVal;
@@ -1457,10 +1504,8 @@
                 payload.phone = phoneVal;
             }
 
-            // Balance
             if ('balance' in raw) payload.balance = balVal;
 
-            // Platform Profit
             if ('platform_profit' in raw) payload.platform_profit = profitVal;
             else if ('profit' in raw) payload.profit = profitVal;
 
@@ -1471,7 +1516,6 @@
                     .eq('id', uid);
 
                 if (error) {
-                    console.warn("ویرایش اول ناموفق بود، اجرای متد جایگزین:", error);
                     const fallbackPayload1 = {
                         fullname: nameVal,
                         email: emailVal,
@@ -1593,7 +1637,7 @@
 
         setInterval(() => {
             loadData();
-        }, 300000);
+        }, 30000);
 
         document.getElementById('logout-btn').onclick = async () => {
             await supabaseClient.auth.signOut().catch(() => {});
