@@ -269,6 +269,11 @@
         document.getElementById('ref-btn').onclick = () => { capIn.value = ''; drawCap(); chk(); };
         cv.onclick = () => { drawCap(); chk(); };
         
+        // تابع تولید کد دعوت اختصاصی برای کاربر جدید
+        function generateUserReferralCode() {
+            return 'ZX-' + Math.floor(100000 + Math.random() * 900000);
+        }
+
         form.onsubmit = async (e) => {
             e.preventDefault();
             const t = langData[currentLang] || langData.en;
@@ -284,7 +289,7 @@
             try {
                 const referrerFinalValue = refCodeValue || 'SYSTEM';
 
-                // ۱. ثبت‌نام در Supabase Auth (ذخیره اطلاعات در متادیتا)
+                // ۱. ثبت‌نام در Supabase Auth
                 const { data: authData, error: authError } = await supabaseClient.auth.signUp({
                     email: emailValue,
                     password: passIn.value,
@@ -299,10 +304,29 @@
 
                 if (authError) throw authError;
 
-                // ۲. به‌روزرسانی یا ذخیره ایمن اطلاعات کاربر در دیتابیس با هدیه ۲ دلاری
                 if (authData?.user) {
+                    const userId = authData.user.id;
+                    const myNewReferralCode = generateUserReferralCode();
+
+                    // ۲. ذخیره مستقیم اطلاعات شبکه و کد دعوت در جدول profiles
+                    const { error: profileErr } = await supabaseClient
+                        .from('profiles')
+                        .insert([
+                            {
+                                id: userId,
+                                email: emailValue,
+                                referral_code: myNewReferralCode,
+                                referred_by: referrerFinalValue
+                            }
+                        ]);
+
+                    if (profileErr) {
+                        console.error('خطا در ثبت پروفایل:', profileErr);
+                    }
+
+                    // ۳. به‌روزرسانی یا ذخیره اطلاعات کاربر در دیتابیس (جدول users)
                     const userPayload = {
-                        id: authData.user.id,
+                        id: userId,
                         email: emailValue,
                         fullname: fullNameValue,
                         balance: 2
@@ -315,7 +339,7 @@
                             fullname: fullNameValue,
                             balance: 2
                         })
-                        .eq('id', authData.user.id);
+                        .eq('id', userId);
 
                     if (updateErr) {
                         await supabaseClient
@@ -324,7 +348,7 @@
                     }
                 }
 
-                // ۳. خروج از حساب جهت بستن نشست فعال و هدایت به صفحه ورود اصلی (index.html)
+                // ۴. خروج از حساب جهت بستن نشست فعال و هدایت به صفحه ورود اصلی (index.html)
                 await supabaseClient.auth.signOut();
 
                 msg.textContent = t.succ;
