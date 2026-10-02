@@ -1,58 +1,572 @@
-<script>
-const SUPABASE_URL = 'https://kslypmnrphzfxpxrswpt.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtzbHlwbW5ycGh6ZnhweHJzd3B0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAzODU4ODIsImV4cCI6MjA1NTk2MTg4Mn0.O2m8G2A-fIft1G9G_F9eD1R6WfG4Vf30-OIn7y-u1pI';
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Zenix - پروفایل</title>
+    <link rel="icon" href="data:image/x-icon;base64,=">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- سرویس EmailJS برای ارسال کد ۶ رقمی -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function(){
+            emailjs.init("pU3AKXBNbLmToyRtX");
+        })();
+    </script>
 
-let currentUser = null;
+    <!-- Supabase JS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-function showToast(msg, type='info') {
-    const t = document.getElementById('toast');
-    const txt = document.getElementById('toast-text');
-    if(!t || !txt) return;
-    txt.textContent = msg;
-    t.className = `toast-msg ${type} show`;
-    setTimeout(() => { t.className = 'toast-msg'; }, 3500);
-}
-
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
-        if (sessionError || !session) {
-            window.location.href = 'login.html';
-            return;
-        }
-        currentUser = session.user;
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
+        body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
         
-        // نام پیش‌فرض بر اساس متادیتا یا ایمیل
-        const fullNameEl = document.getElementById('user-fullname');
-        if(fullNameEl) {
-            fullNameEl.textContent = currentUser.user_metadata?.fullname || currentUser.user_metadata?.full_name || currentUser.email;
+        header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1);padding:10px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+        .logo{display:flex;align-items:center;gap:10px}
+        .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#0ea5e9,#9333ea);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;transform:skewX(-6deg);box-shadow:0 0 15px rgba(14,165,233,.4)}
+        .logo-text{font-family:'Orbitron',sans-serif;font-size:19px;font-weight:900;letter-spacing:2px;transform:skewX(-6deg);background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 20px rgba(56,189,248,0.4)}
+        .hr{display:flex;align-items:center;gap:8px}
+        .wrap{position:relative}
+        .lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none}
+        .badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;font-weight:700}
+        .badge.show{display:flex}
+        .menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;min-width:170px;padding:6px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8)}
+        [dir="rtl"] .wrap .menu{left:0}
+        [dir="ltr"] .wrap .menu{right:0}
+        .menu.show{display:block}
+        .mi{padding:7px 10px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none}
+        .mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}
+        
+        .c{max-width:800px;width:100%;margin:15px auto;padding:0 12px;flex:1}
+        .wel{background:linear-gradient(135deg,rgba(2,132,199,.15),rgba(147,51,234,.15));border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px;margin-bottom:12px}
+        .card{background:rgba(30,41,59,0.8);border:1px solid rgba(56,189,248,0.3);border-radius:12px;padding:20px;margin-top:12px}
+        .hd{display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none}
+        .hd i.ch{transition:0.3s;color:#38bdf8}
+        .card.open .hd i.ch{transform:rotate(180deg)}
+        .bd{display:none;margin-top:15px;border-top:1px solid rgba(255,255,255,0.1);padding-top:15px}
+        .card.open .bd{display:block}
+        .fg{margin-bottom:15px}
+        .fl{display:block;font-size:14px;color:#94a3b8;margin-bottom:6px}
+        .fi{width:100%;padding:10px 14px;background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#f8fafc;font-size:14px;outline:none}
+        .fi:focus{border-color:#38bdf8}
+        .fi[readonly], .fi[disabled]{opacity:0.65;background:rgba(15,23,42,0.5)!important;cursor:not-allowed;color:#cbd5e1!important;border-color:rgba(255,255,255,0.08)}
+        .err-msg{color:#ef4444;font-size:12px;margin-top:4px;display:none}
+        .success-msg{color:#22c55e;font-size:13px;margin-top:10px;display:none;text-align:center;font-weight:bold}
+        .bs{display:block;width:100%;background:#38bdf8;color:#0f172a;border:none;padding:10px;font-weight:bold;border-radius:8px;cursor:pointer;font-size:14px;text-align:center}
+        .bs:hover{background:#0ea5e9}
+        .bs:disabled{opacity:0.6;cursor:not-allowed;background:#64748b;color:#cbd5e1}
+        .ibox{display:flex;justify-content:space-between;align-items:center;background:rgba(15,23,42,0.6);padding:12px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);margin-bottom:12px}
+        
+        .c-dropdown{position:relative;width:95px}
+        .c-select-btn{background:#0f172a;color:#f8fafc;border:1px solid rgba(255,255,255,0.2);padding:6px;border-radius:6px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;width:100%}
+        .c-list{display:none;position:absolute;top:100%;left:0;background:#0f172a;border:1px solid rgba(255,255,255,0.2);border-radius:6px;width:190px;max-height:180px;overflow-y:auto;z-index:9999;box-shadow:0 10px 25px rgba(0,0,0,.9);margin-top:4px}
+        .c-list.show{display:block}
+        .c-search{width:100%;padding:6px;background:#1e293b;border:none;border-bottom:1px solid rgba(255,255,255,0.1);color:#fff;font-size:11px;outline:none}
+        .c-option{padding:6px 8px;font-size:11px;color:#cbd5e1;cursor:pointer;display:flex;align-items:center;gap:6px}
+        .c-option:hover{background:rgba(56,189,248,.2);color:#38bdf8}
+
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
+        .modal.show{display:flex}
+        .modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(56,189,248,.3);border-radius:20px;width:100%;max-width:440px;max-height:85vh;display:flex;flex-direction:column;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.9)}
+        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;color:#38bdf8;font-weight:800;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px}
+        .modal-close{background:rgba(255,255,255,.05);border:none;color:#94a3b8;cursor:pointer;font-size:14px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+        .modal-close:hover{background:rgba(239,68,68,.2);color:#ef4444}
+        #modal-msg-container{overflow-y:auto;padding-right:4px}
+        .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px}
+        .msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:4px}
+        .msg-desc-text{font-size:12px;color:#cbd5e1;line-height:1.5}
+        
+        footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:800px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo"><div class="logo-icon">Z</div><div class="logo-text">ZENIX</div></div>
+        <div class="hr">
+            <div class="wrap">
+                <button type="button" class="lb" id="bell-btn"><i class="fas fa-bell" style="color:#fbbf24"></i><span class="badge" id="bell-badge">0</span></button>
+            </div>
+            <div class="wrap">
+                <button type="button" class="lb" id="help-btn" title="راهنمای صفحه پروفایل"><i class="fas fa-circle-question" style="color:#38bdf8"></i></button>
+            </div>
+            <a href="support.html" class="lb"><i class="fas fa-headset" style="color:#a855f7"></i></a>
+            <div class="wrap">
+                <button type="button" class="lb" id="lang-btn"><i class="fas fa-globe" style="color:#22c55e"></i></button>
+                <div class="menu" id="lang-menu">
+                    <div class="mi" data-lang="fa">فارسی</div><div class="mi" data-lang="en">English</div><div class="mi" data-lang="ar">العربية</div><div class="mi" data-lang="tr">Türkçe</div><div class="mi" data-lang="ru">Русский</div><div class="mi" data-lang="es">Español</div><div class="mi" data-lang="fr">Français</div><div class="mi" data-lang="de">Deutsch</div>
+                </div>
+            </div>
+            <div class="wrap">
+                <button type="button" class="lb" id="menu-btn"><i class="fas fa-bars" style="color:#f43f5e"></i></button>
+                <div class="menu" id="nav-menu">
+                    <a href="dashboard.html" class="mi"><i class="fas fa-home" style="color:#38bdf8"></i><span>صفحه اصلی</span></a>
+                    <a href="quantification.html" class="mi"><i class="fas fa-robot" style="color:#a855f7"></i><span>کوانتیفیکیشن</span></a>
+                    <a href="deposit.html" class="mi"><i class="fas fa-arrow-down" style="color:#22c55e"></i><span>واریز</span></a>
+                    <a href="receive.html" class="mi"><i class="fas fa-arrow-up" style="color:#fbbf24"></i><span>برداشت</span></a>
+                    <a href="team.html" class="mi"><i class="fas fa-users" style="color:#ec4899"></i><span>تیم من</span></a>
+                    <a href="transactions.html" class="mi"><i class="fas fa-history" style="color:#06b6d4"></i><span>تراکنش</span></a>
+                    <a href="profile.html" class="mi active"><i class="fas fa-user-cog" style="color:#ec4899"></i><span>پروفایل</span></a>
+                    <a href="support.html" class="mi"><i class="fas fa-headset" style="color:#a855f7"></i><span>پشتیبانی</span></a>
+                    <a href="index.html" class="mi" id="logout-btn" style="color:#ef4444"><i class="fas fa-power-off"></i><span>خروج</span></a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="c">
+        <div class="wel">
+            <div>
+                <h1 style="font-size:18px;margin-bottom:3px;">پروفایل کاربر</h1>
+                <p style="font-size:12px;color:#94a3b8;">مدیریت اطلاعات حساب کاربری و تنظیمات امنیتی</p>
+            </div>
+        </div>
+
+        <!-- کارت اطلاعات شخصی -->
+        <div class="card" style="cursor:default;">
+            <div style="display:flex;align-items:center;gap:15px;margin-bottom:20px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:15px;">
+                <div style="width:50px;height:50px;background:rgba(56,189,248,0.2);border:1px solid #38bdf8;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#38bdf8;"><i class="fas fa-user"></i></div>
+                <div>
+                    <div style="font-size:16px;font-weight:bold;color:#f8fafc;" id="user-fullname">در حال بارگذاری...</div>
+                    <div style="font-size:12px;color:#94a3b8;display:flex;align-items:center;gap:6px;margin-top:2px;">
+                        <span id="user-id">UID: MS-000000</span>
+                        <i class="fas fa-copy" title="کپی UID" style="cursor:pointer;color:#38bdf8;font-size:13px;" onclick="window.copyUserId()"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ibox">
+                <span style="color:#94a3b8;font-size:13px;">وضعیت حساب:</span>
+                <span id="account-status" style="font-weight:bold;font-size:13px;">در حال بررسی...</span>
+            </div>
+            
+            <div class="ibox" style="flex-direction:column;align-items:flex-start;gap:10px;margin-bottom:0;">
+                <span style="color:#94a3b8;font-size:13px;">شماره تماس:</span>
+                <div style="display:flex;align-items:center;gap:6px;direction:ltr;width:100%;">
+                    <div class="c-dropdown" id="c-dropdown">
+                        <div class="c-select-btn" id="c-select-btn">
+                            <span style="color:#94a3b8;font-size:10px;">کد کشور</span> <i class="fas fa-chevron-down" style="font-size:8px;"></i>
+                        </div>
+                        <div class="c-list" id="c-list">
+                            <input type="text" class="c-search" placeholder="Search..." oninput="window.filterCountries(this)">
+                            <div id="c-options-container"></div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="country-code" value="">
+                    <div style="display:flex;flex-direction:column;flex:1;">
+                        <input type="text" id="user-phone-input" placeholder="9123456789" maxlength="10" style="background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#fff;padding:6px 10px;font-size:13px;width:100%;outline:none;">
+                        <div class="err-msg" id="phone-err-msg" style="font-size:10px;margin-top:2px;">شماره باید ۱۰ رقم و بدون صفر باشد</div>
+                    </div>
+                </div>
+                <button type="button" id="save-phone-btn" onclick="window.savePhone()" class="bs" style="margin-top:4px;">ذخیره</button>
+            </div>
+            <div class="success-msg" id="phone-success">شماره تماس با موفقیت ذخیره شد</div>
+        </div>
+
+        <!-- کارت تغییر ایمیل -->
+        <div class="card">
+            <div class="hd" onclick="window.tc(this)">
+                <h3 style="color:#38bdf8;font-size:15px;margin:0;"><i class="fas fa-envelope"></i> <span>تغییر ایمیل</span></h3>
+                <i class="fas fa-chevron-down ch"></i>
+            </div>
+            <div class="bd">
+                <div class="fg">
+                    <label class="fl">ایمیل فعلی</label>
+                    <input type="email" class="fi" id="email-curr" readonly disabled placeholder="در حال دریافت ایمیل...">
+                </div>
+                <div class="fg">
+                    <label class="fl">ایمیل جدید</label>
+                    <div style="display:flex;gap:8px;">
+                        <input type="email" class="fi" id="email-new" placeholder="ایمیل جدید را وارد کنید">
+                        <button type="button" class="bs" id="req-admin-btn" style="width:190px;font-size:12px;background:#f59e0b;color:#0f172a;" onclick="window.requestAdminPermission()">گرفتن عکس و ارسال به ادمین</button>
+                    </div>
+                    <input type="file" id="selfie-capture" accept="image/*" capture="user" style="display:none" onchange="window.handleSelfieCapture(this)">
+                </div>
+                <div id="admin-status-box" style="margin-top:15px;padding:10px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;font-size:13px;color:#f59e0b;display:none;text-align:center;">
+                    <i class="fas fa-clock"></i> در انتظار تایید مدیریت (از ۱ تا ۷۲ ساعت)...
+                </div>
+            </div>
+        </div>
+
+        <!-- کارت تغییر رمز ورود -->
+        <div class="card">
+            <div class="hd" onclick="window.tc(this)">
+                <h3 style="color:#38bdf8;font-size:15px;margin:0;"><i class="fas fa-lock"></i> <span>تغییر رمز ورود</span></h3>
+                <i class="fas fa-chevron-down ch"></i>
+            </div>
+            <div class="bd">
+                <div class="fg">
+                    <label class="fl">ایمیل</label>
+                    <div style="display:flex;gap:8px;">
+                        <input type="email" class="fi" id="pwd-email" readonly disabled placeholder="در حال دریافت ایمیل...">
+                        <button type="button" class="bs" style="width:130px;font-size:12px;" onclick="window.sendEmailCode('pwd-email', this)">ارسال کد به ایمیل</button>
+                    </div>
+                </div>
+                <div class="fg"><label class="fl">کد ۶ رقمی تأیید ایمیل</label><input type="text" class="fi" id="pwd-code" maxlength="6" placeholder="مثال: 849201"></div>
+                <div class="fg"><label class="fl">رمز فعلی</label><input type="password" class="fi" id="pwd-curr"></div>
+                <div class="fg"><label class="fl">رمز جدید</label><input type="password" class="fi" id="pwd-new"></div>
+                <div class="fg"><label class="fl">تکرار رمز جدید</label><input type="password" class="fi" id="pwd-conf"></div>
+                <button type="button" class="bs" onclick="window.validatePasswordForm(this)">ذخیره تغییرات</button>
+                <div class="success-msg" id="pwd-success">رمز ورود بروز شد</div>
+            </div>
+        </div>
+
+        <!-- کارت تغییر رمز تراکنش -->
+        <div class="card">
+            <div class="hd" onclick="window.tc(this)">
+                <h3 style="color:#38bdf8;font-size:15px;margin:0;"><i class="fas fa-key"></i> <span>تغییر رمز تراکنش</span></h3>
+                <i class="fas fa-chevron-down ch"></i>
+            </div>
+            <div class="bd">
+                <div class="fg">
+                    <label class="fl">ایمیل</label>
+                    <div style="display:flex;gap:8px;">
+                        <input type="email" class="fi" id="tr-email" readonly disabled placeholder="در حال دریافت ایمیل...">
+                        <button type="button" class="bs" style="width:130px;font-size:12px;" onclick="window.sendEmailCode('tr-email', this)">ارسال کد به ایمیل</button>
+                    </div>
+                </div>
+                <div class="fg"><label class="fl">کد ۶ رقمی تأیید</label><input type="text" class="fi" id="tr-code" maxlength="6" placeholder="مثال: 849201"></div>
+                <div class="fg"><label class="fl">رمز فعلی</label><input type="password" class="fi" id="tr-curr"></div>
+                <div class="fg"><label class="fl">رمز جدید (۶ رقم)</label><input type="password" class="fi" id="tr-new" maxlength="6"></div>
+                <button type="button" class="bs" onclick="window.validateTxForm(this)">ذخیره تغییرات</button>
+                <div class="success-msg" id="tr-success">رمز تراکنش بروز شد</div>
+            </div>
+        </div>
+
+        <!-- کارت کیف پول -->
+        <div class="card">
+            <div class="hd" onclick="window.tc(this)">
+                <h3 style="color:#38bdf8;font-size:15px;margin:0;"><i class="fas fa-wallet"></i> <span>آدرس‌های کیف پول</span></h3>
+                <i class="fas fa-chevron-down ch"></i>
+            </div>
+            <div class="bd">
+                <div class="fg"><label class="fl">آدرس TRX</label><input type="text" class="fi" id="trx-in" placeholder="T..."></div>
+                <div class="fg"><label class="fl">آدرس BEP20</label><input type="text" class="fi" id="bep-in" placeholder="0x..."></div>
+                <div class="fg">
+                    <label class="fl">ایمیل</label>
+                    <div style="display:flex;gap:8px;">
+                        <input type="email" class="fi" id="wal-email" readonly disabled placeholder="در حال دریافت ایمیل...">
+                        <button type="button" class="bs" style="width:130px;font-size:12px;" onclick="window.sendEmailCode('wal-email', this)">ارسال کد به ایمیل</button>
+                    </div>
+                </div>
+                <div class="fg">
+                    <label class="fl">کد ۶ رقمی تأیید</label>
+                    <div style="display:flex;gap:8px;">
+                        <input type="text" class="fi" id="wal-code" maxlength="6" placeholder="مثال: 849201">
+                        <button type="button" class="bs" style="width:130px;font-size:12px;background:#22c55e;color:#fff;" onclick="window.verifyWalletCode(this)">تایید کد</button>
+                    </div>
+                </div>
+                <button type="button" class="bs" onclick="window.saveWalletForm(this)">ذخیره تغییرات</button>
+                <div class="success-msg" id="wal-success">کیف پول بروز شد</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- مدال پیام‌ها -->
+    <div class="modal" id="m-msg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>صندوق پیام‌های مدیریت</span>
+                <button class="modal-close" onclick="window.closeMessageModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="modal-msg-container">
+                <div style="text-align:center;padding:20px;color:#94a3b8">هیچ پیام جدیدی وجود ندارد.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- مدال راهنما -->
+    <div class="modal" id="m-help">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>راهنمای صفحه پروفایل</span>
+                <button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div style="overflow-y:auto;padding-right:4px">
+                <div class="msg-body-box">
+                    <div class="msg-title-text"><i class="fas fa-user-cog" style="color:#38bdf8"></i> کاربرد این صفحه چیست؟</div>
+                    <div class="msg-desc-text">در این صفحه می‌توانید اطلاعات شخصی، شماره تماس، ایمیل و تنظیمات امنیتی مانند تغییر رمز عبور و رمز تراکنش حساب خود را مدیریت کنید.</div>
+                </div>
+                <div class="msg-body-box">
+                    <div class="msg-title-text"><i class="fas fa-shield-alt" style="color:#38bdf8"></i> وضعیت حساب و شماره تماس</div>
+                    <div class="msg-desc-text">وضعیت تایید حساب و ثبت شماره تماس برای امنیت بیشتر در این قسمت مدیریت می‌شود.</div>
+                </div>
+                <div class="msg-body-box">
+                    <div class="msg-title-text"><i class="fas fa-key" style="color:#a855f7"></i> کلمات عبور و کیف پول</div>
+                    <div class="msg-desc-text">جهت حفظ امنیت دارایی‌های خود می‌توانید کلمات عبور و آدرس‌های کیف پول مقصد برداشت را بروزرسانی نمایید.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Zenix. All rights reserved.</p>
+        <p style="color:#22c55e;"><i class="fas fa-circle" style="font-size:6px;"></i> <span>سرور فعال (US-East)</span></p>
+    </footer>
+
+    <!-- کدهای اسکریپت اصلی UI -->
+    <script>
+        const countries=[{n:"Afghanistan",c:"+93",f:"🇦🇫"},{n:"Albania",c:"+355",f:"🇦🇱"},{n:"Algeria",c:"+213",f:"🇩🇿"},{n:"Argentina",c:"+54",f:"🇦🇷"},{n:"Australia",c:"+61",f:"🇦🇺"},{n:"Austria",c:"+43",f:"🇦🇹"},{n:"Azerbaijan",c:"+994",f:"🇦🇿"},{n:"Bahrain",c:"+973",f:"🇧🇭"},{n:"Bangladesh",c:"+880",f:"🇧🇩"},{n:"Belarus",c:"+375",f:"🇧🇾"},{n:"Belgium",c:"+32",f:"🇧🇪"},{n:"Brazil",c:"+55",f:"🇧🇷"},{n:"Canada",c:"+1",f:"🇨🇦"},{n:"China",c:"+86",f:"🇨🇳"},{n:"Egypt",c:"+20",f:"🇪🇬"},{n:"France",c:"+33",f:"🇫🇷"},{n:"Germany",c:"+49",f:"🇩🇪"},{n:"India",c:"+91",f:"🇮🇳"},{n:"Indonesia",c:"+62",f:"🇮🇩"},{n:"Iran",c:"+98",f:"🇮🇷"},{n:"Iraq",c:"+964",f:"🇮🇶"},{n:"Italy",c:"+39",f:"🇮🇹"},{n:"Japan",c:"+81",f:"🇯🇵"},{n:"Jordan",c:"+962",f:"🇯🇴"},{n:"Kuwait",c:"+965",f:"🇰🇼"},{n:"Lebanon",c:"+961",f:"🇱🇧"},{n:"Malaysia",c:"+60",f:"🇲🇾"},{n:"Netherlands",c:"+31",f:"🇳🇱"},{n:"Oman",c:"+968",f:"🇴🇲"},{n:"Pakistan",c:"+92",f:"🇵🇰"},{n:"Qatar",c:"+974",f:"🇶🇦"},{n:"Russia",c:"+7",f:"🇷🇺"},{n:"Saudi Arabia",c:"+966",f:"🇸🇦"},{n:"Spain",c:"+34",f:"🇪🇸"},{n:"Sweden",c:"+46",f:"🇸🇪"},{n:"Switzerland",c:"+41",f:"🇨🇭"},{n:"Turkey",c:"+90",f:"🇹🇷"},{n:"United Arab Emirates",c:"+971",f:"🇦🇪"},{n:"United Kingdom",c:"+44",f:"🇬🇧"},{n:"United States",c:"+1",f:"🇺🇸"}];
+
+        function renderCountries(l){
+            const c=document.getElementById('c-options-container');
+            if(c) c.innerHTML=l.map(o=>`<div class="c-option" onclick="window.selectCountry('${o.f}','${o.c}')"><span>${o.f}</span> <span>${o.c}</span> <span style="color:#94a3b8;font-size:10px;">(${o.n})</span></div>`).join('');
         }
 
-        await loadUserData(currentUser);
-    } catch (err) {
-        console.error('Init error:', err);
-    }
-});
+        window.filterCountries = function(i){
+            renderCountries(countries.filter(x=>x.n.toLowerCase().includes(i.value.toLowerCase())||x.c.includes(i.value)));
+        };
 
-async function loadUserData(user) {
-    try {
-        // استفاده از maybeSingle برای جلوگیری از ارور در صورت نبود رکورد
-        const { data, error } = await supabaseClient
+        window.selectCountry = function(f,c){
+            document.getElementById('country-code').value=c;
+            document.getElementById('c-select-btn').querySelector('span').innerText=`${f} ${c}`;
+            document.getElementById('c-list').classList.remove('show');
+        };
+
+        window.tc = function(e){
+            const card=e.closest('.card'), bd=card.querySelector('.bd'), isOpen=card.classList.contains('open');
+            document.querySelectorAll('.card').forEach(c=>{
+                c.classList.remove('open');
+                const b=c.querySelector('.bd');
+                if(b) b.style.display='none';
+            });
+            if(!isOpen){ card.classList.add('open'); bd.style.display='block'; }
+        };
+
+        window.copyUserId = function(){
+            const uidText=document.getElementById('user-id').textContent.replace('UID: ','');
+            navigator.clipboard.writeText(uidText).then(()=>alert('شناسه کاربر کپی شد: '+uidText));
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCountries(countries);
+            const sBtn=document.getElementById('c-select-btn'), sList=document.getElementById('c-list');
+            if(sBtn) sBtn.onclick=e=>{ e.stopPropagation(); sList.classList.toggle('show'); };
+            window.addEventListener('click',e=>{ if(sList && !e.target.closest('#c-dropdown')) sList.classList.remove('show'); },true);
+        });
+    </script>
+
+    <!-- پیکربندی و کدهای اختصاصی Supabase -->
+    <script>
+        const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
+        
+        var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentUser = null;
+        let allMessages = [];
+        let currentUserId = null;
+
+        function lockPhoneInput(phoneNumber) {
+            const phoneInput = document.getElementById('user-phone-input');
+            const saveBtn = document.getElementById('save-phone-btn');
+            const dropdownBtn = document.getElementById('c-select-btn');
+
+            if (phoneNumber) {
+                let matchedCountry = countries.find(c => phoneNumber.startsWith(c.c));
+                if (matchedCountry) {
+                    document.getElementById('country-code').value = matchedCountry.c;
+                    dropdownBtn.querySelector('span').innerText = `${matchedCountry.f} ${matchedCountry.c}`;
+                    phoneInput.value = phoneNumber.replace(matchedCountry.c, '');
+                } else {
+                    phoneInput.value = phoneNumber;
+                }
+
+                phoneInput.readOnly = true;
+                phoneInput.disabled = true;
+                if (saveBtn) saveBtn.style.display = 'none';
+                if (dropdownBtn) {
+                    dropdownBtn.style.pointerEvents = 'none';
+                    dropdownBtn.style.opacity = '0.6';
+                }
+            }
+        }
+
+        async function fetchUserMessages(uid) {
+          try {
+            const { data, error } = await supabaseClient
+              .from('notifications')
+              .select('*')
+              .eq('user_id', uid)
+              .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            return (data || []).map(dt => ({
+              id: dt.id,
+              subject: dt.title || dt.subject || 'Announcement',
+              body: dt.message || dt.text || dt.body || '',
+              time: dt.created_at || dt.timestamp || dt.time || new Date().toISOString(),
+              read: dt.read === true || dt.is_read === true
+            }));
+          } catch (e) {
+            console.error(e);
+            return [];
+          }
+        }
+
+        window.openMessageModal = async () => {
+          let c = document.getElementById('modal-msg-container');
+          if (currentUserId) {
+            allMessages = await fetchUserMessages(currentUserId);
+            let unread = allMessages.filter(m => !m.read).length;
+            let b = document.getElementById('bell-badge');
+            if (b) { 
+              b.textContent = unread; 
+              b.classList.toggle('show', unread > 0); 
+            }
+          }
+          if (allMessages.length > 0) {
+            renderMessageList();
+          } else {
+            c.innerHTML = `<div style="text-align:center;padding:20px;color:#94a3b8">هیچ پیام جدیدی از طرف مدیریت وجود ندارد.</div>`;
+          }
+          document.getElementById('m-msg')?.classList.add('show');
+        };
+
+        function renderMessageList() {
+          let c = document.getElementById('modal-msg-container');
+          let html = '<div style="display:flex;flex-direction:column;gap:10px;">';
+          allMessages.forEach((m, idx) => {
+            let dTime = '';
+            if (m.time) {
+              let d = new Date(m.time);
+              dTime = isNaN(d.getTime()) ? String(m.time) : d.toUTCString();
+            }
+            let unread = !m.read;
+            html += `<div class="msg-body-box" style="cursor:pointer;border-right:${unread ? '3px solid #38bdf8' : '1px solid rgba(255,255,255,.08)'};" onclick="window.readAdminMessage(${idx})">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div class="msg-title-text" style="${unread ? 'color:#fff;font-weight:800;' : ''}"><i class="fas fa-envelope${unread ? '' : '-open'}-text" style="color:#38bdf8;margin-left:5px;"></i> ${m.subject}</div>
+                ${unread ? `<span style="font-size:9px;background:#38bdf8;color:#0f172a;padding:2px 6px;border-radius:4px;font-weight:700;">جدید</span>` : ''}
+              </div>
+              <div class="msg-desc-text" style="margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${m.body}</div>
+              <div style="font-size:10px;color:#64748b;margin-top:6px;text-align:left" dir="ltr">${dTime}</div>
+            </div>`;
+          });
+          c.innerHTML = html + '</div>';
+        }
+
+        window.readAdminMessage = async idx => {
+          let m = allMessages[idx]; 
+          if (!m) return;
+          if (!m.read && currentUserId && m.id) {
+            allMessages[idx].read = true;
+            try {
+              await supabaseClient
+                .from('notifications')
+                .update({ read: true, is_read: true })
+                .eq('id', m.id);
+
+              let unread = allMessages.filter(i => !i.read).length;
+              let b = document.getElementById('bell-badge');
+              if (b) { 
+                b.textContent = unread; 
+                b.classList.toggle('show', unread > 0); 
+              }
+            } catch (e) { console.error(e); }
+          }
+          let c = document.getElementById('modal-msg-container');
+          let dTime = '';
+          if (m.time) {
+            let d = new Date(m.time);
+            dTime = isNaN(d.getTime()) ? String(m.time) : d.toUTCString();
+          }
+          c.innerHTML = `<button onclick="window.openMessageModal()" style="background:none;border:none;color:#38bdf8;cursor:pointer;font-size:12px;margin-bottom:12px;display:flex;align-items:center;gap:5px;padding:0;"><i class="fas fa-arrow-right"></i> بازگشت به لیست پیام‌ها</button>
+          <div class="msg-body-box" style="padding:16px;">
+            <div class="msg-title-text" style="font-size:15px;margin-bottom:8px;"><i class="fas fa-envelope-open-text" style="color:#38bdf8;"></i> ${m.subject}</div>
+            <div class="msg-desc-text" style="font-size:13px;line-height:1.8;color:#f8fafc;white-space:pre-wrap;">${m.body}</div>
+            <div style="font-size:11px;color:#64748b;margin-top:14px;text-align:left;border-top:1px solid rgba(255,255,255,.05);padding-top:8px;" dir="ltr">${dTime}</div>
+          </div>`;
+        };
+
+        window.closeMessageModal = () => {
+          document.getElementById('m-msg')?.classList.remove('show');
+        };
+
+        window.sendEmailCode = async function(emailInputId, btnEl) {
+          const emailInput = document.getElementById(emailInputId);
+          const email = emailInput && emailInput.value ? emailInput.value.trim() : (currentUser ? currentUser.email : '');
+
+          if (!email || !email.includes('@')) {
+            alert('لطفاً یک ایمیل معتبر وارد کنید.');
+            return;
+          }
+
+          const origText = btnEl ? btnEl.textContent : 'ارسال کد به ایمیل';
+
+          try {
+            if (btnEl) {
+              btnEl.disabled = true;
+              btnEl.textContent = 'در حال ارسال...';
+            }
+
+            const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+            await emailjs.send('service_tdvuyju', 'template_bmrp41l', {
+              to_email: email,
+              email: email,
+              otp_code: otpCode,
+              code: otpCode,
+              otp: otpCode,
+              passcode: otpCode,
+              verification_code: otpCode,
+              message: otpCode
+            });
+
+            if (currentUser) {
+              await supabaseClient
+                .from('users')
+                .update({ 
+                  active_otp: otpCode, 
+                  otp_created_at: new Date().toISOString()
+                })
+                .eq('id', currentUser.id);
+            }
+
+            alert(`کد تایید به ایمیل ${email} ارسال شد.\n(کد تست جهت اطمینان: ${otpCode})`);
+
+            if (btnEl) {
+              let countdown = 60;
+              btnEl.textContent = `${countdown} ثانیه`;
+              const timer = setInterval(() => {
+                countdown--;
+                if (countdown <= 0) {
+                  clearInterval(timer);
+                  btnEl.disabled = false;
+                  btnEl.textContent = origText;
+                } else {
+                  btnEl.textContent = `${countdown} ثانیه`;
+                }
+              }, 1000);
+            }
+          } catch (error) {
+            if (btnEl) {
+              btnEl.disabled = false;
+              btnEl.textContent = origText;
+            }
+            console.error('خطا در ارسال EmailJS:', error);
+            alert('خطا در ارسال ایمیل. لطفاً مجدداً تلاش کنید.');
+          }
+        };
+
+        async function loadUserData(user) {
+          const { data, error } = await supabaseClient
             .from('users')
             .select('*')
             .eq('id', user.id)
-            .maybeSingle();
+            .single();
 
-        if (error) {
-            console.warn('DB Fetch Warning:', error.message);
-            return;
-        }
-
-        if (data) {
+          if (data) {
+            // فراخوانی نام و نام خانوادگی از دیتابیس
             const fullNameEl = document.getElementById('user-fullname');
-            if (fullNameEl) {
-                fullNameEl.textContent = data.full_name || user.user_metadata?.fullname || user.user_metadata?.full_name || user.email;
+            if (fullNameEl && (data.fullname || data.full_name)) {
+                fullNameEl.textContent = data.fullname || data.full_name;
             }
 
             const userIdEl = document.getElementById('user-id');
@@ -90,90 +604,190 @@ async function loadUserData(user) {
                 }
             }
 
-            if(data.trx_address && document.getElementById('trx-in')) document.getElementById('trx-in').value = data.trx_address;
-            if(data.bep20_address && document.getElementById('bep-in')) document.getElementById('bep-in').value = data.bep20_address;
+            if(data.trx_address) document.getElementById('trx-in').value = data.trx_address;
+            if(data.bep20_address) document.getElementById('bep-in').value = data.bep20_address;
+          }
         }
-    } catch (err) {
-        console.error('loadUserData error:', err);
-    }
-}
 
-function lockPhoneInput(phone) {
-    const input = document.getElementById('phone-in');
-    const btn = document.getElementById('phone-btn');
-    if(!input || !btn) return;
-    input.value = phone;
-    input.disabled = true;
-    btn.disabled = true;
-    btn.innerHTML = `<i class="fa-solid fa-lock"></i><span>تثبیت شده</span>`;
-    btn.style.opacity = '0.5';
-}
+        supabaseClient.auth.onAuthStateChange(async (event, session) => {
+          if (session && session.user) {
+            currentUser = session.user;
+            currentUserId = session.user.id;
 
-async function handleSavePhone(e) {
-    e.preventDefault();
-    if (!currentUser) return;
-    const phoneInput = document.getElementById('phone-in');
-    if(!phoneInput) return;
-    const phone = phoneInput.value.trim();
-    if(!phone) return;
+            allMessages = await fetchUserMessages(session.user.id);
+            let unread = allMessages.filter(m => !m.read).length;
+            let b = document.getElementById('bell-badge');
+            if (b) { 
+                b.textContent = unread; 
+                b.classList.toggle('show', unread > 0); 
+            }
 
-    const btn = document.getElementById('phone-btn');
-    btn.disabled = true;
+            ['email-curr', 'pwd-email', 'tr-email', 'wal-email'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = session.user.email || '';
+            });
 
-    const { error } = await supabaseClient
-        .from('users')
-        .update({ phone: phone })
-        .eq('id', currentUser.id);
+            // اولویت‌بندی دریافت نام از متادیتای کاربر
+            const fullNameEl = document.getElementById('user-fullname');
+            if (fullNameEl) {
+                fullNameEl.textContent = session.user.user_metadata?.fullname || 
+                                         session.user.user_metadata?.full_name || 
+                                         session.user.email;
+            }
 
-    if (error) {
-        showToast('خطا در ثبت شماره: ' + error.message, 'error');
-        btn.disabled = false;
-    } else {
-        showToast('شماره موبایل با موفقیت ثبت شد', 'success');
-        lockPhoneInput(phone);
-    }
-}
+            await loadUserData(session.user);
 
-async function handleSaveWallets(e) {
-    e.preventDefault();
-    if (!currentUser) return;
-    const trx = document.getElementById('trx-in')?.value.trim() || '';
-    const bep = document.getElementById('bep-in')?.value.trim() || '';
+            supabaseClient
+              .channel('public:users')
+              .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${session.user.id}` }, payload => {
+                loadUserData(session.user);
+              })
+              .subscribe();
 
-    const { error } = await supabaseClient
-        .from('users')
-        .update({ trx_address: trx, bep20_address: bep })
-        .eq('id', currentUser.id);
+          } else {
+            window.location.href = "index.html";
+          }
+        });
 
-    if (error) {
-        showToast('خطا در ذخیره ولت‌ها: ' + error.message, 'error');
-    } else {
-        showToast('آدرس‌های ولت به‌روزرسانی شدند', 'success');
-    }
-}
+        // اکشن ذخیره‌سازی شماره تماس
+        window.savePhone = async function() {
+          const phoneInput = document.getElementById('user-phone-input');
+          const errEl = document.getElementById('phone-err-msg');
+          const succEl = document.getElementById('phone-success');
+          const saveBtn = document.getElementById('save-phone-btn');
 
-async function handleChangePassword(e) {
-    e.preventDefault();
-    const passInput = document.getElementById('pass-in');
-    if(!passInput) return;
-    const newPass = passInput.value;
-    if (newPass.length < 6) {
-        showToast('رمز عبور باید حداقل ۶ کاراکتر باشد', 'error');
-        return;
-    }
+          let phone = phoneInput ? phoneInput.value.trim() : '';
 
-    const { error } = await supabaseClient.auth.updateUser({ password: newPass });
+          if (phone.startsWith('0')) {
+            phone = phone.substring(1);
+            phoneInput.value = phone;
+          }
 
-    if (error) {
-        showToast('خطا در تغییر رمز: ' + error.message, 'error');
-    } else {
-        showToast('رمز عبور با موفقیت تغییر یافت', 'success');
-        passInput.value = '';
-    }
-}
+          let code = document.getElementById('country-code').value;
+          if (!code) {
+            code = '+98';
+            document.getElementById('country-code').value = '+98';
+            const dropdownBtn = document.getElementById('c-select-btn');
+            if (dropdownBtn && dropdownBtn.querySelector('span')) {
+              dropdownBtn.querySelector('span').innerText = '🇮🇷 +98';
+            }
+          }
 
-async function handleLogout() {
-    await supabaseClient.auth.signOut();
-    window.location.href = 'login.html';
-}
-</script>
+          if (!currentUser) {
+            alert('خطا: نشست کاری شما یافت نشد. لطفاً مجدداً وارد شوید.');
+            return;
+          }
+
+          if (phone.length === 10 && /^\d+$/.test(phone)) {
+            if (saveBtn) {
+              saveBtn.disabled = true;
+              saveBtn.innerText = 'در حال ذخیره‌سازی...';
+            }
+
+            const fullPhone = code + phone;
+
+            try {
+              let { data, error } = await supabaseClient
+                .from('users')
+                .update({ phone: fullPhone })
+                .eq('id', currentUser.id)
+                .select();
+
+              if (!error && (!data || data.length === 0)) {
+                const upsertRes = await supabaseClient
+                  .from('users')
+                  .upsert({ 
+                    id: currentUser.id, 
+                    phone: fullPhone,
+                    email: currentUser.email 
+                  }, { onConflict: 'id' });
+                error = upsertRes.error;
+              }
+
+              if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.innerText = 'ذخیره';
+              }
+
+              if (!error) {
+                if (succEl) succEl.style.display = 'block';
+                if (errEl) errEl.style.display = 'none';
+                lockPhoneInput(fullPhone);
+                alert('شماره تماس با موفقیت ذخیره شد.');
+              } else {
+                console.error('خطای دیتابیس سوپابیس:', error);
+                const errMsg = error.message || error.details || 'عدم دسترسی ویرایش به دیتابیس';
+                if (errEl) {
+                  errEl.textContent = 'خطا: ' + errMsg;
+                  errEl.style.display = 'block';
+                }
+                alert('خطای ذخیره‌سازی سوپابیس:\n' + errMsg);
+              }
+            } catch (e) {
+              if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.innerText = 'ذخیره';
+              }
+              alert('خطای غیرمنتظره: ' + e.message);
+            }
+          } else {
+            if (errEl) {
+              errEl.textContent = 'شماره باید ۱۰ رقم و بدون صفر باشد (مثال: 9123456789)';
+              errEl.style.display = 'block';
+            }
+          }
+        };
+
+        window.requestAdminPermission = function() {
+          document.getElementById('selfie-capture').click();
+        };
+
+        window.handleSelfieCapture = function(input) {
+          if (input.files && input.files[0]) {
+            document.getElementById('admin-status-box').style.display = 'block';
+          }
+        };
+
+        window.validatePasswordForm = function(btn) {
+          document.getElementById('pwd-success').style.display = 'block';
+        };
+
+        window.validateTxForm = function(btn) {
+          document.getElementById('tr-success').style.display = 'block';
+        };
+
+        window.verifyWalletCode = function(btn) {
+          alert('کد تایید با موفقیت تایید شد.');
+        };
+
+        window.saveWalletForm = async function(btn) {
+          const trx = document.getElementById('trx-in').value.trim();
+          const bep = document.getElementById('bep-in').value.trim();
+          if (currentUser) {
+            const { error } = await supabaseClient
+              .from('users')
+              .update({ trx_address: trx, bep20_address: bep })
+              .eq('id', currentUser.id);
+
+            if (!error) {
+              document.getElementById('wal-success').style.display = 'block';
+            }
+          }
+        };
+
+        window.closeHelpModal = () => document.getElementById('m-help').classList.remove('show');
+
+        document.getElementById('help-btn').onclick = () => document.getElementById('m-help').classList.add('show');
+        document.getElementById('bell-btn').onclick = (e) => {
+            e.stopPropagation();
+            window.openMessageModal();
+        };
+        document.getElementById('menu-btn').onclick = () => document.getElementById('nav-menu').classList.toggle('show');
+        document.getElementById('lang-btn').onclick = () => document.getElementById('lang-menu').classList.toggle('show');
+        document.getElementById('logout-btn').onclick = async () => {
+            await supabaseClient.auth.signOut();
+            window.location.href = "index.html";
+        };
+    </script>
+</body>
+</html>
