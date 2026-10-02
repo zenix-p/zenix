@@ -1040,12 +1040,13 @@
                             let uid = u.id || u.uid;
                             let meta = u.raw_user_meta_data || u.user_metadata || {};
                             let nameVal = u.fullname || u.fullName || u.full_name || u.name || meta.fullname || meta.fullName || meta.full_name || u.email?.split('@')[0] || 'کاربر جدید';
-                            
+                            let phoneVal = u.phone || u.phone_number || u.mobile || meta.phone || meta.phone_number || '-';
+
                             uMap[uid] = {
                                 id: uid,
                                 fullname: nameVal,
                                 email: u.email || meta.email || '',
-                                phone: u.phone || meta.phone || '-',
+                                phone: phoneVal,
                                 balance: u.balance !== undefined ? Number(u.balance) : 0,
                                 platformProfit: u.platformProfit !== undefined ? Number(u.platformProfit) : Number(u.profit || u.platform_profit || 0),
                                 status: u.status || 'active',
@@ -1444,10 +1445,12 @@
 
         window.openE=uid=>{
             let u=uMap[uid];
+            if(!u) return;
             document.getElementById('e-uid').value=uid;
             document.getElementById('e-name').value=getName(u);
             document.getElementById('e-email').value=u.email||'';
-            document.getElementById('e-phone').value=u.phone||'';
+            let currentPhone = (u.phone && u.phone !== '-') ? u.phone : (u.phone_number || u.mobile || u.phoneNumber || '');
+            document.getElementById('e-phone').value=currentPhone;
             document.getElementById('e-bal').value=u.balance||0;
             document.getElementById('e-profit').value=u.platformProfit || u.profit || 0;
             document.getElementById('m-edit').classList.add('show');
@@ -1456,20 +1459,69 @@
         document.getElementById('f-edit').onsubmit=async e=>{
             e.preventDefault();
             let uid = document.getElementById('e-uid').value;
-            let payload = {
-                fullname:document.getElementById('e-name').value,
-                email:document.getElementById('e-email').value,
-                phone:document.getElementById('e-phone').value,
-                balance:parseFloat(document.getElementById('e-bal').value)||0,
-                platformProfit:parseFloat(document.getElementById('e-profit').value)||0,
-                profit:parseFloat(document.getElementById('e-profit').value)||0
-            };
+            let u = uMap[uid] || {};
+            let nameVal = document.getElementById('e-name').value;
+            let emailVal = document.getElementById('e-email').value;
+            let phoneVal = document.getElementById('e-phone').value;
+            let balVal = parseFloat(document.getElementById('e-bal').value) || 0;
+            let profitVal = parseFloat(document.getElementById('e-profit').value) || 0;
 
-            await supabaseClient.from('users').update(payload).eq('id', uid);
+            // ساخت هوشمند پلود بر اساس ستون‌های دیتابیس کاربر جهت اعمال دقیق در تمام صفحات پلتفرم
+            let payload = {};
 
-            closeModal('m-edit'); 
-            showToast('اطلاعات کاربر با موفقیت ویرایش شد.');
-            loadData();
+            if ('fullname' in u) payload.fullname = nameVal;
+            if ('full_name' in u) payload.full_name = nameVal;
+            if ('fullName' in u) payload.fullName = nameVal;
+            if (!('fullname' in u || 'full_name' in u || 'fullName' in u)) payload.fullname = nameVal;
+
+            payload.email = emailVal;
+
+            if ('phone' in u) payload.phone = phoneVal;
+            if ('phone_number' in u) payload.phone_number = phoneVal;
+            if ('mobile' in u) payload.mobile = phoneVal;
+            if (!('phone' in u || 'phone_number' in u || 'mobile' in u)) payload.phone = phoneVal;
+
+            payload.balance = balVal;
+
+            if ('platformProfit' in u) payload.platformProfit = profitVal;
+            if ('platform_profit' in u) payload.platform_profit = profitVal;
+            if ('profit' in u) payload.profit = profitVal;
+            if (!('platformProfit' in u || 'platform_profit' in u || 'profit' in u)) payload.platformProfit = profitVal;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('users')
+                    .update(payload)
+                    .eq('id', uid);
+
+                if (error) {
+                    console.error("خطا در به‌روزرسانی کاربر:", error);
+                    // تلاش مجدد با ساختار پایه
+                    const fallbackPayload = {
+                        fullname: nameVal,
+                        email: emailVal,
+                        phone: phoneVal,
+                        balance: balVal,
+                        platformProfit: profitVal
+                    };
+                    const { error: err2 } = await supabaseClient
+                        .from('users')
+                        .update(fallbackPayload)
+                        .eq('id', uid);
+
+                    if (err2) {
+                        showToast("خطا در ویرایش: " + err2.message, 'error');
+                        return;
+                    }
+                }
+
+                closeModal('m-edit'); 
+                showToast('اطلاعات کاربر با موفقیت ویرایش شد و در پلتفرم بروزرسانی گردید.');
+                loadData();
+            } catch (err) {
+                console.error("خطای غیرمنتظره:", err);
+                showToast("خطا در ارتباط با سرور", 'error');
+            }
         };
 
         document.getElementById('sm-search').oninput = e => {
