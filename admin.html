@@ -585,6 +585,7 @@
         let currentActiveChatId = null;
         let chatChannel = null;
         let messageChannel = null;
+        window.currentDepositList = [];
 
         function generateUIDDigits(userId) {
             if (!userId) return '000000';
@@ -628,7 +629,7 @@
             isMuted = !isMuted;
             localStorage.setItem('zenix_admin_muted', isMuted);
             updateSoundUI();
-            showToast(isMuted ? 'صدای هشدار بی‌‌صدا شد.' : 'صدای هشدار فعال شد.', isMuted ? 'error' : 'success');
+            showToast(isMuted ? 'صدای هشدار بی‌صدا شد.' : 'صدای هشدار فعال شد.', isMuted ? 'error' : 'success');
         });
 
         let audioCtx = null;
@@ -1016,7 +1017,7 @@
 
                 uMap={};
 
-                // دریافت لیست کاربران
+                // ۱. دریافت لیست کاربران
                 try {
                     const { data: supaUsers, error: supaErr } = await supabaseClient.from('users').select('*');
 
@@ -1053,22 +1054,39 @@
                     console.warn("Supabase users fetch warning:", sErr);
                 }
 
-                // دریافت و پردازش کامل واریزی‌های معلق از جدول transactions
+                let depositList = [];
+                let seenDepositKeys = new Set();
+
+                // ۲. استعلام جامع و کامل تمام تراکنش‌های واریزی از جدول transactions
                 try {
-                    const { data: txDeposits, error: txErr } = await supabaseClient
+                    const { data: txData, error: txErr } = await supabaseClient
                         .from('transactions')
-                        .select('*')
-                        .eq('status', 'pending');
+                        .select('*');
 
                     if (txErr) console.error("خطا در دریافت تراکنش‌ها:", txErr);
 
-                    if (txDeposits && txDeposits.length > 0) {
-                        txDeposits.forEach(tx => {
-                            let uid = tx.user_id || tx.userId || tx.user_id_fk;
+                    if (txData && txData.length > 0) {
+                        txData.forEach(tx => {
+                            let st = String(tx.status || '').toLowerCase();
                             let typeStr = String(tx.type || tx.title || '').toLowerCase();
-                            let isDeposit = typeStr.includes('deposit') || typeStr.includes('deposit_request') || typeStr.includes('واریز');
+                            let isDeposit = typeStr.includes('deposit') || typeStr.includes('واریز') || typeStr.includes('charge');
 
-                            if (isDeposit && uid && uMap[uid]) {
+                            if (st === 'pending' && isDeposit) {
+                                let uid = tx.user_id || tx.userId || tx.user_id_fk || 'unknown';
+
+                                // ایجاد اکانت موقت در صورت عدم وجود کاربر در uMap تا درخواست ناپدید نشود
+                                if (!uMap[uid]) {
+                                    uMap[uid] = {
+                                        id: uid,
+                                        fullname: `کاربر (${String(uid).substring(0,8)}...)`,
+                                        email: '-',
+                                        phone: '-',
+                                        balance: 0,
+                                        platformProfit: 0,
+                                        createdAt: tx.created_at || new Date().toISOString()
+                                    };
+                                }
+
                                 let rawAmt = tx.amount ? (Number(tx.amount) / 1.025) : 0;
                                 let txObj = {
                                     txId: tx.id,
@@ -1079,15 +1097,53 @@
                                     status: 'pending',
                                     createdAt: tx.created_at || tx.createdAt
                                 };
-                                
-                                uMap[uid]._pendingTxMap[tx.id] = txObj;
-                                uMap[uid].pendingDeposit = txObj;
+
+                                let idCode = getUserIdCode(uid);
+                                let nameStr = getName(uMap[uid]);
+                                let key = tx.id ? `tx_${tx.id}` : `hash_${txObj.txHash}`;
+
+                                if (!seenDepositKeys.has(key)) {
+                                    seenDepositKeys.add(key);
+                                    depositList.push({
+                                        uid: uid,
+                                        u: uMap[uid],
+                                        idCode: idCode,
+                                        nameStr: nameStr,
+                                        data: txObj,
+                                        txId: tx.id || null
+                                    });
+                                }
                             }
                         });
                     }
                 } catch(txErr) {
                     console.warn("Transactions fetch warning:", txErr);
                 }
+
+                // ۳. بررسی و بازیابی درخواست‌های واریزی معلق موجود در جدول users (پشتیبانی کامل از درخواست‌های قدیمی)
+                Object.keys(uMap).forEach(uid => {
+                    let u = uMap[uid];
+                    let pDep = u.pendingDeposit || u.pending_deposit;
+                    if (pDep) {
+                        let pStatus = String(pDep.status || 'pending').toLowerCase();
+                        if (pStatus === 'pending') {
+                            let key = pDep.txId ? `tx_${pDep.txId}` : (pDep.txHash ? `hash_${pDep.txHash}` : `user_${uid}`);
+                            if (!seenDepositKeys.has(key)) {
+                                seenDepositKeys.add(key);
+                                let idCode = getUserIdCode(uid);
+                                let nameStr = getName(u);
+                                depositList.push({
+                                    uid: uid,
+                                    u: u,
+                                    idCode: idCode,
+                                    nameStr: nameStr,
+                                    data: pDep,
+                                    txId: pDep.txId || null
+                                });
+                            }
+                        }
+                    }
+                });
 
                 let tbAct=document.getElementById('tb-act'), tbPend=document.getElementById('tb-pend'), tbBan=document.getElementById('tb-ban'), tbW=document.getElementById('tb-withdraw'), tbD=document.getElementById('tb-deposit');
                 if(tbAct) tbAct.innerHTML=""; 
@@ -1096,7 +1152,7 @@
                 if(tbW) tbW.innerHTML=""; 
                 if(tbD) tbD.innerHTML="";
 
-                let totU=0, totB=0, totR=0, totW=0, totD=0, reqList=[], withdrawList=[], depositList=[];
+                let totU=0, totB=0, totR=0, totW=0, totD=depositList.length, reqList=[], withdrawList=[];
                 let cAct=0, cPend=0, cBan=0;
 
                 Object.keys(uMap).forEach(uid => {
@@ -1111,15 +1167,6 @@
 
                     let isBanned = (u.status==='cancelled'||u.status==='banned'||u.isBanned===true);
                     let hasPend = (u.pendingEmail||u.newEmail||u.selfieImage||u.adminApprovalStatus==='pending');
-
-                    // افزودن واریزهای معلق با شرط انعطاف‌پذیر
-                    if (u.pendingDeposit) {
-                        let pStatus = String(u.pendingDeposit.status || 'pending').toLowerCase();
-                        if (pStatus === 'pending') {
-                            totD++;
-                            depositList.push({ uid, u, idCode, nameStr, data: u.pendingDeposit, txId: u.pendingDeposit.txId || null });
-                        }
-                    }
 
                     // افزودن برداشت‌های معلق
                     if (u.pendingWithdrawal && String(u.pendingWithdrawal.status || 'pending').toLowerCase() === 'pending') {
@@ -1230,32 +1277,43 @@
         };
 
         function renderDeposits(list){
+            window.currentDepositList = list;
             let box=document.getElementById('tb-deposit');
             if(!box) return;
             if(list.length===0){box.innerHTML=`<tr><td colspan="2" style="text-align:center;padding:20px;color:#94a3b8">هیچ درخواست واریزی وجود ندارد.</td></tr>`;return;}
             let html='';
-            list.forEach(i=>{
+            list.forEach((i, idx)=>{
                 let dt = formatDate(i.data.createdAt || i.data.created_at || i.data.timestamp);
                 let txIdAttr = i.txId ? `'${i.txId}'` : 'null';
                 html+=`<tr>
-                    <td><span class="badge-id" onclick="openDepositDetails('${i.uid}', ${txIdAttr})">${i.idCode}</span></td>
+                    <td><span class="badge-id" onclick="openDepositDetails('${i.uid}', ${txIdAttr}, ${idx})">${i.idCode}</span></td>
                     <td>${dt}</td>
                 </tr>`;
             });
             box.innerHTML=html;
         }
 
-        window.openDepositDetails = (uid, txId = null) => {
-            let u = uMap[uid];
-            if (!u) return;
-            let dData = u.pendingDeposit || u.pending_deposit;
-            if (!dData && txId && u._pendingTxMap) {
-                dData = u._pendingTxMap[txId];
+        window.openDepositDetails = (uid, txId = null, idx = null) => {
+            let item = null;
+            if (idx !== null && window.currentDepositList && window.currentDepositList[idx]) {
+                item = window.currentDepositList[idx];
             }
+
+            if (!item) {
+                item = (window.currentDepositList || []).find(i => i.uid === uid && (txId ? i.txId === txId : true));
+            }
+
+            let u = (item && item.u) ? item.u : uMap[uid];
+            let dData = item ? item.data : null;
+
+            if (!dData && u) {
+                dData = u.pendingDeposit || u.pending_deposit;
+            }
+
             if (!dData) return;
 
             let idCode = getUserIdCode(uid);
-            let nameStr = getName(u);
+            let nameStr = u ? getName(u) : (item ? item.nameStr : 'کاربر');
             let amtWithFee = Number(dData.amount||0);
             let rawAmt = Number(dData.rawAmount || (amtWithFee > 0 ? (amtWithFee / 1.025) : 0));
             let adminProfitFee = amtWithFee - rawAmt;
@@ -1275,7 +1333,7 @@
                 <div class="detail-row"><span>تاریخ و ساعت:</span><span>${dt}</span></div>
             `;
 
-            let safeTxId = txId ? `'${txId}'` : 'null';
+            let safeTxId = (dData.txId || txId) ? `'${dData.txId || txId}'` : 'null';
             document.getElementById('item-modal-actions').innerHTML = `
                 <button class="btn-action btn-approve" style="flex:1;justify-content:center;padding:10px" onclick="closeModal('m-item-details');handleDeposit('${uid}', true, ${rawAmt}, ${adminProfitFee}, ${safeTxId})"><i class="fas fa-check"></i> تایید و شارژ</button>
                 <button class="btn-action btn-reject" style="flex:1;justify-content:center;padding:10px" onclick="closeModal('m-item-details');handleDeposit('${uid}', false, ${rawAmt}, 0, ${safeTxId})"><i class="fas fa-times"></i> رد درخواست</button>
@@ -1300,11 +1358,11 @@
                     }).eq('id', uid);
                 } catch(e) {}
 
-                // پاک کردن واریز معلق در جدول کاربر به صورت تک‌تک جهت جلوگیری از خطای ۴۰۰
+                // پاک کردن واریز معلق در جدول کاربر به صورت ایمن
                 try { await supabaseClient.from('users').update({ pending_deposit: null }).eq('id', uid); } catch(e) {}
                 try { await supabaseClient.from('users').update({ pendingDeposit: null }).eq('id', uid); } catch(e) {}
 
-                if (txId) {
+                if (txId && txId !== 'null') {
                     await supabaseClient.from('transactions').update({ status: 'success', title: 'واریز تایید شده' }).eq('id', txId);
                 } else {
                     await supabaseClient.from('transactions').update({ status: 'success' }).eq('user_id', uid).eq('type', 'deposit').eq('status', 'pending');
@@ -1325,9 +1383,9 @@
             } else {
                 if (!confirm(`رد درخواست واریز به مبلغ $${rawAmount.toFixed(2)}؟`)) return;
 
-                // ۱. تغییر وضعیت تراکنش به "رد شده" (بخش اصلی فرآیند)
+                // ۱. تغییر وضعیت تراکنش به "رد شده"
                 try {
-                    if (txId) {
+                    if (txId && txId !== 'null') {
                         await supabaseClient.from('transactions').update({ status: 'failed', title: 'واریز رد شده' }).eq('id', txId);
                     } else {
                         await supabaseClient.from('transactions').update({ status: 'failed' }).eq('user_id', uid).eq('type', 'deposit').eq('status', 'pending');
@@ -1336,7 +1394,7 @@
                     console.error("Error updating transaction status:", txErr);
                 }
 
-                // ۲. پاک کردن فیلدهای معلق احتمالاً موجود در جدول users به‌صورت ایمن
+                // ۲. پاک کردن فیلدهای معلق در جدول users به‌صورت ایمن
                 try { await supabaseClient.from('users').update({ pending_deposit: null }).eq('id', uid); } catch(e) {}
                 try { await supabaseClient.from('users').update({ pendingDeposit: null }).eq('id', uid); } catch(e) {}
 
