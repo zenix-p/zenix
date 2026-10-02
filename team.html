@@ -13,6 +13,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Supabase JS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
         body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
@@ -138,7 +142,7 @@
             <div style="overflow-y:auto;padding-right:4px">
                 <p style="font-size:13px;color:#cbd5e1;line-height:1.7;margin-bottom:10px;" id="t-ab-m-desc">پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.</p>
                 <ul style="font-size:12px;color:#94a3b8;padding-right:18px;line-height:1.7;margin-bottom:0;">
-                    <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l1t">هدف اصلی:</strong> <span id="t-ab-m-l1d">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li>
+                    <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l1t">هدف اصلی:</strong> <span id="t-ab-m-l1d">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li>
                     <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l2t">امنیت و زیرساخت:</strong> <span id="t-ab-m-l2d">متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن.</span></li>
                     <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l3t">ساختار چندسطحی (Referral & Team):</strong> <span id="t-ab-m-l3d">ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.</span></li>
                     <li><strong style="color:#f8fafc;" id="t-ab-m-l4t">احساس واقع‌گرایی:</strong> <span id="t-ab-m-l4d">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.</span></li>
@@ -169,11 +173,15 @@
     </footer>
 
     <script>
+        const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
+        var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         let currLang = localStorage.getItem('zenix_lang') || 'fa';
         let allMessages = [];
-        let currentUserId = localStorage.getItem('zenix_user_id') || 'guest';
+        let currentUserId = null;
 
-        // تابع تولید همان کد ۶ رقمی ثابت بر اساس شناسه کاربر
+        // تابع دقیق ریاضی جهت تولید کد ۶ رقمی یکتا و هماهنگ با profile.html
         function generateUIDDigits(userId) {
             if (!userId) return '000000';
             let hash = 5381;
@@ -199,7 +207,7 @@
                 hpT2: 'پاداش‌ها و نرخ کمیسیون نسل‌ها', hpD2: 'سود دعوت دوستان در ۳ سطح محاسبه می‌شود: نسل اول ۱۰٪، نسل دوم ۷٪ و نسل سوم ۳٪ از سود معاملات زیرمجموعه‌ها می‌باشد.',
                 abTitle: 'درباره پلتفرم Zenix (هدف، ماهیت و ساختار)',
                 abDesc: 'پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.',
-                abL1T: 'هدف اصلی:', abL1D: 'اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.',
+                abL1T: 'هدف اصلی:', abL1D: 'اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.',
                 abL2T: 'امنیت و زیرساخت:', abL2D: 'متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن.',
                 abL3T: 'ساختار چندسطحی (Referral & Team):', abL3D: 'ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.',
                 abL4T: 'احساس واقع‌گرایی:', abL4D: 'وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.'
@@ -226,10 +234,15 @@
 
         async function fetchUserMessages(uid) {
             try {
-                let messages = JSON.parse(localStorage.getItem('zenix_notifications') || '[]');
-                return messages;
+                const { data } = await supabaseClient.from('notifications').select('*').eq('user_id', uid).order('created_at', { ascending: false });
+                return (data || []).map(dt => ({
+                    id: dt.id,
+                    subject: dt.title || dt.subject || 'Announcement',
+                    body: dt.message || dt.text || dt.body || '',
+                    time: dt.created_at || new Date().toISOString(),
+                    read: dt.read === true || dt.is_read === true
+                }));
             } catch (e) {
-                console.error("Error fetching messages:", e);
                 return [];
             }
         }
@@ -266,7 +279,9 @@
         window.readAdminMessage = async idx => {
             let m = allMessages[idx]; if (!m) return;
             allMessages[idx].read = true;
-            localStorage.setItem('zenix_notifications', JSON.stringify(allMessages));
+            if (currentUserId && m.id) {
+                await supabaseClient.from('notifications').update({ read: true, is_read: true }).eq('id', m.id);
+            }
             let unread = allMessages.filter(i => !i.read).length, b = document.getElementById('bell-badge');
             if (b) { b.textContent = unread; b.classList.toggle('show', unread > 0); }
 
@@ -301,7 +316,7 @@
 
         function loadTeamData(uid) {
             try {
-                // تنظیم لینک دعوت با فرمت دقیق UID پروفایل (SM-123456)
+                // تنظیم لینک دعوت کاملاً دقیق و هماهنگ با پروفایل (فرمت SM-123456)
                 let myRefCode = 'SM-' + generateUIDDigits(uid);
 
                 const inviteInput = document.getElementById('invite-link');
@@ -329,12 +344,20 @@
             }
         }
 
-        loadTeamData(currentUserId);
+        // بررسی ورود کاربر از طریق Supabase Auth برای یکسان‌سازی شناسه اصلی
+        supabaseClient.auth.onAuthStateChange(async (event, session) => {
+            if (session && session.user) {
+                currentUserId = session.user.id;
+                loadTeamData(session.user.id);
 
-        fetchUserMessages(currentUserId).then(msgs => {
-            allMessages = msgs;
-            let unread = allMessages.filter(m => !m.read).length, b = document.getElementById('bell-badge');
-            if (b && unread > 0) { b.textContent = unread; b.classList.add('show'); }
+                fetchUserMessages(session.user.id).then(msgs => {
+                    allMessages = msgs;
+                    let unread = allMessages.filter(m => !m.read).length, b = document.getElementById('bell-badge');
+                    if (b && unread > 0) { b.textContent = unread; b.classList.add('show'); }
+                });
+            } else {
+                window.location.href = "index.html";
+            }
         });
 
         function setLang(l) {
@@ -395,9 +418,10 @@
 
         document.querySelectorAll('#lang-menu .mi').forEach(i => i.addEventListener('click', () => setLang(i.dataset.lang)));
 
-        document.getElementById('logout-btn')?.addEventListener('click', e => {
+        document.getElementById('logout-btn')?.addEventListener('click', async e => {
             e.preventDefault();
-            localStorage.clear(); window.location.href = 'index.html';
+            await supabaseClient.auth.signOut();
+            window.location.href = 'index.html';
         });
 
         window.showMsg = function(text, isErr) {
