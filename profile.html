@@ -362,7 +362,7 @@
         let currentUser = null;
         let allMessages = [];
         let currentUserId = null;
-        let userChannel = null; // متغیر جهت نگهداری کانال Realtime و جلوگیری از خطای اشتراک مجدد
+        let userChannel = null;
 
         function lockPhoneInput(phoneNumber) {
             const phoneInput = document.getElementById('user-phone-input');
@@ -629,13 +629,21 @@
 
             // حذف اشتراک قبلی جهت جلوگیری از خطای افزودن callback بعد از subscribe
             if (userChannel) {
-              supabaseClient.removeChannel(userChannel);
+              await supabaseClient.removeChannel(userChannel);
+              userChannel = null;
             }
 
-            // ایجاد کانال جدید با نام یکتا و ثبت event پیش از subscribe
-            userChannel = supabaseClient
-              .channel(`user_changes_${session.user.id}`)
-              .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${session.user.id}` }, payload => {
+            // ایجاد کانال جدید با نام یکتا همراه با زمان جاری
+            const channelName = `user_changes_${session.user.id}_${Date.now()}`;
+            userChannel = supabaseClient.channel(channelName);
+
+            userChannel
+              .on('postgres_changes', { 
+                event: 'UPDATE', 
+                schema: 'public', 
+                table: 'users', 
+                filter: `id=eq.${session.user.id}` 
+              }, payload => {
                 loadUserData(session.user);
               })
               .subscribe();
@@ -645,7 +653,7 @@
           }
         });
 
-        // اکشن ذخیره‌سازی شماره تماس - به‌روزرسانی‌شده جهت جلوگیری از خطای RLS/Upsert
+        // اکشن ذخیره‌سازی شماره تماس
         window.savePhone = async function() {
           const phoneInput = document.getElementById('user-phone-input');
           const errEl = document.getElementById('phone-err-msg');
@@ -683,14 +691,12 @@
             const fullPhone = code + phone;
 
             try {
-              // روش اول: آپدیت رکورد بر اساس آیدی کاربر لاگین شده
               let { data, error } = await supabaseClient
                 .from('users')
                 .update({ phone: fullPhone })
                 .eq('id', currentUser.id)
                 .select();
 
-              // روش دوم: اگر هنوز رکوردی در جدول ثبت نشده، یک رکورد جدید بساز (upsert)
               if (!error && (!data || data.length === 0)) {
                 const upsertRes = await supabaseClient
                   .from('users')
