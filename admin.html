@@ -654,7 +654,7 @@
             isMuted = !isMuted;
             localStorage.setItem('zenix_admin_muted', isMuted);
             updateSoundUI();
-            showToast(isMuted ? 'صدای هشدار بی‌صدا شد.' : 'صدای هشدار فعال شد.', isMuted ? 'error' : 'success');
+            showToast(isMuted ? 'صدای هشدار بی‌‌صدا شد.' : 'صدای هشدار فعال شد.', isMuted ? 'error' : 'success');
         });
 
         // ===== تولید و پخش صدای هشدار =====
@@ -756,7 +756,7 @@
             }, 3500);
         }
 
-        const getName=u=>u.fullname||u.fullName||u.name||(u.firstName?`${u.firstName} ${u.lastName||''}`:null)||(u.raw_user_meta_data?.fullname)||(u.user_metadata?.fullname)||u.email?.split('@')[0]||'کاربر بدون نام';
+        const getName=u=>u.fullname||u.fullName||u.full_name||u.name||(u.firstName?`${u.firstName} ${u.lastName||''}`:null)||(u.raw_user_meta_data?.fullname)||(u.user_metadata?.fullname)||u.email?.split('@')[0]||'کاربر بدون نام';
         
         const formatDate=ts=>{
             if(!ts)return 'نامشخص';
@@ -773,7 +773,7 @@
             return isNaN(d.getTime())?'نامشخص':`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} | ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
         };
 
-        // ===== مدیریت چت آنلاین پشتیبانی با کاربران (تصل کامل به Supabase Realtime) =====
+        // ===== مدیریت چت آنلاین پشتیبانی با کاربران =====
         async function initSupportChatListener() {
             async function fetchChats() {
                 try {
@@ -1014,11 +1014,19 @@
                 // دریافت کامل کاربران از دیتابیس Supabase
                 try {
                     const { data: supaUsers, error: supaErr } = await supabaseClient.from('users').select('*');
+                    
+                    // لاگ‌‌گیری در کنسول جهت عیب‌یابی (اصلاح گزینه سوم)
+                    console.log("کاربران دریافت شده از سوپابیس:", supaUsers, "خطای احتمالی:", supaErr);
+
+                    if (supaErr) {
+                        console.error("خطا در فراخوانی کاربران از سوپابیس:", supaErr);
+                    }
+
                     if (!supaErr && supaUsers && supaUsers.length > 0) {
                         supaUsers.forEach(u => {
                             let uid = u.id || u.uid;
                             let meta = u.raw_user_meta_data || u.user_metadata || {};
-                            let nameVal = u.fullname || u.fullName || meta.fullname || meta.fullName || u.email?.split('@')[0] || 'کاربر جدید';
+                            let nameVal = u.fullname || u.fullName || u.full_name || u.name || meta.fullname || meta.fullName || meta.full_name || u.email?.split('@')[0] || 'کاربر جدید';
                             
                             uMap[uid] = {
                                 id: uid,
@@ -1026,9 +1034,9 @@
                                 email: u.email || meta.email || '',
                                 phone: u.phone || meta.phone || '-',
                                 balance: u.balance !== undefined ? Number(u.balance) : 0,
-                                platformProfit: u.platformProfit !== undefined ? Number(u.platformProfit) : Number(u.profit || 0),
+                                platformProfit: u.platformProfit !== undefined ? Number(u.platformProfit) : Number(u.profit || u.platform_profit || 0),
                                 status: u.status || 'active',
-                                isBanned: u.isBanned || u.status === 'banned' || u.status === 'cancelled',
+                                isBanned: u.isBanned || u.is_banned || u.status === 'banned' || u.status === 'cancelled',
                                 createdAt: u.created_at || u.createdAt || new Date().toISOString(),
                                 pendingDeposit: u.pendingDeposit || u.pending_deposit,
                                 pendingWithdrawal: u.pendingWithdrawal || u.pending_withdrawal,
