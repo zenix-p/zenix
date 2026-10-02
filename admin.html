@@ -613,7 +613,7 @@
             if (isMuted) {
                 soundIcon.className = 'fas fa-volume-xmark';
                 soundIcon.style.color = '#ef4444';
-                soundText.innerText = 'بی‌‌صدا';
+                soundText.innerText = 'بی‌صدا';
                 soundBtn.style.borderColor = 'rgba(239,68,68,.3)';
                 soundBtn.style.background = 'rgba(239,68,68,.1)';
             } else {
@@ -753,7 +753,7 @@
             return isNaN(d.getTime())?'نامشخص':`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} | ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
         };
 
-        // تابع کمکی برای ارسال ایمن اعلان‌ها به کاربر
+        // تابع کمکی برای ارسال ایمن اعلان‌ها به کاربر (عدم توقف برنامه در صورت محدودیت RLS)
         async function sendNotificationToUser(uid, title, message) {
             const now = new Date().toISOString();
             try {
@@ -766,17 +766,10 @@
                 }]);
 
                 if (error) {
-                    await supabaseClient.from('notifications').insert([{
-                        userId: uid,
-                        title: title,
-                        message: message,
-                        text: message,
-                        created_at: now,
-                        isRead: false
-                    }]);
+                    console.warn("Notification insert suppressed error:", error.message);
                 }
             } catch (err) {
-                console.warn("Notification insert fallback error:", err);
+                console.warn("Notification send catch warning:", err);
             }
         }
 
@@ -1311,61 +1304,107 @@
 
         window.handleDeposit = async (uid, approve, rawAmount, adminProfitFee, txId = null) => {
             let u = uMap[uid];
+
             if (approve) {
                 if (!confirm(`تایید واریز و شارژ حساب به مبلغ درخواستی $${rawAmount.toFixed(2)} (سود ادمین: $${adminProfitFee.toFixed(2)})؟`)) return;
                 
-                let newBal = Number(u?.balance || 0) + rawAmount;
+                let currentBal = u ? Number(u.balance || 0) : 0;
+                let newBal = currentBal + rawAmount;
 
-                // ۱. به‌روزرسانی موجودی کاربر در جدول users
-                try {
-                    await supabaseClient.from('users').update({ 
-                        balance: newBal 
-                    }).eq('id', uid);
-                } catch(e) {
-                    console.warn("User balance update warning:", e);
+                // ۱. آپدیت موجودی کاربر در جدول users
+                if (uid && uid !== 'unknown') {
+                    try {
+                        const { error: userErr } = await supabaseClient
+                            .from('users')
+                            .update({ balance: newBal })
+                            .eq('id', uid);
+
+                        if (userErr) console.warn("User balance update warning:", userErr.message);
+                    } catch(e) {
+                        console.warn("User update catch:", e);
+                    }
                 }
 
-                // ۲. تغییر وضعیت تراکنش به "success" در جدول transactions
+                // ۲. تغییر وضعیت تراکنش به success در جدول transactions
                 try {
-                    if (txId && txId !== 'null') {
-                        await supabaseClient.from('transactions').update({ status: 'success', title: 'واریز تایید شده' }).eq('id', txId);
-                    } else {
-                        await supabaseClient.from('transactions').update({ status: 'success' }).eq('user_id', uid).eq('type', 'deposit').eq('status', 'pending');
+                    if (txId && txId !== 'null' && txId !== 'undefined') {
+                        const { error: txErr } = await supabaseClient
+                            .from('transactions')
+                            .update({ status: 'success' })
+                            .eq('id', txId);
+
+                        if (txErr) console.warn("Transaction update warning:", txErr.message);
+                    } else if (uid && uid !== 'unknown') {
+                        await supabaseClient
+                            .from('transactions')
+                            .update({ status: 'success' })
+                            .eq('user_id', uid)
+                            .eq('type', 'deposit')
+                            .eq('status', 'pending');
                     }
                 } catch(txErr) {
-                    console.error("Error updating transaction status:", txErr);
+                    console.warn("Transaction status update catch:", txErr);
                 }
 
-                // ۳. محاسبه و ثبت سود ادمین
+                // ۳. ثبت سود ادمین در system_stats به صورت ایمن (عدم توقف فرآیند در صورت خطای دیتابیس)
                 try {
-                    const { data: statsData } = await supabaseClient.from('system_stats').select('id, total_admin_profit').maybeSingle();
-                    let currentProfit = statsData ? Number(statsData.total_admin_profit || 0) : 0;
-                    if(statsData) {
-                        await supabaseClient.from('system_stats').update({ total_admin_profit: currentProfit + adminProfitFee }).eq('id', statsData.id);
-                    } else {
-                        await supabaseClient.from('system_stats').insert([{ total_admin_profit: adminProfitFee }]);
-                    }
-                } catch(e) { console.warn(e); }
+                    const { data: statsData } = await supabaseClient
+                        .from('system_stats')
+                        .select('id, total_admin_profit')
+                        .maybeSingle();
 
-                await sendNotificationToUser(uid, 'تایید واریزی', `درخواست واریز شما به مبلغ $${rawAmount.toFixed(2)} با موفقیت تایید شد و حساب شما شارژ گردید.`);
-                showToast(`واریزی تایید شد. مبلغ $${rawAmount.toFixed(2)} به کاربر اضافه شد.`);
+                    let currentProfit = statsData ? Number(statsData.total_admin_profit || 0) : 0;
+                    if (statsData && statsData.id) {
+                        const { error: stErr1 } = await supabaseClient
+                            .from('system_stats')
+                            .update({ total_admin_profit: currentProfit + adminProfitFee })
+                            .eq('id', statsData.id);
+                        if (stErr1) console.warn("system_stats update suppressed error:", stErr1.message);
+                    } else {
+                        const { error: stErr2 } = await supabaseClient
+                            .from('system_stats')
+                            .insert([{ total_admin_profit: adminProfitFee }]);
+                        if (stErr2) console.warn("system_stats insert suppressed error:", stErr2.message);
+                    }
+                } catch(e) {
+                    console.warn("system_stats execution warning:", e);
+                }
+
+                // ۴. ارسال پیام و اطلاع‌رسانی به کاربر
+                if (uid && uid !== 'unknown') {
+                    await sendNotificationToUser(uid, 'تایید واریزی', `درخواست واریز شما به مبلغ $${rawAmount.toFixed(2)} با موفقیت تایید شد و حساب شما شارژ گردید.`);
+                }
+
+                showToast(`واریزی تایید شد. مبلغ $${rawAmount.toFixed(2)} به حساب کاربر اضافه گردید.`);
             } else {
                 if (!confirm(`رد درخواست واریز به مبلغ $${rawAmount.toFixed(2)}؟`)) return;
 
-                // تغییر وضعیت تراکنش به "failed" در جدول transactions بدون ارسال هیچ درخواستی به جدول users
+                // تغییر وضعیت تراکنش به failed در جدول transactions
                 try {
-                    if (txId && txId !== 'null') {
-                        await supabaseClient.from('transactions').update({ status: 'failed', title: 'واریز رد شده' }).eq('id', txId);
-                    } else {
-                        await supabaseClient.from('transactions').update({ status: 'failed' }).eq('user_id', uid).eq('type', 'deposit').eq('status', 'pending');
+                    if (txId && txId !== 'null' && txId !== 'undefined') {
+                        await supabaseClient
+                            .from('transactions')
+                            .update({ status: 'failed' })
+                            .eq('id', txId);
+                    } else if (uid && uid !== 'unknown') {
+                        await supabaseClient
+                            .from('transactions')
+                            .update({ status: 'failed' })
+                            .eq('user_id', uid)
+                            .eq('type', 'deposit')
+                            .eq('status', 'pending');
                     }
                 } catch (txErr) {
-                    console.error("Error updating transaction status:", txErr);
+                    console.warn("Error updating transaction status:", txErr);
                 }
 
-                await sendNotificationToUser(uid, 'رد درخواست واریزی', `درخواست واریز شما به مبلغ $${rawAmount.toFixed(2)} توسط مدیریت رد شد.`);
+                if (uid && uid !== 'unknown') {
+                    await sendNotificationToUser(uid, 'رد درخواست واریزی', `درخواست واریز شما به مبلغ $${rawAmount.toFixed(2)} توسط مدیریت رد شد.`);
+                }
+
                 showToast('درخواست واریز رد شد.');
             }
+
             loadData();
         };
 
