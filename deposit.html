@@ -230,7 +230,7 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
         <div style="overflow-y:auto;padding-right:4px">
             <p style="font-size:13px;color:#cbd5e1;line-height:1.7;margin-bottom:10px;" id="t-ab-m-desc">پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.</p>
             <ul style="font-size:12px;color:#94a3b8;padding-right:18px;line-height:1.7;margin-bottom:0;">
-                <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l1t">هدف اصلی:</strong> <span id="t-ab-m-l1d">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌‌‌‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li>
+                <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l1t">هدف اصلی:</strong> <span id="t-ab-m-l1d">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوریکه کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li>
                 <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l2t">امنیت و زیرساخت:</strong> <span id="t-ab-m-l2d">متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).</span></li>
                 <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l3t">ساختار چندسطحی (Referral & Team):</strong> <span id="t-ab-m-l3d">ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.</span></li>
                 <li><strong style="color:#f8fafc;" id="t-ab-m-l4t">احساس واقع‌‌گرایی:</strong> <span id="t-ab-m-l4d">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.</span></li>
@@ -435,13 +435,6 @@ function startTimer(startTimeISO) {
   timerInterval = setInterval(update, 1000);
 }
 
-function stopTimer() {
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
-  }
-}
-
 function showMsg(text, isErr, showTimer = false) {
   const box = document.getElementById('status-box');
   if (!box) return;
@@ -491,10 +484,19 @@ window.checkAutoDeposit = async function(){
       createdAt: nowISO
     };
 
-    // ۱. ذخیره وضعیت در حافظه محلی جهت نمایش تایمر و حالت قفل‌شده
+    // ۱. ذخیره وضعیت در حافظه محلی جهت نمایش زنده تایمر
     localStorage.setItem('zenix_pending_deposit_' + currentUser.id, JSON.stringify(pendingDepositObj));
 
-    // ۲. تلاش برای ثبت درخواست در دیتابیس Supabase
+    // ۲. بروزرسانی پروفایل کاربر در جدول users برای پنل مدیریت
+    try {
+      await supabase.from('users').update({ pending_deposit: pendingDepositObj }).eq('id', currentUser.id);
+    } catch(e1) {
+      try {
+        await supabase.from('users').update({ pendingDeposit: pendingDepositObj }).eq('id', currentUser.id);
+      } catch(e2) {}
+    }
+
+    // ۳. درج تراکنش معلق در جدول transactions
     try {
       await supabase.from('transactions').insert([{
         user_id: currentUser.id,
@@ -507,7 +509,7 @@ window.checkAutoDeposit = async function(){
         created_at: nowISO
       }]);
     } catch (dbErr) {
-      // مدیریت ایمن خطای RLS
+      console.warn("transactions insert info:", dbErr);
     }
 
     showMsg(t.pendingSentMsg, false, true);
@@ -711,7 +713,7 @@ async function loadUserData(user) {
   }
 }
 
-// بررسی ورود کاربر با گوش دادن به تغییرات نشست برای جلوگیری از هدایت اشتباه به index.html
+// بررسی ورود کاربر
 supabase.auth.onAuthStateChange((event, session) => {
   if (session && session.user) {
     loadUserData(session.user);
