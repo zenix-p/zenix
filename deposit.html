@@ -487,16 +487,7 @@ window.checkAutoDeposit = async function(){
     // ۱. ذخیره وضعیت در حافظه محلی جهت نمایش زنده تایمر
     localStorage.setItem('zenix_pending_deposit_' + currentUser.id, JSON.stringify(pendingDepositObj));
 
-    // ۲. بروزرسانی پروفایل کاربر در جدول users برای پنل مدیریت
-    try {
-      await supabase.from('users').update({ pending_deposit: pendingDepositObj }).eq('id', currentUser.id);
-    } catch(e1) {
-      try {
-        await supabase.from('users').update({ pendingDeposit: pendingDepositObj }).eq('id', currentUser.id);
-      } catch(e2) {}
-    }
-
-    // ۳. درج تراکنش معلق در جدول transactions
+    // ۲. درج تراکنش معلق در جدول transactions
     try {
       await supabase.from('transactions').insert([{
         user_id: currentUser.id,
