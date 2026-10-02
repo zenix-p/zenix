@@ -202,7 +202,7 @@
             m1: 'صفحه اصلی', m2: 'کوانتیفیکیشن', m3: 'واریز', m4: 'برداشت', mTeam: 'تیم من', m5: 'تراکنش', m6: 'پروفایل', m7: 'پشتیبانی', m8: 'خروج',
             tNode: 'سرور فعال (US-East)', modalTitle: 'صندوق پیام‌های مدیریت', noMsg: 'هیچ پیام جدیدی از طرف مدیریت وجود ندارد.',
             backMsg: 'بازگشت به لیست پیام‌ها', newBadge: 'جدید',
-            typeDeposit: 'واریز تتر (USDT)', typeWithdraw: 'برداشت وجه', typeCommission: 'کمیسیون',
+            typeDeposit: 'واریز تتر (USDT)', typeWithdraw: 'برداشت وجه', typeCommission: 'کمیسیون', typeBonus: 'پاداش ثبت‌نام',
             stSuccess: 'تایید شده', stFailed: 'رد شده',
             noTx: 'هیچ تراکنشی یافت نشد.', loading: 'در حال بارگذاری تراکنش‌ها...',
             helpTitle: 'راهنمای صفحه تراکنش‌ها', helpBtnTitle: 'راهنمای صفحه تراکنش‌ها',
@@ -218,7 +218,7 @@
             m1: 'Home', m2: 'Quantification', m3: 'Deposit', m4: 'Withdraw', mTeam: 'My Team', m5: 'Transactions', m6: 'Profile', m7: 'Support', m8: 'Logout',
             tNode: 'Node Active (US-East)', modalTitle: 'Admin Messages', noMsg: 'No new messages from admin.',
             backMsg: 'Back to Messages List', newBadge: 'NEW',
-            typeDeposit: 'Tether Deposit (USDT)', typeWithdraw: 'Withdrawal', typeCommission: 'Commission',
+            typeDeposit: 'Tether Deposit (USDT)', typeWithdraw: 'Withdrawal', typeCommission: 'Commission', typeBonus: 'Sign-up Bonus',
             stSuccess: 'Approved', stFailed: 'Rejected',
             noTx: 'No transactions found.', loading: 'Loading transactions...',
             helpTitle: 'Transactions Guide', helpBtnTitle: 'Transactions Page Guide',
@@ -229,22 +229,45 @@
           }
         };
 
-        // دریافت تراکنش‌های کاربر از دیتابیس Supabase
-        async function fetchUserTransactions(uid) {
+        // دریافت تراکنش‌های کاربر و ثبت پاداش ثبت‌نام
+        async function fetchUserTransactions(uid, userCreatedAt) {
           try {
             const { data, error } = await supabase.from('transactions').select('*').eq('user_id', uid);
-            if (error) {
-              console.warn("جدول transactions در Supabase یافت نشد یا دسترسی ندارد.");
-              return [];
-            }
-            if (!data) return [];
+            let list = (data && !error) ? [...data] : [];
 
-            let list = [...data];
+            let hasBonus = list.some(t => {
+              let ty = String(t.type || '').toLowerCase();
+              let ti = String(t.title || '').toLowerCase();
+              return ty.includes('bonus') || ti.includes('ثبت‌نام') || ti.includes('signup') || ti.includes('sign-up');
+            });
+
+            if (!hasBonus) {
+              list.push({
+                id: 'signup-bonus-' + uid,
+                user_id: uid,
+                title: currLang === 'fa' ? 'پاداش ثبت‌نام' : 'Sign-up Bonus',
+                type: 'bonus',
+                amount: 2,
+                currency: 'USDT',
+                status: 'success',
+                created_at: userCreatedAt || new Date().toISOString()
+              });
+            }
+
             list.sort((a, b) => new Date(b.created_at || b.createdAt || 0) - new Date(a.created_at || a.createdAt || 0));
             return list;
           } catch (e) {
             console.warn("خطا در دریافت تراکنش‌ها:", e);
-            return [];
+            return [{
+              id: 'signup-bonus-' + uid,
+              user_id: uid,
+              title: currLang === 'fa' ? 'پاداش ثبت‌نام' : 'Sign-up Bonus',
+              type: 'bonus',
+              amount: 2,
+              currency: 'USDT',
+              status: 'success',
+              created_at: userCreatedAt || new Date().toISOString()
+            }];
           }
         }
 
@@ -268,7 +291,10 @@
 
             let itemType = String(item.type || '').toLowerCase();
             if (currentFilter === 'commission') {
-              return itemType.includes('comm') || itemType.includes('ref') || itemType === 'commission';
+              return itemType.includes('comm') || itemType.includes('ref') || itemType.includes('bonus') || itemType === 'commission';
+            }
+            if (currentFilter === 'deposit') {
+              return itemType.includes('dep') || itemType === 'deposit' || itemType.includes('bonus');
             }
             return itemType === currentFilter;
           });
@@ -283,14 +309,16 @@
             let rawType = String(tx.type || 'deposit').toLowerCase();
             let isDeposit = rawType.includes('dep') || rawType === 'deposit';
             let isWithdraw = rawType.includes('with') || rawType === 'withdraw' || rawType === 'receive';
+            let isBonus = rawType.includes('bonus');
             let isComm = rawType.includes('comm') || rawType === 'commission' || rawType.includes('ref');
 
-            let typeClass = isWithdraw ? 'withdraw' : (isComm ? 'commission' : 'deposit');
-            let iconClass = isWithdraw ? 'fa-arrow-up' : (isComm ? 'fa-users' : 'fa-arrow-down');
+            let typeClass = isWithdraw ? 'withdraw' : (isComm || isBonus ? 'commission' : 'deposit');
+            let iconClass = isWithdraw ? 'fa-arrow-up' : (isBonus ? 'fa-gift' : (isComm ? 'fa-users' : 'fa-arrow-down'));
 
             let titleText = tx.title || tx.description;
             if (!titleText) {
               if (isWithdraw) titleText = t.typeWithdraw;
+              else if (isBonus) titleText = t.typeBonus;
               else if (isComm) titleText = t.typeCommission;
               else titleText = t.typeDeposit;
             }
@@ -449,11 +477,13 @@
               if (b && unread > 0) { b.textContent = unread; b.classList.add('show'); }
             }
 
-            userTransactions = await fetchUserTransactions(user.id);
+            let userCreatedAt = userData?.created_at || user.created_at;
+            userTransactions = await fetchUserTransactions(user.id, userCreatedAt);
             renderTransactions();
 
           } catch (e) {
             console.error("خطا در دریافت اطلاعات کاربر:", e);
+            userTransactions = await fetchUserTransactions(user.id, user.created_at);
             renderTransactions();
           }
         }
