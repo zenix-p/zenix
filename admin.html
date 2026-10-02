@@ -1033,6 +1033,8 @@
                             let phoneVal = u.phone || u.phone_number || u.mobile || meta.phone || meta.phone_number || '-';
 
                             uMap[uid] = {
+                                ...u,
+                                _raw: u,
                                 id: uid,
                                 fullname: nameVal,
                                 email: u.email || meta.email || '',
@@ -1047,8 +1049,7 @@
                                 pendingEmail: u.pendingEmail || u.pending_email,
                                 newEmail: u.newEmail || u.new_email,
                                 selfieImage: u.selfieImage || u.selfie_image,
-                                adminApprovalStatus: u.adminApprovalStatus || u.admin_approval_status,
-                                ...u
+                                adminApprovalStatus: u.adminApprovalStatus || u.admin_approval_status
                             };
                         });
                     }
@@ -1430,50 +1431,72 @@
             e.preventDefault();
             let uid = document.getElementById('e-uid').value;
             let u = uMap[uid] || {};
-            let nameVal = document.getElementById('e-name').value;
-            let emailVal = document.getElementById('e-email').value;
-            let phoneVal = document.getElementById('e-phone').value;
+            let raw = u._raw || u;
+
+            let nameVal = document.getElementById('e-name').value.trim();
+            let emailVal = document.getElementById('e-email').value.trim();
+            let phoneVal = document.getElementById('e-phone').value.trim();
             let balVal = parseFloat(document.getElementById('e-bal').value) || 0;
             let profitVal = parseFloat(document.getElementById('e-profit').value) || 0;
 
             let payload = {};
-            if ('fullname' in u) payload.fullname = nameVal;
-            if ('full_name' in u) payload.full_name = nameVal;
-            if (!('fullname' in u || 'full_name' in u)) payload.fullname = nameVal;
 
+            // Fullname
+            if ('full_name' in raw) payload.full_name = nameVal;
+            if ('fullname' in raw) payload.fullname = nameVal;
+            if (!('full_name' in raw || 'fullname' in raw)) payload.fullname = nameVal;
+
+            // Email
             payload.email = emailVal;
 
-            if ('phone' in u) payload.phone = phoneVal;
-            if ('phone_number' in u) payload.phone_number = phoneVal;
-            if (!('phone' in u || 'phone_number' in u)) payload.phone = phoneVal;
+            // Phone
+            if ('phone' in raw) payload.phone = phoneVal;
+            if ('phone_number' in raw) payload.phone_number = phoneVal;
+            if ('mobile' in raw) payload.mobile = phoneVal;
+            if (!('phone' in raw || 'phone_number' in raw || 'mobile' in raw)) {
+                payload.phone = phoneVal;
+            }
 
-            payload.balance = balVal;
+            // Balance
+            if ('balance' in raw) payload.balance = balVal;
 
-            if ('platformProfit' in u) payload.platformProfit = profitVal;
-            if ('platform_profit' in u) payload.platform_profit = profitVal;
+            // Platform Profit
+            if ('platform_profit' in raw) payload.platform_profit = profitVal;
+            else if ('profit' in raw) payload.profit = profitVal;
 
             try {
-                const { error } = await supabaseClient
+                let { error } = await supabaseClient
                     .from('users')
                     .update(payload)
                     .eq('id', uid);
 
                 if (error) {
-                    const fallbackPayload = {
+                    console.warn("ویرایش اول ناموفق بود، اجرای متد جایگزین:", error);
+                    const fallbackPayload1 = {
                         fullname: nameVal,
                         email: emailVal,
                         phone: phoneVal,
                         balance: balVal
                     };
-                    await supabaseClient.from('users').update(fallbackPayload).eq('id', uid);
+                    let res1 = await supabaseClient.from('users').update(fallbackPayload1).eq('id', uid);
+                    if (res1.error) {
+                        const fallbackPayload2 = {
+                            fullname: nameVal,
+                            email: emailVal,
+                            phone_number: phoneVal,
+                            balance: balVal
+                        };
+                        let res2 = await supabaseClient.from('users').update(fallbackPayload2).eq('id', uid);
+                        if (res2.error) throw res2.error;
+                    }
                 }
 
                 closeModal('m-edit'); 
                 showToast('اطلاعات کاربر با موفقیت ویرایش شد.');
                 loadData();
             } catch (err) {
-                console.error("خطای غیرمنتژره:", err);
-                showToast("خطا در ارتباط با سرور", 'error');
+                console.error("خطا در ویرایش اطلاعات کاربر:", err);
+                showToast("خطا در ثبت اطلاعات کاربر", 'error');
             }
         };
 
