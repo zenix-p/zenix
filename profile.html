@@ -282,11 +282,13 @@
 
             await loadUserData(session.user);
 
-            // حذف کانال قبلی در صورت وجود برای جلوگیری از خطای Re-subscription
+            // حذف ناهمگام (await) کانال قبلی در صورت وجود
             if (userRealtimeChannel) {
-              supabaseClient.removeChannel(userRealtimeChannel);
+              await supabaseClient.removeChannel(userRealtimeChannel);
+              userRealtimeChannel = null;
             }
 
+            // ایجاد کانال جدید پس از حذف کامل کانال قبلی
             userRealtimeChannel = supabaseClient
               .channel('user_realtime_' + session.user.id)
               .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${session.user.id}` }, payload => {
@@ -295,6 +297,10 @@
               .subscribe();
 
           } else {
+            if (userRealtimeChannel) {
+              await supabaseClient.removeChannel(userRealtimeChannel);
+              userRealtimeChannel = null;
+            }
             window.location.href = "index.html";
           }
         });
