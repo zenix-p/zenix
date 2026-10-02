@@ -5,7 +5,6 @@ const SUPABASE_URL = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const qB=document.getElementById('quant-btn');
 let uUid=null,tProf=0,bBal=0;
 const tpEl=document.getElementById('today-profit-val'),tbEl=document.getElementById('total-balance-val'),hList=document.getElementById('history-list');
 
@@ -13,7 +12,6 @@ window.cachedNotifications = [];
 window.activeNotifFilter = 'all';
 window.actualUserKeys = [];
 
-// تابع کمکی برای پاک‌سازی و استانداردسازی فرمت تاریخ (YYYY-MM-DD)
 function cleanDate(d) {
   if (!d) return '';
   return String(d).split('T')[0].split(' ')[0].trim();
@@ -22,7 +20,6 @@ function cleanDate(d) {
 async function saveUserFields(dict) {
   if (!uUid) return;
 
-  // ۱. ذخیره‌سازی محلی سریع جهت جلوگیری از صفر شدن اطلاعات هنگام ریفرش
   try {
     const localData = {
       count: dict.count,
@@ -36,7 +33,6 @@ async function saveUserFields(dict) {
     console.warn("خطا در ذخیره LocalStorage:", e);
   }
 
-  // ۲. آماده‌سازی داده‌ها برای ارسال به Supabase
   const payload = {};
   const keys = window.actualUserKeys || [];
   const findKey = (candidates) => keys.find(x => candidates.some(c => c.toLowerCase() === x.toLowerCase()));
@@ -99,7 +95,7 @@ window.renderNotifications = function() {
   });
 
   if (filtered.length === 0) {
-    container.innerHTML = `<div style="text-align:center;padding:25px;color:#94a3b8;font-size:12px;"><i class="fas fa-inbox" style="font-size:24px;margin-bottom:8px;display:block;opacity:0.5;"></i>هیچ پیامی در این دسته‌‌بندی وجود ندارد.</div>`;
+    container.innerHTML = `<div style="text-align:center;padding:25px;color:#94a3b8;font-size:12px;"><i class="fas fa-inbox" style="font-size:24px;margin-bottom:8px;display:block;opacity:0.5;"></i>هیچ پیامی در این دسته‌بندی وجود ندارد.</div>`;
     return;
   }
 
@@ -194,18 +190,21 @@ const cList=[
 ];
 
 window.checkClickState=function(){
-  if(!window.isBotActive)return;
+  const qBtn = document.getElementById('quant-btn');
+  if(!qBtn || !window.isBotActive) return;
+  
   const l=window.currentActiveLang||'fa',t=(window.LD&&window.LD[l])||(window.LD&&window.LD.fa)||{};
   if(cCnt>=4){
-    qB.disabled=true;qB.style.opacity="0.5";qB.style.cursor="not-allowed";
-    qB.innerHTML=`<i class="fas fa-ban"></i> <span>${t.dailyLimit || 'پایان ظرفیت امروز'}</span>`;
+    qBtn.disabled=true;qBtn.style.opacity="0.5";qBtn.style.cursor="not-allowed";
+    qBtn.innerHTML=`<i class="fas fa-ban"></i> <span>${t.dailyLimit || 'پایان ظرفیت امروز'}</span>`;
   }else{
-    qB.disabled=false;qB.style.opacity="1";qB.style.cursor="pointer";
-    qB.innerHTML=`<i class="fas fa-robot"></i> <span>${t.quantification || 'کوانتیفیکیشن'} (${cCnt}/4)</span>`;
+    qBtn.disabled=false;qBtn.style.opacity="1";qBtn.style.cursor="pointer";
+    qBtn.innerHTML=`<i class="fas fa-robot"></i> <span>${t.quantification || 'کوانتیفیکیشن'} (${cCnt}/4)</span>`;
   }
 };
 
 window.renderHistory=function(){
+  if(!hList) return;
   const l=window.currentActiveLang||'fa',t=(window.LD&&window.LD[l])||(window.LD&&window.LD.fa)||{};
   const btn=document.getElementById('view-all-history-btn'),btnTxt=document.getElementById('history-btn-text'),btnIcon=document.getElementById('history-btn-icon');
   
@@ -245,86 +244,93 @@ window.renderHistory=function(){
   hList.innerHTML=htmlStr;
 };
 
-if(qB){
-  qB.onclick=function(e){
-    e.preventDefault();
-    if(cCnt>=4||!window.isBotActive||!uUid)return;
-    cCnt++;
-    qB.disabled=true;qB.style.opacity="0.5";
-    const l=window.currentActiveLang||'fa',t=(window.LD&&window.LD[l])||(window.LD&&window.LD.fa)||{};
-    let dailyRate=0.015;
-    if(bBal>=10000)dailyRate=0.04;
-    else if(bBal>=5000)dailyRate=0.035;
-    else if(bBal>=2500)dailyRate=0.03;
-    else if(bBal>=1000)dailyRate=0.025;
-    else if(bBal>=300)dailyRate=0.02;
+document.addEventListener('DOMContentLoaded', () => {
+  const qBtn = document.getElementById('quant-btn');
+  if(qBtn){
+    qBtn.onclick=function(e){
+      e.preventDefault();
+      if(cCnt>=4||!window.isBotActive||!uUid)return;
+      cCnt++;
+      qBtn.disabled=true;qBtn.style.opacity="0.5";
+      const l=window.currentActiveLang||'fa',t=(window.LD&&window.LD[l])||(window.LD&&window.LD.fa)||{};
+      let dailyRate=0.015;
+      if(bBal>=10000)dailyRate=0.04;
+      else if(bBal>=5000)dailyRate=0.035;
+      else if(bBal>=2500)dailyRate=0.03;
+      else if(bBal>=1000)dailyRate=0.025;
+      else if(bBal>=300)dailyRate=0.02;
 
-    const tradeAmount = bBal;
-    const p=(tradeAmount*dailyRate)/4;
-    const tBox=document.getElementById('trade-box'),tDet=document.getElementById('trade-details');
-    tBox.style.display='block';
-    const rc=cList[Math.floor(Math.random()*cList.length)];
-    let tLeft=10;
+      const tradeAmount = bBal;
+      const p=(tradeAmount*dailyRate)/4;
+      const tBox=document.getElementById('trade-box'),tDet=document.getElementById('trade-details');
+      if(tBox) tBox.style.display='block';
+      const rc=cList[Math.floor(Math.random()*cList.length)];
+      let tLeft=10;
 
-    tDet.innerHTML=`
-      <div style="display:flex;flex-direction:column;gap:6px;align-items:center;width:100%;">
-        <div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;">
-          <i class="fas fa-spinner fa-spin" style="color:#38bdf8;"></i> 
-          <span>${t.trading || 'معامله'}</span> 
-          <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:${rc.color};color:#fff;font-size:12px;margin:0 2px;"><i class="${rc.cls}"></i></span> 
-          <b>${rc.name} (${rc.symbol})</b>
-        </div>
-        <div style="font-size:11px;color:#cbd5e1;background:rgba(255,255,255,0.04);padding:5px 12px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;width:100%;max-width:320px;border:1px solid rgba(255,255,255,0.06);">
-          <span>${t.tradeAmount || 'مبلغ معامله'}: <b style="color:#38bdf8;">$${tradeAmount.toFixed(2)}</b></span>
-          <span>زمان: <b id="cd-v" style="color:#f59e0b;">10</b> ${t.seconds || 'ثانیه'}</span>
-        </div>
-      </div>
-    `;
-
-    const tI=setInterval(()=>{
-      tLeft--;
-      const cd=document.getElementById('cd-v');if(cd)cd.innerText=tLeft;
-      if(tLeft<=0)clearInterval(tI);
-    },1000);
-
-    setTimeout(async ()=>{
-      clearInterval(tI);
-      tProf+=p;bBal+=p;
-      if(tpEl)tpEl.innerText='$'+tProf.toFixed(2);
-      if(tbEl)tbEl.innerText='$'+bBal.toFixed(2);
-
-      tDet.innerHTML=`
-        <div style="display:flex;flex-direction:column;gap:6px;align-items:center;width:100%;">
-          <div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;color:#22c55e;">
-            <i class="fas fa-check-circle"></i> ${t.success || 'موفق!'} 
-            <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:${rc.color};color:#fff;font-size:12px;margin:0 2px;"><i class="${rc.cls}"></i></span> 
-            <b>${rc.name} (${rc.symbol})</b>
+      if(tDet){
+        tDet.innerHTML=`
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:center;width:100%;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;">
+              <i class="fas fa-spinner fa-spin" style="color:#38bdf8;"></i> 
+              <span>${t.trading || 'معامله'}</span> 
+              <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:${rc.color};color:#fff;font-size:12px;margin:0 2px;"><i class="${rc.cls}"></i></span> 
+              <b>${rc.name} (${rc.symbol})</b>
+            </div>
+            <div style="font-size:11px;color:#cbd5e1;background:rgba(255,255,255,0.04);padding:5px 12px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;width:100%;max-width:320px;border:1px solid rgba(255,255,255,0.06);">
+              <span>${t.tradeAmount || 'مبلغ معامله'}: <b style="color:#38bdf8;">$${tradeAmount.toFixed(2)}</b></span>
+              <span>زمان: <b id="cd-v" style="color:#f59e0b;">10</b> ${t.seconds || 'ثانیه'}</span>
+            </div>
           </div>
-          <div style="font-size:11px;color:#cbd5e1;background:rgba(34,197,94,0.1);padding:5px 12px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;width:100%;max-width:320px;border:1px solid rgba(34,197,94,0.25);">
-            <span>${t.tradeAmount || 'مبلغ معامله'}: <b style="color:#f8fafc;">$${tradeAmount.toFixed(2)}</b></span>
-            <span>${t.prof || 'سود'}: <b style="color:#22c55e;">+$${p.toFixed(2)}</b></span>
-          </div>
-        </div>
-      `;
-      
-      const now=new Date();
-      const dateStr=`${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} - ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-      const tradeObj={name:rc.name,symbol:rc.symbol,cls:rc.cls,color:rc.color,profit:p,dateStr:dateStr,timestamp:now.getTime()};
-      allTradesArray.unshift(tradeObj);
-      window.renderHistory();
-      
-      window.checkClickState();
+        `;
+      }
 
-      await saveUserFields({
-        count: cCnt,
-        date: todayNY,
-        profit: tProf,
-        balance: bBal,
-        history: allTradesArray
-      });
-    },10000);
-  };
-}
+      const tI=setInterval(()=>{
+        tLeft--;
+        const cd=document.getElementById('cd-v');if(cd)cd.innerText=tLeft;
+        if(tLeft<=0)clearInterval(tI);
+      },1000);
+
+      setTimeout(async ()=>{
+        clearInterval(tI);
+        tProf+=p;bBal+=p;
+        if(tpEl)tpEl.innerText='$'+tProf.toFixed(2);
+        if(tbEl)tbEl.innerText='$'+bBal.toFixed(2);
+
+        if(tDet){
+          tDet.innerHTML=`
+            <div style="display:flex;flex-direction:column;gap:6px;align-items:center;width:100%;">
+              <div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;color:#22c55e;">
+                <i class="fas fa-check-circle"></i> ${t.success || 'موفق!'} 
+                <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:${rc.color};color:#fff;font-size:12px;margin:0 2px;"><i class="${rc.cls}"></i></span> 
+                <b>${rc.name} (${rc.symbol})</b>
+              </div>
+              <div style="font-size:11px;color:#cbd5e1;background:rgba(34,197,94,0.1);padding:5px 12px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;width:100%;max-width:320px;border:1px solid rgba(34,197,94,0.25);">
+                <span>${t.tradeAmount || 'مبلغ معامله'}: <b style="color:#f8fafc;">$${tradeAmount.toFixed(2)}</b></span>
+                <span>${t.prof || 'سود'}: <b style="color:#22c55e;">+$${p.toFixed(2)}</b></span>
+              </div>
+            </div>
+          `;
+        }
+        
+        const now=new Date();
+        const dateStr=`${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} - ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+        const tradeObj={name:rc.name,symbol:rc.symbol,cls:rc.cls,color:rc.color,profit:p,dateStr:dateStr,timestamp:now.getTime()};
+        allTradesArray.unshift(tradeObj);
+        window.renderHistory();
+        
+        window.checkClickState();
+
+        await saveUserFields({
+          count: cCnt,
+          date: todayNY,
+          profit: tProf,
+          balance: bBal,
+          history: allTradesArray
+        });
+      },10000);
+    };
+  }
+});
 
 async function initPage() {
   try {
@@ -337,7 +343,6 @@ async function initPage() {
     const u = session.user;
     uUid = u.id;
 
-    // ۱. دریافت اعلانات
     try {
       const { data, error: notifError } = await supabase.from('notifications').select('*').eq('user_id', u.id);
       if (!notifError && data) {
@@ -355,10 +360,8 @@ async function initPage() {
       console.warn('جدول اعلانات یا خطا در دریافت آن:', err);
     }
 
-    // ۲. دریافت اطلاعات کاربر از Supabase
     const { data: userData } = await supabase.from("users").select("*").eq("id", u.id).single();
 
-    // پشتیبان LocalStorage
     let localSaved = null;
     try {
       const rawLocal = localStorage.getItem(`zenix_quant_${uUid}`);
@@ -378,7 +381,6 @@ async function initPage() {
         cCnt = Number(qCount);
         tProf = Number(tProfit);
       } else if (localSaved && cleanDate(localSaved.date) === currentNY) {
-        // بازیابی از حافظه محلی در صورت تأخیر همگام‌سازی دیتابیس
         cCnt = Number(localSaved.count || 0);
         tProf = Number(localSaved.profit || 0);
       } else {
@@ -396,28 +398,40 @@ async function initPage() {
       }
 
       const b = document.getElementById('status-badge'), v = document.getElementById('vip1-badge'), l = window.currentActiveLang || localStorage.getItem('zenix_lang') || 'fa', t = (window.LD&&window.LD[l])||(window.LD&&window.LD.fa)||{};
+      const qBtn = document.getElementById('quant-btn');
+
       if (bBal >= 20) {
         window.isBotActive = true;
         window.checkClickState();
-        b.style.background = "rgba(34,197,94,.18)";
-        b.style.borderColor = "#22c55e";
-        b.style.color = "#22c55e";
-        b.style.boxShadow = "0 0 12px rgba(34,197,94,.4)";
-        b.innerHTML = `<i class="fas fa-robot"></i> <span>${t.active || 'فعال'}</span>`;
-        v.className = "badge-active";
-        v.innerText = t.active || 'فعال';
+        if(b){
+          b.style.background = "rgba(34,197,94,.18)";
+          b.style.borderColor = "#22c55e";
+          b.style.color = "#22c55e";
+          b.style.boxShadow = "0 0 12px rgba(34,197,94,.4)";
+          b.innerHTML = `<i class="fas fa-robot"></i> <span>${t.active || 'فعال'}</span>`;
+        }
+        if(v){
+          v.className = "badge-active";
+          v.innerText = t.active || 'فعال';
+        }
       } else {
         window.isBotActive = false;
-        qB.disabled = true;
-        qB.style.opacity = "0.5";
-        qB.style.cursor = "not-allowed";
-        b.style.background = "rgba(239,68,68,.18)";
-        b.style.borderColor = "#ef4444";
-        b.style.color = "#ef4444";
-        b.style.boxShadow = "0 0 12px rgba(239,68,68,.4)";
-        b.innerHTML = `<i class="fas fa-lock"></i> <span>${t.inactive || 'غیرفعال'}</span>`;
-        v.className = "badge-lock";
-        v.innerHTML = '<i class="fas fa-lock"></i>';
+        if(qBtn){
+          qBtn.disabled = true;
+          qBtn.style.opacity = "0.5";
+          qBtn.style.cursor = "not-allowed";
+        }
+        if(b){
+          b.style.background = "rgba(239,68,68,.18)";
+          b.style.borderColor = "#ef4444";
+          b.style.color = "#ef4444";
+          b.style.boxShadow = "0 0 12px rgba(239,68,68,.4)";
+          b.innerHTML = `<i class="fas fa-lock"></i> <span>${t.inactive || 'غیرفعال'}</span>`;
+        }
+        if(v){
+          v.className = "badge-lock";
+          v.innerHTML = '<i class="fas fa-lock"></i>';
+        }
       }
     }
   } catch (err) {
