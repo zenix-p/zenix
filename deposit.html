@@ -491,11 +491,22 @@ window.checkAutoDeposit = async function(){
       createdAt: nowISO
     };
 
-    const { error } = await supabase.from('users').update({
-      pendingDeposit: pendingDepositObj
-    }).eq('id', currentUser.id);
+    // ۱. ثبت درخواست واریز در جدول استاندارد transactions
+    const { error: txErr } = await supabase.from('transactions').insert([{
+      user_id: currentUser.id,
+      amount: amountWithFee,
+      type: 'deposit',
+      status: 'pending',
+      currency: 'USDT',
+      title: `واریز ${window.currentNetwork || 'TRC20'}`,
+      description: `TxID: ${txVal}`,
+      created_at: nowISO
+    }]);
 
-    if (error) throw error;
+    if (txErr) console.warn("transactions insert warning:", txErr);
+
+    // ۲. ذخیره وضعیت در حافظه محلی جهت نمایش تایمر و حالت قفل‌شده
+    localStorage.setItem('zenix_pending_deposit_' + currentUser.id, JSON.stringify(pendingDepositObj));
 
     showMsg(t.pendingSentMsg, false, true);
     startTimer(nowISO);
@@ -605,23 +616,50 @@ async function loadUserData(user) {
 
   // بررسی درخواست واریز معلق کاربر
   try {
-    const { data: userData } = await supabase.from('users').select('*').eq('id', user.id).single();
-    if (userData && userData.pendingDeposit && userData.pendingDeposit.status === 'pending') {
+    let pendingDepositData = null;
+
+    // ۱. استعلام از جدول transactions
+    const { data: txData } = await supabase
+      .from('transactions')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('type', 'deposit')
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if (txData && txData.length > 0) {
+      const p = txData[0];
+      pendingDepositData = {
+        rawAmount: p.amount ? (p.amount / 1.025) : 0,
+        amount: p.amount,
+        txHash: p.description ? p.description.replace('TxID: ', '') : '',
+        createdAt: p.created_at || p.createdAt
+      };
+    } else {
+      // ۲. دریافت از حافظه محلی
+      const localVal = localStorage.getItem('zenix_pending_deposit_' + user.id);
+      if (localVal) {
+        try { pendingDepositData = JSON.parse(localVal); } catch(e){}
+      }
+    }
+
+    if (pendingDepositData) {
       const t = window.currentLangData || LD.fa;
       showMsg(t.pendingSentMsg || '⏳ درخواست واریز شما ثبت شده و در حال بررسی توسط مدیریت می‌باشد.', false, true);
-      startTimer(userData.pendingDeposit.createdAt);
+      startTimer(pendingDepositData.createdAt);
       
       const calcInput = document.getElementById('calc-input');
       const txInput = document.getElementById('tx-hash-input');
       const inquiryBtn = document.getElementById('inquiry-btn');
 
       if (calcInput && txInput) {
-        calcInput.value = userData.pendingDeposit.rawAmount || '';
-        txInput.value = userData.pendingDeposit.txHash || '';
+        calcInput.value = pendingDepositData.rawAmount ? parseFloat(pendingDepositData.rawAmount).toFixed(2) : '';
+        txInput.value = pendingDepositData.txHash || '';
         calcInput.readOnly = true;
         txInput.readOnly = true;
         
-        const val = parseFloat(userData.pendingDeposit.rawAmount) || 0;
+        const val = parseFloat(pendingDepositData.rawAmount) || 0;
         document.getElementById('calc-result').innerText = (val * 1.025).toFixed(2) + ' USDT';
         
         const walletInput = document.getElementById('wallet-address');
