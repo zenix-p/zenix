@@ -12,7 +12,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- FontAwesome و Supabase JS با تنظیمات ضد Tracking Prevention -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
         body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
@@ -109,7 +113,7 @@
                 <ul style="padding-right:18px;color:#94a3b8;display:flex;flex-direction:column;gap:8px;">
                     <li><strong style="color:#f8fafc;" id="t-help-l1t">مبالغ واریز و برداشت:</strong> <span id="t-help-l1d">میزان کل واریزی‌ها و برداشت‌های هر کاربر زیرمجموعه به‌صورت لحظه‌ای قابل مشاهده است.</span></li>
                     <li><strong style="color:#f8fafc;" id="t-help-l2t">دکمه مشاهده:</strong> <span id="t-help-l2d">با کلیک روی دکمه «مشاهده» روبروی هر کاربر، می‌توانید نام کاربری و آدرس ایمیل (جمیل) او را بررسی کنید.</span></li>
-                    <li><strong style="color:#f8fafc;" id="t-help-l3t">تاریخ ثبت‌‌نام:</strong> <span id="t-help-l3d">تاریخ و ساعت دقیق عضویت کاربر در شبکه شما درج شده است.</span></li>
+                    <li><strong style="color:#f8fafc;" id="t-help-l3t">تاریخ ثبت‌نام:</strong> <span id="t-help-l3d">تاریخ و ساعت دقیق عضویت کاربر در شبکه شما درج شده است.</span></li>
                 </ul>
             </div>
         </div>
@@ -142,7 +146,7 @@
                     <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l1t">هدف اصلی:</strong> <span id="t-ab-m-l1d">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li>
                     <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l2t">امنیت و زیرساخت:</strong> <span id="t-ab-m-l2d">متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن.</span></li>
                     <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l3t">ساختار چندسطحی (Referral & Team):</strong> <span id="t-ab-m-l3d">ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.</span></li>
-                    <li><strong style="color:#f8fafc;" id="t-ab-m-l4t">احساس واقع‌گرایی:</strong> <span id="t-ab-m-l4d">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌‌المللی و زنده سروکار دارد.</span></li>
+                    <li><strong style="color:#f8fafc;" id="t-ab-m-l4t">احساس واقع‌گرایی:</strong> <span id="t-ab-m-l4d">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.</span></li>
                 </ul>
             </div>
         </div>
@@ -153,19 +157,58 @@
     </footer>
 
     <script>
-        let currLang = localStorage.getItem('zenix_lang') || 'fa';
+        function safeGetItem(key) {
+            try { return localStorage.getItem(key); } catch(e) { return null; }
+        }
+        function safeSetItem(key, val) {
+            try { localStorage.setItem(key, val); } catch(e) {}
+        }
+        function safeRemoveItem(key) {
+            try { localStorage.removeItem(key); } catch(e) {}
+        }
+
+        const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
+
+        const customStorage = {
+            getItem: (key) => safeGetItem(key),
+            setItem: (key, value) => safeSetItem(key, value),
+            removeItem: (key) => safeRemoveItem(key)
+        };
+
+        var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                persistSession: true,
+                storage: customStorage,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+            }
+        });
+
+        let currLang = safeGetItem('zenix_lang') || 'fa';
         let allMessages = [];
-        let currentUserId = localStorage.getItem('zenix_user_id') || 'guest';
+        let currentUserId = null;
 
         const params = new URLSearchParams(window.location.search);
         const targetLevel = parseInt(params.get('level')) || 1;
+
+        function generateUIDDigits(userId) {
+            if (!userId) return '000000';
+            let hash = 5381;
+            let str = String(userId);
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) + hash) + str.charCodeAt(i);
+            }
+            const num = Math.abs(hash % 900000) + 100000;
+            return num.toString();
+        }
 
         const ld = {
             fa: {
                 m1: 'صفحه اصلی', m2: 'کوانتیفیکیشن', m3: 'واریز', m4: 'برداشت', m_team: 'تیم من', m5: 'تراکنش', m6: 'پروفایل', m7: 'پشتیبانی',
                 m_about: 'درباره پلتفرم', m8: 'خروج', modalTitle: 'صندوق پیام‌های مدیریت', noMsg: 'هیچ پیام جدیدی از طرف مدیریت وجود ندارد.',
                 backMsg: 'بازگشت به لیست پیام‌ها', newBadge: 'جدید',
-                tTpl: 'اعضای نسل', desc: 'مشاهده جزئیات و مبالغ واریز و برداشت کاربران زیرمجموعه',
+                tTpl: 'اعضای نسل ' + targetLevel, desc: 'مشاهده جزئیات و مبالغ واریز و برداشت کاربران زیرمجموعه',
                 reg: 'ثبت‌نام:', dep: 'مجموع واریزی:', wit: 'مجموع برداشتی:', nf: 'هیچ کاربری در این نسل یافت نشد.',
                 backToTeam: 'بازگشت به تیم', viewBtn: 'مشاهده',
                 helpTitle: 'راهنمای بخش اعضای نسل',
@@ -185,7 +228,7 @@
                 m1: 'Home', m2: 'Quantification', m3: 'Deposit', m4: 'Withdraw', m_team: 'My Team', m5: 'Transactions', m6: 'Profile', m7: 'Support',
                 m_about: 'About Platform', m8: 'Logout', modalTitle: 'Admin Messages', noMsg: 'No new messages from admin.',
                 backMsg: 'Back to Messages List', newBadge: 'NEW',
-                tTpl: 'Generation Members', desc: 'View user deposit and withdrawal details and amounts',
+                tTpl: 'Gen ' + targetLevel + ' Members', desc: 'View user deposit and withdrawal details and amounts',
                 reg: 'Registered:', dep: 'Total Deposits:', wit: 'Total Withdrawals:', nf: 'No users found in this generation.',
                 backToTeam: 'Back to Team', viewBtn: 'View',
                 helpTitle: 'Generation Members Guide',
@@ -205,10 +248,15 @@
 
         async function fetchUserMessages(uid) {
             try {
-                let messages = JSON.parse(localStorage.getItem('zenix_notifications') || '[]');
-                return messages;
+                const { data } = await supabaseClient.from('notifications').select('*').eq('user_id', uid).order('created_at', { ascending: false });
+                return (data || []).map(dt => ({
+                    id: dt.id,
+                    subject: dt.title || dt.subject || 'Announcement',
+                    body: dt.message || dt.text || dt.body || '',
+                    time: dt.created_at || new Date().toISOString(),
+                    read: dt.read === true || dt.is_read === true
+                }));
             } catch (e) {
-                console.error("Error fetching messages:", e);
                 return [];
             }
         }
@@ -245,7 +293,11 @@
         window.readAdminMessage = async idx => {
             let m = allMessages[idx]; if (!m) return;
             allMessages[idx].read = true;
-            localStorage.setItem('zenix_notifications', JSON.stringify(allMessages));
+            if (currentUserId && m.id) {
+                try {
+                    await supabaseClient.from('notifications').update({ read: true, is_read: true }).eq('id', m.id);
+                } catch(e) {}
+            }
             let unread = allMessages.filter(i => !i.read).length, b = document.getElementById('bell-badge');
             if (b) { b.textContent = unread; b.classList.toggle('show', unread > 0); }
 
@@ -266,6 +318,12 @@
         window.openHelpModal = () => document.getElementById('m-help')?.classList.add('show');
         window.openAboutModal = () => document.getElementById('m-about')?.classList.add('show');
 
+        window.showUserModal = function(username, email) {
+            document.getElementById('modal-username').textContent = username || '-';
+            document.getElementById('modal-email').textContent = email || '-';
+            document.getElementById('m-user-detail')?.classList.add('show');
+        };
+
         document.getElementById('bell-btn')?.addEventListener('click', e => { e.stopPropagation(); window.openMessageModal(); });
 
         const mBtn = document.getElementById('menu-btn'), nMenu = document.getElementById('nav-menu'), lBtn = document.getElementById('lang-btn'), lMenu = document.getElementById('lang-menu');
@@ -278,116 +336,268 @@
             }
         });
 
-        document.getElementById('logout-btn')?.addEventListener('click', e => {
-            e.preventDefault();
-            localStorage.clear(); window.location.href = 'index.html';
-        });
-
-        // تغییر زبان با کلیک روی آیتم‌های منوی زبان
-        document.querySelectorAll('[data-lang]').forEach(el => {
-            el.addEventListener('click', () => {
-                let lang = el.getAttribute('data-lang');
-                if (lang) {
-                    localStorage.setItem('zenix_lang', lang);
-                    location.reload();
-                }
-            });
-        });
-
-        window.openUserModal = (username, email) => {
-            const uElem = document.getElementById('modal-username');
-            const eElem = document.getElementById('modal-email');
-            if (uElem) uElem.textContent = username || '-';
-            if (eElem) eElem.textContent = email || '-';
-            document.getElementById('m-user-detail')?.classList.add('show');
-        };
-
-        function renderTeamMembers() {
-            const t = ld[currLang] || ld.fa;
-            
-            // به‌روزرسانی عناوین صفحه
-            const titleEl = document.getElementById('page-title');
-            if (titleEl) titleEl.textContent = `${t.tTpl} ${targetLevel}`;
-            
-            const descEl = document.getElementById('page-desc');
-            if (descEl) descEl.textContent = t.desc;
-
-            const backBtnEl = document.getElementById('t-back-btn');
-            if (backBtnEl) backBtnEl.textContent = t.backToTeam;
-
-            // خواندن لیست اعضا از ذخیره‌سازی محلی
-            let members = [];
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
             try {
-                const stored = localStorage.getItem('zenix_team_members') || localStorage.getItem('zenix_team') || localStorage.getItem('zenix_referrals');
-                if (stored) {
-                    const parsed = JSON.parse(stored);
-                    if (Array.isArray(parsed)) {
-                        members = parsed.filter(m => parseInt(m.level) === targetLevel);
-                    }
-                }
-            } catch (e) {
-                console.error("Error loading team members:", e);
+                let d = new Date(dateStr);
+                if (isNaN(d.getTime())) return dateStr;
+                return d.toLocaleDateString(currLang === 'fa' ? 'fa-IR' : 'en-US');
+            } catch(e) {
+                return dateStr;
             }
-
-            // داده‌های نمونه برای هر سطح در صورت عدم وجود اعضا در ذخیره‌سازی
-            if (members.length === 0) {
-                if (targetLevel === 1) {
-                    members = [
-                        { username: 'User_8921', email: 'user8921@gmail.com', regDate: '2026-08-15 14:20', deposit: '$500.00', withdraw: '$120.00', level: 1 },
-                        { username: 'User_3410', email: 'user3410@gmail.com', regDate: '2026-08-28 09:15', deposit: '$1,200.00', withdraw: '$350.00', level: 1 },
-                        { username: 'User_7702', email: 'user7702@gmail.com', regDate: '2026-09-02 18:45', deposit: '$250.00', withdraw: '$0.00', level: 1 }
-                    ];
-                } else if (targetLevel === 2) {
-                    members = [
-                        { username: 'User_5514', email: 'user5514@gmail.com', regDate: '2026-09-05 11:10', deposit: '$300.00', withdraw: '$50.00', level: 2 },
-                        { username: 'User_9088', email: 'user9088@gmail.com', regDate: '2026-09-12 16:30', deposit: '$800.00', withdraw: '$200.00', level: 2 }
-                    ];
-                } else if (targetLevel === 3) {
-                    members = [
-                        { username: 'User_1143', email: 'user1143@gmail.com', regDate: '2026-09-18 20:05', deposit: '$150.00', withdraw: '$0.00', level: 3 }
-                    ];
-                }
-            }
-
-            const listElem = document.getElementById('team-members-list');
-            if (!listElem) return;
-
-            if (members.length === 0) {
-                listElem.innerHTML = `<div style="text-align:center;color:#94a3b8;padding:20px;font-size:12px;">${t.nf}</div>`;
-                return;
-            }
-
-            let html = '';
-            members.forEach(user => {
-                const uName = user.username || user.name || user.id || 'User';
-                const uEmail = user.email || user.gmail || '-';
-                const uReg = user.regDate || user.registeredAt || user.date || '-';
-                const uDep = user.deposit || user.totalDeposit || '$0.00';
-                const uWit = user.withdraw || user.totalWithdraw || '$0.00';
-
-                html += `
-                <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <div style="display:flex;align-items:center;gap:10px;">
-                            <div style="width:34px;height:34px;border-radius:50%;background:rgba(56,189,248,0.15);color:#38bdf8;display:flex;align-items:center;justify-content:center;font-size:14px;"><i class="fas fa-user"></i></div>
-                            <div>
-                                <div style="font-weight:700;font-size:13px;color:#f8fafc;">${uName}</div>
-                                <div style="font-size:10px;color:#64748b;margin-top:2px;">${t.reg} ${uReg}</div>
-                            </div>
-                        </div>
-                        <button type="button" onclick="window.openUserModal('${uName}', '${uEmail}')" style="background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.3);color:#38bdf8;padding:5px 12px;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600;"><i class="fas fa-eye"></i> ${t.viewBtn}</button>
-                    </div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(15,23,42,0.6);padding:8px 12px;border-radius:6px;font-size:11px;margin-top:2px;">
-                        <div style="color:#cbd5e1;"><span>${t.dep}</span> <strong style="color:#22c55e;margin-right:4px;">${uDep}</strong></div>
-                        <div style="color:#cbd5e1;"><span>${t.wit}</span> <strong style="color:#fbbf24;margin-right:4px;">${uWit}</strong></div>
-                    </div>
-                </div>`;
-            });
-
-            listElem.innerHTML = html;
         }
 
-        renderTeamMembers();
+        async function loadTeamMembers(uid, sessionUser) {
+            const listElem = document.getElementById('team-members-list');
+            const t = ld[currLang] || ld.fa;
+
+            try {
+                let codeDigits = generateUIDDigits(uid);
+                let myRefCode = 'MS-' + codeDigits;
+
+                try {
+                    const { data: myProfile } = await supabaseClient
+                        .from('profiles')
+                        .select('referral_code')
+                        .eq('id', uid)
+                        .maybeSingle();
+
+                    if (myProfile && myProfile.referral_code) {
+                        myRefCode = myProfile.referral_code;
+                    }
+                } catch(e) {}
+
+                let rawList = [];
+
+                try {
+                    const { data: dbProfiles } = await supabaseClient.from('profiles').select('*');
+                    if (dbProfiles && Array.isArray(dbProfiles)) {
+                        rawList.push(...dbProfiles);
+                    }
+                } catch(e) {}
+
+                if (sessionUser && sessionUser.user_metadata) {
+                    let metaTeam = sessionUser.user_metadata.team_members || sessionUser.user_metadata.referrals || sessionUser.user_metadata.invited_users;
+                    if (Array.isArray(metaTeam)) rawList.push(...metaTeam);
+                }
+
+                ['zenix_registered_users', 'zenix_users', 'zenix_referrals', 'zenix_team_' + uid, 'zenix_all_users'].forEach(k => {
+                    let item = safeGetItem(k);
+                    if (item) {
+                        try {
+                            let parsed = JSON.parse(item);
+                            if (Array.isArray(parsed)) rawList.push(...parsed);
+                            else if (parsed && typeof parsed === 'object') rawList.push(parsed);
+                        } catch(e) {}
+                    }
+                });
+
+                let uniqueMap = new Map();
+                rawList.forEach(u => {
+                    if (u) {
+                        let key = u.user_id || u.id || u.email || u.username || JSON.stringify(u);
+                        uniqueMap.set(key, u);
+                    }
+                });
+                let allProfiles = Array.from(uniqueMap.values());
+
+                function isReferredBy(u, refUid, refCodeVal) {
+                    if (!u) return false;
+                    let uUid = u.user_id || u.id;
+                    if (uUid === refUid) return false;
+
+                    let digits = generateUIDDigits(refUid);
+                    let defaultCode = 'MS-' + digits;
+                    let legacyCode = 'SM-' + digits;
+
+                    let refs = [
+                        u.referred_by,
+                        u.referrer_id,
+                        u.invitation_code,
+                        u.ref_code,
+                        u.inviter,
+                        u.referral_code,
+                        u.ref
+                    ].map(x => x ? String(x).trim().toUpperCase() : '');
+
+                    const targetCodes = [
+                        String(refUid).toUpperCase(),
+                        defaultCode.toUpperCase(),
+                        legacyCode.toUpperCase(),
+                        digits.toUpperCase()
+                    ];
+                    if (refCodeVal) targetCodes.push(String(refCodeVal).toUpperCase());
+
+                    return refs.some(r => r && targetCodes.includes(r));
+                }
+
+                let lvl1Users = allProfiles.filter(u => isReferredBy(u, uid, myRefCode));
+
+                let lvl2Users = [];
+                if (lvl1Users.length > 0) {
+                    lvl2Users = allProfiles.filter(u => {
+                        let uUid = u.user_id || u.id;
+                        if (uUid === uid || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid)) return false;
+                        return lvl1Users.some(l1 => isReferredBy(u, l1.user_id || l1.id, l1.referral_code));
+                    });
+                }
+
+                let lvl3Users = [];
+                if (lvl2Users.length > 0) {
+                    lvl3Users = allProfiles.filter(u => {
+                        let uUid = u.user_id || u.id;
+                        if (uUid === uid || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid) || lvl2Users.some(l2 => (l2.user_id || l2.id) === uUid)) return false;
+                        return lvl2Users.some(l2 => isReferredBy(u, l2.user_id || l2.id, l2.referral_code));
+                    });
+                }
+
+                let targetUsers = [];
+                if (targetLevel === 1) targetUsers = lvl1Users;
+                else if (targetLevel === 2) targetUsers = lvl2Users;
+                else if (targetLevel === 3) targetUsers = lvl3Users;
+
+                if (!listElem) return;
+
+                if (targetUsers.length === 0) {
+                    listElem.innerHTML = `<div style="text-align:center;color:#94a3b8;padding:20px;font-size:12px;">${t.nf}</div>`;
+                    return;
+                }
+
+                let html = '';
+                targetUsers.forEach((u, idx) => {
+                    let uName = u.username || u.name || (u.email ? u.email.split('@')[0] : `کاربر ${idx + 1}`);
+                    let uEmail = u.email || u.gmail || '-';
+                    let depVal = Number(u.total_deposit || u.deposit || u.deposits || 0).toFixed(2);
+                    let witVal = Number(u.total_withdraw || u.withdraw || u.withdrawals || 0).toFixed(2);
+                    let regDate = formatDate(u.created_at || u.registered_at || u.date);
+
+                    html += `
+                    <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:10px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <div style="display:flex;align-items:center;gap:10px;">
+                                <div style="width:38px;height:38px;border-radius:50%;background:rgba(56,189,248,0.15);color:#38bdf8;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:15px;"><i class="fas fa-user"></i></div>
+                                <div>
+                                    <div style="font-weight:bold;font-size:13px;color:#f8fafc;">${uName}</div>
+                                    <div style="font-size:10px;color:#94a3b8;margin-top:2px;">${t.reg} ${regDate}</div>
+                                </div>
+                            </div>
+                            <button type="button" onclick="showUserModal('${uName.replace(/'/g, "\\'")}', '${uEmail.replace(/'/g, "\\'")}')" style="background:rgba(56,189,248,0.15);border:1px solid #38bdf8;color:#38bdf8;padding:5px 12px;border-radius:6px;font-size:11px;cursor:pointer;font-weight:bold;display:flex;align-items:center;gap:4px;">
+                                <i class="fas fa-eye"></i> ${t.viewBtn}
+                            </button>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;background:rgba(30,41,59,0.5);padding:10px 12px;border-radius:8px;font-size:11px;">
+                            <div><span style="color:#94a3b8;">${t.dep}</span> <strong style="color:#22c55e;">${depVal}$</strong></div>
+                            <div><span style="color:#94a3b8;">${t.wit}</span> <strong style="color:#ef4444;">${witVal}$</strong></div>
+                        </div>
+                    </div>`;
+                });
+
+                listElem.innerHTML = html;
+
+            } catch (err) {
+                console.error("Error loading team members:", err);
+                if (listElem) {
+                    listElem.innerHTML = `<div style="text-align:center;color:#ef4444;padding:20px;font-size:12px;">خطا در بارگیری داده‌ها. لطفا مجددا تلاش کنید.</div>`;
+                }
+            }
+        }
+
+        supabaseClient.auth.onAuthStateChange(async (event, session) => {
+            if (session && session.user) {
+                currentUserId = session.user.id;
+                loadTeamMembers(session.user.id, session.user);
+
+                fetchUserMessages(session.user.id).then(msgs => {
+                    allMessages = msgs;
+                    let unread = allMessages.filter(m => !m.read).length, b = document.getElementById('bell-badge');
+                    if (b && unread > 0) { b.textContent = unread; b.classList.add('show'); }
+                });
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        function setLang(l) {
+            currLang = l;
+            safeSetItem('zenix_lang', l);
+            let t = ld[l] || ld.fa;
+            let r = l === 'fa' || l === 'ar';
+            
+            document.documentElement.setAttribute('dir', r ? 'rtl' : 'ltr');
+            document.documentElement.setAttribute('lang', l);
+
+            for (let i = 1; i <= 8; i++) {
+                let m = document.getElementById('m' + i);
+                if (m) m.textContent = t['m' + i] || '';
+            }
+
+            let mTeam = document.getElementById('m_team');
+            if (mTeam) mTeam.textContent = t.m_team;
+
+            let elModalTitle = document.getElementById('t-modal-title');
+            if (elModalTitle) elModalTitle.textContent = t.modalTitle;
+
+            let elAbout = document.getElementById('m_about');
+            if (elAbout) elAbout.textContent = t.m_about;
+
+            let helpBtn = document.getElementById('help-btn');
+            if (helpBtn) helpBtn.setAttribute('title', t.helpTitle || '');
+
+            let elHelpTitle = document.getElementById('t-help-title');
+            if (elHelpTitle) elHelpTitle.textContent = t.helpTitle;
+
+            let elPageTitle = document.getElementById('page-title');
+            if (elPageTitle) elPageTitle.textContent = t.tTpl;
+
+            let elPageDesc = document.getElementById('page-desc');
+            if (elPageDesc) elPageDesc.textContent = t.desc;
+
+            let elBackBtn = document.getElementById('t-back-btn');
+            if (elBackBtn) elBackBtn.textContent = t.backToTeam;
+
+            let elUserModalTitle = document.getElementById('t-user-modal-title');
+            if (elUserModalTitle) elUserModalTitle.textContent = t.userModalTitle;
+
+            let elLblUsername = document.getElementById('t-lbl-username');
+            if (elLblUsername) elLblUsername.textContent = t.lblUsername;
+
+            let elLblEmail = document.getElementById('t-lbl-email');
+            if (elLblEmail) elLblEmail.textContent = t.lblEmail;
+
+            let elHelpDesc = document.getElementById('t-help-desc');
+            if (elHelpDesc) elHelpDesc.textContent = t.helpDesc;
+
+            for (let i = 1; i <= 3; i++) {
+                let ht = document.getElementById('t-help-l' + i + 't');
+                let hd = document.getElementById('t-help-l' + i + 'd');
+                if (ht && t['helpL' + i + 'T']) ht.textContent = t['helpL' + i + 'T'];
+                if (hd && t['helpL' + i + 'D']) hd.textContent = t['helpL' + i + 'D'];
+            }
+
+            ['t-about-title'].forEach(id => { let el = document.getElementById(id); if (el) el.textContent = t.abTitle; });
+            ['t-ab-m-desc'].forEach(id => { let el = document.getElementById(id); if (el) el.textContent = t.abDesc; });
+
+            for (let i = 1; i <= 4; i++) {
+                let elT = document.getElementById('t-ab-m-l' + i + 't');
+                let elD = document.getElementById('t-ab-m-l' + i + 'd');
+                if (elT) elT.textContent = t['abL' + i + 'T'];
+                if (elD) elD.textContent = t['abL' + i + 'D'];
+            }
+
+            if (currentUserId) {
+                loadTeamMembers(currentUserId, supabaseClient.auth.getSession());
+            }
+        }
+
+        document.querySelectorAll('#lang-menu .mi').forEach(i => i.addEventListener('click', () => setLang(i.dataset.lang)));
+
+        document.getElementById('logout-btn')?.addEventListener('click', async e => {
+            e.preventDefault();
+            try { await supabaseClient.auth.signOut(); } catch(e) {}
+            window.location.href = 'index.html';
+        });
+
+        setLang(currLang);
     </script>
 </body>
 </html>
