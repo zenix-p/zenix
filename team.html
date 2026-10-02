@@ -12,10 +12,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Supabase JS Library -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- FontAwesome با تنظیمات ضد Tracking Prevention -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    
+    <!-- Supabase JS Library با تنظیمات ضد Tracking Prevention -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
@@ -142,7 +144,7 @@
             <div style="overflow-y:auto;padding-right:4px">
                 <p style="font-size:13px;color:#cbd5e1;line-height:1.7;margin-bottom:10px;" id="t-ab-m-desc">پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.</p>
                 <ul style="font-size:12px;color:#94a3b8;padding-right:18px;line-height:1.7;margin-bottom:0;">
-                    <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l1t">هدف اصلی:</strong> <span id="t-ab-m-l1d">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li>
+                    <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l1t">هدف اصلی:</strong> <span id="t-ab-m-l1d">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li>
                     <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l2t">امنیت و زیرساخت:</strong> <span id="t-ab-m-l2d">متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن.</span></li>
                     <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l3t">ساختار چندسطحی (Referral & Team):</strong> <span id="t-ab-m-l3d">ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.</span></li>
                     <li><strong style="color:#f8fafc;" id="t-ab-m-l4t">احساس واقع‌گرایی:</strong> <span id="t-ab-m-l4d">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.</span></li>
@@ -179,10 +181,28 @@
         function safeSetItem(key, val) {
             try { localStorage.setItem(key, val); } catch(e) {}
         }
+        function safeRemoveItem(key) {
+            try { localStorage.removeItem(key); } catch(e) {}
+        }
 
         const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
-        var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // پشتیبانی ایمن از حافظه مرورگر جهت جلوگیری از خطای Tracking Prevention
+        const customStorage = {
+            getItem: (key) => safeGetItem(key),
+            setItem: (key, value) => safeSetItem(key, value),
+            removeItem: (key) => safeRemoveItem(key)
+        };
+
+        var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                persistSession: true,
+                storage: customStorage,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+            }
+        });
 
         let currLang = safeGetItem('zenix_lang') || 'fa';
         let allMessages = [];
@@ -327,7 +347,6 @@
                 let codeDigits = generateUIDDigits(uid);
                 let myRefCode = 'MS-' + codeDigits;
 
-                // ۱. دریافت کد دعوت اختصاصی ثبت‌شده کاربر از دیتابیس Supabase
                 try {
                     const { data: myProfile } = await supabaseClient
                         .from('profiles')
@@ -350,7 +369,6 @@
 
                 let rawList = [];
 
-                // ۲. خواندن کاربران ثبت‌نام شده مستقیماً از دیتابیس سوبابیس (جدول profiles)
                 try {
                     const { data: dbProfiles } = await supabaseClient
                         .from('profiles')
@@ -363,13 +381,11 @@
                     console.log("خطا در دریافت لیست اعضا از دیتابیس:", e);
                 }
 
-                // ۳. پشتیبانی از متاداده کاربر جاری
                 if (sessionUser && sessionUser.user_metadata) {
                     let metaTeam = sessionUser.user_metadata.team_members || sessionUser.user_metadata.referrals || sessionUser.user_metadata.invited_users;
                     if (Array.isArray(metaTeam)) rawList.push(...metaTeam);
                 }
 
-                // ۴. پشتیبانی از حافظه محلی
                 ['zenix_registered_users', 'zenix_users', 'zenix_referrals', 'zenix_team_' + uid, 'zenix_all_users'].forEach(k => {
                     let item = safeGetItem(k);
                     if (item) {
@@ -381,7 +397,6 @@
                     }
                 });
 
-                // حذف گزینه‌های تکراری
                 let uniqueMap = new Map();
                 rawList.forEach(u => {
                     if (u) {
@@ -421,10 +436,8 @@
                     return refs.some(r => r && targetCodes.includes(r));
                 }
 
-                // محاسبه اعضای نسل ۱ (زیرمجموعه‌های مستقیم)
                 let lvl1Users = allProfiles.filter(u => isReferredBy(u, uid, myRefCode));
 
-                // محاسبه اعضای نسل ۲
                 let lvl2Users = [];
                 if (lvl1Users.length > 0) {
                     lvl2Users = allProfiles.filter(u => {
@@ -434,7 +447,6 @@
                     });
                 }
 
-                // محاسبه اعضای نسل ۳
                 let lvl3Users = [];
                 if (lvl2Users.length > 0) {
                     lvl3Users = allProfiles.filter(u => {
@@ -483,7 +495,6 @@
             }
         }
 
-        // بررسی ورود کاربر از طریق Supabase Auth
         supabaseClient.auth.onAuthStateChange(async (event, session) => {
             if (session && session.user) {
                 currentUserId = session.user.id;
