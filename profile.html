@@ -40,45 +40,48 @@
             gap: 10px;
             pointer-events: none;
             width: 90%;
-            max-width: 400px;
+            max-width: 420px;
         }
         .toast {
-            padding: 12px 18px;
-            border-radius: 12px;
+            padding: 14px 18px;
+            border-radius: 14px;
             font-size: 13px;
             font-weight: 600;
             display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(12px);
+            align-items: flex-start;
+            gap: 12px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(14px);
             opacity: 0;
             transform: translateY(-20px);
             transition: all 0.35s cubic-bezier(0.68, -0.55, 0.27, 1.55);
             pointer-events: auto;
             direction: rtl;
+            line-height: 1.5;
         }
         .toast.show {
             opacity: 1;
             transform: translateY(0);
         }
         .toast-success {
-            background: rgba(16, 185, 129, 0.18);
-            border: 1px solid rgba(16, 185, 129, 0.5);
+            background: rgba(16, 185, 129, 0.22);
+            border: 1px solid rgba(16, 185, 129, 0.6);
             color: #34d399;
         }
         .toast-error {
-            background: rgba(239, 68, 68, 0.18);
-            border: 1px solid rgba(239, 68, 68, 0.5);
+            background: rgba(239, 68, 68, 0.22);
+            border: 1px solid rgba(239, 68, 68, 0.6);
             color: #f87171;
         }
         .toast-info {
-            background: rgba(56, 189, 248, 0.18);
+            background: rgba(15, 23, 42, 0.92);
             border: 1px solid rgba(56, 189, 248, 0.5);
             color: #38bdf8;
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.25);
         }
         .toast i {
-            font-size: 16px;
+            font-size: 18px;
+            margin-top: 2px;
         }
 
         header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1);padding:10px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
@@ -363,8 +366,8 @@
 
     <!-- کدهای اسکریپت اصلی UI -->
     <script>
-        // تابع نمایش اعلان شکیل درون برنامه‌ای (Toast)
-        window.showToast = function(message, type = 'success') {
+        // تابع نمایش اعلان درون برنامه‌ای (زمان نمایش به ۸ ثانیه و ساختار دو رنگی ارتقاء یافت)
+        window.showToast = function(message, type = 'success', duration = 8000) {
             const container = document.getElementById('toast-container');
             if (!container) return;
 
@@ -375,7 +378,7 @@
             if (type === 'error') iconClass = 'fa-exclamation-circle';
             if (type === 'info') iconClass = 'fa-info-circle';
 
-            toast.innerHTML = `<i class="fas ${iconClass}"></i><span>${message}</span>`;
+            toast.innerHTML = `<i class="fas ${iconClass}"></i><div style="flex:1;">${message}</div>`;
             container.appendChild(toast);
 
             setTimeout(() => {
@@ -387,7 +390,7 @@
                 setTimeout(() => {
                     toast.remove();
                 }, 350);
-            }, 3500);
+            }, duration);
         };
 
         const countries=[{n:"Afghanistan",c:"+93",f:"🇦🇫"},{n:"Albania",c:"+355",f:"🇦🇱"},{n:"Algeria",c:"+213",f:"🇩🇿"},{n:"Argentina",c:"+54",f:"🇦🇷"},{n:"Australia",c:"+61",f:"🇦🇺"},{n:"Austria",c:"+43",f:"🇦🇹"},{n:"Azerbaijan",c:"+994",f:"🇦🇿"},{n:"Bahrain",c:"+973",f:"🇧🇭"},{n:"Bangladesh",c:"+880",f:"🇧🇩"},{n:"Belarus",c:"+375",f:"🇧🇾"},{n:"Belgium",c:"+32",f:"🇧🇪"},{n:"Brazil",c:"+55",f:"🇧🇷"},{n:"Canada",c:"+1",f:"🇨🇦"},{n:"China",c:"+86",f:"🇨🇳"},{n:"Egypt",c:"+20",f:"🇪🇬"},{n:"France",c:"+33",f:"🇫🇷"},{n:"Germany",c:"+49",f:"🇩🇪"},{n:"India",c:"+91",f:"🇮🇳"},{n:"Indonesia",c:"+62",f:"🇮🇩"},{n:"Iran",c:"+98",f:"🇮🇷"},{n:"Iraq",c:"+964",f:"🇮🇶"},{n:"Italy",c:"+39",f:"🇮🇹"},{n:"Japan",c:"+81",f:"🇯🇵"},{n:"Jordan",c:"+962",f:"🇯🇴"},{n:"Kuwait",c:"+965",f:"🇰🇼"},{n:"Lebanon",c:"+961",f:"🇱🇧"},{n:"Malaysia",c:"+60",f:"🇲🇾"},{n:"Netherlands",c:"+31",f:"🇳🇱"},{n:"Oman",c:"+968",f:"🇴🇲"},{n:"Pakistan",c:"+92",f:"🇵🇰"},{n:"Qatar",c:"+974",f:"🇶🇦"},{n:"Russia",c:"+7",f:"🇷🇺"},{n:"Saudi Arabia",c:"+966",f:"🇸🇦"},{n:"Spain",c:"+34",f:"🇪🇸"},{n:"Sweden",c:"+46",f:"🇸🇪"},{n:"Switzerland",c:"+41",f:"🇨🇭"},{n:"Turkey",c:"+90",f:"🇹🇷"},{n:"United Arab Emirates",c:"+971",f:"🇦🇪"},{n:"United Kingdom",c:"+44",f:"🇬🇧"},{n:"United States",c:"+1",f:"🇺🇸"}];
@@ -419,7 +422,7 @@
 
         window.copyUserId = function(){
             const uidText=document.getElementById('user-id').textContent.replace('UID: ','');
-            navigator.clipboard.writeText(uidText).then(()=>window.showToast('شناسه کاربر کپی شد: ' + uidText, 'info'));
+            navigator.clipboard.writeText(uidText).then(()=>window.showToast('شناسه کاربر کپی شد: ' + uidText, 'info', 4000));
         };
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -583,7 +586,7 @@
           const email = emailInput && emailInput.value ? emailInput.value.trim() : (currentUser ? currentUser.email : '');
 
           if (!email || !email.includes('@')) {
-            window.showToast('لطفاً یک ایمیل معتبر وارد کنید.', 'error');
+            window.showToast('لطفاً یک ایمیل معتبر وارد کنید.', 'error', 4000);
             return;
           }
 
@@ -618,7 +621,7 @@
                 .eq('id', currentUser.id);
             }
 
-            window.showToast(`کد تایید به ایمیل ${email} ارسال شد.`, 'success');
+            window.showToast(`کد تایید به ایمیل ${email} ارسال شد.`, 'success', 5000);
 
             if (btnEl) {
               let countdown = 60;
@@ -640,9 +643,28 @@
               btnEl.textContent = origText;
             }
             console.error('خطا در ارسال EmailJS:', error);
-            window.showToast('خطا در ارسال ایمیل. لطفاً مجدداً تلاش کنید.', 'error');
+            window.showToast('خطا در ارسال ایمیل. لطفاً مجدداً تلاش کنید.', 'error', 4000);
           }
         };
+
+        // تابع نمایش پیام خوش‌آمدگویی جلب‌توجه‌کننده
+        function triggerWelcomeToast() {
+            if (hasShownWelcomeToast) return;
+            hasShownWelcomeToast = true;
+            
+            const welcomeMsg = `
+                <strong style="color:#fbbf24; font-size:14px; font-weight:800; display:block; margin-bottom:4px; text-shadow:0 0 10px rgba(251,191,36,0.3);">
+                    🎉 به Zenix خوش آمدید!
+                </strong>
+                <span style="color:#e2e8f0; font-size:12px; font-weight:500; line-height:1.6;">
+                    جهت دسترسی کامل و استفاده از تمام امکانات پلتفرم، لطفاً شماره موبایل خود را وارد و ذخیره کنید.
+                </span>
+            `;
+            
+            setTimeout(() => {
+                window.showToast(welcomeMsg, 'info', 8000); // زمان نمایش به ۸ ثانیه تغییر یافت
+            }, 500);
+        }
 
         async function loadUserData(user) {
           const { data, error } = await supabaseClient
@@ -665,11 +687,8 @@
 
             if (data.phone) {
                 lockPhoneInput(data.phone);
-            } else if (!hasShownWelcomeToast) {
-                hasShownWelcomeToast = true;
-                setTimeout(() => {
-                    window.showToast('به Zenix خوش آمدید! جهت دسترسی کامل و استفاده از امکانات پلتفرم، لطفاً شماره موبایل خود را وارد نمایید.', 'info');
-                }, 500);
+            } else {
+                triggerWelcomeToast();
             }
 
             const statusEl = document.getElementById('account-status');
@@ -693,11 +712,8 @@
 
             if(data.trx_address) document.getElementById('trx-in').value = data.trx_address;
             if(data.bep20_address) document.getElementById('bep-in').value = data.bep20_address;
-          } else if (!hasShownWelcomeToast) {
-            hasShownWelcomeToast = true;
-            setTimeout(() => {
-                window.showToast('به Zenix خوش آمدید! جهت دسترسی کامل و استفاده از امکانات پلتفرم، لطفاً شماره موبایل خود را وارد نمایید.', 'info');
-            }, 500);
+          } else {
+            triggerWelcomeToast();
           }
         }
 
@@ -749,7 +765,7 @@
           }
         });
 
-        // ذخیره شماره تماس با نمایش توست‌نوتیفیکیشن مدرن
+        // ذخیره شماره تماس با نمایش توست‌نوتیفیکیشن
         window.savePhone = async function() {
           const phoneInput = document.getElementById('user-phone-input');
           const errEl = document.getElementById('phone-err-msg');
@@ -773,7 +789,7 @@
           }
 
           if (!currentUser) {
-            window.showToast('نشست کاری شما یافت نشد. لطفاً مجدداً وارد شوید.', 'error');
+            window.showToast('نشست کاری شما یافت نشد. لطفاً مجدداً وارد شوید.', 'error', 4000);
             return;
           }
 
@@ -817,7 +833,7 @@
               if (!error) {
                 if (errEl) errEl.style.display = 'none';
                 lockPhoneInput(fullPhone);
-                window.showToast('شماره تماس با موفقیت ثبت شد.', 'success');
+                window.showToast('شماره تماس با موفقیت ثبت شد.', 'success', 5000);
               } else {
                 console.error('خطای دیتابیس سوپابیس:', error);
                 const errMsg = error.message || error.details || 'عدم دسترسی ویرایش به دیتابیس';
@@ -825,21 +841,21 @@
                   errEl.textContent = 'خطا: ' + errMsg;
                   errEl.style.display = 'block';
                 }
-                window.showToast('خطای ذخیره‌سازی سوپابیس: ' + errMsg, 'error');
+                window.showToast('خطای ذخیره‌سازی سوپابیس: ' + errMsg, 'error', 5000);
               }
             } catch (e) {
               if (saveBtn) {
                 saveBtn.disabled = false;
                 saveBtn.innerText = 'ذخیره';
               }
-              window.showToast('خطای غیرمنتظره: ' + e.message, 'error');
+              window.showToast('خطای غیرمنتظره: ' + e.message, 'error', 5000);
             }
           } else {
             if (errEl) {
               errEl.textContent = 'شماره باید ۱۰ رقم و بدون صفر باشد (مثال: 9123456789)';
               errEl.style.display = 'block';
             }
-            window.showToast('لطفاً شماره را به‌صورت ۱۰ رقمی و بدون صفر وارد کنید.', 'error');
+            window.showToast('لطفاً شماره را به‌صورت ۱۰ رقمی و بدون صفر وارد کنید.', 'error', 4000);
           }
         };
 
@@ -850,20 +866,20 @@
         window.handleSelfieCapture = function(input) {
           if (input.files && input.files[0]) {
             document.getElementById('admin-status-box').style.display = 'block';
-            window.showToast('تصویر سلفی ارسال شد و در انتظار بررسی ادمین قرار گرفت.', 'info');
+            window.showToast('تصویر سلفی ارسال شد و در انتظار بررسی ادمین قرار گرفت.', 'info', 5000);
           }
         };
 
         window.validatePasswordForm = function(btn) {
-          window.showToast('رمز ورود با موفقیت به‌روزرسانی شد.', 'success');
+          window.showToast('رمز ورود با موفقیت به‌روزرسانی شد.', 'success', 4000);
         };
 
         window.validateTxForm = function(btn) {
-          window.showToast('رمز تراکنش با موفقیت به‌روزرسانی شد.', 'success');
+          window.showToast('رمز تراکنش با موفقیت به‌روزرسانی شد.', 'success', 4000);
         };
 
         window.verifyWalletCode = function(btn) {
-          window.showToast('کد تایید با موفقیت تایید شد.', 'success');
+          window.showToast('کد تایید با موفقیت تایید شد.', 'success', 4000);
         };
 
         window.saveWalletForm = async function(btn) {
@@ -876,9 +892,9 @@
               .eq('id', currentUser.id);
 
             if (!error) {
-              window.showToast('آدرس‌های کیف پول با موفقیت ثبت شدند.', 'success');
+              window.showToast('آدرس‌های کیف پول با موفقیت ثبت شدند.', 'success', 5000);
             } else {
-              window.showToast('خطا در ذخیره کیف پول: ' + error.message, 'error');
+              window.showToast('خطا در ذخیره کیف پول: ' + error.message, 'error', 5000);
             }
           }
         };
