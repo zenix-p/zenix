@@ -327,15 +327,16 @@
                 }
 
                 let allProfiles = [];
-                const { data: profiles, error } = await supabaseClient.from('profiles').select('*');
-                if (!error && profiles) {
-                    allProfiles = profiles;
-                } else {
-                    const { data: pL1 } = await supabaseClient
-                        .from('profiles')
-                        .select('*')
-                        .or(`referred_by.eq.${uid},referred_by.eq.${myRefCode},referred_by.eq.${codeDigits},referrer_id.eq.${uid},invitation_code.eq.${myRefCode},invitation_code.eq.${codeDigits}`);
-                    if (pL1) allProfiles = pL1;
+                // بررسی جداول احتمالی کاربران
+                const targetTables = ['profiles', 'users', 'user_profiles'];
+                for (let tName of targetTables) {
+                    try {
+                        const { data, error } = await supabaseClient.from(tName).select('*');
+                        if (!error && data) {
+                            allProfiles = data;
+                            break;
+                        }
+                    } catch (e) {}
                 }
 
                 function isReferredBy(u, refUid) {
