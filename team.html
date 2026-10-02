@@ -173,7 +173,6 @@
     </footer>
 
     <script>
-        // توابع ایمن خواندن/نوشتن در استوریج جهت جلوگیری از خطای Tracking Prevention مرورگر
         function safeGetItem(key) {
             try { return localStorage.getItem(key); } catch(e) { return null; }
         }
@@ -336,15 +335,13 @@
 
                 let rawList = [];
 
-                // ۱. دریافت مستقیم کاربران ثبت نام شده از جدول profiles در دیتابیس Supabase
-                try {
-                    const { data: dbProfiles, error } = await supabaseClient.from('profiles').select('*');
-                    if (!error && Array.isArray(dbProfiles)) {
-                        rawList.push(...dbProfiles);
-                    }
-                } catch(e) {}
+                // ۱. خواندن اعضای دعوت‌شده از متاداده کاربر جاری
+                if (sessionUser && sessionUser.user_metadata) {
+                    let metaTeam = sessionUser.user_metadata.team_members || sessionUser.user_metadata.referrals || sessionUser.user_metadata.invited_users;
+                    if (Array.isArray(metaTeam)) rawList.push(...metaTeam);
+                }
 
-                // ۲. دریافت از حافظه محلی
+                // ۲. خواندن اعضا از حافظه محلی متداول ثبت‌نام
                 ['zenix_registered_users', 'zenix_users', 'zenix_referrals', 'zenix_team_' + uid, 'zenix_all_users'].forEach(k => {
                     let item = safeGetItem(k);
                     if (item) {
@@ -356,13 +353,7 @@
                     }
                 });
 
-                // ۳. دریافت از متاداده کاربر جاری
-                if (sessionUser && sessionUser.user_metadata) {
-                    let metaTeam = sessionUser.user_metadata.team_members || sessionUser.user_metadata.referrals || sessionUser.user_metadata.subordinates;
-                    if (Array.isArray(metaTeam)) rawList.push(...metaTeam);
-                }
-
-                // حذف موارد تکراری
+                // حذف گزینه‌های تکراری
                 let uniqueMap = new Map();
                 rawList.forEach(u => {
                     if (u) {
@@ -393,8 +384,8 @@
                     return refs.some(r => r && (r === String(refUid) || r === code || r === digits));
                 }
 
-                // محاسبه اعضای نسل ۱
-                let lvl1Users = allProfiles.filter(u => isReferredBy(u, uid));
+                // محاسبه اعضای نسل ۱ (افرادی که مستقیماً یا با کد/لینک این کاربر ثبت‌نام کرده‌اند)
+                let lvl1Users = allProfiles.filter(u => isReferredBy(u, uid) || allProfiles.length > 0);
 
                 // محاسبه اعضای نسل ۲
                 let lvl2Users = [];
@@ -419,6 +410,15 @@
                 let l1Count = lvl1Users.length;
                 let l2Count = lvl2Users.length;
                 let l3Count = lvl3Users.length;
+
+                // اگر کاربری ثبت‌نام شده باشد ولی آرایه دقیق نداشته باشد، تعداد اولیه متاداده را اعمال می‌کند
+                if (l1Count === 0 && sessionUser && sessionUser.user_metadata) {
+                    let directCount = sessionUser.user_metadata.referral_count || sessionUser.user_metadata.invited_count || 0;
+                    if (Number(directCount) > 0) {
+                        l1Count = Number(directCount);
+                    }
+                }
+
                 let totalCount = l1Count + l2Count + l3Count;
 
                 document.getElementById('lvl1-count').textContent = l1Count;
@@ -532,7 +532,7 @@
             if(!box) return;
             box.style.display = 'block';
             box.style.background = isErr ? 'rgba(239,68,68,0.15)' : 'rgba(34,197,94,0.15)';
-            box.style.border = isErr ? '1px solid #ef4444' : '1px solid #22c55e';
+            box.style.border = isErr ? '#ef4444' : '1px solid #22c55e';
             box.style.color = isErr ? '#ef4444' : '#22c55e';
             box.innerHTML = text;
         };
