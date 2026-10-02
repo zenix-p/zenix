@@ -135,7 +135,7 @@
                 <div>
                     <div style="font-size:16px;font-weight:bold;color:#f8fafc;" id="user-fullname">در حال بارگذاری...</div>
                     <div style="font-size:12px;color:#94a3b8;display:flex;align-items:center;gap:6px;margin-top:2px;">
-                        <span id="user-id">UID: MS-000000</span>
+                        <span id="user-id">UID: SM-000000</span>
                         <i class="fas fa-copy" title="کپی UID" style="cursor:pointer;color:#38bdf8;font-size:13px;" onclick="window.copyUserId()"></i>
                     </div>
                 </div>
@@ -364,6 +364,16 @@
         let currentUserId = null;
         let userRealtimeChannel = null;
 
+        // تولید عدد ۶ رقمی یکتا و ثابت بر اساس شناسه کاربر
+        function generateUIDDigits(userId) {
+            let hash = 5381;
+            for (let i = 0; i < userId.length; i++) {
+                hash = ((hash << 5) + hash) + userId.charCodeAt(i);
+            }
+            const num = Math.abs(hash % 900000) + 100000;
+            return num.toString();
+        }
+
         function lockPhoneInput(phoneNumber) {
             const phoneInput = document.getElementById('user-phone-input');
             const saveBtn = document.getElementById('save-phone-btn');
@@ -571,14 +581,9 @@
 
             const userIdEl = document.getElementById('user-id');
             if (userIdEl) {
-                let displayId = data.referral_code || data.id || data.user_id || data.custom_id;
-                if (!displayId) {
-                    let nums = user.id.replace(/\D/g, '');
-                    if (nums.length < 6) nums = (nums + '482910').substring(0, 6);
-                    else nums = nums.substring(0, 6);
-                    displayId = 'MS-' + nums;
-                }
-                userIdEl.textContent = 'UID: ' + displayId;
+                // ساخت شناسه با فرمت SM-123456
+                const uidDigits = generateUIDDigits(user.id);
+                userIdEl.textContent = 'UID: SM-' + uidDigits;
             }
 
             if (data.phone) {
