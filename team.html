@@ -240,9 +240,8 @@
 
         async function fetchUserMessages(uid) {
             try {
-                const { data, error } = await supabaseClient.from('notifications').select('*').eq('user_id', uid).order('created_at', { ascending: false });
-                if (error || !data) return [];
-                return data.map(dt => ({
+                const { data } = await supabaseClient.from('notifications').select('*').eq('user_id', uid).order('created_at', { ascending: false });
+                return (data || []).map(dt => ({
                     id: dt.id,
                     subject: dt.title || dt.subject || 'Announcement',
                     body: dt.message || dt.text || dt.body || '',
@@ -326,7 +325,22 @@
         async function loadTeamData(uid, sessionUser) {
             try {
                 let codeDigits = generateUIDDigits(uid);
-                let myRefCode = 'SM-' + codeDigits;
+                let myRefCode = 'MS-' + codeDigits;
+
+                // ۱. دریافت کد دعوت اختصاصی ثبت‌شده کاربر از دیتابیس Supabase
+                try {
+                    const { data: myProfile } = await supabaseClient
+                        .from('profiles')
+                        .select('referral_code')
+                        .eq('id', uid)
+                        .maybeSingle();
+
+                    if (myProfile && myProfile.referral_code) {
+                        myRefCode = myProfile.referral_code;
+                    }
+                } catch(e) {
+                    console.log("خطا در دریافت کد دعوت از پروفایل:", e);
+                }
 
                 const inviteInput = document.getElementById('invite-link');
                 if (inviteInput) {
@@ -336,13 +350,26 @@
 
                 let rawList = [];
 
-                // ۱. خواندن اعضا از متاداده کاربر جاری
+                // ۲. خواندن کاربران ثبت‌نام شده مستقیماً از دیتابیس سوبابیس (جدول profiles)
+                try {
+                    const { data: dbProfiles } = await supabaseClient
+                        .from('profiles')
+                        .select('*');
+                    
+                    if (dbProfiles && Array.isArray(dbProfiles)) {
+                        rawList.push(...dbProfiles);
+                    }
+                } catch(e) {
+                    console.log("خطا در دریافت لیست اعضا از دیتابیس:", e);
+                }
+
+                // ۳. پشتیبانی از متاداده کاربر جاری
                 if (sessionUser && sessionUser.user_metadata) {
                     let metaTeam = sessionUser.user_metadata.team_members || sessionUser.user_metadata.referrals || sessionUser.user_metadata.invited_users;
                     if (Array.isArray(metaTeam)) rawList.push(...metaTeam);
                 }
 
-                // ۲. خواندن اعضا از حافظه محلی متداول ثبت‌نام
+                // ۴. پشتیبانی از حافظه محلی
                 ['zenix_registered_users', 'zenix_users', 'zenix_referrals', 'zenix_team_' + uid, 'zenix_all_users'].forEach(k => {
                     let item = safeGetItem(k);
                     if (item) {
@@ -358,19 +385,20 @@
                 let uniqueMap = new Map();
                 rawList.forEach(u => {
                     if (u) {
-                        let key = u.id || u.user_id || u.email || u.username;
-                        if (key) uniqueMap.set(String(key), u);
+                        let key = u.user_id || u.id || u.email || u.username || JSON.stringify(u);
+                        uniqueMap.set(key, u);
                     }
                 });
                 let allProfiles = Array.from(uniqueMap.values());
 
-                function isReferredBy(u, refUid) {
+                function isReferredBy(u, refUid, refCodeVal) {
                     if (!u) return false;
                     let uUid = u.user_id || u.id;
                     if (uUid === refUid) return false;
 
                     let digits = generateUIDDigits(refUid);
-                    let code = 'SM-' + digits;
+                    let defaultCode = 'MS-' + digits;
+                    let legacyCode = 'SM-' + digits;
 
                     let refs = [
                         u.referred_by,
@@ -379,15 +407,22 @@
                         u.ref_code,
                         u.inviter,
                         u.referral_code,
-                        u.ref,
-                        u.invited_by
-                    ].map(x => x ? String(x).trim() : '');
+                        u.ref
+                    ].map(x => x ? String(x).trim().toUpperCase() : '');
 
-                    return refs.some(r => r && (r === String(refUid) || r === code || r === digits));
+                    const targetCodes = [
+                        String(refUid).toUpperCase(),
+                        defaultCode.toUpperCase(),
+                        legacyCode.toUpperCase(),
+                        digits.toUpperCase()
+                    ];
+                    if (refCodeVal) targetCodes.push(String(refCodeVal).toUpperCase());
+
+                    return refs.some(r => r && targetCodes.includes(r));
                 }
 
-                // محاسبه اعضای نسل ۱
-                let lvl1Users = allProfiles.filter(u => isReferredBy(u, uid));
+                // محاسبه اعضای نسل ۱ (زیرمجموعه‌های مستقیم)
+                let lvl1Users = allProfiles.filter(u => isReferredBy(u, uid, myRefCode));
 
                 // محاسبه اعضای نسل ۲
                 let lvl2Users = [];
@@ -395,7 +430,7 @@
                     lvl2Users = allProfiles.filter(u => {
                         let uUid = u.user_id || u.id;
                         if (uUid === uid || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid)) return false;
-                        return lvl1Users.some(l1 => isReferredBy(u, l1.user_id || l1.id));
+                        return lvl1Users.some(l1 => isReferredBy(u, l1.user_id || l1.id, l1.referral_code));
                     });
                 }
 
@@ -405,7 +440,7 @@
                     lvl3Users = allProfiles.filter(u => {
                         let uUid = u.user_id || u.id;
                         if (uUid === uid || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid) || lvl2Users.some(l2 => (l2.user_id || l2.id) === uUid)) return false;
-                        return lvl2Users.some(l2 => isReferredBy(u, l2.user_id || l2.id));
+                        return lvl2Users.some(l2 => isReferredBy(u, l2.user_id || l2.id, l2.referral_code));
                     });
                 }
 
@@ -413,9 +448,8 @@
                 let l2Count = lvl2Users.length;
                 let l3Count = lvl3Users.length;
 
-                // خواندن تعداد مستقیم از متاداده در صورت وجود
                 if (l1Count === 0 && sessionUser && sessionUser.user_metadata) {
-                    let directCount = sessionUser.user_metadata.referral_count || sessionUser.user_metadata.invited_count || sessionUser.user_metadata.team_count || 0;
+                    let directCount = sessionUser.user_metadata.referral_count || sessionUser.user_metadata.invited_count || 0;
                     if (Number(directCount) > 0) {
                         l1Count = Number(directCount);
                     }
