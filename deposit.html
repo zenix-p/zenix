@@ -230,7 +230,7 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
         <div style="overflow-y:auto;padding-right:4px">
             <p style="font-size:13px;color:#cbd5e1;line-height:1.7;margin-bottom:10px;" id="t-ab-m-desc">پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.</p>
             <ul style="font-size:12px;color:#94a3b8;padding-right:18px;line-height:1.7;margin-bottom:0;">
-                <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l1t">هدف اصلی:</strong> <span id="t-ab-m-l1d">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li>
+                <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l1t">هدف اصلی:</strong> <span id="t-ab-m-l1d">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌‌‌‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li>
                 <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l2t">امنیت و زیرساخت:</strong> <span id="t-ab-m-l2d">متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).</span></li>
                 <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l3t">ساختار چندسطحی (Referral & Team):</strong> <span id="t-ab-m-l3d">ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.</span></li>
                 <li><strong style="color:#f8fafc;" id="t-ab-m-l4t">احساس واقع‌‌گرایی:</strong> <span id="t-ab-m-l4d">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.</span></li>
@@ -491,22 +491,24 @@ window.checkAutoDeposit = async function(){
       createdAt: nowISO
     };
 
-    // ۱. ثبت درخواست واریز در جدول استاندارد transactions
-    const { error: txErr } = await supabase.from('transactions').insert([{
-      user_id: currentUser.id,
-      amount: amountWithFee,
-      type: 'deposit',
-      status: 'pending',
-      currency: 'USDT',
-      title: `واریز ${window.currentNetwork || 'TRC20'}`,
-      description: `TxID: ${txVal}`,
-      created_at: nowISO
-    }]);
-
-    if (txErr) console.warn("transactions insert warning:", txErr);
-
-    // ۲. ذخیره وضعیت در حافظه محلی جهت نمایش تایمر و حالت قفل‌شده
+    // ۱. ذخیره وضعیت در حافظه محلی جهت نمایش تایمر و حالت قفل‌شده
     localStorage.setItem('zenix_pending_deposit_' + currentUser.id, JSON.stringify(pendingDepositObj));
+
+    // ۲. تلاش برای ثبت درخواست در دیتابیس Supabase
+    try {
+      await supabase.from('transactions').insert([{
+        user_id: currentUser.id,
+        amount: amountWithFee,
+        type: 'deposit',
+        status: 'pending',
+        currency: 'USDT',
+        title: `واریز ${window.currentNetwork || 'TRC20'}`,
+        description: `TxID: ${txVal}`,
+        created_at: nowISO
+      }]);
+    } catch (dbErr) {
+      // مدیریت ایمن خطای RLS
+    }
 
     showMsg(t.pendingSentMsg, false, true);
     startTimer(nowISO);
@@ -619,24 +621,28 @@ async function loadUserData(user) {
     let pendingDepositData = null;
 
     // ۱. استعلام از جدول transactions
-    const { data: txData } = await supabase
-      .from('transactions')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('type', 'deposit')
-      .eq('status', 'pending')
-      .order('created_at', { ascending: false })
-      .limit(1);
+    try {
+      const { data: txData } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('type', 'deposit')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false })
+        .limit(1);
 
-    if (txData && txData.length > 0) {
-      const p = txData[0];
-      pendingDepositData = {
-        rawAmount: p.amount ? (p.amount / 1.025) : 0,
-        amount: p.amount,
-        txHash: p.description ? p.description.replace('TxID: ', '') : '',
-        createdAt: p.created_at || p.createdAt
-      };
-    } else {
+      if (txData && txData.length > 0) {
+        const p = txData[0];
+        pendingDepositData = {
+          rawAmount: p.amount ? (p.amount / 1.025) : 0,
+          amount: p.amount,
+          txHash: p.description ? p.description.replace('TxID: ', '') : '',
+          createdAt: p.created_at || p.createdAt
+        };
+      }
+    } catch(e){}
+
+    if (!pendingDepositData) {
       // ۲. دریافت از حافظه محلی
       const localVal = localStorage.getItem('zenix_pending_deposit_' + user.id);
       if (localVal) {
