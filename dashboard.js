@@ -18,10 +18,11 @@ let currLang = localStorage.getItem('zenix_lang') || 'fa';
 
 const ld = {
   fa: {
-    m1: 'صفحه اصلی', m2: 'کوانتیفیکیشن', m3: 'واریز', m4: 'برداشت', m5: 'تراکنش', m6: 'پروفایل', m7: 'پشتیبانی', mAbout: 'درباره پلتفرم', m8: 'خروج',
+    m1: 'صفحه اصلی', m2: 'کوانتیفیکیشن', m_roulette: 'بازی رولت', m3: 'واریز', m4: 'برداشت', m5: 'تراکنش', m6: 'پروفایل', m7: 'پشتیبانی', mAbout: 'درباره پلتفرم', m8: 'خروج',
     wel: 'خوش آمدید', sub: 'پنل مدیریت کاربری', st: 'تایید شده',
     ts1: 'موجودی', ts2: 'زیرمجموعه',
     c1: 'کوانتیفیکیشن', d1: 'معاملات هوشمند',
+    c_roulette: 'بازی رولت', d_roulette: 'شانس و درآمد بیشتر',
     c2: 'واریز', d2: 'شارژ حساب',
     c3: 'برداشت', d3: 'برداشت دارایی',
     c4: 'تیم', d4: 'زیرمجموعه‌ها',
@@ -39,14 +40,15 @@ const ld = {
     helpTitle: 'راهنمای صفحه داشبورد',
     hpT1: 'کاربرد این صفحه (داشبورد) چیست؟', hpD1: 'داشبورد مرکز کنترل و خانه اصلی حساب کاربری شماست. از این صفحه می‌توانید کل دارایی‌ها، وضعیت حساب و وضعیت تیم خود را بررسی کنید و به تمام بخش‌های اصلی پلتفرم دسترسی سریع داشته باشید.',
     hpT2: 'کارت موجودی و زیرمجموعه‌ها', hpD2: 'در این قسمت می‌توانید مجموع کل دارایی‌های دلاری و تعداد اعضای تیم زیرمجموعه خود را به صورت لحظه‌ای مشاهده کنید.',
-    hpT3: 'بخش‌های دسترسی سریع', hpD3: 'دکمه‌های میانبر (کوانتیفیکیشن، واریز، برداشت، تیم، تراکنش‌ها و پروفایل) برای ورود آنی به بخش‌های مختلف پلتفرم تعبیه شده‌اند.',
+    hpT3: 'بخش‌های دسترسی سریع', hpD3: 'دکمه‌های میانبر (کوانتیفیکیشن، بازی رولت، واریز، برداشت، تیم، تراکنش‌ها و پروفایل) برای ورود آنی به بخش‌های مختلف پلتفرم تعبیه شده‌اند.',
     hpT4: 'بازار زنده ارزهای دیجیتال', hpD4: 'نمایش لحظه‌ای تغییرات قیمت و درصد سود برترین ارزهای دیجیتال برای رصد بازار جهانی در یک نگاه.'
   },
   en: {
-    m1: 'Home', m2: 'Quantification', m3: 'Deposit', m4: 'Withdraw', m5: 'Transactions', m6: 'Profile', m7: 'Support', mAbout: 'About Platform', m8: 'Logout',
+    m1: 'Home', m2: 'Quantification', m_roulette: 'Roulette', m3: 'Deposit', m4: 'Withdraw', m5: 'Transactions', m6: 'Profile', m7: 'Support', mAbout: 'About Platform', m8: 'Logout',
     wel: 'Welcome', sub: 'User Dashboard Panel', st: 'Verified',
     ts1: 'Balance', ts2: 'Referrals',
     c1: 'Quantification', d1: 'Smart Trading',
+    c_roulette: 'Roulette Game', d_roulette: 'Try your luck & win',
     c2: 'Deposit', d2: 'Account Recharge',
     c3: 'Withdraw', d3: 'Asset Withdrawal',
     c4: 'Team', d4: 'Referral Network',
@@ -64,7 +66,7 @@ const ld = {
     helpTitle: 'Dashboard Guide',
     hpT1: 'What is the purpose of this page?', hpD1: 'The dashboard is your main control center. Here you can inspect total assets, account status, team metrics, and access all core features quickly.',
     hpT2: 'Balance & Team Cards', hpD2: 'View your live USD balance and team member count in real-time.',
-    hpT3: 'Quick Access Grid', hpD3: 'Shortcuts (Quantification, Deposit, Withdraw, Team, Transactions, Profile) for instant navigation.',
+    hpT3: 'Quick Access Grid', hpD3: 'Shortcuts (Quantification, Roulette, Deposit, Withdraw, Team, Transactions, Profile) for instant navigation.',
     hpT4: 'Live Crypto Market', hpD4: 'Real-time price changes and trends of top cryptocurrencies at a glance.'
   }
 };
@@ -93,10 +95,11 @@ function setLang(lang) {
   document.documentElement.setAttribute('lang', lang);
 
   const map = {
-    'm1': t.m1, 'm2': t.m2, 'm3': t.m3, 'm4': t.m4, 'm5': t.m5, 'm6': t.m6, 'm7': t.m7, 'm_about': t.mAbout, 'm8': t.m8,
+    'm1': t.m1, 'm2': t.m2, 'm_roulette': t.m_roulette, 'm3': t.m3, 'm4': t.m4, 'm5': t.m5, 'm6': t.m6, 'm7': t.m7, 'm_about': t.mAbout, 'm8': t.m8,
     't-wel': t.wel, 't-sub': t.sub, 't-st': t.st,
     'ts1': t.ts1, 'ts2': t.ts2,
-    'c1': t.c1, 'd1': t.d1, 'c2': t.c2, 'd2': t.d2, 'c3': t.c3, 'd3': t.d3,
+    'c1': t.c1, 'd1': t.d1, 'c_roulette': t.c_roulette, 'd_roulette': t.d_roulette,
+    'c2': t.c2, 'd2': t.d2, 'c3': t.c3, 'd3': t.d3,
     'c4': t.c4, 'd4': t.d4, 'c5': t.c5, 'd5': t.d5, 'c6': t.c6, 'd6': t.d6,
     't-live': t.tLive,
     't-ab-title': t.tAbTitle, 't-ab-desc': t.tAbDesc,
@@ -231,7 +234,6 @@ async function checkUserSession() {
 
     const user = session.user;
 
-    // استفاده از maybeSingle() جهت جلوگیری از خطای PGRST116 در صورت نبودن ردیف
     const { data: userData, error: dbError } = await supabase
       .from('users')
       .select('*')
@@ -271,7 +273,6 @@ async function checkUserSession() {
         refElem.textContent = userData.referrals_count;
       }
     } else {
-      // مقداردهی جایگزین در صورتی که کاربر هنوز در جدول users ثبت نشده است
       if (fullNameElem) {
         fullNameElem.textContent = user.user_metadata?.fullname || user.email?.split('@')[0] || 'کاربر Zenix';
       }
@@ -360,10 +361,6 @@ function setupEventListeners() {
     profileForm.addEventListener('submit', handleProfileUpdate);
   }
 }
-
-// ==========================================
-// توابع عمومی مدیریت مودال‌ها و فیلتر پیام‌ها
-// ==========================================
 
 window.openAboutModal = function() {
   const modal = document.getElementById('m-about');
