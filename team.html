@@ -314,10 +314,11 @@
             }
         });
 
-        function loadTeamData(uid) {
+        async function loadTeamData(uid) {
             try {
                 // تنظیم لینک دعوت کاملاً دقیق و هماهنگ با پروفایل (فرمت SM-123456)
-                let myRefCode = 'SM-' + generateUIDDigits(uid);
+                let codeDigits = generateUIDDigits(uid);
+                let myRefCode = 'SM-' + codeDigits;
 
                 const inviteInput = document.getElementById('invite-link');
                 if (inviteInput) {
@@ -325,19 +326,86 @@
                     inviteInput.value = fullInviteUrl;
                 }
 
-                document.getElementById('lvl1-count').textContent = '0';
-                document.getElementById('lvl2-count').textContent = '0';
-                document.getElementById('lvl3-count').textContent = '0';
+                let allProfiles = [];
+                const { data: profiles, error } = await supabaseClient.from('profiles').select('*');
+                if (!error && profiles) {
+                    allProfiles = profiles;
+                } else {
+                    const { data: pL1 } = await supabaseClient
+                        .from('profiles')
+                        .select('*')
+                        .or(`referred_by.eq.${uid},referred_by.eq.${myRefCode},referred_by.eq.${codeDigits},referrer_id.eq.${uid},invitation_code.eq.${myRefCode},invitation_code.eq.${codeDigits}`);
+                    if (pL1) allProfiles = pL1;
+                }
 
-                document.getElementById('team-count').textContent = '0';
+                function isReferredBy(u, refUid) {
+                    if (!u) return false;
+                    let uUid = u.user_id || u.id;
+                    if (uUid === refUid) return false;
 
-                document.getElementById('lvl1-comm').textContent = `0.00 USDT`;
-                document.getElementById('lvl2-comm').textContent = `0.00 USDT`;
-                document.getElementById('lvl3-comm').textContent = `0.00 USDT`;
-                document.getElementById('total-commission').textContent = '0.00';
+                    let digits = generateUIDDigits(refUid);
+                    let code = 'SM-' + digits;
 
-                document.getElementById('team-volume').textContent = `0.00$`;
-                document.getElementById('team-daily').textContent = `0.00$`;
+                    let refs = [
+                        u.referred_by,
+                        u.referrer_id,
+                        u.invitation_code,
+                        u.ref_code,
+                        u.inviter,
+                        u.referral_code
+                    ].map(x => x ? String(x).trim() : '');
+
+                    return refs.some(r => r && (r === String(refUid) || r === code || r === digits));
+                }
+
+                // محاسبه اعضای نسل ۱
+                let lvl1Users = allProfiles.filter(u => isReferredBy(u, uid));
+
+                // محاسبه اعضای نسل ۲
+                let lvl2Users = [];
+                if (lvl1Users.length > 0) {
+                    lvl2Users = allProfiles.filter(u => {
+                        let uUid = u.user_id || u.id;
+                        if (uUid === uid || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid)) return false;
+                        return lvl1Users.some(l1 => isReferredBy(u, l1.user_id || l1.id));
+                    });
+                }
+
+                // محاسبه اعضای نسل ۳
+                let lvl3Users = [];
+                if (lvl2Users.length > 0) {
+                    lvl3Users = allProfiles.filter(u => {
+                        let uUid = u.user_id || u.id;
+                        if (uUid === uid || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid) || lvl2Users.some(l2 => (l2.user_id || l2.id) === uUid)) return false;
+                        return lvl2Users.some(l2 => isReferredBy(u, l2.user_id || l2.id));
+                    });
+                }
+
+                let l1Count = lvl1Users.length;
+                let l2Count = lvl2Users.length;
+                let l3Count = lvl3Users.length;
+                let totalCount = l1Count + l2Count + l3Count;
+
+                document.getElementById('lvl1-count').textContent = l1Count;
+                document.getElementById('lvl2-count').textContent = l2Count;
+                document.getElementById('lvl3-count').textContent = l3Count;
+                document.getElementById('team-count').textContent = totalCount;
+
+                let l1Comm = lvl1Users.reduce((sum, u) => sum + Number(u.commission || u.l1_commission || u.reward || 0), 0);
+                let l2Comm = lvl2Users.reduce((sum, u) => sum + Number(u.commission || u.l2_commission || u.reward || 0), 0);
+                let l3Comm = lvl3Users.reduce((sum, u) => sum + Number(u.commission || u.l3_commission || u.reward || 0), 0);
+                let totalComm = l1Comm + l2Comm + l3Comm;
+
+                let teamVol = [...lvl1Users, ...lvl2Users, ...lvl3Users].reduce((sum, u) => sum + Number(u.volume || u.trading_volume || 0), 0);
+                let teamDaily = [...lvl1Users, ...lvl2Users, ...lvl3Users].reduce((sum, u) => sum + Number(u.daily_commission || u.today_commission || 0), 0);
+
+                document.getElementById('lvl1-comm').textContent = `${l1Comm.toFixed(2)} USDT`;
+                document.getElementById('lvl2-comm').textContent = `${l2Comm.toFixed(2)} USDT`;
+                document.getElementById('lvl3-comm').textContent = `${l3Comm.toFixed(2)} USDT`;
+                document.getElementById('total-commission').textContent = totalComm.toFixed(2);
+
+                document.getElementById('team-volume').textContent = `${teamVol.toFixed(2)}$`;
+                document.getElementById('team-daily').textContent = `${teamDaily.toFixed(2)}$`;
 
             } catch (err) {
                 console.error("Error loading team stats:", err);
