@@ -663,7 +663,7 @@
           }
         });
 
-        // اکشن ذخیره‌سازی شماره تماس - به‌روزرسانی‌شده جهت جلوگیری از خطای RLS/Upsert
+        // اکشن ذخیره‌سازی شماره تماس - به‌روزرسانی‌شده جهت رفع خطای NOT NULL و RLS/Upsert
         window.savePhone = async function() {
           const phoneInput = document.getElementById('user-phone-input');
           const errEl = document.getElementById('phone-err-msg');
@@ -701,6 +701,12 @@
             const fullPhone = code + phone;
 
             try {
+              // استخراج مقدار نام کاربر برای جلوگیری از خطای NOT NULL در ستون fullname
+              const fullNameVal = currentUser.user_metadata?.fullname || 
+                                 currentUser.user_metadata?.full_name || 
+                                 document.getElementById('user-fullname')?.textContent || 
+                                 currentUser.email;
+
               let { data, error } = await supabaseClient
                 .from('users')
                 .update({ phone: fullPhone })
@@ -713,7 +719,8 @@
                   .upsert({ 
                     id: currentUser.id, 
                     phone: fullPhone,
-                    email: currentUser.email 
+                    email: currentUser.email,
+                    fullname: fullNameVal
                   }, { onConflict: 'id' });
                 error = upsertRes.error;
               }
