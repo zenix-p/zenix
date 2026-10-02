@@ -335,13 +335,28 @@
 
                 let rawList = [];
 
-                // ۱. خواندن اعضای دعوت‌شده از متاداده کاربر جاری
+                // ۱. فراخوانی کاربران آنلاین از پایگاه‌داده سوبابیس
+                try {
+                    const { data: dbProfiles, error: dbErr1 } = await supabaseClient.from('profiles').select('*');
+                    if (!dbErr1 && Array.isArray(dbProfiles)) {
+                        rawList.push(...dbProfiles);
+                    }
+                } catch(e) {}
+
+                try {
+                    const { data: dbUsers, error: dbErr2 } = await supabaseClient.from('users').select('*');
+                    if (!dbErr2 && Array.isArray(dbUsers)) {
+                        rawList.push(...dbUsers);
+                    }
+                } catch(e) {}
+
+                // ۲. خواندن اعضای دعوت‌شده از متاداده کاربر جاری
                 if (sessionUser && sessionUser.user_metadata) {
                     let metaTeam = sessionUser.user_metadata.team_members || sessionUser.user_metadata.referrals || sessionUser.user_metadata.invited_users;
                     if (Array.isArray(metaTeam)) rawList.push(...metaTeam);
                 }
 
-                // ۲. خواندن اعضا از حافظه محلی متداول ثبت‌نام
+                // ۳. خواندن اعضا از حافظه محلی
                 ['zenix_registered_users', 'zenix_users', 'zenix_referrals', 'zenix_team_' + uid, 'zenix_all_users'].forEach(k => {
                     let item = safeGetItem(k);
                     if (item) {
@@ -357,8 +372,8 @@
                 let uniqueMap = new Map();
                 rawList.forEach(u => {
                     if (u) {
-                        let key = u.user_id || u.id || u.email || u.username || JSON.stringify(u);
-                        uniqueMap.set(key, u);
+                        let key = u.id || u.user_id || u.email || u.username;
+                        if (key) uniqueMap.set(String(key), u);
                     }
                 });
                 let allProfiles = Array.from(uniqueMap.values());
@@ -378,16 +393,17 @@
                         u.ref_code,
                         u.inviter,
                         u.referral_code,
-                        u.ref
+                        u.ref,
+                        u.invited_by
                     ].map(x => x ? String(x).trim() : '');
 
                     return refs.some(r => r && (r === String(refUid) || r === code || r === digits));
                 }
 
-                // محاسبه اعضای نسل ۱ (افرادی که مستقیماً یا با کد/لینک این کاربر ثبت‌نام کرده‌اند)
-                let lvl1Users = allProfiles.filter(u => isReferredBy(u, uid) || allProfiles.length > 0);
+                // محاسبه دقیق اعضای نسل ۱
+                let lvl1Users = allProfiles.filter(u => isReferredBy(u, uid));
 
-                // محاسبه اعضای نسل ۲
+                // محاسبه دقیق اعضای نسل ۲
                 let lvl2Users = [];
                 if (lvl1Users.length > 0) {
                     lvl2Users = allProfiles.filter(u => {
@@ -397,7 +413,7 @@
                     });
                 }
 
-                // محاسبه اعضای نسل ۳
+                // محاسبه دقیق اعضای نسل ۳
                 let lvl3Users = [];
                 if (lvl2Users.length > 0) {
                     lvl3Users = allProfiles.filter(u => {
@@ -411,9 +427,9 @@
                 let l2Count = lvl2Users.length;
                 let l3Count = lvl3Users.length;
 
-                // اگر کاربری ثبت‌نام شده باشد ولی آرایه دقیق نداشته باشد، تعداد اولیه متاداده را اعمال می‌کند
+                // پشتیبان متاداده در صورت وجود ثبت مستقیم
                 if (l1Count === 0 && sessionUser && sessionUser.user_metadata) {
-                    let directCount = sessionUser.user_metadata.referral_count || sessionUser.user_metadata.invited_count || 0;
+                    let directCount = sessionUser.user_metadata.referral_count || sessionUser.user_metadata.invited_count || sessionUser.user_metadata.team_count || 0;
                     if (Number(directCount) > 0) {
                         l1Count = Number(directCount);
                     }
