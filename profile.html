@@ -627,16 +627,17 @@
 
             await loadUserData(session.user);
 
-            // حذف اشتراک قبلی جهت جلوگیری از خطای افزودن callback بعد از subscribe
+            // ۱. پاکسازی کامل کانال قبلی در صورت وجود
             if (userChannel) {
               await supabaseClient.removeChannel(userChannel);
               userChannel = null;
             }
 
-            // ایجاد کانال جدید با نام یکتا همراه با زمان جاری
+            // ۲. ساخت کانال جدید با نام یکتا همراه با زمان جاری
             const channelName = `user_changes_${session.user.id}_${Date.now()}`;
             userChannel = supabaseClient.channel(channelName);
 
+            // ۳. تعریف رویدادها قبل از فراخوانی subscribe
             userChannel
               .on('postgres_changes', { 
                 event: 'UPDATE', 
