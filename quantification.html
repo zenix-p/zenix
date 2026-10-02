@@ -12,7 +12,8 @@ window.cachedNotifications = [];
 window.activeNotifFilter = 'all';
 window.actualUserKeys = [];
 
-function cleanDate(d) {
+// تابع کمکی برای پاک‌سازی فرمت تاریخ (فقط YYYY-MM-DD)
+function cleanDateStr(d) {
   if (!d) return '';
   return String(d).split('T')[0].split(' ')[0].trim();
 }
@@ -20,6 +21,7 @@ function cleanDate(d) {
 async function saveUserFields(dict) {
   if (!uUid) return;
 
+  // ذخیره در LocalStorage به عنوان پشتیبان سریع
   try {
     const localData = {
       count: dict.count,
@@ -28,35 +30,21 @@ async function saveUserFields(dict) {
       balance: dict.balance,
       history: dict.history || allTradesArray
     };
-    localStorage.setItem(`zenix_quant_${uUid}`, JSON.stringify(localData));
-  } catch(e) {
-    console.warn("خطا در ذخیره LocalStorage:", e);
-  }
+    localStorage.setItem(`zenix_quant_state_${uUid}`, JSON.stringify(localData));
+  } catch(e) {}
 
   const payload = {};
   const keys = window.actualUserKeys || [];
-  const findKey = (candidates) => keys.find(x => candidates.some(c => c.toLowerCase() === x.toLowerCase()));
+  const getCol = (candidates, fallback) => {
+    const found = keys.find(x => candidates.some(c => c.toLowerCase() === x.toLowerCase()));
+    return found || fallback;
+  };
 
-  if (dict.count !== undefined) {
-    const k = findKey(['quantCount', 'quant_count']) || 'quant_count';
-    payload[k] = dict.count;
-  }
-  if (dict.date !== undefined) {
-    const k = findKey(['quantDate', 'quant_date']) || 'quant_date';
-    payload[k] = dict.date;
-  }
-  if (dict.profit !== undefined) {
-    const k = findKey(['todayProfit', 'today_profit']) || 'today_profit';
-    payload[k] = dict.profit;
-  }
-  if (dict.balance !== undefined) {
-    const k = findKey(['balance']) || 'balance';
-    payload[k] = dict.balance;
-  }
-  if (dict.history !== undefined) {
-    const k = findKey(['tradeHistoryArray', 'quantHistory', 'trades', 'history']) || 'tradeHistoryArray';
-    payload[k] = dict.history;
-  }
+  if (dict.count !== undefined) payload[getCol(['quantCount', 'quant_count'], 'quant_count')] = dict.count;
+  if (dict.date !== undefined) payload[getCol(['quantDate', 'quant_date'], 'quant_date')] = dict.date;
+  if (dict.profit !== undefined) payload[getCol(['todayProfit', 'today_profit'], 'today_profit')] = dict.profit;
+  if (dict.balance !== undefined) payload[getCol(['balance'], 'balance')] = dict.balance;
+  if (dict.history !== undefined) payload[getCol(['tradeHistoryArray', 'quantHistory', 'trades', 'history'], 'tradeHistoryArray')] = dict.history;
 
   if (Object.keys(payload).length > 0) {
     const { error: updateErr } = await supabase.from("users").update(payload).eq("id", uUid);
@@ -192,7 +180,7 @@ const cList=[
 window.checkClickState=function(){
   const qBtn = document.getElementById('quant-btn');
   if(!qBtn || !window.isBotActive) return;
-  
+
   const l=window.currentActiveLang||'fa',t=(window.LD&&window.LD[l])||(window.LD&&window.LD.fa)||{};
   if(cCnt>=4){
     qBtn.disabled=true;qBtn.style.opacity="0.5";qBtn.style.cursor="not-allowed";
@@ -244,93 +232,94 @@ window.renderHistory=function(){
   hList.innerHTML=htmlStr;
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+// فعال‌سازی رویداد کلیک دکمه
+function initQuantButton() {
   const qBtn = document.getElementById('quant-btn');
-  if(qBtn){
-    qBtn.onclick=function(e){
-      e.preventDefault();
-      if(cCnt>=4||!window.isBotActive||!uUid)return;
-      cCnt++;
-      qBtn.disabled=true;qBtn.style.opacity="0.5";
-      const l=window.currentActiveLang||'fa',t=(window.LD&&window.LD[l])||(window.LD&&window.LD.fa)||{};
-      let dailyRate=0.015;
-      if(bBal>=10000)dailyRate=0.04;
-      else if(bBal>=5000)dailyRate=0.035;
-      else if(bBal>=2500)dailyRate=0.03;
-      else if(bBal>=1000)dailyRate=0.025;
-      else if(bBal>=300)dailyRate=0.02;
+  if(!qBtn) return;
 
-      const tradeAmount = bBal;
-      const p=(tradeAmount*dailyRate)/4;
-      const tBox=document.getElementById('trade-box'),tDet=document.getElementById('trade-details');
-      if(tBox) tBox.style.display='block';
-      const rc=cList[Math.floor(Math.random()*cList.length)];
-      let tLeft=10;
+  qBtn.onclick=function(e){
+    e.preventDefault();
+    if(cCnt>=4||!window.isBotActive||!uUid)return;
+    cCnt++;
+    qBtn.disabled=true;qBtn.style.opacity="0.5";
+    const l=window.currentActiveLang||'fa',t=(window.LD&&window.LD[l])||(window.LD&&window.LD.fa)||{};
+    let dailyRate=0.015;
+    if(bBal>=10000)dailyRate=0.04;
+    else if(bBal>=5000)dailyRate=0.035;
+    else if(bBal>=2500)dailyRate=0.03;
+    else if(bBal>=1000)dailyRate=0.025;
+    else if(bBal>=300)dailyRate=0.02;
 
-      if(tDet){
+    const tradeAmount = bBal;
+    const p=(tradeAmount*dailyRate)/4;
+    const tBox=document.getElementById('trade-box'),tDet=document.getElementById('trade-details');
+    if(tBox) tBox.style.display='block';
+    const rc=cList[Math.floor(Math.random()*cList.length)];
+    let tLeft=10;
+
+    if(tDet) {
+      tDet.innerHTML=`
+        <div style="display:flex;flex-direction:column;gap:6px;align-items:center;width:100%;">
+          <div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;">
+            <i class="fas fa-spinner fa-spin" style="color:#38bdf8;"></i> 
+            <span>${t.trading || 'معامله'}</span> 
+            <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:${rc.color};color:#fff;font-size:12px;margin:0 2px;"><i class="${rc.cls}"></i></span> 
+            <b>${rc.name} (${rc.symbol})</b>
+          </div>
+          <div style="font-size:11px;color:#cbd5e1;background:rgba(255,255,255,0.04);padding:5px 12px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;width:100%;max-width:320px;border:1px solid rgba(255,255,255,0.06);">
+            <span>${t.tradeAmount || 'مبلغ معامله'}: <b style="color:#38bdf8;">$${tradeAmount.toFixed(2)}</b></span>
+            <span>زمان: <b id="cd-v" style="color:#f59e0b;">10</b> ${t.seconds || 'ثانیه'}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    const tI=setInterval(()=>{
+      tLeft--;
+      const cd=document.getElementById('cd-v');if(cd)cd.innerText=tLeft;
+      if(tLeft<=0)clearInterval(tI);
+    },1000);
+
+    setTimeout(async ()=>{
+      clearInterval(tI);
+      tProf+=p;bBal+=p;
+      if(tpEl)tpEl.innerText='$'+tProf.toFixed(2);
+      if(tbEl)tbEl.innerText='$'+bBal.toFixed(2);
+
+      if(tDet) {
         tDet.innerHTML=`
           <div style="display:flex;flex-direction:column;gap:6px;align-items:center;width:100%;">
-            <div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;">
-              <i class="fas fa-spinner fa-spin" style="color:#38bdf8;"></i> 
-              <span>${t.trading || 'معامله'}</span> 
+            <div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;color:#22c55e;">
+              <i class="fas fa-check-circle"></i> ${t.success || 'موفق!'} 
               <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:${rc.color};color:#fff;font-size:12px;margin:0 2px;"><i class="${rc.cls}"></i></span> 
               <b>${rc.name} (${rc.symbol})</b>
             </div>
-            <div style="font-size:11px;color:#cbd5e1;background:rgba(255,255,255,0.04);padding:5px 12px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;width:100%;max-width:320px;border:1px solid rgba(255,255,255,0.06);">
-              <span>${t.tradeAmount || 'مبلغ معامله'}: <b style="color:#38bdf8;">$${tradeAmount.toFixed(2)}</b></span>
-              <span>زمان: <b id="cd-v" style="color:#f59e0b;">10</b> ${t.seconds || 'ثانیه'}</span>
+            <div style="font-size:11px;color:#cbd5e1;background:rgba(34,197,94,0.1);padding:5px 12px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;width:100%;max-width:320px;border:1px solid rgba(34,197,94,0.25);">
+              <span>${t.tradeAmount || 'مبلغ معامله'}: <b style="color:#f8fafc;">$${tradeAmount.toFixed(2)}</b></span>
+              <span>${t.prof || 'سود'}: <b style="color:#22c55e;">+$${p.toFixed(2)}</b></span>
             </div>
           </div>
         `;
       }
+      
+      const now=new Date();
+      const dateStr=`${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} - ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      const tradeObj={name:rc.name,symbol:rc.symbol,cls:rc.cls,color:rc.color,profit:p,dateStr:dateStr,timestamp:now.getTime()};
+      allTradesArray.unshift(tradeObj);
+      window.renderHistory();
+      
+      window.checkClickState();
 
-      const tI=setInterval(()=>{
-        tLeft--;
-        const cd=document.getElementById('cd-v');if(cd)cd.innerText=tLeft;
-        if(tLeft<=0)clearInterval(tI);
-      },1000);
-
-      setTimeout(async ()=>{
-        clearInterval(tI);
-        tProf+=p;bBal+=p;
-        if(tpEl)tpEl.innerText='$'+tProf.toFixed(2);
-        if(tbEl)tbEl.innerText='$'+bBal.toFixed(2);
-
-        if(tDet){
-          tDet.innerHTML=`
-            <div style="display:flex;flex-direction:column;gap:6px;align-items:center;width:100%;">
-              <div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;color:#22c55e;">
-                <i class="fas fa-check-circle"></i> ${t.success || 'موفق!'} 
-                <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:${rc.color};color:#fff;font-size:12px;margin:0 2px;"><i class="${rc.cls}"></i></span> 
-                <b>${rc.name} (${rc.symbol})</b>
-              </div>
-              <div style="font-size:11px;color:#cbd5e1;background:rgba(34,197,94,0.1);padding:5px 12px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;width:100%;max-width:320px;border:1px solid rgba(34,197,94,0.25);">
-                <span>${t.tradeAmount || 'مبلغ معامله'}: <b style="color:#f8fafc;">$${tradeAmount.toFixed(2)}</b></span>
-                <span>${t.prof || 'سود'}: <b style="color:#22c55e;">+$${p.toFixed(2)}</b></span>
-              </div>
-            </div>
-          `;
-        }
-        
-        const now=new Date();
-        const dateStr=`${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} - ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-        const tradeObj={name:rc.name,symbol:rc.symbol,cls:rc.cls,color:rc.color,profit:p,dateStr:dateStr,timestamp:now.getTime()};
-        allTradesArray.unshift(tradeObj);
-        window.renderHistory();
-        
-        window.checkClickState();
-
-        await saveUserFields({
-          count: cCnt,
-          date: todayNY,
-          profit: tProf,
-          balance: bBal,
-          history: allTradesArray
-        });
-      },10000);
-    };
-  }
-});
+      await saveUserFields({
+        count: cCnt,
+        date: todayNY,
+        profit: tProf,
+        balance: bBal,
+        history: allTradesArray
+      });
+    },10000);
+  };
+}
 
 async function initPage() {
   try {
@@ -342,6 +331,8 @@ async function initPage() {
 
     const u = session.user;
     uUid = u.id;
+
+    initQuantButton();
 
     try {
       const { data, error: notifError } = await supabase.from('notifications').select('*').eq('user_id', u.id);
@@ -362,27 +353,27 @@ async function initPage() {
 
     const { data: userData } = await supabase.from("users").select("*").eq("id", u.id).single();
 
-    let localSaved = null;
+    let localCache = null;
     try {
-      const rawLocal = localStorage.getItem(`zenix_quant_${uUid}`);
-      if (rawLocal) localSaved = JSON.parse(rawLocal);
+      const rawCache = localStorage.getItem(`zenix_quant_state_${uUid}`);
+      if (rawCache) localCache = JSON.parse(rawCache);
     } catch(e) {}
 
     if (userData) {
       window.actualUserKeys = Object.keys(userData);
 
       bBal = Number(userData.balance || userData.depositAmount || 0);
-      const qDate = cleanDate(userData.quantDate || userData.quant_date);
+      const qDate = cleanDateStr(userData.quantDate || userData.quant_date);
       const qCount = userData.quantCount ?? userData.quant_count ?? 0;
       const tProfit = userData.todayProfit ?? userData.today_profit ?? 0;
-      const currentNY = cleanDate(todayNY);
+      const currentNY = cleanDateStr(todayNY);
 
       if (qDate && qDate === currentNY) {
         cCnt = Number(qCount);
         tProf = Number(tProfit);
-      } else if (localSaved && cleanDate(localSaved.date) === currentNY) {
-        cCnt = Number(localSaved.count || 0);
-        tProf = Number(localSaved.profit || 0);
+      } else if (localCache && cleanDateStr(localCache.date) === currentNY) {
+        cCnt = Number(localCache.count || 0);
+        tProf = Number(localCache.profit || 0);
       } else {
         cCnt = 0;
         tProf = 0;
@@ -391,7 +382,7 @@ async function initPage() {
       if (tpEl) tpEl.innerText = '$' + tProf.toFixed(2);
       if (tbEl) tbEl.innerText = '$' + bBal.toFixed(2);
       
-      const rawHistory = userData.tradeHistoryArray || userData.quantHistory || userData.trades || userData.history || (localSaved ? localSaved.history : []);
+      const rawHistory = userData.tradeHistoryArray || userData.quantHistory || userData.trades || userData.history || (localCache ? localCache.history : []);
       if (Array.isArray(rawHistory) && rawHistory.length > 0) {
         allTradesArray = rawHistory;
         window.renderHistory();
