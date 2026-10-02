@@ -229,7 +229,7 @@
           }
         };
 
-        // دریافت تراکنش‌های کاربر و ثبت پاداش ثبت‌نام
+        // دریافت تراکنش‌های کاربر و اضافه کردن پاداش ثبت‌نام
         async function fetchUserTransactions(uid, userCreatedAt) {
           try {
             const { data, error } = await supabase.from('transactions').select('*').eq('user_id', uid);
@@ -271,7 +271,7 @@
           }
         }
 
-        // رندر تراکنش‌ها روی صفحه با نمایش تاریخ میلادی
+        // رندر تراکنش‌ها با فرمت تاریخ YYYY/MM/DD و تفکیک واریز از پاداش
         function renderTransactions() {
           let container = document.getElementById('tx-list');
           let t = ld[currLang] || ld.fa;
@@ -290,12 +290,17 @@
             if (currentFilter === 'all') return true;
 
             let itemType = String(item.type || '').toLowerCase();
+
+            // فیلتر واریز (تنها واریزهای واقعی کاربر)
+            if (currentFilter === 'deposit') {
+              return (itemType.includes('dep') || itemType === 'deposit') && !itemType.includes('bonus');
+            }
+
+            // فیلتر کمیسیون (شامل پاداش ثبت‌نام و کمیسیون‌ها)
             if (currentFilter === 'commission') {
               return itemType.includes('comm') || itemType.includes('ref') || itemType.includes('bonus') || itemType === 'commission';
             }
-            if (currentFilter === 'deposit') {
-              return itemType.includes('dep') || itemType === 'deposit' || itemType.includes('bonus');
-            }
+
             return itemType === currentFilter;
           });
 
@@ -307,7 +312,6 @@
           let html = '';
           filtered.forEach(tx => {
             let rawType = String(tx.type || 'deposit').toLowerCase();
-            let isDeposit = rawType.includes('dep') || rawType === 'deposit';
             let isWithdraw = rawType.includes('with') || rawType === 'withdraw' || rawType === 'receive';
             let isBonus = rawType.includes('bonus');
             let isComm = rawType.includes('comm') || rawType === 'commission' || rawType.includes('ref');
@@ -323,11 +327,19 @@
               else titleText = t.typeDeposit;
             }
 
+            // محاسبه و فرمت تاریخ میلادی به فرمت YYYY/MM/DD
             let timeVal = tx.created_at || tx.createdAt || tx.timestamp || tx.time;
             let dateStr = '';
             if (timeVal) {
               let d = new Date(timeVal);
-              dateStr = isNaN(d.getTime()) ? String(timeVal) : d.toLocaleString('en-US');
+              if (isNaN(d.getTime())) {
+                dateStr = String(timeVal);
+              } else {
+                let y = d.getFullYear();
+                let m = String(d.getMonth() + 1).padStart(2, '0');
+                let day = String(d.getDate()).padStart(2, '0');
+                dateStr = `${y}/${m}/${day}`;
+              }
             } else {
               dateStr = '---';
             }
