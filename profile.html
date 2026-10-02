@@ -362,6 +362,7 @@
         let currentUser = null;
         let allMessages = [];
         let currentUserId = null;
+        let userChannel = null; // متغیر جهت نگهداری کانال Realtime و جلوگیری از خطای اشتراک مجدد
 
         function lockPhoneInput(phoneNumber) {
             const phoneInput = document.getElementById('user-phone-input');
@@ -626,8 +627,14 @@
 
             await loadUserData(session.user);
 
-            supabaseClient
-              .channel('public:users')
+            // حذف اشتراک قبلی جهت جلوگیری از خطای افزودن callback بعد از subscribe
+            if (userChannel) {
+              supabaseClient.removeChannel(userChannel);
+            }
+
+            // ایجاد کانال جدید با نام یکتا و ثبت event پیش از subscribe
+            userChannel = supabaseClient
+              .channel(`user_changes_${session.user.id}`)
               .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${session.user.id}` }, payload => {
                 loadUserData(session.user);
               })
