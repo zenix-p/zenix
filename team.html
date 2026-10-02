@@ -173,15 +173,22 @@
     </footer>
 
     <script>
+        // توابع ایمن خواندن/نوشتن در استوریج جهت جلوگیری از خطای Tracking Prevention مرورگر
+        function safeGetItem(key) {
+            try { return localStorage.getItem(key); } catch(e) { return null; }
+        }
+        function safeSetItem(key, val) {
+            try { localStorage.setItem(key, val); } catch(e) {}
+        }
+
         const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
         var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        let currLang = localStorage.getItem('zenix_lang') || 'fa';
+        let currLang = safeGetItem('zenix_lang') || 'fa';
         let allMessages = [];
         let currentUserId = null;
 
-        // تابع دقیق ریاضی جهت تولید کد ۶ رقمی یکتا و هماهنگ با profile.html
         function generateUIDDigits(userId) {
             if (!userId) return '000000';
             let hash = 5381;
@@ -207,7 +214,7 @@
                 hpT2: 'پاداش‌ها و نرخ کمیسیون نسل‌ها', hpD2: 'سود دعوت دوستان در ۳ سطح محاسبه می‌شود: نسل اول ۱۰٪، نسل دوم ۷٪ و نسل سوم ۳٪ از سود معاملات زیرمجموعه‌ها می‌باشد.',
                 abTitle: 'درباره پلتفرم Zenix (هدف، ماهیت و ساختار)',
                 abDesc: 'پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.',
-                abL1T: 'هدف اصلی:', abL1D: 'اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌‌‌‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.',
+                abL1T: 'هدف اصلی:', abL1D: 'اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.',
                 abL2T: 'امنیت و زیرساخت:', abL2D: 'متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن.',
                 abL3T: 'ساختار چندسطحی (Referral & Team):', abL3D: 'ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.',
                 abL4T: 'احساس واقع‌گرایی:', abL4D: 'وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.'
@@ -280,7 +287,9 @@
             let m = allMessages[idx]; if (!m) return;
             allMessages[idx].read = true;
             if (currentUserId && m.id) {
-                await supabaseClient.from('notifications').update({ read: true, is_read: true }).eq('id', m.id);
+                try {
+                    await supabaseClient.from('notifications').update({ read: true, is_read: true }).eq('id', m.id);
+                } catch(e) {}
             }
             let unread = allMessages.filter(i => !i.read).length, b = document.getElementById('bell-badge');
             if (b) { b.textContent = unread; b.classList.toggle('show', unread > 0); }
@@ -316,7 +325,6 @@
 
         async function loadTeamData(uid, sessionUser) {
             try {
-                // تنظیم لینک دعوت کاملاً دقیق و هماهنگ با پروفایل (فرمت SM-123456)
                 let codeDigits = generateUIDDigits(uid);
                 let myRefCode = 'SM-' + codeDigits;
 
@@ -326,27 +334,35 @@
                     inviteInput.value = fullInviteUrl;
                 }
 
-                let allProfiles = [];
-
-                // خواندن اطلاعات زیرمجموعه‌ها از حافظه محلی و متاداده برای جلوگیری کامل از خطای 404 در شبکه
                 let rawList = [];
+
+                // ۱. دریافت مستقیم کاربران ثبت نام شده از جدول profiles در دیتابیس Supabase
+                try {
+                    const { data: dbProfiles, error } = await supabaseClient.from('profiles').select('*');
+                    if (!error && Array.isArray(dbProfiles)) {
+                        rawList.push(...dbProfiles);
+                    }
+                } catch(e) {}
+
+                // ۲. دریافت از حافظه محلی
                 ['zenix_registered_users', 'zenix_users', 'zenix_referrals', 'zenix_team_' + uid, 'zenix_all_users'].forEach(k => {
-                    try {
-                        let item = localStorage.getItem(k);
-                        if (item) {
+                    let item = safeGetItem(k);
+                    if (item) {
+                        try {
                             let parsed = JSON.parse(item);
                             if (Array.isArray(parsed)) rawList.push(...parsed);
                             else if (parsed && typeof parsed === 'object') rawList.push(parsed);
-                        }
-                    } catch(e) {}
+                        } catch(e) {}
+                    }
                 });
 
+                // ۳. دریافت از متاداده کاربر جاری
                 if (sessionUser && sessionUser.user_metadata) {
                     let metaTeam = sessionUser.user_metadata.team_members || sessionUser.user_metadata.referrals || sessionUser.user_metadata.subordinates;
                     if (Array.isArray(metaTeam)) rawList.push(...metaTeam);
                 }
 
-                // فیلتر تکراری‌ها
+                // حذف موارد تکراری
                 let uniqueMap = new Map();
                 rawList.forEach(u => {
                     if (u) {
@@ -354,7 +370,7 @@
                         uniqueMap.set(key, u);
                     }
                 });
-                allProfiles = Array.from(uniqueMap.values());
+                let allProfiles = Array.from(uniqueMap.values());
 
                 function isReferredBy(u, refUid) {
                     if (!u) return false;
@@ -431,7 +447,7 @@
             }
         }
 
-        // بررسی ورود کاربر از طریق Supabase Auth برای یکسان‌سازی شناسه اصلی
+        // بررسی ورود کاربر از طریق Supabase Auth
         supabaseClient.auth.onAuthStateChange(async (event, session) => {
             if (session && session.user) {
                 currentUserId = session.user.id;
@@ -449,7 +465,7 @@
 
         function setLang(l) {
             currLang = l;
-            localStorage.setItem('zenix_lang', l);
+            safeSetItem('zenix_lang', l);
             let t = ld[l] || ld.fa;
             let r = l === 'fa' || l === 'ar';
             
@@ -507,7 +523,7 @@
 
         document.getElementById('logout-btn')?.addEventListener('click', async e => {
             e.preventDefault();
-            await supabaseClient.auth.signOut();
+            try { await supabaseClient.auth.signOut(); } catch(e) {}
             window.location.href = 'index.html';
         });
 
