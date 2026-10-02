@@ -194,7 +194,7 @@
         .badge-id:hover { background: rgba(56,189,248,.22); box-shadow: 0 4px 14px -4px rgba(56,189,248,.6); }
 
         /* Actions */
-        .btn-action { padding: 6px 12px; border-radius: 9px; cursor: pointer; font-size: 11px; font-weight: 700; border: none; display: inline-flex; align-items: center; gap: 5px; transition: all .22s cubic-bezier(.4,0,.2,1); margin-inline-end: 4px; }
+        .btn-action { padding: 6px 12px; border-radius: 9px; cursor: pointer; font-size: 11px; font-weight: 700; border: none; display: inline-flex; align-items: center; gap: 5px; transition: all .22s cubic-bezier(.4,0,.2,1); }
         .btn-action:hover { transform: translateY(-1px); opacity: 1; }
         .btn-edit { background: rgba(56,189,248,.15); border: 1px solid rgba(56,189,248,.3); color: #38bdf8; }
         .btn-edit:hover { box-shadow: 0 8px 18px -8px rgba(56,189,248,.7); }
@@ -242,7 +242,6 @@
             color: #f8fafc; padding: 14px 22px; border-radius: 14px; box-shadow: 0 20px 50px -12px rgba(0,0,0,.9);
             z-index: 9999; display: flex; align-items: center; gap: 10px; transform: translateY(100px); opacity: 0; transition: all .3s ease; backdrop-filter: blur(10px);
         }
-        #toast-notification.show { transform: translateY(0); opacity: 1; }
 
         /* Chat Styling */
         .chat-item { padding: 10px; border-radius: 10px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); cursor: pointer; transition: all .2s; display: flex; flex-direction: column; gap: 4px; }
@@ -354,7 +353,7 @@
                                     <th>تلفن</th>
                                     <th>موجودی</th>
                                     <th>سود از پلتفرم</th>
-                                    <th>تاریخ ثبت‌‌نام</th>
+                                    <th>تاریخ ثبت‌نام</th>
                                     <th>عملیات</th>
                                 </tr>
                             </thead>
@@ -425,10 +424,7 @@
                             <thead>
                                 <tr>
                                     <th>شناسه کاربر</th>
-                                    <th>مبلغ</th>
-                                    <th>روش پرداخت</th>
                                     <th>تاریخ و ساعت</th>
-                                    <th>عملیات</th>
                                 </tr>
                             </thead>
                             <tbody id="tb-deposit"></tbody>
@@ -446,10 +442,7 @@
                             <thead>
                                 <tr>
                                     <th>شناسه کاربر</th>
-                                    <th>مبلغ</th>
-                                    <th>شماره حساب/والت</th>
                                     <th>تاریخ و ساعت</th>
-                                    <th>عملیات</th>
                                 </tr>
                             </thead>
                             <tbody id="tb-withdraw"></tbody>
@@ -462,7 +455,7 @@
             <div id="t-reqs" class="tab-content">
                 <div class="panel-box">
                     <div class="panel-header"><div class="panel-title"><i class="fas fa-inbox"></i> صندوق درخواست‌ها</div></div>
-                    <div id="req-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                    <div id="req-container"></div>
                 </div>
             </div>
 
@@ -477,7 +470,9 @@
                             <div style="padding: 12px; background: rgba(30,41,59,0.5); border-bottom: 1px solid rgba(255,255,255,0.08); font-weight: bold; color: #38bdf8; font-size: 12px;">
                                 <i class="fas fa-list"></i> لیست چت‌های فعال
                             </div>
-                            <div id="admin-chat-list" style="flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 6px;"></div>
+                            <div id="admin-chat-list" style="flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
+                                <div style="text-align:center; color:#64748b; margin-top:20px;">هیچ چتی ثبت نشده است.</div>
+                            </div>
                         </div>
 
                         <div style="flex: 1; min-width: 300px; background: rgba(10, 15, 30, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden;">
@@ -498,27 +493,41 @@
 
             <!-- Tab 8: Messaging Center -->
             <div id="t-messages" class="tab-content">
-                <div class="panel-box">
-                    <div class="panel-title"><i class="fas fa-paper-plane"></i> ارسال پیام همگانی و اطلاعیه به کاربران</div>
-                    <form id="form-broadcast-msg" style="margin-top: 16px; display: flex; flex-direction: column; gap: 14px;">
-                        <div class="form-group">
-                            <label>گیرندگان پیام</label>
-                            <select id="broadcast-target">
-                                <option value="all">همه کاربران (عمومی)</option>
-                                <option value="active">فقط کاربران فعال</option>
-                                <option value="pending">فقط کاربران در انتظار احراز</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>عنوان پیام</label>
-                            <input type="text" id="broadcast-title" placeholder="عنوان اطلاعیه را وارد کنید..." required>
-                        </div>
-                        <div class="form-group">
-                            <label>متن اعلان</label>
-                            <textarea id="broadcast-body" rows="5" placeholder="متن پیام خود را بنویسید..." required></textarea>
-                        </div>
-                        <button type="submit" class="btn-save"><i class="fas fa-paper-plane"></i> ارسال فوری پیام</button>
-                    </form>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:20px;">
+                    <div class="panel-box" style="margin-bottom:0;">
+                        <div class="panel-header"><div class="panel-title"><i class="fas fa-bullhorn"></i> ارسال پیام همگانی به همه کاربران</div></div>
+                        <form id="f-broadcast">
+                            <div class="form-group"><label>موضوع پیام</label><input type="text" id="bc-title" placeholder="موضوع..." required></div>
+                            <div class="form-group"><label>متن پیام</label><textarea id="bc-msg" style="height:110px;resize:vertical;" placeholder="متن پیام همگانی..." required></textarea></div>
+                            <button type="submit" class="btn-save" style="background:linear-gradient(135deg,#0284c7,#0369a1)"><i class="fas fa-paper-plane"></i> ارسال به تمام کاربران</button>
+                        </form>
+                    </div>
+
+                    <div class="panel-box" style="margin-bottom:0;">
+                        <div class="panel-header"><div class="panel-title"><i class="fas fa-user-pen"></i> ارسال پیام تکی به یک کاربر</div></div>
+                        <form id="f-single-msg">
+                            <input type="hidden" id="target-uid-hidden" required>
+                            <div id="selected-user-card" style="display:none; background:rgba(56,189,248,.12); border:1px solid rgba(56,189,248,.35); border-radius:10px; padding:10px 14px; margin-bottom:12px; align-items:center; justify-content:space-between;">
+                                <div>
+                                    <span style="font-size:10px; color:#38bdf8; display:block; font-weight:600;"><i class="fas fa-user-check"></i> کاربر گیرنده انتخاب‌شده:</span>
+                                    <span id="sel-user-name" style="font-weight:700; color:#f8fafc; font-size:12px;">-</span>
+                                </div>
+                                <button type="button" onclick="clearSelectedUser()" style="background:rgba(239,68,68,.2); border:1px solid rgba(239,68,68,.4); color:#ef4444; border-radius:6px; padding:4px 8px; font-size:10px; cursor:pointer;"><i class="fas fa-times"></i> تغییر کاربر</button>
+                            </div>
+
+                            <div class="form-group" id="sm-uid-container">
+                                <label>جستجو و انتخاب کاربر</label>
+                                <input type="text" id="sm-search" placeholder="جستجو بر اساس نام، ایمیل یا شناسه..." style="margin-bottom:6px;">
+                                <select id="sm-uid" style="background:#0f172a; height: 100px;" size="4">
+                                    <option value="">ابتدا یک کاربر را از لیست جستجو انتخاب کنید...</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group"><label>موضوع پیام</label><input type="text" id="sm-title" placeholder="موضوع..." required></div>
+                            <div class="form-group"><label>متن پیام</label><textarea id="sm-msg" style="height:70px;resize:vertical;" placeholder="متن پیام..." required></textarea></div>
+                            <button type="submit" class="btn-save" style="background:linear-gradient(135deg,#059669,#047857)"><i class="fas fa-paper-plane"></i> ارسال پیام به کاربر</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -526,437 +535,1047 @@
     </div>
 
     <!-- Modals -->
-    <!-- Modal: View / Edit User -->
-    <div id="modal-user" class="modal">
+    <div class="modal" id="m-details">
         <div class="modal-content">
-            <div class="modal-header">
-                <span id="modal-user-title"><i class="fas fa-user-edit"></i> مدیریت کاربر</span>
-                <button class="modal-close" onclick="closeModal('modal-user')"><i class="fas fa-times"></i></button>
-            </div>
-            <form id="form-user-edit">
-                <input type="hidden" id="edit-user-id">
-                <div class="form-group">
-                    <label>نام و نام خانوادگی</label>
-                    <input type="text" id="edit-user-name" required>
-                </div>
-                <div class="form-group">
-                    <label>ایمیل</label>
-                    <input type="email" id="edit-user-email" required>
-                </div>
-                <div class="form-group">
-                    <label>شماره تلفن</label>
-                    <input type="text" id="edit-user-phone">
-                </div>
-                <div class="form-group">
-                    <label>موجودی ($)</label>
-                    <input type="number" step="0.01" id="edit-user-balance" required>
-                </div>
-                <div class="form-group">
-                    <label>سود کسب شده ($)</label>
-                    <input type="number" step="0.01" id="edit-user-profit" required>
-                </div>
-                <div class="form-group">
-                    <label>وضعیت حساب</label>
-                    <select id="edit-user-status">
-                        <option value="active">فعال</option>
-                        <option value="pending">در انتظار احراز</option>
-                        <option value="banned">مسدود / لغو شده</option>
-                    </select>
-                </div>
+            <div class="modal-header"><span>اطلاعات کامل کاربر</span><button class="modal-close" onclick="closeModal('m-details')"><i class="fas fa-times"></i></button></div>
+            <div id="user-details-body"></div>
+            <div id="modal-action-btn" style="margin-top:12px"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="m-item-details">
+        <div class="modal-content">
+            <div class="modal-header"><span id="item-modal-title">جزئیات درخواست</span><button class="modal-close" onclick="closeModal('m-item-details')"><i class="fas fa-times"></i></button></div>
+            <div id="item-details-body"></div>
+            <div id="item-modal-actions" style="margin-top:16px; display:flex; gap:10px;"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="m-edit">
+        <div class="modal-content">
+            <div class="modal-header"><span>ویرایش مشخصات کاربر</span><button class="modal-close" onclick="closeModal('m-edit')"><i class="fas fa-times"></i></button></div>
+            <form id="f-edit">
+                <input type="hidden" id="e-uid">
+                <div class="form-group"><label>نام و نام خانوادگی</label><input type="text" id="e-name"></div>
+                <div class="form-group"><label>ایمیل</label><input type="text" id="e-email"></div>
+                <div class="form-group"><label>تلفن</label><input type="text" id="e-phone"></div>
+                <div class="form-group"><label>موجودی حساب ($)</label><input type="number" step="any" id="e-bal"></div>
+                <div class="form-group"><label>سود از پلتفرم ($)</label><input type="number" step="any" id="e-profit"></div>
                 <button type="submit" class="btn-save">ذخیره تغییرات</button>
             </form>
         </div>
     </div>
 
-    <!-- Toast Container -->
+    <!-- Toast Notification Banner -->
     <div id="toast-notification">
-        <i id="toast-icon" class="fas fa-info-circle"></i>
-        <span id="toast-text">اعلان سیستم</span>
+        <i id="toast-icon" class="fas fa-check-circle" style="color:#22c55e; font-size:16px;"></i>
+        <span id="toast-text" style="font-size:12px; font-weight:600;">عملیات با موفقیت انجام شد.</span>
     </div>
 
-    <!-- Application Script Logic -->
-    <script>
-        // Initial State Data
-        let soundEnabled = true;
-        let activeChatUserId = null;
+    <footer><p>&copy; 2026 Zenix Platform - Enterprise Admin Dashboard</p></footer>
 
-        let users = [
-            { id: "ZX-101", name: "علی محمدی", email: "ali@example.com", phone: "09121111111", balance: 1450.00, profit: 320.50, status: "active", regDate: "1402/05/10" },
-            { id: "ZX-102", name: "سارا حسینی", email: "sara@example.com", phone: "09122222222", balance: 890.00, profit: 110.00, status: "active", regDate: "1402/06/15" },
-            { id: "ZX-103", name: "رضا کریمی", email: "reza@example.com", phone: "09123333333", balance: 0.00, profit: 0.00, status: "pending", regDate: "1402/07/01" },
-            { id: "ZX-104", name: "مهدی احمدی", email: "mehdi@example.com", phone: "09124444444", balance: 15.00, profit: 0.00, status: "banned", regDate: "1402/04/20" }
-        ];
+    <script type="module">
+        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-        let deposits = [
-            { id: "DEP-881", userId: "ZX-101", amount: 500.00, method: "TRC20 (USDT)", date: "1402/07/05 - 14:20" },
-            { id: "DEP-882", userId: "ZX-102", amount: 200.00, method: "تومانی / کارت", date: "1402/07/05 - 15:10" }
-        ];
+        const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let uMap = {}, tUid = null;
+        let currentActiveChatId = null;
+        let chatChannel = null;
+        let messageChannel = null;
 
-        let withdrawals = [
-            { id: "WTH-991", userId: "ZX-101", amount: 150.00, wallet: "T9z...Kx2q", date: "1402/07/05 - 16:05" }
-        ];
+        function generateUIDDigits(userId) {
+            if (!userId) return '000000';
+            let hash = 5381;
+            let str = String(userId);
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) + hash) + str.charCodeAt(i);
+            }
+            const num = Math.abs(hash % 900000) + 100000;
+            return num.toString();
+        }
 
-        let requests = [
-            { id: "REQ-01", userId: "ZX-103", title: "درخواست تایید مدارک و هویت", date: "1402/07/05 - 10:30" }
-        ];
+        function getUserIdCode(uid) {
+            return 'SM-' + generateUIDDigits(uid);
+        }
 
-        let chats = {
-            "ZX-101": [
-                { sender: "user", text: "سلام، واریزی من کی تایید میشه؟", time: "14:22" },
-                { sender: "admin", text: "سلام علی عزیز، درخواست شما در حال بررسی است.", time: "14:25" }
-            ],
-            "ZX-102": [
-                { sender: "user", text: "درود، چطور می‌تونم برداشت ریالی بزنم؟", time: "15:00" }
-            ]
+        let isMuted = localStorage.getItem('zenix_admin_muted') === 'true';
+
+        function updateSoundUI() {
+            const soundBtn = document.getElementById('toggle-sound-btn');
+            const soundIcon = document.getElementById('sound-icon');
+            const soundText = document.getElementById('sound-text');
+            if(!soundBtn || !soundIcon || !soundText) return;
+
+            if (isMuted) {
+                soundIcon.className = 'fas fa-volume-xmark';
+                soundIcon.style.color = '#ef4444';
+                soundText.innerText = 'بی‌صدا';
+                soundBtn.style.borderColor = 'rgba(239,68,68,.3)';
+                soundBtn.style.background = 'rgba(239,68,68,.1)';
+            } else {
+                soundIcon.className = 'fas fa-volume-high';
+                soundIcon.style.color = '#22c55e';
+                soundText.innerText = 'صدا فعال';
+                soundBtn.style.borderColor = 'rgba(34,197,94,.3)';
+                soundBtn.style.background = 'rgba(34,197,94,.1)';
+            }
+        }
+
+        document.getElementById('toggle-sound-btn')?.addEventListener('click', () => {
+            isMuted = !isMuted;
+            localStorage.setItem('zenix_admin_muted', isMuted);
+            updateSoundUI();
+            showToast(isMuted ? 'صدای هشدار بی‌صدا شد.' : 'صدای هشدار فعال شد.', isMuted ? 'error' : 'success');
+        });
+
+        let audioCtx = null;
+
+        function unlockAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+        document.addEventListener('click', unlockAudio, { once: true });
+        document.addEventListener('touchstart', unlockAudio, { once: true });
+
+        function playAlertSound() {
+            if (isMuted) return;
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const now = audioCtx.currentTime;
+
+                const osc1 = audioCtx.createOscillator();
+                const gain1 = audioCtx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(880, now);
+                gain1.gain.setValueAtTime(0.3, now);
+                gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                osc1.connect(gain1);
+                gain1.connect(audioCtx.destination);
+                osc1.start(now);
+                osc1.stop(now + 0.25);
+
+                const osc2 = audioCtx.createOscillator();
+                const gain2 = audioCtx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(1174.66, now + 0.15);
+                gain2.gain.setValueAtTime(0.35, now + 0.15);
+                gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                osc2.connect(gain2);
+                gain2.connect(audioCtx.destination);
+                osc2.start(now + 0.15);
+                osc2.stop(now + 0.5);
+            } catch (e) {
+                console.error("خطا در پخش صدای هشدار:", e);
+            }
+        }
+
+        const BOT_TOKEN = "8410709888:AAGtbRe48eip7ATE-F65QVhR8XpcOtBLQ6A";
+        const CHAT_ID = "249551923";
+        let prevD = -1, prevW = -1, prevR = -1, prevChat = -1;
+
+        async function sendTelegramAlert(messageText) {
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+            try {
+                await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: CHAT_ID,
+                        text: messageText,
+                        parse_mode: 'HTML'
+                    })
+                });
+            } catch (e) {
+                console.error("خطا در ارسال پیام تلگرام:", e);
+            }
+        }
+
+        window.switchTab=(id,btn)=>{
+            document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
         };
 
-        // Navigation Tabs Trigger
-        function switchTab(tabId, btnElement) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        window.closeModal=id=>document.getElementById(id).classList.remove('show');
 
-            document.getElementById(tabId).classList.add('active');
-            if(btnElement) btnElement.classList.add('active');
-
-            renderAll();
-        }
-
-        // Render Data across Dashboard
-        function renderAll() {
-            // Stats Calculation
-            document.getElementById('st-users').innerText = users.length;
-            const totalBalance = users.reduce((acc, u) => acc + u.balance, 0);
-            const totalProfit = users.reduce((acc, u) => acc + u.profit, 0);
-            document.getElementById('st-bal').innerText = `$${totalBalance.toFixed(2)}`;
-            document.getElementById('st-admin-profit').innerText = `$${totalProfit.toFixed(2)}`;
-            document.getElementById('st-req').innerText = requests.length;
-            document.getElementById('st-d-req').innerText = deposits.length;
-            document.getElementById('st-w-req').innerText = withdrawals.length;
-
-            // Badges
-            updateBadge('d-badge', deposits.length);
-            updateBadge('w-badge', withdrawals.length);
-            updateBadge('req-badge', requests.length);
-            updateBadge('chat-badge', Object.keys(chats).length);
-
-            // Active Users Table
-            const activeUsers = users.filter(u => u.status === 'active');
-            renderUserTable('tb-act', activeUsers);
-
-            // Pending Users Table
-            const pendingUsers = users.filter(u => u.status === 'pending');
-            renderUserTable('tb-pend', pendingUsers);
-
-            // Banned Users Table
-            const bannedUsers = users.filter(u => u.status === 'banned');
-            renderUserTable('tb-ban', bannedUsers);
-
-            // Deposit Requests
-            const tbDeposit = document.getElementById('tb-deposit');
-            tbDeposit.innerHTML = deposits.length === 0 ? '<tr><td colspan="5" style="text-align:center;color:#64748b;">درخواستی موجود نیست</td></tr>' : 
-            deposits.map(d => `
-                <tr>
-                    <td><span class="badge-id" onclick="openEditUser('${d.userId}')">${d.userId}</span></td>
-                    <td style="color:#22c55e;font-weight:bold;">$${d.amount.toFixed(2)}</td>
-                    <td>${d.method}</td>
-                    <td>${d.date}</td>
-                    <td>
-                        <button class="btn-action btn-approve" onclick="approveDeposit('${d.id}')"><i class="fas fa-check"></i> تایید</button>
-                        <button class="btn-action btn-reject" onclick="rejectDeposit('${d.id}')"><i class="fas fa-times"></i> رد</button>
-                    </td>
-                </tr>
-            `).join('');
-
-            // Withdraw Requests
-            const tbWithdraw = document.getElementById('tb-withdraw');
-            tbWithdraw.innerHTML = withdrawals.length === 0 ? '<tr><td colspan="5" style="text-align:center;color:#64748b;">درخواستی موجود نیست</td></tr>' : 
-            withdrawals.map(w => `
-                <tr>
-                    <td><span class="badge-id" onclick="openEditUser('${w.userId}')">${w.userId}</span></td>
-                    <td style="color:#ef4444;font-weight:bold;">$${w.amount.toFixed(2)}</td>
-                    <td>${w.wallet}</td>
-                    <td>${w.date}</td>
-                    <td>
-                        <button class="btn-action btn-approve" onclick="approveWithdrawal('${w.id}')"><i class="fas fa-check"></i> پرداخت</button>
-                        <button class="btn-action btn-reject" onclick="rejectWithdrawal('${w.id}')"><i class="fas fa-times"></i> لغو</button>
-                    </td>
-                </tr>
-            `).join('');
-
-            // Inbox Requests
-            const reqContainer = document.getElementById('req-container');
-            reqContainer.innerHTML = requests.length === 0 ? '<div style="text-align:center;color:#64748b;padding:20px;">هیچ درخواست معلقی وجود ندارد.</div>' :
-            requests.map(r => `
-                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); padding:14px; border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <div style="font-weight:bold; color:#f8fafc; margin-bottom:4px;">${r.title}</div>
-                        <div style="font-size:11px; color:#94a3b8;">کاربر: <span class="badge-id" onclick="openEditUser('${r.userId}')">${r.userId}</span> | تاریخ: ${r.date}</div>
-                    </div>
-                    <div>
-                        <button class="btn-action btn-approve" onclick="resolveRequest('${r.id}')"><i class="fas fa-check"></i> بررسی شد</button>
-                    </div>
-                </div>
-            `).join('');
-
-            // Support Chat List
-            renderChatList();
-        }
-
-        function updateBadge(id, count) {
-            const el = document.getElementById(id);
-            el.innerText = count;
-            if(count > 0) { el.classList.remove('zero'); } else { el.classList.add('zero'); }
-        }
-
-        function renderUserTable(targetId, userList) {
-            const tbody = document.getElementById(targetId);
-            if(userList.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#64748b;">کاربری یافت نشد</td></tr>';
-                return;
-            }
-            tbody.innerHTML = userList.map(u => `
-                <tr>
-                    <td><span class="badge-id" onclick="openEditUser('${u.id}')">${u.id}</span></td>
-                    <td><strong>${u.name}</strong></td>
-                    <td>${u.email}</td>
-                    <td>${u.phone || 'ثبت نشده'}</td>
-                    <td style="color:#38bdf8;font-weight:700;">$${u.balance.toFixed(2)}</td>
-                    <td style="color:#a855f7;font-weight:700;">$${u.profit.toFixed(2)}</td>
-                    ${u.regDate ? `<td>${u.regDate}</td>` : ''}
-                    <td>
-                        <button class="btn-action btn-edit" onclick="openEditUser('${u.id}')"><i class="fas fa-edit"></i> مدیریت</button>
-                        ${u.status !== 'banned' ? `<button class="btn-action btn-ban" onclick="toggleBanUser('${u.id}')"><i class="fas fa-ban"></i> مسدود</button>` : `<button class="btn-action btn-approve" onclick="toggleBanUser('${u.id}')"><i class="fas fa-unlock"></i> رفع انسداد</button>`}
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        // Modal Controls
-        function openEditUser(id) {
-            const user = users.find(u => u.id === id);
-            if(!user) return;
-            document.getElementById('edit-user-id').value = user.id;
-            document.getElementById('edit-user-name').value = user.name;
-            document.getElementById('edit-user-email').value = user.email;
-            document.getElementById('edit-user-phone').value = user.phone;
-            document.getElementById('edit-user-balance').value = user.balance;
-            document.getElementById('edit-user-profit').value = user.profit;
-            document.getElementById('edit-user-status').value = user.status;
-            
-            document.getElementById('modal-user-title').innerHTML = `<i class="fas fa-user-edit"></i> ویرایش کاربر ${user.id}`;
-            document.getElementById('modal-user').classList.add('show');
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('show');
-        }
-
-        // Form Submit: Save Edit User
-        document.getElementById('form-user-edit').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const id = document.getElementById('edit-user-id').value;
-            const user = users.find(u => u.id === id);
-            if(user) {
-                user.name = document.getElementById('edit-user-name').value;
-                user.email = document.getElementById('edit-user-email').value;
-                user.phone = document.getElementById('edit-user-phone').value;
-                user.balance = parseFloat(document.getElementById('edit-user-balance').value) || 0;
-                user.profit = parseFloat(document.getElementById('edit-user-profit').value) || 0;
-                user.status = document.getElementById('edit-user-status').value;
-                
-                showToast(`اطلاعات کاربر ${id} بروزرسانی شد`);
-                closeModal('modal-user');
-                renderAll();
-            }
-        });
-
-        // Toggle User Ban
-        function toggleBanUser(id) {
-            const user = users.find(u => u.id === id);
-            if(user) {
-                user.status = user.status === 'banned' ? 'active' : 'banned';
-                showToast(`وضعیت حساب ${id} تغییر یافت`);
-                renderAll();
-            }
-        }
-
-        // Approve/Reject Handlers
-        function approveDeposit(id) {
-            const depIndex = deposits.findIndex(d => d.id === id);
-            if(depIndex !== -1) {
-                const dep = deposits[depIndex];
-                const user = users.find(u => u.id === dep.userId);
-                if(user) user.balance += dep.amount;
-                deposits.splice(depIndex, 1);
-                showToast(`واریزی ${id} با موفقیت تایید شد`);
-                renderAll();
-            }
-        }
-
-        function rejectDeposit(id) {
-            deposits = deposits.filter(d => d.id !== id);
-            showToast(`واریزی ${id} رد شد`);
-            renderAll();
-        }
-
-        function approveWithdrawal(id) {
-            withdrawals = withdrawals.filter(w => w.id !== id);
-            showToast(`برداشت ${id} تایید و تسویه گردید`);
-            renderAll();
-        }
-
-        function rejectWithdrawal(id) {
-            const wthIndex = withdrawals.findIndex(w => w.id === id);
-            if(wthIndex !== -1) {
-                const w = withdrawals[wthIndex];
-                const user = users.find(u => u.id === w.userId);
-                if(user) user.balance += w.amount; // عودت مبلغ به حساب
-                withdrawals.splice(wthIndex, 1);
-                showToast(`درخواست برداشت رد و مبلغ به کاربر عودت داده شد`);
-                renderAll();
-            }
-        }
-
-        function resolveRequest(id) {
-            requests = requests.filter(r => r.id !== id);
-            showToast(`درخواست ${id} به‌عنوان بررسی‌شده ثبت گردید`);
-            renderAll();
-        }
-
-        // Chat System
-        function renderChatList() {
-            const listEl = document.getElementById('admin-chat-list');
-            const chatUserIds = Object.keys(chats);
-            if(chatUserIds.length === 0) {
-                listEl.innerHTML = '<div style="text-align:center; color:#64748b; margin-top:20px;">چتی موجود نیست.</div>';
-                return;
-            }
-
-            listEl.innerHTML = chatUserIds.map(uId => {
-                const userMsgs = chats[uId];
-                const lastMsg = userMsgs[userMsgs.length - 1];
-                const user = users.find(u => u.id === uId);
-                const activeClass = activeChatUserId === uId ? 'active' : '';
-                return `
-                    <div class="chat-item ${activeClass}" onclick="openChat('${uId}')">
-                        <div class="chat-item-header">
-                            <span class="chat-item-title">${user ? user.name : uId}</span>
-                            <span class="chat-item-time">${lastMsg ? lastMsg.time : ''}</span>
-                        </div>
-                        <div class="chat-item-sub">${lastMsg ? lastMsg.text : ''}</div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function openChat(uId) {
-            activeChatUserId = uId;
-            renderChatList();
-            const user = users.find(u => u.id === uId);
-            document.getElementById('admin-chat-header').innerHTML = `<span><i class="fas fa-user"></i> گفت‌وگو با: ${user ? user.name : uId} (${uId})</span>`;
-            document.getElementById('admin-chat-form').style.display = 'flex';
-            
-            const msgBox = document.getElementById('admin-chat-messages');
-            msgBox.innerHTML = chats[uId].map(m => `
-                <div class="chat-msg-box ${m.sender}">${m.text}</div>
-            `).join('');
-            msgBox.scrollTop = msgBox.scrollHeight;
-        }
-
-        document.getElementById('admin-chat-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const input = document.getElementById('admin-chat-input');
-            const text = input.value.trim();
-            if(!text || !activeChatUserId) return;
-
-            chats[activeChatUserId].push({
-                sender: 'admin',
-                text: text,
-                time: new Date().toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' })
+        // بستن مودال‌ها با کلیک روی پس‌زمینه
+        document.querySelectorAll('.modal').forEach(m => {
+            m.addEventListener('click', (e) => {
+                if (e.target === m) closeModal(m.id);
             });
-            input.value = '';
-            openChat(activeChatUserId);
-            sendTelegramAlert(`پاسخ پشتیبان به کاربر ${activeChatUserId}: ${text}`);
         });
+        
+        function showToast(text, type='success'){
+            let t = document.getElementById('toast-notification');
+            let icon = document.getElementById('toast-icon');
+            let txt = document.getElementById('toast-text');
+            txt.innerText = text;
+            icon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+            icon.style.color = type === 'success' ? '#22c55e' : '#ef4444';
+            t.style.borderColor = type === 'success' ? 'rgba(34,197,94,.4)' : 'rgba(239,68,68,.4)';
+            t.style.transform = 'translateY(0)';
+            t.style.opacity = '1';
+            setTimeout(() => {
+                t.style.transform = 'translateY(100px)';
+                t.style.opacity = '0';
+            }, 3500);
+        }
 
-        // Broadcast Message Form
-        document.getElementById('form-broadcast-msg').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const title = document.getElementById('broadcast-title').value;
-            showToast(`اعلان عمومی "${title}" با موفقیت ارسال شد`);
-            this.reset();
-        });
-
-        // Sound Toggle
-        document.getElementById('toggle-sound-btn').addEventListener('click', function() {
-            soundEnabled = !soundEnabled;
-            const icon = document.getElementById('sound-icon');
-            const text = document.getElementById('sound-text');
-            if(soundEnabled) {
-                icon.className = "fas fa-volume-high";
-                icon.style.color = "#22c55e";
-                text.innerText = "صدا فعال";
+        const getName=u=>u.fullname||u.fullName||u.full_name||u.name||(u.firstName?`${u.firstName} ${u.lastName||''}`:null)||(u.raw_user_meta_data?.fullname)||(u.user_metadata?.fullname)||u.email?.split('@')[0]||'کاربر بدون نام';
+        
+        const formatDate=ts=>{
+            if(!ts)return 'نامشخص';
+            let d;
+            if(typeof ts.toDate==='function'){
+                d=ts.toDate();
+            } else if(typeof ts==='string'){
+                let cleanStr = ts.replace(/at\s.*UTC.*/i, '').trim();
+                d=new Date(cleanStr);
+                if(isNaN(d.getTime())) d=new Date(ts);
             } else {
-                icon.className = "fas fa-volume-xmark";
-                icon.style.color = "#ef4444";
-                text.innerText = "صدا غیرفعال";
+                d=new Date(ts);
             }
-        });
+            return isNaN(d.getTime())?'نامشخص':`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} | ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+        };
 
-        // Toast Notification System
-        function showToast(msg) {
-            const toast = document.getElementById('toast-notification');
-            document.getElementById('toast-text').innerText = msg;
-            toast.classList.add('show');
-            if(soundEnabled) playNotificationSound();
-            setTimeout(() => { toast.classList.remove('show'); }, 3000);
-        }
-
-        function playNotificationSound() {
+        // تابع کمکی برای ارسال ایمن اعلان‌ها به کاربر
+        async function sendNotificationToUser(uid, title, message) {
+            const now = new Date().toISOString();
             try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.frequency.value = 587.33; // D5
-                gain.gain.setValueAtTime(0.08, ctx.currentTime);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.15);
-            } catch(e) {}
+                // درج با ساختار استاندارد snake_case
+                const { error } = await supabaseClient.from('notifications').insert([{
+                    user_id: uid,
+                    title: title,
+                    message: message,
+                    created_at: now,
+                    read: false
+                }]);
+
+                if (error) {
+                    // در صورت خطای نام ستون، تست با فیلدهای جایگزین
+                    await supabaseClient.from('notifications').insert([{
+                        userId: uid,
+                        title: title,
+                        message: message,
+                        text: message,
+                        created_at: now,
+                        isRead: false
+                    }]);
+                }
+            } catch (err) {
+                console.warn("Notification insert fallback error:", err);
+            }
         }
 
-        // Simulated Realtime Telegram Alert Hook
-        function sendTelegramAlert(message) {
-            console.log("[Telegram Alert Transmitted]:", message);
+        async function initSupportChatListener() {
+            async function fetchChats() {
+                try {
+                    const { data: chats, error } = await supabaseClient
+                        .from('support_chats')
+                        .select('*')
+                        .order('updated_at', { ascending: false });
+
+                    let listContainer = document.getElementById('admin-chat-list');
+                    if(!listContainer) return;
+
+                    if (error || !chats || chats.length === 0) {
+                        listContainer.innerHTML = `<div style="text-align:center; color:#64748b; margin-top:20px;">هیچ چتی ثبت نشده است.</div>`;
+                        let badge = document.getElementById('chat-badge');
+                        if (badge) {
+                            badge.innerText = '0';
+                            badge.className = 'tab-badge zero';
+                        }
+                        prevChat = 0;
+                        return;
+                    }
+
+                    let unreadCount = 0;
+                    let html = '';
+
+                    chats.forEach(chat => {
+                        let chatId = chat.id;
+                        let userName = chat.user_name || chat.userName || chat.fullname || chat.user_email || chat.userEmail || 'کاربر';
+                        let lastMsg = chat.last_message || chat.lastMessage || 'درخواست چت جدید';
+                        let isUnread = chat.unread_by_admin === true || chat.unreadByAdmin === true;
+
+                        if (isUnread) unreadCount++;
+
+                        let isActive = currentActiveChatId === chatId;
+
+                        html += `
+                            <div class="chat-item ${isActive ? 'active' : ''}" onclick="openAdminChat('${chatId}', '${userName}', '${chat.user_email || chat.userEmail || ''}')">
+                                <div class="chat-item-header">
+                                    <span class="chat-item-title">${userName} ${isUnread ? '<span style="color:#ef4444; font-size:14px;">●</span>' : ''}</span>
+                                    <span class="chat-item-time">${formatDate(chat.updated_at || chat.updatedAt || chat.created_at || chat.createdAt)}</span>
+                                </div>
+                                <div class="chat-item-sub">${lastMsg}</div>
+                            </div>
+                        `;
+                    });
+
+                    listContainer.innerHTML = html;
+                    let badge = document.getElementById('chat-badge');
+                    if (badge) {
+                        badge.innerText = unreadCount;
+                        badge.className = unreadCount > 0 ? 'tab-badge' : 'tab-badge zero';
+                    }
+
+                    if (prevChat !== -1 && unreadCount > prevChat) {
+                        playAlertSound();
+                        sendTelegramAlert(`💬 <b>پیام پشتیبانی جدید در پنل Zenix!</b>\nکاربری در بخش پشتیبانی پیام ارسال کرده است.`);
+                    }
+                    prevChat = unreadCount;
+                } catch(err) {
+                    console.error("Error fetching chats from Supabase:", err);
+                }
+            }
+
+            await fetchChats();
+
+            if (chatChannel) supabaseClient.removeChannel(chatChannel);
+            chatChannel = supabaseClient
+                .channel('realtime_support_chats')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'support_chats' }, () => {
+                    fetchChats();
+                })
+                .subscribe();
         }
 
-        // Logout
-        document.getElementById('logout-btn').addEventListener('click', function() {
-            if(confirm('آیا از خروج از پنل مدیریت اطمینان دارید؟')) {
-                alert('شما با موفقیت خارج شدید.');
-                location.reload();
+        window.openAdminChat = async (chatId, userName, userEmail) => {
+            currentActiveChatId = chatId;
+            document.getElementById('admin-chat-header').innerHTML = `
+                <div>
+                    <span><i class="fas fa-user-circle"></i> گفتگو با <strong>${userName}</strong></span>
+                    <span style="font-size:10px; color:#94a3b8; display:block;">${userEmail}</span>
+                </div>
+                <button onclick="deleteAdminChat('${chatId}')" style="background:rgba(239,68,68,.15); border:1px solid rgba(239,68,68,.3); color:#ef4444; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:11px; font-weight:600; display:flex; align-items:center; gap:4px; transition:all .2s;">
+                    <i class="fas fa-trash-alt"></i> بستن و حذف گفتگو
+                </button>
+            `;
+            document.getElementById('admin-chat-form').style.display = 'flex';
+
+            await supabaseClient.from('support_chats').update({ unread_by_admin: false }).eq('id', chatId);
+
+            async function fetchMessages() {
+                const { data: messages, error } = await supabaseClient
+                    .from('support_messages')
+                    .select('*')
+                    .eq('chat_id', chatId)
+                    .order('created_at', { ascending: true });
+
+                let msgBox = document.getElementById('admin-chat-messages');
+                if(!msgBox) return;
+
+                if (error || !messages || messages.length === 0) {
+                    msgBox.innerHTML = `<div style="text-align:center; color:#64748b; margin-top:50px;">هنوز پیامی رد و بدل نشده است.</div>`;
+                    return;
+                }
+
+                let msgHtml = '';
+                messages.forEach(msg => {
+                    let isAdmin = msg.sender === 'admin';
+                    msgHtml += `
+                        <div class="chat-msg-box ${isAdmin ? 'admin' : 'user'}">
+                            <div style="font-size:10px; opacity:0.7; margin-bottom:2px;">${isAdmin ? 'پشتیبان (شما)' : userName}</div>
+                            <div>${msg.text}</div>
+                        </div>
+                    `;
+                });
+
+                msgBox.innerHTML = msgHtml;
+                msgBox.scrollTop = msgBox.scrollHeight;
+            }
+
+            await fetchMessages();
+
+            if (messageChannel) supabaseClient.removeChannel(messageChannel);
+            messageChannel = supabaseClient
+                .channel(`realtime_messages_${chatId}`)
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'support_messages', filter: `chat_id=eq.${chatId}` }, () => {
+                    fetchMessages();
+                })
+                .subscribe();
+        };
+
+        window.deleteAdminChat = async (chatId) => {
+            if (!confirm('آیا از بستن و حذف کامل این گفتگو و تاریخچه آن اطمینان دارید؟')) return;
+
+            try {
+                await supabaseClient.from('support_messages').delete().eq('chat_id', chatId);
+                await supabaseClient.from('support_chats').delete().eq('id', chatId);
+
+                currentActiveChatId = null;
+                if (messageChannel) supabaseClient.removeChannel(messageChannel);
+
+                document.getElementById('admin-chat-header').innerHTML = `<span>یک کاربر را برای شروع گفتگو انتخاب کنید...</span>`;
+                document.getElementById('admin-chat-messages').innerHTML = `<div style="text-align: center; color: #64748b; margin-top: 100px;">لطفاً از لیست سمت راست یک کاربر را انتخاب کنید.</div>`;
+                document.getElementById('admin-chat-form').style.display = 'none';
+
+                showToast('گفتگو با موفقیت بسته و حذف گردید.');
+                initSupportChatListener();
+            } catch (err) {
+                console.error("Error deleting chat:", err);
+                showToast("خطا در حذف گفتگو", "error");
+            }
+        };
+
+        document.getElementById('admin-chat-form').onsubmit = async (e) => {
+            e.preventDefault();
+            let input = document.getElementById('admin-chat-input');
+            let text = input.value.trim();
+            if (!text || !currentActiveChatId) return;
+
+            input.value = '';
+
+            try {
+                await supabaseClient.from('support_messages').insert([{
+                    chat_id: currentActiveChatId,
+                    sender: 'admin',
+                    text: text,
+                    created_at: new Date().toISOString()
+                }]);
+
+                await supabaseClient.from('support_chats').update({
+                    last_message: text,
+                    updated_at: new Date().toISOString(),
+                    status: 'answered',
+                    unread_by_user: true
+                }).eq('id', currentActiveChatId);
+            } catch (err) {
+                console.error("Error sending chat message:", err);
+                showToast("خطا در ارسال پیام", "error");
+            }
+        };
+
+        function updateSelectOptions(filter=""){
+            let smSelect=document.getElementById('sm-uid');
+            if(!smSelect)return;
+            let currentVal=smSelect.value;
+            let html='<option value="">انتخاب کاربر...</option>';
+            let q=filter.toLowerCase();
+            
+            for(let uid in uMap){
+                let u=uMap[uid];
+                let idCode=getUserIdCode(uid);
+                let nameStr=getName(u);
+                let emailStr=u.email||'-';
+                let phoneStr=u.phone||'-';
+                let searchStr=`${idCode} ${nameStr} ${emailStr} ${phoneStr}`.toLowerCase();
+                
+                if(!q || searchStr.includes(q)){
+                    html+=`<option value="${uid}">${nameStr} (${idCode} - ${emailStr})</option>`;
+                }
+            }
+            smSelect.innerHTML=html;
+            smSelect.value=currentVal;
+        }
+
+        window.selectUserForMessage = uid => {
+            let u = uMap[uid];
+            if(!u) return;
+            let idCode = getUserIdCode(uid);
+            let nameStr = getName(u);
+            document.getElementById('sel-user-name').innerText = `${nameStr} (${idCode} - ${u.email || '-'})`;
+            document.getElementById('selected-user-card').style.display = 'flex';
+            document.getElementById('sm-uid-container').style.display = 'none';
+            document.getElementById('target-uid-hidden').value = uid;
+        };
+
+        window.clearSelectedUser = () => {
+            document.getElementById('selected-user-card').style.display = 'none';
+            document.getElementById('sm-uid-container').style.display = 'block';
+            document.getElementById('sm-uid').value = '';
+            document.getElementById('target-uid-hidden').value = '';
+        };
+
+        async function loadData(){
+            try {
+                let adminProfitTotal = 0;
+                try {
+                    const { data: statsData } = await supabaseClient
+                        .from('system_stats')
+                        .select('total_admin_profit')
+                        .maybeSingle();
+                    
+                    if (statsData) {
+                        adminProfitTotal = Number(statsData.total_admin_profit || 0);
+                    }
+                } catch(e){ console.warn("Error reading system_stats:", e); }
+
+                uMap={};
+
+                try {
+                    const { data: supaUsers, error: supaErr } = await supabaseClient.from('users').select('*');
+
+                    if (supaErr) {
+                        console.error("خطا در فراخوانی کاربران از سوپابیس:", supaErr);
+                    }
+
+                    if (!supaErr && supaUsers && supaUsers.length > 0) {
+                        supaUsers.forEach(u => {
+                            let uid = u.id || u.uid;
+                            let meta = u.raw_user_meta_data || u.user_metadata || {};
+                            let nameVal = u.fullname || u.fullName || u.full_name || u.name || meta.fullname || meta.fullName || meta.full_name || u.email?.split('@')[0] || 'کاربر جدید';
+                            let phoneVal = u.phone || u.phone_number || u.mobile || meta.phone || meta.phone_number || '-';
+
+                            uMap[uid] = {
+                                id: uid,
+                                fullname: nameVal,
+                                email: u.email || meta.email || '',
+                                phone: phoneVal,
+                                balance: u.balance !== undefined ? Number(u.balance) : 0,
+                                platformProfit: u.platformProfit !== undefined ? Number(u.platformProfit) : Number(u.profit || u.platform_profit || 0),
+                                status: u.status || 'active',
+                                isBanned: u.isBanned || u.is_banned || u.status === 'banned' || u.status === 'cancelled',
+                                createdAt: u.created_at || u.createdAt || new Date().toISOString(),
+                                pendingDeposit: u.pendingDeposit || u.pending_deposit,
+                                pendingWithdrawal: u.pendingWithdrawal || u.pending_withdrawal,
+                                pendingEmail: u.pendingEmail || u.pending_email,
+                                newEmail: u.newEmail || u.new_email,
+                                selfieImage: u.selfieImage || u.selfie_image,
+                                adminApprovalStatus: u.adminApprovalStatus || u.admin_approval_status,
+                                ...u
+                            };
+                        });
+                    }
+                } catch(sErr) {
+                    console.warn("Supabase users fetch warning:", sErr);
+                }
+
+                let tbAct=document.getElementById('tb-act'), tbPend=document.getElementById('tb-pend'), tbBan=document.getElementById('tb-ban'), tbW=document.getElementById('tb-withdraw'), tbD=document.getElementById('tb-deposit');
+                if(tbAct) tbAct.innerHTML=""; 
+                if(tbPend) tbPend.innerHTML=""; 
+                if(tbBan) tbBan.innerHTML=""; 
+                if(tbW) tbW.innerHTML=""; 
+                if(tbD) tbD.innerHTML="";
+
+                let totU=0, totB=0, totR=0, totW=0, totD=0, reqList=[], withdrawList=[], depositList=[];
+                let cAct=0, cPend=0, cBan=0;
+
+                Object.keys(uMap).forEach(uid => {
+                    let u = uMap[uid];
+                    totU++; totB += Number(u.balance || 0);
+                    let idCode = getUserIdCode(uid);
+                    let nameStr = getName(u);
+                    let emailStr = u.email || '-';
+                    let phoneStr = u.phone || '-';
+                    let regStr = formatDate(u.createdAt);
+                    let search = `${idCode} ${nameStr} ${emailStr} ${phoneStr} ${regStr}`.toLowerCase();
+
+                    let isBanned = (u.status==='cancelled'||u.status==='banned'||u.isBanned===true);
+                    let hasPend = (u.pendingEmail||u.newEmail||u.selfieImage||u.adminApprovalStatus==='pending');
+
+                    if(u.pendingDeposit && u.pendingDeposit.status === 'pending'){
+                        totD++;
+                        depositList.push({ uid, u, idCode, nameStr, data: u.pendingDeposit });
+                    }
+
+                    if(u.pendingWithdrawal && u.pendingWithdrawal.status === 'pending'){
+                        totW++;
+                        withdrawList.push({ uid, u, idCode, nameStr, data: u.pendingWithdrawal });
+                    }
+
+                    let balStr = `$${Number(u.balance||0).toLocaleString()}`;
+                    let profitStr = `$${Number(u.platformProfit || u.profit || 0).toLocaleString()}`;
+
+                    let rowHtml=`<tr data-s="${search}">
+                        <td><span class="badge-id" onclick="openDetails('${uid}')">${idCode}</span></td>
+                        <td><b>${nameStr}</b></td>
+                        <td>${emailStr}</td>
+                        <td dir="ltr" style="text-align:right">${phoneStr}</td>
+                        <td style="color:#22c55e;font-weight:bold">${balStr}</td>
+                        <td style="color:#38bdf8;font-weight:bold">${profitStr}</td>`;
+
+                    if(isBanned){
+                        cBan++;
+                        rowHtml+=`<td><button class="btn-action btn-approve" onclick="toggleBan('${uid}',false)"><i class="fas fa-undo"></i> فعال‌سازی</button></td></tr>`;
+                        if(tbBan) tbBan.innerHTML+=rowHtml;
+                    }else if(hasPend){
+                        cPend++; totR++;
+                        reqList.push({uid, u, time: u.requestTimestamp||u.updatedAt||u.createdAt});
+                        rowHtml+=`<td>
+                            <button class="btn-action btn-approve" onclick="appEm('${uid}','${u.pendingEmail||u.newEmail||emailStr}')">تایید</button>
+                            <button class="btn-action btn-reject" onclick="rejEm('${uid}')">رد</button>
+                        </td></tr>`;
+                        if(tbPend) tbPend.innerHTML+=rowHtml;
+                    }else{
+                        cAct++;
+                        rowHtml+=`<td>${regStr}</td>
+                        <td>
+                            <button class="btn-action btn-ban" onclick="toggleBan('${uid}',true)">لغو کاربر</button>
+                        </td></tr>`;
+                        if(tbAct) tbAct.innerHTML+=rowHtml;
+                    }
+                });
+
+                updateSelectOptions(document.getElementById('sm-search')?.value || '');
+
+                document.getElementById('st-users').innerText=totU;
+                document.getElementById('st-bal').innerText='$'+totB.toLocaleString('en-US',{minimumFractionDigits:2});
+                document.getElementById('st-admin-profit').innerText='$'+adminProfitTotal.toLocaleString('en-US',{minimumFractionDigits:2});
+                document.getElementById('st-req').innerText=totR;
+                document.getElementById('st-d-req').innerText=totD;
+                document.getElementById('st-w-req').innerText=totW;
+                
+                if (prevD !== -1) {
+                    let telegramAlerts = [];
+
+                    if (totD > prevD) telegramAlerts.push("واریز وجه");
+                    if (totW > prevW) telegramAlerts.push("برداشت وجه");
+                    if (totR > prevR) telegramAlerts.push("احراز هویت");
+
+                    if (telegramAlerts.length > 0) {
+                        playAlertSound();
+                        sendTelegramAlert(`🔔 <b>درخواست جدید در پنل Zenix!</b>\nنوع درخواست: ${telegramAlerts.join("، ")}`);
+                    }
+                }
+
+                prevD = totD;
+                prevW = totW;
+                prevR = totR;
+
+                let badge=document.getElementById('req-badge');
+                if(badge){ badge.innerText=totR; badge.className=totR>0?'tab-badge':'tab-badge zero'; }
+
+                let dBadge=document.getElementById('d-badge');
+                if(dBadge){ dBadge.innerText=totD; dBadge.className=totD>0?'tab-badge':'tab-badge zero'; }
+
+                let wBadge=document.getElementById('w-badge');
+                if(wBadge){ wBadge.innerText=totW; wBadge.className=totW>0?'tab-badge':'tab-badge zero'; }
+
+                if(cAct===0 && tbAct) tbAct.innerHTML=`<tr><td colspan="8" style="text-align:center;padding:20px;color:#94a3b8">هیچ کاربر فعالی یافت نشد</td></tr>`;
+                if(cPend===0 && tbPend) tbPend.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:20px;color:#94a3b8">هیچ کاربر معلقی یافت نشد</td></tr>`;
+                if(cBan===0 && tbBan) tbBan.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:20px;color:#94a3b8">هیچ کاربر لغو شده‌ای وجود ندارد</td></tr>`;
+
+                renderDeposits(depositList);
+                renderWithdrawals(withdrawList);
+                renderReqs(reqList);
+            } catch(err) {
+                console.error("Error loading users:", err);
+            }
+        }
+
+        window.openDetails=uid=>{
+            let u=uMap[uid], idCode=getUserIdCode(uid);
+            let regDate=formatDate(u.createdAt);
+            document.getElementById('user-details-body').innerHTML=`
+                <div class="detail-row"><span>شناسه:</span><span>${idCode}</span></div>
+                <div class="detail-row"><span>نام و نام خانوادگی:</span><span>${getName(u)}</span></div>
+                <div class="detail-row"><span>ایمیل:</span><span>${u.email||'-'}</span></div>
+                <div class="detail-row"><span>تلفن:</span><span dir="ltr">${u.phone||'-'}</span></div>
+                <div class="detail-row"><span>موجودی:</span><span>$${Number(u.balance||0).toLocaleString()}</span></div>
+                <div class="detail-row"><span>سود از پلتفرم:</span><span>$${Number(u.platformProfit || u.profit || 0).toLocaleString()}</span></div>
+                <div class="detail-row"><span>وضعیت تایید:</span><span>${u.adminApprovalStatus||'نامشخص'}</span></div>
+                <div class="detail-row"><span>تاریخ ثبت‌نام:</span><span>${regDate}</span></div>
+            `;
+            document.getElementById('modal-action-btn').innerHTML=`
+                <div style="display:flex;gap:8px;">
+                    <button class="btn-action btn-edit" style="flex:1;justify-content:center;padding:8px" onclick="closeModal('m-details');openE('${uid}')"><i class="fas fa-edit"></i> ویرایش مشخصات</button>
+                    <button class="btn-action btn-approve" style="flex:1;justify-content:center;padding:8px" onclick="closeModal('m-details');switchTab('t-messages', document.querySelector('.admin-tabs button:last-child'));selectUserForMessage('${uid}');"><i class="fas fa-paper-plane"></i> ارسال پیام</button>
+                </div>
+            `;
+            document.getElementById('m-details').classList.add('show');
+        };
+
+        function renderDeposits(list){
+            let box=document.getElementById('tb-deposit');
+            if(!box) return;
+            if(list.length===0){box.innerHTML=`<tr><td colspan="2" style="text-align:center;padding:20px;color:#94a3b8">هیچ درخواست واریزی وجود ندارد.</td></tr>`;return;}
+            let html='';
+            list.forEach(i=>{
+                let dt = formatDate(i.data.createdAt || i.data.timestamp);
+                html+=`<tr>
+                    <td><span class="badge-id" onclick="openDepositDetails('${i.uid}')">${i.idCode}</span></td>
+                    <td>${dt}</td>
+                </tr>`;
+            });
+            box.innerHTML=html;
+        }
+
+        window.openDepositDetails = uid => {
+            let u = uMap[uid];
+            if (!u || !u.pendingDeposit) return;
+            let dData = u.pendingDeposit;
+            let idCode = getUserIdCode(uid);
+            let nameStr = getName(u);
+            let amtWithFee = Number(dData.amount||0);
+            let rawAmt = Number(dData.rawAmount || (amtWithFee / 1.025));
+            let adminProfitFee = amtWithFee - rawAmt;
+            let net = dData.network || 'TRC20';
+            let tx = dData.txHash || '-';
+            let dt = formatDate(dData.createdAt || dData.timestamp);
+
+            document.getElementById('item-modal-title').innerText = 'جزئیات درخواست واریز وجه';
+            document.getElementById('item-details-body').innerHTML = `
+                <div class="detail-row"><span>شناسه کاربر:</span><span>${idCode}</span></div>
+                <div class="detail-row"><span>نام کاربر:</span><span>${nameStr}</span></div>
+                <div class="detail-row"><span>مبلغ درخواستی ($):</span><span style="color:#38bdf8;font-weight:bold">$${rawAmt.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
+                <div class="detail-row"><span>مبلغ نهایی (+۲.۵٪):</span><span style="font-weight:600">$${amtWithFee.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
+                <div class="detail-row"><span>سود ادمین (۲.۵٪):</span><span style="color:#a855f7;font-weight:bold">+$${adminProfitFee.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
+                <div class="detail-row"><span>شبکه:</span><span><span style="background:rgba(56,189,248,0.15);color:#38bdf8;padding:2px 6px;border-radius:4px;font-weight:600;">${net}</span></span></div>
+                <div class="detail-row"><span>هش تراکنش (TxID):</span><span dir="ltr" style="font-family:monospace;word-break:break-all;" title="${tx}">${tx}</span></div>
+                <div class="detail-row"><span>تاریخ و ساعت:</span><span>${dt}</span></div>
+            `;
+
+            document.getElementById('item-modal-actions').innerHTML = `
+                <button class="btn-action btn-approve" style="flex:1;justify-content:center;padding:10px" onclick="closeModal('m-item-details');handleDeposit('${uid}', true, ${rawAmt}, ${adminProfitFee})"><i class="fas fa-check"></i> تایید و شارژ</button>
+                <button class="btn-action btn-reject" style="flex:1;justify-content:center;padding:10px" onclick="closeModal('m-item-details');handleDeposit('${uid}', false, ${rawAmt}, 0)"><i class="fas fa-times"></i> رد درخواست</button>
+            `;
+            document.getElementById('m-item-details').classList.add('show');
+        };
+
+        window.handleDeposit=async(uid, approve, rawAmount, adminProfitFee)=>{
+            let u = uMap[uid];
+            if(approve){
+                if(!confirm(`تایید واریز و شارژ حساب به مبلغ درخواستی $${rawAmount.toFixed(2)} (سود ادمین: $${adminProfitFee.toFixed(2)})؟`)) return;
+                
+                let newBal = Number(u?.balance || 0) + rawAmount;
+                let newDep = Number(u?.depositAmount || 0) + rawAmount;
+
+                await supabaseClient.from('users').update({ 
+                    balance: newBal, 
+                    depositAmount: newDep,
+                    pendingDeposit: null,
+                    pending_deposit: null 
+                }).eq('id', uid);
+
+                try {
+                    const { data: statsData } = await supabaseClient.from('system_stats').select('id, total_admin_profit').maybeSingle();
+                    let currentProfit = statsData ? Number(statsData.total_admin_profit || 0) : 0;
+                    if(statsData) {
+                        await supabaseClient.from('system_stats').update({ total_admin_profit: currentProfit + adminProfitFee }).eq('id', statsData.id);
+                    } else {
+                        await supabaseClient.from('system_stats').insert([{ total_admin_profit: adminProfitFee }]);
+                    }
+                } catch(e) { console.warn(e); }
+
+                await sendNotificationToUser(uid, 'تایید واریزی', `درخواست واریز شما به مبلغ $${rawAmount.toFixed(2)} با موفقیت تایید شد و حساب شما شارژ گردید.`);
+                showToast(`واریزی تایید شد. مبلغ $${rawAmount.toFixed(2)} به کاربر اضافه شد.`);
+            } else {
+                if(!confirm(`رد درخواست واریز به مبلغ $${rawAmount.toFixed(2)}؟`)) return;
+                await supabaseClient.from('users').update({ pendingDeposit: null, pending_deposit: null }).eq('id', uid);
+
+                await sendNotificationToUser(uid, 'رد درخواست واریزی', `درخواست واریز شما به مبلغ $${rawAmount.toFixed(2)} توسط مدیریت رد شد.`);
+                showToast('درخواست واریز رد شد.');
+            }
+            loadData();
+        };
+
+        function renderWithdrawals(list){
+            let box=document.getElementById('tb-withdraw');
+            if(!box) return;
+            if(list.length===0){box.innerHTML=`<tr><td colspan="2" style="text-align:center;padding:20px;color:#94a3b8">هیچ درخواست برداشتی وجود ندارد.</td></tr>`;return;}
+            let html='';
+            list.forEach(i=>{
+                let dt = formatDate(i.data.createdAt || i.data.timestamp);
+                html+=`<tr>
+                    <td><span class="badge-id" onclick="openWithdrawDetails('${i.uid}')">${i.idCode}</span></td>
+                    <td>${dt}</td>
+                </tr>`;
+            });
+            box.innerHTML=html;
+        }
+
+        window.openWithdrawDetails = uid => {
+            let u = uMap[uid];
+            if (!u || !u.pendingWithdrawal) return;
+            let wData = u.pendingWithdrawal;
+            let idCode = getUserIdCode(uid);
+            let nameStr = getName(u);
+            let amt = Number(wData.amount||0);
+            let addr = wData.address || wData.wallet || '-';
+            let dt = formatDate(wData.createdAt || wData.timestamp);
+
+            document.getElementById('item-modal-title').innerText = 'جزئیات درخواست برداشت وجه';
+            document.getElementById('item-details-body').innerHTML = `
+                <div class="detail-row"><span>شناسه کاربر:</span><span>${idCode}</span></div>
+                <div class="detail-row"><span>نام کاربر:</span><span>${nameStr}</span></div>
+                <div class="detail-row"><span>مبلغ برداشت ($):</span><span style="color:#22c55e;font-weight:bold">$${amt.toLocaleString()}</span></div>
+                <div class="detail-row"><span>آدرس کیف پول:</span><span dir="ltr" style="font-family:monospace;word-break:break-all;">${addr}</span></div>
+                <div class="detail-row"><span>تاریخ و ساعت:</span><span>${dt}</span></div>
+            `;
+
+            document.getElementById('item-modal-actions').innerHTML = `
+                <button class="btn-action btn-approve" style="flex:1;justify-content:center;padding:10px" onclick="closeModal('m-item-details');handleWithdraw('${uid}', true, ${amt})"><i class="fas fa-check"></i> تایید برداشت</button>
+                <button class="btn-action btn-reject" style="flex:1;justify-content:center;padding:10px" onclick="closeModal('m-item-details');handleWithdraw('${uid}', false, ${amt})"><i class="fas fa-times"></i> رد برداشت</button>
+            `;
+            document.getElementById('m-item-details').classList.add('show');
+        };
+
+        window.handleWithdraw=async(uid, approve, amount)=>{
+            let u = uMap[uid];
+            if(approve){
+                if(!confirm(`تایید برداشت به مبلغ $${amount}؟`)) return;
+                await supabaseClient.from('users').update({ pendingWithdrawal: null, pending_withdrawal: null }).eq('id', uid);
+                await sendNotificationToUser(uid, 'تایید برداشت وجه', `درخواست برداشت شما به مبلغ $${amount.toLocaleString()} با موفقیت تایید و واریز شد.`);
+                showToast('تایید برداشت با موفقیت انجام شد.');
+            } else {
+                if(!confirm(`لغو برداشت و بازگشت مبلغ $${amount} به موجودی؟`)) return;
+                let newBal = Number(u?.balance || 0) + amount;
+                await supabaseClient.from('users').update({ balance: newBal, pendingWithdrawal: null, pending_withdrawal: null }).eq('id', uid);
+                await sendNotificationToUser(uid, 'رد درخواست برداشت', `درخواست برداشت شما به مبلغ $${amount.toLocaleString()} رد شد و مبلغ به موجودی حساب شما بازگشت.`);
+                showToast('برداشت لغو و مبلغ به کاربر عودت داده شد.');
+            }
+            loadData();
+        };
+
+        function renderReqs(list){
+            let box=document.getElementById('req-container');
+            if(!box) return;
+            if(list.length===0){box.innerHTML=`<div style="text-align:center;padding:20px;color:#94a3b8">هیچ درخواست معلقی وجود ندارد.</div>`;return;}
+            let html=`<div class="table-responsive"><table><thead><tr><th>شناسه کاربر</th><th>تاریخ و ساعت</th></tr></thead><tbody>`;
+            list.forEach(i=>{
+                let u=i.u, uid=i.uid, idCode = getUserIdCode(uid);
+                let dt = formatDate(i.time || u.createdAt);
+                html+=`<tr>
+                    <td><span class="badge-id" onclick="openReqDetails('${uid}')">${idCode}</span></td>
+                    <td>${dt}</td>
+                </tr>`;
+            });
+            box.innerHTML=html+`</tbody></table></div>`;
+        }
+
+        window.openReqDetails = uid => {
+            let u = uMap[uid];
+            if (!u) return;
+            let idCode = getUserIdCode(uid);
+            let nameStr = getName(u);
+            let newEmail = u.pendingEmail || u.newEmail || '-';
+            let dt = formatDate(u.requestTimestamp || u.updatedAt || u.createdAt);
+
+            document.getElementById('item-modal-title').innerText = 'جزئیات درخواست احراز / تغییر اطلاعات';
+            document.getElementById('item-details-body').innerHTML = `
+                <div class="detail-row"><span>شناسه کاربر:</span><span>${idCode}</span></div>
+                <div class="detail-row"><span>نام کاربر:</span><span>${nameStr}</span></div>
+                <div class="detail-row"><span>ایمیل فعلی:</span><span>${u.email||'-'}</span></div>
+                <div class="detail-row"><span>ایمیل جدید (درخواستی):</span><span style="color:#f59e0b;font-weight:bold">${newEmail}</span></div>
+                <div class="detail-row"><span>تاریخ و ساعت درخواست:</span><span>${dt}</span></div>
+            `;
+
+            document.getElementById('item-modal-actions').innerHTML = `
+                <button class="btn-action btn-approve" style="flex:1;justify-content:center;padding:10px" onclick="closeModal('m-item-details');appEm('${uid}','${newEmail}')"><i class="fas fa-check"></i> تایید درخواست</button>
+                <button class="btn-action btn-reject" style="flex:1;justify-content:center;padding:10px" onclick="closeModal('m-item-details');rejEm('${uid}')"><i class="fas fa-times"></i> رد درخواست</button>
+            `;
+            document.getElementById('m-item-details').classList.add('show');
+        };
+
+        window.toggleBan=async(uid,ban)=>{
+            if(!confirm(ban?'مسدودسازی این حساب؟':'فعال‌سازی مجدد حساب؟'))return;
+            await supabaseClient.from('users').update({
+                status: ban ? "cancelled" : "active",
+                isBanned: ban,
+                is_banned: ban
+            }).eq('id', uid);
+            showToast(ban ? 'حساب کاربر مسدود شد.' : 'حساب کاربر فعال شد.');
+            loadData();
+        };
+
+        window.appEm=async(uid,email)=>{
+            await supabaseClient.from('users').update({
+                email: email,
+                pendingEmail: "",
+                pending_email: "",
+                newEmail: "",
+                new_email: "",
+                selfieImage: "",
+                selfie_image: "",
+                adminApprovalStatus: "approved",
+                admin_approval_status: "approved"
+            }).eq('id', uid);
+            
+            await sendNotificationToUser(uid, 'تایید اطلاعات حساب', 'درخواست ویرایش / احراز اطلاعات شما توسط مدیریت تایید شد.');
+            showToast('درخواست تایید شد.');
+            loadData();
+        };
+
+        window.rejEm=async(uid)=>{
+            await supabaseClient.from('users').update({
+                adminApprovalStatus: "rejected",
+                admin_approval_status: "rejected"
+            }).eq('id', uid);
+            
+            await sendNotificationToUser(uid, 'رد درخواست احراز', 'درخواست ویرایش / احراز اطلاعات شما توسط مدیریت رد شد.');
+            showToast('درخواست رد شد.');
+            loadData();
+        };
+
+        window.openE=uid=>{
+            let u=uMap[uid];
+            if(!u) return;
+            document.getElementById('e-uid').value=uid;
+            document.getElementById('e-name').value=getName(u);
+            document.getElementById('e-email').value=u.email||'';
+            let currentPhone = (u.phone && u.phone !== '-') ? u.phone : (u.phone_number || u.mobile || u.phoneNumber || '');
+            document.getElementById('e-phone').value=currentPhone;
+            document.getElementById('e-bal').value=u.balance||0;
+            document.getElementById('e-profit').value=u.platformProfit || u.profit || 0;
+            document.getElementById('m-edit').classList.add('show');
+        };
+
+        document.getElementById('f-edit').onsubmit=async e=>{
+            e.preventDefault();
+            let uid = document.getElementById('e-uid').value;
+            let u = uMap[uid] || {};
+            let nameVal = document.getElementById('e-name').value;
+            let emailVal = document.getElementById('e-email').value;
+            let phoneVal = document.getElementById('e-phone').value;
+            let balVal = parseFloat(document.getElementById('e-bal').value) || 0;
+            let profitVal = parseFloat(document.getElementById('e-profit').value) || 0;
+
+            let payload = {};
+            if ('fullname' in u) payload.fullname = nameVal;
+            if ('full_name' in u) payload.full_name = nameVal;
+            if (!('fullname' in u || 'full_name' in u)) payload.fullname = nameVal;
+
+            payload.email = emailVal;
+
+            if ('phone' in u) payload.phone = phoneVal;
+            if ('phone_number' in u) payload.phone_number = phoneVal;
+            if (!('phone' in u || 'phone_number' in u)) payload.phone = phoneVal;
+
+            payload.balance = balVal;
+
+            if ('platformProfit' in u) payload.platformProfit = profitVal;
+            if ('platform_profit' in u) payload.platform_profit = profitVal;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('users')
+                    .update(payload)
+                    .eq('id', uid);
+
+                if (error) {
+                    const fallbackPayload = {
+                        fullname: nameVal,
+                        email: emailVal,
+                        phone: phoneVal,
+                        balance: balVal
+                    };
+                    await supabaseClient.from('users').update(fallbackPayload).eq('id', uid);
+                }
+
+                closeModal('m-edit'); 
+                showToast('اطلاعات کاربر با موفقیت ویرایش شد.');
+                loadData();
+            } catch (err) {
+                console.error("خطای غیرمنتژره:", err);
+                showToast("خطا در ارتباط با سرور", 'error');
+            }
+        };
+
+        document.getElementById('sm-search').oninput = e => {
+            updateSelectOptions(e.target.value);
+        };
+
+        document.getElementById('sm-uid').onchange = e => {
+            let uid = e.target.value;
+            if(uid) selectUserForMessage(uid);
+        };
+
+        document.getElementById('f-broadcast').onsubmit=async e=>{
+            e.preventDefault();
+            let title = document.getElementById('bc-title').value;
+            let message = document.getElementById('bc-msg').value;
+            let userKeys = Object.keys(uMap);
+            if(userKeys.length === 0){ showToast('هیچ کاربری یافت نشد.', 'error'); return; }
+            if(!confirm(`ارسال این پیام به تمام کاربران (${userKeys.length} کاربر)؟`)) return;
+            
+            try {
+                for (let uid of userKeys) {
+                    await sendNotificationToUser(uid, title, message);
+                }
+
+                showToast(`پیام همگانی با موفقیت به ${userKeys.length} کاربر ارسال شد.`);
+                document.getElementById('bc-title').value = '';
+                document.getElementById('bc-msg').value = '';
+            } catch(err){
+                console.error("Error broadcasting message:", err);
+                showToast("خطا در ارسال پیام", 'error');
+            }
+        };
+
+        document.getElementById('f-single-msg').onsubmit=async e=>{
+            e.preventDefault();
+            let uid = document.getElementById('target-uid-hidden').value;
+            let title = document.getElementById('sm-title').value;
+            let message = document.getElementById('sm-msg').value;
+            if(!uid){ showToast('لطفاً یک کاربر را انتخاب کنید.', 'error'); return; }
+
+            try {
+                await sendNotificationToUser(uid, title, message);
+
+                showToast('پیام با موفقیت به کاربر ارسال شد.');
+                document.getElementById('sm-title').value = '';
+                document.getElementById('sm-msg').value = '';
+                clearSelectedUser();
+                updateSelectOptions();
+            } catch(err){
+                console.error("Error sending message:", err);
+                showToast("خطا در ارسال پیام", 'error');
+            }
+        };
+
+        ['act','pend','ban'].forEach(k=>{
+            let inp = document.getElementById(`s-${k}`);
+            if(inp) {
+                inp.oninput = e => {
+                    let q = e.target.value.toLowerCase();
+                    document.querySelectorAll(`#tb-${k} tr`).forEach(r => {
+                        if (r.dataset && r.dataset.s) {
+                            r.style.display = r.dataset.s.includes(q) ? '' : 'none';
+                        }
+                    });
+                };
             }
         });
 
-        // Search Handlers
-        document.getElementById('s-act').addEventListener('input', function(e) {
-            const q = e.target.value.toLowerCase();
-            renderUserTable('tb-act', users.filter(u => u.status === 'active' && (u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q) || u.id.toLowerCase().includes(q))));
-        });
-        document.getElementById('s-pend').addEventListener('input', function(e) {
-            const q = e.target.value.toLowerCase();
-            renderUserTable('tb-pend', users.filter(u => u.status === 'pending' && (u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q) || u.id.toLowerCase().includes(q))));
-        });
-        document.getElementById('s-ban').addEventListener('input', function(e) {
-            const q = e.target.value.toLowerCase();
-            renderUserTable('tb-ban', users.filter(u => u.status === 'banned' && (u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q) || u.id.toLowerCase().includes(q))));
-        });
+        async function checkAdminAuthAndInit() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
 
-        // Initial Load
-        window.addEventListener('DOMContentLoaded', () => {
-            renderAll();
-        });
+            if (!session) {
+                setTimeout(async () => {
+                    const { data: { session: s2 } } = await supabaseClient.auth.getSession();
+                    if (!s2) {
+                        window.location.href = 'index.html';
+                    } else {
+                        startAdminDashboard();
+                    }
+                }, 500);
+            } else {
+                startAdminDashboard();
+            }
+        }
+
+        function startAdminDashboard() {
+            updateSoundUI();
+            loadData();
+            initSupportChatListener();
+        }
+
+        checkAdminAuthAndInit();
+
+        setInterval(() => {
+            loadData();
+        }, 300000);
+
+        document.getElementById('logout-btn').onclick = async () => {
+            await supabaseClient.auth.signOut().catch(() => {});
+            window.location.href = 'index.html';
+        };
     </script>
 </body>
 </html>
