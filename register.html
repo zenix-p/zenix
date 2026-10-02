@@ -163,17 +163,6 @@
         const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // محاسبه شناسه عددی UID مطابق با فایل profile.html
-        function generateUIDDigits(userId) {
-            if (!userId) return '';
-            let hash = 5381;
-            for (let i = 0; i < userId.length; i++) {
-                hash = ((hash << 5) + hash) + userId.charCodeAt(i);
-            }
-            const num = Math.abs(hash % 900000) + 100000;
-            return num.toString();
-        }
-
         const langData = {
             fa:{dir:'rtl',wel:'ثبت‌نام حساب کاربری جدید',email:'ایمیل',emailP:'ایمیل',name:'نام و نام خانوادگی',nameP:'نام و نام خانوادگی',pass:'رمز عبور',passP:'رمز عبور',confirmPass:'تکرار رمز عبور',confirmPassP:'تکرار رمز عبور',ref:'کد معرف',refP:'کد معرف',cap:'کد امنیتی',capP:'کد را وارد کنید',btn:'ثبت‌نام در زنیکس',back:'بازگشت به صفحه اصلی',succ:'ثبت‌نام با موفقیت انجام شد!',err:'کد امنیتی اشتباه است!',refErr:'کد معرف معتبر نیست یا وجود ندارد!',passErr:'رمز عبور و تکرار آن مطابقت ندارند!',lenErr:'رمز عبور باید حداقل ۶ کاراکتر باشد!',existErr:'این ایمیل قبلاً ثبت شده است!',supTitle:'پشتیبانی',langTitle:'تغییر زبان'},
             en:{dir:'ltr',wel:'Register New Account',email:'Email',emailP:'Email',name:'Full Name',nameP:'Full Name',pass:'Password',passP:'Password',confirmPass:'Confirm Password',confirmPassP:'Confirm Password',ref:'Referral Code',refP:'Referral Code',cap:'Security Code',capP:'Enter code',btn:'Sign Up',back:'Back to Main Page',succ:'Successfully registered!',err:'Invalid security code!',refErr:'Invalid or non-existent referral code!',passErr:'Passwords do not match!',lenErr:'Password must be at least 6 characters!',existErr:'Email already registered!',supTitle:'Support',langTitle:'Change Language'},
@@ -295,13 +284,14 @@
             try {
                 const referrerFinalValue = refCodeValue || 'SYSTEM';
 
-                // ۱. ثبت‌نام در Supabase Auth
+                // ۱. ثبت‌نام در Supabase Auth (ذخیره اطلاعات در متادیتا)
                 const { data: authData, error: authError } = await supabaseClient.auth.signUp({
                     email: emailValue,
                     password: passIn.value,
                     options: {
                         data: {
                             fullname: fullNameValue,
+                            full_name: fullNameValue,
                             referred_by: referrerFinalValue
                         }
                     }
@@ -309,28 +299,33 @@
 
                 if (authError) throw authError;
 
-                // ۲. ذخیره اطلاعات کاربر در دیتابیس با ۲ دلار پاداش ثبت‌نام
+                // ۲. به‌روزرسانی یا ذخیره ایمن اطلاعات کاربر در دیتابیس با هدیه ۲ دلاری
                 if (authData?.user) {
-                    const userUidDigits = generateUIDDigits(authData.user.id);
-                    const userOwnRefCode = 'SM-' + userUidDigits;
-
                     const userPayload = {
                         id: authData.user.id,
                         email: emailValue,
                         fullname: fullNameValue,
-                        referred_by: referrerFinalValue,
-                        referral_code: userOwnRefCode,
                         balance: 2
                     };
 
-                    const { error: dbError } = await supabaseClient
+                    const { error: updateErr } = await supabaseClient
                         .from('users')
-                        .upsert(userPayload);
+                        .update({
+                            email: emailValue,
+                            fullname: fullNameValue,
+                            balance: 2
+                        })
+                        .eq('id', authData.user.id);
 
-                    if (dbError) {
-                        console.error('Supabase DB Insert Error:', dbError);
+                    if (updateErr) {
+                        await supabaseClient
+                            .from('users')
+                            .insert([userPayload]);
                     }
                 }
+
+                // ۳. خروج از حساب جهت بستن نشست فعال و هدایت به صفحه ورود اصلی (index.html)
+                await supabaseClient.auth.signOut();
 
                 msg.textContent = t.succ;
                 msg.className = 'succ';
