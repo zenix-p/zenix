@@ -137,7 +137,7 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
 <input type="text" id="wallet-address" value="" placeholder="ابتدا مبلغ واریزی را وارد کنید..." readonly style="width:100%;background:transparent;border:none;color:#f8fafc;padding:10px;font-size:12px;outline:none;direction:ltr;text-align:left;user-select:none;-webkit-user-select:none;">
 <button type="button" id="copy-btn" onclick="copyAddress()" disabled style="background:#475569;border:none;color:#94a3b8;padding:0 14px;cursor:not-allowed;font-weight:bold;font-size:12px;transition:0.3s;"><i class="fas fa-copy"></i> <span data-i18n="copyBtn">کپی</span></button>
 </div>
-<div id="copy-warning" style="font-size:10px;color:#ef4444;margin-top:4px;" data-i18n="copyWarning">⚠️️ برای نمایش و کپی آدرس کیف پول، ابتدا مبلغ واریزی را وارد کنید.</div>
+<div id="copy-warning" style="font-size:10px;color:#ef4444;margin-top:4px;" data-i18n="copyWarning">⚠ برای نمایش و کپی آدرس کیف پول، ابتدا مبلغ واریزی را وارد کنید.</div>
 </div>
 
 <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;margin-bottom:16px;">
@@ -233,7 +233,7 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
                 <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l1t">هدف اصلی:</strong> <span id="t-ab-m-l1d">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوریکه کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li>
                 <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l2t">امنیت و زیرساخت:</strong> <span id="t-ab-m-l2d">متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).</span></li>
                 <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l3t">ساختار چندسطحی (Referral & Team):</strong> <span id="t-ab-m-l3d">ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.</span></li>
-                <li><strong style="color:#f8fafc;" id="t-ab-m-l4t">احساس واقع‌‌گرایی:</strong> <span id="t-ab-m-l4d">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.</span></li>
+                <li><strong style="color:#f8fafc;" id="t-ab-m-l4t">احساس واقع‌‌‌‌گرایی:</strong> <span id="t-ab-m-l4d">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.</span></li>
             </ul>
         </div>
     </div>
@@ -450,6 +450,26 @@ function showMsg(text, isErr, showTimer = false) {
   }
 }
 
+function resetDepositForm() {
+  if (timerInterval) clearInterval(timerInterval);
+  const box = document.getElementById('status-box');
+  if (box) box.style.display = 'none';
+
+  const calcInput = document.getElementById('calc-input');
+  const txInput = document.getElementById('tx-hash-input');
+  const inquiryBtn = document.getElementById('inquiry-btn');
+
+  if (calcInput) { calcInput.readOnly = false; calcInput.value = ''; }
+  if (txInput) { txInput.readOnly = false; txInput.value = ''; }
+  if (inquiryBtn) {
+    inquiryBtn.disabled = true;
+    inquiryBtn.style.background = '#475569';
+    inquiryBtn.style.cursor = 'not-allowed';
+    inquiryBtn.innerHTML = '<i class="fas fa-sync-alt"></i> <span data-i18n="inquiryBtn">استعلام و واریزی</span>';
+  }
+  checkInputs();
+}
+
 window.checkAutoDeposit = async function(){
   const t = window.currentLangData || LD.fa;
   
@@ -484,10 +504,8 @@ window.checkAutoDeposit = async function(){
       createdAt: nowISO
     };
 
-    // ۱. ذخیره وضعیت در حافظه محلی جهت نمایش زنده تایمر
     localStorage.setItem('zenix_pending_deposit_' + currentUser.id, JSON.stringify(pendingDepositObj));
 
-    // ۲. درج تراکنش معلق در جدول transactions
     try {
       await supabase.from('transactions').insert([{
         user_id: currentUser.id,
@@ -609,38 +627,35 @@ window.renderNotifications = function() {
 async function loadUserData(user) {
   currentUser = user;
 
-  // بررسی درخواست واریز معلق کاربر
+  // بررسی دقیق درخواست واریز معلق کاربر از دیتابیس
   try {
     let pendingDepositData = null;
 
-    // ۱. استعلام از جدول transactions
-    try {
-      const { data: txData } = await supabase
-        .from('transactions')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('type', 'deposit')
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false })
-        .limit(1);
+    const { data: txData } = await supabase
+      .from('transactions')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('type', 'deposit')
+      .order('created_at', { ascending: false })
+      .limit(1);
 
-      if (txData && txData.length > 0) {
-        const p = txData[0];
+    if (txData && txData.length > 0) {
+      const p = txData[0];
+      let statusStr = String(p.status || '').toLowerCase();
+
+      if (statusStr === 'pending') {
         pendingDepositData = {
           rawAmount: p.amount ? (p.amount / 1.025) : 0,
           amount: p.amount,
           txHash: p.description ? p.description.replace('TxID: ', '') : '',
           createdAt: p.created_at || p.createdAt
         };
+      } else {
+        // اگر آخرین درخواست رد یا تایید شده، حافظه محلی پاک می‌شود
+        localStorage.removeItem('zenix_pending_deposit_' + user.id);
       }
-    } catch(e){}
-
-    if (!pendingDepositData) {
-      // ۲. دریافت از حافظه محلی
-      const localVal = localStorage.getItem('zenix_pending_deposit_' + user.id);
-      if (localVal) {
-        try { pendingDepositData = JSON.parse(localVal); } catch(e){}
-      }
+    } else {
+      localStorage.removeItem('zenix_pending_deposit_' + user.id);
     }
 
     if (pendingDepositData) {
@@ -680,6 +695,8 @@ async function loadUserData(user) {
         inquiryBtn.style.cursor = 'not-allowed';
         inquiryBtn.innerHTML = '<i class="fas fa-hourglass-half"></i> درخواست در حال بررسی...';
       }
+    } else {
+      resetDepositForm();
     }
   } catch (err) {
     console.warn("User deposit data check warning:", err);
