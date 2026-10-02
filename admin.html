@@ -626,6 +626,22 @@
         let chatChannel = null;
         let messageChannel = null;
 
+        // ===== تولید عدد ۶ رقمی یکتا و تابع ساخت فرمت شناسه SM-123456 یکسان با پروفایل =====
+        function generateUIDDigits(userId) {
+            if (!userId) return '000000';
+            let hash = 5381;
+            let str = String(userId);
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) + hash) + str.charCodeAt(i);
+            }
+            const num = Math.abs(hash % 900000) + 100000;
+            return num.toString();
+        }
+
+        function getUserIdCode(uid) {
+            return 'SM-' + generateUIDDigits(uid);
+        }
+
         // ===== مدیریت وضعیت قطع/وصل صدای هشدار با localStorage =====
         let isMuted = localStorage.getItem('zenix_admin_muted') === 'true';
 
@@ -963,7 +979,7 @@
             
             for(let uid in uMap){
                 let u=uMap[uid];
-                let idCode=`MS-${(String(uid).replace(/\D/g,'')+"123").substring(0,6)}`;
+                let idCode=getUserIdCode(uid);
                 let nameStr=getName(u);
                 let emailStr=u.email||'-';
                 let phoneStr=u.phone||'-';
@@ -980,7 +996,7 @@
         window.selectUserForMessage = uid => {
             let u = uMap[uid];
             if(!u) return;
-            let idCode = `MS-${(String(uid).replace(/\D/g,'')+"123").substring(0,6)}`;
+            let idCode = getUserIdCode(uid);
             let nameStr = getName(u);
             document.getElementById('sel-user-name').innerText = `${nameStr} (${idCode} - ${u.email || '-'})`;
             document.getElementById('selected-user-card').style.display = 'flex';
@@ -1062,7 +1078,7 @@
                 Object.keys(uMap).forEach(uid => {
                     let u = uMap[uid];
                     totU++; totB += Number(u.balance || 0);
-                    let idCode = `MS-${(String(uid).replace(/\D/g,'')+"123").substring(0,6)}`;
+                    let idCode = getUserIdCode(uid);
                     let nameStr = getName(u);
                     let emailStr = u.email || '-';
                     let phoneStr = u.phone || '-';
@@ -1169,7 +1185,7 @@
         }
 
         window.openDetails=uid=>{
-            let u=uMap[uid], idCode=`MS-${(String(uid).replace(/\D/g,'')+"123").substring(0,6)}`;
+            let u=uMap[uid], idCode=getUserIdCode(uid);
             let regDate=formatDate(u.createdAt);
             document.getElementById('user-details-body').innerHTML=`
                 <div class="detail-row"><span>شناسه:</span><span>${idCode}</span></div>
@@ -1209,7 +1225,7 @@
             let u = uMap[uid];
             if (!u || !u.pendingDeposit) return;
             let dData = u.pendingDeposit;
-            let idCode = `MS-${(String(uid).replace(/\D/g,'')+"123").substring(0,6)}`;
+            let idCode = getUserIdCode(uid);
             let nameStr = getName(u);
             let amtWithFee = Number(dData.amount||0);
             let rawAmt = Number(dData.rawAmount || (amtWithFee / 1.025));
@@ -1313,7 +1329,7 @@
             let u = uMap[uid];
             if (!u || !u.pendingWithdrawal) return;
             let wData = u.pendingWithdrawal;
-            let idCode = `MS-${(String(uid).replace(/\D/g,'')+"123").substring(0,6)}`;
+            let idCode = getUserIdCode(uid);
             let nameStr = getName(u);
             let amt = Number(wData.amount||0);
             let addr = wData.address || wData.wallet || '-';
@@ -1356,7 +1372,7 @@
             if(list.length===0){box.innerHTML=`<div style="text-align:center;padding:20px;color:#94a3b8">هیچ درخواست معلقی وجود ندارد.</div>`;return;}
             let html=`<div class="table-responsive"><table><thead><tr><th>شناسه کاربر</th><th>تاریخ و ساعت</th></tr></thead><tbody>`;
             list.forEach(i=>{
-                let u=i.u, uid=i.uid, idCode=`MS-${(String(uid).replace(/\D/g,'')+"123").substring(0,6)}`;
+                let u=i.u, uid=i.uid, idCode = getUserIdCode(uid);
                 let dt = formatDate(i.time || u.createdAt);
                 html+=`<tr>
                     <td><span class="badge-id" onclick="openReqDetails('${uid}')">${idCode}</span></td>
@@ -1369,7 +1385,7 @@
         window.openReqDetails = uid => {
             let u = uMap[uid];
             if (!u) return;
-            let idCode = `MS-${(String(uid).replace(/\D/g,'')+"123").substring(0,6)}`;
+            let idCode = getUserIdCode(uid);
             let nameStr = getName(u);
             let newEmail = u.pendingEmail || u.newEmail || '-';
             let dt = formatDate(u.requestTimestamp || u.updatedAt || u.createdAt);
