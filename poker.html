@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zenix VIP - 3D Poker Table & Rules Guide</title>
+    <title>Zenix VIP - Real 3D Interactive Poker Demo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -13,300 +13,345 @@
             --primary-glow: #22c55e;
             --accent-blue: #38bdf8;
             --gold-accent: #facc15;
-            --bg-dark: #030712;
-            --felt-green: radial-gradient(ellipse at center, #0f5132 0%, #062817 70%, #010c06 100%);
-            --glass-border: rgba(255, 255, 255, 0.15);
+            --bg-dark: #020617;
+            --wood-rim: #2d1810;
+            --glass-border: rgba(255, 255, 255, 0.12);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', 'Vazirmatn', sans-serif; user-select: none; }
-        body { background: var(--bg-dark); min-height: 100vh; color: #f8fafc; display: flex; flex-direction: column; overflow-x: hidden; }
+        body { 
+            background: var(--bg-dark); 
+            min-height: 100vh; 
+            color: #f8fafc; 
+            display: flex; 
+            flex-direction: column; 
+            overflow-x: hidden; 
+            background-image: radial-gradient(circle at 50% 30%, rgba(30, 58, 138, 0.25) 0%, rgba(2, 6, 23, 0.95) 70%);
+        }
 
-        /* هدر فوق‌العاده مدرن */
+        /* هدر استیج */
         header {
-            background: rgba(15, 23, 42, 0.85); border-bottom: 1px solid var(--glass-border);
-            padding: 12px 24px; display: flex; justify-content: space-between; align-items: center;
-            backdrop-filter: blur(16px); z-index: 100;
+            background: rgba(15, 23, 42, 0.85);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(16px);
+            z-index: 100;
         }
-        .logo { display: flex; align-items: center; gap: 10px; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 18px; color: var(--accent-blue); }
-        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .logo { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 18px; color: var(--accent-blue); display: flex; align-items: center; gap: 8px; }
         
+        .header-actions { display: flex; align-items: center; gap: 12px; }
         .guide-btn {
-            background: linear-gradient(135deg, #38bdf8, #0284c7); border: none; color: #fff;
-            padding: 8px 18px; border-radius: 20px; font-weight: 800; font-size: 12px; cursor: pointer;
-            display: flex; align-items: center; gap: 8px; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
-            transition: transform 0.2s;
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            border: 1px solid rgba(56, 189, 248, 0.4); color: #fff;
+            padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 12px; cursor: pointer;
+            display: flex; align-items: center; gap: 6px; transition: 0.2s;
         }
-        .guide-btn:hover { transform: scale(1.05); }
+        .guide-btn:hover { background: #0284c7; transform: translateY(-1px); }
 
         .user-pill { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); padding: 5px 15px; border-radius: 30px; display: flex; align-items: center; gap: 8px; }
         .user-pill .val { font-family: 'Orbitron', sans-serif; font-weight: 800; color: var(--primary-glow); }
 
-        .container { max-width: 1200px; width: 100%; margin: 10px auto; padding: 0 10px; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .main-container { max-width: 1240px; width: 100%; margin: 0 auto; padding: 10px; flex: 1; display: flex; flex-direction: column; justify-content: center; }
 
-        /* استیج سه‌بعدی میز */
+        /* استیج ۳ بعدی واقعی پوکر */
         .poker-stage {
-            position: relative; width: 100%; height: 550px;
+            position: relative; width: 100%; height: 530px;
             display: flex; justify-content: center; align-items: center;
-            perspective: 1200px; margin-bottom: 10px;
+            perspective: 1100px; margin-bottom: 10px;
         }
 
-        /* میز سه بعدی با زاویه چرخش واقعی */
-        .poker-table-3d {
-            position: relative; width: 90%; height: 420px;
-            background: var(--felt-green);
-            border-radius: 200px;
-            border: 14px solid #1a0f0a;
-            box-shadow: 0 0 0 4px #2e1a12, 0 30px 80px rgba(0,0,0,0.95), inset 0 0 60px rgba(0,0,0,0.8), 0 0 40px rgba(34, 197, 94, 0.25);
-            transform: rotateX(24deg);
+        /* نورپردازی نقطه ای روی میز */
+        .poker-stage::before {
+            content: ''; position: absolute; width: 600px; height: 300px;
+            background: radial-gradient(ellipse at center, rgba(34, 197, 94, 0.25) 0%, transparent 70%);
+            top: 20%; pointer-events: none; z-index: 1;
+        }
+
+        /* میز سه‌بعدی واقعی با بافت چوب و نمد عالی */
+        .poker-table {
+            position: relative; width: 88%; height: 410px;
+            background: radial-gradient(ellipse at center, #15803d 0%, #052e16 75%, #021a0c 100%);
+            border-radius: 220px;
+            border: 18px solid var(--wood-rim);
+            box-shadow: 
+                0 0 0 3px #522f1c,
+                0 40px 100px rgba(0, 0, 0, 0.95),
+                inset 0 0 80px rgba(0, 0, 0, 0.85),
+                0 0 50px rgba(34, 197, 94, 0.15);
+            transform: rotateX(28deg);
             transform-style: preserve-3d;
             display: flex; justify-content: center; align-items: center;
+            z-index: 2;
         }
 
-        .table-inner-ring {
-            position: absolute; width: 85%; height: 80%;
-            border: 2px dashed rgba(250, 204, 21, 0.25);
-            border-radius: 160px; pointer-events: none;
+        .table-line {
+            position: absolute; width: 84%; height: 78%;
+            border: 2px dashed rgba(250, 204, 21, 0.3);
+            border-radius: 170px; pointer-events: none;
         }
 
-        /* جایگاه دیلر در بالای میز */
+        /* جایگاه دیلر */
         .dealer-station {
-            position: absolute; top: -55px; left: 50%; transform: translateX(-50%) rotateX(-24deg);
-            display: flex; flex-direction: column; align-items: center; z-index: 30;
+            position: absolute; top: -65px; left: 50%; transform: translateX(-50%) rotateX(-28deg);
+            display: flex; flex-direction: column; align-items: center; z-index: 35;
         }
         .dealer-avatar {
-            width: 70px; height: 70px; border-radius: 50%; border: 3px solid var(--gold-accent);
+            width: 65px; height: 65px; border-radius: 50%; border: 3px solid var(--gold-accent);
             background: url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80') center/cover;
-            box-shadow: 0 0 20px rgba(250, 204, 21, 0.5);
+            box-shadow: 0 0 20px rgba(250, 204, 21, 0.4);
         }
-        .dealer-badge { background: rgba(0,0,0,0.85); color: var(--gold-accent); font-size: 11px; padding: 2px 10px; border-radius: 12px; font-weight: bold; margin-top: -8px; border: 1px solid var(--gold-accent); }
-
-        /* مرکز میز: پات و کارت‌های مشترک */
-        .table-center-area {
-            display: flex; flex-direction: column; align-items: center; gap: 12px;
-            transform: rotateX(-24deg); z-index: 20;
+        .dealer-label {
+            background: #0f172a; color: var(--gold-accent); font-size: 10px; padding: 2px 10px;
+            border-radius: 10px; font-weight: bold; margin-top: -8px; border: 1px solid var(--gold-accent);
         }
-        .pot-badge {
-            background: rgba(15, 23, 42, 0.9); border: 1px solid var(--gold-accent);
-            padding: 6px 24px; border-radius: 30px; text-align: center;
-            backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+
+        /* مرکز میز (پات و کارت های مشترک) */
+        .table-center {
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
+            transform: rotateX(-28deg); z-index: 20;
         }
-        .pot-title { font-size: 9px; color: var(--gold-accent); text-transform: uppercase; font-weight: 800; letter-spacing: 1px; }
-        .pot-amount { font-family: 'Orbitron', sans-serif; font-size: 22px; font-weight: 900; color: #fff; }
+        .pot-box {
+            background: rgba(15, 23, 42, 0.92); border: 1px solid var(--gold-accent);
+            padding: 5px 20px; border-radius: 20px; text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+        }
+        .pot-title { font-size: 9px; color: var(--gold-accent); font-weight: 800; letter-spacing: 1px; }
+        .pot-val { font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 900; color: #fff; }
 
-        .community-cards { display: flex; gap: 8px; min-height: 60px; }
+        .community-cards { display: flex; gap: 8px; min-height: 62px; align-items: center; }
 
-        /* صندلی‌های ۶ گانه پشت میز */
+        /* صندلی بازیکنان دور میز */
         .seat {
             position: absolute; display: flex; flex-direction: column; align-items: center;
-            transform: rotateX(-24deg); z-index: 25; transition: transform 0.3s ease;
+            transform: rotateX(-28deg); z-index: 25; transition: all 0.3s ease;
         }
+        .seat-1 { bottom: -50px; left: 50%; transform: translateX(-50%) rotateX(-28deg) scale(1.1); z-index: 40; } /* کاربر اصلی */
+        .seat-2 { bottom: 15px; left: 3%; }
+        .seat-3 { top: 15px; left: 8%; }
+        .seat-4 { top: 15px; right: 8%; }
+        .seat-5 { bottom: 15px; right: 3%; }
 
-        /* چیدمان صندلی‌ها در اطراف بیضی */
-        .seat-main { bottom: -45px; left: 50%; transform: translateX(-50%) rotateX(-24deg); scale: 1.1; } /* شما (جلو) */
-        .seat-left-bottom { bottom: 10px; left: 2%; }
-        .seat-left-top { top: 20px; left: 8%; }
-        .seat-right-top { top: 20px; right: 8%; }
-        .seat-right-bottom { bottom: 10px; right: 2%; }
-
-        .avatar-frame { position: relative; width: 58px; height: 58px; }
+        .avatar-wrap { position: relative; width: 56px; height: 56px; }
         .avatar-img {
-            width: 100%; height: 100%; border-radius: 50%; border: 2.5px solid #64748b;
-            background-size: cover; background-position: center; transition: 0.3s;
+            width: 100%; height: 100%; border-radius: 50%; border: 2px solid #64748b;
+            background-size: cover; background-position: center; box-shadow: 0 6px 15px rgba(0,0,0,0.6);
         }
-        .seat.active-turn .avatar-img {
+        .seat.turn-active .avatar-img {
             border-color: var(--primary-glow);
             box-shadow: 0 0 25px var(--primary-glow);
-            animation: pulseTurn 1.1s infinite alternate;
+            animation: pulseGlow 1s infinite alternate;
         }
-        @keyframes pulseTurn { from { transform: scale(1); } to { transform: scale(1.1); } }
+        @keyframes pulseGlow { from { transform: scale(1); } to { transform: scale(1.08); } }
 
-        .chip-stack {
-            position: absolute; top: -15px; right: -20px;
-            background: linear-gradient(135deg, #facc15, #ca8a04);
-            color: #000; font-family: 'Orbitron', sans-serif; font-size: 9px; font-weight: 900;
+        /* نشانگر ژتون ها */
+        .chips-visual {
+            position: absolute; top: -12px; right: -15px;
+            background: linear-gradient(135deg, #facc15, #ca8a04); color: #000;
+            font-family: 'Orbitron', sans-serif; font-size: 9px; font-weight: 900;
             width: 22px; height: 22px; border-radius: 50%; border: 2px dashed #fff;
-            display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.6);
         }
 
-        .player-card-info {
-            background: rgba(15, 23, 42, 0.92); border: 1px solid var(--glass-border);
-            border-radius: 10px; padding: 4px 10px; text-align: center; margin-top: 6px; min-width: 90px;
+        .player-info {
+            background: rgba(15, 23, 42, 0.95); border: 1px solid var(--glass-border);
+            border-radius: 8px; padding: 4px 10px; text-align: center; margin-top: 4px; min-width: 95px;
         }
-        .p-name { font-size: 11px; font-weight: bold; white-space: nowrap; }
+        .p-name { font-size: 11px; font-weight: 700; color: #e2e8f0; }
         .p-chips { font-family: 'Orbitron', sans-serif; font-size: 10px; color: var(--gold-accent); }
-        .p-action { font-size: 9px; font-weight: 800; color: var(--accent-blue); height: 12px; }
+        .p-status { font-size: 9px; font-weight: 800; color: var(--accent-blue); height: 12px; margin-top: 1px; }
 
-        /* کارت‌های دست */
-        .hole-cards { position: absolute; top: -25px; display: flex; gap: -8px; }
+        /* کارت‌های بازی */
+        .cards-hand { position: absolute; top: -30px; display: flex; gap: -10px; }
 
         .card {
-            width: 38px; height: 54px; background: #fff; border-radius: 6px;
-            display: flex; flex-direction: column; justify-content: space-between; padding: 3px;
-            font-size: 11px; font-weight: 800; box-shadow: 0 6px 15px rgba(0,0,0,0.7);
+            width: 40px; height: 58px; background: #fff; border-radius: 6px;
+            display: flex; flex-direction: column; justify-content: space-between; padding: 3px 4px;
+            font-size: 11px; font-weight: 800; box-shadow: 0 8px 18px rgba(0,0,0,0.8);
+            border: 1px solid #cbd5e1; transition: transform 0.2s;
         }
         .card.red { color: #dc2626; }
         .card.black { color: #0f172a; }
-        .card.back {
-            background: linear-gradient(135deg, #1e3a8a, #0f172a); border: 1px solid rgba(255,255,255,0.4);
-            display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.3); font-family: 'Orbitron'; font-size: 14px;
+        .card.card-back {
+            background: linear-gradient(135deg, #1e3a8a, #0f172a);
+            border: 1px solid rgba(255,255,255,0.3);
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(255,255,255,0.4); font-family: 'Orbitron'; font-size: 13px;
         }
 
-        /* انیمیشن پرواز کارت از دیلر */
-        .flying-card {
-            position: fixed; width: 38px; height: 54px; background: linear-gradient(135deg, #1e3a8a, #0f172a);
-            border-radius: 6px; border: 1px solid #fff; z-index: 1000; pointer-events: none;
-            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        /* انیمیشن کارت پران دیلر */
+        .animated-card {
+            position: fixed; width: 40px; height: 58px;
+            background: linear-gradient(135deg, #1e3a8a, #0f172a);
+            border-radius: 6px; border: 1px solid #fff; z-index: 1000;
+            transition: all 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+            pointer-events: none;
         }
 
-        /* کنترل دکمه‌های پایین */
-        .control-panel {
-            background: rgba(15, 23, 42, 0.92); border: 1px solid var(--glass-border);
-            border-radius: 18px; padding: 14px 20px; backdrop-filter: blur(16px);
+        /* پنل کنترلی بازی */
+        .controls-wrapper {
+            background: rgba(15, 23, 42, 0.9); border: 1px solid var(--glass-border);
+            border-radius: 16px; padding: 14px 20px; backdrop-filter: blur(16px);
             display: flex; justify-content: space-between; align-items: center; gap: 15px;
         }
-        .btn-group { display: flex; gap: 10px; flex: 1; }
-        .act-btn {
-            flex: 1; padding: 14px; border: none; border-radius: 12px; font-weight: 800;
-            cursor: pointer; color: #fff; transition: 0.2s; font-size: 14px;
+        .action-btns { display: flex; gap: 10px; flex: 1; }
+        .btn-act {
+            flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: 800;
+            cursor: pointer; color: #fff; transition: all 0.2s; font-size: 13px;
         }
-        .act-fold { background: linear-gradient(135deg, #ef4444, #991b1b); }
-        .act-call { background: linear-gradient(135deg, #0ea5e9, #0369a1); }
-        .act-raise { background: linear-gradient(135deg, #22c55e, #115e59); }
+        .btn-act:disabled { opacity: 0.3; cursor: not-allowed; }
+        .btn-fold { background: linear-gradient(135deg, #ef4444, #991b1b); }
+        .btn-call { background: linear-gradient(135deg, #0284c7, #0369a1); }
+        .btn-raise { background: linear-gradient(135deg, #22c55e, #15803d); }
 
-        .slider-box { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 8px 16px; border-radius: 12px; }
-        .slider-box input { accent-color: var(--primary-glow); cursor: pointer; }
+        .slider-group { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 8px 14px; border-radius: 10px; }
+        .slider-group input { accent-color: var(--primary-glow); cursor: pointer; }
 
-        /* مدال اختصاصی قوانین و راهنما */
+        .btn-start-hand {
+            background: linear-gradient(135deg, #facc15, #ca8a04); color: #000;
+            font-weight: 900; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer;
+            box-shadow: 0 0 15px rgba(250, 204, 21, 0.3); transition: 0.2s;
+        }
+        .btn-start-hand:hover { transform: scale(1.03); }
+
+        /* مدال قوانین */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(12px); z-index: 1000; display: none;
             justify-content: center; align-items: center; padding: 20px;
         }
         .modal-overlay.active { display: flex; }
-
-        .modal-content {
+        .modal-box {
             background: #0f172a; border: 1px solid var(--glass-border);
-            border-radius: 24px; width: 100%; max-width: 800px; max-height: 85vh;
+            border-radius: 20px; width: 100%; max-width: 780px; max-height: 85vh;
             overflow-y: auto; padding: 24px; color: #f8fafc; box-shadow: 0 25px 50px rgba(0,0,0,0.9);
         }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 14px; margin-bottom: 18px; }
-        .modal-title { font-size: 20px; font-weight: 800; color: var(--accent-blue); display: flex; align-items: center; gap: 10px; }
-        .close-modal { background: none; border: none; color: #94a3b8; font-size: 22px; cursor: pointer; }
-        .close-modal:hover { color: #fff; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px; margin-bottom: 16px; }
+        .modal-title { font-size: 18px; font-weight: 800; color: var(--accent-blue); display: flex; align-items: center; gap: 8px; }
+        .close-btn { background: none; border: none; color: #94a3b8; font-size: 22px; cursor: pointer; }
 
-        .guide-section { margin-bottom: 20px; }
-        .guide-section h3 { font-size: 15px; color: var(--gold-accent); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-        .guide-section p { font-size: 13px; color: #cbd5e1; line-height: 1.7; margin-bottom: 8px; }
+        .rule-section { margin-bottom: 16px; }
+        .rule-section h3 { font-size: 14px; color: var(--gold-accent); margin-bottom: 6px; }
+        .rule-section p { font-size: 12.5px; color: #cbd5e1; line-height: 1.6; }
 
-        .hands-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-top: 10px; }
-        .hand-card { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); padding: 10px; border-radius: 12px; }
-        .hand-card .title { font-size: 13px; font-weight: 800; color: var(--primary-glow); }
-        .hand-card .desc { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+        .hand-rankings { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin-top: 8px; }
+        .rank-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); padding: 10px; border-radius: 10px; }
+        .rank-card .rtitle { font-size: 12px; font-weight: 800; color: var(--primary-glow); }
+        .rank-card .rdesc { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+
+        /* بنر اعلام مرحله بازی */
+        .stage-banner {
+            position: absolute; top: 15px; background: rgba(15, 23, 42, 0.85); border: 1px solid var(--accent-blue);
+            padding: 4px 16px; border-radius: 20px; font-size: 11px; font-weight: 800; color: var(--accent-blue);
+            transform: rotateX(-28deg); z-index: 30; letter-spacing: 0.5px;
+        }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo"><i class="fas fa-crown" style="color:var(--gold-accent)"></i> ZENIX VIP POKER</div>
+        <div class="logo"><i class="fas fa-crown" style="color:var(--gold-accent)"></i> ZENIX REAL POKER DEMO</div>
         <div class="header-actions">
-            <button class="guide-btn" onclick="toggleModal(true)">
-                <i class="fas fa-book-open"></i> قوانین و راهنما
-            </button>
+            <button class="guide-btn" onclick="toggleGuide(true)"><i class="fas fa-book-open"></i> قوانین بازی</button>
             <div class="user-pill">
                 <span style="font-size:11px; color:#94a3b8;">موجودی:</span>
-                <span class="val" id="user-bal">$1,000</span>
+                <span class="val" id="user-chips-header">$1,000</span>
             </div>
         </div>
     </header>
 
-    <div class="container">
-        <!-- استیج سه‌بعدی بازی -->
+    <div class="main-container">
+        <!-- استیج ۳ بعدی میز -->
         <div class="poker-stage">
-            <div class="poker-table-3d">
-                <div class="table-inner-ring"></div>
+            <div class="stage-banner" id="game-stage-text">آماده شروع بازی دمو</div>
 
-                <!-- جایگاه دیلر انسان -->
-                <div class="dealer-station" id="dealer-pos">
+            <div class="poker-table">
+                <div class="table-line"></div>
+
+                <!-- دیلر زنده -->
+                <div class="dealer-station" id="dealer-anchor">
                     <div class="dealer-avatar"></div>
-                    <span class="dealer-badge">النا (Live Dealer)</span>
+                    <span class="dealer-label">النا (دیلر)</span>
                 </div>
 
-                <!-- مرکز میز (پات و کارت‌های مشترک) -->
-                <div class="table-center-area">
-                    <div class="pot-badge">
+                <!-- مرکز میز (پات و ۵ کارت اصلی) -->
+                <div class="table-center">
+                    <div class="pot-box">
                         <div class="pot-title">مجموع پات (POT)</div>
-                        <div class="pot-amount" id="pot-display">$0</div>
+                        <div class="pot-val" id="pot-amount">$0</div>
                     </div>
-                    <div class="community-cards" id="community-area"></div>
+                    <div class="community-cards" id="community-cards-container"></div>
                 </div>
 
-                <!-- بازیکن ۲ (سمت چپ پایین) -->
-                <div class="seat seat-left-bottom" id="seat-2">
-                    <div class="hole-cards" id="cards-seat-2"></div>
-                    <div class="avatar-frame">
+                <!-- صندلی بازیکن ۲ (چپ پایین) -->
+                <div class="seat seat-2" id="seat-2">
+                    <div class="cards-hand" id="hand-seat-2"></div>
+                    <div class="avatar-wrap">
                         <div class="avatar-img" style="background-image:url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80')"></div>
-                        <div class="chip-stack">$</div>
+                        <div class="chips-visual">$</div>
                     </div>
-                    <div class="player-card-info">
-                        <div class="p-name">Alex (USA)</div>
-                        <div class="p-chips">$850</div>
-                        <div class="p-action" id="act-seat-2"></div>
+                    <div class="player-info">
+                        <div class="p-name">Alex</div>
+                        <div class="p-chips" id="chips-seat-2">$850</div>
+                        <div class="p-status" id="status-seat-2"></div>
                     </div>
                 </div>
 
-                <!-- بازیکن ۳ (سمت چپ بالا) -->
-                <div class="seat seat-left-top" id="seat-3">
-                    <div class="hole-cards" id="cards-seat-3"></div>
-                    <div class="avatar-frame">
+                <!-- صندلی بازیکن ۳ (چپ بالا) -->
+                <div class="seat seat-3" id="seat-3">
+                    <div class="cards-hand" id="hand-seat-3"></div>
+                    <div class="avatar-wrap">
                         <div class="avatar-img" style="background-image:url('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80')"></div>
-                        <div class="chip-stack">$</div>
+                        <div class="chips-visual">$</div>
                     </div>
-                    <div class="player-card-info">
-                        <div class="p-name">Dmitry (RU)</div>
-                        <div class="p-chips">$1,200</div>
-                        <div class="p-action" id="act-seat-3"></div>
+                    <div class="player-info">
+                        <div class="p-name">Dmitry</div>
+                        <div class="p-chips" id="chips-seat-3">$1,200</div>
+                        <div class="p-status" id="status-seat-3"></div>
                     </div>
                 </div>
 
-                <!-- بازیکن ۴ (سمت راست بالا) -->
-                <div class="seat seat-right-top" id="seat-4">
-                    <div class="hole-cards" id="cards-seat-4"></div>
-                    <div class="avatar-frame">
+                <!-- صندلی بازیکن ۴ (راست بالا) -->
+                <div class="seat seat-4" id="seat-4">
+                    <div class="cards-hand" id="hand-seat-4"></div>
+                    <div class="avatar-wrap">
                         <div class="avatar-img" style="background-image:url('https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80')"></div>
-                        <div class="chip-stack">$</div>
+                        <div class="chips-visual">$</div>
                     </div>
-                    <div class="player-card-info">
-                        <div class="p-name">Sarah (UK)</div>
-                        <div class="p-chips">$640</div>
-                        <div class="p-action" id="act-seat-4"></div>
+                    <div class="player-info">
+                        <div class="p-name">Sarah</div>
+                        <div class="p-chips" id="chips-seat-4">$640</div>
+                        <div class="p-status" id="status-seat-4"></div>
                     </div>
                 </div>
 
-                <!-- بازیکن ۵ (سمت راست پایین) -->
-                <div class="seat seat-right-bottom" id="seat-5">
-                    <div class="hole-cards" id="cards-seat-5"></div>
-                    <div class="avatar-frame">
+                <!-- صندلی بازیکن ۵ (راست پایین) -->
+                <div class="seat seat-5" id="seat-5">
+                    <div class="cards-hand" id="hand-seat-5"></div>
+                    <div class="avatar-wrap">
                         <div class="avatar-img" style="background-image:url('https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=150&q=80')"></div>
-                        <div class="chip-stack">$</div>
+                        <div class="chips-visual">$</div>
                     </div>
-                    <div class="player-card-info">
-                        <div class="p-name">Marco (IT)</div>
-                        <div class="p-chips">$910</div>
-                        <div class="p-action" id="act-seat-5"></div>
+                    <div class="player-info">
+                        <div class="p-name">Marco</div>
+                        <div class="p-chips" id="chips-seat-5">$910</div>
+                        <div class="p-status" id="status-seat-5"></div>
                     </div>
                 </div>
 
-                <!-- بازیکن ۱ (شما - جلوی میز) -->
-                <div class="seat seat-main active-turn" id="seat-1">
-                    <div class="hole-cards" id="cards-seat-1"></div>
-                    <div class="avatar-frame">
+                <!-- بازیکن ۱ (شما - جلوی تصویر) -->
+                <div class="seat seat-1" id="seat-1">
+                    <div class="cards-hand" id="hand-seat-1"></div>
+                    <div class="avatar-wrap">
                         <div class="avatar-img" style="background-image:url('https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80')"></div>
-                        <div class="chip-stack" style="background:#22c55e;color:#fff">$</div>
+                        <div class="chips-visual" style="background:#22c55e; color:#fff">$</div>
                     </div>
-                    <div class="player-card-info">
+                    <div class="player-info">
                         <div class="p-name" style="color:var(--primary-glow)">شما (You)</div>
-                        <div class="p-chips" id="your-chips">$1,000</div>
-                        <div class="p-action" id="act-seat-1">نوبت شما</div>
+                        <div class="p-chips" id="chips-seat-1">$1,000</div>
+                        <div class="p-status" id="status-seat-1">منتظر شروع</div>
                     </div>
                 </div>
 
@@ -314,211 +359,298 @@
         </div>
 
         <!-- پنل کنترل پایین -->
-        <div class="control-panel">
-            <div class="btn-group">
-                <button class="act-btn act-fold" onclick="playerAction('fold')">Fold (انصراف)</button>
-                <button class="act-btn act-call" onclick="playerAction('call')">Call ($20)</button>
-                <button class="act-btn act-raise" onclick="playerAction('raise')">Raise</button>
+        <div class="controls-wrapper">
+            <button class="btn-start-hand" id="start-btn" onclick="startNewHand()">دست جدید (Start)</button>
+
+            <div class="action-btns">
+                <button class="btn-act btn-fold" id="btn-fold" disabled onclick="userAction('fold')">Fold (انصراف)</button>
+                <button class="btn-act btn-call" id="btn-call" disabled onclick="userAction('call')">Call ($20)</button>
+                <button class="btn-act btn-raise" id="btn-raise" disabled onclick="userAction('raise')">Raise</button>
             </div>
 
-            <div class="slider-box">
-                <input type="range" id="raise-range" min="20" max="500" value="40" step="10" oninput="document.getElementById('raise-val').textContent='$'+this.value">
+            <div class="slider-group">
+                <input type="range" id="raise-slider" min="20" max="200" value="40" step="10" oninput="document.getElementById('raise-val').textContent='$'+this.value">
                 <span style="font-family:'Orbitron'; font-weight:800; color:var(--primary-glow);" id="raise-val">$40</span>
             </div>
-
-            <button class="act-btn" style="background:var(--gold-accent); color:#000; flex:0.4;" onclick="startNewHand()">دست جدید</button>
         </div>
     </div>
 
-    <!-- مدال راهنما و قوانین جامع بازی -->
+    <!-- مدال راهنمای قوانین -->
     <div class="modal-overlay" id="guide-modal">
-        <div class="modal-content">
+        <div class="modal-box">
             <div class="modal-header">
-                <div class="modal-title"><i class="fas fa-graduation-cap"></i> راهنمای جامع و قوانین پوکر تگزاس هولدم</div>
-                <button class="close-modal" onclick="toggleModal(false)">&times;</button>
+                <div class="modal-title"><i class="fas fa-graduation-cap"></i> راهنما و قوانین تگزاس هولدم</div>
+                <button class="close-btn" onclick="toggleGuide(false)">&times;</button>
             </div>
 
-            <div class="guide-section">
-                <h3><i class="fas fa-play-circle"></i> ۱. هدف بازی</h3>
-                <p>هدف در پوکر، ساختن بهترین ترکیب ۵ کارته از مجموع ۷ کارت در دسترس (۲ کارت شخصی + ۵ کارت مشترک روی میز) یا مجبور کردن سایر بازیکنان به انصراف (Fold) است.</p>
+            <div class="rule-section">
+                <h3><i class="fas fa-play-circle"></i> نحوه بازی در دمو</h3>
+                <p>روی دکمه «دست جدید» کلیک کنید. کارت‌ها به صورت واقعی بر خورده و پخش می‌شوند. در هر مرحله می‌توانید بازی کنید یا انصراف دهید تا کارت‌های بعدی رو شوند و برنده نهایی مشخص شود.</p>
             </div>
 
-            <div class="guide-section">
-                <h3><i class="fas fa-layer-group"></i> ۲. مراحل یک دست بازی</h3>
-                <p><strong>پیش از فلپ (Pre-Flop):</strong> به هر بازیکن ۲ کارت مخفی داده می‌شود و دور اول شرط‌بندی آغاز می‌شود.</p>
-                <p><strong>فلپ (Flop):</strong> دیلر ۳ کارت مشترک رو می‌سازد و دور دوم شرط‌بندی انجام می‌شود.</p>
-                <p><strong>ترن (Turn):</strong> کارت چهارم مشترک رو می‌شود و شرط‌بندی ادامه می‌یابد.</p>
-                <p><strong>ریور (River):</strong> کارت پنجم و نهایی رو می‌شود و آخرین دور شرط‌بندی صورت می‌گیرد.</p>
-                <p><strong>شو داون (Showdown):</strong> بازیکنان باقی‌مانده کارت‌های خود را رو می‌کنند و دارنده بهترین دست، پات (Pot) را برنده می‌شود.</p>
-            </div>
-
-            <div class="guide-section">
-                <h3><i class="fas fa-trophy"></i> ۳. رتبه‌بندی دست‌ها (از قوی‌ترین به ضعیف‌ترین)</h3>
-                <div class="hands-grid">
-                    <div class="hand-card">
-                        <div class="title">۱. رویال فلش (Royal Flush)</div>
-                        <div class="desc">A-K-Q-J-10 از یک خال متوالی. نادری‌ترین و قوی‌ترین دست.</div>
-                    </div>
-                    <div class="hand-card">
-                        <div class="title">۲. استریت فلش (Straight Flush)</div>
-                        <div class="desc">پنج کارت متوالی از یک خال (مثلاً 9-8-7-6-5 دل).</div>
-                    </div>
-                    <div class="hand-card">
-                        <div class="title">۳. کالس / فور آف ا کاید (4 of a Kind)</div>
-                        <div class="desc">چهار کارت با ارزش یکسان (مثلاً ۴ عدد شاه K).</div>
-                    </div>
-                    <div class="hand-card">
-                        <div class="title">۴. فول هاوس (Full House)</div>
-                        <div class="desc">یک سه تایی + یک جفت (مثلاً ۳ تا ۱۰ و ۲ تا سرباز).</div>
-                    </div>
-                    <div class="hand-card">
-                        <div class="title">۵. رنگ / فلش (Flush)</div>
-                        <div class="desc">پنج کارت غیرمتوالی ولی هم‌خال (مثلاً ۵ کارت از خشت).</div>
-                    </div>
-                    <div class="hand-card">
-                        <div class="title">۶. ردیف / استریت (Straight)</div>
-                        <div class="desc">پنج کارت متوالی از خال‌های مختلف (مثلاً 8-7-6-5-4).</div>
-                    </div>
-                    <div class="hand-card">
-                        <div class="title">۷. سه تایی (Three of a Kind)</div>
-                        <div class="desc">سه کارت هم‌ارزش (مثلاً ۳ عدد اس A).</div>
-                    </div>
-                    <div class="hand-card">
-                        <div class="title">۸. دو جفت (Two Pair)</div>
-                        <div class="desc">دو جفت کارت با ارزش یکسان (مثلاً ۲ تا ۱۰ و ۲ تا ۸).</div>
-                    </div>
-                    <div class="hand-card">
-                        <div class="title">۹. یک جفت (One Pair)</div>
-                        <div class="desc">دو کارت یکسان در دست (مثلاً ۲ عدد بی بی Q).</div>
-                    </div>
-                    <div class="hand-card">
-                        <div class="title">۱۰. کارت بالا (High Card)</div>
-                        <div class="desc">اگر هیچ ترکیبی ساخته نشود، کارتی که بیشترین ارزش را دارد ملاک است.</div>
-                    </div>
+            <div class="rule-section">
+                <h3><i class="fas fa-trophy"></i> رتبه‌بندی دست‌های پوکر</h3>
+                <div class="hand-rankings">
+                    <div class="rank-card"><div class="rtitle">۱. رویال فلش</div><div class="rdesc">A-K-Q-J-10 از یک خال متوالی</div></div>
+                    <div class="rank-card"><div class="rtitle">۲. استریت فلش</div><div class="rdesc">۵ کارت متوالی هم‌خال</div></div>
+                    <div class="rank-card"><div class="rtitle">۳. کالس (4 of a kind)</div><div class="rdesc">۴ کارت هم‌ارزش</div></div>
+                    <div class="rank-card"><div class="rtitle">۴. فول هاوس</div><div class="rdesc">یک ۳تایی + یک جفت</div></div>
+                    <div class="rank-card"><div class="rtitle">۵. رنگ (Flush)</div><div class="rdesc">۵ کارت غیرمتوالی هم‌خال</div></div>
+                    <div class="rank-card"><div class="rtitle">۶. ردیف (Straight)</div><div class="rdesc">۵ کارت متوالی از خال‌های مختلف</div></div>
+                    <div class="rank-card"><div class="rtitle">۷. سه تایی</div><div class="rdesc">۳ کارت با ارزش یکسان</div></div>
+                    <div class="rank-card"><div class="rtitle">۸. دو جفت (Two Pair)</div><div class="rdesc">دو جفت کارت با ارزش یکسان</div></div>
+                    <div class="rank-card"><div class="rtitle">۹. یک جفت (One Pair)</div><div class="rdesc">۲ کارت هم‌ارزش</div></div>
+                    <div class="rank-card"><div class="rtitle">۱۰. کارت بالا (High Card)</div><div class="rdesc">بالاترین تک‌کارت در دست</div></div>
                 </div>
-            </div>
-
-            <div class="guide-section">
-                <h3><i class="fas fa-hand-pointer"></i> ۴. کلیدها و حرکت‌های بازی</h3>
-                <p><strong>Fold (انصراف):</strong> خارج شدن از دست جاری و واگذاری چیپ‌های شرط‌بندی‌شده.</p>
-                <p><strong>Check (بررسی):</strong> بدون اضافه کردن شرط، نوبت را به نفر بعدی دادن (اگر شرط جدیدی بسته نشده باشد).</p>
-                <p><strong>Call (کال):</strong> پرداخت مبلغی معادل آخرین شرط بسته‌شده برای ماندن در بازی.</p>
-                <p><strong>Raise (افزایش):</strong> افزایش دادن میزان شرط بازی بیش از مبلغ قبلی.</p>
             </div>
         </div>
     </div>
 
     <script>
-        let balance = 1000;
-        let pot = 0;
+        // موتور منطق بازی دمو
         const suits = ['♥', '♦', '♣', '♠'];
         const values = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+        
+        let deck = [];
+        let pot = 0;
+        let currentBet = 20;
+        let gameStage = 'IDLE'; // IDLE, PREFLOP, FLOP, TURN, RIVER, SHOWDOWN
+        let playerState = {
+            1: { name: 'You', chips: 1000, hand: [], folded: false },
+            2: { name: 'Alex', chips: 850, hand: [], folded: false },
+            3: { name: 'Dmitry', chips: 1200, hand: [], folded: false },
+            4: { name: 'Sarah', chips: 640, hand: [], folded: false },
+            5: { name: 'Marco', chips: 910, hand: [], folded: false }
+        };
+        let communityCards = [];
 
-        function toggleModal(show) {
+        function toggleGuide(show) {
             document.getElementById('guide-modal').classList.toggle('active', show);
         }
 
-        function animateCardDeal(targetElemId, isFaceUp = false, cardData = null, delay = 0) {
-            setTimeout(() => {
-                const dealer = document.getElementById('dealer-pos').getBoundingClientRect();
-                const target = document.getElementById(targetElemId).getBoundingClientRect();
-
-                const flyCard = document.createElement('div');
-                flyCard.className = 'flying-card';
-                flyCard.style.left = `${dealer.left + 20}px`;
-                flyCard.style.top = `${dealer.top + 20}px`;
-                document.body.appendChild(flyCard);
-
-                requestAnimationFrame(() => {
-                    flyCard.style.left = `${target.left}px`;
-                    flyCard.style.top = `${target.top}px`;
-                    flyCard.style.transform = 'rotate(360deg)';
-                });
-
-                setTimeout(() => {
-                    flyCard.remove();
-                    const container = document.getElementById(targetElemId);
-                    
-                    const cardElem = document.createElement('div');
-                    if (isFaceUp && cardData) {
-                        cardElem.className = `card ${cardData.isRed ? 'red' : 'black'}`;
-                        cardElem.innerHTML = `<span>${cardData.value}</span><span style="text-align:center">${cardData.suit}</span>`;
-                    } else {
-                        cardElem.className = 'card back';
-                        cardElem.textContent = 'Z';
-                    }
-                    container.appendChild(cardElem);
-                }, 400);
-            }, delay);
-        }
-
-        function getRandomCard() {
-            const suit = suits[Math.floor(Math.random() * suits.length)];
-            const value = values[Math.floor(Math.random() * values.length)];
-            return { suit, value, isRed: suit === '♥' || suit === '♦' };
-        }
-
-        function startNewHand() {
-            document.getElementById('community-area').innerHTML = '';
-            for(let i=1; i<=5; i++) {
-                document.getElementById(`cards-seat-${i}`).innerHTML = '';
-                document.getElementById(`act-seat-${i}`).textContent = '';
+        function buildDeck() {
+            deck = [];
+            for (let suit of suits) {
+                for (let value of values) {
+                    deck.push({ suit, value, isRed: suit === '♥' || suit === '♦' });
+                }
             }
-            pot = 100;
-            document.getElementById('pot-display').textContent = `$${pot}`;
+            // Shuffle
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+        }
 
-            let delay = 0;
+        function dealCardToTarget(targetElemId, cardData = null, isFaceUp = false, delay = 0) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const dealer = document.getElementById('dealer-anchor').getBoundingClientRect();
+                    const target = document.getElementById(targetElemId).getBoundingClientRect();
+
+                    const animCard = document.createElement('div');
+                    animCard.className = 'animated-card';
+                    animCard.style.left = `${dealer.left + 15}px`;
+                    animCard.style.top = `${dealer.top + 10}px`;
+                    document.body.appendChild(animCard);
+
+                    requestAnimationFrame(() => {
+                        animCard.style.left = `${target.left}px`;
+                        animCard.style.top = `${target.top}px`;
+                        animCard.style.transform = 'rotate(360deg)';
+                    });
+
+                    setTimeout(() => {
+                        animCard.remove();
+                        const container = document.getElementById(targetElemId);
+                        const cardElem = document.createElement('div');
+                        if (isFaceUp && cardData) {
+                            cardElem.className = `card ${cardData.isRed ? 'red' : 'black'}`;
+                            cardElem.innerHTML = `<span>${cardData.value}</span><span style="text-align:center">${cardData.suit}</span>`;
+                        } else {
+                            cardElem.className = 'card card-back';
+                            cardElem.textContent = 'Z';
+                        }
+                        container.appendChild(cardElem);
+                        resolve();
+                    }, 400);
+                }, delay);
+            });
+        }
+
+        async function startNewHand() {
+            // ریست حالت بازی
+            buildDeck();
+            pot = 100; // ورود همه
+            communityCards = [];
+            gameStage = 'PREFLOP';
+            document.getElementById('pot-amount').textContent = `$${pot}`;
+            document.getElementById('game-stage-text').textContent = 'مرحله Pre-Flop (پخش کارت‌ها)';
+            document.getElementById('start-btn').disabled = true;
+
+            // پاک کردن کارت‌های قبلی
+            document.getElementById('community-cards-container').innerHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`hand-seat-${i}`).innerHTML = '';
+                document.getElementById(`status-seat-${i}`).textContent = '';
+                playerState[i].folded = false;
+                playerState[i].hand = [];
+            }
+
+            // پخش دو کارت به هر بازیکن
+            let delayCount = 0;
             for (let round = 0; round < 2; round++) {
                 for (let seat = 1; seat <= 5; seat++) {
+                    const card = deck.pop();
+                    playerState[seat].hand.push(card);
                     const isUser = (seat === 1);
-                    animateCardDeal(`cards-seat-${seat}`, isUser, getRandomCard(), delay);
-                    delay += 140;
+                    dealCardToTarget(`hand-seat-${seat}`, card, isUser, delayCount * 120);
+                    delayCount++;
                 }
             }
 
             setTimeout(() => {
-                for (let c = 0; c < 3; c++) {
-                    animateCardDeal('community-area', true, getRandomCard(), c * 180);
+                enableUserTurn();
+            }, delayCount * 120 + 300);
+        }
+
+        function enableUserTurn() {
+            if (playerState[1].folded) {
+                simulateAiTurn();
+                return;
+            }
+            document.querySelectorAll('.seat').forEach(s => s.classList.remove('turn-active'));
+            document.getElementById('seat-1').classList.add('turn-active');
+            document.getElementById('status-seat-1').textContent = 'نوبت شماست';
+
+            document.getElementById('btn-fold').disabled = false;
+            document.getElementById('btn-call').disabled = false;
+            document.getElementById('btn-raise').disabled = false;
+        }
+
+        function disableUserControls() {
+            document.getElementById('btn-fold').disabled = true;
+            document.getElementById('btn-call').disabled = true;
+            document.getElementById('btn-raise').disabled = true;
+        }
+
+        async function userAction(action) {
+            disableUserControls();
+            const raiseVal = parseInt(document.getElementById('raise-slider').value);
+
+            if (action === 'fold') {
+                playerState[1].folded = true;
+                document.getElementById('status-seat-1').textContent = 'FOLD';
+                document.getElementById('status-seat-1').style.color = '#ef4444';
+            } else if (action === 'call') {
+                pot += 20;
+                playerState[1].chips -= 20;
+                document.getElementById('status-seat-1').textContent = 'CALL $20';
+            } else if (action === 'raise') {
+                pot += raiseVal;
+                playerState[1].chips -= raiseVal;
+                document.getElementById('status-seat-1').textContent = `RAISE $${raiseVal}`;
+            }
+
+            updateChipsDisplay();
+            simulateAiTurn();
+        }
+
+        function updateChipsDisplay() {
+            document.getElementById('pot-amount').textContent = `$${pot}`;
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`chips-seat-${i}`).textContent = `$${playerState[i].chips}`;
+            }
+            document.getElementById('user-chips-header').textContent = `$${playerState[1].chips}`;
+        }
+
+        async function simulateAiTurn() {
+            const aiSeats = [2, 3, 4, 5];
+            const actions = ['CHECK', 'CALL $20', 'RAISE $30', 'FOLD'];
+
+            for (let seat of aiSeats) {
+                if (playerState[seat].folded) continue;
+
+                document.querySelectorAll('.seat').forEach(s => s.classList.remove('turn-active'));
+                document.getElementById(`seat-${seat}`).classList.add('turn-active');
+
+                await new Promise(res => setTimeout(res, 500));
+
+                const act = actions[Math.floor(Math.random() * actions.length)];
+                document.getElementById(`status-seat-${seat}`).textContent = act;
+
+                if (act === 'FOLD') {
+                    playerState[seat].folded = true;
+                } else if (act.includes('CALL')) {
+                    pot += 20;
+                } else if (act.includes('RAISE')) {
+                    pot += 30;
                 }
-            }, delay + 200);
+                updateChipsDisplay();
+            }
+
+            document.querySelectorAll('.seat').forEach(s => s.classList.remove('turn-active'));
+            progressGameStage();
         }
 
-        function playerAction(type) {
-            const bet = parseInt(document.getElementById('raise-range').value);
-
-            if (type === 'fold') {
-                document.getElementById('act-seat-1').textContent = 'FOLD';
-                document.getElementById('act-seat-1').style.color = '#ef4444';
-            } else {
-                pot += (type === 'call' ? 20 : bet);
-                balance -= (type === 'call' ? 20 : bet);
-                document.getElementById('pot-display').textContent = `$${pot}`;
-                document.getElementById('your-chips').textContent = `$${balance}`;
-                document.getElementById('user-bal').textContent = `$${balance}`;
-                document.getElementById('act-seat-1').textContent = type.toUpperCase();
-                
-                simulateTurnRotation();
+        async function progressGameStage() {
+            if (gameStage === 'PREFLOP') {
+                gameStage = 'FLOP';
+                document.getElementById('game-stage-text').textContent = 'مرحله Flop (۳ کارت مشترک)';
+                for (let i = 0; i < 3; i++) {
+                    const card = deck.pop();
+                    communityCards.push(card);
+                    await dealCardToTarget('community-cards-container', card, true, i * 150);
+                }
+                enableUserTurn();
+            } else if (gameStage === 'FLOP') {
+                gameStage = 'TURN';
+                document.getElementById('game-stage-text').textContent = 'مرحله Turn (کارت چهارم)';
+                const card = deck.pop();
+                communityCards.push(card);
+                await dealCardToTarget('community-cards-container', card, true, 0);
+                enableUserTurn();
+            } else if (gameStage === 'TURN') {
+                gameStage = 'RIVER';
+                document.getElementById('game-stage-text').textContent = 'مرحله River (کارت پنجم و نهایی)';
+                const card = deck.pop();
+                communityCards.push(card);
+                await dealCardToTarget('community-cards-container', card, true, 0);
+                enableUserTurn();
+            } else if (gameStage === 'RIVER') {
+                triggerShowdown();
             }
         }
 
-        function simulateTurnRotation() {
-            const actions = ['CHECK', 'CALL $20', 'RAISE $40', 'FOLD'];
+        async function triggerShowdown() {
+            gameStage = 'SHOWDOWN';
+            document.getElementById('game-stage-text').textContent = 'مرحله Showdown - رو شدن کارت‌ها';
+
+            // رو کردن کارت‌های بازیکنان AI
             for (let seat = 2; seat <= 5; seat++) {
-                setTimeout(() => {
-                    document.querySelectorAll('.seat').forEach(s => s.classList.remove('active-turn'));
-                    document.getElementById(`seat-${seat}`).classList.add('active-turn');
-
-                    const act = actions[Math.floor(Math.random() * actions.length)];
-                    document.getElementById(`act-seat-${seat}`).textContent = act;
-
-                    if(seat === 5) {
-                        setTimeout(() => {
-                            document.querySelectorAll('.seat').forEach(s => s.classList.remove('active-turn'));
-                            document.getElementById('seat-1').classList.add('active-turn');
-                        }, 500);
-                    }
-                }, (seat - 1) * 600);
+                if (!playerState[seat].folded) {
+                    const handElem = document.getElementById(`hand-seat-${seat}`);
+                    handElem.innerHTML = '';
+                    playerState[seat].hand.forEach(card => {
+                        const cardElem = document.createElement('div');
+                        cardElem.className = `card ${card.isRed ? 'red' : 'black'}`;
+                        cardElem.innerHTML = `<span>${card.value}</span><span style="text-align:center">${card.suit}</span>`;
+                        handElem.appendChild(cardElem);
+                    });
+                }
             }
+
+            // تعیین تصادفی یک برنده برای دمو
+            const activeSeats = [1, 2, 3, 4, 5].filter(s => !playerState[s].folded);
+            const winner = activeSeats[Math.floor(Math.random() * activeSeats.length)];
+            playerState[winner].chips += pot;
+
+            setTimeout(() => {
+                alert(`🎉 پایان دست! برنده این دست: ${playerState[winner].name} (مبلغ جایزه: $${pot})`);
+                updateChipsDisplay();
+                document.getElementById('start-btn').disabled = false;
+                document.getElementById('game-stage-text').textContent = 'دست پایان یافت. برای بازی بعدی کلیک کنید.';
+            }, 800);
         }
     </script>
 </body>
