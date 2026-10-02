@@ -334,6 +334,7 @@ function cleanDateStr(d) {
 async function saveUserFields(dict) {
   if (!uUid) return;
 
+  // ۱. ذخیره‌سازی همزمان در LocalStorage جهت پشتیبانی و عدم صفر شدن
   try {
     const localData = {
       count: dict.count !== undefined ? dict.count : cCnt,
@@ -347,20 +348,30 @@ async function saveUserFields(dict) {
     console.warn("خطا در ذخیره‌سازی محلی:", e);
   }
 
+  // ۲. فقط ستون‌هایی که واقعاً در دیتابیس وجود دارند برای آپدیت انتخاب می‌شوند
   const payload = {};
   const keys = window.actualUserKeys || [];
   
-  const findCol = (candidates, fallback) => {
-    const matched = keys.find(x => candidates.some(c => c.toLowerCase() === x.toLowerCase()));
-    return matched || fallback;
+  const findCol = (candidates) => {
+    return keys.find(x => candidates.some(c => c.toLowerCase() === x.toLowerCase()));
   };
 
-  if (dict.count !== undefined) payload[findCol(['quantCount', 'quant_count'], 'quant_count')] = dict.count;
-  if (dict.date !== undefined) payload[findCol(['quantDate', 'quant_date'], 'quant_date')] = dict.date;
-  if (dict.profit !== undefined) payload[findCol(['todayProfit', 'today_profit'], 'today_profit')] = dict.profit;
-  if (dict.balance !== undefined) payload[findCol(['balance'], 'balance')] = dict.balance;
-  if (dict.history !== undefined) payload[findCol(['tradeHistoryArray', 'quantHistory', 'trades', 'history'], 'tradeHistoryArray')] = dict.history;
+  const kCount = findCol(['quantCount', 'quant_count']);
+  if (dict.count !== undefined && kCount) payload[kCount] = dict.count;
 
+  const kDate = findCol(['quantDate', 'quant_date']);
+  if (dict.date !== undefined && kDate) payload[kDate] = dict.date;
+
+  const kProfit = findCol(['todayProfit', 'today_profit']);
+  if (dict.profit !== undefined && kProfit) payload[kProfit] = dict.profit;
+
+  const kBal = findCol(['balance']);
+  if (dict.balance !== undefined && kBal) payload[kBal] = dict.balance;
+
+  const kHist = findCol(['tradeHistoryArray', 'quantHistory', 'trades', 'history']);
+  if (dict.history !== undefined && kHist) payload[kHist] = dict.history;
+
+  // جلوگیری از ارسال درخواست‌هایی که ستون آن در دیتابیس نیست
   if (Object.keys(payload).length > 0) {
     const { error: updateErr } = await supabase.from("users").update(payload).eq("id", uUid);
     if (updateErr) console.error("خطا در بروزرسانی اطلاعات معامله در Supabase:", updateErr);
@@ -673,13 +684,14 @@ async function initPage() {
       if (rawCache) localCache = JSON.parse(rawCache);
     } catch(e) {}
 
-    if (userData) {
-      window.actualUserKeys = Object.keys(userData);
+    if (userData || localCache) {
+      if (userData) window.actualUserKeys = Object.keys(userData);
 
-      bBal = Number(userData.balance || userData.depositAmount || (localCache ? localCache.balance : 0) || 0);
-      const qDate = cleanDateStr(userData.quantDate || userData.quant_date);
-      const qCount = userData.quantCount ?? userData.quant_count ?? null;
-      const tProfit = userData.todayProfit ?? userData.today_profit ?? null;
+      bBal = Number((userData && (userData.balance || userData.depositAmount)) || (localCache ? localCache.balance : 0) || 0);
+      
+      const qDate = cleanDateStr((userData && (userData.quantDate || userData.quant_date)) || (localCache ? localCache.date : ''));
+      const qCount = userData ? (userData.quantCount ?? userData.quant_count ?? null) : null;
+      const tProfit = userData ? (userData.todayProfit ?? userData.today_profit ?? null) : null;
       const currentNY = cleanDateStr(todayNY);
 
       if (qDate && qDate === currentNY) {
@@ -696,7 +708,7 @@ async function initPage() {
       if (tpEl) tpEl.innerText = '$' + tProf.toFixed(2);
       if (tbEl) tbEl.innerText = '$' + bBal.toFixed(2);
       
-      const rawHistory = userData.tradeHistoryArray || userData.quantHistory || userData.trades || userData.history || (localCache ? localCache.history : []);
+      const rawHistory = (userData && (userData.tradeHistoryArray || userData.quantHistory || userData.trades || userData.history)) || (localCache ? localCache.history : []);
       if (Array.isArray(rawHistory) && rawHistory.length > 0) {
         allTradesArray = rawHistory;
         window.renderHistory();
