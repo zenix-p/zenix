@@ -49,8 +49,8 @@
         .modal-close{background:rgba(255,255,255,.05);border:none;color:#94a3b8;cursor:pointer;font-size:14px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
         .modal-close:hover{background:rgba(239,68,68,.2);color:#ef4444}
         .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px;transition:0.2s}
-        .msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:4px}
-        .msg-desc-text{font-size:12px;color:#cbd5e1;line-height:1.5}
+        .msg-body-box:hover{background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.3);}
+        .msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:0}
 
         .notif-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
         .notif-tab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#94a3b8;padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;white-space:nowrap;transition:0.2s;display:flex;align-items:center;justify-content:center;gap:5px;flex:1 1 auto}
@@ -261,6 +261,16 @@ window.cachedNotifications = [];
 window.currentFilteredNotifs = [];
 window.activeNotifFilter = 'all';
 
+window.updateBellBadge = function() {
+  const unreadCount = window.cachedNotifications.filter(n => !n.read && !n.isRead).length;
+  const badge = document.getElementById('bell-badge');
+  if (badge) {
+    badge.innerText = unreadCount;
+    if (unreadCount > 0) badge.classList.add('show');
+    else badge.classList.remove('show');
+  }
+};
+
 window.setNotifFilter = function(filter, btnElement) {
   window.activeNotifFilter = filter;
   document.querySelectorAll('.notif-tab').forEach(t => t.classList.remove('active'));
@@ -281,9 +291,22 @@ window.getNotifCategory = function(n) {
   return 'admin_message';
 };
 
-window.openMsgDetail = function(idx) {
+window.openMsgDetail = async function(idx) {
   const n = window.currentFilteredNotifs[idx];
   if (!n) return;
+
+  // به عنوان خوانده شده علامت بگذار اگر هنوز خوانده نشده
+  if (!n.read && !n.isRead) {
+    n.read = true;
+    n.isRead = true;
+    window.updateBellBadge();
+    window.renderNotifications();
+    try {
+      await supabase.from('notifications').update({ read: true, isRead: true }).eq('id', n.id);
+    } catch (err) {
+      console.error('خطا در بروزرسانی وضعیت پیام:', err);
+    }
+  }
 
   const title = n.title || 'پیام سیستم';
   const msg = n.message || n.text || n.body || '';
@@ -333,14 +356,13 @@ window.renderNotifications = function() {
   let html = '';
   filtered.forEach((n, idx) => {
     const title = n.title || 'پیام سیستم';
-    const msg = n.message || n.text || n.body || '';
     const category = window.getNotifCategory(n);
+    const isUnread = !n.read && !n.isRead;
 
     let borderStyle = "border:1px solid rgba(255,255,255,.08);";
     let bgStyle = "background:rgba(255,255,255,.03);";
     let icon = '<i class="fas fa-bullhorn" style="color:#38bdf8"></i>';
     let tagHtml = '<span style="font-size:10px;background:rgba(56,189,248,0.2);color:#38bdf8;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">پیام مدیریت</span>';
-    let supportBtn = '';
 
     if (category === 'approved') {
       borderStyle = "border:1px solid rgba(34, 197, 94, 0.4);";
@@ -352,25 +374,17 @@ window.renderNotifications = function() {
       bgStyle = "background:rgba(239, 68, 68, 0.08);";
       icon = '<i class="fas fa-times-circle" style="color:#ef4444"></i>';
       tagHtml = '<span style="font-size:10px;background:rgba(239,68,68,0.2);color:#ef4444;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">لغو درخواست</span>';
-      
-      supportBtn = `
-        <div style="margin-top:10px;padding-top:8px;border-top:1px dashed rgba(239,68,68,0.2);display:flex;justify-content:flex-end;">
-          <a href="support.html" onclick="event.stopPropagation();sessionStorage.setItem('zenix_return_page', window.location.href);" style="display:inline-flex;align-items:center;gap:6px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f8fafc;padding:5px 10px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:600;transition:0.2s;">
-            <i class="fas fa-headset" style="color:#ef4444;"></i>
-            <span>پیگیری از طریق پشتیبانی</span>
-          </a>
-        </div>
-      `;
     }
+
+    const unreadDot = isUnread ? '<span style="width:8px;height:8px;background:#ef4444;border-radius:50%;display:inline-block;margin-left:4px;" title="خوانده نشده"></span>' : '';
 
     html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle} cursor:pointer;" onclick="window.openMsgDetail(${idx})">
       <div class="msg-title-text" style="display:flex;align-items:center;gap:8px;">
+        ${unreadDot}
         ${icon}
         <span>${title}</span>
         ${tagHtml}
       </div>
-      <div class="msg-desc-text" style="margin-top:6px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${msg}</div>
-      ${supportBtn}
     </div>`;
   });
 
@@ -472,13 +486,7 @@ async function initPage() {
             if (!notifError && data) {
                 window.cachedNotifications = data;
                 window.renderNotifications();
-                const unreadCount = data.filter(n => !n.read && !n.isRead).length;
-                const badge = document.getElementById('bell-badge');
-                if (badge) {
-                    badge.innerText = unreadCount;
-                    if (unreadCount > 0) badge.classList.add('show');
-                    else badge.classList.remove('show');
-                }
+                window.updateBellBadge();
             }
         } catch (err) {}
 
