@@ -27,17 +27,48 @@
         .badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;font-weight:700}
         .badge.show{display:flex}
         
-        /* تنظیم هماهنگ عرض منوها بر اساس محتوا */
-        .menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;width:max-content;min-width:100%;padding:6px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8);white-space:nowrap}
-        [dir="rtl"] .wrap .menu{left:0}
-        [dir="ltr"] .wrap .menu{right:0}
+        /* تنظیم دقیق عرض منو مطابق با طولانی‌ترین عبارت */
+        .menu{
+            display:none;
+            position:absolute;
+            top:42px;
+            background:#0f172a;
+            border:1px solid rgba(56,189,248,.3);
+            border-radius:10px;
+            width:max-content !important;
+            min-width:150px;
+            padding:6px;
+            z-index:999;
+            box-shadow:0 10px 30px rgba(0,0,0,.85);
+            white-space:nowrap
+        }
+        [dir="rtl"] .wrap .menu{left:0;right:auto}
+        [dir="ltr"] .wrap .menu{right:0;left:auto}
         .menu.show{display:block}
         
-        .mi{padding:8px 12px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;transition:0.2s;white-space:nowrap}
+        .mi{
+            padding:9px 12px;
+            font-size:12px;
+            color:#cbd5e1;
+            cursor:pointer;
+            border-radius:6px;
+            display:flex;
+            align-items:center;
+            gap:8px;
+            text-decoration:none;
+            transition:all 0.2s ease;
+            white-space:nowrap;
+            width:100%
+        }
         .mi:hover{background:rgba(56,189,248,.15);color:#38bdf8}
         
-        /* استایل مشخص برای زبان و ایتم فعال منو به رنگ آبی */
-        .mi.active{background:rgba(56,189,248,.2)!important;color:#38bdf8!important;font-weight:700!important}
+        /* استایل آبی برجسته و کاملاً مشخص برای زبان انتخابی و منوی فعال */
+        .mi.active{
+            background:#0ea5e9 !important;
+            color:#ffffff !important;
+            font-weight:700 !important;
+            box-shadow:0 2px 8px rgba(14,165,233,0.4)
+        }
 
         .c{max-width:900px;width:100%;margin:15px auto;padding:0 12px;flex:1}
         .wel{background:linear-gradient(135deg,rgba(2,132,199,.15),rgba(147,51,234,.15));border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
@@ -128,7 +159,6 @@
         <div style="background:rgba(30,41,59,0.8);border:1px solid rgba(56,189,248,0.3);border-radius:12px;padding:16px;margin-top:12px;">
             <div id="status-box" style="display:none;padding:10px;border-radius:8px;font-size:11px;margin-bottom:12px;text-align:center;font-weight:600;"></div>
             
-            <!-- باکس تایمر زمان سپری‌شده از ثبت درخواست -->
             <div id="withdrawal-timer-box" style="display:none; background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.3); border-radius:8px; padding:10px; text-align:center; margin-bottom:12px; font-size:12px; color:#38bdf8;">
                 <i class="fas fa-stopwatch" style="margin-left:5px;"></i> <span id="t-timer-label">زمان سپری‌شده از ثبت درخواست:</span> 
                 <strong id="timer-clock" style="font-family:monospace; font-size:14px; color:#fff; direction:ltr; display:inline-block; margin-right:6px;">00:00:00</strong>
@@ -151,7 +181,6 @@
                 <input type="number" id="withdraw-amount" placeholder="مقدار عددی تتر" style="width:100%;background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#f8fafc;padding:10px;font-size:12px;outline:none;box-sizing:border-box;">
             </div>
 
-            <!-- فیلد نمایش محاسبه مبلغ دریافتی با کسر کارمزد ۰.۹٪ -->
             <div style="margin-bottom:14px; background:rgba(15,23,42,0.5); border:1px solid rgba(56,189,248,0.25); border-radius:8px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center;">
                 <span style="font-size:11px; color:#cbd5e1;" id="t-lbl-net-amt"><i class="fas fa-calculator" style="color:#38bdf8; margin-left:4px;"></i> مبلغ دریافتی نهایی (با کسر ۰.۹٪ کارمزد):</span>
                 <span style="font-size:13px; font-weight:bold; color:#22c55e;"><span id="net-receive-amount">0.00</span> USDT</span>
@@ -213,7 +242,7 @@
                     <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l1t">هدف اصلی:</strong> <span id="t-ab-m-l1d">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li>
                     <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l2t">امنیت و زیرساخت:</strong> <span id="t-ab-m-l2d">متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).</span></li>
                     <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l3t">ساختار چندسطحی (Referral & Team):</strong> <span id="t-ab-m-l3d">ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.</span></li>
-                    <li><strong style="color:#f8fafc;" id="t-ab-m-l4t">احساس واقع‌‌گرایی:</strong> <span id="t-ab-m-l4d">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.</span></li>
+                    <li><strong style="color:#f8fafc;" id="t-ab-m-l4t">احساس واقع‌‌‌‌گرایی:</strong> <span id="t-ab-m-l4d">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.</span></li>
                 </ul>
             </div>
         </div>
@@ -254,7 +283,6 @@
         let userBalance = 0;
         let timerInterval = null;
 
-        // متغیرهای مدیریت اعلان‌ها
         window.cachedNotifications = [];
         window.currentFilteredNotifs = [];
         window.activeNotifFilter = 'all';
@@ -329,7 +357,6 @@
             });
         });
 
-        // --- توابع اختصاصی اعلان‌ها ---
         window.updateBellBadge = function() {
             const unreadCount = window.cachedNotifications.filter(n => !n.read && !n.isRead && !n.is_read).length;
             const badge = document.getElementById('bell-badge');
@@ -476,10 +503,9 @@
         window.closeMessageModal = () => document.getElementById('m-msg')?.classList.remove('show');
         window.closeMsgDetailModal = () => document.getElementById('m-msg-detail')?.classList.remove('show');
 
-        // --- محاسبات و برداشت ---
         function updateNetReceiveAmount() {
             const amt = parseFloat(document.getElementById('withdraw-amount').value) || 0;
-            const fee = amt * 0.009; // کارمزد 0.9%
+            const fee = amt * 0.009;
             const netAmt = Math.max(0, amt - fee);
             const el = document.getElementById('net-receive-amount');
             if (el) el.textContent = netAmt.toFixed(2);
@@ -683,7 +709,7 @@
                 return;
             }
 
-            const fee = amt * 0.009; // کارمزد 0.9%
+            const fee = amt * 0.009;
             const netAmt = amt - fee;
             const nowISO = new Date().toISOString();
 
@@ -725,7 +751,7 @@
                 lockForm(true, `🎉 درخواست برداشت مبلغ ${amt} USDT (مبلغ خالص دریافتی: ${netAmt.toFixed(2)} USDT) با موفقیت ثبت شد و در انتظار تایید مدیریت است.`, nowISO, pendingData);
             } catch(err) {
                 console.error("Error submitting withdrawal:", err);
-                showMsg("⚠️️ خطا در ثبت درخواست: " + err.message, true);
+                showMsg("⚠ خطا در ثبت درخواست: " + err.message, true);
             }
         };
 
@@ -748,7 +774,7 @@
             document.documentElement.setAttribute('dir', r ? 'rtl' : 'ltr');
             document.documentElement.setAttribute('lang', l);
 
-            // مشخص کردن دقیق زبان فعال در منوی کشویی زبان با کلاس active و رنگ آبی
+            // اعمال کلاس active روی زبان انتخاب‌شده با تغییر رنگ واضح به آبی
             document.querySelectorAll('#lang-menu .mi').forEach(item => {
                 if (item.dataset.lang === l) {
                     item.classList.add('active');
