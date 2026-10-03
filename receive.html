@@ -22,14 +22,15 @@
         .logo-text{font-family:'Orbitron',sans-serif;font-size:19px;font-weight:900;letter-spacing:2px;font-style:italic;transform:skewX(-6deg);background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 20px rgba(56,189,248,0.4)}
         .hr{display:flex;align-items:center;gap:8px}
         .wrap{position:relative}
-        .lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none}
+        .lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none;transition:all 0.2s}
+        .lb:hover{background:rgba(56,189,248,.15);border-color:#38bdf8}
         .badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;font-weight:700}
         .badge.show{display:flex}
         .menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;min-width:170px;padding:6px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8)}
         [dir="rtl"] .wrap .menu{left:0}
         [dir="ltr"] .wrap .menu{right:0}
         .menu.show{display:block}
-        .mi{padding:7px 10px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none}
+        .mi{padding:7px 10px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;transition:0.2s}
         .mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}
         .c{max-width:900px;width:100%;margin:15px auto;padding:0 12px;flex:1}
         .wel{background:linear-gradient(135deg,rgba(2,132,199,.15),rgba(147,51,234,.15));border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
@@ -48,7 +49,7 @@
         .msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:0}
         .msg-desc-text{font-size:12px;color:#cbd5e1;line-height:1.5}
 
-        /* استایل‌های بخش تب‌ها و اسکرول بار اعلان‌ها */
+        /* استایل‌های تب‌ها و اسکرول بار اعلان‌ها */
         .notif-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
         .notif-tab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#94a3b8;padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;white-space:nowrap;transition:0.2s;display:flex;align-items:center;justify-content:center;gap:5px;flex:1 1 auto}
         .notif-tab:hover{background:rgba(56,189,248,.15);color:#38bdf8}
@@ -163,7 +164,7 @@
         </div>
     </div>
 
-    <!-- مودال صندوق پیام‌ها و اعلان‌ها (هماهنگ شده با فایل تراکنش‌ها) -->
+    <!-- مودال صندوق پیام‌ها و اعلان‌ها -->
     <div class="modal" id="m-msg">
         <div class="modal-content">
             <div class="modal-header">
@@ -182,7 +183,7 @@
         </div>
     </div>
 
-    <!-- مودال مشاهده جزئیات پیام (هماهنگ شده با فایل تراکنش‌ها) -->
+    <!-- مودال مشاهده جزئیات پیام -->
     <div class="modal" id="m-msg-detail" style="z-index:1050;">
         <div class="modal-content">
             <div class="modal-header">
@@ -247,7 +248,7 @@
         let userBalance = 0;
         let timerInterval = null;
 
-        // متغیرهای مدیریت اعلان‌ها دقیقا مطابق با فایل تراکنش‌ها
+        // متغیرهای مدیریت اعلان‌ها
         window.cachedNotifications = [];
         window.currentFilteredNotifs = [];
         window.activeNotifFilter = 'all';
@@ -293,7 +294,37 @@
             }
         };
 
-        // --- توابع اختصاصی اعلان‌ها عینا هماهنگ با فایل تراکنش‌ها ---
+        // --- مدیریت منوها و تغییر زبان دقیقاً هماهنگ با فایل تراکنش‌ها ---
+        const mBtn = document.getElementById('menu-btn'), 
+              nMenu = document.getElementById('nav-menu'), 
+              lBtn = document.getElementById('lang-btn'), 
+              lMenu = document.getElementById('lang-menu');
+
+        function toggleM(m, e) { 
+            e?.stopPropagation(); 
+            [nMenu, lMenu].forEach(x => { if (x && x !== m) x.classList.remove('show'); }); 
+            m?.classList.toggle('show'); 
+        }
+
+        mBtn?.addEventListener('click', e => toggleM(nMenu, e));
+        lBtn?.addEventListener('click', e => toggleM(lMenu, e));
+
+        document.addEventListener('click', e => {
+            if (!e.target.closest('.menu') && !e.target.closest('#menu-btn') && !e.target.closest('#lang-btn')) {
+                [nMenu, lMenu].forEach(x => x?.classList.remove('show'));
+            }
+        });
+
+        document.querySelectorAll('#lang-menu .mi').forEach(i => {
+            i.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const lang = i.dataset.lang;
+                setLang(lang);
+                lMenu?.classList.remove('show');
+            });
+        });
+
+        // --- توابع اختصاصی اعلان‌ها ---
         window.updateBellBadge = function() {
             const unreadCount = window.cachedNotifications.filter(n => !n.read && !n.isRead && !n.is_read).length;
             const badge = document.getElementById('bell-badge');
@@ -442,8 +473,7 @@
         window.closeMessageModal = () => document.getElementById('m-msg')?.classList.remove('show');
         window.closeMsgDetailModal = () => document.getElementById('m-msg-detail')?.classList.remove('show');
 
-        // --- پایان توابع اعلان‌ها ---
-
+        // --- محاسبات و برداشت ---
         function updateNetReceiveAmount() {
             const amt = parseFloat(document.getElementById('withdraw-amount').value) || 0;
             const fee = amt * 0.009; // کارمزد 0.9%
@@ -553,16 +583,6 @@
         document.getElementById('bell-btn')?.addEventListener('click', e => { e.stopPropagation(); window.openMessageModal(); });
         document.getElementById('help-btn')?.addEventListener('click', e => { e.stopPropagation(); window.openHelpModal(); });
 
-        const mBtn = document.getElementById('menu-btn'), nMenu = document.getElementById('nav-menu'), lBtn = document.getElementById('lang-btn'), lMenu = document.getElementById('lang-menu');
-        function toggleM(m, e) { e?.stopPropagation(); [nMenu, lMenu].forEach(x => { if (x && x !== m) x.classList.remove('show'); }); m?.classList.toggle('show'); }
-        mBtn?.addEventListener('click', e => toggleM(nMenu, e));
-        lBtn?.addEventListener('click', e => toggleM(lMenu, e));
-        document.addEventListener('click', e => {
-            if (!e.target.closest('.menu') && !e.target.closest('#menu-btn') && !e.target.closest('#lang-btn')) {
-                [nMenu, lMenu].forEach(x => x?.classList.remove('show'));
-            }
-        });
-
         async function loadUserData(user) {
             currentUser = user;
             currentUserId = user.id;
@@ -593,7 +613,6 @@
                 console.error("Error watching user document:", e);
             }
 
-            // دریافت اعلان‌ها مطابق با روش فایل تراکنش‌ها
             try {
                 const { data, error: notifError } = await supabase.from('notifications').select('*').eq('user_id', user.id);
                 if (!notifError && data) {
@@ -606,7 +625,6 @@
             }
         }
 
-        // بررسی هوشمند وضعیت لاگین بدون هدایت اشتباه
         supabase.auth.onAuthStateChange((event, session) => {
             if (session && session.user) {
                 loadUserData(session.user);
@@ -680,7 +698,6 @@
             try {
                 const newBalance = userBalance - amt;
 
-                // ثبت درخواست برداشت معلق و بروزرسانی موجودی کاربر
                 const { error: updateErr } = await supabase.from("users").update({
                     balance: newBalance,
                     pendingWithdrawal: pendingData
@@ -688,7 +705,6 @@
 
                 if (updateErr) throw updateErr;
 
-                // ثبت تراکنش در جدول transactions
                 await supabase.from('transactions').insert([{
                     user_id: currentUser.id,
                     type: 'withdrawal',
@@ -703,7 +719,6 @@
 
                 document.getElementById('withdraw-pass').value = '';
 
-                // قفل فرم و نمایش اطلاعات ذخیره‌شده
                 lockForm(true, `🎉 درخواست برداشت مبلغ ${amt} USDT (مبلغ خالص دریافتی: ${netAmt.toFixed(2)} USDT) با موفقیت ثبت شد و در انتظار تایید مدیریت است.`, nowISO, pendingData);
             } catch(err) {
                 console.error("Error submitting withdrawal:", err);
@@ -729,6 +744,15 @@
             
             document.documentElement.setAttribute('dir', r ? 'rtl' : 'ltr');
             document.documentElement.setAttribute('lang', l);
+
+            // مشخص کردن زبان فعال در منوی کشویی زبان
+            document.querySelectorAll('#lang-menu .mi').forEach(item => {
+                if (item.dataset.lang === l) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
 
             for (let i = 1; i <= 8; i++) {
                 let m = document.getElementById('m' + i);
@@ -779,8 +803,6 @@
                 if (elD) elD.textContent = t['abL' + i + 'D'];
             }
         }
-
-        document.querySelectorAll('#lang-menu .mi').forEach(i => i.addEventListener('click', () => setLang(i.dataset.lang)));
 
         document.getElementById('logout-btn')?.addEventListener('click', async e => {
             e.preventDefault();
