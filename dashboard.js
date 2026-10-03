@@ -26,10 +26,6 @@ const ld = {
     m1: 'صفحه اصلی', m2: 'کوانتیفیکیشن', m_poker: 'پوکر کازینویی', m3: 'واریز', m4: 'برداشت', m5: 'تراکنش', m6: 'پروفایل', m7: 'پشتیبانی', mAbout: 'درباره پلتفرم', m8: 'خروج',
     wel: 'خوش آمدید', sub: 'پنل مدیریت کاربری', st: 'تایید شده',
     ts1: 'موجودی', ts2: 'زیرمجموعه',
-    tsTitle: 'خلاصه آمار تیم و زیرمجموعه‌ها', tsManage: 'مدیریت کامل',
-    tsTotalCount: 'اعضای کل تیم', tsTotalVol: 'حجم معاملات تیم', tsTotalComm: 'کمیسیون دریافتی',
-    tsLvl1: 'نسل ۱ (۱۰٪):', tsLvl2: 'نسل ۲ (۷٪):', tsLvl3: 'نسل ۳ (۳٪):',
-    tsRefTitle: 'لینک دعوت اختصاصی شما', tsCopy: 'کپی',
     c1: 'کوانتیفیکیشن', d1: 'معاملات هوشمند',
     c_poker: 'پوکر کازینویی', d_poker: 'رقابت با دیلر',
     c2: 'واریز', d2: 'شارژ حساب',
@@ -40,7 +36,7 @@ const ld = {
     tMkt: 'بازار ارزهای دیجیتال (۳ ارز برتر منبع زنده)', tLive: 'زنده',
     tAbTitle: 'درباره پلتفرم Zenix (هدف، ماهیت و ساختار)',
     tAbDesc: 'پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.',
-    tAbL1t: 'هدف اصلی:', tAbL1d: 'اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.',
+    tAbL1t: 'هدف اصلی:', tAbL1d: 'اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.',
     tAbL2t: 'امنیت و زیرساخت:', tAbL2d: 'متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).',
     tAbL3t: 'ساختار چندسطحی (Referral & Team):', tAbL3d: 'ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.',
     tAbL4t: 'احساس واقع‌گرایی:', tAbL4d: 'وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.',
@@ -56,10 +52,6 @@ const ld = {
     m1: 'Home', m2: 'Quantification', m_poker: 'Casino Poker', m3: 'Deposit', m4: 'Withdraw', m5: 'Transactions', m6: 'Profile', m7: 'Support', mAbout: 'About Platform', m8: 'Logout',
     wel: 'Welcome', sub: 'User Dashboard Panel', st: 'Verified',
     ts1: 'Balance', ts2: 'Referrals',
-    tsTitle: 'Team & Referral Summary', tsManage: 'Full Management',
-    tsTotalCount: 'Total Members', tsTotalVol: 'Team Volume', tsTotalComm: 'Commissions Earned',
-    tsLvl1: 'Level 1 (10%):', tsLvl2: 'Level 2 (7%):', tsLvl3: 'Level 3 (3%):',
-    tsRefTitle: 'Your Exclusive Referral Link', tsCopy: 'Copy',
     c1: 'Quantification', d1: 'Smart Trading',
     c_poker: 'Casino Poker', d_poker: 'Play against dealer',
     c2: 'Deposit', d2: 'Account Recharge',
@@ -111,10 +103,6 @@ function setLang(lang) {
     'm1': t.m1, 'm2': t.m2, 'm_poker': t.m_poker, 'm3': t.m3, 'm4': t.m4, 'm5': t.m5, 'm6': t.m6, 'm7': t.m7, 'm_about': t.mAbout, 'm8': t.m8,
     't-wel': t.wel, 't-sub': t.sub, 't-st': t.st,
     'ts1': t.ts1, 'ts2': t.ts2,
-    't-ts-title': t.tsTitle, 't-ts-manage': t.tsManage,
-    't-ts-total-count': t.tsTotalCount, 't-ts-total-vol': t.tsTotalVol, 't-ts-total-comm': t.tsTotalComm,
-    't-ts-lvl1': t.tsLvl1, 't-ts-lvl2': t.tsLvl2, 't-ts-lvl3': t.tsLvl3,
-    't-ts-ref-title': t.tsRefTitle, 't-ts-copy': t.tsCopy,
     'c1': t.c1, 'd1': t.d1, 'c_poker': t.c_poker, 'd_poker': t.d_poker,
     'c2': t.c2, 'd2': t.d2, 'c3': t.c3, 'd3': t.d3,
     'c4': t.c4, 'd4': t.d4, 'c5': t.c5, 'd5': t.d5, 'c6': t.c6, 'd6': t.d6,
@@ -229,177 +217,6 @@ async function fetchCryptoMarket() {
   }
 }
 
-// ==========================================
-// کپی لینک دعوت در داشبورد
-// ==========================================
-window.copyDashInviteLink = function() {
-  const linkInput = document.getElementById("dash-invite-link");
-  const msgBox = document.getElementById("dash-copy-msg");
-  if (!linkInput || !linkInput.value) return;
-  
-  linkInput.select();
-  navigator.clipboard.writeText(linkInput.value).then(() => {
-    if (msgBox) {
-      const isFa = (localStorage.getItem('zenix_lang') || 'fa') === 'fa';
-      msgBox.textContent = isFa ? "📋 لینک دعوت با موفقیت کپی شد." : "📋 Referral link copied successfully.";
-      msgBox.style.display = "block";
-      setTimeout(() => { msgBox.style.display = "none"; }, 3000);
-    }
-  }).catch(err => {
-    console.error("Copy failed:", err);
-  });
-};
-
-function generateUIDDigits(userId) {
-  if (!userId) return '000000';
-  let hash = 5381;
-  let str = String(userId);
-  for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) + hash) + str.charCodeAt(i);
-  }
-  return (Math.abs(hash % 900000) + 100000).toString();
-}
-
-// ==========================================
-// محاسبه کامل آمار ۳ نسل زیرمجموعه‌گیری
-// ==========================================
-async function loadDashboardTeamData(uid, sessionUser) {
-  if (!uid || !supabase) return;
-
-  try {
-    let codeDigits = generateUIDDigits(uid);
-    let myRefCode = 'MS-' + codeDigits;
-
-    // ۱. استخراج کد دعوت کاربر از Supabase
-    try {
-      const { data: myProfile } = await supabase
-        .from('profiles')
-        .select('referral_code')
-        .eq('id', uid)
-        .maybeSingle();
-
-      if (myProfile && myProfile.referral_code) {
-        myRefCode = myProfile.referral_code;
-      }
-    } catch(e) {
-      console.warn("خطا در بارگیری referral_code کاربر:", e);
-    }
-
-    // ۲. تولید لینک دعوت
-    const inviteInput = document.getElementById('dash-invite-link');
-    if (inviteInput) {
-      inviteInput.value = new URL(`register.html?ref=${myRefCode}`, window.location.href).href;
-    }
-
-    // ۳. جمع‌آوری اطلاعات اعضا از جداول و متادیتا
-    let rawList = [];
-
-    try {
-      const { data: dbProfiles } = await supabase.from('profiles').select('*');
-      if (dbProfiles && Array.isArray(dbProfiles)) rawList.push(...dbProfiles);
-    } catch(e) {}
-
-    try {
-      const { data: dbUsers } = await supabase.from('users').select('*');
-      if (dbUsers && Array.isArray(dbUsers)) rawList.push(...dbUsers);
-    } catch(e) {}
-
-    if (sessionUser && sessionUser.user_metadata) {
-      let metaTeam = sessionUser.user_metadata.team_members || sessionUser.user_metadata.referrals || sessionUser.user_metadata.invited_users;
-      if (Array.isArray(metaTeam)) rawList.push(...metaTeam);
-    }
-
-    // ۴. حذف تکراری‌ها
-    let uniqueMap = new Map();
-    rawList.forEach(u => {
-      if (u) {
-        let key = u.user_id || u.id || u.email;
-        if (key) uniqueMap.set(key, u);
-      }
-    });
-    let allProfiles = Array.from(uniqueMap.values());
-
-    // ۵. منطق بررسی ارجاع
-    function isReferredBy(u, refUid, refCodeVal) {
-      if (!u) return false;
-      let uUid = u.user_id || u.id;
-      if (uUid === refUid) return false;
-
-      let digits = generateUIDDigits(refUid);
-      let defaultCode = 'MS-' + digits;
-      let legacyCode = 'SM-' + digits;
-
-      let refs = [
-        u.referred_by, u.referrer_id, u.invitation_code,
-        u.ref_code, u.inviter, u.referral_code, u.ref
-      ].map(x => x ? String(x).trim().toUpperCase() : '');
-
-      const targetCodes = [
-        String(refUid).toUpperCase(),
-        defaultCode.toUpperCase(),
-        legacyCode.toUpperCase(),
-        digits.toUpperCase()
-      ];
-      if (refCodeVal) targetCodes.push(String(refCodeVal).toUpperCase());
-
-      return refs.some(r => r && targetCodes.includes(r));
-    }
-
-    // ۶. تفکیک نسل‌های ۱، ۲ و ۳
-    let lvl1Users = allProfiles.filter(u => isReferredBy(u, uid, myRefCode));
-
-    let lvl2Users = [];
-    if (lvl1Users.length > 0) {
-      lvl2Users = allProfiles.filter(u => {
-        let uUid = u.user_id || u.id;
-        if (uUid === uid || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid)) return false;
-        return lvl1Users.some(l1 => isReferredBy(u, l1.user_id || l1.id, l1.referral_code));
-      });
-    }
-
-    let lvl3Users = [];
-    if (lvl2Users.length > 0) {
-      lvl3Users = allProfiles.filter(u => {
-        let uUid = u.user_id || u.id;
-        if (uUid === uid || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid) || lvl2Users.some(l2 => (l2.user_id || l2.id) === uUid)) return false;
-        return lvl2Users.some(l2 => isReferredBy(u, l2.user_id || l2.id, l2.referral_code));
-      });
-    }
-
-    // ۷. محاسبات
-    let l1Count = lvl1Users.length;
-    let l2Count = lvl2Users.length;
-    let l3Count = lvl3Users.length;
-    let totalCount = l1Count + l2Count + l3Count;
-
-    let l1Comm = lvl1Users.reduce((sum, u) => sum + Number(u.commission || u.l1_commission || u.reward || 0), 0);
-    let l2Comm = lvl2Users.reduce((sum, u) => sum + Number(u.commission || u.l2_commission || u.reward || 0), 0);
-    let l3Comm = lvl3Users.reduce((sum, u) => sum + Number(u.commission || u.l3_commission || u.reward || 0), 0);
-    let totalComm = l1Comm + l2Comm + l3Comm;
-
-    let teamVol = [...lvl1Users, ...lvl2Users, ...lvl3Users].reduce((sum, u) => sum + Number(u.volume || u.trading_volume || 0), 0);
-
-    // ۸. به‌روزرسانی DOM داشبورد
-    const refElem = document.getElementById('val-ref');
-    if (refElem) refElem.textContent = totalCount;
-
-    if (document.getElementById('dash-team-count')) document.getElementById('dash-team-count').textContent = totalCount;
-    if (document.getElementById('dash-team-volume')) document.getElementById('dash-team-volume').textContent = `$${teamVol.toFixed(2)}`;
-    if (document.getElementById('dash-team-comm')) document.getElementById('dash-team-comm').textContent = `${totalComm.toFixed(2)} USDT`;
-
-    if (document.getElementById('dash-lvl1-count')) document.getElementById('dash-lvl1-count').textContent = l1Count;
-    if (document.getElementById('dash-lvl2-count')) document.getElementById('dash-lvl2-count').textContent = l2Count;
-    if (document.getElementById('dash-lvl3-count')) document.getElementById('dash-lvl3-count').textContent = l3Count;
-
-    if (document.getElementById('dash-lvl1-comm')) document.getElementById('dash-lvl1-comm').textContent = `${l1Comm.toFixed(2)} USDT`;
-    if (document.getElementById('dash-lvl2-comm')) document.getElementById('dash-lvl2-comm').textContent = `${l2Comm.toFixed(2)} USDT`;
-    if (document.getElementById('dash-lvl3-comm')) document.getElementById('dash-lvl3-comm').textContent = `${l3Comm.toFixed(2)} USDT`;
-
-  } catch (err) {
-    console.error("خطا در محاسبه آمار زیرمجموعه‌ها در داشبورد:", err);
-  }
-}
-
 document.addEventListener('DOMContentLoaded', async () => {
   setLang(currLang);
   setupEventListeners();
@@ -410,6 +227,32 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!supabase) return;
   await checkUserSession();
 });
+
+// ==========================================
+// تابع بهینه‌شده دریافت تعداد زیرمجموعه‌ها با RPC
+// ==========================================
+async function getReferralCount(user, userData) {
+  if (!user || !supabase) return 0;
+
+  try {
+    // فراخوانی مستقیم تابع SQL تعریف‌شده در سوپابیس
+    const { data, error } = await supabase.rpc('get_my_referrals_stats');
+    
+    if (!error && data && data.length > 0) {
+      return Number(data[0].total_count || 0);
+    }
+  } catch (err) {
+    console.warn('خطا در فراخوانی RPC برای زیرمجموعه‌ها:', err);
+  }
+
+  // فال‌بک در صورت عدم دسترسی به تابع RPC: بررسی فیلدهای مستقیم کاربر
+  let directCount = userData?.referrals_count ?? userData?.referral_count ?? userData?.invited_count ?? userData?.team_count ?? userData?.total_referrals;
+  if (directCount !== undefined && directCount !== null) {
+    return Number(directCount);
+  }
+
+  return 0;
+}
 
 async function checkUserSession() {
   try {
@@ -457,8 +300,9 @@ async function checkUserSession() {
     const userIdElem = document.getElementById('user-id');
     const phoneInput = document.getElementById('user-phone-input');
     const balanceElem = document.getElementById('val-balance');
+    const refElem = document.getElementById('val-ref');
 
-    // به‌روزرسانی اطلاعات اصلی
+    // به‌روزرسانی اطلاعات داشبورد
     if (userData) {
       if (fullNameElem) {
         fullNameElem.textContent = userData.fullname || userData.full_name || userData.fullName || user.user_metadata?.fullname || user.user_metadata?.full_name || user.email || 'کاربر Zenix';
@@ -488,8 +332,11 @@ async function checkUserSession() {
       }
     }
 
-    // بارگیری آمار تیم و زیرمجموعه‌ها
-    await loadDashboardTeamData(user.id, user);
+    // به‌روزرسانی عدد زیرمجموعه‌ها روی کارت
+    if (refElem) {
+      const totalRef = await getReferralCount(user, userData);
+      refElem.textContent = totalRef;
+    }
 
   } catch (err) {
     console.error('خطای غیرمنتظره در بررسی نشست:', err);
