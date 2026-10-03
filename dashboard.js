@@ -11,6 +11,24 @@ if (SUPABASE_URL && SUPABASE_URL.startsWith('http')) {
 }
 
 // ==========================================
+// توابع کمکی حافظه و شناسه (مطابق فایل team.html)
+// ==========================================
+function safeGetItem(key) {
+  try { return localStorage.getItem(key); } catch(e) { return null; }
+}
+
+function generateUIDDigits(userId) {
+  if (!userId) return '000000';
+  let hash = 5381;
+  let str = String(userId);
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) + hash) + str.charCodeAt(i);
+  }
+  const num = Math.abs(hash % 900000) + 100000;
+  return num.toString();
+}
+
+// ==========================================
 // متغیرهای مدیریت اعلان‌ها و پیام‌ها
 // ==========================================
 window.cachedNotifications = [];
@@ -19,7 +37,7 @@ window.activeNotifFilter = 'all';
 // ==========================================
 // دیکشنری زبان‌ها و سیستم ترجمه
 // ==========================================
-let currLang = localStorage.getItem('zenix_lang') || 'fa';
+let currLang = safeGetItem('zenix_lang') || 'fa';
 
 const ld = {
   fa: {
@@ -39,7 +57,7 @@ const ld = {
     tAbL1t: 'هدف اصلی:', tAbL1d: 'اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.',
     tAbL2t: 'امنیت و زیرساخت:', tAbL2d: 'متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).',
     tAbL3t: 'ساختار چندسطحی (Referral & Team):', tAbL3d: 'ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.',
-    tAbL4t: 'احساس واقع‌گرایی:', tAbL4d: 'وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.',
+    tAbL4t: 'احساس واقع‌‌گرایی:', tAbL4d: 'وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.',
     modalTitle: 'صندوق پیام‌ها و اعلان‌ها', tabAll: 'همه', tabApproved: 'تایید درخواست', tabRejected: 'لغو درخواست', tabAdmin: 'پیام مدیریت',
     node: 'سرور فعال (US-East)',
     helpTitle: 'راهنمای صفحه داشبورد',
@@ -229,30 +247,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ==========================================
-// تابع تولید هش کد دعوت (مطابق با صفحه team.html)
-// ==========================================
-function generateUIDDigits(userId) {
-  if (!userId) return '000000';
-  let hash = 5381;
-  let str = String(userId);
-  for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) + hash) + str.charCodeAt(i);
-  }
-  const num = Math.abs(hash % 900000) + 100000;
-  return num.toString();
-}
-
-// ==========================================
-// تابع محاسبه و دریافت دقیق تعداد اعضای تیم (کاملاً هماهنگ با team.html)
+// محاسبه چندلایه و کامل اعضای تیم
 // ==========================================
 async function getReferralCount(user, userData) {
-  if (!user || !supabase) return 0;
+  if (!user) return 0;
 
-  try {
-    let codeDigits = generateUIDDigits(user.id);
-    let myRefCode = 'MS-' + codeDigits;
+  let codeDigits = generateUIDDigits(user.id);
+  let myRefCode = 'MS-' + codeDigits;
 
-    // دریافت کد دعوت کاربر از پروفایل
+  // ۱. دریافت کد دعوت اختصاصی کاربر
+  if (supabase) {
     try {
       const { data: myProfile } = await supabase
         .from('profiles')
@@ -263,41 +267,50 @@ async function getReferralCount(user, userData) {
       if (myProfile && myProfile.referral_code) {
         myRefCode = myProfile.referral_code;
       }
-    } catch (e) {
-      console.warn('خطا در دریافت کد دعوت از پروفایل:', e);
-    }
+    } catch (e) {}
+  }
 
+  // ۲. محاسبه شبکه اعضا بر اساس ۳ نسل (مطابق team.html)
+  try {
     let rawList = [];
 
-    // دریافت تمام پروفایل‌ها از دیتابیس
-    try {
-      const { data: dbProfiles } = await supabase.from('profiles').select('*');
-      if (dbProfiles && Array.isArray(dbProfiles)) {
-        rawList.push(...dbProfiles);
-      }
-    } catch (e) {
-      console.warn('خطا در دریافت پروفایل‌ها:', e);
+    if (supabase) {
+      try {
+        const { data: dbProfiles } = await supabase.from('profiles').select('*');
+        if (dbProfiles && Array.isArray(dbProfiles)) rawList.push(...dbProfiles);
+      } catch (e) {}
+
+      try {
+        const { data: dbUsers } = await supabase.from('users').select('*');
+        if (dbUsers && Array.isArray(dbUsers)) rawList.push(...dbUsers);
+      } catch (e) {}
     }
 
-    // دریافت از جدول users جهت اطمینان
-    try {
-      const { data: dbUsers } = await supabase.from('users').select('*');
-      if (dbUsers && Array.isArray(dbUsers)) {
-        rawList.push(...dbUsers);
-      }
-    } catch (e) {}
+    if (user.user_metadata) {
+      let metaTeam = user.user_metadata.team_members || user.user_metadata.referrals || user.user_metadata.invited_users;
+      if (Array.isArray(metaTeam)) rawList.push(...metaTeam);
+    }
 
-    // یکتا سازی لیست
+    ['zenix_registered_users', 'zenix_users', 'zenix_referrals', 'zenix_team_' + user.id, 'zenix_all_users'].forEach(k => {
+      let item = safeGetItem(k);
+      if (item) {
+        try {
+          let parsed = JSON.parse(item);
+          if (Array.isArray(parsed)) rawList.push(...parsed);
+          else if (parsed && typeof parsed === 'object') rawList.push(parsed);
+        } catch(e) {}
+      }
+    });
+
     let uniqueMap = new Map();
     rawList.forEach(u => {
       if (u) {
-        let key = u.user_id || u.id || u.email || u.username;
-        if (key) uniqueMap.set(key, u);
+        let key = u.user_id || u.id || u.email || u.username || JSON.stringify(u);
+        uniqueMap.set(key, u);
       }
     });
     let allProfiles = Array.from(uniqueMap.values());
 
-    // تابع شناسایی زیرمجموعه‌ها
     function isReferredBy(u, refUid, refCodeVal) {
       if (!u) return false;
       let uUid = u.user_id || u.id;
@@ -328,7 +341,6 @@ async function getReferralCount(user, userData) {
       return refs.some(r => r && targetCodes.includes(r));
     }
 
-    // محاسبه نسل اول، دوم و سوم
     let lvl1Users = allProfiles.filter(u => isReferredBy(u, user.id, myRefCode));
 
     let lvl2Users = [];
@@ -349,23 +361,40 @@ async function getReferralCount(user, userData) {
       });
     }
 
-    let totalCalculated = lvl1Users.length + lvl2Users.length + lvl3Users.length;
-    if (totalCalculated > 0) {
-      return totalCalculated;
+    let calculatedTotal = lvl1Users.length + lvl2Users.length + lvl3Users.length;
+    if (calculatedTotal > 0) {
+      return calculatedTotal;
     }
   } catch (err) {
-    console.warn('خطا در محاسبه شبکه تیم:', err);
+    console.warn("خطا در محاسبه شبکه اعضا:", err);
   }
 
-  // بررسی متادیتا و فیلدهای مستقیم کاربر
-  let directCount = userData?.team_count ?? userData?.total_referrals ?? userData?.referrals_count ?? userData?.referral_count ?? userData?.invited_count;
-  if (directCount !== undefined && directCount !== null && !isNaN(Number(directCount))) {
-    return Number(directCount);
+  // ۳. بررسی مستقیم فیلدهای کاربر در دیتابیس
+  if (userData) {
+    let directCount = userData.team_count ?? userData.total_referrals ?? userData.referrals_count ?? userData.referral_count ?? userData.invited_count;
+    if (directCount !== undefined && directCount !== null && !isNaN(Number(directCount)) && Number(directCount) > 0) {
+      return Number(directCount);
+    }
+    if (Array.isArray(userData.referrals) && userData.referrals.length > 0) {
+      return userData.referrals.length;
+    }
+    if (Array.isArray(userData.team_members) && userData.team_members.length > 0) {
+      return userData.team_members.length;
+    }
   }
 
+  // ۴. بررسی متادیتای کاربر در ثبت‌نام (User Metadata)
   if (user.user_metadata) {
-    let metaCount = user.user_metadata.referral_count || user.user_metadata.invited_count || user.user_metadata.team_count;
-    if (metaCount) return Number(metaCount);
+    let metaCount = user.user_metadata.team_count || user.user_metadata.referral_count || user.user_metadata.invited_count || user.user_metadata.total_referrals;
+    if (metaCount && !isNaN(Number(metaCount)) && Number(metaCount) > 0) {
+      return Number(metaCount);
+    }
+    if (Array.isArray(user.user_metadata.team_members) && user.user_metadata.team_members.length > 0) {
+      return user.user_metadata.team_members.length;
+    }
+    if (Array.isArray(user.user_metadata.referrals) && user.user_metadata.referrals.length > 0) {
+      return user.user_metadata.referrals.length;
+    }
   }
 
   return 0;
@@ -419,7 +448,7 @@ async function checkUserSession() {
     const balanceElem = document.getElementById('val-balance');
     const refElem = document.getElementById('val-ref');
 
-    // به‌‌روزرسانی اطلاعات داشبورد
+    // به‌روزرسانی اطلاعات داشبورد
     if (userData) {
       if (fullNameElem) {
         fullNameElem.textContent = userData.fullname || userData.full_name || userData.fullName || user.user_metadata?.fullname || user.user_metadata?.full_name || user.email || 'کاربر Zenix';
