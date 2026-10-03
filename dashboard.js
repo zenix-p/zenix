@@ -239,6 +239,7 @@ async function checkUserSession() {
 
     const user = session.user;
 
+    // بارگیری اعلان‌های کاربر از سوپابیس
     try {
       const { data, error: notifError } = await supabase
         .from('notifications')
@@ -276,9 +277,10 @@ async function checkUserSession() {
     const balanceElem = document.getElementById('val-balance');
     const refElem = document.getElementById('val-ref');
 
+    // به‌روزرسانی اطلاعات نام و مقادیر داشبورد
     if (userData) {
       if (fullNameElem) {
-        fullNameElem.textContent = userData.full_name || userData.fullname || userData.fullName || user.user_metadata?.fullname || 'کاربر Zenix';
+        fullNameElem.textContent = userData.fullname || userData.full_name || userData.fullName || user.user_metadata?.fullname || user.user_metadata?.full_name || user.email || 'کاربر Zenix';
       }
       
       if (userIdElem) {
@@ -299,7 +301,7 @@ async function checkUserSession() {
       }
     } else {
       if (fullNameElem) {
-        fullNameElem.textContent = user.user_metadata?.fullname || user.email?.split('@')[0] || 'کاربر Zenix';
+        fullNameElem.textContent = user.user_metadata?.fullname || user.user_metadata?.full_name || user.email?.split('@')[0] || 'کاربر Zenix';
       }
       if (userIdElem) {
         userIdElem.textContent = `UID: ${user.id.slice(0, 8)}`;
