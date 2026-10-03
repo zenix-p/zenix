@@ -28,7 +28,7 @@
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
         body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
         
-        /* سیستم توست نوتیفیکیشن اختصاصی */
+        /* سیستم توست نوتیفیکیشن اختصاصی Zenix */
         .toast-container {
             position: fixed;
             top: 20px;
@@ -460,6 +460,7 @@
         let allMessages = [];
         let currentUserId = null;
         let userRealtimeChannel = null;
+        let notificationRealtimeChannel = null;
         let hasShownWelcomeToast = false;
 
         function generateUIDDigits(userId) {
@@ -496,39 +497,46 @@
             }
         }
 
+        /* دریافت اعلانات عمومی و اختصاصی کاربر بر اساس ساختار کوانتیفیکیشن */
         async function fetchUserMessages(uid) {
           try {
             const { data, error } = await supabaseClient
               .from('notifications')
               .select('*')
-              .eq('user_id', uid)
+              .or(`user_id.eq.${uid},user_id.is.null`)
               .order('created_at', { ascending: false });
 
             if (error) throw error;
 
             return (data || []).map(dt => ({
               id: dt.id,
-              subject: dt.title || dt.subject || 'Announcement',
+              subject: dt.title || dt.subject || 'اطلاعیه مدیریت',
               body: dt.message || dt.text || dt.body || '',
               time: dt.created_at || dt.timestamp || dt.time || new Date().toISOString(),
               read: dt.read === true || dt.is_read === true
             }));
           } catch (e) {
-            console.error(e);
+            console.error('خطا در دریافت اعلانات:', e);
             return [];
+          }
+        }
+
+        /* به‌روزرسانی شمارنده اعلانات خوانده‌نشده روی زنگوله */
+        async function updateNotificationBadge() {
+          if (!currentUserId) return;
+          allMessages = await fetchUserMessages(currentUserId);
+          let unread = allMessages.filter(m => !m.read).length;
+          let b = document.getElementById('bell-badge');
+          if (b) { 
+            b.textContent = unread; 
+            b.classList.toggle('show', unread > 0); 
           }
         }
 
         window.openMessageModal = async () => {
           let c = document.getElementById('modal-msg-container');
           if (currentUserId) {
-            allMessages = await fetchUserMessages(currentUserId);
-            let unread = allMessages.filter(m => !m.read).length;
-            let b = document.getElementById('bell-badge');
-            if (b) { 
-              b.textContent = unread; 
-              b.classList.toggle('show', unread > 0); 
-            }
+            await updateNotificationBadge();
           }
           if (allMessages.length > 0) {
             renderMessageList();
@@ -545,7 +553,7 @@
             let dTime = '';
             if (m.time) {
               let d = new Date(m.time);
-              dTime = isNaN(d.getTime()) ? String(m.time) : d.toUTCString();
+              dTime = isNaN(d.getTime()) ? String(m.time) : d.toLocaleString('fa-IR');
             }
             let unread = !m.read;
             html += `<div class="msg-body-box" style="cursor:pointer;border-right:${unread ? '3px solid #38bdf8' : '1px solid rgba(255,255,255,.08)'};" onclick="window.readAdminMessage(${idx})">
@@ -583,7 +591,7 @@
           let dTime = '';
           if (m.time) {
             let d = new Date(m.time);
-            dTime = isNaN(d.getTime()) ? String(m.time) : d.toUTCString();
+            dTime = isNaN(d.getTime()) ? String(m.time) : d.toLocaleString('fa-IR');
           }
           c.innerHTML = `<button onclick="window.openMessageModal()" style="background:none;border:none;color:#38bdf8;cursor:pointer;font-size:12px;margin-bottom:12px;display:flex;align-items:center;gap:5px;padding:0;"><i class="fas fa-arrow-right"></i> بازگشت به لیست پیام‌ها</button>
           <div class="msg-body-box" style="padding:16px;">
@@ -732,18 +740,48 @@
           }
         }
 
+        /* راه اندازی لیسنرهای آنی (Real-time) سوپابیس برای اطلاعات کاربر و اعلانات */
+        async function setupRealtimeSubscriptions(userId) {
+            if (userRealtimeChannel) {
+              await supabaseClient.removeChannel(userRealtimeChannel);
+            }
+            if (notificationRealtimeChannel) {
+              await supabaseClient.removeChannel(notificationRealtimeChannel);
+            }
+
+            userRealtimeChannel = supabaseClient
+              .channel('user_realtime_' + userId)
+              .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${userId}` }, payload => {
+                if (currentUser) loadUserData(currentUser);
+              })
+              .subscribe();
+
+            notificationRealtimeChannel = supabaseClient
+              .channel('notifications_realtime_' + userId)
+              .on('postgres_changes', { 
+                event: '*', 
+                schema: 'public', 
+                table: 'notifications' 
+              }, async (payload) => {
+                const newRec = payload.new;
+                if (!newRec || !newRec.user_id || newRec.user_id === userId) {
+                  await updateNotificationBadge();
+                  if (payload.eventType === 'INSERT') {
+                    const title = newRec.title || newRec.subject || 'اعلان جدید';
+                    const msg = newRec.message || newRec.text || newRec.body || '';
+                    window.showToast(`<strong>${title}</strong><br>${msg}`, 'info', 7000);
+                  }
+                }
+              })
+              .subscribe();
+        }
+
         supabaseClient.auth.onAuthStateChange(async (event, session) => {
           if (session && session.user) {
             currentUser = session.user;
             currentUserId = session.user.id;
 
-            allMessages = await fetchUserMessages(session.user.id);
-            let unread = allMessages.filter(m => !m.read).length;
-            let b = document.getElementById('bell-badge');
-            if (b) { 
-                b.textContent = unread; 
-                b.classList.toggle('show', unread > 0); 
-            }
+            await updateNotificationBadge();
 
             ['email-curr', 'pwd-email', 'tr-email', 'wal-email'].forEach(id => {
                 const el = document.getElementById(id);
@@ -758,24 +796,13 @@
             }
 
             await loadUserData(session.user);
-
-            if (userRealtimeChannel) {
-              await supabaseClient.removeChannel(userRealtimeChannel);
-              userRealtimeChannel = null;
-            }
-
-            userRealtimeChannel = supabaseClient
-              .channel('user_realtime_' + session.user.id)
-              .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${session.user.id}` }, payload => {
-                loadUserData(session.user);
-              })
-              .subscribe();
+            await setupRealtimeSubscriptions(session.user.id);
 
           } else {
-            if (userRealtimeChannel) {
-              await supabaseClient.removeChannel(userRealtimeChannel);
-              userRealtimeChannel = null;
-            }
+            if (userRealtimeChannel) await supabaseClient.removeChannel(userRealtimeChannel);
+            if (notificationRealtimeChannel) await supabaseClient.removeChannel(notificationRealtimeChannel);
+            userRealtimeChannel = null;
+            notificationRealtimeChannel = null;
             window.location.href = "index.html";
           }
         });
@@ -939,10 +966,10 @@
         });
 
         document.getElementById('logout-btn').onclick = async () => {
-            if (userRealtimeChannel) {
-              await supabaseClient.removeChannel(userRealtimeChannel);
-              userRealtimeChannel = null;
-            }
+            if (userRealtimeChannel) await supabaseClient.removeChannel(userRealtimeChannel);
+            if (notificationRealtimeChannel) await supabaseClient.removeChannel(notificationRealtimeChannel);
+            userRealtimeChannel = null;
+            notificationRealtimeChannel = null;
             await supabaseClient.auth.signOut();
             window.location.href = "index.html";
         };
