@@ -36,7 +36,7 @@ const ld = {
     tMkt: 'بازار ارزهای دیجیتال (۳ ارز برتر منبع زنده)', tLive: 'زنده',
     tAbTitle: 'درباره پلتفرم Zenix (هدف، ماهیت و ساختار)',
     tAbDesc: 'پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.',
-    tAbL1t: 'هدف اصلی:', tAbL1d: 'اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.',
+    tAbL1t: 'هدف اصلی:', tAbL1d: 'اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.',
     tAbL2t: 'امنیت و زیرساخت:', tAbL2d: 'متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).',
     tAbL3t: 'ساختار چندسطحی (Referral & Team):', tAbL3d: 'ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.',
     tAbL4t: 'احساس واقع‌گرایی:', tAbL4d: 'وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.',
@@ -228,8 +228,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   await checkUserSession();
 });
 
-// تابع محاسبه و شمارش دقیق زیرمجموعه‌ها براساس منطق صفحه تیم
+// ==========================================
+// تابع محاسبه ایمن زیرمجموعه‌ها (بدون خطای 400 سوپابیس)
+// ==========================================
 async function getReferralCount(user, userData) {
+  // ۱. بررسی اولویت‌دار فیلدهای عددی
   let count = userData?.referrals_count ?? userData?.referral_count ?? userData?.invited_count ?? userData?.team_count ?? userData?.ref_count;
   if (count !== undefined && count !== null && Number(count) > 0) {
     return Number(count);
@@ -240,6 +243,7 @@ async function getReferralCount(user, userData) {
     return Number(metaCount);
   }
 
+  // ۲. محاسبه فرانت‌اندی هماهنگ با team.html برای جلوگیری از خطای REST API
   try {
     const uid = user.id;
     let hash = 5381;
@@ -248,29 +252,68 @@ async function getReferralCount(user, userData) {
       hash = ((hash << 5) + hash) + str.charCodeAt(i);
     }
     const digits = (Math.abs(hash % 900000) + 100000).toString();
-    const code1 = 'MS-' + digits;
-    const code2 = 'SM-' + digits;
+    const defaultCode = 'MS-' + digits;
+    const legacyCode = 'SM-' + digits;
     const customCode = userData?.referral_code || user.user_metadata?.referral_code;
 
-    const { count: dbCount, error } = await supabase
-      .from('users')
-      .select('id', { count: 'exact', head: true })
-      .or(`referred_by.eq.${uid},referrer_id.eq.${uid},referred_by.eq.${code1},referred_by.eq.${code2}${customCode ? `,referred_by.eq.${customCode}` : ''}`);
+    const targetCodes = [
+      String(uid).toUpperCase(),
+      defaultCode.toUpperCase(),
+      legacyCode.toUpperCase(),
+      digits.toUpperCase()
+    ];
+    if (customCode) targetCodes.push(String(customCode).toUpperCase());
 
-    if (!error && dbCount !== null && dbCount > 0) {
-      return dbCount;
+    let rawList = [];
+
+    // فراخوانی ایمن جداول بدون ساختار فیلترهای آسیب‌پذیر
+    const { data: dbProfiles } = await supabase.from('profiles').select('*');
+    if (dbProfiles && Array.isArray(dbProfiles)) {
+      rawList.push(...dbProfiles);
     }
 
-    const { count: profCount, error: profErr } = await supabase
-      .from('profiles')
-      .select('id', { count: 'exact', head: true })
-      .or(`referred_by.eq.${uid},referrer_id.eq.${uid},referred_by.eq.${code1},referred_by.eq.${code2}${customCode ? `,referred_by.eq.${customCode}` : ''}`);
-
-    if (!profErr && profCount !== null && profCount > 0) {
-      return profCount;
+    const { data: dbUsers } = await supabase.from('users').select('*');
+    if (dbUsers && Array.isArray(dbUsers)) {
+      rawList.push(...dbUsers);
     }
+
+    if (user.user_metadata) {
+      let metaTeam = user.user_metadata.team_members || user.user_metadata.referrals || user.user_metadata.invited_users;
+      if (Array.isArray(metaTeam)) rawList.push(...metaTeam);
+    }
+
+    let uniqueMap = new Map();
+    rawList.forEach(u => {
+      if (u) {
+        let key = u.user_id || u.id || u.email || u.username || JSON.stringify(u);
+        uniqueMap.set(key, u);
+      }
+    });
+
+    let allProfiles = Array.from(uniqueMap.values());
+
+    let lvl1Users = allProfiles.filter(u => {
+      if (!u) return false;
+      let uUid = u.user_id || u.id;
+      if (uUid === uid) return false;
+
+      let refs = [
+        u.referred_by,
+        u.referrer_id,
+        u.invitation_code,
+        u.ref_code,
+        u.inviter,
+        u.referral_code,
+        u.ref
+      ].map(x => x ? String(x).trim().toUpperCase() : '');
+
+      return refs.some(r => r && targetCodes.includes(r));
+    });
+
+    return lvl1Users.length;
+
   } catch (e) {
-    console.warn('خطا در دریافت تعداد زیرمجموعه‌ها از دیتابیس:', e);
+    console.warn('خطا در محاسبه تعداد زیرمجموعه‌ها:', e);
   }
 
   return Number(count || metaCount || 0);
