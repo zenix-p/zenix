@@ -180,6 +180,7 @@
             <button class="modal-close" onclick="window.closeMsgDetailModal()"><i class="fas fa-times"></i></button>
         </div>
         <div style="overflow-y:auto;padding-right:6px">
+            <div id="detail-msg-date" style="font-size:11px;color:#94a3b8;direction:ltr;text-align:left;margin-bottom:10px;display:none;"></div>
             <div id="detail-msg-body" style="font-size:13px;color:#cbd5e1;line-height:1.7;white-space:pre-wrap;margin-bottom:12px;"></div>
             <div id="detail-msg-support"></div>
         </div>
@@ -261,6 +262,19 @@ window.cachedNotifications = [];
 window.currentFilteredNotifs = [];
 window.activeNotifFilter = 'all';
 
+// تابع فرمت‌دهی تاریخ و ساعت به میلادی
+window.formatGregorianDate = function(rawDate) {
+  if (!rawDate) return '';
+  const d = new Date(rawDate);
+  if (isNaN(d.getTime())) return '';
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+};
+
 window.updateBellBadge = function() {
   const unreadCount = window.cachedNotifications.filter(n => !n.read && !n.isRead && !n.is_read).length;
   const badge = document.getElementById('bell-badge');
@@ -306,7 +320,7 @@ window.openMsgDetail = async function(idx) {
     window.updateBellBadge();
     window.renderNotifications();
 
-    // بروزرسانی دیتابیس Supabase با بررسی خطا و تست ستون‌های احتمالی
+    // بروزرسانی دیتابیس Supabase
     try {
       const { data, error } = await supabase
         .from('notifications')
@@ -337,12 +351,24 @@ window.openMsgDetail = async function(idx) {
   const title = n.title || 'پیام سیستم';
   const msg = n.message || n.text || n.body || '';
   const category = window.getNotifCategory(n);
+  const dateStr = window.formatGregorianDate(n.created_at || n.date || n.created_date);
 
   const detailTitle = document.getElementById('detail-msg-title');
+  const detailDate = document.getElementById('detail-msg-date');
   const detailBody = document.getElementById('detail-msg-body');
   const detailSupport = document.getElementById('detail-msg-support');
 
   if (detailTitle) detailTitle.innerHTML = `<i class="fas fa-bell" style="color:#38bdf8"></i> ${title}`;
+  
+  if (detailDate) {
+    if (dateStr) {
+      detailDate.innerHTML = `<i class="far fa-clock" style="color:#38bdf8;margin-right:4px;"></i>${dateStr}`;
+      detailDate.style.display = 'block';
+    } else {
+      detailDate.style.display = 'none';
+    }
+  }
+
   if (detailBody) detailBody.innerText = msg;
 
   if (detailSupport) {
@@ -384,6 +410,7 @@ window.renderNotifications = function() {
     const title = n.title || 'پیام سیستم';
     const category = window.getNotifCategory(n);
     const isUnread = !n.read && !n.isRead && !n.is_read;
+    const dateStr = window.formatGregorianDate(n.created_at || n.date || n.created_date);
 
     let borderStyle = "border:1px solid rgba(255,255,255,.08);";
     let bgStyle = "background:rgba(255,255,255,.03);";
@@ -403,6 +430,7 @@ window.renderNotifications = function() {
     }
 
     const unreadDot = isUnread ? '<span style="width:8px;height:8px;background:#ef4444;border-radius:50%;display:inline-block;margin-left:4px;" title="خوانده نشده"></span>' : '';
+    const dateDisplay = dateStr ? `<div style="font-size:11px;color:#94a3b8;margin-top:6px;direction:ltr;text-align:left;"><i class="far fa-clock" style="margin-right:4px;"></i>${dateStr}</div>` : '';
 
     html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle} cursor:pointer;" onclick="window.openMsgDetail(${idx})">
       <div class="msg-title-text" style="display:flex;align-items:center;gap:8px;">
@@ -411,6 +439,7 @@ window.renderNotifications = function() {
         <span>${title}</span>
         ${tagHtml}
       </div>
+      ${dateDisplay}
     </div>`;
   });
 
@@ -508,7 +537,7 @@ async function initPage() {
         }
 
         try {
-            const { data, error: notifError } = await supabase.from('notifications').select('*').eq('user_id', user.id);
+            const { data, error: notifError } = await supabase.from('notifications').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
             if (!notifError && data) {
                 window.cachedNotifications = data;
                 window.renderNotifications();
