@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zenix Multiplayer 3D Roulette</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-glow: #22c55e;
+            --accent-blue: #38bdf8;
+            --gold-accent: #facc15;
+            --bg-dark: #020617;
+            --felt-green: #064e3b;
+            --felt-border: #022c22;
+            --glass-border: rgba(255, 255, 255, 0.12);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', 'Vazirmatn', sans-serif; user-select: none; }
+        body {
+            background: var(--bg-dark);
+            min-height: 100vh;
+            color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 30%, #1e293b 0%, #020617 85%);
+        }
+
+        /* هدر استیج */
+        header {
+            background: rgba(15, 23, 42, 0.9);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 10px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(16px);
+            z-index: 100;
+        }
+        .logo { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 18px; color: var(--gold-accent); display: flex; align-items: center; gap: 8px; }
+        
+        .history-bar { display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.4); padding: 4px 12px; border-radius: 20px; border: 1px solid var(--glass-border); }
+        .history-title { font-size: 11px; color: #94a3b8; font-weight: 700; margin-left: 6px; }
+        .hist-num { width: 26px; height: 26px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 11px; font-weight: 800; font-family: 'Orbitron'; color: #fff; }
+        .hist-red { background: #dc2626; }
+        .hist-black { background: #1e293b; border: 1px solid #475569; }
+        .hist-green { background: #16a34a; }
+
+        .user-stats { display: flex; align-items: center; gap: 15px; }
+        .stat-pill { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 6px 16px; border-radius: 30px; display: flex; align-items: center; gap: 8px; }
+        .stat-val { font-family: 'Orbitron', sans-serif; font-weight: 800; color: var(--primary-glow); }
+
+        /* صحنه اصلی بازی */
+        .main-stage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            gap: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* چرخ رولت و آواتارها */
+        .top-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            gap: 20px;
+        }
+
+        /* صندلی‌های بازیکنان مجازی */
+        .players-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 180px;
+        }
+        .player-card {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+        }
+        .player-avatar {
+            width: 36px; height: 36px; border-radius: 50%; background-size: cover; background-position: center; border: 2px solid #64748b;
+        }
+        .p-info { display: flex; flex-direction: column; }
+        .p-name { font-size: 12px; font-weight: 700; color: #e2e8f0; }
+        .p-status { font-size: 10px; font-family: 'Orbitron'; color: var(--gold-accent); }
+
+        /* چرخ سه‌بعدی Canvas */
+        .wheel-box {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, #2d160a 0%, #020617 70%);
+            border-radius: 50%;
+            border: 8px solid #42281d;
+            box-shadow: 0 0 50px rgba(0,0,0,0.9), 0 0 30px rgba(250, 204, 21, 0.15);
+        }
+        canvas#rouletteWheel { transform: rotate(0deg); transition: transform 0.05s linear; }
+
+        .wheel-pointer {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0; height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 20px solid var(--gold-accent);
+            z-index: 10;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
+        }
+
+        /* تایمر و پیام مرکزی */
+        .status-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 180px;
+        }
+        .timer-circle {
+            width: 70px; height: 70px; border-radius: 50%;
+            border: 4px solid var(--accent-blue);
+            display: flex; justify-content: center; align-items: center;
+            font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 24px;
+            color: #fff; background: rgba(15, 23, 42, 0.8);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+        }
+        .status-text { font-size: 12px; font-weight: 800; color: var(--gold-accent); text-align: center; }
+
+        /* میز شرط‌بندی (Roulette Layout Grid) */
+        .table-viewport {
+            perspective: 800px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .roulette-table {
+            transform: rotateX(25deg);
+            background: var(--felt-green);
+            border: 14px solid var(--felt-border);
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.95), inset 0 0 60px rgba(0,0,0,0.8);
+            display: grid;
+            grid-template-columns: 50px repeat(12, 1fr) 60px;
+            grid-template-rows: repeat(3, 48px) 40px 40px;
+            gap: 3px;
+            position: relative;
+            max-width: 950px;
+            width: 100%;
+        }
+
+        .cell {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 800;
+            font-size: 14px;
+            color: #fff;
+            cursor: pointer;
+            position: relative;
+            border-radius: 4px;
+            transition: 0.15s;
+        }
+        .cell:hover { background: rgba(250, 204, 21, 0.3); border-color: var(--gold-accent); }
+        .cell.red-num { background: rgba(220, 38, 38, 0.85); }
+        .cell.black-num { background: rgba(15, 23, 42, 0.9); }
+        .cell.zero-num { grid-row: 1 / span 3; background: #16a34a; font-size: 18px; }
+
+        .cell.outside-bet { font-size: 11px; font-weight: 800; background: rgba(15, 23, 42, 0.7); }
+        .cell.outside-red { background: rgba(220, 38, 38, 0.7); }
+        .cell.outside-black { background: rgba(15, 23, 42, 0.9); }
+
+        /* ژتون‌های روی میز */
+        .chip-on-table {
+            position: absolute;
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            border: 2px dashed #fff;
+            font-family: 'Orbitron';
+            font-size: 8px;
+            font-weight: 900;
+            display: flex; justify-content: center; align-items: center;
+            color: #000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.8);
+            pointer-events: none;
+            z-index: 5;
+            animation: chipDrop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes chipDrop { from { transform: scale(2) translateY(-20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+
+        .chip-10 { background: #38bdf8; }
+        .chip-50 { background: #facc15; }
+        .chip-100 { background: #22c55e; }
+        .chip-500 { background: #a855f7; color: #fff; }
+
+        .bot-dot {
+            position: absolute; width: 8px; height: 8px; border-radius: 50%; top: -2px; right: -2px; border: 1px solid #fff;
+        }
+
+        /* کنترل پنل پایین */
+        .control-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 1px solid var(--glass-border);
+            padding: 12px 24px;
+            backdrop-filter: blur(16px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 200;
+        }
+
+        .chip-rack { display: flex; gap: 12px; align-items: center; }
+        .chip-select {
+            width: 48px; height: 48px; border-radius: 50%;
+            border: 3px dashed #fff;
+            display: flex; justify-content: center; align-items: center;
+            font-family: 'Orbitron'; font-weight: 900; font-size: 11px; color: #000;
+            cursor: pointer; transition: 0.2s; box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+        }
+        .chip-select:hover, .chip-select.active { transform: translateY(-6px) scale(1.1); border-style: solid; border-color: var(--gold-accent); box-shadow: 0 0 20px var(--gold-accent); }
+
+        .action-btns { display: flex; gap: 10px; }
+        .btn-act {
+            padding: 10px 20px; border-radius: 10px; border: none; font-weight: 800; font-size: 12px; cursor: pointer; color: #fff; transition: 0.2s;
+        }
+        .btn-clear { background: #ef4444; }
+        .btn-double { background: #0ea5e9; }
+        .btn-clear:hover { background: #dc2626; }
+        .btn-double:hover { background: #0284c7; }
+
+        /* برنده شدن هایلایت */
+        .winning-cell { animation: winPulse 0.8s infinite alternate; border-color: var(--gold-accent) !important; z-index: 10; }
+        @keyframes winPulse { from { box-shadow: 0 0 5px var(--gold-accent); } to { box-shadow: 0 0 25px var(--gold-accent); background: rgba(250, 204, 21, 0.6); } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo"><i class="fas fa-dharmachakra"></i> ZENIX ROULETTE</div>
+        
+        <div class="history-bar">
+            <span class="history-title">دست‌های اخیر:</span>
+            <div id="history-list" style="display:flex; gap:4px;"></div>
+        </div>
+
+        <div class="user-stats">
+            <div class="stat-pill">
+                <span style="font-size:11px; color:#94a3b8;">مجموع شرط:</span>
+                <span class="stat-val" id="total-bet-val">$0</span>
+            </div>
+            <div class="stat-pill">
+                <span style="font-size:11px; color:#94a3b8;">موجودی:</span>
+                <span class="stat-val" id="balance-val" style="color:var(--gold-accent);">$1,000</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-stage">
+        <div class="top-section">
+            <!-- بازیکنان مجازی ۱ و ۲ -->
+            <div class="players-container">
+                <div class="player-card">
+                    <div class="player-avatar" style="background-image:url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80')"></div>
+                    <div class="p-info"><span class="p-name">Alex</span><span class="p-status" id="bet-p1">در حال انتخاب...</span></div>
+                </div>
+                <div class="player-card">
+                    <div class="player-avatar" style="background-image:url('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80')"></div>
+                    <div class="p-info"><span class="p-name">Dmitry</span><span class="p-status" id="bet-p2">در حال انتخاب...</span></div>
+                </div>
+            </div>
+
+            <!-- چرخ رولت -->
+            <div class="wheel-box">
+                <div class="wheel-pointer"></div>
+                <canvas id="rouletteWheel" width="280" height="280"></canvas>
+            </div>
+
+            <!-- وضعیت و بازیکنان مجازی ۳ و ۴ -->
+            <div class="status-center">
+                <div class="timer-circle" id="timer-display">12</div>
+                <div class="status-text" id="status-msg">ژتون‌های خود را قرار دهید</div>
+            </div>
+
+            <div class="players-container">
+                <div class="player-card">
+                    <div class="player-avatar" style="background-image:url('https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80')"></div>
+                    <div class="p-info"><span class="p-name">Sarah</span><span class="p-status" id="bet-p3">در حال انتخاب...</span></div>
+                </div>
+                <div class="player-card">
+                    <div class="player-avatar" style="background-image:url('https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=100&q=80')"></div>
+                    <div class="p-info"><span class="p-name">Marco</span><span class="p-status" id="bet-p4">در حال انتخاب...</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- میز سه‌بعدی شرط‌بندی -->
+        <div class="table-viewport">
+            <div class="roulette-table" id="roulette-table">
+                <!-- خانه صفر -->
+                <div class="cell zero-num" data-bet="0">0</div>
+
+                <!-- اعداد 1 تا 36 در 3 سطر -->
+                <!-- تولید داینامیک توسط JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- پنل کنترل پایین -->
+    <div class="control-bar">
+        <div class="chip-rack">
+            <span style="font-size:11px; color:#94a3b8; font-weight:700;">انتخاب ژتون:</span>
+            <div class="chip-select chip-10 active" onclick="selectChip(10, this)">$10</div>
+            <div class="chip-select chip-50" onclick="selectChip(50, this)">$50</div>
+            <div class="chip-select chip-100" onclick="selectChip(100, this)">$100</div>
+            <div class="chip-select chip-500" onclick="selectChip(500, this)">$500</div>
+        </div>
+
+        <div class="action-btns">
+            <button class="btn-act btn-clear" onclick="clearUserBets()"><i class="fas fa-trash"></i> پاک کردن شرط‌ها</button>
+            <button class="btn-act btn-double" onclick="doubleUserBets()"><i class="fas fa-clone"></i> دو برابر کردن</button>
+        </div>
+    </div>
+
+    <script>
+        // ترتیب رسمی اعداد رولت اروپایی
+        const wheelNumbers = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3];
+        const redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+        
+        let userBalance = 1000;
+        let selectedChipVal = 10;
+        let userBets = []; // { target: '17', amount: 50, chipClass: 'chip-50' }
+        let botBets = [];  // { target: 'RED', amount: 100, botId: 1, color: '#38bdf8' }
+        let gameState = 'BETTING'; // BETTING, SPINNING, RESULT
+        let countdown = 12;
+        let timerInterval;
+        let currentWheelAngle = 0;
+
+        // وب آدیو برای افکت صوتی
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(freq, type = 'sine', duration = 0.1) {
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e){}
+        }
+
+        // رسم چرخ رولت در Canvas
+        function drawWheel() {
+            const canvas = document.getElementById('rouletteWheel');
+            const ctx = canvas.getContext('2d');
+            const numSlices = wheelNumbers.length;
+            const radius = canvas.width / 2;
+            const sliceAngle = (2 * Math.PI) / numSlices;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < numSlices; i++) {
+                const angle = i * sliceAngle;
+                const num = wheelNumbers[i];
+
+                // رنگ خانه
+                if (num === 0) ctx.fillStyle = '#16a34a';
+                else if (redNumbers.includes(num)) ctx.fillStyle = '#dc2626';
+                else ctx.fillStyle = '#0f172a';
+
+                ctx.beginPath();
+                ctx.moveTo(radius, radius);
+                ctx.arc(radius, radius, radius - 8, angle, angle + sliceAngle);
+                ctx.closePath();
+                ctx.fill();
+                ctx.strokeStyle = '#facc15';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                // متن عدد
+                ctx.save();
+                ctx.translate(radius, radius);
+                ctx.rotate(angle + sliceAngle / 2);
+                ctx.textAlign = 'right';
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 10px Orbitron';
+                ctx.fillText(num.toString(), radius - 14, 4);
+                ctx.restore();
+            }
+
+            // مرکز چرخ
+            ctx.beginPath();
+            ctx.arc(radius, radius, 35, 0, 2 * Math.PI);
+            ctx.fillStyle = '#2d160a';
+            ctx.fill();
+            ctx.strokeStyle = '#facc15';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
+
+        // ساخت جدول شرط‌بندی
+        function buildTable() {
+            const table = document.getElementById('roulette-table');
+            
+            // چیدمان اعداد 1 تا 36 در 3 سطر استاندارد رولت
+            // سطر 1: 3, 6, 9, 12, ... 36
+            // سطر 2: 2, 5, 8, 11, ... 35
+            // سطر 3: 1, 4, 7, 10, ... 34
+            for (let r = 0; r < 3; r++) {
+                for (let c = 1; c <= 12; c++) {
+                    const num = (c - 1) * 3 + (3 - r);
+                    const cell = document.createElement('div');
+                    const isRed = redNumbers.includes(num);
+                    cell.className = `cell ${isRed ? 'red-num' : 'black-num'}`;
+                    cell.style.gridRow = `${r + 1}`;
+                    cell.style.gridColumn = `${c + 1}`;
+                    cell.setAttribute('data-bet', num.toString());
+                    cell.textContent = num;
+                    cell.onclick = () => placeBet(num.toString(), cell);
+                    table.appendChild(cell);
+                }
+            }
+
+            // ستون شرط‌های انتخابی (2 to 1)
+            for (let r = 0; r < 3; r++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell outside-bet';
+                cell.style.gridRow = `${r + 1}`;
+                cell.style.gridColumn = '14';
+                const colTarget = `COL_${3 - r}`;
+                cell.setAttribute('data-bet', colTarget);
+                cell.textContent = '2:1';
+                cell.onclick = () => placeBet(colTarget, cell);
+                table.appendChild(cell);
+            }
+
+            // سطر دوازده‌تایی‌ها (1st 12, 2nd 12, 3rd 12)
+            const dozenBets = [
+                { name: '1st 12', target: 'DOZ_1', colSpan: '2 / span 4' },
+                { name: '2nd 12', target: 'DOZ_2', colSpan: '6 / span 4' },
+                { name: '3rd 12', target: 'DOZ_3', colSpan: '10 / span 4' }
+            ];
+            dozenBets.forEach(d => {
+                const cell = document.createElement('div');
+                cell.className = 'cell outside-bet';
+                cell.style.gridRow = '4';
+                cell.style.gridColumn = d.colSpan;
+                cell.setAttribute('data-bet', d.target);
+                cell.textContent = d.name;
+                cell.onclick = () => placeBet(d.target, cell);
+                table.appendChild(cell);
+            });
+
+            // سطر شرط‌های ۵۰/۵۰ (1-18, EVEN, RED, BLACK, ODD, 19-36)
+            const outsideBets = [
+                { name: '1-18', target: 'LOW', colSpan: '2 / span 2', cls: '' },
+                { name: 'EVEN', target: 'EVEN', colSpan: '4 / span 2', cls: '' },
+                { name: 'RED', target: 'RED', colSpan: '6 / span 2', cls: 'outside-red' },
+                { name: 'BLACK', target: 'BLACK', colSpan: '8 / span 2', cls: 'outside-black' },
+                { name: 'ODD', target: 'ODD', colSpan: '10 / span 2', cls: '' },
+                { name: '19-36', target: 'HIGH', colSpan: '12 / span 2', cls: '' }
+            ];
+            outsideBets.forEach(o => {
+                const cell = document.createElement('div');
+                cell.className = `cell outside-bet ${o.cls}`;
+                cell.style.gridRow = '5';
+                cell.style.gridColumn = o.colSpan;
+                cell.setAttribute('data-bet', o.target);
+                cell.textContent = o.name;
+                cell.onclick = () => placeBet(o.target, cell);
+                table.appendChild(cell);
+            });
+        }
+
+        function selectChip(val, elem) {
+            selectedChipVal = val;
+            document.querySelectorAll('.chip-select').forEach(c => c.classList.remove('active'));
+            elem.classList.add('active');
+            playSound(600, 'sine', 0.05);
+        }
+
+        function placeBet(target, cellElem) {
+            if (gameState !== 'BETTING') return;
+            if (userBalance < selectedChipVal) {
+                alert('موجودی شما برای این شرط کافی نیست!');
+                return;
+            }
+
+            userBalance -= selectedChipVal;
+            userBets.push({ target, amount: selectedChipVal, chipClass: `chip-${selectedChipVal}` });
+
+            playSound(800, 'triangle', 0.08);
+            renderChips();
+            updateStats();
+        }
+
+        function renderChips() {
+            // پاکسازی ژتون‌های قدیمی
+            document.querySelectorAll('.chip-on-table').forEach(c => c.remove());
+
+            // ثبت ژتون‌های کاربر
+            userBets.forEach(b => {
+                const cell = document.querySelector(`[data-bet="${b.target}"]`);
+                if (cell) {
+                    const chip = document.createElement('div');
+                    chip.className = `chip-on-table ${b.chipClass}`;
+                    chip.textContent = `$${b.amount}`;
+                    cell.appendChild(chip);
+                }
+            });
+
+            // ثبت ژتون‌های بات‌ها (گروهی)
+            botBets.forEach(b => {
+                const cell = document.querySelector(`[data-bet="${b.target}"]`);
+                if (cell) {
+                    const chip = document.createElement('div');
+                    chip.className = 'chip-on-table chip-10';
+                    chip.style.background = b.color;
+                    chip.style.color = '#fff';
+                    chip.innerHTML = `$${b.amount}<div class="bot-dot" style="background:${b.color}"></div>`;
+                    cell.appendChild(chip);
+                }
+            });
+        }
+
+        function clearUserBets() {
+            if (gameState !== 'BETTING') return;
+            const totalRefund = userBets.reduce((sum, b) => sum + b.amount, 0);
+            userBalance += totalRefund;
+            userBets = [];
+            renderChips();
+            updateStats();
+            playSound(300, 'sine', 0.1);
+        }
+
+        function doubleUserBets() {
+            if (gameState !== 'BETTING') return;
+            const totalCurrent = userBets.reduce((sum, b) => sum + b.amount, 0);
+            if (userBalance < totalCurrent) {
+                alert('موجودی کافی برای دوبرابر کردن وجود ندارد!');
+                return;
+            }
+            userBalance -= totalCurrent;
+            const newBets = JSON.parse(JSON.stringify(userBets));
+            userBets = userBets.concat(newBets);
+            renderChips();
+            updateStats();
+            playSound(900, 'sine', 0.1);
+        }
+
+        function updateStats() {
+            const totalBet = userBets.reduce((sum, b) => sum + b.amount, 0);
+            document.getElementById('total-bet-val').textContent = `$${totalBet}`;
+            document.getElementById('balance-val').textContent = `$${userBalance}`;
+        }
+
+        // شبیه‌سازی شرط‌بندی زنده بازیکنان دیگر
+        function simulateBotBets() {
+            if (gameState !== 'BETTING') return;
+
+            const targets = ['RED', 'BLACK', 'EVEN', 'ODD', 'DOZ_1', 'DOZ_2', '7', '17', '23', '0', '36'];
+            const botColors = ['#38bdf8', '#a855f7', '#f43f5e', '#fbbf24'];
+
+            const randomBot = Math.floor(Math.random() * 4) + 1;
+            const randomTarget = targets[Math.floor(Math.random() * targets.length)];
+            const randomAmount = [10, 50, 100][Math.floor(Math.random() * 3)];
+
+            botBets.push({
+                target: randomTarget,
+                amount: randomAmount,
+                botId: randomBot,
+                color: botColors[randomBot - 1]
+            });
+
+            document.getElementById(`bet-p${randomBot}`).textContent = `شرط روی ${randomTarget}`;
+            renderChips();
+        }
+
+        // چرخه تایمر و شروع چرخش
+        function startTimer() {
+            countdown = 10;
+            gameState = 'BETTING';
+            botBets = [];
+            document.getElementById('status-msg').textContent = 'ژتون‌های خود را قرار دهید';
+            document.querySelectorAll('.cell').forEach(c => c.classList.remove('winning-cell'));
+
+            timerInterval = setInterval(() => {
+                countdown--;
+                document.getElementById('timer-display').textContent = countdown;
+
+                if (countdown > 2 && Math.random() > 0.4) {
+                    simulateBotBets();
+                }
+
+                if (countdown <= 0) {
+                    clearInterval(timerInterval);
+                    spinWheel();
+                }
+            }, 1000);
+        }
+
+        function spinWheel() {
+            gameState = 'SPINNING';
+            document.getElementById('status-msg').textContent = 'در حال چرخش چرخ رولت...';
+            document.getElementById('timer-display').textContent = '🌀';
+
+            // انتخاب عدد برنده به صورت تصادفی
+            const winningIndex = Math.floor(Math.random() * wheelNumbers.length);
+            const winningNumber = wheelNumbers[winningIndex];
+
+            // محاسبه زاویه نهایی
+            const sliceAngle = 360 / wheelNumbers.length;
+            const targetDegree = 360 * 5 + (360 - (winningIndex * sliceAngle)); // 5 دور کامل + زاویه خانه
+
+            const canvas = document.getElementById('rouletteWheel');
+            canvas.style.transition = 'transform 4s cubic-bezier(0.15, 0.9, 0.2, 1)';
+            canvas.style.transform = `rotate(${targetDegree}deg)`;
+
+            // صدای چرخش
+            let spinSoundInt = setInterval(() => playSound(200 + Math.random() * 100, 'square', 0.03), 100);
+
+            setTimeout(() => {
+                clearInterval(spinSoundInt);
+                evaluateResult(winningNumber);
+            }, 4200);
+        }
+
+        function evaluateResult(winNum) {
+            gameState = 'RESULT';
+            const isRed = redNumbers.includes(winNum);
+            const isEven = winNum !== 0 && winNum % 2 === 0;
+
+            // هایلایت خانه برنده
+            const winCell = document.querySelector(`[data-bet="${winNum}"]`);
+            if (winCell) winCell.classList.add('winning-cell');
+
+            // محاسبه برد کاربر
+            let totalPayout = 0;
+
+            userBets.forEach(b => {
+                let won = false;
+                let multiplier = 0;
+
+                if (b.target === winNum.toString()) { won = true; multiplier = 36; }
+                else if (b.target === 'RED' && isRed) { won = true; multiplier = 2; }
+                else if (b.target === 'BLACK' && !isRed && winNum !== 0) { won = true; multiplier = 2; }
+                else if (b.target === 'EVEN' && isEven) { won = true; multiplier = 2; }
+                else if (b.target === 'ODD' && !isEven && winNum !== 0) { won = true; multiplier = 2; }
+                else if (b.target === 'LOW' && winNum >= 1 && winNum <= 18) { won = true; multiplier = 2; }
+                else if (b.target === 'HIGH' && winNum >= 19 && winNum <= 36) { won = true; multiplier = 2; }
+                else if (b.target === 'DOZ_1' && winNum >= 1 && winNum <= 12) { won = true; multiplier = 3; }
+                else if (b.target === 'DOZ_2' && winNum >= 13 && winNum <= 24) { won = true; multiplier = 3; }
+                else if (b.target === 'DOZ_3' && winNum >= 25 && winNum <= 36) { won = true; multiplier = 3; }
+
+                if (won) {
+                    totalPayout += b.amount * multiplier;
+                }
+            });
+
+            userBalance += totalPayout;
+            updateStats();
+
+            // پیام برنده
+            const colorName = winNum === 0 ? 'سبز' : (isRed ? 'قرمز' : 'مشکی');
+            if (totalPayout > 0) {
+                document.getElementById('status-msg').textContent = `🎉 عدد ${winNum} (${colorName}) - شما $${totalPayout} برنده شدید!`;
+                playSound(1200, 'sine', 0.4);
+            } else {
+                document.getElementById('status-msg').textContent = `عدد برنده: ${winNum} (${colorName})`;
+            }
+
+            // افزودن به تاریخچه
+            addHistory(winNum);
+
+            // ریست چرخ برای دست بعدی
+            setTimeout(() => {
+                const canvas = document.getElementById('rouletteWheel');
+                canvas.style.transition = 'none';
+                canvas.style.transform = 'rotate(0deg)';
+                userBets = [];
+                renderChips();
+                updateStats();
+                startTimer();
+            }, 4000);
+        }
+
+        function addHistory(num) {
+            const histList = document.getElementById('history-list');
+            const elem = document.createElement('div');
+            const isRed = redNumbers.includes(num);
+            const cls = num === 0 ? 'hist-green' : (isRed ? 'hist-red' : 'hist-black');
+            elem.className = `hist-num ${cls}`;
+            elem.textContent = num;
+            histList.insertBefore(elem, histList.firstChild);
+            if (histList.children.length > 7) histList.removeChild(histList.lastChild);
+        }
+
+        // راه‌اندازی اولیه
+        window.onload = () => {
+            drawWheel();
+            buildTable();
+            startTimer();
+        };
+    </script>
+</body>
+</html>
