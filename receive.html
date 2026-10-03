@@ -35,16 +35,50 @@
         .wel{background:linear-gradient(135deg,rgba(2,132,199,.15),rgba(147,51,234,.15));border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
         .wel h1{font-size:16px;margin-bottom:3px}
         .wel p{color:#94a3b8;font-size:11px}
+        
         .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
         .modal.show{display:flex}
-        .modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(56,189,248,.3);border-radius:20px;width:100%;max-width:440px;max-height:85vh;display:flex;flex-direction:column;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.9)}
-        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;color:#38bdf8;font-weight:800;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px}
+        .modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(56,189,248,.3);border-radius:20px;width:100%;max-width:460px;max-height:85vh;display:flex;flex-direction:column;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.9);overflow:hidden}
+        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;color:#38bdf8;font-weight:800;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;flex-shrink:0}
         .modal-close{background:rgba(255,255,255,.05);border:none;color:#94a3b8;cursor:pointer;font-size:14px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
         .modal-close:hover{background:rgba(239,68,68,.2);color:#ef4444}
-        #modal-msg-container{overflow-y:auto;padding-right:4px}
-        .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px}
-        .msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:4px}
+        
+        .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px;transition:0.2s}
+        .msg-body-box:hover{background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.3);}
+        .msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:0}
         .msg-desc-text{font-size:12px;color:#cbd5e1;line-height:1.5}
+
+        /* استایل‌های بخش تب‌ها و اسکرول بار اعلان‌ها */
+        .notif-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
+        .notif-tab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#94a3b8;padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;white-space:nowrap;transition:0.2s;display:flex;align-items:center;justify-content:center;gap:5px;flex:1 1 auto}
+        .notif-tab:hover{background:rgba(56,189,248,.15);color:#38bdf8}
+        .notif-tab.active{background:#38bdf8;color:#0f172a;font-weight:bold;border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.3)}
+
+        #modal-msg-container{overflow-y:auto;padding-right:6px;flex:1;min-height:0}
+
+        #modal-msg-container::-webkit-scrollbar,
+        .modal-content div::-webkit-scrollbar {
+          width: 5px;
+        }
+        #modal-msg-container::-webkit-scrollbar-track,
+        .modal-content div::-webkit-scrollbar-track {
+          background: rgba(15, 23, 42, 0.6);
+          border-radius: 10px;
+        }
+        #modal-msg-container::-webkit-scrollbar-thumb,
+        .modal-content div::-webkit-scrollbar-thumb {
+          background: rgba(56, 189, 248, 0.35);
+          border-radius: 10px;
+        }
+        #modal-msg-container::-webkit-scrollbar-thumb:hover,
+        .modal-content div::-webkit-scrollbar-thumb:hover {
+          background: rgba(56, 189, 248, 0.7);
+        }
+        #modal-msg-container, .modal-content div {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(56, 189, 248, 0.35) rgba(15, 23, 42, 0.6);
+        }
+
         footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
     </style>
 </head>
@@ -129,11 +163,36 @@
         </div>
     </div>
 
-    <!-- مدال پیام‌ها -->
+    <!-- مودال صندوق پیام‌ها و اعلان‌ها (هماهنگ شده با فایل تراکنش‌ها) -->
     <div class="modal" id="m-msg">
         <div class="modal-content">
-            <div class="modal-header"><span id="t-modal-title">صندوق پیام‌های مدیریت</span><button class="modal-close" onclick="window.closeMessageModal()"><i class="fas fa-times"></i></button></div>
+            <div class="modal-header">
+                <span id="t-modal-title"><i class="fas fa-bell"></i> صندوق پیام‌ها و اعلان‌ها</span>
+                <button class="modal-close" onclick="window.closeMessageModal()"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="notif-tabs" id="notif-tabs">
+                <button type="button" class="notif-tab active" onclick="window.setNotifFilter('all', this)"><i class="fas fa-list"></i> همه</button>
+                <button type="button" class="notif-tab" onclick="window.setNotifFilter('approved', this)"><i class="fas fa-check-circle" style="color:#22c55e"></i> تایید درخواست</button>
+                <button type="button" class="notif-tab" onclick="window.setNotifFilter('rejected', this)"><i class="fas fa-times-circle" style="color:#ef4444"></i> لغو درخواست</button>
+                <button type="button" class="notif-tab" onclick="window.setNotifFilter('admin_message', this)"><i class="fas fa-bullhorn" style="color:#38bdf8"></i> پیام مدیریت</button>
+            </div>
+
             <div id="modal-msg-container"><div style="text-align:center;padding:20px;color:#94a3b8">هیچ پیام جدیدی وجود ندارد.</div></div>
+        </div>
+    </div>
+
+    <!-- مودال مشاهده جزئیات پیام (هماهنگ شده با فایل تراکنش‌ها) -->
+    <div class="modal" id="m-msg-detail" style="z-index:1050;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="detail-msg-title"><i class="fas fa-envelope-open"></i> مشاهده پیام</span>
+                <button class="modal-close" onclick="window.closeMsgDetailModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div style="overflow-y:auto;padding-right:6px">
+                <div id="detail-msg-body" style="font-size:13px;color:#cbd5e1;line-height:1.7;white-space:pre-wrap;margin-bottom:12px;"></div>
+                <div id="detail-msg-support"></div>
+            </div>
         </div>
     </div>
 
@@ -182,17 +241,21 @@
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currLang = localStorage.getItem('zenix_lang') || 'fa';
-        let allMessages = [];
         let currentUser = null;
         let currentUserId = null;
         let currentNetwork = 'TRC20';
         let userBalance = 0;
         let timerInterval = null;
 
+        // متغیرهای مدیریت اعلان‌ها دقیقا مطابق با فایل تراکنش‌ها
+        window.cachedNotifications = [];
+        window.currentFilteredNotifs = [];
+        window.activeNotifFilter = 'all';
+
         const ld = {
             fa: {
                 m1: 'صفحه اصلی', m2: 'کوانتیفیکیشن', m3: 'واریز', m4: 'برداشت', m5: 'تراکنش', m6: 'پروفایل', m7: 'پشتیبانی',
-                m_about: 'درباره پلتفرم', m8: 'خروج', modalTitle: 'صندوق پیام‌های مدیریت', noMsg: 'هیچ پیام جدیدی از طرف مدیریت وجود ندارد.',
+                m_about: 'درباره پلتفرم', m8: 'خروج', modalTitle: 'صندوق پیام‌ها و اعلان‌ها', noMsg: 'هیچ پیام جدیدی وجود ندارد.',
                 backMsg: 'بازگشت به لیست پیام‌ها', newBadge: 'جدید', helpTitle: 'راهنمای صفحه برداشت', helpBtnTitle: 'راهنمای صفحه برداشت',
                 recTitle: 'برداشت ارز دیجیتال', recSub: 'انتقال ایمن دارایی به کیف پول شخصی', balLabel: 'موجودی:',
                 netSel: 'انتخاب شبکه مقصد', lblAddr: 'آدرس کیف پول مقصد:', lblAmt: 'مقدار برداشت (USDT):', btnMax: 'حداکثر کل',
@@ -211,7 +274,7 @@
             },
             en: {
                 m1: 'Home', m2: 'Quantification', m3: 'Deposit', m4: 'Withdraw', m5: 'Transactions', m6: 'Profile', m7: 'Support',
-                m_about: 'About Platform', m8: 'Logout', modalTitle: 'Admin Messages', noMsg: 'No new messages from admin.',
+                m_about: 'About Platform', m8: 'Logout', modalTitle: 'Notifications & Messages', noMsg: 'No new messages found.',
                 backMsg: 'Back to Messages List', newBadge: 'NEW', helpTitle: 'Withdrawal Guide', helpBtnTitle: 'Withdrawal Page Guide',
                 recTitle: 'Withdraw Crypto', recSub: 'Securely transfer assets to personal wallet', balLabel: 'Balance:',
                 netSel: 'Select Destination Network', lblAddr: 'Destination Wallet Address:', lblAmt: 'Withdrawal Amount (USDT):', btnMax: 'Max All',
@@ -229,6 +292,157 @@
                 abL4T: 'Realism & Live Data:', abL4D: 'Live crypto ticker, volume indicators, network gas fees, and system notices ensure users interact with an active global platform.'
             }
         };
+
+        // --- توابع اختصاصی اعلان‌ها عینا هماهنگ با فایل تراکنش‌ها ---
+        window.updateBellBadge = function() {
+            const unreadCount = window.cachedNotifications.filter(n => !n.read && !n.isRead && !n.is_read).length;
+            const badge = document.getElementById('bell-badge');
+            if (badge) {
+                badge.innerText = unreadCount;
+                if (unreadCount > 0) badge.classList.add('show');
+                else badge.classList.remove('show');
+            }
+        };
+
+        window.setNotifFilter = function(filter, btnElement) {
+            window.activeNotifFilter = filter;
+            document.querySelectorAll('.notif-tab').forEach(t => t.classList.remove('active'));
+            if(btnElement) btnElement.classList.add('active');
+            window.renderNotifications();
+        };
+
+        window.getNotifCategory = function(n) {
+            const type = (n.type || '').toLowerCase();
+            const title = (n.title || '').toLowerCase();
+
+            if (type.includes('approved') || type.includes('confirm') || title.includes('تایید') || title.includes('موفق') || title.includes('شارژ شد')) {
+                return 'approved';
+            }
+            if (type.includes('rejected') || type.includes('canceled') || type.includes('cancel') || title.includes('رد') || title.includes('لغو') || title.includes('ناموفق')) {
+                return 'rejected';
+            }
+            return 'admin_message';
+        };
+
+        window.openMsgDetail = async function(idx) {
+            const n = window.currentFilteredNotifs[idx];
+            if (!n) return;
+
+            const isUnread = !n.read && !n.isRead && !n.is_read;
+
+            if (isUnread) {
+                if ('read' in n) n.read = true;
+                if ('isRead' in n) n.isRead = true;
+                if ('is_read' in n) n.is_read = true;
+                if (!('read' in n) && !('isRead' in n) && !('is_read' in n)) n.read = true;
+
+                window.updateBellBadge();
+                window.renderNotifications();
+
+                const updatePayload = {};
+                if ('is_read' in n) updatePayload.is_read = true;
+                if ('read' in n) updatePayload.read = true;
+                if ('isRead' in n) updatePayload.isRead = true;
+                if (Object.keys(updatePayload).length === 0) updatePayload.is_read = true;
+
+                try {
+                    const { error } = await supabase.from('notifications').update(updatePayload).eq('id', n.id);
+                    if (error) {
+                        console.error('خطا در ثبت وضعیت در Supabase:', error);
+                    }
+                } catch (err) {
+                    console.error('خطا در ارسال درخواست به Supabase:', err);
+                }
+            }
+
+            const title = n.title || 'پیام سیستم';
+            const msg = n.message || n.text || n.body || '';
+            const category = window.getNotifCategory(n);
+
+            const detailTitle = document.getElementById('detail-msg-title');
+            const detailBody = document.getElementById('detail-msg-body');
+            const detailSupport = document.getElementById('detail-msg-support');
+
+            if (detailTitle) detailTitle.innerHTML = `<i class="fas fa-bell" style="color:#38bdf8"></i> ${title}`;
+            if (detailBody) detailBody.innerText = msg;
+
+            if (detailSupport) {
+                if (category === 'rejected') {
+                    detailSupport.innerHTML = `
+                    <div style="margin-top:15px;padding-top:10px;border-top:1px dashed rgba(239,68,68,0.3);display:flex;justify-content:flex-end;">
+                        <a href="support.html" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);" style="display:inline-flex;align-items:center;gap:6px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f8fafc;padding:6px 12px;border-radius:6px;font-size:12px;text-decoration:none;font-weight:600;transition:0.2s;">
+                            <i class="fas fa-headset" style="color:#ef4444;"></i>
+                            <span>پیگیری از طریق پشتیبانی</span>
+                        </a>
+                    </div>`;
+                } else {
+                    detailSupport.innerHTML = '';
+                }
+            }
+
+            document.getElementById('m-msg-detail')?.classList.add('show');
+        };
+
+        window.renderNotifications = function() {
+            const container = document.getElementById('modal-msg-container');
+            if (!container) return;
+
+            const filter = window.activeNotifFilter;
+            const filtered = window.cachedNotifications.filter(n => {
+                if (filter === 'all') return true;
+                return window.getNotifCategory(n) === filter;
+            });
+
+            window.currentFilteredNotifs = filtered;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div style="text-align:center;padding:25px;color:#94a3b8;font-size:12px;"><i class="fas fa-inbox" style="font-size:24px;margin-bottom:8px;display:block;opacity:0.5;"></i>هیچ پیامی در این دسته‌بندی وجود ندارد.</div>`;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach((n, idx) => {
+                const title = n.title || 'پیام سیستم';
+                const category = window.getNotifCategory(n);
+                const isUnread = !n.read && !n.isRead && !n.is_read;
+
+                let borderStyle = "border:1px solid rgba(255,255,255,.08);";
+                let bgStyle = "background:rgba(255,255,255,.03);";
+                let icon = '<i class="fas fa-bullhorn" style="color:#38bdf8"></i>';
+                let tagHtml = '<span style="font-size:10px;background:rgba(56,189,248,0.2);color:#38bdf8;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">پیام مدیریت</span>';
+
+                if (category === 'approved') {
+                    borderStyle = "border:1px solid rgba(34, 197, 94, 0.4);";
+                    bgStyle = "background:rgba(34, 197, 94, 0.08);";
+                    icon = '<i class="fas fa-check-circle" style="color:#22c55e"></i>';
+                    tagHtml = '<span style="font-size:10px;background:rgba(34,197,94,0.2);color:#22c55e;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">تایید درخواست</span>';
+                } else if (category === 'rejected') {
+                    borderStyle = "border:1px solid rgba(239, 68, 68, 0.4);";
+                    bgStyle = "background:rgba(239, 68, 68, 0.08);";
+                    icon = '<i class="fas fa-times-circle" style="color:#ef4444"></i>';
+                    tagHtml = '<span style="font-size:10px;background:rgba(239,68,68,0.2);color:#ef4444;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">لغو درخواست</span>';
+                }
+
+                const unreadDot = isUnread ? '<span style="width:8px;height:8px;background:#ef4444;border-radius:50%;display:inline-block;margin-left:4px;" title="خوانده نشده"></span>' : '';
+
+                html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle} cursor:pointer;" onclick="window.openMsgDetail(${idx})">
+                    <div class="msg-title-text" style="display:flex;align-items:center;gap:8px;">
+                        ${unreadDot}
+                        ${icon}
+                        <span>${title}</span>
+                        ${tagHtml}
+                    </div>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+        };
+
+        window.openMessageModal = () => document.getElementById('m-msg')?.classList.add('show');
+        window.closeMessageModal = () => document.getElementById('m-msg')?.classList.remove('show');
+        window.closeMsgDetailModal = () => document.getElementById('m-msg-detail')?.classList.remove('show');
+
+        // --- پایان توابع اعلان‌ها ---
 
         function updateNetReceiveAmount() {
             const amt = parseFloat(document.getElementById('withdraw-amount').value) || 0;
@@ -330,84 +544,6 @@
             }
         }
 
-        async function fetchUserMessages(uid) {
-            try {
-                const { data, error } = await supabase.from("notifications").select("*").eq("user_id", uid);
-                if (error || !data) return [];
-
-                let messages = data.map(d => ({
-                    id: d.id,
-                    subject: d.title || d.subject || 'Announcement',
-                    body: d.message || d.text || d.body || '',
-                    time: d.created_at || d.createdAt || d.timestamp || d.time || new Date().toISOString(),
-                    read: d.read === true || d.isRead === true
-                }));
-
-                messages.sort((a, b) => new Date(b.time) - new Date(a.time));
-                return messages;
-            } catch (e) {
-                console.error("Error fetching messages:", e);
-                return [];
-            }
-        }
-
-        window.openMessageModal = async () => {
-            let c = document.getElementById('modal-msg-container'), t = ld[currLang] || ld.fa;
-            if (currentUserId) {
-                allMessages = await fetchUserMessages(currentUserId);
-                let unread = allMessages.filter(m => !m.read).length, b = document.getElementById('bell-badge');
-                if (b) { b.textContent = unread; b.classList.toggle('show', unread > 0); }
-            }
-            if (allMessages.length > 0) renderMessageList();
-            else c.innerHTML = `<div style="text-align:center;padding:20px;color:#94a3b8">${t.noMsg}</div>`;
-            document.getElementById('m-msg')?.classList.add('show');
-        };
-
-        function renderMessageList() {
-            let c = document.getElementById('modal-msg-container'), t = ld[currLang] || ld.fa, html = '<div style="display:flex;flex-direction:column;gap:10px;">';
-            allMessages.forEach((m, idx) => {
-                let dTime = '';
-                if (m.time) {
-                    let d = new Date(m.time);
-                    dTime = isNaN(d.getTime()) ? String(m.time) : d.toUTCString();
-                }
-                let unread = !m.read;
-                html += `<div class="msg-body-box" style="cursor:pointer;border-right:${unread ? '3px solid #38bdf8' : '1px solid rgba(255,255,255,.08)'};" onclick="window.readAdminMessage(${idx})">
-                    <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <div class="msg-title-text" style="${unread ? 'color:#fff;font-weight:800;' : ''}"><i class="fas fa-envelope${unread ? '' : '-open'}-text" style="color:#38bdf8;margin-left:5px;"></i> ${m.subject}</div>
-                        ${unread ? `<span style="font-size:9px;background:#38bdf8;color:#0f172a;padding:2px 6px;border-radius:4px;font-weight:700;">${t.newBadge}</span>` : ''}
-                    </div>
-                    <div class="msg-desc-text" style="margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${m.body}</div>
-                    <div style="font-size:10px;color:#64748b;margin-top:6px;text-align:left" dir="ltr">${dTime}</div>
-                </div>`;
-            });
-            c.innerHTML = html + '</div>';
-        }
-
-        window.readAdminMessage = async idx => {
-            let m = allMessages[idx]; if (!m) return;
-            if (!m.read && currentUserId && m.id) {
-                allMessages[idx].read = true;
-                try {
-                    await supabase.from("notifications").update({ read: true, isRead: true }).eq("id", m.id);
-                    let unread = allMessages.filter(i => !i.read).length, b = document.getElementById('bell-badge');
-                    if (b) { b.textContent = unread; b.classList.toggle('show', unread > 0); }
-                } catch (e) { console.error(e); }
-            }
-            let c = document.getElementById('modal-msg-container'), t = ld[currLang] || ld.fa, dTime = '';
-            if (m.time) {
-                let d = new Date(m.time);
-                dTime = isNaN(d.getTime()) ? String(m.time) : d.toUTCString();
-            }
-            c.innerHTML = `<button onclick="window.openMessageModal()" style="background:none;border:none;color:#38bdf8;cursor:pointer;font-size:12px;margin-bottom:12px;display:flex;align-items:center;gap:5px;padding:0;"><i class="fas fa-arrow-right"></i> ${t.backMsg}</button>
-            <div class="msg-body-box" style="padding:16px;">
-                <div class="msg-title-text" style="font-size:15px;margin-bottom:8px;"><i class="fas fa-envelope-open-text" style="color:#38bdf8;"></i> ${m.subject}</div>
-                <div class="msg-desc-text" style="font-size:13px;line-height:1.8;color:#f8fafc;white-space:pre-wrap;">${m.body}</div>
-                <div style="font-size:11px;color:#64748b;margin-top:14px;text-align:left;border-top:1px solid rgba(255,255,255,.05);padding-top:8px;" dir="ltr">${dTime}</div>
-            </div>`;
-        };
-
-        window.closeMessageModal = () => document.getElementById('m-msg')?.classList.remove('show');
         window.closeHelpModal = () => document.getElementById('m-help')?.classList.remove('show');
         window.closeAboutModal = () => document.getElementById('m-about')?.classList.remove('show');
 
@@ -457,10 +593,14 @@
                 console.error("Error watching user document:", e);
             }
 
+            // دریافت اعلان‌ها مطابق با روش فایل تراکنش‌ها
             try {
-                allMessages = await fetchUserMessages(user.id);
-                let unread = allMessages.filter(m => !m.read).length, b = document.getElementById('bell-badge');
-                if (b && unread > 0) { b.textContent = unread; b.classList.add('show'); }
+                const { data, error: notifError } = await supabase.from('notifications').select('*').eq('user_id', user.id);
+                if (!notifError && data) {
+                    window.cachedNotifications = data;
+                    window.renderNotifications();
+                    window.updateBellBadge();
+                }
             } catch (e) {
                 console.error("خطا در دریافت اطلاعات کاربر:", e);
             }
@@ -596,7 +736,7 @@
             }
 
             let elModalTitle = document.getElementById('t-modal-title');
-            if (elModalTitle) elModalTitle.textContent = t.modalTitle;
+            if (elModalTitle && t.modalTitle) elModalTitle.innerHTML = `<i class="fas fa-bell"></i> ${t.modalTitle}`;
 
             let elAbout = document.getElementById('m_about');
             if (elAbout) elAbout.textContent = t.m_about;
