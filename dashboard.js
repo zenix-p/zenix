@@ -229,23 +229,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ==========================================
-// تابع بهینه‌شده دریافت تعداد زیرمجموعه‌ها (اصلاح‌شده)
+// تابع دریافت تعداد زیرمجموعه‌ها (با اولویت تابع RPC)
 // ==========================================
 async function getReferralCount(user, userData) {
   if (!user || !supabase) return 0;
 
-  // ۱. بررسی مستقیم فیلدهای عددی در شیء userData کاربر
-  let directCount = userData?.referrals_count ?? userData?.referral_count ?? userData?.invited_count ?? userData?.team_count ?? userData?.total_referrals ?? userData?.sub_count;
-  if (directCount !== undefined && directCount !== null && !isNaN(Number(directCount))) {
-    const num = Number(directCount);
-    if (num > 0) return num;
-  }
-
-  // ۲. تلاش برای فراخوانی تابع RPC در صورت تعریف در دیتابیس
+  // ۱. اولویت اول: فراخوانی مستقیم تابع RPC در سوپابیس (دارای SECURITY DEFINER)
   try {
     const { data, error } = await supabase.rpc('get_my_referrals_stats');
-    if (!error && data) {
-      if (typeof data === 'number') return data;
+    if (!error && data !== null && data !== undefined) {
+      if (typeof data === 'number') {
+        return data;
+      }
       if (Array.isArray(data) && data.length > 0) {
         const val = data[0].total_count ?? data[0].count ?? data[0].total;
         if (val !== undefined && val !== null) return Number(val);
@@ -256,10 +251,16 @@ async function getReferralCount(user, userData) {
       }
     }
   } catch (err) {
-    // عدم وجود RPC
+    console.warn('عدم موفقیت در فراخوانی RPC زیرمجموعه‌ها، تلاش با لایه‌های بعدی...', err);
   }
 
-  // ۳. شمارش مستقیم کاربران دعوت‌شده در جدول users بر اساس ستون‌های مرجع احتمالی
+  // ۲. اولویت دوم: بررسی مستقیم فیلدهای عددی ذخیره‌شده در شیء کاربر
+  let directCount = userData?.referrals_count ?? userData?.referral_count ?? userData?.invited_count ?? userData?.team_count ?? userData?.total_referrals ?? userData?.sub_count;
+  if (directCount !== undefined && directCount !== null && !isNaN(Number(directCount)) && Number(directCount) > 0) {
+    return Number(directCount);
+  }
+
+  // ۳. اولویت سوم: شمارش مستقیم در جدول users بر اساس ستون‌های احتمالی
   const refCode = userData?.referral_code || userData?.ref_code || userData?.invite_code || userData?.code;
   const candidateColumns = ['referred_by', 'inviter_id', 'referrer_id', 'parent_id', 'ref_by'];
 
@@ -289,7 +290,7 @@ async function getReferralCount(user, userData) {
     }
   }
 
-  // ۴. بررسی جداول احتمالی ارجاعات (referrals یا teams)
+  // ۴. اولویت چهارم: بررسی جداول مجزای ارجاعات (referrals / teams / user_referrals)
   const candidateTables = ['referrals', 'teams', 'user_referrals'];
   for (const tbl of candidateTables) {
     for (const col of ['referrer_id', 'user_id', 'parent_id', 'inviter_id']) {
@@ -303,7 +304,7 @@ async function getReferralCount(user, userData) {
           return count;
         }
       } catch (err) {
-        // ادامه بررسی جدول بعدی
+        // ادامه بررسی
       }
     }
   }
@@ -363,7 +364,7 @@ async function checkUserSession() {
     const balanceElem = document.getElementById('val-balance');
     const refElem = document.getElementById('val-ref');
 
-    // به‌روزرسانی اطلاعات داشبورد
+    // به‌روزرسانی اطلاعات کاربر در UI
     if (userData) {
       if (fullNameElem) {
         fullNameElem.textContent = userData.fullname || userData.full_name || userData.fullName || user.user_metadata?.fullname || user.user_metadata?.full_name || user.email || 'کاربر Zenix';
@@ -393,7 +394,7 @@ async function checkUserSession() {
       }
     }
 
-    // به‌روزرسانی عدد زیرمجموعه‌ها روی کارت
+    // محاسبه و درج تعداد زیرمجموعه‌ها روی کارت داشبورد
     if (refElem) {
       const totalRef = await getReferralCount(user, userData);
       refElem.textContent = totalRef;
