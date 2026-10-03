@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zenix Multiplayer 3D Roulette</title>
+    
+    <!-- 🟢 مرحله ۱: افزودن کتابخانه رسمی Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -28,40 +32,42 @@
             flex-direction: column;
             overflow-x: hidden;
             background-image: radial-gradient(circle at 50% 30%, #1e293b 0%, #020617 85%);
+            /* فاصله از پایین برای جلوگیر از کاور شدن توسط نوار ثابت کنترل */
+            padding-bottom: 110px; 
         }
 
         /* هدر استیج */
         header {
             background: rgba(15, 23, 42, 0.9);
             border-bottom: 1px solid var(--glass-border);
-            padding: 10px 24px;
+            padding: 10px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             backdrop-filter: blur(16px);
             z-index: 100;
         }
-        .logo { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 18px; color: var(--gold-accent); display: flex; align-items: center; gap: 8px; }
+        .logo { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 16px; color: var(--gold-accent); display: flex; align-items: center; gap: 8px; }
         
-        .history-bar { display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.4); padding: 4px 12px; border-radius: 20px; border: 1px solid var(--glass-border); }
-        .history-title { font-size: 11px; color: #94a3b8; font-weight: 700; margin-left: 6px; }
-        .hist-num { width: 26px; height: 26px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 11px; font-weight: 800; font-family: 'Orbitron'; color: #fff; }
+        .history-bar { display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.4); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--glass-border); }
+        .history-title { font-size: 11px; color: #94a3b8; font-weight: 700; margin-left: 4px; }
+        .hist-num { width: 24px; height: 24px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 10px; font-weight: 800; font-family: 'Orbitron'; color: #fff; }
         .hist-red { background: #dc2626; }
         .hist-black { background: #1e293b; border: 1px solid #475569; }
         .hist-green { background: #16a34a; }
 
-        .user-stats { display: flex; align-items: center; gap: 15px; }
-        .stat-pill { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 6px 16px; border-radius: 30px; display: flex; align-items: center; gap: 8px; }
-        .stat-val { font-family: 'Orbitron', sans-serif; font-weight: 800; color: var(--primary-glow); }
+        .user-stats { display: flex; align-items: center; gap: 10px; }
+        .stat-pill { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 5px 12px; border-radius: 30px; display: flex; align-items: center; gap: 6px; }
+        .stat-val { font-family: 'Orbitron', sans-serif; font-weight: 800; color: var(--primary-glow); font-size: 13px; }
 
         /* صحنه اصلی بازی */
         .main-stage {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 15px;
-            gap: 15px;
-            max-width: 1200px;
+            padding: 10px 15px;
+            gap: 10px;
+            max-width: 1100px;
             margin: 0 auto;
             width: 100%;
         }
@@ -72,59 +78,60 @@
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            gap: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
         /* صندلی‌های بازیکنان مجازی */
         .players-container {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            width: 180px;
+            gap: 8px;
+            width: 160px;
         }
         .player-card {
             background: rgba(15, 23, 42, 0.7);
             border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 8px 12px;
+            border-radius: 10px;
+            padding: 6px 10px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             transition: 0.3s;
         }
         .player-avatar {
-            width: 36px; height: 36px; border-radius: 50%; background-size: cover; background-position: center; border: 2px solid #64748b;
+            width: 32px; height: 32px; border-radius: 50%; background-size: cover; background-position: center; border: 2px solid #64748b; flex-shrink: 0;
         }
-        .p-info { display: flex; flex-direction: column; }
-        .p-name { font-size: 12px; font-weight: 700; color: #e2e8f0; }
-        .p-status { font-size: 10px; font-family: 'Orbitron'; color: var(--gold-accent); }
+        .p-info { display: flex; flex-direction: column; overflow: hidden; }
+        .p-name { font-size: 11px; font-weight: 700; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .p-status { font-size: 9px; font-family: 'Orbitron'; color: var(--gold-accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* چرخ سه‌بعدی Canvas */
         .wheel-box {
             position: relative;
-            width: 300px;
-            height: 300px;
+            width: 230px;
+            height: 230px;
             display: flex;
             justify-content: center;
             align-items: center;
             background: radial-gradient(circle, #2d160a 0%, #020617 70%);
             border-radius: 50%;
-            border: 8px solid #42281d;
-            box-shadow: 0 0 50px rgba(0,0,0,0.9), 0 0 30px rgba(250, 204, 21, 0.15);
+            border: 6px solid #42281d;
+            box-shadow: 0 0 40px rgba(0,0,0,0.9), 0 0 20px rgba(250, 204, 21, 0.15);
         }
         canvas#rouletteWheel { transform: rotate(0deg); transition: transform 0.05s linear; }
 
         .wheel-pointer {
             position: absolute;
-            top: -10px;
+            top: -8px;
             left: 50%;
             transform: translateX(-50%);
             width: 0; height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-top: 20px solid var(--gold-accent);
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 16px solid var(--gold-accent);
             z-index: 10;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
+            filter: drop-shadow(0 3px 5px rgba(0,0,0,0.8));
         }
 
         /* تایمر و پیام مرکزی */
@@ -132,42 +139,45 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
-            width: 180px;
+            gap: 8px;
+            width: 150px;
         }
         .timer-circle {
-            width: 70px; height: 70px; border-radius: 50%;
-            border: 4px solid var(--accent-blue);
+            width: 60px; height: 60px; border-radius: 50%;
+            border: 3px solid var(--accent-blue);
             display: flex; justify-content: center; align-items: center;
-            font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 24px;
+            font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 20px;
             color: #fff; background: rgba(15, 23, 42, 0.8);
-            box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
         }
-        .status-text { font-size: 12px; font-weight: 800; color: var(--gold-accent); text-align: center; }
+        .status-text { font-size: 11px; font-weight: 800; color: var(--gold-accent); text-align: center; }
 
-        /* میز شرط‌بندی (Roulette Layout Grid) */
+        /* میز شرط‌بندی (بهینه‌شده برای نمایش کامل اعداد) */
         .table-viewport {
-            perspective: 800px;
+            perspective: 900px;
             width: 100%;
             display: flex;
             justify-content: center;
-            margin-top: 10px;
+            margin-top: 5px;
+            overflow-x: auto;
+            padding: 5px 0;
         }
 
         .roulette-table {
-            transform: rotateX(25deg);
+            transform: rotateX(15deg); /* زاویه ملایم‌تر برای خوانایی کامل اعداد */
             background: var(--felt-green);
-            border: 14px solid var(--felt-border);
-            border-radius: 20px;
-            padding: 15px;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.95), inset 0 0 60px rgba(0,0,0,0.8);
+            border: 10px solid var(--felt-border);
+            border-radius: 16px;
+            padding: 8px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.95), inset 0 0 40px rgba(0,0,0,0.8);
             display: grid;
-            grid-template-columns: 50px repeat(12, 1fr) 60px;
-            grid-template-rows: repeat(3, 48px) 40px 40px;
-            gap: 3px;
+            grid-template-columns: 45px repeat(12, minmax(0, 1fr)) 50px;
+            grid-template-rows: repeat(3, 38px) 34px 34px;
+            gap: 2px;
             position: relative;
-            max-width: 950px;
+            max-width: 920px;
             width: 100%;
+            min-width: 650px; /* جلوگیری از بهم خوردن چیدمان در موبایل */
         }
 
         .cell {
@@ -178,34 +188,34 @@
             align-items: center;
             font-family: 'Orbitron', sans-serif;
             font-weight: 800;
-            font-size: 14px;
+            font-size: 13px;
             color: #fff;
             cursor: pointer;
             position: relative;
-            border-radius: 4px;
+            border-radius: 3px;
             transition: 0.15s;
         }
         .cell:hover { background: rgba(250, 204, 21, 0.3); border-color: var(--gold-accent); }
         .cell.red-num { background: rgba(220, 38, 38, 0.85); }
         .cell.black-num { background: rgba(15, 23, 42, 0.9); }
-        .cell.zero-num { grid-row: 1 / span 3; background: #16a34a; font-size: 18px; }
+        .cell.zero-num { grid-row: 1 / span 3; background: #16a34a; font-size: 16px; }
 
-        .cell.outside-bet { font-size: 11px; font-weight: 800; background: rgba(15, 23, 42, 0.7); }
+        .cell.outside-bet { font-size: 10px; font-weight: 800; background: rgba(15, 23, 42, 0.7); }
         .cell.outside-red { background: rgba(220, 38, 38, 0.7); }
         .cell.outside-black { background: rgba(15, 23, 42, 0.9); }
 
         /* ژتون‌های روی میز */
         .chip-on-table {
             position: absolute;
-            width: 24px; height: 24px;
+            width: 22px; height: 22px;
             border-radius: 50%;
             border: 2px dashed #fff;
             font-family: 'Orbitron';
-            font-size: 8px;
+            font-size: 7px;
             font-weight: 900;
             display: flex; justify-content: center; align-items: center;
             color: #000;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.8);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.8);
             pointer-events: none;
             z-index: 5;
             animation: chipDrop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -218,7 +228,7 @@
         .chip-500 { background: #a855f7; color: #fff; }
 
         .bot-dot {
-            position: absolute; width: 8px; height: 8px; border-radius: 50%; top: -2px; right: -2px; border: 1px solid #fff;
+            position: absolute; width: 6px; height: 6px; border-radius: 50%; top: -2px; right: -2px; border: 1px solid #fff;
         }
 
         /* کنترل پنل پایین */
@@ -227,7 +237,7 @@
             bottom: 0; left: 0; right: 0;
             background: rgba(15, 23, 42, 0.95);
             border-top: 1px solid var(--glass-border);
-            padding: 12px 24px;
+            padding: 10px 20px;
             backdrop-filter: blur(16px);
             display: flex;
             justify-content: space-between;
@@ -235,19 +245,19 @@
             z-index: 200;
         }
 
-        .chip-rack { display: flex; gap: 12px; align-items: center; }
+        .chip-rack { display: flex; gap: 10px; align-items: center; }
         .chip-select {
-            width: 48px; height: 48px; border-radius: 50%;
-            border: 3px dashed #fff;
+            width: 42px; height: 42px; border-radius: 50%;
+            border: 2px dashed #fff;
             display: flex; justify-content: center; align-items: center;
-            font-family: 'Orbitron'; font-weight: 900; font-size: 11px; color: #000;
-            cursor: pointer; transition: 0.2s; box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+            font-family: 'Orbitron'; font-weight: 900; font-size: 10px; color: #000;
+            cursor: pointer; transition: 0.2s; box-shadow: 0 4px 8px rgba(0,0,0,0.5);
         }
-        .chip-select:hover, .chip-select.active { transform: translateY(-6px) scale(1.1); border-style: solid; border-color: var(--gold-accent); box-shadow: 0 0 20px var(--gold-accent); }
+        .chip-select:hover, .chip-select.active { transform: translateY(-4px) scale(1.08); border-style: solid; border-color: var(--gold-accent); box-shadow: 0 0 15px var(--gold-accent); }
 
-        .action-btns { display: flex; gap: 10px; }
+        .action-btns { display: flex; gap: 8px; }
         .btn-act {
-            padding: 10px 20px; border-radius: 10px; border: none; font-weight: 800; font-size: 12px; cursor: pointer; color: #fff; transition: 0.2s;
+            padding: 8px 16px; border-radius: 8px; border: none; font-weight: 800; font-size: 11px; cursor: pointer; color: #fff; transition: 0.2s;
         }
         .btn-clear { background: #ef4444; }
         .btn-double { background: #0ea5e9; }
@@ -256,7 +266,7 @@
 
         /* برنده شدن هایلایت */
         .winning-cell { animation: winPulse 0.8s infinite alternate; border-color: var(--gold-accent) !important; z-index: 10; }
-        @keyframes winPulse { from { box-shadow: 0 0 5px var(--gold-accent); } to { box-shadow: 0 0 25px var(--gold-accent); background: rgba(250, 204, 21, 0.6); } }
+        @keyframes winPulse { from { box-shadow: 0 0 5px var(--gold-accent); } to { box-shadow: 0 0 20px var(--gold-accent); background: rgba(250, 204, 21, 0.6); } }
     </style>
 </head>
 <body>
@@ -271,11 +281,11 @@
 
         <div class="user-stats">
             <div class="stat-pill">
-                <span style="font-size:11px; color:#94a3b8;">مجموع شرط:</span>
+                <span style="font-size:10px; color:#94a3b8;">مجموع شرط:</span>
                 <span class="stat-val" id="total-bet-val">$0</span>
             </div>
             <div class="stat-pill">
-                <span style="font-size:11px; color:#94a3b8;">موجودی:</span>
+                <span style="font-size:10px; color:#94a3b8;">موجودی:</span>
                 <span class="stat-val" id="balance-val" style="color:var(--gold-accent);">$1,000</span>
             </div>
         </div>
@@ -298,7 +308,7 @@
             <!-- چرخ رولت -->
             <div class="wheel-box">
                 <div class="wheel-pointer"></div>
-                <canvas id="rouletteWheel" width="280" height="280"></canvas>
+                <canvas id="rouletteWheel" width="220" height="220"></canvas>
             </div>
 
             <!-- وضعیت و بازیکنان مجازی ۳ و ۴ -->
@@ -334,7 +344,7 @@
     <!-- پنل کنترل پایین -->
     <div class="control-bar">
         <div class="chip-rack">
-            <span style="font-size:11px; color:#94a3b8; font-weight:700;">انتخاب ژتون:</span>
+            <span style="font-size:10px; color:#94a3b8; font-weight:700;">ژتون:</span>
             <div class="chip-select chip-10 active" onclick="selectChip(10, this)">$10</div>
             <div class="chip-select chip-50" onclick="selectChip(50, this)">$50</div>
             <div class="chip-select chip-100" onclick="selectChip(100, this)">$100</div>
@@ -342,12 +352,39 @@
         </div>
 
         <div class="action-btns">
-            <button class="btn-act btn-clear" onclick="clearUserBets()"><i class="fas fa-trash"></i> پاک کردن شرط‌ها</button>
-            <button class="btn-act btn-double" onclick="doubleUserBets()"><i class="fas fa-clone"></i> دو برابر کردن</button>
+            <button class="btn-act btn-clear" onclick="clearUserBets()"><i class="fas fa-trash"></i> پاک کردن</button>
+            <button class="btn-act btn-double" onclick="doubleUserBets()"><i class="fas fa-clone"></i> ۲ برابر</button>
         </div>
     </div>
 
     <script>
+        // ==========================================
+        // مرحله ۱: آماده‌سازی متغیرهای اتصال Supabase
+        // ==========================================
+        const SUPABASE_URL = 'https://your-project-ref.supabase.co'; // آدرس پروژه خود را جایگزین کنید
+        const SUPABASE_ANON_KEY = 'your-anon-key-here';             // کلید Anon پروژه خود را جایگزین کنید
+        
+        let supabaseClient = null;
+        let rouletteChannel = null;
+        const currentUserId = 'user_' + Math.floor(1000 + Math.random() * 9000);
+        const userName = 'بازیکن ' + currentUserId.slice(-4);
+
+        // راه اندازی سوپابیس (در صورت جایگزینی کلیدهای بالا فعال می‌شود)
+        if (typeof supabase !== 'undefined' && !SUPABASE_URL.includes('your-project-ref')) {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            rouletteChannel = supabaseClient.channel('roulette_room_1', {
+                config: {
+                    presence: { key: currentUserId },
+                    broadcast: { self: false }
+                }
+            });
+            rouletteChannel.subscribe((status) => {
+                if (status === 'SUBSCRIBED') {
+                    console.log(`✅ با موفقیت به Supabase متصل شدید | نام کاربر: ${userName}`);
+                }
+            });
+        }
+
         // ترتیب رسمی اعداد رولت اروپایی
         const wheelNumbers = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3];
         const redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
@@ -359,7 +396,6 @@
         let gameState = 'BETTING'; // BETTING, SPINNING, RESULT
         let countdown = 12;
         let timerInterval;
-        let currentWheelAngle = 0;
 
         // وب آدیو برای افکت صوتی
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -399,7 +435,7 @@
 
                 ctx.beginPath();
                 ctx.moveTo(radius, radius);
-                ctx.arc(radius, radius, radius - 8, angle, angle + sliceAngle);
+                ctx.arc(radius, radius, radius - 6, angle, angle + sliceAngle);
                 ctx.closePath();
                 ctx.fill();
                 ctx.strokeStyle = '#facc15';
@@ -412,18 +448,18 @@
                 ctx.rotate(angle + sliceAngle / 2);
                 ctx.textAlign = 'right';
                 ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 10px Orbitron';
-                ctx.fillText(num.toString(), radius - 14, 4);
+                ctx.font = 'bold 9px Orbitron';
+                ctx.fillText(num.toString(), radius - 12, 3);
                 ctx.restore();
             }
 
             // مرکز چرخ
             ctx.beginPath();
-            ctx.arc(radius, radius, 35, 0, 2 * Math.PI);
+            ctx.arc(radius, radius, 28, 0, 2 * Math.PI);
             ctx.fillStyle = '#2d160a';
             ctx.fill();
             ctx.strokeStyle = '#facc15';
-            ctx.lineWidth = 3;
+            ctx.lineWidth = 2;
             ctx.stroke();
         }
 
@@ -432,9 +468,6 @@
             const table = document.getElementById('roulette-table');
             
             // چیدمان اعداد 1 تا 36 در 3 سطر استاندارد رولت
-            // سطر 1: 3, 6, 9, 12, ... 36
-            // سطر 2: 2, 5, 8, 11, ... 35
-            // سطر 3: 1, 4, 7, 10, ... 34
             for (let r = 0; r < 3; r++) {
                 for (let c = 1; c <= 12; c++) {
                     const num = (c - 1) * 3 + (3 - r);
@@ -524,10 +557,8 @@
         }
 
         function renderChips() {
-            // پاکسازی ژتون‌های قدیمی
             document.querySelectorAll('.chip-on-table').forEach(c => c.remove());
 
-            // ثبت ژتون‌های کاربر
             userBets.forEach(b => {
                 const cell = document.querySelector(`[data-bet="${b.target}"]`);
                 if (cell) {
@@ -538,7 +569,6 @@
                 }
             });
 
-            // ثبت ژتون‌های بات‌ها (گروهی)
             botBets.forEach(b => {
                 const cell = document.querySelector(`[data-bet="${b.target}"]`);
                 if (cell) {
@@ -583,7 +613,6 @@
             document.getElementById('balance-val').textContent = `$${userBalance}`;
         }
 
-        // شبیه‌سازی شرط‌بندی زنده بازیکنان دیگر
         function simulateBotBets() {
             if (gameState !== 'BETTING') return;
 
@@ -605,7 +634,6 @@
             renderChips();
         }
 
-        // چرخه تایمر و شروع چرخش
         function startTimer() {
             countdown = 10;
             gameState = 'BETTING';
@@ -633,19 +661,16 @@
             document.getElementById('status-msg').textContent = 'در حال چرخش چرخ رولت...';
             document.getElementById('timer-display').textContent = '🌀';
 
-            // انتخاب عدد برنده به صورت تصادفی
             const winningIndex = Math.floor(Math.random() * wheelNumbers.length);
             const winningNumber = wheelNumbers[winningIndex];
 
-            // محاسبه زاویه نهایی
             const sliceAngle = 360 / wheelNumbers.length;
-            const targetDegree = 360 * 5 + (360 - (winningIndex * sliceAngle)); // 5 دور کامل + زاویه خانه
+            const targetDegree = 360 * 5 + (360 - (winningIndex * sliceAngle));
 
             const canvas = document.getElementById('rouletteWheel');
             canvas.style.transition = 'transform 4s cubic-bezier(0.15, 0.9, 0.2, 1)';
             canvas.style.transform = `rotate(${targetDegree}deg)`;
 
-            // صدای چرخش
             let spinSoundInt = setInterval(() => playSound(200 + Math.random() * 100, 'square', 0.03), 100);
 
             setTimeout(() => {
@@ -659,11 +684,9 @@
             const isRed = redNumbers.includes(winNum);
             const isEven = winNum !== 0 && winNum % 2 === 0;
 
-            // هایلایت خانه برنده
             const winCell = document.querySelector(`[data-bet="${winNum}"]`);
             if (winCell) winCell.classList.add('winning-cell');
 
-            // محاسبه برد کاربر
             let totalPayout = 0;
 
             userBets.forEach(b => {
@@ -689,7 +712,6 @@
             userBalance += totalPayout;
             updateStats();
 
-            // پیام برنده
             const colorName = winNum === 0 ? 'سبز' : (isRed ? 'قرمز' : 'مشکی');
             if (totalPayout > 0) {
                 document.getElementById('status-msg').textContent = `🎉 عدد ${winNum} (${colorName}) - شما $${totalPayout} برنده شدید!`;
@@ -698,10 +720,8 @@
                 document.getElementById('status-msg').textContent = `عدد برنده: ${winNum} (${colorName})`;
             }
 
-            // افزودن به تاریخچه
             addHistory(winNum);
 
-            // ریست چرخ برای دست بعدی
             setTimeout(() => {
                 const canvas = document.getElementById('rouletteWheel');
                 canvas.style.transition = 'none';
@@ -724,7 +744,6 @@
             if (histList.children.length > 7) histList.removeChild(histList.lastChild);
         }
 
-        // راه‌اندازی اولیه
         window.onload = () => {
             drawWheel();
             buildTable();
