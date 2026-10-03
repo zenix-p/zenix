@@ -262,7 +262,7 @@ window.currentFilteredNotifs = [];
 window.activeNotifFilter = 'all';
 
 window.updateBellBadge = function() {
-  const unreadCount = window.cachedNotifications.filter(n => !n.read && !n.isRead).length;
+  const unreadCount = window.cachedNotifications.filter(n => !n.read && !n.isRead && !n.is_read).length;
   const badge = document.getElementById('bell-badge');
   if (badge) {
     badge.innerText = unreadCount;
@@ -295,16 +295,32 @@ window.openMsgDetail = async function(idx) {
   const n = window.currentFilteredNotifs[idx];
   if (!n) return;
 
-  // به عنوان خوانده شده علامت بگذار اگر هنوز خوانده نشده
-  if (!n.read && !n.isRead) {
-    n.read = true;
-    n.isRead = true;
+  const isUnread = !n.read && !n.isRead && !n.is_read;
+
+  if (isUnread) {
+    // علامت‌گذاری محلی
+    if ('read' in n) n.read = true;
+    if ('isRead' in n) n.isRead = true;
+    if ('is_read' in n) n.is_read = true;
+    if (!('read' in n) && !('isRead' in n) && !('is_read' in n)) n.read = true;
+
     window.updateBellBadge();
     window.renderNotifications();
+
+    // تشخيص پویا نام ستون در Supabase برای جلوگیری از خطای 400
+    const updatePayload = {};
+    if ('is_read' in n) updatePayload.is_read = true;
+    if ('read' in n) updatePayload.read = true;
+    if ('isRead' in n) updatePayload.isRead = true;
+    if (Object.keys(updatePayload).length === 0) updatePayload.is_read = true;
+
     try {
-      await supabase.from('notifications').update({ read: true, isRead: true }).eq('id', n.id);
+      const { error } = await supabase.from('notifications').update(updatePayload).eq('id', n.id);
+      if (error) {
+        console.error('خطا در ثبت وضعیت در Supabase:', error);
+      }
     } catch (err) {
-      console.error('خطا در بروزرسانی وضعیت پیام:', err);
+      console.error('خطا در ارسال درخواست به Supabase:', err);
     }
   }
 
@@ -357,7 +373,7 @@ window.renderNotifications = function() {
   filtered.forEach((n, idx) => {
     const title = n.title || 'پیام سیستم';
     const category = window.getNotifCategory(n);
-    const isUnread = !n.read && !n.isRead;
+    const isUnread = !n.read && !n.isRead && !n.is_read;
 
     let borderStyle = "border:1px solid rgba(255,255,255,.08);";
     let bgStyle = "background:rgba(255,255,255,.03);";
