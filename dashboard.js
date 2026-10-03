@@ -11,6 +11,12 @@ if (SUPABASE_URL && SUPABASE_URL.startsWith('http')) {
 }
 
 // ==========================================
+// متغیرهای مدیریت اعلان‌ها و پیام‌ها
+// ==========================================
+window.cachedNotifications = [];
+window.activeNotifFilter = 'all';
+
+// ==========================================
 // دیکشنری زبان‌ها و سیستم ترجمه
 // ==========================================
 let currLang = localStorage.getItem('zenix_lang') || 'fa';
@@ -230,6 +236,27 @@ async function checkUserSession() {
 
     const user = session.user;
 
+    // دریافت و به‌روزرسانی اعلان‌های کاربر از Supabase (کاملاً منطبق با quantification.html)
+    try {
+      const { data, error: notifError } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', user.id);
+      if (!notifError && data) {
+        window.cachedNotifications = data;
+        window.renderNotifications();
+        const unreadCount = data.filter(n => !n.read && !n.isRead).length;
+        const badge = document.getElementById('bell-badge');
+        if (badge) {
+          badge.innerText = unreadCount;
+          if (unreadCount > 0) badge.classList.add('show');
+          else badge.classList.remove('show');
+        }
+      }
+    } catch (err) {
+      console.error('خطا در بارگیری اعلان‌ها:', err);
+    }
+
     const { data: userData, error: dbError } = await supabase
       .from('users')
       .select('*')
@@ -378,7 +405,11 @@ window.closeMessageModal = function() {
   if (modal) modal.classList.remove('show');
 };
 
+// ==========================================
+// سیستم دسته‌بندی، فیلتر و رندر اعلان‌ها (کاملاً منطبق با quantification.html)
+// ==========================================
 window.setNotifFilter = function(filter, element) {
+  window.activeNotifFilter = filter;
   const tabs = document.querySelectorAll('#notif-tabs .notif-tab');
   tabs.forEach(tab => tab.classList.remove('active'));
   
@@ -386,9 +417,82 @@ window.setNotifFilter = function(filter, element) {
     element.classList.add('active');
   }
   
-  if (typeof window.renderNotifications === 'function') {
-    window.renderNotifications(filter);
+  window.renderNotifications();
+};
+
+window.getNotifCategory = function(n) {
+  const type = (n.type || '').toLowerCase();
+  const title = (n.title || '').toLowerCase();
+
+  if (type.includes('approved') || type.includes('confirm') || title.includes('تایید') || title.includes('موفق') || title.includes('شارژ شد')) {
+    return 'approved';
   }
+  if (type.includes('rejected') || type.includes('canceled') || type.includes('cancel') || title.includes('رد') || title.includes('لغو') || title.includes('ناموفق')) {
+    return 'rejected';
+  }
+  return 'admin_message';
+};
+
+window.renderNotifications = function() {
+  const container = document.getElementById('modal-msg-container');
+  if (!container) return;
+
+  const filter = window.activeNotifFilter;
+  const filtered = window.cachedNotifications.filter(n => {
+    if (filter === 'all') return true;
+    return window.getNotifCategory(n) === filter;
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div style="text-align:center;padding:25px;color:#94a3b8;font-size:12px;"><i class="fas fa-inbox" style="font-size:24px;margin-bottom:8px;display:block;opacity:0.5;"></i>هیچ پیامی در این دسته‌بندی وجود ندارد.</div>`;
+    return;
+  }
+
+  let html = '';
+  filtered.forEach(n => {
+    const title = n.title || 'پیام سیستم';
+    const msg = n.message || n.text || n.body || '';
+    const category = window.getNotifCategory(n);
+
+    let borderStyle = "border:1px solid rgba(255,255,255,.08);";
+    let bgStyle = "background:rgba(255,255,255,.03);";
+    let icon = '<i class="fas fa-bullhorn" style="color:#38bdf8"></i>';
+    let tagHtml = '<span style="font-size:10px;background:rgba(56,189,248,0.2);color:#38bdf8;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">پیام مدیریت</span>';
+    let supportBtn = '';
+
+    if (category === 'approved') {
+      borderStyle = "border:1px solid rgba(34, 197, 94, 0.4);";
+      bgStyle = "background:rgba(34, 197, 94, 0.08);";
+      icon = '<i class="fas fa-check-circle" style="color:#22c55e"></i>';
+      tagHtml = '<span style="font-size:10px;background:rgba(34,197,94,0.2);color:#22c55e;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">تایید درخواست</span>';
+    } else if (category === 'rejected') {
+      borderStyle = "border:1px solid rgba(239, 68, 68, 0.4);";
+      bgStyle = "background:rgba(239, 68, 68, 0.08);";
+      icon = '<i class="fas fa-times-circle" style="color:#ef4444"></i>';
+      tagHtml = '<span style="font-size:10px;background:rgba(239,68,68,0.2);color:#ef4444;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">لغو درخواست</span>';
+      
+      supportBtn = `
+        <div style="margin-top:10px;padding-top:8px;border-top:1px dashed rgba(239,68,68,0.2);display:flex;justify-content:flex-end;">
+          <a href="support.html" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);" style="display:inline-flex;align-items:center;gap:6px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f8fafc;padding:5px 10px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:600;transition:0.2s;">
+            <i class="fas fa-headset" style="color:#ef4444;"></i>
+            <span>پیگیری از طریق پشتیبانی</span>
+          </a>
+        </div>
+      `;
+    }
+
+    html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle}">
+      <div class="msg-title-text" style="display:flex;align-items:center;gap:8px;">
+        ${icon}
+        <span>${title}</span>
+        ${tagHtml}
+      </div>
+      <div class="msg-desc-text" style="margin-top:6px;">${msg}</div>
+      ${supportBtn}
+    </div>`;
+  });
+
+  container.innerHTML = html;
 };
 
 window.switchNotifTab = function(tabName) {
