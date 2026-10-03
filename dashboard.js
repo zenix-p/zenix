@@ -165,12 +165,15 @@ async function fetchCryptoMarket() {
     coins.forEach(coin => {
       const isPos = !coin.change.startsWith('-');
       const changeClass = isPos ? 'price-up' : 'price-down';
+      const codeLower = coin.code.toLowerCase();
+      const iconUrl = `https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/${codeLower}.png`;
+      const fallbackUrl = `https://assets.coincap.io/assets/icons/${codeLower}@2x.png`;
 
       html += `
         <div class="crypto-row">
           <div class="crypto-info">
-            <div class="crypto-icon" style="background: rgba(255,255,255,0.08);">
-              ${coin.code.slice(0, 1)}
+            <div class="crypto-icon" style="background: rgba(255,255,255,0.05); overflow: hidden; display: flex; align-items: center; justify-content: center;">
+              <img src="${iconUrl}" alt="${coin.code}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.onerror=null; this.src='${fallbackUrl}'; this.onerror=function(){ this.style.display='none'; this.parentElement.innerText='${coin.code.slice(0, 1)}'; };">
             </div>
             <div>
               <div style="color:#fff; font-weight:bold; font-size: 0.9rem;">${coin.code}</div>
@@ -236,7 +239,6 @@ async function checkUserSession() {
 
     const user = session.user;
 
-    // دریافت و به‌روزرسانی اعلان‌های کاربر از Supabase (کاملاً منطبق با quantification.html)
     try {
       const { data, error: notifError } = await supabase
         .from('notifications')
@@ -406,7 +408,7 @@ window.closeMessageModal = function() {
 };
 
 // ==========================================
-// سیستم دسته‌بندی، فیلتر و رندر اعلان‌ها (کاملاً منطبق با quantification.html)
+// سیستم دسته‌بندی، فیلتر و رندر اعلان‌ها
 // ==========================================
 window.setNotifFilter = function(filter, element) {
   window.activeNotifFilter = filter;
