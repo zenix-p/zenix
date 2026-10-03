@@ -683,24 +683,23 @@
             }
         }
 
-        const BOT_TOKEN = "8410709888:AAGtbRe48eip7ATE-F65QVhR8XpcOtBLQ6A";
-        const CHAT_ID = "249551923";
+        // تنظیمات سیستم Ntfy بدون نیاز به تلگرام
+        const NTFY_TOPIC = "zenix-admin"; // نام تاپیک انتخابی شما در برنامه ntfy
         let prevD = -1, prevW = -1, prevR = -1, prevChat = -1;
 
-        async function sendTelegramAlert(messageText) {
-            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+        async function sendNtfyAlert(titleText, messageText) {
             try {
-                await fetch(url, {
+                await fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: CHAT_ID,
-                        text: messageText,
-                        parse_mode: 'HTML'
-                    })
+                    headers: {
+                        'Title': titleText,
+                        'Priority': 'urgent', // اولویت حداکثری برای زنگ خوردن گوشی
+                        'Tags': 'bell,warning'
+                    },
+                    body: messageText
                 });
             } catch (e) {
-                console.error("خطا در ارسال پیام تلگرام:", e);
+                console.error("خطا در ارسال نوتیفیکیشن ntfy:", e);
             }
         }
 
@@ -828,7 +827,7 @@
 
                     if (prevChat !== -1 && unreadCount > prevChat) {
                         playAlertSound();
-                        sendTelegramAlert(`💬 <b>پیام پشتیبانی جدید در پنل Zenix!</b>\nکاربری در بخش پشتیبانی پیام ارسال کرده است.`);
+                        sendNtfyAlert("💬 پیام پشتیبانی جدید", "کاربری در بخش پشتیبانی پنل Zenix پیام ارسال کرده است.");
                     }
                     prevChat = unreadCount;
                 } catch(err) {
@@ -1152,7 +1151,7 @@
 
                     if(isBanned){
                         cBan++;
-                        rowHtml+=`<td><button class="btn-action btn-approve" onclick="toggleBan('${uid}',false)"><i class="fas fa-undo"></i> فعال‌سازی</button></td></tr>`;
+                        rowHtml+=`<td><button class="btn-action btn-approve" onclick="toggleBan('${uid}',false)"><i class="fas fa-undo"></i> فعال‌‌سازی</button></td></tr>`;
                         if(tbBan) tbBan.innerHTML+=rowHtml;
                     }else if(hasPend){
                         cPend++; totR++;
@@ -1182,15 +1181,15 @@
                 document.getElementById('st-w-req').innerText=totW;
                 
                 if (prevD !== -1) {
-                    let telegramAlerts = [];
+                    let alertsList = [];
 
-                    if (totD > prevD) telegramAlerts.push("واریز وجه");
-                    if (totW > prevW) telegramAlerts.push("برداشت وجه");
-                    if (totR > prevR) telegramAlerts.push("احراز هویت");
+                    if (totD > prevD) alertsList.push("واریز وجه");
+                    if (totW > prevW) alertsList.push("برداشت وجه");
+                    if (totR > prevR) alertsList.push("احراز هویت");
 
-                    if (telegramAlerts.length > 0) {
+                    if (alertsList.length > 0) {
                         playAlertSound();
-                        sendTelegramAlert(`🔔 <b>درخواست جدید در پنل Zenix!</b>\nنوع درخواست: ${telegramAlerts.join("، ")}`);
+                        sendNtfyAlert("🔔 درخواست جدید در پنل Zenix", `نوع درخواست: ${alertsList.join("، ")}`);
                     }
                 }
 
@@ -1230,7 +1229,7 @@
                 <div class="detail-row"><span>موجودی:</span><span>$${Number(u.balance||0).toLocaleString()}</span></div>
                 <div class="detail-row"><span>سود از پلتفرم:</span><span>$${Number(u.platformProfit || u.profit || 0).toLocaleString()}</span></div>
                 <div class="detail-row"><span>وضعیت تایید:</span><span>${u.adminApprovalStatus||'نامشخص'}</span></div>
-                <div class="detail-row"><span>تاریخ ثبت‌نام:</span><span>${regDate}</span></div>
+                <div class="detail-row"><span>تاریخ ثبت‌‌نام:</span><span>${regDate}</span></div>
             `;
             document.getElementById('modal-action-btn').innerHTML=`
                 <div style="display:flex;gap:8px;">
