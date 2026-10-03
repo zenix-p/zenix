@@ -229,25 +229,86 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ==========================================
-// تابع بهینه‌شده دریافت تعداد زیرمجموعه‌ها با RPC
+// تابع بهینه‌شده دریافت تعداد زیرمجموعه‌ها (اصلاح‌شده)
 // ==========================================
 async function getReferralCount(user, userData) {
   if (!user || !supabase) return 0;
 
-  try {
-    // فراخوانی مستقیم تابع SQL تعریف‌شده در سوپابیس
-    const { data, error } = await supabase.rpc('get_my_referrals_stats');
-    
-    if (!error && data && data.length > 0) {
-      return Number(data[0].total_count || 0);
-    }
-  } catch (err) {
-    console.warn('خطا در فراخوانی RPC برای زیرمجموعه‌ها:', err);
+  // ۱. بررسی مستقیم فیلدهای عددی در شیء userData کاربر
+  let directCount = userData?.referrals_count ?? userData?.referral_count ?? userData?.invited_count ?? userData?.team_count ?? userData?.total_referrals ?? userData?.sub_count;
+  if (directCount !== undefined && directCount !== null && !isNaN(Number(directCount))) {
+    const num = Number(directCount);
+    if (num > 0) return num;
   }
 
-  // فال‌بک در صورت عدم دسترسی به تابع RPC: بررسی فیلدهای مستقیم کاربر
-  let directCount = userData?.referrals_count ?? userData?.referral_count ?? userData?.invited_count ?? userData?.team_count ?? userData?.total_referrals;
-  if (directCount !== undefined && directCount !== null) {
+  // ۲. تلاش برای فراخوانی تابع RPC در صورت تعریف در دیتابیس
+  try {
+    const { data, error } = await supabase.rpc('get_my_referrals_stats');
+    if (!error && data) {
+      if (typeof data === 'number') return data;
+      if (Array.isArray(data) && data.length > 0) {
+        const val = data[0].total_count ?? data[0].count ?? data[0].total;
+        if (val !== undefined && val !== null) return Number(val);
+      }
+      if (typeof data === 'object') {
+        const val = data.total_count ?? data.count ?? data.total;
+        if (val !== undefined && val !== null) return Number(val);
+      }
+    }
+  } catch (err) {
+    // عدم وجود RPC
+  }
+
+  // ۳. شمارش مستقیم کاربران دعوت‌شده در جدول users بر اساس ستون‌های مرجع احتمالی
+  const refCode = userData?.referral_code || userData?.ref_code || userData?.invite_code || userData?.code;
+  const candidateColumns = ['referred_by', 'inviter_id', 'referrer_id', 'parent_id', 'ref_by'];
+
+  for (const col of candidateColumns) {
+    try {
+      const { count, error } = await supabase
+        .from('users')
+        .select('id', { count: 'exact', head: true })
+        .eq(col, user.id);
+
+      if (!error && count !== null && count > 0) {
+        return count;
+      }
+
+      if (refCode) {
+        const { count: codeCount, error: codeErr } = await supabase
+          .from('users')
+          .select('id', { count: 'exact', head: true })
+          .eq(col, refCode);
+
+        if (!codeErr && codeCount !== null && codeCount > 0) {
+          return codeCount;
+        }
+      }
+    } catch (err) {
+      // ادامه بررسی ستون بعدی
+    }
+  }
+
+  // ۴. بررسی جداول احتمالی ارجاعات (referrals یا teams)
+  const candidateTables = ['referrals', 'teams', 'user_referrals'];
+  for (const tbl of candidateTables) {
+    for (const col of ['referrer_id', 'user_id', 'parent_id', 'inviter_id']) {
+      try {
+        const { count, error } = await supabase
+          .from(tbl)
+          .select('id', { count: 'exact', head: true })
+          .eq(col, user.id);
+
+        if (!error && count !== null && count > 0) {
+          return count;
+        }
+      } catch (err) {
+        // ادامه بررسی جدول بعدی
+      }
+    }
+  }
+
+  if (directCount !== undefined && directCount !== null && !isNaN(Number(directCount))) {
     return Number(directCount);
   }
 
