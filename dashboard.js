@@ -25,7 +25,7 @@ const ld = {
   fa: {
     m1: 'صفحه اصلی', m2: 'کوانتیفیکیشن', m_poker: 'پوکر کازینویی', m3: 'واریز', m4: 'برداشت', m5: 'تراکنش', m6: 'پروفایل', m7: 'پشتیبانی', mAbout: 'درباره پلتفرم', m8: 'خروج',
     wel: 'خوش آمدید', sub: 'پنل مدیریت کاربری', st: 'تایید شده',
-    ts1: 'موجودی', ts2: 'زیرمجموعه',
+    ts1: 'موجودی', ts2: 'اعضای کل تیم',
     c1: 'کوانتیفیکیشن', d1: 'معاملات هوشمند',
     c_poker: 'پوکر کازینویی', d_poker: 'رقابت با دیلر',
     c2: 'واریز', d2: 'شارژ حساب',
@@ -51,7 +51,7 @@ const ld = {
   en: {
     m1: 'Home', m2: 'Quantification', m_poker: 'Casino Poker', m3: 'Deposit', m4: 'Withdraw', m5: 'Transactions', m6: 'Profile', m7: 'Support', mAbout: 'About Platform', m8: 'Logout',
     wel: 'Welcome', sub: 'User Dashboard Panel', st: 'Verified',
-    ts1: 'Balance', ts2: 'Referrals',
+    ts1: 'Balance', ts2: 'Total Team Members',
     c1: 'Quantification', d1: 'Smart Trading',
     c_poker: 'Casino Poker', d_poker: 'Play against dealer',
     c2: 'Deposit', d2: 'Account Recharge',
@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ==========================================
-// تابع بهینه‌شده دریافت تعداد زیرمجموعه‌ها با RPC
+// تابع بهینه‌شده دریافت تعداد زیرمجموعه‌ها با RPC (هماهنگ با صفحه تیم)
 // ==========================================
 async function getReferralCount(user, userData) {
   if (!user || !supabase) return 0;
@@ -238,16 +238,30 @@ async function getReferralCount(user, userData) {
     // فراخوانی مستقیم تابع SQL تعریف‌شده در سوپابیس
     const { data, error } = await supabase.rpc('get_my_referrals_stats');
     
-    if (!error && data && data.length > 0) {
-      return Number(data[0].total_count || 0);
+    if (!error && data) {
+      const stats = Array.isArray(data) ? (data[0] || {}) : data;
+      
+      // محاسبه مجموع اعضای نسل ۱، ۲ و ۳
+      const l1 = Number(stats.lvl1_count || stats.level1_count || stats.lvl1 || 0);
+      const l2 = Number(stats.lvl2_count || stats.level2_count || stats.lvl2 || 0);
+      const l3 = Number(stats.lvl3_count || stats.level3_count || stats.lvl3 || 0);
+      const sumLevels = l1 + l2 + l3;
+
+      const total = stats.total_count ?? stats.total_members ?? stats.total_team ?? stats.team_count ?? stats.total_referrals;
+
+      if (total !== undefined && total !== null && !isNaN(Number(total)) && Number(total) > 0) {
+        return Number(total);
+      } else if (sumLevels > 0) {
+        return sumLevels;
+      }
     }
   } catch (err) {
     console.warn('خطا در فراخوانی RPC برای زیرمجموعه‌ها:', err);
   }
 
   // فال‌بک در صورت عدم دسترسی به تابع RPC: بررسی فیلدهای مستقیم کاربر
-  let directCount = userData?.referrals_count ?? userData?.referral_count ?? userData?.invited_count ?? userData?.team_count ?? userData?.total_referrals;
-  if (directCount !== undefined && directCount !== null) {
+  let directCount = userData?.team_count ?? userData?.total_referrals ?? userData?.referrals_count ?? userData?.referral_count ?? userData?.invited_count;
+  if (directCount !== undefined && directCount !== null && !isNaN(Number(directCount))) {
     return Number(directCount);
   }
 
@@ -332,7 +346,7 @@ async function checkUserSession() {
       }
     }
 
-    // به‌روزرسانی عدد زیرمجموعه‌ها روی کارت
+    // به‌روزرسانی عدد اعضای کل تیم روی کارت
     if (refElem) {
       const totalRef = await getReferralCount(user, userData);
       refElem.textContent = totalRef;
