@@ -49,8 +49,8 @@
         .modal-close{background:rgba(255,255,255,.05);border:none;color:#94a3b8;cursor:pointer;font-size:14px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
         .modal-close:hover{background:rgba(239,68,68,.2);color:#ef4444}
         .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px;transition:0.2s}
-        .msg-body-box:hover{background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.3);}
-        .msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:0}
+        .msg-body-box:hover{border-color:rgba(56,189,248,.5)!important;opacity:1!important;}
+        .msg-title-text{font-size:13px;margin-bottom:0}
 
         .notif-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
         .notif-tab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#94a3b8;padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;white-space:nowrap;transition:0.2s;display:flex;align-items:center;justify-content:center;gap:5px;flex:1 1 auto}
@@ -413,31 +413,45 @@ window.renderNotifications = function() {
     const dateStr = window.formatGregorianDate(n.created_at || n.date || n.created_date);
 
     let borderStyle = "border:1px solid rgba(255,255,255,.08);";
-    let bgStyle = "background:rgba(255,255,255,.03);";
+    let bgStyle = "background:rgba(255,255,255,.02);";
     let icon = '<i class="fas fa-bullhorn" style="color:#38bdf8"></i>';
-    let tagHtml = '<span style="font-size:10px;background:rgba(56,189,248,0.2);color:#38bdf8;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">پیام مدیریت</span>';
+    let tagHtml = '<span style="font-size:10px;background:rgba(56,189,248,0.2);color:#38bdf8;padding:2px 6px;border-radius:4px;font-weight:700;">پیام مدیریت</span>';
 
     if (category === 'approved') {
-      borderStyle = "border:1px solid rgba(34, 197, 94, 0.4);";
-      bgStyle = "background:rgba(34, 197, 94, 0.08);";
+      borderStyle = isUnread ? "border:1px solid rgba(34, 197, 94, 0.6);" : "border:1px solid rgba(34, 197, 94, 0.2);";
+      bgStyle = isUnread ? "background:rgba(34, 197, 94, 0.12);" : "background:rgba(34, 197, 94, 0.03);";
       icon = '<i class="fas fa-check-circle" style="color:#22c55e"></i>';
-      tagHtml = '<span style="font-size:10px;background:rgba(34,197,94,0.2);color:#22c55e;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">تایید درخواست</span>';
+      tagHtml = '<span style="font-size:10px;background:rgba(34,197,94,0.2);color:#22c55e;padding:2px 6px;border-radius:4px;font-weight:700;">تایید درخواست</span>';
     } else if (category === 'rejected') {
-      borderStyle = "border:1px solid rgba(239, 68, 68, 0.4);";
-      bgStyle = "background:rgba(239, 68, 68, 0.08);";
+      borderStyle = isUnread ? "border:1px solid rgba(239, 68, 68, 0.6);" : "border:1px solid rgba(239, 68, 68, 0.2);";
+      bgStyle = isUnread ? "background:rgba(239, 68, 68, 0.12);" : "background:rgba(239, 68, 68, 0.03);";
       icon = '<i class="fas fa-times-circle" style="color:#ef4444"></i>';
-      tagHtml = '<span style="font-size:10px;background:rgba(239,68,68,0.2);color:#ef4444;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">لغو درخواست</span>';
+      tagHtml = '<span style="font-size:10px;background:rgba(239,68,68,0.2);color:#ef4444;padding:2px 6px;border-radius:4px;font-weight:700;">لغو درخواست</span>';
+    } else {
+      bgStyle = isUnread ? "background:rgba(56, 189, 248, 0.12);" : "background:rgba(255, 255, 255, 0.02);";
+      borderStyle = isUnread ? "border:1px solid rgba(56, 189, 248, 0.5);" : "border:1px solid rgba(255, 255, 255, 0.08);";
     }
 
-    const unreadDot = isUnread ? '<span style="width:8px;height:8px;background:#ef4444;border-radius:50%;display:inline-block;margin-left:4px;" title="خوانده نشده"></span>' : '';
-    const dateDisplay = dateStr ? `<div style="font-size:11px;color:#94a3b8;margin-top:6px;direction:ltr;text-align:left;"><i class="far fa-clock" style="margin-right:4px;"></i>${dateStr}</div>` : '';
+    // استایل متمایزکننده خوانده‌شده و خوانده‌نشده
+    const opacityStyle = isUnread ? "opacity:1;" : "opacity:0.65;";
+    const unreadDot = isUnread ? '<span style="width:9px;height:9px;background:#ef4444;border-radius:50%;display:inline-block;box-shadow:0 0 8px #ef4444;" title="خوانده نشده"></span>' : '';
+    const readBadge = isUnread 
+      ? '<span style="font-size:10px;background:#ef4444;color:#fff;padding:2px 7px;border-radius:10px;font-weight:800;box-shadow:0 0 8px rgba(239,68,68,0.5);">جدید</span>' 
+      : '<span style="font-size:10px;background:rgba(255,255,255,0.06);color:#94a3b8;padding:2px 6px;border-radius:10px;"><i class="fas fa-check" style="font-size:9px;color:#64748b;"></i> خوانده‌شده</span>';
 
-    html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle} cursor:pointer;" onclick="window.openMsgDetail(${idx})">
-      <div class="msg-title-text" style="display:flex;align-items:center;gap:8px;">
-        ${unreadDot}
-        ${icon}
-        <span>${title}</span>
-        ${tagHtml}
+    const dateDisplay = dateStr ? `<div style="font-size:11px;color:${isUnread ? '#cbd5e1' : '#64748b'};margin-top:6px;direction:ltr;text-align:left;"><i class="far fa-clock" style="margin-right:4px;"></i>${dateStr}</div>` : '';
+
+    html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle} ${opacityStyle} cursor:pointer; position:relative; transition:all 0.2s;" onclick="window.openMsgDetail(${idx})">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div class="msg-title-text" style="display:flex;align-items:center;gap:8px;font-weight:${isUnread ? '800' : '500'};color:${isUnread ? '#f8fafc' : '#cbd5e1'};">
+          ${unreadDot}
+          ${icon}
+          <span>${title}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          ${tagHtml}
+          ${readBadge}
+        </div>
       </div>
       ${dateDisplay}
     </div>`;
