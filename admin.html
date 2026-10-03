@@ -9,8 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <!-- بارگذاری استاندارد فونت‌اوسم جهت رفع خطای Tracking Prevention -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
@@ -293,6 +293,11 @@
         <header>
             <div class="topbar-title"><i class="fas fa-gauge-high"></i> داشبورد مدیریت پلتفرم</div>
             <div class="topbar-right">
+                <!-- دکمه تست آنلاین آلارم -->
+                <button id="test-ntfy-btn" class="admin-badge topbar-badge" style="cursor:pointer; display:flex; align-items:center; gap:6px; background:rgba(56,189,248,.15); border:1px solid rgba(56,189,248,.3); color:#38bdf8;" title="تست ارسال آلارم به گوشی">
+                    <i class="fas fa-paper-plane"></i>
+                    <span>تست آلارم گوشی</span>
+                </button>
                 <button id="toggle-sound-btn" class="admin-badge topbar-badge" style="cursor:pointer; display:flex; align-items:center; gap:6px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); color:#f8fafc;" title="قطع / وصل صدای هشدار">
                     <i id="sound-icon" class="fas fa-volume-high" style="color:#22c55e;"></i>
                     <span id="sound-text">صدا فعال</span>
@@ -353,7 +358,7 @@
                                     <th>تلفن</th>
                                     <th>موجودی</th>
                                     <th>سود از پلتفرم</th>
-                                    <th>تاریخ ثبت‌‌نام</th>
+                                    <th>تاریخ ثبت‌نام</th>
                                     <th>عملیات</th>
                                 </tr>
                             </thead>
@@ -642,8 +647,9 @@
                 audioCtx.resume();
             }
         }
-        document.addEventListener('click', unlockAudio, { once: true });
-        document.addEventListener('touchstart', unlockAudio, { once: true });
+        // فعال‌سازی صدای مرورگر با هر لمس یا کلیک رو صفحه
+        document.addEventListener('click', unlockAudio);
+        document.addEventListener('touchstart', unlockAudio);
 
         function playAlertSound() {
             if (isMuted) return;
@@ -683,13 +689,13 @@
             }
         }
 
-        // تنظیمات سیستم Ntfy بدون نیاز به تلگرام (ارسال JSON جهت جلوگیری از خطای کاراکترهای فارسی در Header)
-        const NTFY_TOPIC = "zenix-admin"; // نام تاپیک انتخابی شما در برنامه ntfy
+        // تنظیمات ntfy
+        const NTFY_TOPIC = "zenix-admin"; 
         let prevD = -1, prevW = -1, prevR = -1, prevChat = -1;
 
         async function sendNtfyAlert(titleText, messageText) {
             try {
-                await fetch('https://ntfy.sh', {
+                const res = await fetch('https://ntfy.sh', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -698,14 +704,25 @@
                         topic: NTFY_TOPIC,
                         title: titleText,
                         message: messageText,
-                        priority: 5, // اولویت حداکثری برای زنگ خوردن گوشی
+                        priority: 5, // اولویت حداکثری زنگ
                         tags: ['bell', 'warning']
                     })
                 });
+                if (!res.ok) {
+                    console.error("خطای ارسال ntfy با کد وضعیت:", res.status);
+                }
             } catch (e) {
                 console.error("خطا در ارسال نوتیفیکیشن ntfy:", e);
             }
         }
+
+        // دکمه تست آنلاین آلارم و ntfy
+        document.getElementById('test-ntfy-btn')?.addEventListener('click', async () => {
+            unlockAudio();
+            playAlertSound();
+            await sendNtfyAlert("🧪 تست آلارم Zenix", "این یک پیام تست برای بررسی زنگ خوردن گوشی است.");
+            showToast("پیام تست به ntfy ارسال شد.");
+        });
 
         window.switchTab=(id,btn)=>{
             document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
@@ -756,7 +773,6 @@
             return isNaN(d.getTime())?'نامشخص':`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} | ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
         };
 
-        // تابع کمکی برای ارسال ایمن اعلان‌ها به کاربر (عدم توقف برنامه در صورت محدودیت RLS)
         async function sendNotificationToUser(uid, title, message) {
             const now = new Date().toISOString();
             try {
