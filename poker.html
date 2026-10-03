@@ -37,6 +37,91 @@
             padding-bottom: 120px; 
         }
 
+        /* 📱 پاپ‌آپ راهنما و چرخش صفحه برای موبایل */
+        #rotate-prompt {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(2, 6, 23, 0.96);
+            backdrop-filter: blur(12px);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .rotate-card {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--gold-accent);
+            border-radius: 16px;
+            padding: 25px 20px;
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 0 30px rgba(250, 204, 21, 0.2);
+        }
+
+        .rotate-icon {
+            font-size: 48px;
+            color: var(--gold-accent);
+            margin-bottom: 15px;
+            animation: rotatePhone 2s infinite ease-in-out;
+        }
+
+        @keyframes rotatePhone {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(-90deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        .rotate-card h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .rotate-card p {
+            font-size: 12px;
+            color: #94a3b8;
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        .btn-rotate-force {
+            width: 100%;
+            background: linear-gradient(135deg, #eab308, #ca8a04);
+            color: #000;
+            font-weight: 800;
+            font-size: 13px;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-skip {
+            background: transparent;
+            border: none;
+            color: #64748b;
+            font-size: 11px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* نمایش پاپ‌آپ فقط در گوشی وقتی حالت عمودی است */
+        @media (max-width: 900px) and (orientation: portrait) {
+            #rotate-prompt {
+                display: flex;
+            }
+        }
+
         /* هدر استیج */
         header {
             background: rgba(15, 23, 42, 0.9);
@@ -73,7 +158,6 @@
             width: 100%;
         }
 
-        /* چرخ رولت و آواتارها */
         .top-section {
             display: flex;
             justify-content: space-between;
@@ -255,73 +339,32 @@
         .winning-cell { animation: winPulse 0.8s infinite alternate; border-color: var(--gold-accent) !important; z-index: 10; }
         @keyframes winPulse { from { box-shadow: 0 0 5px var(--gold-accent); } to { box-shadow: 0 0 18px var(--gold-accent); background: rgba(250, 204, 21, 0.6); } }
 
-        /* ========================================================= */
-        /* 📱 استایل‌های مخصوص موبایل و تبلت (استایل‌های کاملاً ریسپانسیو) */
-        /* ========================================================= */
+        /* 📱 استایل‌های موبایل */
         @media (max-width: 768px) {
-            body {
-                padding-bottom: 130px; /* فضای کافی برای پنل کنترل موبایل */
-            }
-
-            header {
-                padding: 8px 10px;
-            }
+            body { padding-bottom: 130px; }
+            header { padding: 8px 10px; }
             .logo { font-size: 12px; }
             .history-title { display: none; }
             .hist-num { width: 18px; height: 18px; font-size: 8px; }
             .stat-pill { padding: 3px 6px; }
             .stat-val { font-size: 10px; }
 
-            .top-section {
-                flex-direction: column;
-                gap: 8px;
-            }
-
-            /* نمایش افقی بازیکنان روی موبایل */
-            .players-container {
-                flex-direction: row;
-                width: 100%;
-                justify-content: space-between;
-                gap: 4px;
-            }
-            .player-card {
-                flex: 1;
-                padding: 3px 5px;
-                gap: 4px;
-                justify-content: center;
-            }
+            .top-section { flex-direction: column; gap: 8px; }
+            .players-container { flex-direction: row; width: 100%; justify-content: space-between; gap: 4px; }
+            .player-card { flex: 1; padding: 3px 5px; gap: 4px; justify-content: center; }
             .player-avatar { width: 22px; height: 22px; }
             .p-name { font-size: 9px; }
             .p-status { font-size: 7px; }
 
-            /* کوچک کردن چرخ رولت در موبایل */
-            .wheel-box {
-                width: 160px;
-                height: 160px;
-                border-width: 4px;
-            }
+            .wheel-box { width: 150px; height: 150px; border-width: 4px; }
 
-            .status-center {
-                width: 100%;
-                flex-direction: row;
-                justify-content: center;
-                gap: 10px;
-            }
-            .timer-circle {
-                width: 40px;
-                height: 40px;
-                font-size: 15px;
-            }
+            .status-center { width: 100%; flex-direction: row; justify-content: center; gap: 10px; }
+            .timer-circle { width: 38px; height: 38px; font-size: 14px; }
             .status-text { font-size: 9px; }
 
-            /* مسطح کردن زاویه میز در موبایل برای راحت‌تر شدن لمس خانه‌ها */
-            .table-viewport {
-                perspective: none;
-                justify-content: flex-start;
-            }
-
+            .table-viewport { perspective: none; justify-content: flex-start; }
             .roulette-table {
-                transform: none; /* حذف چرخش ۳بعدی روی گوشی برای لمس دقیق */
+                transform: none;
                 min-width: 560px;
                 grid-template-columns: 32px repeat(12, minmax(0, 1fr)) 36px;
                 grid-template-rows: repeat(3, 30px) 28px 28px;
@@ -334,37 +377,26 @@
             .cell.outside-bet { font-size: 8px; }
             .chip-on-table { width: 16px; height: 16px; font-size: 6px; }
 
-            /* چیدمان دو طبقه‌ای کنترل‌ها در موبایل */
-            .control-bar {
-                flex-direction: column;
-                gap: 8px;
-                padding: 8px;
-            }
-            .chip-rack {
-                width: 100%;
-                justify-content: center;
-                gap: 12px;
-            }
-            .chip-select {
-                width: 36px;
-                height: 36px;
-                font-size: 9px;
-            }
-            .action-btns {
-                width: 100%;
-                justify-content: space-between;
-                gap: 8px;
-            }
-            .btn-act {
-                flex: 1;
-                padding: 8px;
-                font-size: 10px;
-                text-align: center;
-            }
+            .control-bar { flex-direction: column; gap: 8px; padding: 8px; }
+            .chip-rack { width: 100%; justify-content: center; gap: 12px; }
+            .chip-select { width: 36px; height: 36px; font-size: 9px; }
+            .action-btns { width: 100%; justify-content: space-between; gap: 8px; }
+            .btn-act { flex: 1; padding: 8px; font-size: 10px; text-align: center; }
         }
     </style>
 </head>
 <body>
+
+    <!-- 📱 modal چرخش صفحه -->
+    <div id="rotate-prompt">
+        <div class="rotate-card">
+            <i class="fas fa-mobile-screen-button rotate-icon"></i>
+            <h3>گوشی خود را بچرخانید</h3>
+            <p>برای قرارگیری دقیق و آسان اعداد رولت زیر انگشتانتان، لطفاً صفحه گوشی را افقی کنید.</p>
+            <button class="btn-rotate-force" onclick="requestLandscape()"><i class="fas fa-rotate"></i> چرخش و تمام‌صفحه</button>
+            <button class="btn-skip" onclick="dismissRotatePrompt()">ادامه در همین حالت</button>
+        </div>
+    </div>
 
     <header>
         <div class="logo"><i class="fas fa-dharmachakra"></i> ZENIX</div>
@@ -447,6 +479,25 @@
     </div>
 
     <script>
+        // درخواست حالت افقی و تمام‌صفحه در صورت کلیک روی دکمه چرخش
+        async function requestLandscape() {
+            try {
+                if (document.documentElement.requestFullscreen) {
+                    await document.documentElement.requestFullscreen();
+                }
+                if (screen.orientation && screen.orientation.lock) {
+                    await screen.orientation.lock('landscape');
+                }
+            } catch (err) {
+                console.log('امکان چرخش اجباری در این مرورگر وجود ندارد، لطفاً چرخش خودکار گوشی را روشن کنید.');
+            }
+            dismissRotatePrompt();
+        }
+
+        function dismissRotatePrompt() {
+            document.getElementById('rotate-prompt').style.display = 'none';
+        }
+
         const SUPABASE_URL = 'https://your-project-ref.supabase.co'; 
         const SUPABASE_ANON_KEY = 'your-anon-key-here';             
         
