@@ -10,8 +10,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- لینک جایگزین JSDelivr جهت رفع خطای Tracking Prevention مرورگر -->
+    <!-- CDN بدون خطای Tracking Prevention برای آیکون‌ها -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    
+    <!-- تنظیمات اختصاصی وب‌اپلیکیشن (PWA Admin) -->
+    <link rel="manifest" href="manifest-admin.json">
+    <meta name="theme-color" content="#0a0f1e">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Zenix Admin">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/906/906343.png">
     
     <style>
         :root {
@@ -782,7 +791,6 @@
             }
         }
 
-        // پاکسازی کانال‌ها هنگام رفتن صفحه به حالت خواب (Back-Forward Cache) جهت جلوگیری از خطای WebSocket
         function cleanupRealtimeChannels() {
             if (chatChannel) supabaseClient.removeChannel(chatChannel);
             if (messageChannel) supabaseClient.removeChannel(messageChannel);
@@ -790,7 +798,6 @@
             if (realtimeUsersChannel) supabaseClient.removeChannel(realtimeUsersChannel);
         }
 
-        // گوش دادن به تغییرات زنده داده‌ها
         async function initRealtimeDataListeners() {
             cleanupRealtimeChannels();
 
@@ -1643,6 +1650,15 @@
             } else {
                 startAdminDashboard();
             }
+        }
+
+        // ثبت سرویس‌‌ورکر اختصاصی وب‌اپلیکیشن ادمین
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw-admin.js')
+                    .then(reg => console.log('Admin Service Worker registered:', reg.scope))
+                    .catch(err => console.error('Admin SW registration failed:', err));
+            });
         }
 
         // مدیریت لغو اتصال WebSocket هنگام رفتن صفحه به حالت غیرفعال / خواب (bfcache)
