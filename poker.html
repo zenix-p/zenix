@@ -325,8 +325,8 @@
         .winning-cell { animation: winPulse 0.8s infinite alternate; border-color: var(--gold-accent) !important; z-index: 10; }
         @keyframes winPulse { from { box-shadow: 0 0 4px var(--gold-accent); } to { box-shadow: 0 0 14px var(--gold-accent); background: rgba(250, 204, 21, 0.6); } }
 
-        /* 📱 تنظیمات کاملاً اختصاصی موبایل (فیت ۱۰۰٪ بدون اسکرول) */
-        @media (max-width: 768px) {
+        /* 📱 ۱. استایل مخصوص حالت عمودی گوشی (PORTRAIT) */
+        @media (max-width: 768px) and (orientation: portrait) {
             body { padding-bottom: 80px; }
             header { padding: 6px 8px; }
             .logo { font-size: 12px; }
@@ -339,7 +339,6 @@
                 gap: 6px;
             }
 
-            /* ۱. انتقال جدول اعداد به بالا و فیت کامل صفحه */
             .table-viewport {
                 order: 1;
                 width: 100%;
@@ -348,7 +347,7 @@
 
             .roulette-table {
                 width: 100%;
-                min-width: 0; /* حذف عرض حداقل برای جلوگیری از بیرون زدگی */
+                min-width: 0;
                 grid-template-columns: 24px repeat(12, minmax(0, 1fr)) 28px;
                 grid-template-rows: repeat(3, 28px) 24px 24px;
                 padding: 2px;
@@ -361,7 +360,6 @@
             .cell.outside-bet { font-size: 7px; padding: 0; }
             .chip-on-table { width: 13px; height: 13px; font-size: 5px; }
 
-            /* ۲. گردونه فشرده و تایمر در زیر اعداد */
             .top-section {
                 order: 2;
                 flex-direction: row;
@@ -378,7 +376,6 @@
                 width: 75px;
                 height: 75px;
                 border-width: 2px;
-                box-shadow: 0 0 10px rgba(0,0,0,0.8);
             }
 
             .wheel-pointer {
@@ -403,7 +400,6 @@
 
             .status-text { font-size: 9px; }
 
-            /* ۳. لیست بازیکنان بصورت یک ردیف متراکم */
             .players-container {
                 order: 3;
                 flex-direction: row;
@@ -416,12 +412,113 @@
             .p-name { font-size: 8px; }
             .p-status { font-size: 7px; }
 
-            /* ۴. پنل ژتون‌ها در پایین صفحه */
             .control-bar {
                 padding: 6px 8px max(6px, env(safe-area-inset-bottom));
             }
             .chip-select { width: 32px; height: 32px; font-size: 8px; }
             .btn-act { padding: 6px 8px; font-size: 9px; }
+        }
+
+        /* 🔄 ۲. استایل فوق‌العاده برای حالت چرخش افقی (LANDSCAPE) */
+        @media (orientation: landscape) and (max-height: 550px) {
+            body {
+                padding-bottom: 50px;
+            }
+
+            header {
+                padding: 4px 12px;
+            }
+
+            .logo { font-size: 11px; }
+            .history-title { display: none; }
+            .hist-num { width: 15px; height: 15px; font-size: 7px; }
+            .stat-val { font-size: 9px; }
+
+            .main-stage {
+                flex-direction: row; /* چیدمان افقی (گردونه سمت راست، میز سمت چپ) */
+                align-items: center;
+                justify-content: space-between;
+                padding: 4px 10px;
+                gap: 10px;
+                width: 100%;
+            }
+
+            /* گردونه و وضعیت در کنار میز قرار می‌گیرند */
+            .top-section {
+                order: 1;
+                flex-direction: column;
+                width: 125px;
+                flex-shrink: 0;
+                padding: 6px;
+                gap: 4px;
+                background: rgba(15, 23, 42, 0.6);
+                border-radius: 10px;
+                border: 1px solid var(--glass-border);
+            }
+
+            .wheel-box {
+                width: 80px;
+                height: 80px;
+                border-width: 2px;
+            }
+
+            .wheel-pointer {
+                top: -3px;
+                border-left: 4px solid transparent;
+                border-right: 4px solid transparent;
+                border-top: 8px solid var(--gold-accent);
+            }
+
+            .status-center {
+                width: 100%;
+                flex-direction: row;
+                justify-content: center;
+                gap: 4px;
+            }
+
+            .timer-circle {
+                width: 28px;
+                height: 28px;
+                font-size: 11px;
+                border-width: 2px;
+            }
+
+            .status-text { font-size: 8px; }
+
+            /* میز شرط‌بندی تمام فضای باقی‌مانده افقی را می‌پوشاند */
+            .table-viewport {
+                order: 2;
+                flex: 1;
+                width: 100%;
+                padding: 0;
+            }
+
+            .roulette-table {
+                width: 100%;
+                min-width: 0;
+                grid-template-columns: 28px repeat(12, minmax(0, 1fr)) 32px;
+                grid-template-rows: repeat(3, 26px) 22px 22px;
+                padding: 3px;
+                border-width: 3px;
+                gap: 1.5px;
+            }
+
+            .cell { font-size: 9px; font-weight: 800; }
+            .cell.zero-num { font-size: 10px; }
+            .cell.outside-bet { font-size: 7px; padding: 0; }
+            .chip-on-table { width: 12px; height: 12px; font-size: 5px; }
+
+            /* مخفی‌سازی لیست بازیکنان در حالت افقی برای جلوگیری از شلوغی صفحه */
+            .players-container {
+                display: none;
+            }
+
+            /* نوار کنترل پایین */
+            .control-bar {
+                padding: 4px 12px max(4px, env(safe-area-inset-bottom));
+            }
+            .chip-select { width: 30px; height: 30px; font-size: 8px; }
+            .btn-act { padding: 5px 10px; font-size: 9px; }
         }
     </style>
 </head>
@@ -457,7 +554,7 @@
     </header>
 
     <div class="main-stage">
-        <!-- میز شرط‌بندی (فیت کامل ۱۰۰٪ عرض موبایل) -->
+        <!-- میز شرط‌بندی -->
         <div class="table-viewport">
             <div class="roulette-table" id="roulette-table">
                 <div class="cell zero-num" data-bet="0">0</div>
@@ -898,7 +995,7 @@
             buildTable();
             startTimer();
 
-            if (window.innerWidth <= 768) {
+            if (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) {
                 document.getElementById('rotate-prompt').style.display = 'flex';
             }
         };
