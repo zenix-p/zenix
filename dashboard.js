@@ -228,6 +228,54 @@ document.addEventListener('DOMContentLoaded', async () => {
   await checkUserSession();
 });
 
+// تابع محاسبه و شمارش دقیق زیرمجموعه‌ها براساس منطق صفحه تیم
+async function getReferralCount(user, userData) {
+  let count = userData?.referrals_count ?? userData?.referral_count ?? userData?.invited_count ?? userData?.team_count ?? userData?.ref_count;
+  if (count !== undefined && count !== null && Number(count) > 0) {
+    return Number(count);
+  }
+
+  const metaCount = user.user_metadata?.referral_count ?? user.user_metadata?.invited_count ?? user.user_metadata?.referrals_count;
+  if (metaCount !== undefined && metaCount !== null && Number(metaCount) > 0) {
+    return Number(metaCount);
+  }
+
+  try {
+    const uid = user.id;
+    let hash = 5381;
+    let str = String(uid);
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) + hash) + str.charCodeAt(i);
+    }
+    const digits = (Math.abs(hash % 900000) + 100000).toString();
+    const code1 = 'MS-' + digits;
+    const code2 = 'SM-' + digits;
+    const customCode = userData?.referral_code || user.user_metadata?.referral_code;
+
+    const { count: dbCount, error } = await supabase
+      .from('users')
+      .select('id', { count: 'exact', head: true })
+      .or(`referred_by.eq.${uid},referrer_id.eq.${uid},referred_by.eq.${code1},referred_by.eq.${code2}${customCode ? `,referred_by.eq.${customCode}` : ''}`);
+
+    if (!error && dbCount !== null && dbCount > 0) {
+      return dbCount;
+    }
+
+    const { count: profCount, error: profErr } = await supabase
+      .from('profiles')
+      .select('id', { count: 'exact', head: true })
+      .or(`referred_by.eq.${uid},referrer_id.eq.${uid},referred_by.eq.${code1},referred_by.eq.${code2}${customCode ? `,referred_by.eq.${customCode}` : ''}`);
+
+    if (!profErr && profCount !== null && profCount > 0) {
+      return profCount;
+    }
+  } catch (e) {
+    console.warn('خطا در دریافت تعداد زیرمجموعه‌ها از دیتابیس:', e);
+  }
+
+  return Number(count || metaCount || 0);
+}
+
 async function checkUserSession() {
   try {
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -296,8 +344,9 @@ async function checkUserSession() {
         balanceElem.textContent = `$${Number(userData.balance).toFixed(2)}`;
       }
 
-      if (refElem && userData.referrals_count !== undefined) {
-        refElem.textContent = userData.referrals_count;
+      if (refElem) {
+        const totalRef = await getReferralCount(user, userData);
+        refElem.textContent = totalRef;
       }
     } else {
       if (fullNameElem) {
@@ -310,7 +359,8 @@ async function checkUserSession() {
         balanceElem.textContent = '$0.00';
       }
       if (refElem) {
-        refElem.textContent = '0';
+        const totalRef = await getReferralCount(user, null);
+        refElem.textContent = totalRef;
       }
     }
   } catch (err) {
