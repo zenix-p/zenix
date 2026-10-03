@@ -40,539 +40,412 @@
         .filter-container{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px}
         .filter-btn{background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);color:#cbd5e1;padding:8px 14px;border-radius:8px;font-size:12px;cursor:pointer;white-space:nowrap;transition:all .2s ease}
         .filter-btn.active{background:#38bdf8;color:#0f172a;font-weight:bold;border:none}
-        .tx-list-title{font-size:15px;color:#38bdf8;font-weight:bold;margin-bottom:12px;display:flex;align-items:center;gap:6px}
-        .tx-item{background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-bottom:10px;transition:all .2s ease}
-        .tx-item:hover{border-color:rgba(56,189,248,0.4);background:rgba(15,23,42,0.9)}
-        .tx-left{display:flex;align-items:center;gap:12px}
-        .tx-icon{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px}
-        .tx-icon.deposit{background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.3)}
-        .tx-icon.withdraw{background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3)}
-        .tx-icon.commission{background:rgba(56,189,248,0.15);color:#38bdf8;border:1px solid rgba(56,189,248,0.3)}
-        .tx-title{font-weight:bold;color:#f8fafc;margin-bottom:2px}
-        .tx-date{font-size:11px;color:#94a3b8}
-        .tx-right{text-align:left}
-        .tx-amount{font-weight:bold}
-        .tx-amount.positive{color:#22c55e}
-        .tx-amount.negative{color:#ef4444}
-        .tx-status{font-size:11px}
-        .status-success{color:#22c55e}
-        .status-failed{color:#ef4444}
-
-        /* Modal Styles */
+        .tx-list-title{font-size:15px;color:#38bdf8;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+        
         .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
         .modal.show{display:flex}
-        .modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(56,189,248,.3);border-radius:20px;width:100%;max-width:440px;max-height:85vh;display:flex;flex-direction:column;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.9)}
-        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;color:#38bdf8;font-weight:800;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px}
+        .modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(56,189,248,.3);border-radius:20px;width:100%;max-width:460px;max-height:85vh;display:flex;flex-direction:column;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.9);overflow:hidden}
+        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;color:#38bdf8;font-weight:800;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;flex-shrink:0}
         .modal-close{background:rgba(255,255,255,.05);border:none;color:#94a3b8;cursor:pointer;font-size:14px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
         .modal-close:hover{background:rgba(239,68,68,.2);color:#ef4444}
-        #modal-msg-container{overflow-y:auto;padding-right:4px}
-        .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px}
+        .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px;transition:0.2s}
         .msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:4px}
         .msg-desc-text{font-size:12px;color:#cbd5e1;line-height:1.5}
-        footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
+
+        .notif-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
+        .notif-tab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#94a3b8;padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;white-space:nowrap;transition:0.2s;display:flex;align-items:center;justify-content:center;gap:5px;flex:1 1 auto}
+        .notif-tab:hover{background:rgba(56,189,248,.15);color:#38bdf8}
+        .notif-tab.active{background:#38bdf8;color:#0f172a;font-weight:bold;border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.3)}
+
+        #modal-msg-container{overflow-y:auto;padding-right:6px;flex:1;min-height:0}
+
+        #modal-msg-container::-webkit-scrollbar,
+        .modal-content div::-webkit-scrollbar {
+          width: 5px;
+        }
+        #modal-msg-container::-webkit-scrollbar-track,
+        .modal-content div::-webkit-scrollbar-track {
+          background: rgba(15, 23, 42, 0.6);
+          border-radius: 10px;
+        }
+        #modal-msg-container::-webkit-scrollbar-thumb,
+        .modal-content div::-webkit-scrollbar-thumb {
+          background: rgba(56, 189, 248, 0.35);
+          border-radius: 10px;
+        }
+        #modal-msg-container::-webkit-scrollbar-thumb:hover,
+        .modal-content div::-webkit-scrollbar-thumb:hover {
+          background: rgba(56, 189, 248, 0.7);
+        }
+        #modal-msg-container, .modal-content div {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(56, 189, 248, 0.35) rgba(15, 23, 42, 0.6);
+        }
+
+        footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);margin-top:auto}
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo"><div class="logo-icon">Z</div><div class="logo-text">ZENIX</div></div>
-        <div class="hr">
-            <div class="wrap">
-                <button type="button" class="lb" id="bell-btn"><i class="fas fa-bell" style="color:#fbbf24"></i><span class="badge" id="bell-badge">0</span></button>
-            </div>
-            <div class="wrap">
-                <button type="button" class="lb" id="help-btn" title="راهنمای صفحه تراکنش‌ها"><i class="fas fa-circle-question" style="color:#38bdf8"></i></button>
-            </div>
-            <a href="support.html" class="lb"><i class="fas fa-headset" style="color:#a855f7"></i></a>
-            <div class="wrap">
-                <button type="button" class="lb" id="lang-btn"><i class="fas fa-globe" style="color:#22c55e"></i></button>
-                <div class="menu" id="lang-menu">
-                    <div class="mi" data-lang="fa">فارسی</div><div class="mi" data-lang="en">English</div><div class="mi" data-lang="ar">العربية</div><div class="mi" data-lang="tr">Türkçe</div><div class="mi" data-lang="ru">Русский</div><div class="mi" data-lang="es">Español</div><div class="mi" data-lang="fr">Français</div><div class="mi" data-lang="de">Deutsch</div>
-                </div>
-            </div>
-            <div class="wrap">
-                <button type="button" class="lb" id="menu-btn"><i class="fas fa-bars" style="color:#f43f5e"></i></button>
-                <div class="menu" id="nav-menu">
-                    <a href="dashboard.html" class="mi"><i class="fas fa-home" style="color:#38bdf8"></i><span id="m1">صفحه اصلی</span></a>
-                    <a href="quantification.html" class="mi"><i class="fas fa-robot" style="color:#a855f7"></i><span id="m2">کوانتیفیکیشن</span></a>
-                    <a href="deposit.html" class="mi"><i class="fas fa-arrow-down" style="color:#22c55e"></i><span id="m3">واریز</span></a>
-                    <a href="receive.html" class="mi"><i class="fas fa-arrow-up" style="color:#fbbf24"></i><span id="m4">برداشت</span></a>
-                    <a href="team.html" class="mi"><i class="fas fa-users" style="color:#ec4899"></i><span id="m-team">تیم من</span></a>
-                    <a href="transactions.html" class="mi active"><i class="fas fa-history" style="color:#06b6d4"></i><span id="m5">تراکنش</span></a>
-                    <a href="profile.html" class="mi"><i class="fas fa-user-cog" style="color:#ec4899"></i><span id="m6">پروفایل</span></a>
-                    <a href="support.html" class="mi"><i class="fas fa-headset" style="color:#a855f7"></i><span id="m7">پشتیبانی</span></a>
-                    <a href="#" class="mi" id="logout-btn" style="color:#ef4444"><i class="fas fa-power-off"></i><span id="m8">خروج</span></a>
-                </div>
+<header>
+    <div class="logo"><div class="logo-icon">Z</div><div class="logo-text">ZENIX</div></div>
+    <div class="hr">
+        <div class="wrap">
+            <button type="button" class="lb" id="bell-btn"><i class="fas fa-bell" style="color:#fbbf24"></i><span class="badge" id="bell-badge">0</span></button>
+        </div>
+        <a href="support.html" class="lb"><i class="fas fa-headset" style="color:#a855f7"></i></a>
+        <div class="wrap">
+            <button type="button" class="lb" id="lang-btn"><i class="fas fa-globe" style="color:#22c55e"></i></button>
+            <div class="menu" id="lang-menu">
+                <div class="mi" data-lang="fa">فارسی</div>
+                <div class="mi" data-lang="en">English</div>
+                <div class="mi" data-lang="ar">العربية</div>
+                <div class="mi" data-lang="tr">Türkçe</div>
+                <div class="mi" data-lang="ru">Русский</div>
+                <div class="mi" data-lang="es">Español</div>
+                <div class="mi" data-lang="fr">Français</div>
+                <div class="mi" data-lang="de">Deutsch</div>
             </div>
         </div>
-    </header>
-
-    <div class="c">
-        <div class="wel">
-            <div>
-                <h1 id="t-tx-title">تاریخچه تراکنش‌ها</h1>
-                <p id="t-tx-sub">مشاهده و بررسی تمامی تراکنش‌های مالی و پاداش‌ها</p>
-            </div>
-            <div style="font-size:13px;background:rgba(56,189,248,.1);border:1px solid #38bdf8;padding:6px 10px;border-radius:6px;color:#38bdf8;font-weight:600;">
-                <i class="fas fa-wallet"></i> <span id="t-tot-bal">کل موجودی:</span> <span id="total-balance">$0.00</span>
-            </div>
-        </div>
-
-        <div class="tx-card">
-            <div class="filter-container">
-                <button type="button" class="filter-btn active" id="f-all" onclick="window.filterTx('all',this)">همه</button>
-                <button type="button" class="filter-btn" id="f-deposit" onclick="window.filterTx('deposit',this)">واریز</button>
-                <button type="button" class="filter-btn" id="f-withdraw" onclick="window.filterTx('withdraw',this)">برداشت</button>
-                <button type="button" class="filter-btn" id="f-commission" onclick="window.filterTx('commission',this)">کمیسیون</button>
-                <button type="button" class="filter-btn" id="f-failed" onclick="window.filterTx('failed',this)">تراکنش ناموفق</button>
-            </div>
-
-            <div class="tx-list-title"><i class="fas fa-list-ul"></i> <span id="t-list-title">لیست تراکنش‌ها</span></div>
-
-            <div id="tx-list">
-                <div style="text-align:center;padding:30px;color:#94a3b8;font-size:13px;" id="t-loading">در حال بارگذاری تراکنش‌ها...</div>
+        <div class="wrap">
+            <button type="button" class="lb" id="menu-btn"><i class="fas fa-bars" style="color:#f43f5e"></i></button>
+            <div class="menu" id="nav-menu">
+                <a href="dashboard.html" class="mi"><i class="fas fa-home" style="color:#38bdf8"></i><span data-i18n="home">صفحه اصلی</span></a>
+                <a href="quantification.html" class="mi"><i class="fas fa-robot" style="color:#a855f7"></i><span data-i18n="quantification">کوانتیفیکیشن</span></a>
+                <a href="deposit.html" class="mi"><i class="fas fa-arrow-down" style="color:#22c55e"></i><span data-i18n="deposit">واریز</span></a>
+                <a href="receive.html" class="mi"><i class="fas fa-arrow-up" style="color:#fbbf24"></i><span data-i18n="receive">برداشت</span></a>
+                <a href="transactions.html" class="mi active"><i class="fas fa-history" style="color:#06b6d4"></i><span data-i18n="transactions">تراکنش</span></a>
+                <a href="profile.html" class="mi"><i class="fas fa-user-cog" style="color:#ec4899"></i><span data-i18n="profile">پروفایل</span></a>
+                <a href="support.html" class="mi"><i class="fas fa-headset" style="color:#a855f7"></i><span data-i18n="support">پشتیبانی</span></a>
+                <a href="#" class="mi" onclick="window.openAboutModal();return false;"><i class="fas fa-info-circle" style="color:#38bdf8"></i><span data-i18n="about">درباره پلتفرم</span></a>
+                <a href="#" class="mi" id="logout-btn" style="color:#ef4444"><i class="fas fa-power-off"></i><span data-i18n="logout">خروج</span></a>
             </div>
         </div>
     </div>
+</header>
 
-    <!-- مدال پیام‌ها -->
-    <div class="modal" id="m-msg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span id="t-modal-title">صندوق پیام‌های مدیریت</span>
-                <button class="modal-close" onclick="window.closeMessageModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <div id="modal-msg-container">
-                <div style="text-align:center;padding:20px;color:#94a3b8">هیچ پیام جدیدی وجود ندارد.</div>
-            </div>
+<div class="c">
+    <div class="wel">
+        <div>
+            <h1 data-i18n="transactionsTitle">تاریخچه تراکنش‌ها</h1>
+            <p data-i18n="transactionsSub">گزارش جامع تمام واریزها، برداشت‌ها و پاداش‌ها</p>
         </div>
+        <div style="font-size:20px;color:#06b6d4"><i class="fas fa-file-invoice-dollar"></i></div>
     </div>
 
-    <!-- مدال راهنما -->
-    <div class="modal" id="m-help">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span id="t-help-title">راهنمای صفحه تراکنش‌ها</span>
-                <button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <div style="overflow-y:auto;padding-right:4px">
-                <div class="msg-body-box">
-                    <div class="msg-title-text" id="t-hp-t1"><i class="fas fa-history" style="color:#38bdf8"></i> کاربرد این صفحه چیست؟</div>
-                    <div class="msg-desc-text" id="t-hp-d1">در این صفحه می‌توانید تاریخچه تراکنش‌های حساب خود شامل واریزها، برداشت‌ها و کمیسیون‌های دریافتی را مشاهده و پیگیری کنید.</div>
-                </div>
-                <div class="msg-body-box">
-                    <div class="msg-title-text" id="t-hp-t2"><i class="fas fa-filter" style="color:#38bdf8"></i> فیلتر تراکنش‌ها</div>
-                    <div class="msg-desc-text" id="t-hp-d2">با استفاده از دکمه‌های فیلتر (همه، واریز، برداشت، کمیسیون، تراکنش ناموفق) می‌توانید تراکنش‌های مورد نظر خود را به تفکیک دسته‌بندی و بررسی نمایید.</div>
-                </div>
-                <div class="msg-body-box">
-                    <div class="msg-title-text" id="t-hp-t3"><i class="fas fa-wallet" style="color:#a855f7"></i> کارت کل موجودی</div>
-                    <div class="msg-desc-text" id="t-hp-d3">در بالای صفحه، مجموع کل موجودی کیف پول دلاری شما به صورت زنده نمایش داده می‌شود.</div>
-                </div>
-                <div class="msg-body-box">
-                    <div class="msg-title-text" id="t-hp-t4"><i class="fas fa-check-circle" style="color:#22c55e"></i> نمایش تراکنش‌ها</div>
-                    <div class="msg-desc-text" id="t-hp-d4">تراکنش‌های تاییدشده در بخش‌های مربوطه و تراکنش‌های ردشده توسط مدیریت در بخش «تراکنش ناموفق» قابل مشاهده هستند.</div>
-                </div>
-            </div>
+    <div class="tx-card">
+        <div class="filter-container">
+            <button class="filter-btn active" onclick="filterTx('all', this)" data-i18n="all">همه تراکنش‌ها</button>
+            <button class="filter-btn" onclick="filterTx('deposit', this)" data-i18n="deposit">واریزها</button>
+            <button class="filter-btn" onclick="filterTx('withdraw', this)" data-i18n="receive">برداشت‌ها</button>
+            <button class="filter-btn" onclick="filterTx('reward', this)" data-i18n="reward">پاداش‌ها و سودها</button>
+        </div>
+
+        <div class="tx-list-title">
+            <i class="fas fa-list-ul"></i>
+            <span data-i18n="recordsList">لیست سوابق</span>
+        </div>
+
+        <div id="tx-container" style="display:flex;flex-direction:column;gap:10px">
+            <div style="text-align:center;padding:20px;color:#94a3b8" data-i18n="loading">در حال بارگذاری اطلاعات...</div>
         </div>
     </div>
+</div>
 
-    <footer>
-        <p>&copy; 2026 Zenix. All rights reserved.</p>
-        <p style="color:#22c55e;"><i class="fas fa-circle" style="font-size:6px;"></i> <span id="t-node">سرور فعال (US-East)</span></p>
-    </footer>
+<!-- مودال صندوق پیام‌ها -->
+<div class="modal" id="m-msg">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span id="t-modal-title"><i class="fas fa-bell"></i> صندوق پیام‌ها و اعلان‌ها</span>
+            <button class="modal-close" onclick="window.closeMessageModal()"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div class="notif-tabs" id="notif-tabs">
+            <button type="button" class="notif-tab active" onclick="window.setNotifFilter('all', this)"><i class="fas fa-list"></i> همه</button>
+            <button type="button" class="notif-tab" onclick="window.setNotifFilter('approved', this)"><i class="fas fa-check-circle" style="color:#22c55e"></i> تایید درخواست</button>
+            <button type="button" class="notif-tab" onclick="window.setNotifFilter('rejected', this)"><i class="fas fa-times-circle" style="color:#ef4444"></i> لغو درخواست</button>
+            <button type="button" class="notif-tab" onclick="window.setNotifFilter('admin_message', this)"><i class="fas fa-bullhorn" style="color:#38bdf8"></i> پیام مدیریت</button>
+        </div>
 
-    <script type="module">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+        <div id="modal-msg-container"><div style="text-align:center;padding:20px;color:#94a3b8">هیچ پیام جدیدی وجود ندارد.</div></div>
+    </div>
+</div>
 
-        const SUPABASE_URL = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+<!-- مدال درباره پلتفرم Zenix -->
+<div class="modal" id="m-about">
+    <div class="modal-content">
+        <div class="modal-header"><span data-i18n="aboutModalTitle">درباره پلتفرم Zenix (هدف، ماهیت و ساختار)</span><button class="modal-close" onclick="window.closeAboutModal()"><i class="fas fa-times"></i></button></div>
+        <div style="overflow-y:auto;padding-right:6px">
+            <p style="font-size:13px;color:#cbd5e1;line-height:1.7;margin-bottom:10px;" data-i18n="abDesc">پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.</p>
+            <ul style="font-size:12px;color:#94a3b8;padding-right:18px;line-height:1.7;margin-bottom:0;">
+                <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" data-i18n="abL1T">هدف اصلی:</strong> <span data-i18n="abL1D">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li>
+                <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" data-i18n="abL2T">امنیت و زیرساخت:</strong> <span data-i18n="abL2D">متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).</span></li>
+                <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" data-i18n="abL3T">ساختار چندسطحی (Referral & Team):</strong> <span data-i18n="abL3D">ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.</span></li>
+                <li><strong style="color:#f8fafc;" data-i18n="abL4T">احساس واقع‌گرایی:</strong> <span data-i18n="abL4D">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.</span></li>
+            </ul>
+        </div>
+    </div>
+</div>
 
-        let currLang = localStorage.getItem('zenix_lang') || 'fa';
-        let allMessages = [];
-        let currentUserId = null;
-        let userTransactions = [];
-        let currentFilter = 'all';
-        let isLoaded = false;
+<footer><p>&copy; 2026 Zenix</p></footer>
 
-        const ld = {
-          fa: {
-            txTitle: 'تاریخچه تراکنش‌ها', txSub: 'مشاهده و بررسی تمامی تراکنش‌های مالی و پاداش‌ها',
-            totBal: 'کل موجودی:', listTitle: 'لیست تراکنش‌ها',
-            fAll: 'همه', fDep: 'واریز', fWith: 'برداشت', fComm: 'کمیسیون', fFailed: 'تراکنش ناموفق',
-            m1: 'صفحه اصلی', m2: 'کوانتیفیکیشن', m3: 'واریز', m4: 'برداشت', mTeam: 'تیم من', m5: 'تراکنش', m6: 'پروفایل', m7: 'پشتیبانی', m8: 'خروج',
-            tNode: 'سرور فعال (US-East)', modalTitle: 'صندوق پیام‌های مدیریت', noMsg: 'هیچ پیام جدیدی از طرف مدیریت وجود ندارد.',
-            backMsg: 'بازگشت به لیست پیام‌ها', newBadge: 'جدید',
-            typeDeposit: 'واریز تتر (USDT)', typeWithdraw: 'برداشت وجه', typeCommission: 'کمیسیون', typeBonus: 'پاداش ثبت‌‌نام',
-            stSuccess: 'تایید شده', stFailed: 'رد شده',
-            noTx: 'هیچ تراکنشی یافت نشد.', loading: 'در حال بارگذاری تراکنش‌ها...',
-            helpTitle: 'راهنمای صفحه تراکنش‌ها', helpBtnTitle: 'راهنمای صفحه تراکنش‌ها',
-            hpT1: 'کاربرد این صفحه چیست؟', hpD1: 'در این صفحه می‌توانید تاریخچه تراکنش‌های حساب خود شامل واریزها، برداشت‌ها و کمیسیون‌های دریافتی را مشاهده و پیگیری کنید.',
-            hpT2: 'فیلتر تراکنش‌ها', hpD2: 'با استفاده از دکمه‌های فیلتر (همه، واریز، برداشت، کمیسیون، تراکنش ناموفق) می‌توانید تراکنش‌های مورد نظر خود را به تفکیک دسته‌بندی و بررسی نمایید.',
-            hpT3: 'کارت کل موجودی', hpD3: 'در بالای صفحه، مجموع کل موجودی کیف پول دلاری شما به صورت زنده نمایش داده می‌شود.',
-            hpT4: 'نمایش تراکنش‌ها', hpD4: 'تراکنش‌های تاییدشده در بخش‌های مربوطه و تراکنش‌های ردشده توسط مدیریت در بخش «تراکنش ناموفق» قابل مشاهده هستند.'
-          },
-          en: {
-            txTitle: 'Transactions History', txSub: 'View and review all financial transactions and rewards',
-            totBal: 'Total Balance:', listTitle: 'Transaction List',
-            fAll: 'All', fDep: 'Deposit', fWith: 'Withdraw', fComm: 'Commission', fFailed: 'Failed Transactions',
-            m1: 'Home', m2: 'Quantification', m3: 'Deposit', m4: 'Withdraw', mTeam: 'My Team', m5: 'Transactions', m6: 'Profile', m7: 'Support', m8: 'Logout',
-            tNode: 'Node Active (US-East)', modalTitle: 'Admin Messages', noMsg: 'No new messages from admin.',
-            backMsg: 'Back to Messages List', newBadge: 'NEW',
-            typeDeposit: 'Tether Deposit (USDT)', typeWithdraw: 'Withdrawal', typeCommission: 'Commission', typeBonus: 'Sign-up Bonus',
-            stSuccess: 'Approved', stFailed: 'Rejected',
-            noTx: 'No transactions found.', loading: 'Loading transactions...',
-            helpTitle: 'Transactions Guide', helpBtnTitle: 'Transactions Page Guide',
-            hpT1: 'What is the purpose of this page?', hpD1: 'On this page you can view and track a complete history of all financial transactions including deposits, withdrawals, and commissions.',
-            hpT2: 'Filter Transactions', hpD2: 'Use the filter buttons (All, Deposit, Withdraw, Commission, Failed) to easily categorize and inspect transactions.',
-            hpT3: 'Total Balance Card', hpD3: 'At the top of the page, your total live USD wallet balance is displayed in real time.',
-            hpT4: 'Transaction Status Display', hpD4: 'Approved transactions appear in their respective sections, while admin-rejected transactions are shown under "Failed Transactions".'
-          }
-        };
+<script>
+window.openAboutModal=()=>document.getElementById('m-about')?.classList.add('show');
+window.closeAboutModal=()=>document.getElementById('m-about')?.classList.remove('show');
 
-        // دریافت تراکنش‌های کاربر و اضافه کردن پاداش ثبت‌نام
-        async function fetchUserTransactions(uid, userCreatedAt) {
-          try {
-            const { data, error } = await supabase.from('transactions').select('*').eq('user_id', uid);
-            let list = (data && !error) ? [...data] : [];
+window.openMessageModal = () => document.getElementById('m-msg')?.classList.add('show');
+window.closeMessageModal = () => document.getElementById('m-msg')?.classList.remove('show');
 
-            let hasBonus = list.some(t => {
-              let ty = String(t.type || '').toLowerCase();
-              let ti = String(t.title || '').toLowerCase();
-              return ty.includes('bonus') || ti.includes('ثبت‌نام') || ti.includes('signup') || ti.includes('sign-up');
-            });
+window.LD={
+  fa:{dir:'rtl',home:'صفحه اصلی',quantification:'کوانتیفیکیشن',deposit:'واریز',receive:'برداشت',transactions:'تراکنش',profile:'پروفایل',support:'پشتیبانی',about:'درباره پلتفرم',logout:'خروج',transactionsTitle:'تاریخچه تراکنش‌ها',transactionsSub:'گزارش جامع تمام واریزها، برداشت‌ها و پاداش‌ها',all:'همه تراکنش‌ها',reward:'پاداش‌ها و سودها',recordsList:'لیست سوابق',loading:'در حال بارگذاری اطلاعات...',noTx:'هیچ تراکنشی یافت نشد.',modalTitle:'صندوق پیام‌ها و اعلان‌ها',noMsg:'هیچ پیام جدیدی وجود ندارد.',aboutModalTitle:'درباره پلتفرم Zenix (هدف، ماهیت و ساختار)',abDesc:'پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.',abL1T:'هدف اصلی:',abL1D:'اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.',abL2T:'امنیت و زیرساخت:',abL2D:'متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).',abL3T:'ساختار چندسطحی (Referral & Team):',abL3D:'ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.',abL4T:'احساس واقع‌گرایی:',abL4D:'وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.'},
+  en:{dir:'ltr',home:'Home',quantification:'Quantification',deposit:'Deposit',receive:'Withdraw',transactions:'Transactions',profile:'Profile',support:'Support',about:'About Platform',logout:'Logout',transactionsTitle:'Transactions History',transactionsSub:'Comprehensive report of deposits, withdrawals, and rewards',all:'All Transactions',reward:'Rewards & Profit',recordsList:'Records List',loading:'Loading data...',noTx:'No transactions found.',modalTitle:'Notifications & Messages',noMsg:'No new messages found.',aboutModalTitle:'About Zenix Platform (Goal, Nature & Structure)',abDesc:'Zenix Platform is an innovative financial ecosystem in cryptocurrency and trading processing designed for a secure, automated, and profitable user experience.',abL1T:'Main Goal:',abL1D:'Automating trading processes via AI systems and quantification algorithms, enabling users to profit from market fluctuations without complex trading expertise.',abL2T:'Security & Infrastructure:',abL2D:'Backed by advanced encryption protocols, high-speed cloud processing nodes, and secure Supabase database storage.',abL3T:'Multi-level Structure (Referral & Team):',abL3D:'Creating a dynamic referral network so users receive multi-level rewards and sustainable passive income from team activity.',abL4T:'Realism & Live Data:',abL4D:'Live crypto ticker, volume indicators, network gas fees, and system notices ensure users interact with an active global platform.'},
+  ar:{dir:'rtl',home:'الرئيسية',quantification:'التداول الكمي',deposit:'إيداع',receive:'سحب',transactions:'المعاملات',profile:'الملف الشخصي',support:'الدعم',about:'عن المنصة',logout:'تسجيل خروج',transactionsTitle:'سجل المعاملات',transactionsSub:'تقرير شامل لجميع الإيداعات والسحوبات والمكافآت',all:'جميع المعاملات',reward:'المكافآت والأرباح',recordsList:'قائمة السجلات',loading:'جاري تحميل البيانات...',noTx:'لم يتم العثور على أي معاملات.',modalTitle:'صندوق الرسائل والإشعارات',noMsg:'لا توجد رسائل جديدة.',aboutModalTitle:'عن منصة Zenix (الهدف والطبيعة والهيكل)',abDesc:'منصة Zenix هي بيئة مالية مبتكرة وذكية في مجال العملات الرقمية صُممت لتقديم تجربة آمنة وآلية ومربحة للمستخدمين.',abL1T:'الهدف الرئيسي:',abL1D:'أتمتة عمليات التداول عبر الذكاء الاصطناعي وخوارزميات الكمية لتمكين المستخدمين من تحقيق أرباح دون الحاجة لخبرة تداول معقدة.',abL2T:'الأمان والبنية التحتية:',abL2D:'تعتمد على بروتوكولات تشفير متقدمة وعقد معالجة سحابية سريعة وقاعدة بيانات Supabase آمنة.',abL3T:'الهيكل متعدد المستويات:',abL3D:'إنشاء شبكة إحالة ديناميكية لتمكين المستخدمين من الحصول على مكافآت مستمرة من نشاط فريقهم.',abL4T:'بيانات حية وواقعية:',abL4D:'مؤشرات أسعار وحجم تداول ورسوم شبكة حية تضمن التفاعل مع منصة عالمية حقيقية.'}
+};
 
-            if (!hasBonus) {
-              list.push({
-                id: 'signup-bonus-' + uid,
-                user_id: uid,
-                title: currLang === 'fa' ? 'پاداش ثبت‌نام' : 'Sign-up Bonus',
-                type: 'bonus',
-                amount: 2,
-                currency: 'USDT',
-                status: 'success',
-                created_at: userCreatedAt || new Date().toISOString()
-              });
-            }
+function setLang(l){
+  const t=window.LD[l]||window.LD.fa;document.documentElement.dir=t.dir;document.documentElement.lang=l;localStorage.setItem('zenix_lang',l);
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(t[k])el.innerText=t[k];});
+  
+  let elModalTitle = document.getElementById('t-modal-title');
+  if (elModalTitle && t.modalTitle) elModalTitle.innerHTML = `<i class="fas fa-bell"></i> ${t.modalTitle}`;
 
-            list.sort((a, b) => new Date(b.created_at || b.createdAt || 0) - new Date(a.created_at || a.createdAt || 0));
-            return list;
-          } catch (e) {
-            console.warn("خطا در دریافت تراکنش‌ها:", e);
-            return [{
-              id: 'signup-bonus-' + uid,
-              user_id: uid,
-              title: currLang === 'fa' ? 'پاداش ثبت‌نام' : 'Sign-up Bonus',
-              type: 'bonus',
-              amount: 2,
-              currency: 'USDT',
-              status: 'success',
-              created_at: userCreatedAt || new Date().toISOString()
-            }];
-          }
+  if(window.renderTxList)window.renderTxList();
+}
+setLang(localStorage.getItem('zenix_lang')||'fa');
+
+const mB=document.getElementById('menu-btn'),nM=document.getElementById('nav-menu'),lB=document.getElementById('lang-btn'),lMenu=document.getElementById('lang-menu'),bB=document.getElementById('bell-btn');
+document.querySelectorAll('#lang-menu .mi').forEach(el=>{el.onclick=(e)=>{e.stopPropagation();setLang(el.dataset.lang);lMenu.classList.remove('show');};});
+function tM(o,e){e.stopPropagation();[nM,lMenu].forEach(m=>{if(m!==o)m.classList.remove('show');});o.classList.toggle('show');}
+if(mB)mB.onclick=(e)=>tM(nM,e);if(lB)lB.onclick=(e)=>tM(lMenu,e);
+if(bB)bB.onclick=(e)=>{e.stopPropagation();window.openMessageModal();};
+document.onclick=()=>{[nM,lMenu].forEach(m=>m.classList.remove('show'));};
+document.querySelectorAll('.menu').forEach(m=>m.onclick=(e)=>e.stopPropagation());
+</script>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SUPABASE_URL = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let rawTxList = [];
+let currentFilter = 'all';
+
+window.cachedNotifications = [];
+window.activeNotifFilter = 'all';
+
+window.setNotifFilter = function(filter, btnElement) {
+  window.activeNotifFilter = filter;
+  document.querySelectorAll('.notif-tab').forEach(t => t.classList.remove('active'));
+  if(btnElement) btnElement.classList.add('active');
+  window.renderNotifications();
+};
+
+window.getNotifCategory = function(n) {
+  const type = (n.type || '').toLowerCase();
+  const title = (n.title || '').toLowerCase();
+
+  if (type.includes('approved') || type.includes('confirm') || title.includes('تایید') || title.includes('موفق') || title.includes('شارژ شد')) {
+    return 'approved';
+  }
+  if (type.includes('rejected') || type.includes('canceled') || type.includes('cancel') || title.includes('رد') || title.includes('لغو') || title.includes('ناموفق')) {
+    return 'rejected';
+  }
+  return 'admin_message';
+};
+
+window.renderNotifications = function() {
+  const container = document.getElementById('modal-msg-container');
+  if (!container) return;
+
+  const filter = window.activeNotifFilter;
+  const filtered = window.cachedNotifications.filter(n => {
+    if (filter === 'all') return true;
+    return window.getNotifCategory(n) === filter;
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div style="text-align:center;padding:25px;color:#94a3b8;font-size:12px;"><i class="fas fa-inbox" style="font-size:24px;margin-bottom:8px;display:block;opacity:0.5;"></i>هیچ پیامی در این دسته‌بندی وجود ندارد.</div>`;
+    return;
+  }
+
+  let html = '';
+  filtered.forEach(n => {
+    const title = n.title || 'پیام سیستم';
+    const msg = n.message || n.text || n.body || '';
+    const category = window.getNotifCategory(n);
+
+    let borderStyle = "border:1px solid rgba(255,255,255,.08);";
+    let bgStyle = "background:rgba(255,255,255,.03);";
+    let icon = '<i class="fas fa-bullhorn" style="color:#38bdf8"></i>';
+    let tagHtml = '<span style="font-size:10px;background:rgba(56,189,248,0.2);color:#38bdf8;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">پیام مدیریت</span>';
+    let supportBtn = '';
+
+    if (category === 'approved') {
+      borderStyle = "border:1px solid rgba(34, 197, 94, 0.4);";
+      bgStyle = "background:rgba(34, 197, 94, 0.08);";
+      icon = '<i class="fas fa-check-circle" style="color:#22c55e"></i>';
+      tagHtml = '<span style="font-size:10px;background:rgba(34,197,94,0.2);color:#22c55e;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">تایید درخواست</span>';
+    } else if (category === 'rejected') {
+      borderStyle = "border:1px solid rgba(239, 68, 68, 0.4);";
+      bgStyle = "background:rgba(239, 68, 68, 0.08);";
+      icon = '<i class="fas fa-times-circle" style="color:#ef4444"></i>';
+      tagHtml = '<span style="font-size:10px;background:rgba(239,68,68,0.2);color:#ef4444;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">لغو درخواست</span>';
+      
+      supportBtn = `
+        <div style="margin-top:10px;padding-top:8px;border-top:1px dashed rgba(239,68,68,0.2);display:flex;justify-content:flex-end;">
+          <a href="support.html" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);" style="display:inline-flex;align-items:center;gap:6px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f8fafc;padding:5px 10px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:600;transition:0.2s;">
+            <i class="fas fa-headset" style="color:#ef4444;"></i>
+            <span>پیگیری از طریق پشتیبانی</span>
+          </a>
+        </div>
+      `;
+    }
+
+    html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle}">
+      <div class="msg-title-text" style="display:flex;align-items:center;gap:8px;">
+        ${icon}
+        <span>${title}</span>
+        ${tagHtml}
+      </div>
+      <div class="msg-desc-text" style="margin-top:6px;">${msg}</div>
+      ${supportBtn}
+    </div>`;
+  });
+
+  container.innerHTML = html;
+};
+
+window.filterTx = function(type, btn) {
+    currentFilter = type;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+    window.renderTxList();
+};
+
+window.renderTxList = function() {
+    const container = document.getElementById('tx-container');
+    if(!container) return;
+
+    const lang = localStorage.getItem('zenix_lang') || 'fa';
+    const t = window.LD[lang] || window.LD.fa;
+
+    let filtered = rawTxList;
+    if(currentFilter !== 'all') {
+        filtered = rawTxList.filter(x => (x.type || '').toLowerCase() === currentFilter);
+    }
+
+    if(filtered.length === 0) {
+        container.innerHTML = `<div style="text-align:center;padding:30px;color:#94a3b8;font-size:13px">${t.noTx}</div>`;
+        return;
+    }
+
+    let html = '';
+    filtered.forEach(item => {
+        let typeStr = item.type || 'تراکنش';
+        let icon = '<i class="fas fa-exchange-alt" style="color:#06b6d4"></i>';
+        let amountColor = '#f8fafc';
+        let sign = '';
+
+        const typeLower = (item.type || '').toLowerCase();
+        if(typeLower === 'deposit') {
+            typeStr = 'واریز به حساب';
+            icon = '<i class="fas fa-arrow-down" style="color:#22c55e"></i>';
+            amountColor = '#22c55e';
+            sign = '+';
+        } else if(typeLower === 'withdraw' || typeLower === 'receive') {
+            typeStr = 'برداشت از حساب';
+            icon = '<i class="fas fa-arrow-up" style="color:#ef4444"></i>';
+            amountColor = '#ef4444';
+            sign = '-';
+        } else if(typeLower === 'reward' || typeLower === 'profit') {
+            typeStr = 'پاداش / سود معامله';
+            icon = '<i class="fas fa-gift" style="color:#fbbf24"></i>';
+            amountColor = '#fbbf24';
+            sign = '+';
         }
 
-        // رندر تراکنش‌ها با فرمت تاریخ و ساعت (YYYY/MM/DD HH:mm)
-        function renderTransactions() {
-          let container = document.getElementById('tx-list');
-          let t = ld[currLang] || ld.fa;
-          if (!container) return;
+        let statusBg = 'rgba(234, 179, 8, 0.15)', statusColor = '#eab308', statusBorder = 'rgba(234, 179, 8, 0.3)', statusText = 'در حال بررسی';
+        const st = (item.status || 'pending').toLowerCase();
+        if(st === 'approved' || st === 'completed' || st === 'success') {
+            statusBg = 'rgba(34, 197, 94, 0.15)'; statusColor = '#22c55e'; statusBorder = 'rgba(34, 197, 94, 0.3)'; statusText = 'تایید شده';
+        } else if(st === 'rejected' || st === 'failed' || st === 'canceled') {
+            statusBg = 'rgba(239, 68, 68, 0.15)'; statusColor = '#ef4444'; statusBorder = 'rgba(239, 68, 68, 0.3)'; statusText = 'لغو شده';
+        }
 
-          let filtered = userTransactions.filter(item => {
-            let rawSt = String(item.status || '').toLowerCase().trim();
-            let isApproved = rawSt === 'success' || rawSt === 'approved' || rawSt === 'completed' || rawSt === 'done' || rawSt === 'موفق' || rawSt === 'تایید شده';
-            let isFailed = rawSt.includes('fail') || rawSt.includes('reject') || rawSt.includes('cancel') || rawSt === 'ناموفق' || rawSt === 'رد شده';
+        const dateVal = item.created_at ? new Date(item.created_at).toLocaleString(lang === 'fa' ? 'fa-IR' : 'en-US') : (item.date || '-');
 
-            if (currentFilter === 'failed') {
-              return isFailed;
-            }
-
-            if (!isApproved) return false;
-            if (currentFilter === 'all') return true;
-
-            let itemType = String(item.type || '').toLowerCase();
-
-            // فیلتر واریز (تنها واریزهای واقعی کاربر)
-            if (currentFilter === 'deposit') {
-              return (itemType.includes('dep') || itemType === 'deposit') && !itemType.includes('bonus');
-            }
-
-            // فیلتر کمیسیون (شامل پاداش ثبت‌نام و کمیسیون‌ها)
-            if (currentFilter === 'commission') {
-              return itemType.includes('comm') || itemType.includes('ref') || itemType.includes('bonus') || itemType === 'commission';
-            }
-
-            return itemType === currentFilter;
-          });
-
-          if (filtered.length === 0) {
-            container.innerHTML = `<div style="text-align:center;padding:35px 15px;color:#94a3b8;font-size:13px;"><i class="fas fa-receipt" style="font-size:24px;color:#64748b;margin-bottom:10px;display:block;"></i>${t.noTx}</div>`;
-            return;
-          }
-
-          let html = '';
-          filtered.forEach(tx => {
-            let rawType = String(tx.type || 'deposit').toLowerCase();
-            let isWithdraw = rawType.includes('with') || rawType === 'withdraw' || rawType === 'receive';
-            let isBonus = rawType.includes('bonus');
-            let isComm = rawType.includes('comm') || rawType === 'commission' || rawType.includes('ref');
-
-            let typeClass = isWithdraw ? 'withdraw' : (isComm || isBonus ? 'commission' : 'deposit');
-            let iconClass = isWithdraw ? 'fa-arrow-up' : (isBonus ? 'fa-gift' : (isComm ? 'fa-users' : 'fa-arrow-down'));
-
-            let titleText = tx.title || tx.description;
-            if (!titleText) {
-              if (isWithdraw) titleText = t.typeWithdraw;
-              else if (isBonus) titleText = t.typeBonus;
-              else if (isComm) titleText = t.typeCommission;
-              else titleText = t.typeDeposit;
-            }
-
-            // محاسبه و فرمت تاریخ و ساعت به فرمت YYYY/MM/DD HH:mm
-            let timeVal = tx.created_at || tx.createdAt || tx.timestamp || tx.time;
-            let dateStr = '';
-            if (timeVal) {
-              let d = new Date(timeVal);
-              if (isNaN(d.getTime())) {
-                dateStr = String(timeVal);
-              } else {
-                let y = d.getFullYear();
-                let m = String(d.getMonth() + 1).padStart(2, '0');
-                let day = String(d.getDate()).padStart(2, '0');
-                let hh = String(d.getHours()).padStart(2, '0');
-                let mm = String(d.getMinutes()).padStart(2, '0');
-                dateStr = `${y}/${m}/${day} ${hh}:${mm}`;
-              }
-            } else {
-              dateStr = '---';
-            }
-
-            let numAmt = parseFloat(tx.amount || 0);
-            let sign = isWithdraw ? '-' : '+';
-            let amtClass = isWithdraw ? 'negative' : 'positive';
-            let formattedAmt = `${sign}${Math.abs(numAmt).toFixed(2)} ${tx.currency || 'USDT'}`;
-
-            let rawSt = String(tx.status || '').toLowerCase().trim();
-            let isFailed = rawSt.includes('fail') || rawSt.includes('reject') || rawSt.includes('cancel') || rawSt === 'ناموفق' || rawSt === 'رد شده';
-            let stText = isFailed ? t.stFailed : t.stSuccess;
-            let stClass = isFailed ? 'status-failed' : 'status-success';
-
-            html += `
-            <div class="tx-item" data-type="${typeClass}">
-                <div class="tx-left">
-                    <div class="tx-icon ${typeClass}"><i class="fas ${iconClass}"></i></div>
-                    <div>
-                        <div class="tx-title">${titleText}</div>
-                        <div class="tx-date" dir="ltr" style="text-align:right;">${dateStr}</div>
-                    </div>
+        html += `
+        <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+            <div style="display:flex;align-items:center;gap:12px">
+                <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;font-size:16px">
+                    ${icon}
                 </div>
-                <div class="tx-right">
-                    <div class="tx-amount ${amtClass}">${formattedAmt}</div>
-                    <div class="tx-status ${stClass}">${stText}</div>
+                <div>
+                    <div style="font-size:13px;font-weight:700;color:#f8fafc">${typeStr}</div>
+                    <div style="font-size:11px;color:#94a3b8;margin-top:2px">${dateVal}</div>
                 </div>
-            </div>`;
-          });
+            </div>
+            <div style="text-align:left">
+                <div style="font-size:14px;font-weight:800;color:${amountColor}">${sign}$${parseFloat(item.amount || 0).toFixed(2)}</div>
+                <div style="display:inline-block;margin-top:4px;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;background:${statusBg};color:${statusColor};border:1px solid ${statusBorder}">
+                    ${statusText}
+                </div>
+            </div>
+        </div>`;
+    });
 
-          container.innerHTML = html;
-        }
+    container.innerHTML = html;
+};
 
-        async function fetchUserMessages(uid) {
-          try {
-            const { data, error } = await supabase.from('notifications').select('*').eq('user_id', uid);
-            if (error || !data) return [];
-
-            let messages = data.map(d => ({
-              id: d.id,
-              subject: d.title || d.subject || 'Announcement',
-              body: d.message || d.text || d.body || '',
-              time: d.created_at || d.createdAt || new Date().toISOString(),
-              read: d.read === true || d.isRead === true
-            }));
-
-            messages.sort((a, b) => new Date(b.time) - new Date(a.time));
-            return messages;
-          } catch (e) {
-            console.error(e);
-            return [];
-          }
-        }
-
-        window.openMessageModal = async () => {
-          let c = document.getElementById('modal-msg-container'), t = ld[currLang] || ld.fa;
-          if (currentUserId) {
-            allMessages = await fetchUserMessages(currentUserId);
-            let unread = allMessages.filter(m => !m.read).length, b = document.getElementById('bell-badge');
-            if (b) { b.textContent = unread; b.classList.toggle('show', unread > 0); }
-          }
-          if (allMessages.length > 0) renderMessageList();
-          else c.innerHTML = `<div style="text-align:center;padding:20px;color:#94a3b8">${t.noMsg}</div>`;
-          document.getElementById('m-msg')?.classList.add('show');
-        };
-
-        function renderMessageList() {
-          let c = document.getElementById('modal-msg-container'), t = ld[currLang] || ld.fa, html = '<div style="display:flex;flex-direction:column;gap:10px;">';
-          allMessages.forEach((m, idx) => {
-            let dTime = '';
-            if (m.time) {
-              let d = new Date(m.time);
-              dTime = isNaN(d.getTime()) ? String(m.time) : d.toUTCString();
-            }
-            let unread = !m.read;
-            html += `<div class="msg-body-box" style="cursor:pointer;border-right:${unread ? '3px solid #38bdf8' : '1px solid rgba(255,255,255,.08)'};" onclick="window.readAdminMessage(${idx})">
-              <div style="display:flex;justify-content:space-between;align-items:center;">
-                <div class="msg-title-text" style="${unread ? 'color:#fff;font-weight:800;' : ''}"><i class="fas fa-envelope${unread ? '' : '-open'}-text" style="color:#38bdf8;margin-left:5px;"></i> ${m.subject}</div>
-                ${unread ? `<span style="font-size:9px;background:#38bdf8;color:#0f172a;padding:2px 6px;border-radius:4px;font-weight:700;">${t.newBadge}</span>` : ''}
-              </div>
-              <div class="msg-desc-text" style="margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${m.body}</div>
-              <div style="font-size:10px;color:#64748b;margin-top:6px;text-align:left" dir="ltr">${dTime}</div>
-            </div>`;
-          });
-          c.innerHTML = html + '</div>';
-        }
-
-        window.readAdminMessage = async idx => {
-          let m = allMessages[idx]; if (!m) return;
-          if (!m.read && currentUserId && m.id) {
-            allMessages[idx].read = true;
-            try {
-              await supabase.from("notifications").update({ read: true, isRead: true }).eq('id', m.id);
-              let unread = allMessages.filter(i => !i.read).length, b = document.getElementById('bell-badge');
-              if (b) { b.textContent = unread; b.classList.toggle('show', unread > 0); }
-            } catch (e) { console.error(e); }
-          }
-          let c = document.getElementById('modal-msg-container'), t = ld[currLang] || ld.fa, dTime = '';
-          if (m.time) {
-            let d = new Date(m.time);
-            dTime = isNaN(d.getTime()) ? String(m.time) : d.toUTCString();
-          }
-          c.innerHTML = `<button onclick="window.openMessageModal()" style="background:none;border:none;color:#38bdf8;cursor:pointer;font-size:12px;margin-bottom:12px;display:flex;align-items:center;gap:5px;padding:0;"><i class="fas fa-arrow-right"></i> ${t.backMsg}</button>
-          <div class="msg-body-box" style="padding:16px;">
-            <div class="msg-title-text" style="font-size:15px;margin-bottom:8px;"><i class="fas fa-envelope-open-text" style="color:#38bdf8;"></i> ${m.subject}</div>
-            <div class="msg-desc-text" style="font-size:13px;line-height:1.8;color:#f8fafc;white-space:pre-wrap;">${m.body}</div>
-            <div style="font-size:11px;color:#64748b;margin-top:14px;text-align:left;border-top:1px solid rgba(255,255,255,.05);padding-top:8px;" dir="ltr">${dTime}</div>
-          </div>`;
-        };
-
-        window.closeMessageModal = () => {
-          document.getElementById('m-msg')?.classList.remove('show');
-        };
-
-        window.openHelpModal = () => document.getElementById('m-help')?.classList.add('show');
-        window.closeHelpModal = () => document.getElementById('m-help')?.classList.remove('show');
-
-        window.filterTx = (type, btn) => {
-          currentFilter = type;
-          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-          if (btn) btn.classList.add('active');
-          renderTransactions();
-        };
-
-        document.getElementById('bell-btn')?.addEventListener('click', e => { e.stopPropagation(); window.openMessageModal(); });
-        document.getElementById('help-btn')?.addEventListener('click', e => { e.stopPropagation(); window.openHelpModal(); });
-
-        async function loadUserData(user) {
-          if (currentUserId === user.id && isLoaded) return;
-          currentUserId = user.id;
-          isLoaded = true;
-
-          try {
-            const { data: userData, error } = await supabase.from('users').select('*').eq('id', user.id).maybeSingle();
-            if (error) console.error("خطا در دریافت پروفایل کاربر:", error);
-
-            if (userData) {
-              let rawBalance = userData.balance ?? userData.depositAmount ?? userData.wallet ?? userData.amount ?? 0;
-              let numericBalance = parseFloat(rawBalance);
-              if (isNaN(numericBalance)) numericBalance = 0;
-              
-              let elBal = document.getElementById('total-balance');
-              if (elBal) elBal.textContent = `$${numericBalance.toFixed(2)}`;
-
-              allMessages = await fetchUserMessages(user.id);
-              let unread = allMessages.filter(m => !m.read).length, b = document.getElementById('bell-badge');
-              if (b && unread > 0) { b.textContent = unread; b.classList.add('show'); }
-            }
-
-            let userCreatedAt = userData?.created_at || user.created_at;
-            userTransactions = await fetchUserTransactions(user.id, userCreatedAt);
-            renderTransactions();
-
-          } catch (e) {
-            console.error("خطا در دریافت اطلاعات کاربر:", e);
-            userTransactions = await fetchUserTransactions(user.id, user.created_at);
-            renderTransactions();
-          }
-        }
-
-        // بررسی هوشمند وضعیت لاگین
-        supabase.auth.onAuthStateChange((event, session) => {
-          if (session && session.user) {
-            loadUserData(session.user);
-          } else if (event === 'SIGNED_OUT') {
+async function initPage() {
+    try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error || !user) {
             window.location.href = 'index.html';
-          }
-        });
-
-        const mBtn = document.getElementById('menu-btn'), nMenu = document.getElementById('nav-menu'), lBtn = document.getElementById('lang-btn'), lMenu = document.getElementById('lang-menu');
-        function toggleM(m, e) { e?.stopPropagation(); [nMenu, lMenu].forEach(x => { if (x && x !== m) x.classList.remove('show'); }); m?.classList.toggle('show'); }
-        mBtn?.addEventListener('click', e => toggleM(nMenu, e));
-        lBtn?.addEventListener('click', e => toggleM(lMenu, e));
-        document.addEventListener('click', e => {
-          if (!e.target.closest('.menu') && !e.target.closest('#menu-btn') && !e.target.closest('#lang-btn')) {
-            [nMenu, lMenu].forEach(x => x?.classList.remove('show'));
-          }
-        });
-        window.addEventListener('scroll', () => [nMenu, lMenu].forEach(x => x?.classList.remove('show')));
-
-        function setLang(l) {
-          currLang = l;
-          localStorage.setItem('zenix_lang', l);
-          [nMenu, lMenu].forEach(x => x?.classList.remove('show'));
-          let t = ld[l] || ld.fa;
-          let r = l === 'fa' || l === 'ar';
-          
-          document.documentElement.setAttribute('dir', r ? 'rtl' : 'ltr');
-          document.documentElement.setAttribute('lang', l);
-
-          let map = {
-            't-tx-title': t.txTitle, 't-tx-sub': t.txSub, 't-tot-bal': t.totBal,
-            't-list-title': t.listTitle, 'f-all': t.fAll, 'f-deposit': t.fDep,
-            'f-withdraw': t.fWith, 'f-commission': t.fComm, 'f-failed': t.fFailed,
-            'm1': t.m1, 'm2': t.m2, 'm3': t.m3, 'm4': t.m4, 'm-team': t.mTeam,
-            'm5': t.m5, 'm6': t.m6, 'm7': t.m7, 'm8': t.m8, 't-node': t.tNode,
-            't-modal-title': t.modalTitle, 't-help-title': t.helpTitle
-          };
-
-          Object.keys(map).forEach(id => {
-            let el = document.getElementById(id);
-            if (el && map[id]) el.textContent = map[id];
-          });
-
-          let helpBtn = document.getElementById('help-btn');
-          if (helpBtn) helpBtn.setAttribute('title', t.helpBtnTitle || '');
-
-          for (let i = 1; i <= 4; i++) {
-            let ht = document.getElementById('t-hp-t' + i);
-            let hd = document.getElementById('t-hp-d' + i);
-            if (ht) {
-              const icons = ['fa-history', 'fa-filter', 'fa-wallet', 'fa-check-circle'];
-              const colors = ['#38bdf8', '#38bdf8', '#a855f7', '#22c55e'];
-              ht.innerHTML = `<i class="fas ${icons[i-1]}" style="color:${colors[i-1]}"></i> ` + (t['hpT' + i] || '');
-            }
-            if (hd) hd.textContent = t['hpD' + i] || '';
-          }
-
-          renderTransactions();
+            return;
         }
 
-        document.querySelectorAll('#lang-menu .mi').forEach(i => i.addEventListener('click', () => setLang(i.dataset.lang)));
+        try {
+            const { data, error: notifError } = await supabase.from('notifications').select('*').eq('user_id', user.id);
+            if (!notifError && data) {
+                window.cachedNotifications = data;
+                window.renderNotifications();
+                const unreadCount = data.filter(n => !n.read && !n.isRead).length;
+                const badge = document.getElementById('bell-badge');
+                if (badge) {
+                    badge.innerText = unreadCount;
+                    if (unreadCount > 0) badge.classList.add('show');
+                    else badge.classList.remove('show');
+                }
+            }
+        } catch (err) {}
 
-        document.getElementById('logout-btn')?.addEventListener('click', async e => {
-          e.preventDefault();
-          await supabase.auth.signOut();
-          localStorage.clear();
-          window.location.href = 'index.html';
-        });
+        const { data: txs, error: txErr } = await supabase.from('transactions').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+        if(!txErr && txs) {
+            rawTxList = txs;
+        } else {
+            rawTxList = [];
+        }
 
-        setLang(currLang);
-    </script>
+        window.renderTxList();
+
+    } catch(err) {
+        console.error('خطا در بارگذاری تراکنش‌ها:', err);
+    }
+}
+
+initPage();
+
+const lBtn = document.getElementById('logout-btn');
+if (lBtn) {
+  lBtn.onclick = async e => {
+    e.preventDefault();
+    await supabase.auth.signOut();
+    localStorage.clear();
+    window.location.href = 'index.html';
+  };
+}
+</script>
 </body>
 </html>
