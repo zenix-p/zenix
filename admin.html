@@ -9,8 +9,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- بارگذاری استاندارد فونت‌اوسم جهت رفع خطای Tracking Prevention -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- لینک جایگزین JSDelivr جهت رفع خطای Tracking Prevention مرورگر -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     
     <style>
         :root {
@@ -293,7 +294,6 @@
         <header>
             <div class="topbar-title"><i class="fas fa-gauge-high"></i> داشبورد مدیریت پلتفرم</div>
             <div class="topbar-right">
-                <!-- دکمه تست آنلاین آلارم -->
                 <button id="test-ntfy-btn" class="admin-badge topbar-badge" style="cursor:pointer; display:flex; align-items:center; gap:6px; background:rgba(56,189,248,.15); border:1px solid rgba(56,189,248,.3); color:#38bdf8;" title="تست ارسال آلارم به گوشی">
                     <i class="fas fa-paper-plane"></i>
                     <span>تست آلارم گوشی</span>
@@ -586,10 +586,12 @@
         const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
-        let uMap = {}, tUid = null;
+        let uMap = {};
         let currentActiveChatId = null;
         let chatChannel = null;
         let messageChannel = null;
+        let realtimeTxChannel = null;
+        let realtimeUsersChannel = null;
         window.currentDepositList = [];
 
         function generateUIDDigits(userId) {
@@ -647,7 +649,6 @@
                 audioCtx.resume();
             }
         }
-        // فعال‌سازی صدای مرورگر با هر لمس یا کلیک رو صفحه
         document.addEventListener('click', unlockAudio);
         document.addEventListener('touchstart', unlockAudio);
 
@@ -689,7 +690,6 @@
             }
         }
 
-        // تنظیمات ntfy
         const NTFY_TOPIC = "zenix-admin"; 
         let prevD = -1, prevW = -1, prevR = -1, prevChat = -1;
 
@@ -697,26 +697,21 @@
             try {
                 const res = await fetch('https://ntfy.sh', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         topic: NTFY_TOPIC,
                         title: titleText,
                         message: messageText,
-                        priority: 5, // اولویت حداکثری زنگ
+                        priority: 5,
                         tags: ['bell', 'warning']
                     })
                 });
-                if (!res.ok) {
-                    console.error("خطای ارسال ntfy با کد وضعیت:", res.status);
-                }
+                if (!res.ok) console.error("خطای ارسال ntfy:", res.status);
             } catch (e) {
                 console.error("خطا در ارسال نوتیفیکیشن ntfy:", e);
             }
         }
 
-        // دکمه تست آنلاین آلارم و ntfy
         document.getElementById('test-ntfy-btn')?.addEventListener('click', async () => {
             unlockAudio();
             playAlertSound();
@@ -733,7 +728,6 @@
 
         window.closeModal=id=>document.getElementById(id).classList.remove('show');
 
-        // بستن مودال‌ها با کلیک روی پس‌زمینه
         document.querySelectorAll('.modal').forEach(m => {
             m.addEventListener('click', (e) => {
                 if (e.target === m) closeModal(m.id);
@@ -776,20 +770,43 @@
         async function sendNotificationToUser(uid, title, message) {
             const now = new Date().toISOString();
             try {
-                const { error } = await supabaseClient.from('notifications').insert([{
+                await supabaseClient.from('notifications').insert([{
                     user_id: uid,
                     title: title,
                     message: message,
                     created_at: now,
                     read: false
                 }]);
-
-                if (error) {
-                    console.warn("Notification insert suppressed error:", error.message);
-                }
             } catch (err) {
-                console.warn("Notification send catch warning:", err);
+                console.warn("Notification send warning:", err);
             }
+        }
+
+        // پاکسازی کانال‌ها هنگام رفتن صفحه به حالت خواب (Back-Forward Cache) جهت جلوگیری از خطای WebSocket
+        function cleanupRealtimeChannels() {
+            if (chatChannel) supabaseClient.removeChannel(chatChannel);
+            if (messageChannel) supabaseClient.removeChannel(messageChannel);
+            if (realtimeTxChannel) supabaseClient.removeChannel(realtimeTxChannel);
+            if (realtimeUsersChannel) supabaseClient.removeChannel(realtimeUsersChannel);
+        }
+
+        // گوش دادن به تغییرات زنده داده‌ها
+        async function initRealtimeDataListeners() {
+            cleanupRealtimeChannels();
+
+            realtimeTxChannel = supabaseClient
+                .channel('realtime_transactions_changes')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, () => {
+                    loadData();
+                })
+                .subscribe();
+
+            realtimeUsersChannel = supabaseClient
+                .channel('realtime_users_changes')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, () => {
+                    loadData();
+                })
+                .subscribe();
         }
 
         async function initSupportChatListener() {
@@ -1029,11 +1046,10 @@
 
                 uMap={};
 
-                // ۱. دریافت لیست کاربران
                 try {
-                    const { data: supaUsers, error: supaErr } = await supabaseClient.from('users').select('*');
+                    const { data: supaUsers } = await supabaseClient.from('users').select('*');
 
-                    if (!supaErr && supaUsers && supaUsers.length > 0) {
+                    if (supaUsers && supaUsers.length > 0) {
                         supaUsers.forEach(u => {
                             let uid = u.id || u.uid;
                             let meta = u.raw_user_meta_data || u.user_metadata || {};
@@ -1061,19 +1077,14 @@
                         });
                     }
                 } catch(sErr) {
-                    console.warn("Supabase users fetch warning:", sErr);
+                    console.warn("Users fetch warning:", sErr);
                 }
 
                 let depositList = [];
                 let seenDepositKeys = new Set();
 
-                // ۲. دریافت تراکنش‌های واریزی معلق
                 try {
-                    const { data: txData, error: txErr } = await supabaseClient
-                        .from('transactions')
-                        .select('*');
-
-                    if (txErr) console.error("خطا در دریافت تراکنش‌ها:", txErr);
+                    const { data: txData } = await supabaseClient.from('transactions').select('*');
 
                     if (txData && txData.length > 0) {
                         txData.forEach(tx => {
@@ -1152,7 +1163,6 @@
                     let isBanned = (u.status==='cancelled'||u.status==='banned'||u.isBanned===true);
                     let hasPend = (u.pendingEmail||u.newEmail||u.selfieImage||u.adminApprovalStatus==='pending');
 
-                    // افزودن برداشت‌های معلق
                     if (u.pendingWithdrawal && String(u.pendingWithdrawal.status || 'pending').toLowerCase() === 'pending') {
                         totW++;
                         withdrawList.push({ uid, u, idCode, nameStr, data: u.pendingWithdrawal });
@@ -1225,10 +1235,6 @@
 
                 let wBadge=document.getElementById('w-badge');
                 if(wBadge){ wBadge.innerText=totW; wBadge.className=totW>0?'tab-badge':'tab-badge zero'; }
-
-                if(cAct===0 && tbAct) tbAct.innerHTML=`<tr><td colspan="8" style="text-align:center;padding:20px;color:#94a3b8">هیچ کاربر فعالی یافت نشد</td></tr>`;
-                if(cPend===0 && tbPend) tbPend.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:20px;color:#94a3b8">هیچ کاربر معلقی یافت نشد</td></tr>`;
-                if(cBan===0 && tbBan) tbBan.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:20px;color:#94a3b8">هیچ کاربر لغو شده‌ای وجود ندارد</td></tr>`;
 
                 renderDeposits(depositList);
                 renderWithdrawals(withdrawList);
@@ -1330,66 +1336,30 @@
                 let currentBal = u ? Number(u.balance || 0) : 0;
                 let newBal = currentBal + rawAmount;
 
-                // ۱. آپدیت موجودی کاربر در جدول users
                 if (uid && uid !== 'unknown') {
                     try {
-                        const { error: userErr } = await supabaseClient
-                            .from('users')
-                            .update({ balance: newBal })
-                            .eq('id', uid);
-
-                        if (userErr) console.warn("User balance update warning:", userErr.message);
-                    } catch(e) {
-                        console.warn("User update catch:", e);
-                    }
+                        await supabaseClient.from('users').update({ balance: newBal }).eq('id', uid);
+                    } catch(e) { console.warn("User update catch:", e); }
                 }
 
-                // ۲. تغییر وضعیت تراکنش به success در جدول transactions
                 try {
                     if (txId && txId !== 'null' && txId !== 'undefined') {
-                        const { error: txErr } = await supabaseClient
-                            .from('transactions')
-                            .update({ status: 'success' })
-                            .eq('id', txId);
-
-                        if (txErr) console.warn("Transaction update warning:", txErr.message);
+                        await supabaseClient.from('transactions').update({ status: 'success' }).eq('id', txId);
                     } else if (uid && uid !== 'unknown') {
-                        await supabaseClient
-                            .from('transactions')
-                            .update({ status: 'success' })
-                            .eq('user_id', uid)
-                            .eq('type', 'deposit')
-                            .eq('status', 'pending');
+                        await supabaseClient.from('transactions').update({ status: 'success' }).eq('user_id', uid).eq('type', 'deposit').eq('status', 'pending');
                     }
-                } catch(txErr) {
-                    console.warn("Transaction status update catch:", txErr);
-                }
+                } catch(txErr) { console.warn("Transaction status update catch:", txErr); }
 
-                // ۳. ثبت سود ادمین در system_stats به صورت ایمن (عدم توقف فرآیند در صورت خطای دیتابیس)
                 try {
-                    const { data: statsData } = await supabaseClient
-                        .from('system_stats')
-                        .select('id, total_admin_profit')
-                        .maybeSingle();
-
+                    const { data: statsData } = await supabaseClient.from('system_stats').select('id, total_admin_profit').maybeSingle();
                     let currentProfit = statsData ? Number(statsData.total_admin_profit || 0) : 0;
                     if (statsData && statsData.id) {
-                        const { error: stErr1 } = await supabaseClient
-                            .from('system_stats')
-                            .update({ total_admin_profit: currentProfit + adminProfitFee })
-                            .eq('id', statsData.id);
-                        if (stErr1) console.warn("system_stats update suppressed error:", stErr1.message);
+                        await supabaseClient.from('system_stats').update({ total_admin_profit: currentProfit + adminProfitFee }).eq('id', statsData.id);
                     } else {
-                        const { error: stErr2 } = await supabaseClient
-                            .from('system_stats')
-                            .insert([{ total_admin_profit: adminProfitFee }]);
-                        if (stErr2) console.warn("system_stats insert suppressed error:", stErr2.message);
+                        await supabaseClient.from('system_stats').insert([{ total_admin_profit: adminProfitFee }]);
                     }
-                } catch(e) {
-                    console.warn("system_stats execution warning:", e);
-                }
+                } catch(e) { console.warn("system_stats execution warning:", e); }
 
-                // ۴. ارسال پیام و اطلاع‌رسانی به کاربر
                 if (uid && uid !== 'unknown') {
                     await sendNotificationToUser(uid, 'تایید واریزی', `درخواست واریز شما به مبلغ $${rawAmount.toFixed(2)} با موفقیت تایید شد و حساب شما شارژ گردید.`);
                 }
@@ -1398,24 +1368,13 @@
             } else {
                 if (!confirm(`رد درخواست واریز به مبلغ $${rawAmount.toFixed(2)}؟`)) return;
 
-                // تغییر وضعیت تراکنش به failed در جدول transactions
                 try {
                     if (txId && txId !== 'null' && txId !== 'undefined') {
-                        await supabaseClient
-                            .from('transactions')
-                            .update({ status: 'failed' })
-                            .eq('id', txId);
+                        await supabaseClient.from('transactions').update({ status: 'failed' }).eq('id', txId);
                     } else if (uid && uid !== 'unknown') {
-                        await supabaseClient
-                            .from('transactions')
-                            .update({ status: 'failed' })
-                            .eq('user_id', uid)
-                            .eq('type', 'deposit')
-                            .eq('status', 'pending');
+                        await supabaseClient.from('transactions').update({ status: 'failed' }).eq('user_id', uid).eq('type', 'deposit').eq('status', 'pending');
                     }
-                } catch (txErr) {
-                    console.warn("Error updating transaction status:", txErr);
-                }
+                } catch (txErr) { console.warn("Error updating transaction status:", txErr); }
 
                 if (uid && uid !== 'unknown') {
                     await sendNotificationToUser(uid, 'رد درخواست واریزی', `درخواست واریز شما به مبلغ $${rawAmount.toFixed(2)} توسط مدیریت رد شد.`);
@@ -1537,10 +1496,7 @@
         };
 
         window.appEm=async(uid,email)=>{
-            await supabaseClient.from('users').update({
-                email: email
-            }).eq('id', uid);
-            
+            await supabaseClient.from('users').update({ email: email }).eq('id', uid);
             await sendNotificationToUser(uid, 'تایید اطلاعات حساب', 'درخواست ویرایش / احراز اطلاعات شما توسط مدیریت تایید شد.');
             showToast('درخواست تایید شد.');
             loadData();
@@ -1591,17 +1547,10 @@
             payload.balance = balVal;
 
             try {
-                let { error } = await supabaseClient
-                    .from('users')
-                    .update(payload)
-                    .eq('id', uid);
+                let { error } = await supabaseClient.from('users').update(payload).eq('id', uid);
 
                 if (error) {
-                    const fallbackPayload = {
-                        fullname: nameVal,
-                        email: emailVal,
-                        balance: balVal
-                    };
+                    const fallbackPayload = { fullname: nameVal, email: emailVal, balance: balVal };
                     await supabaseClient.from('users').update(fallbackPayload).eq('id', uid);
                 }
 
@@ -1614,14 +1563,8 @@
             }
         };
 
-        document.getElementById('sm-search').oninput = e => {
-            updateSelectOptions(e.target.value);
-        };
-
-        document.getElementById('sm-uid').onchange = e => {
-            let uid = e.target.value;
-            if(uid) selectUserForMessage(uid);
-        };
+        document.getElementById('sm-search').oninput = e => { updateSelectOptions(e.target.value); };
+        document.getElementById('sm-uid').onchange = e => { if(e.target.value) selectUserForMessage(e.target.value); };
 
         document.getElementById('f-broadcast').onsubmit=async e=>{
             e.preventDefault();
@@ -1635,7 +1578,6 @@
                 for (let uid of userKeys) {
                     await sendNotificationToUser(uid, title, message);
                 }
-
                 showToast(`پیام همگانی با موفقیت به ${userKeys.length} کاربر ارسال شد.`);
                 document.getElementById('bc-title').value = '';
                 document.getElementById('bc-msg').value = '';
@@ -1654,7 +1596,6 @@
 
             try {
                 await sendNotificationToUser(uid, title, message);
-
                 showToast('پیام با موفقیت به کاربر ارسال شد.');
                 document.getElementById('sm-title').value = '';
                 document.getElementById('sm-msg').value = '';
@@ -1680,6 +1621,13 @@
             }
         });
 
+        function startAdminDashboard() {
+            updateSoundUI();
+            loadData();
+            initSupportChatListener();
+            initRealtimeDataListeners();
+        }
+
         async function checkAdminAuthAndInit() {
             const { data: { session } } = await supabaseClient.auth.getSession();
 
@@ -1697,11 +1645,25 @@
             }
         }
 
-        function startAdminDashboard() {
-            updateSoundUI();
-            loadData();
-            initSupportChatListener();
-        }
+        // مدیریت لغو اتصال WebSocket هنگام رفتن صفحه به حالت غیرفعال / خواب (bfcache)
+        window.addEventListener('pagehide', () => {
+            cleanupRealtimeChannels();
+        });
+
+        // بازسازی خودکار اتصال سوپابیس پس از بازگشت کاربر به زبانه پنل
+        window.addEventListener('pageshow', (e) => {
+            if (e.persisted) {
+                supabaseClient.realtime.connect();
+                startAdminDashboard();
+            }
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                supabaseClient.realtime.connect();
+                loadData();
+            }
+        });
 
         checkAdminAuthAndInit();
 
