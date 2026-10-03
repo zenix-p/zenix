@@ -298,26 +298,39 @@ window.openMsgDetail = async function(idx) {
   const isUnread = !n.read && !n.isRead && !n.is_read;
 
   if (isUnread) {
-    // علامت‌گذاری محلی
-    if ('read' in n) n.read = true;
-    if ('isRead' in n) n.isRead = true;
-    if ('is_read' in n) n.is_read = true;
-    if (!('read' in n) && !('isRead' in n) && !('is_read' in n)) n.read = true;
+    // تشخیص ستون‌های موجود قبل از تغییر داد‌ه‌های شیء
+    const hasIsRead = 'is_read' in n;
+    const hasRead = 'read' in n;
+    const hasIsReadCamel = 'isRead' in n;
+
+    // علامت‌‌گذاری محلی
+    n.is_read = true;
+    n.read = true;
+    n.isRead = true;
 
     window.updateBellBadge();
     window.renderNotifications();
 
-    // تشخيص پویا نام ستون در Supabase برای جلوگیری از خطای 400
-    const updatePayload = {};
-    if ('is_read' in n) updatePayload.is_read = true;
-    if ('read' in n) updatePayload.read = true;
-    if ('isRead' in n) updatePayload.isRead = true;
-    if (Object.keys(updatePayload).length === 0) updatePayload.is_read = true;
+    // ساخت پلود بروزرسانی بر اساس وضعیت اصلی
+    let updatePayload = {};
+    if (hasIsRead) updatePayload.is_read = true;
+    else if (hasRead) updatePayload.read = true;
+    else if (hasIsReadCamel) updatePayload.isRead = true;
+    else updatePayload = { is_read: true };
 
     try {
-      const { error } = await supabase.from('notifications').update(updatePayload).eq('id', n.id);
+      let { error } = await supabase.from('notifications').update(updatePayload).eq('id', n.id);
+      
+      // در صورت بروز هرگونه خطای احتمالی در نام ستون، ستون‌های جایگزین امتحان می‌شوند
       if (error) {
-        console.error('خطا در ثبت وضعیت در Supabase:', error);
+        console.warn('تلاش اول ثبت وضعیت خوانده شده با خطا مواجه شد، در حال تلاش با ستون‌های جایگزین...', error);
+        let r1 = await supabase.from('notifications').update({ is_read: true }).eq('id', n.id);
+        if (r1.error) {
+          let r2 = await supabase.from('notifications').update({ isRead: true }).eq('id', n.id);
+          if (r2.error) {
+            await supabase.from('notifications').update({ read: true }).eq('id', n.id);
+          }
+        }
       }
     } catch (err) {
       console.error('خطا در ارسال درخواست به Supabase:', err);
