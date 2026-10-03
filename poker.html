@@ -444,12 +444,12 @@
 </head>
 <body>
 
-    <!-- 📱 modal چرخش صفحه (اختیاری) -->
+    <!-- 📱 پاپ‌آپ چرخش صفحه برای موبایل -->
     <div id="rotate-prompt">
         <div class="rotate-card">
             <i class="fas fa-mobile-screen-button rotate-icon"></i>
             <h3>گوشی خود را بچرخانید</h3>
-            <p>برای نمایش بزرگ‌تر میز رولت می‌توانید گوشی را افقی کنید.</p>
+            <p>برای نمایش بهتر و کامل‌تر میز رولت می‌توانید گوشی را افقی کنید.</p>
             <button class="btn-rotate-force" onclick="requestLandscape()"><i class="fas fa-rotate"></i> چرخش و تمام‌صفحه</button>
             <button class="btn-skip" onclick="dismissRotatePrompt()">ادامه در همین حالت</button>
         </div>
@@ -540,7 +540,7 @@
                     await screen.orientation.lock('landscape');
                 }
             } catch (err) {
-                console.log('چرخش اتوماتیک فعال نشد.');
+                console.log('چرخش اتوماتیک توسط مرورگر مسدود شد.');
             }
             dismissRotatePrompt();
         }
@@ -914,6 +914,11 @@
             drawWheel();
             buildTable();
             startTimer();
+
+            // 📱 نمایش خودکار پاپ‌آپ چرخش صفحه در صورت ورود با گوشی/تبلت
+            if (window.innerWidth <= 768) {
+                document.getElementById('rotate-prompt').style.display = 'flex';
+            }
         };
     </script>
 </body>
