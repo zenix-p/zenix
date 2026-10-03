@@ -229,40 +229,143 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ==========================================
-// تابع بهینه‌شده دریافت تعداد زیرمجموعه‌ها با RPC (هماهنگ با صفحه تیم)
+// تابع تولید هش کد دعوت (مطابق با صفحه team.html)
+// ==========================================
+function generateUIDDigits(userId) {
+  if (!userId) return '000000';
+  let hash = 5381;
+  let str = String(userId);
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) + hash) + str.charCodeAt(i);
+  }
+  const num = Math.abs(hash % 900000) + 100000;
+  return num.toString();
+}
+
+// ==========================================
+// تابع محاسبه و دریافت دقیق تعداد اعضای تیم (کاملاً هماهنگ با team.html)
 // ==========================================
 async function getReferralCount(user, userData) {
   if (!user || !supabase) return 0;
 
   try {
-    // فراخوانی مستقیم تابع SQL تعریف‌شده در سوپابیس
-    const { data, error } = await supabase.rpc('get_my_referrals_stats');
-    
-    if (!error && data) {
-      const stats = Array.isArray(data) ? (data[0] || {}) : data;
-      
-      // محاسبه مجموع اعضای نسل ۱، ۲ و ۳
-      const l1 = Number(stats.lvl1_count || stats.level1_count || stats.lvl1 || 0);
-      const l2 = Number(stats.lvl2_count || stats.level2_count || stats.lvl2 || 0);
-      const l3 = Number(stats.lvl3_count || stats.level3_count || stats.lvl3 || 0);
-      const sumLevels = l1 + l2 + l3;
+    let codeDigits = generateUIDDigits(user.id);
+    let myRefCode = 'MS-' + codeDigits;
 
-      const total = stats.total_count ?? stats.total_members ?? stats.total_team ?? stats.team_count ?? stats.total_referrals;
+    // دریافت کد دعوت کاربر از پروفایل
+    try {
+      const { data: myProfile } = await supabase
+        .from('profiles')
+        .select('referral_code')
+        .eq('id', user.id)
+        .maybeSingle();
 
-      if (total !== undefined && total !== null && !isNaN(Number(total)) && Number(total) > 0) {
-        return Number(total);
-      } else if (sumLevels > 0) {
-        return sumLevels;
+      if (myProfile && myProfile.referral_code) {
+        myRefCode = myProfile.referral_code;
       }
+    } catch (e) {
+      console.warn('خطا در دریافت کد دعوت از پروفایل:', e);
+    }
+
+    let rawList = [];
+
+    // دریافت تمام پروفایل‌ها از دیتابیس
+    try {
+      const { data: dbProfiles } = await supabase.from('profiles').select('*');
+      if (dbProfiles && Array.isArray(dbProfiles)) {
+        rawList.push(...dbProfiles);
+      }
+    } catch (e) {
+      console.warn('خطا در دریافت پروفایل‌ها:', e);
+    }
+
+    // دریافت از جدول users جهت اطمینان
+    try {
+      const { data: dbUsers } = await supabase.from('users').select('*');
+      if (dbUsers && Array.isArray(dbUsers)) {
+        rawList.push(...dbUsers);
+      }
+    } catch (e) {}
+
+    // یکتا سازی لیست
+    let uniqueMap = new Map();
+    rawList.forEach(u => {
+      if (u) {
+        let key = u.user_id || u.id || u.email || u.username;
+        if (key) uniqueMap.set(key, u);
+      }
+    });
+    let allProfiles = Array.from(uniqueMap.values());
+
+    // تابع شناسایی زیرمجموعه‌ها
+    function isReferredBy(u, refUid, refCodeVal) {
+      if (!u) return false;
+      let uUid = u.user_id || u.id;
+      if (uUid === refUid) return false;
+
+      let digits = generateUIDDigits(refUid);
+      let defaultCode = 'MS-' + digits;
+      let legacyCode = 'SM-' + digits;
+
+      let refs = [
+        u.referred_by,
+        u.referrer_id,
+        u.invitation_code,
+        u.ref_code,
+        u.inviter,
+        u.referral_code,
+        u.ref
+      ].map(x => x ? String(x).trim().toUpperCase() : '');
+
+      const targetCodes = [
+        String(refUid).toUpperCase(),
+        defaultCode.toUpperCase(),
+        legacyCode.toUpperCase(),
+        digits.toUpperCase()
+      ];
+      if (refCodeVal) targetCodes.push(String(refCodeVal).toUpperCase());
+
+      return refs.some(r => r && targetCodes.includes(r));
+    }
+
+    // محاسبه نسل اول، دوم و سوم
+    let lvl1Users = allProfiles.filter(u => isReferredBy(u, user.id, myRefCode));
+
+    let lvl2Users = [];
+    if (lvl1Users.length > 0) {
+      lvl2Users = allProfiles.filter(u => {
+        let uUid = u.user_id || u.id;
+        if (uUid === user.id || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid)) return false;
+        return lvl1Users.some(l1 => isReferredBy(u, l1.user_id || l1.id, l1.referral_code));
+      });
+    }
+
+    let lvl3Users = [];
+    if (lvl2Users.length > 0) {
+      lvl3Users = allProfiles.filter(u => {
+        let uUid = u.user_id || u.id;
+        if (uUid === user.id || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid) || lvl2Users.some(l2 => (l2.user_id || l2.id) === uUid)) return false;
+        return lvl2Users.some(l2 => isReferredBy(u, l2.user_id || l2.id, l2.referral_code));
+      });
+    }
+
+    let totalCalculated = lvl1Users.length + lvl2Users.length + lvl3Users.length;
+    if (totalCalculated > 0) {
+      return totalCalculated;
     }
   } catch (err) {
-    console.warn('خطا در فراخوانی RPC برای زیرمجموعه‌ها:', err);
+    console.warn('خطا در محاسبه شبکه تیم:', err);
   }
 
-  // فال‌بک در صورت عدم دسترسی به تابع RPC: بررسی فیلدهای مستقیم کاربر
+  // بررسی متادیتا و فیلدهای مستقیم کاربر
   let directCount = userData?.team_count ?? userData?.total_referrals ?? userData?.referrals_count ?? userData?.referral_count ?? userData?.invited_count;
   if (directCount !== undefined && directCount !== null && !isNaN(Number(directCount))) {
     return Number(directCount);
+  }
+
+  if (user.user_metadata) {
+    let metaCount = user.user_metadata.referral_count || user.user_metadata.invited_count || user.user_metadata.team_count;
+    if (metaCount) return Number(metaCount);
   }
 
   return 0;
@@ -316,7 +419,7 @@ async function checkUserSession() {
     const balanceElem = document.getElementById('val-balance');
     const refElem = document.getElementById('val-ref');
 
-    // به‌روزرسانی اطلاعات داشبورد
+    // به‌‌روزرسانی اطلاعات داشبورد
     if (userData) {
       if (fullNameElem) {
         fullNameElem.textContent = userData.fullname || userData.full_name || userData.fullName || user.user_metadata?.fullname || user.user_metadata?.full_name || user.email || 'کاربر Zenix';
