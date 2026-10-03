@@ -229,52 +229,64 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ==========================================
-// تابع محاسبه ایمن زیرمجموعه‌ها (بدون خطای 400 سوپابیس)
+// تابع محاسبه ایمن و دقیق زیرمجموعه‌ها در تمام سطح‌ها (L1, L2, L3)
 // ==========================================
 async function getReferralCount(user, userData) {
-  // ۱. بررسی اولویت‌دار فیلدهای عددی
-  let count = userData?.referrals_count ?? userData?.referral_count ?? userData?.invited_count ?? userData?.team_count ?? userData?.ref_count;
-  if (count !== undefined && count !== null && Number(count) > 0) {
-    return Number(count);
+  if (!user) return 0;
+
+  // ۱. بررسی اولویت‌دار فیلدهای عددی مستقیم در userData یا metadata
+  let directCount = userData?.referrals_count ?? userData?.referral_count ?? userData?.invited_count ?? userData?.team_count ?? userData?.ref_count ?? userData?.team_size ?? userData?.total_referrals;
+  if (directCount !== undefined && directCount !== null && Number(directCount) > 0) {
+    return Number(directCount);
   }
 
-  const metaCount = user.user_metadata?.referral_count ?? user.user_metadata?.invited_count ?? user.user_metadata?.referrals_count;
+  const metaCount = user.user_metadata?.referral_count ?? user.user_metadata?.invited_count ?? user.user_metadata?.referrals_count ?? user.user_metadata?.team_count;
   if (metaCount !== undefined && metaCount !== null && Number(metaCount) > 0) {
     return Number(metaCount);
   }
 
-  // ۲. محاسبه فرانت‌اندی هماهنگ با team.html برای جلوگیری از خطای REST API
+  // بررسی مستقیم لیست/آرایه‌های تیم
+  if (Array.isArray(userData?.team_members) && userData.team_members.length > 0) return userData.team_members.length;
+  if (Array.isArray(userData?.referrals) && userData.referrals.length > 0) return userData.referrals.length;
+  if (Array.isArray(userData?.invited_users) && userData.invited_users.length > 0) return userData.invited_users.length;
+  if (Array.isArray(user.user_metadata?.team_members) && user.user_metadata.team_members.length > 0) return user.user_metadata.team_members.length;
+  if (Array.isArray(user.user_metadata?.referrals) && user.user_metadata.referrals.length > 0) return user.user_metadata.referrals.length;
+
+  // ۲. محاسبه کامل اعضای تیم در ۳ نسل (هماهنگ با team.html)
   try {
-    const uid = user.id;
+    const uid = String(user.id).trim();
     let hash = 5381;
-    let str = String(uid);
-    for (let i = 0; i < str.length; i++) {
-      hash = ((hash << 5) + hash) + str.charCodeAt(i);
+    for (let i = 0; i < uid.length; i++) {
+      hash = ((hash << 5) + hash) + uid.charCodeAt(i);
     }
     const digits = (Math.abs(hash % 900000) + 100000).toString();
     const defaultCode = 'MS-' + digits;
     const legacyCode = 'SM-' + digits;
     const customCode = userData?.referral_code || user.user_metadata?.referral_code;
+    const userEmail = user.email ? String(user.email).trim() : '';
 
-    const targetCodes = [
-      String(uid).toUpperCase(),
+    const targetCodes = new Set([
+      uid.toUpperCase(),
       defaultCode.toUpperCase(),
       legacyCode.toUpperCase(),
       digits.toUpperCase()
-    ];
-    if (customCode) targetCodes.push(String(customCode).toUpperCase());
+    ]);
+    if (customCode) targetCodes.add(String(customCode).trim().toUpperCase());
+    if (userEmail) targetCodes.add(userEmail.toUpperCase());
 
     let rawList = [];
 
-    // فراخوانی ایمن جداول بدون ساختار فیلترهای آسیب‌پذیر
-    const { data: dbProfiles } = await supabase.from('profiles').select('*');
-    if (dbProfiles && Array.isArray(dbProfiles)) {
-      rawList.push(...dbProfiles);
-    }
-
-    const { data: dbUsers } = await supabase.from('users').select('*');
-    if (dbUsers && Array.isArray(dbUsers)) {
-      rawList.push(...dbUsers);
+    // فراخوانی ایمن جداول پایگاه داده
+    const tableNames = ['profiles', 'users', 'referrals', 'teams', 'subordinates'];
+    for (const tableName of tableNames) {
+      try {
+        const { data, error } = await supabase.from(tableName).select('*');
+        if (!error && Array.isArray(data)) {
+          rawList.push(...data);
+        }
+      } catch (e) {
+        // نادیده گرفتن خطاها
+      }
     }
 
     if (user.user_metadata) {
@@ -282,21 +294,22 @@ async function getReferralCount(user, userData) {
       if (Array.isArray(metaTeam)) rawList.push(...metaTeam);
     }
 
+    if (userData) {
+      let userTeam = userData.team_members || userData.referrals || userData.invited_users;
+      if (Array.isArray(userTeam)) rawList.push(...userTeam);
+    }
+
     let uniqueMap = new Map();
     rawList.forEach(u => {
-      if (u) {
+      if (u && typeof u === 'object') {
         let key = u.user_id || u.id || u.email || u.username || JSON.stringify(u);
-        uniqueMap.set(key, u);
+        uniqueMap.set(String(key), u);
       }
     });
 
     let allProfiles = Array.from(uniqueMap.values());
 
-    let lvl1Users = allProfiles.filter(u => {
-      if (!u) return false;
-      let uUid = u.user_id || u.id;
-      if (uUid === uid) return false;
-
+    const getRefCodesOfUser = (u) => {
       let refs = [
         u.referred_by,
         u.referrer_id,
@@ -304,19 +317,85 @@ async function getReferralCount(user, userData) {
         u.ref_code,
         u.inviter,
         u.referral_code,
-        u.ref
-      ].map(x => x ? String(x).trim().toUpperCase() : '');
+        u.ref,
+        u.parent_id,
+        u.invited_by,
+        u.leader_id,
+        u.sponsor_id,
+        u.upline_id
+      ];
+      return refs.filter(Boolean).map(x => String(x).trim().toUpperCase());
+    };
 
-      return refs.some(r => r && targetCodes.includes(r));
+    const getUserIdentifiers = (u) => {
+      let uUid = u.user_id || u.id;
+      let uHash = 5381;
+      let str = String(uUid || '');
+      for (let i = 0; i < str.length; i++) {
+        uHash = ((uHash << 5) + uHash) + str.charCodeAt(i);
+      }
+      let uDigits = (Math.abs(uHash % 900000) + 100000).toString();
+      let codes = [
+        String(uUid).toUpperCase(),
+        ('MS-' + uDigits).toUpperCase(),
+        ('SM-' + uDigits).toUpperCase(),
+        uDigits.toUpperCase()
+      ];
+      if (u.referral_code) codes.push(String(u.referral_code).trim().toUpperCase());
+      if (u.ref_code) codes.push(String(u.ref_code).trim().toUpperCase());
+      if (u.invitation_code) codes.push(String(u.invitation_code).trim().toUpperCase());
+      if (u.email) codes.push(String(u.email).trim().toUpperCase());
+      return codes;
+    };
+
+    // نسل اول (Level 1)
+    let lvl1Users = allProfiles.filter(u => {
+      if (!u) return false;
+      let uUid = String(u.user_id || u.id || '').trim();
+      if (uUid.toUpperCase() === uid.toUpperCase()) return false;
+      let refs = getRefCodesOfUser(u);
+      return refs.some(r => targetCodes.has(r));
     });
 
-    return lvl1Users.length;
+    let lvl1Identifiers = new Set();
+    lvl1Users.forEach(u => {
+      getUserIdentifiers(u).forEach(id => lvl1Identifiers.add(id));
+    });
+
+    let processedIds = new Set([uid.toUpperCase(), ...lvl1Users.map(u => String(u.user_id || u.id).toUpperCase())]);
+
+    // نسل دوم (Level 2)
+    let lvl2Users = allProfiles.filter(u => {
+      if (!u) return false;
+      let uUid = String(u.user_id || u.id || '').trim().toUpperCase();
+      if (processedIds.has(uUid)) return false;
+      let refs = getRefCodesOfUser(u);
+      return refs.some(r => lvl1Identifiers.has(r));
+    });
+
+    let lvl2Identifiers = new Set();
+    lvl2Users.forEach(u => {
+      getUserIdentifiers(u).forEach(id => lvl2Identifiers.add(id));
+    });
+
+    lvl2Users.forEach(u => processedIds.add(String(u.user_id || u.id).toUpperCase()));
+
+    // نسل سوم (Level 3)
+    let lvl3Users = allProfiles.filter(u => {
+      if (!u) return false;
+      let uUid = String(u.user_id || u.id || '').trim().toUpperCase();
+      if (processedIds.has(uUid)) return false;
+      let refs = getRefCodesOfUser(u);
+      return refs.some(r => lvl2Identifiers.has(r));
+    });
+
+    return lvl1Users.length + lvl2Users.length + lvl3Users.length;
 
   } catch (e) {
     console.warn('خطا در محاسبه تعداد زیرمجموعه‌ها:', e);
   }
 
-  return Number(count || metaCount || 0);
+  return Number(directCount || metaCount || 0);
 }
 
 async function checkUserSession() {
