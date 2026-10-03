@@ -353,7 +353,7 @@
                                     <th>تلفن</th>
                                     <th>موجودی</th>
                                     <th>سود از پلتفرم</th>
-                                    <th>تاریخ ثبت‌نام</th>
+                                    <th>تاریخ ثبت‌‌نام</th>
                                     <th>عملیات</th>
                                 </tr>
                             </thead>
@@ -683,20 +683,24 @@
             }
         }
 
-        // تنظیمات سیستم Ntfy بدون نیاز به تلگرام
+        // تنظیمات سیستم Ntfy بدون نیاز به تلگرام (ارسال JSON جهت جلوگیری از خطای کاراکترهای فارسی در Header)
         const NTFY_TOPIC = "zenix-admin"; // نام تاپیک انتخابی شما در برنامه ntfy
         let prevD = -1, prevW = -1, prevR = -1, prevChat = -1;
 
         async function sendNtfyAlert(titleText, messageText) {
             try {
-                await fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
+                await fetch('https://ntfy.sh', {
                     method: 'POST',
                     headers: {
-                        'Title': titleText,
-                        'Priority': 'urgent', // اولویت حداکثری برای زنگ خوردن گوشی
-                        'Tags': 'bell,warning'
+                        'Content-Type': 'application/json'
                     },
-                    body: messageText
+                    body: JSON.stringify({
+                        topic: NTFY_TOPIC,
+                        title: titleText,
+                        message: messageText,
+                        priority: 5, // اولویت حداکثری برای زنگ خوردن گوشی
+                        tags: ['bell', 'warning']
+                    })
                 });
             } catch (e) {
                 console.error("خطا در ارسال نوتیفیکیشن ntfy:", e);
