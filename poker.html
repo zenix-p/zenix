@@ -115,13 +115,6 @@
             text-decoration: underline;
         }
 
-        /* نمایش پاپ‌آپ فقط در گوشی وقتی حالت عمودی است */
-        @media (max-width: 900px) and (orientation: portrait) {
-            #rotate-prompt {
-                display: flex;
-            }
-        }
-
         /* هدر استیج */
         header {
             background: rgba(15, 23, 42, 0.9);
@@ -339,60 +332,124 @@
         .winning-cell { animation: winPulse 0.8s infinite alternate; border-color: var(--gold-accent) !important; z-index: 10; }
         @keyframes winPulse { from { box-shadow: 0 0 5px var(--gold-accent); } to { box-shadow: 0 0 18px var(--gold-accent); background: rgba(250, 204, 21, 0.6); } }
 
-        /* 📱 استایل‌های موبایل */
+        /* 📱 استایل‌های مخصوص گوشی (اعداد در بالا + گردونه کوچک) */
         @media (max-width: 768px) {
-            body { padding-bottom: 130px; }
-            header { padding: 8px 10px; }
+            body { padding-bottom: 110px; }
+            header { padding: 6px 10px; }
             .logo { font-size: 12px; }
             .history-title { display: none; }
             .hist-num { width: 18px; height: 18px; font-size: 8px; }
             .stat-pill { padding: 3px 6px; }
             .stat-val { font-size: 10px; }
 
-            .top-section { flex-direction: column; gap: 8px; }
-            .players-container { flex-direction: row; width: 100%; justify-content: space-between; gap: 4px; }
-            .player-card { flex: 1; padding: 3px 5px; gap: 4px; justify-content: center; }
-            .player-avatar { width: 22px; height: 22px; }
-            .p-name { font-size: 9px; }
-            .p-status { font-size: 7px; }
+            .main-stage {
+                padding: 4px;
+                gap: 8px;
+            }
 
-            .wheel-box { width: 150px; height: 150px; border-width: 4px; }
+            /* ۱. انتقال جدول اعداد به بالاترین بخش صفحه */
+            .table-viewport {
+                order: 1;
+                perspective: none;
+                justify-content: flex-start;
+                padding: 2px 0;
+                background: rgba(15, 23, 42, 0.5);
+                border-radius: 10px;
+                border: 1px solid var(--glass-border);
+            }
 
-            .status-center { width: 100%; flex-direction: row; justify-content: center; gap: 10px; }
-            .timer-circle { width: 38px; height: 38px; font-size: 14px; }
-            .status-text { font-size: 9px; }
-
-            .table-viewport { perspective: none; justify-content: flex-start; }
             .roulette-table {
                 transform: none;
                 min-width: 560px;
                 grid-template-columns: 32px repeat(12, minmax(0, 1fr)) 36px;
-                grid-template-rows: repeat(3, 30px) 28px 28px;
+                grid-template-rows: repeat(3, 32px) 28px 28px;
                 padding: 4px;
-                border-width: 5px;
+                border-width: 4px;
+                gap: 2px;
             }
 
-            .cell { font-size: 10px; }
+            .cell { font-size: 10px; font-weight: 800; }
             .cell.zero-num { font-size: 12px; }
             .cell.outside-bet { font-size: 8px; }
             .chip-on-table { width: 16px; height: 16px; font-size: 6px; }
 
-            .control-bar { flex-direction: column; gap: 8px; padding: 8px; }
-            .chip-rack { width: 100%; justify-content: center; gap: 12px; }
-            .chip-select { width: 36px; height: 36px; font-size: 9px; }
-            .action-btns { width: 100%; justify-content: space-between; gap: 8px; }
-            .btn-act { flex: 1; padding: 8px; font-size: 10px; text-align: center; }
+            /* ۲. قرارگیری گردونه بسیار کوچک و تایمر در زیر اعداد */
+            .top-section {
+                order: 2;
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: center;
+                background: rgba(15, 23, 42, 0.8);
+                border: 1px solid var(--glass-border);
+                border-radius: 12px;
+                padding: 6px 12px;
+                width: 100%;
+            }
+
+            .wheel-box {
+                width: 90px;
+                height: 90px;
+                border-width: 3px;
+                box-shadow: 0 0 15px rgba(0,0,0,0.8);
+            }
+
+            .wheel-pointer {
+                top: -4px;
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                border-top: 10px solid var(--gold-accent);
+            }
+
+            .status-center {
+                width: auto;
+                flex-direction: row;
+                gap: 8px;
+            }
+
+            .timer-circle {
+                width: 36px;
+                height: 36px;
+                font-size: 13px;
+                border-width: 2px;
+            }
+
+            .status-text { font-size: 10px; }
+
+            /* ۳. لیست بازیکنان در پایین صفحه */
+            .players-container {
+                order: 3;
+                flex-direction: row;
+                width: 100%;
+                justify-content: space-between;
+                gap: 4px;
+            }
+
+            .player-card { flex: 1; padding: 3px 5px; gap: 4px; justify-content: center; }
+            .player-avatar { width: 20px; height: 20px; }
+            .p-name { font-size: 8px; }
+            .p-status { font-size: 7px; }
+
+            /* ۴. پنل کنترل زیرین */
+            .control-bar {
+                flex-direction: row;
+                gap: 6px;
+                padding: 6px 10px;
+            }
+            .chip-rack { flex: 2; justify-content: space-around; gap: 4px; }
+            .chip-select { width: 34px; height: 34px; font-size: 8px; }
+            .action-btns { flex: 1; justify-content: flex-end; gap: 4px; }
+            .btn-act { padding: 6px 8px; font-size: 9px; text-align: center; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 📱 modal چرخش صفحه -->
+    <!-- 📱 modal چرخش صفحه (اختیاری) -->
     <div id="rotate-prompt">
         <div class="rotate-card">
             <i class="fas fa-mobile-screen-button rotate-icon"></i>
             <h3>گوشی خود را بچرخانید</h3>
-            <p>برای قرارگیری دقیق و آسان اعداد رولت زیر انگشتانتان، لطفاً صفحه گوشی را افقی کنید.</p>
+            <p>برای نمایش بزرگ‌تر میز رولت می‌توانید گوشی را افقی کنید.</p>
             <button class="btn-rotate-force" onclick="requestLandscape()"><i class="fas fa-rotate"></i> چرخش و تمام‌صفحه</button>
             <button class="btn-skip" onclick="dismissRotatePrompt()">ادامه در همین حالت</button>
         </div>
@@ -417,7 +474,27 @@
     </header>
 
     <div class="main-stage">
-        <!-- بازیکنان ۱ و ۲ -->
+        <!-- میز شرط‌بندی (در موبایل به بالا منتقل می‌شود) -->
+        <div class="table-viewport">
+            <div class="roulette-table" id="roulette-table">
+                <div class="cell zero-num" data-bet="0">0</div>
+            </div>
+        </div>
+
+        <!-- گردونه و وضعیت (در موبایل کوچک و در وسط قرار می‌گیرد) -->
+        <div class="top-section">
+            <div class="wheel-box">
+                <div class="wheel-pointer"></div>
+                <canvas id="rouletteWheel" width="220" height="220"></canvas>
+            </div>
+
+            <div class="status-center">
+                <div class="timer-circle" id="timer-display">12</div>
+                <div class="status-text" id="status-msg">ژتون انتخاب کنید</div>
+            </div>
+        </div>
+
+        <!-- بازیکنان آنلاین -->
         <div class="players-container">
             <div class="player-card">
                 <div class="player-avatar" style="background-image:url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80')"></div>
@@ -427,24 +504,6 @@
                 <div class="player-avatar" style="background-image:url('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80')"></div>
                 <div class="p-info"><span class="p-name">Dmitry</span><span class="p-status" id="bet-p2">آماده</span></div>
             </div>
-        </div>
-
-        <div class="top-section" style="justify-content: center;">
-            <!-- چرخ رولت -->
-            <div class="wheel-box">
-                <div class="wheel-pointer"></div>
-                <canvas id="rouletteWheel" width="220" height="220"></canvas>
-            </div>
-
-            <!-- وضعیت -->
-            <div class="status-center">
-                <div class="timer-circle" id="timer-display">12</div>
-                <div class="status-text" id="status-msg">ژتون انتخاب کنید</div>
-            </div>
-        </div>
-
-        <!-- بازیکنان ۳ و ۴ -->
-        <div class="players-container">
             <div class="player-card">
                 <div class="player-avatar" style="background-image:url('https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80')"></div>
                 <div class="p-info"><span class="p-name">Sarah</span><span class="p-status" id="bet-p3">آماده</span></div>
@@ -452,13 +511,6 @@
             <div class="player-card">
                 <div class="player-avatar" style="background-image:url('https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=100&q=80')"></div>
                 <div class="p-info"><span class="p-name">Marco</span><span class="p-status" id="bet-p4">آماده</span></div>
-            </div>
-        </div>
-
-        <!-- میز شرط‌بندی -->
-        <div class="table-viewport">
-            <div class="roulette-table" id="roulette-table">
-                <div class="cell zero-num" data-bet="0">0</div>
             </div>
         </div>
     </div>
@@ -479,7 +531,6 @@
     </div>
 
     <script>
-        // درخواست حالت افقی و تمام‌صفحه در صورت کلیک روی دکمه چرخش
         async function requestLandscape() {
             try {
                 if (document.documentElement.requestFullscreen) {
@@ -489,7 +540,7 @@
                     await screen.orientation.lock('landscape');
                 }
             } catch (err) {
-                console.log('امکان چرخش اجباری در این مرورگر وجود ندارد، لطفاً چرخش خودکار گوشی را روشن کنید.');
+                console.log('چرخش اتوماتیک فعال نشد.');
             }
             dismissRotatePrompt();
         }
