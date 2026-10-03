@@ -3,19 +3,34 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const SUPABASE_URL = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
 
-let supabase = null;
-if (SUPABASE_URL && SUPABASE_URL.startsWith('http')) {
-  supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-} else {
-  console.error('لطفاً آدرس معتبر Supabase را در فایل dashboard.js وارد کنید.');
-}
-
 // ==========================================
-// توابع کمکی حافظه و شناسه (مطابق فایل team.html)
+// پشتیبانی ایمن از حافظه مرورگر (مشابه team.html)
 // ==========================================
 function safeGetItem(key) {
   try { return localStorage.getItem(key); } catch(e) { return null; }
 }
+function safeSetItem(key, val) {
+  try { localStorage.setItem(key, val); } catch(e) {}
+}
+function safeRemoveItem(key) {
+  try { localStorage.removeItem(key); } catch(e) {}
+}
+
+const customStorage = {
+  getItem: (key) => safeGetItem(key),
+  setItem: (key, value) => safeSetItem(key, value),
+  removeItem: (key) => safeRemoveItem(key)
+};
+
+// مقداردهی کلاینت Supabase همراه با customStorage
+let supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    persistSession: true,
+    storage: customStorage,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
+});
 
 function generateUIDDigits(userId) {
   if (!userId) return '000000';
@@ -29,14 +44,11 @@ function generateUIDDigits(userId) {
 }
 
 // ==========================================
-// متغیرهای مدیریت اعلان‌ها و پیام‌ها
+// متغیرهای اعلان‌ها و زبان
 // ==========================================
 window.cachedNotifications = [];
 window.activeNotifFilter = 'all';
 
-// ==========================================
-// دیکشنری زبان‌ها و سیستم ترجمه
-// ==========================================
 let currLang = safeGetItem('zenix_lang') || 'fa';
 
 const ld = {
@@ -57,7 +69,7 @@ const ld = {
     tAbL1t: 'هدف اصلی:', tAbL1d: 'اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.',
     tAbL2t: 'امنیت و زیرساخت:', tAbL2d: 'متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).',
     tAbL3t: 'ساختار چندسطحی (Referral & Team):', tAbL3d: 'ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.',
-    tAbL4t: 'احساس واقع‌‌گرایی:', tAbL4d: 'وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.',
+    tAbL4t: 'احساس واقع‌گرایی:', tAbL4d: 'وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.',
     modalTitle: 'صندوق پیام‌ها و اعلان‌ها', tabAll: 'همه', tabApproved: 'تایید درخواست', tabRejected: 'لغو درخواست', tabAdmin: 'پیام مدیریت',
     node: 'سرور فعال (US-East)',
     helpTitle: 'راهنمای صفحه داشبورد',
@@ -96,7 +108,7 @@ const ld = {
 
 function setLang(lang) {
   currLang = lang;
-  localStorage.setItem('zenix_lang', lang);
+  safeSetItem('zenix_lang', lang);
 
   document.querySelectorAll('#lang-menu .mi').forEach(item => {
     if (item.getAttribute('data-lang') === lang) {
@@ -235,63 +247,44 @@ async function fetchCryptoMarket() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-  setLang(currLang);
-  setupEventListeners();
-  
-  fetchCryptoMarket();
-  setInterval(fetchCryptoMarket, 10000);
-
-  if (!supabase) return;
-  await checkUserSession();
-});
-
 // ==========================================
-// محاسبه چندلایه و کامل اعضای تیم
+// محاسبه دقیق اعضای تیم (کاملاً عین الگوریتم team.html)
 // ==========================================
-async function getReferralCount(user, userData) {
-  if (!user) return 0;
+async function calculateTeamMembersCount(uid, sessionUser) {
+  try {
+    let codeDigits = generateUIDDigits(uid);
+    let myRefCode = 'MS-' + codeDigits;
 
-  let codeDigits = generateUIDDigits(user.id);
-  let myRefCode = 'MS-' + codeDigits;
-
-  // ۱. دریافت کد دعوت اختصاصی کاربر
-  if (supabase) {
     try {
       const { data: myProfile } = await supabase
         .from('profiles')
         .select('referral_code')
-        .eq('id', user.id)
+        .eq('id', uid)
         .maybeSingle();
 
       if (myProfile && myProfile.referral_code) {
         myRefCode = myProfile.referral_code;
       }
-    } catch (e) {}
-  }
+    } catch(e) {}
 
-  // ۲. محاسبه شبکه اعضا بر اساس ۳ نسل (مطابق team.html)
-  try {
     let rawList = [];
 
-    if (supabase) {
-      try {
-        const { data: dbProfiles } = await supabase.from('profiles').select('*');
-        if (dbProfiles && Array.isArray(dbProfiles)) rawList.push(...dbProfiles);
-      } catch (e) {}
+    try {
+      const { data: dbProfiles } = await supabase
+        .from('profiles')
+        .select('*');
+      
+      if (dbProfiles && Array.isArray(dbProfiles)) {
+        rawList.push(...dbProfiles);
+      }
+    } catch(e) {}
 
-      try {
-        const { data: dbUsers } = await supabase.from('users').select('*');
-        if (dbUsers && Array.isArray(dbUsers)) rawList.push(...dbUsers);
-      } catch (e) {}
-    }
-
-    if (user.user_metadata) {
-      let metaTeam = user.user_metadata.team_members || user.user_metadata.referrals || user.user_metadata.invited_users;
+    if (sessionUser && sessionUser.user_metadata) {
+      let metaTeam = sessionUser.user_metadata.team_members || sessionUser.user_metadata.referrals || sessionUser.user_metadata.invited_users;
       if (Array.isArray(metaTeam)) rawList.push(...metaTeam);
     }
 
-    ['zenix_registered_users', 'zenix_users', 'zenix_referrals', 'zenix_team_' + user.id, 'zenix_all_users'].forEach(k => {
+    ['zenix_registered_users', 'zenix_users', 'zenix_referrals', 'zenix_team_' + uid, 'zenix_all_users'].forEach(k => {
       let item = safeGetItem(k);
       if (item) {
         try {
@@ -341,13 +334,13 @@ async function getReferralCount(user, userData) {
       return refs.some(r => r && targetCodes.includes(r));
     }
 
-    let lvl1Users = allProfiles.filter(u => isReferredBy(u, user.id, myRefCode));
+    let lvl1Users = allProfiles.filter(u => isReferredBy(u, uid, myRefCode));
 
     let lvl2Users = [];
     if (lvl1Users.length > 0) {
       lvl2Users = allProfiles.filter(u => {
         let uUid = u.user_id || u.id;
-        if (uUid === user.id || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid)) return false;
+        if (uUid === uid || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid)) return false;
         return lvl1Users.some(l1 => isReferredBy(u, l1.user_id || l1.id, l1.referral_code));
       });
     }
@@ -356,62 +349,34 @@ async function getReferralCount(user, userData) {
     if (lvl2Users.length > 0) {
       lvl3Users = allProfiles.filter(u => {
         let uUid = u.user_id || u.id;
-        if (uUid === user.id || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid) || lvl2Users.some(l2 => (l2.user_id || l2.id) === uUid)) return false;
+        if (uUid === uid || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid) || lvl2Users.some(l2 => (l2.user_id || l2.id) === uUid)) return false;
         return lvl2Users.some(l2 => isReferredBy(u, l2.user_id || l2.id, l2.referral_code));
       });
     }
 
-    let calculatedTotal = lvl1Users.length + lvl2Users.length + lvl3Users.length;
-    if (calculatedTotal > 0) {
-      return calculatedTotal;
+    let l1Count = lvl1Users.length;
+    let l2Count = lvl2Users.length;
+    let l3Count = lvl3Users.length;
+
+    if (l1Count === 0 && sessionUser && sessionUser.user_metadata) {
+      let directCount = sessionUser.user_metadata.referral_count || sessionUser.user_metadata.invited_count || 0;
+      if (Number(directCount) > 0) {
+        l1Count = Number(directCount);
+      }
     }
+
+    return l1Count + l2Count + l3Count;
   } catch (err) {
-    console.warn("خطا در محاسبه شبکه اعضا:", err);
+    console.error("خطا در محاسبه تعداد اعضا:", err);
+    return 0;
   }
-
-  // ۳. بررسی مستقیم فیلدهای کاربر در دیتابیس
-  if (userData) {
-    let directCount = userData.team_count ?? userData.total_referrals ?? userData.referrals_count ?? userData.referral_count ?? userData.invited_count;
-    if (directCount !== undefined && directCount !== null && !isNaN(Number(directCount)) && Number(directCount) > 0) {
-      return Number(directCount);
-    }
-    if (Array.isArray(userData.referrals) && userData.referrals.length > 0) {
-      return userData.referrals.length;
-    }
-    if (Array.isArray(userData.team_members) && userData.team_members.length > 0) {
-      return userData.team_members.length;
-    }
-  }
-
-  // ۴. بررسی متادیتای کاربر در ثبت‌نام (User Metadata)
-  if (user.user_metadata) {
-    let metaCount = user.user_metadata.team_count || user.user_metadata.referral_count || user.user_metadata.invited_count || user.user_metadata.total_referrals;
-    if (metaCount && !isNaN(Number(metaCount)) && Number(metaCount) > 0) {
-      return Number(metaCount);
-    }
-    if (Array.isArray(user.user_metadata.team_members) && user.user_metadata.team_members.length > 0) {
-      return user.user_metadata.team_members.length;
-    }
-    if (Array.isArray(user.user_metadata.referrals) && user.user_metadata.referrals.length > 0) {
-      return user.user_metadata.referrals.length;
-    }
-  }
-
-  return 0;
 }
 
-async function checkUserSession() {
+async function checkUserSession(user) {
+  if (!user) return;
+
   try {
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    
-    if (sessionError || !session || !session.user) {
-      window.location.href = 'index.html';
-      return;
-    }
-
-    const user = session.user;
-
-    // بارگیری اعلان‌های کاربر از سوپابیس
+    // بارگیری اعلان‌ها
     try {
       const { data, error: notifError } = await supabase
         .from('notifications')
@@ -428,41 +393,22 @@ async function checkUserSession() {
           else badge.classList.remove('show');
         }
       }
-    } catch (err) {
-      console.error('خطا در بارگیری اعلان‌ها:', err);
-    }
+    } catch (err) {}
 
-    const { data: userData, error: dbError } = await supabase
+    const { data: userData } = await supabase
       .from('users')
       .select('*')
       .eq('id', user.id)
       .maybeSingle();
 
-    if (dbError) {
-      console.error('خطا در دریافت اطلاعات کاربر:', dbError);
-    }
-
     const fullNameElem = document.getElementById('user-fullname');
-    const userIdElem = document.getElementById('user-id');
-    const phoneInput = document.getElementById('user-phone-input');
     const balanceElem = document.getElementById('val-balance');
     const refElem = document.getElementById('val-ref');
 
-    // به‌روزرسانی اطلاعات داشبورد
     if (userData) {
       if (fullNameElem) {
         fullNameElem.textContent = userData.fullname || userData.full_name || userData.fullName || user.user_metadata?.fullname || user.user_metadata?.full_name || user.email || 'کاربر Zenix';
       }
-      
-      if (userIdElem) {
-        userIdElem.textContent = `UID: ${userData.id.slice(0, 8)}`;
-      }
-
-      if (phoneInput) {
-        const phone = userData.phone || userData.phone_number || userData.phoneNumber || '';
-        if (phone) phoneInput.value = phone;
-      }
-
       if (balanceElem && userData.balance !== undefined) {
         balanceElem.textContent = `$${Number(userData.balance).toFixed(2)}`;
       }
@@ -470,24 +416,39 @@ async function checkUserSession() {
       if (fullNameElem) {
         fullNameElem.textContent = user.user_metadata?.fullname || user.user_metadata?.full_name || user.email?.split('@')[0] || 'کاربر Zenix';
       }
-      if (userIdElem) {
-        userIdElem.textContent = `UID: ${user.id.slice(0, 8)}`;
-      }
       if (balanceElem) {
         balanceElem.textContent = '$0.00';
       }
     }
 
-    // به‌روزرسانی عدد اعضای کل تیم روی کارت
+    // به‌روزرسانی کارت اعضای کل تیم روی داشبورد
     if (refElem) {
-      const totalRef = await getReferralCount(user, userData);
-      refElem.textContent = totalRef;
+      const totalTeamCount = await calculateTeamMembersCount(user.id, user);
+      refElem.textContent = totalTeamCount;
     }
 
   } catch (err) {
-    console.error('خطای غیرمنتظره در بررسی نشست:', err);
+    console.error('خطا در به‌‌روزرسانی اطلاعات کاربر:', err);
   }
 }
+
+// ==========================================
+// شنونده وضعیت ورود کاربر (عین team.html)
+// ==========================================
+supabase.auth.onAuthStateChange(async (event, session) => {
+  if (session && session.user) {
+    await checkUserSession(session.user);
+  } else {
+    window.location.href = "index.html";
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  setLang(currLang);
+  setupEventListeners();
+  fetchCryptoMarket();
+  setInterval(fetchCryptoMarket, 10000);
+});
 
 function setupEventListeners() {
   const menuBtn = document.getElementById('menu-btn');
@@ -553,11 +514,6 @@ function setupEventListeners() {
       window.location.href = 'index.html';
     });
   }
-
-  const profileForm = document.getElementById('profile-form');
-  if (profileForm) {
-    profileForm.addEventListener('submit', handleProfileUpdate);
-  }
 }
 
 window.openAboutModal = function() {
@@ -580,9 +536,6 @@ window.closeMessageModal = function() {
   if (modal) modal.classList.remove('show');
 };
 
-// ==========================================
-// سیستم دسته‌بندی، فیلتر و رندر اعلان‌ها
-// ==========================================
 window.setNotifFilter = function(filter, element) {
   window.activeNotifFilter = filter;
   const tabs = document.querySelectorAll('#notif-tabs .notif-tab');
@@ -673,32 +626,3 @@ window.renderNotifications = function() {
 window.switchNotifTab = function(tabName) {
   window.setNotifFilter(tabName, document.querySelector(`.notif-tab[data-tab="${tabName}"]`));
 };
-
-async function handleProfileUpdate(e) {
-  e.preventDefault();
-
-  if (!supabase) return;
-
-  const phoneInput = document.getElementById('user-phone-input');
-  const newPhone = phoneInput ? phoneInput.value.trim() : '';
-
-  if (!newPhone) {
-    alert('لطفاً شماره تلفن همراه را وارد کنید.');
-    return;
-  }
-
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session || !session.user) return;
-
-  const { error } = await supabase
-    .from('users')
-    .update({ phone: newPhone })
-    .eq('id', session.user.id);
-
-  if (error) {
-    alert('خطا در ثبت اطلاعات: ' + error.message);
-  } else {
-    alert('شماره تلفن با موفقیت ثبت شد.');
-    window.location.href = 'dashboard.html';
-  }
-}
