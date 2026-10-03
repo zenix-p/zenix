@@ -93,11 +93,13 @@
         .lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none}
         .badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;font-weight:700}
         .badge.show{display:flex}
-        .menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;min-width:170px;padding:6px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8)}
+        
+        /* اصلاح عرض منوی زبان و منوی سه خط بر اساس عریض‌ترین آیتم */
+        .menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;width:max-content;min-width:max-content;white-space:nowrap;padding:6px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8)}
         [dir="rtl"] .wrap .menu{left:0}
         [dir="ltr"] .wrap .menu{right:0}
         .menu.show{display:block}
-        .mi{padding:7px 10px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none}
+        .mi{padding:7px 12px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap}
         .mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}
         
         .c{max-width:800px;width:100%;margin:15px auto;padding:0 12px;flex:1}
@@ -366,7 +368,7 @@
 
     <!-- کدهای اسکریپت اصلی UI -->
     <script>
-        // تابع نمایش اعلان درون برنامه‌ای (زمان نمایش به ۸ ثانیه و ساختار دو رنگی ارتقاء یافت)
+        // تابع نمایش اعلان درون برنامه‌ای
         window.showToast = function(message, type = 'success', duration = 8000) {
             const container = document.getElementById('toast-container');
             if (!container) return;
@@ -647,7 +649,6 @@
           }
         };
 
-        // تابع نمایش پیام خوش‌آمدگویی جلب‌توجه‌کننده
         function triggerWelcomeToast() {
             if (hasShownWelcomeToast) return;
             hasShownWelcomeToast = true;
@@ -662,7 +663,7 @@
             `;
             
             setTimeout(() => {
-                window.showToast(welcomeMsg, 'info', 8000); // زمان نمایش به ۸ ثانیه تغییر یافت
+                window.showToast(welcomeMsg, 'info', 8000);
             }, 500);
         }
 
@@ -906,8 +907,25 @@
             e.stopPropagation();
             window.openMessageModal();
         };
-        document.getElementById('menu-btn').onclick = () => document.getElementById('nav-menu').classList.toggle('show');
-        document.getElementById('lang-btn').onclick = () => document.getElementById('lang-menu').classList.toggle('show');
+        
+        /* مدیریت باز و بسته شدن هوشمند منوهای زبان و سه خط */
+        document.getElementById('menu-btn').onclick = (e) => {
+            e.stopPropagation();
+            document.getElementById('lang-menu').classList.remove('show');
+            document.getElementById('nav-menu').classList.toggle('show');
+        };
+        document.getElementById('lang-btn').onclick = (e) => {
+            e.stopPropagation();
+            document.getElementById('nav-menu').classList.remove('show');
+            document.getElementById('lang-menu').classList.toggle('show');
+        };
+        window.addEventListener('click', (e) => {
+            if (!e.target.closest('.wrap')) {
+                document.getElementById('nav-menu')?.classList.remove('show');
+                document.getElementById('lang-menu')?.classList.remove('show');
+            }
+        });
+
         document.getElementById('logout-btn').onclick = async () => {
             if (userRealtimeChannel) {
               await supabaseClient.removeChannel(userRealtimeChannel);
