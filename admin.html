@@ -62,6 +62,67 @@
         ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, var(--accent), var(--accent-2)); }
         ::selection { background: rgba(56,189,248,.35); color: #fff; }
 
+        /* Login Screen Overlay */
+        #admin-login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(1100px 620px at 50% 30%, rgba(56,189,248,.18), transparent 70%),
+                        linear-gradient(180deg, rgba(5,6,13,0.96), rgba(10,15,30,0.98));
+            backdrop-filter: blur(25px);
+            z-index: 20000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .login-card {
+            background: linear-gradient(160deg, #111a30, #0a1122);
+            border: 1px solid rgba(56,189,248,.32);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 400px;
+            padding: 32px 26px;
+            box-shadow: 0 30px 70px -20px rgba(0,0,0,.9), 0 0 0 1px rgba(56,189,248,.12);
+            text-align: center;
+            animation: pop .35s cubic-bezier(.34,1.56,.64,1) both;
+        }
+        .login-card .logo-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 16px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(56,189,248,.25), rgba(129,140,248,.25));
+            border: 1px solid rgba(56,189,248,.4);
+            display: grid;
+            place-items: center;
+            color: #7dd3fc;
+            font-size: 24px;
+            box-shadow: 0 10px 25px -8px rgba(56,189,248,.5);
+        }
+        .login-card h2 {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            background: linear-gradient(90deg, #7dd3fc, #818cf8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .login-card p { color: #94a3b8; font-size: 12px; margin-bottom: 22px; }
+        .login-err {
+            background: rgba(239,68,68,.15);
+            border: 1px solid rgba(239,68,68,.3);
+            color: #f87171;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 11px;
+            margin-bottom: 14px;
+            display: none;
+        }
+
         /* Layout Structure */
         .app-shell { display: flex; align-items: stretch; min-height: 100vh; }
         
@@ -279,6 +340,22 @@
     </style>
 </head>
 <body>
+    <!-- Login Screen Overlay -->
+    <div id="admin-login-overlay">
+        <div class="login-card">
+            <div class="logo-icon"><i class="fas fa-shield-halved"></i></div>
+            <h2>ورود به سیستم مدیریت Zenix</h2>
+            <p>لطفاً برای دسترسی به داشبورد، رمز ورود را وارد کنید.</p>
+            <form id="f-admin-login">
+                <div class="login-err" id="login-err-msg">رمز ورود اشتباه است!</div>
+                <div class="form-group">
+                    <input type="password" id="admin-pass-input" placeholder="رمز ورود..." style="text-align:center; font-size:14px; letter-spacing:2px;" required autofocus>
+                </div>
+                <button type="submit" class="btn-save" style="margin-top:12px;"><i class="fas fa-key"></i> ورود به پنل</button>
+            </form>
+        </div>
+    </div>
+
     <div class="app-shell">
       <aside class="sidebar">
         <div class="brand">
@@ -591,6 +668,9 @@
     <script type="module">
         import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
+        // رمز ورود به پنل مدیریت (می‌توانید این مقدار را تغییر دهید)
+        const ADMIN_PASSWORD = "admin123456";
+
         const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -602,6 +682,48 @@
         let realtimeTxChannel = null;
         let realtimeUsersChannel = null;
         window.currentDepositList = [];
+
+        // مدیریت لایه احراز هویت و ورود
+        function checkAdminAuth() {
+            const isAuth = sessionStorage.getItem('zenix_admin_auth') === 'true';
+            const overlay = document.getElementById('admin-login-overlay');
+            if (isAuth) {
+                if (overlay) overlay.style.display = 'none';
+                initRealtimeDataListeners();
+                initSupportChatListener();
+                loadData();
+            } else {
+                if (overlay) overlay.style.display = 'flex';
+            }
+        }
+
+        document.getElementById('f-admin-login')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const passInput = document.getElementById('admin-pass-input');
+            const errMsg = document.getElementById('login-err-msg');
+            
+            if (passInput.value === ADMIN_PASSWORD) {
+                sessionStorage.setItem('zenix_admin_auth', 'true');
+                document.getElementById('admin-login-overlay').style.display = 'none';
+                if (errMsg) errMsg.style.display = 'none';
+                passInput.value = '';
+                
+                initRealtimeDataListeners();
+                initSupportChatListener();
+                loadData();
+                showToast('با موفقیت وارد پنل مدیریت شدید.');
+            } else {
+                if (errMsg) errMsg.style.display = 'block';
+                passInput.value = '';
+            }
+        });
+
+        document.getElementById('logout-btn')?.addEventListener('click', () => {
+            if (confirm('آیا قصد خروج از حساب مدیریت را دارید؟')) {
+                sessionStorage.removeItem('zenix_admin_auth');
+                location.reload();
+            }
+        });
 
         function generateUIDDigits(userId) {
             if (!userId) return '000000';
@@ -1609,88 +1731,14 @@
                 clearSelectedUser();
                 updateSelectOptions();
             } catch(err){
-                console.error("Error sending message:", err);
+                console.error("Error sending single message:", err);
                 showToast("خطا در ارسال پیام", 'error');
             }
         };
 
-        ['act','pend','ban'].forEach(k=>{
-            let inp = document.getElementById(`s-${k}`);
-            if(inp) {
-                inp.oninput = e => {
-                    let q = e.target.value.toLowerCase();
-                    document.querySelectorAll(`#tb-${k} tr`).forEach(r => {
-                        if (r.dataset && r.dataset.s) {
-                            r.style.display = r.dataset.s.includes(q) ? '' : 'none';
-                        }
-                    });
-                };
-            }
-        });
-
-        function startAdminDashboard() {
-            updateSoundUI();
-            loadData();
-            initSupportChatListener();
-            initRealtimeDataListeners();
-        }
-
-        async function checkAdminAuthAndInit() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-
-            if (!session) {
-                setTimeout(async () => {
-                    const { data: { session: s2 } } = await supabaseClient.auth.getSession();
-                    if (!s2) {
-                        window.location.href = 'index.html';
-                    } else {
-                        startAdminDashboard();
-                    }
-                }, 500);
-            } else {
-                startAdminDashboard();
-            }
-        }
-
-        // ثبت سرویس‌‌ورکر اختصاصی وب‌اپلیکیشن ادمین
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw-admin.js')
-                    .then(reg => console.log('Admin Service Worker registered:', reg.scope))
-                    .catch(err => console.error('Admin SW registration failed:', err));
-            });
-        }
-
-        // مدیریت لغو اتصال WebSocket هنگام رفتن صفحه به حالت غیرفعال / خواب (bfcache)
-        window.addEventListener('pagehide', () => {
-            cleanupRealtimeChannels();
-        });
-
-        // بازسازی خودکار اتصال سوپابیس پس از بازگشت کاربر به زبانه پنل
-        window.addEventListener('pageshow', (e) => {
-            if (e.persisted) {
-                supabaseClient.realtime.connect();
-                startAdminDashboard();
-            }
-        });
-
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') {
-                supabaseClient.realtime.connect();
-                loadData();
-            }
-        });
-
-        checkAdminAuthAndInit();
-
-        setInterval(() => {
-            loadData();
-        }, 30000);
-
-        document.getElementById('logout-btn').onclick = async () => {
-            await supabaseClient.auth.signOut().catch(() => {});
-            window.location.href = 'index.html';
-        };
+        // بررسی وضعیت ورود هنگام بارگذاری صفحه
+        checkAdminAuth();
+        updateSoundUI();
     </script>
 </body>
 </html>
