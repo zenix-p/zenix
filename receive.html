@@ -188,6 +188,11 @@
             <div style="margin-bottom:16px;">
                 <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;" id="t-lbl-pass">رمز عبور امنیتی / تراکنش:</label>
                 <input type="password" id="withdraw-pass" placeholder="رمز عبور حساب کاربری" style="width:100%;background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#f8fafc;padding:10px;font-size:12px;outline:none;box-sizing:border-box;">
+                <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+                    <a href="support.html" id="t-forgot-pass" style="font-size:11px;color:#38bdf8;text-decoration:none;transition:0.2s;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                        <i class="fas fa-key" style="font-size:10px;margin-left:3px;"></i> فراموشی رمز عبور؟
+                    </a>
+                </div>
             </div>
             <button type="button" id="btn-submit-withdraw" onclick="submitWithdraw()" style="width:100%;background:#ef4444;color:#fff;border:none;padding:12px;border-radius:8px;font-weight:bold;cursor:pointer;font-size:13px;"><i class="fas fa-paper-plane"></i> <span id="t-btn-sub">ثبت درخواست برداشت وجه</span></button>
         </div>
@@ -239,7 +244,7 @@
             <div style="overflow-y:auto;padding-right:4px">
                 <p style="font-size:13px;color:#cbd5e1;line-height:1.7;margin-bottom:10px;" id="t-ab-m-desc">پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.</p>
                 <ul style="font-size:12px;color:#94a3b8;padding-right:18px;line-height:1.7;margin-bottom:0;">
-                    <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l1t">هدف اصلی:</strong> <span id="t-ab-m-l1d">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li>
+                    <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l1t">هدف اصلی:</strong> <span id="t-ab-m-l1d">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li>
                     <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l2t">امنیت و زیرساخت:</strong> <span id="t-ab-m-l2d">متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).</span></li>
                     <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l3t">ساختار چندسطحی (Referral & Team):</strong> <span id="t-ab-m-l3d">ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.</span></li>
                     <li><strong style="color:#f8fafc;" id="t-ab-m-l4t">احساس واقع‌گرایی:</strong> <span id="t-ab-m-l4d">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.</span></li>
@@ -287,7 +292,7 @@
         window.currentFilteredNotifs = [];
         window.activeNotifFilter = 'all';
 
-        // تابع فرمت‌دهی تاریخ و ساعت به میلادی (عیناً منطبق با transactions.html)
+        // تابع فرمت‌دهی تاریخ و ساعت به میلادی (عیناً منطبق بر transactions.html)
         window.formatGregorianDate = function(rawDate) {
           if (!rawDate) return '';
           const d = new Date(rawDate);
@@ -308,7 +313,7 @@
                 recTitle: 'برداشت ارز دیجیتال', recSub: 'انتقال ایمن دارایی به کیف پول شخصی', balLabel: 'موجودی:',
                 netSel: 'انتخاب شبکه مقصد', lblAddr: 'آدرس کیف پول مقصد:', lblAmt: 'مقدار برداشت (USDT):', btnMax: 'حداکثر کل',
                 lblNetAmt: 'مبلغ دریافتی نهایی (با کسر ۰.۹٪ کارمزد):',
-                lblPass: 'رمز عبور امنیتی / تراکنش:', btnSub: 'ثبت درخواست برداشت وجه', rulesTitle: 'قوانین برداشت:',
+                lblPass: 'رمز عبور امنیتی / تراکنش:', forgotPass: 'فراموشی رمز عبور؟', btnSub: 'ثبت درخواست برداشت وجه', rulesTitle: 'قوانین برداشت:',
                 rulesDesc: '* حداقل آستانه برداشت معادل ۱۰ تتر (USDT) است.<br>* کارمزد انتقال معادل ۰.۹٪ می‌باشد و از مبلغ کل درخواست کسر خواهد شد.',
                 timerLabel: 'زمان سپری‌شده از ثبت درخواست:',
                 hpT1: 'کاربرد این صفحه چیست؟', hpD1: 'از این صفحه می‌توانید دارایی تتر (USDT) خود را بر روی شبکه‌های TRC20 یا BEP20 به کیف پول شخصی منتقل کنید.',
@@ -327,7 +332,7 @@
                 recTitle: 'Withdraw Crypto', recSub: 'Securely transfer assets to personal wallet', balLabel: 'Balance:',
                 netSel: 'Select Destination Network', lblAddr: 'Destination Wallet Address:', lblAmt: 'Withdrawal Amount (USDT):', btnMax: 'Max All',
                 lblNetAmt: 'Final Amount Received (0.9% Fee Deducted):',
-                lblPass: 'Security / Transaction Password:', btnSub: 'Submit Withdrawal Request', rulesTitle: 'Withdrawal Rules:',
+                lblPass: 'Security / Transaction Password:', forgotPass: 'Forgot Password?', btnSub: 'Submit Withdrawal Request', rulesTitle: 'Withdrawal Rules:',
                 rulesDesc: '* Minimum withdrawal threshold is 10 USDT.<br>* Transfer fee is 0.9% and will be deducted from total amount.',
                 timerLabel: 'Elapsed time since request:',
                 hpT1: 'What is this page for?', hpD1: 'From this page you can transfer your USDT assets via TRC20 or BEP20 networks to your personal wallet.',
@@ -855,6 +860,9 @@
 
             let elHelpTitle = document.getElementById('t-help-title');
             if (elHelpTitle) elHelpTitle.textContent = t.helpTitle;
+
+            let elForgotPass = document.getElementById('t-forgot-pass');
+            if (elForgotPass && t.forgotPass) elForgotPass.innerHTML = `<i class="fas fa-key" style="font-size:10px;margin-left:3px;"></i> ${t.forgotPass}`;
 
             let elTimerLabel = document.getElementById('t-timer-label');
             if (elTimerLabel && t.timerLabel) elTimerLabel.textContent = t.timerLabel;
