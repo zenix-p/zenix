@@ -20,12 +20,15 @@
         .notif-tab:hover{background:rgba(56,189,248,.15);color:#38bdf8}
         .notif-tab.active{background:#38bdf8;color:#0f172a;font-weight:bold;border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.3)}
         #modal-msg-container{overflow-y:auto;padding-right:6px;flex:1;min-height:0}
-        #modal-msg-container::-webkit-scrollbar{width:5px}
-        #modal-msg-container::-webkit-scrollbar-track{background:rgba(15,23,42,.6);border-radius:10px}
-        #modal-msg-container::-webkit-scrollbar-thumb{background:rgba(56,189,248,.35);border-radius:10px}
-        #modal-msg-container::-webkit-scrollbar-thumb:hover{background:rgba(56,189,248,.7)}
-        #modal-msg-container{scrollbar-width:thin;scrollbar-color:rgba(56,189,248,.35) rgba(15,23,42,.6)}
-        .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px;transition:0.2s}.msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:4px}.msg-desc-text{font-size:12px;color:#cbd5e1;line-height:1.5}footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
+        #modal-msg-container::-webkit-scrollbar, .modal-content div::-webkit-scrollbar{width:5px}
+        #modal-msg-container::-webkit-scrollbar-track, .modal-content div::-webkit-scrollbar-track{background:rgba(15,23,42,.6);border-radius:10px}
+        #modal-msg-container::-webkit-scrollbar-thumb, .modal-content div::-webkit-scrollbar-thumb{background:rgba(56,189,248,.35);border-radius:10px}
+        #modal-msg-container::-webkit-scrollbar-thumb:hover, .modal-content div::-webkit-scrollbar-thumb:hover{background:rgba(56,189,248,.7)}
+        #modal-msg-container, .modal-content div{scrollbar-width:thin;scrollbar-color:rgba(56,189,248,.35) rgba(15,23,42,.6)}
+        .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px;transition:0.2s}
+        .msg-body-box:hover{border-color:rgba(56,189,248,.5)!important;opacity:1!important;}
+        .msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:0}
+        .msg-desc-text{font-size:12px;color:#cbd5e1;line-height:1.5}footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
     </style>
 </head>
 <body>
@@ -94,7 +97,7 @@
         </div>
     </div>
 
-    <!-- مودال اصلاح‌شده صندوق پیام‌ها و اعلان‌ها -->
+    <!-- مودال اصلاح‌شده صندوق پیام‌ها و اعلان‌ها (کاملاً عین transactions.html) -->
     <div class="modal" id="m-msg">
         <div class="modal-content">
             <div class="modal-header">
@@ -108,6 +111,21 @@
                 <button type="button" class="notif-tab" onclick="window.setNotifFilter('admin_message', this)"><i class="fas fa-bullhorn" style="color:#38bdf8"></i> <span id="t-tab-admin">پیام مدیریت</span></button>
             </div>
             <div id="modal-msg-container"><div style="text-align:center;padding:20px;color:#94a3b8">هیچ پیام جدیدی وجود ندارد.</div></div>
+        </div>
+    </div>
+
+    <!-- مودال مشاهده جزئیات پیام (عیناً افزوده شده مطابق transactions.html) -->
+    <div class="modal" id="m-msg-detail" style="z-index:1050;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="detail-msg-title"><i class="fas fa-envelope-open"></i> مشاهده پیام</span>
+                <button class="modal-close" onclick="window.closeMsgDetailModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div style="overflow-y:auto;padding-right:6px">
+                <div id="detail-msg-date" style="font-size:11px;color:#94a3b8;direction:ltr;text-align:left;margin-bottom:10px;display:none;"></div>
+                <div id="detail-msg-body" style="font-size:13px;color:#cbd5e1;line-height:1.7;white-space:pre-wrap;margin-bottom:12px;"></div>
+                <div id="detail-msg-support"></div>
+            </div>
         </div>
     </div>
 
@@ -155,6 +173,6 @@
         <p style="color:#22c55e;"><i class="fas fa-circle" style="font-size:6px;"></i> <span id="t-node">سرور فعال (US-East)</span></p>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script type="module" src="dashboard.js?v=7"></script>
+    <script type="module" src="dashboard.js?v=8"></script>
 </body>
 </html>
