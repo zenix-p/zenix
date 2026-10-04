@@ -44,11 +44,222 @@ function generateUIDDigits(userId) {
 }
 
 // ==========================================
-// متغیرهای اعلان‌ها و زبان
+// متغیرها و توابع مدیریت اعلان‌ها (عیناً هماهنگ‌شده با transactions.html)
 // ==========================================
 window.cachedNotifications = [];
+window.currentFilteredNotifs = [];
 window.activeNotifFilter = 'all';
 
+// تابع فرمت‌دهی تاریخ و ساعت به میلادی
+window.formatGregorianDate = function(rawDate) {
+  if (!rawDate) return '';
+  const d = new Date(rawDate);
+  if (isNaN(d.getTime())) return '';
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+};
+
+window.updateBellBadge = function() {
+  const unreadCount = window.cachedNotifications.filter(n => !n.read && !n.isRead && !n.is_read).length;
+  const badge = document.getElementById('bell-badge');
+  if (badge) {
+    badge.innerText = unreadCount;
+    if (unreadCount > 0) badge.classList.add('show');
+    else badge.classList.remove('show');
+  }
+};
+
+window.setNotifFilter = function(filter, element) {
+  window.activeNotifFilter = filter;
+  const tabs = document.querySelectorAll('#notif-tabs .notif-tab');
+  tabs.forEach(tab => tab.classList.remove('active'));
+  
+  if (element) {
+    element.classList.add('active');
+  }
+  
+  window.renderNotifications();
+};
+
+window.getNotifCategory = function(n) {
+  const type = (n.type || '').toLowerCase();
+  const title = (n.title || '').toLowerCase();
+
+  if (type.includes('approved') || type.includes('confirm') || title.includes('تایید') || title.includes('موفق') || title.includes('شارژ شد')) {
+    return 'approved';
+  }
+  if (type.includes('rejected') || type.includes('canceled') || type.includes('cancel') || title.includes('رد') || title.includes('لغو') || title.includes('ناموفق')) {
+    return 'rejected';
+  }
+  return 'admin_message';
+};
+
+window.closeMsgDetailModal = function() {
+  const modal = document.getElementById('m-msg-detail');
+  if (modal) modal.classList.remove('show');
+};
+
+window.openMsgDetail = async function(idx) {
+  const n = window.currentFilteredNotifs[idx];
+  if (!n) return;
+
+  const isUnread = !n.read && !n.isRead && !n.is_read;
+
+  if (isUnread) {
+    // علامت‌گذاری فوری محلی در حافظه
+    n.is_read = true;
+    n.read = true;
+    n.isRead = true;
+
+    window.updateBellBadge();
+    window.renderNotifications();
+
+    // بروزرسانی دیتابیس Supabase
+    try {
+      const { data, error } = await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('id', n.id)
+        .select();
+
+      if (error) {
+        console.warn('خطا در ستون is_read، تلاش برای ثبت در ستون read:', error);
+        const res2 = await supabase
+          .from('notifications')
+          .update({ read: true })
+          .eq('id', n.id);
+          
+        if (res2.error) {
+          console.warn('خطا در ستون read، تلاش برای ثبت در ستون isRead:', res2.error);
+          await supabase
+            .from('notifications')
+            .update({ isRead: true })
+            .eq('id', n.id);
+        }
+      }
+    } catch (err) {
+      console.error('خطای ارتباط با Supabase در به‌روزرسانی اعلان:', err);
+    }
+  }
+
+  const title = n.title || 'پیام سیستم';
+  const msg = n.message || n.text || n.body || '';
+  const category = window.getNotifCategory(n);
+  const dateStr = window.formatGregorianDate(n.created_at || n.date || n.created_date);
+
+  const detailTitle = document.getElementById('detail-msg-title');
+  const detailDate = document.getElementById('detail-msg-date');
+  const detailBody = document.getElementById('detail-msg-body');
+  const detailSupport = document.getElementById('detail-msg-support');
+
+  if (detailTitle) detailTitle.innerHTML = `<i class="fas fa-bell" style="color:#38bdf8"></i> ${title}`;
+  
+  if (detailDate) {
+    if (dateStr) {
+      detailDate.innerHTML = `<i class="far fa-clock" style="color:#38bdf8;margin-right:4px;"></i>${dateStr}`;
+      detailDate.style.display = 'block';
+    } else {
+      detailDate.style.display = 'none';
+    }
+  }
+
+  if (detailBody) detailBody.innerText = msg;
+
+  if (detailSupport) {
+      if (category === 'rejected') {
+          detailSupport.innerHTML = `
+          <div style="margin-top:15px;padding-top:10px;border-top:1px dashed rgba(239,68,68,0.3);display:flex;justify-content:flex-end;">
+            <a href="support.html" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);" style="display:inline-flex;align-items:center;gap:6px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f8fafc;padding:6px 12px;border-radius:6px;font-size:12px;text-decoration:none;font-weight:600;transition:0.2s;">
+              <i class="fas fa-headset" style="color:#ef4444;"></i>
+              <span>پیگیری از طریق پشتیبانی</span>
+            </a>
+          </div>`;
+      } else {
+          detailSupport.innerHTML = '';
+      }
+  }
+
+  document.getElementById('m-msg-detail')?.classList.add('show');
+};
+
+window.renderNotifications = function() {
+  const container = document.getElementById('modal-msg-container');
+  if (!container) return;
+
+  const filter = window.activeNotifFilter;
+  const filtered = window.cachedNotifications.filter(n => {
+    if (filter === 'all') return true;
+    return window.getNotifCategory(n) === filter;
+  });
+
+  window.currentFilteredNotifs = filtered;
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div style="text-align:center;padding:25px;color:#94a3b8;font-size:12px;"><i class="fas fa-inbox" style="font-size:24px;margin-bottom:8px;display:block;opacity:0.5;"></i>هیچ پیامی در این دسته‌بندی وجود ندارد.</div>`;
+    return;
+  }
+
+  let html = '';
+  filtered.forEach((n, idx) => {
+    const title = n.title || 'پیام سیستم';
+    const category = window.getNotifCategory(n);
+    const isUnread = !n.read && !n.isRead && !n.is_read;
+    const dateStr = window.formatGregorianDate(n.created_at || n.date || n.created_date);
+
+    let borderStyle = "border:1px solid rgba(255,255,255,.08);";
+    let bgStyle = "background:rgba(255,255,255,.02);";
+    let icon = '<i class="fas fa-bullhorn" style="color:#38bdf8"></i>';
+    let tagHtml = '<span style="font-size:10px;background:rgba(56,189,248,0.2);color:#38bdf8;padding:2px 6px;border-radius:4px;font-weight:700;">پیام مدیریت</span>';
+
+    if (category === 'approved') {
+      borderStyle = isUnread ? "border:1px solid rgba(34, 197, 94, 0.6);" : "border:1px solid rgba(34, 197, 94, 0.2);";
+      bgStyle = isUnread ? "background:rgba(34, 197, 94, 0.12);" : "background:rgba(34, 197, 94, 0.03);";
+      icon = '<i class="fas fa-check-circle" style="color:#22c55e"></i>';
+      tagHtml = '<span style="font-size:10px;background:rgba(34,197,94,0.2);color:#22c55e;padding:2px 6px;border-radius:4px;font-weight:700;">تایید درخواست</span>';
+    } else if (category === 'rejected') {
+      borderStyle = isUnread ? "border:1px solid rgba(239, 68, 68, 0.6);" : "border:1px solid rgba(239, 68, 68, 0.2);";
+      bgStyle = isUnread ? "background:rgba(239, 68, 68, 0.12);" : "background:rgba(239, 68, 68, 0.03);";
+      icon = '<i class="fas fa-times-circle" style="color:#ef4444"></i>';
+      tagHtml = '<span style="font-size:10px;background:rgba(239,68,68,0.2);color:#ef4444;padding:2px 6px;border-radius:4px;font-weight:700;">لغو درخواست</span>';
+    } else {
+      bgStyle = isUnread ? "background:rgba(56, 189, 248, 0.12);" : "background:rgba(255, 255, 255, 0.02);";
+      borderStyle = isUnread ? "border:1px solid rgba(56, 189, 248, 0.5);" : "border:1px solid rgba(255, 255, 255, 0.08);";
+    }
+
+    const opacityStyle = isUnread ? "opacity:1;" : "opacity:0.65;";
+    const unreadDot = isUnread ? '<span style="width:9px;height:9px;background:#ef4444;border-radius:50%;display:inline-block;box-shadow:0 0 8px #ef4444;" title="خوانده نشده"></span>' : '';
+    const readBadge = isUnread 
+      ? '<span style="font-size:10px;background:#ef4444;color:#fff;padding:2px 7px;border-radius:10px;font-weight:800;box-shadow:0 0 8px rgba(239,68,68,0.5);">جدید</span>' 
+      : '<span style="font-size:10px;background:rgba(255,255,255,0.06);color:#94a3b8;padding:2px 6px;border-radius:10px;"><i class="fas fa-check" style="font-size:9px;color:#64748b;"></i> خوانده‌شده</span>';
+
+    const dateDisplay = dateStr ? `<div style="font-size:11px;color:${isUnread ? '#cbd5e1' : '#64748b'};margin-top:6px;direction:ltr;text-align:left;"><i class="far fa-clock" style="margin-right:4px;"></i>${dateStr}</div>` : '';
+
+    html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle} ${opacityStyle} cursor:pointer; position:relative; transition:all 0.2s;" onclick="window.openMsgDetail(${idx})">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div class="msg-title-text" style="display:flex;align-items:center;gap:8px;font-weight:${isUnread ? '800' : '500'};color:${isUnread ? '#f8fafc' : '#cbd5e1'};">
+          ${unreadDot}
+          ${icon}
+          <span>${title}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          ${tagHtml}
+          ${readBadge}
+        </div>
+      </div>
+      ${dateDisplay}
+    </div>`;
+  });
+
+  container.innerHTML = html;
+};
+
+// ==========================================
+// تنظیمات زبان
+// ==========================================
 let currLang = safeGetItem('zenix_lang') || 'fa';
 
 const ld = {
@@ -376,22 +587,17 @@ async function checkUserSession(user) {
   if (!user) return;
 
   try {
-    // بارگیری اعلان‌ها
+    // بارگیری اعلان‌ها (منطبق بر transactions.html)
     try {
       const { data, error: notifError } = await supabase
         .from('notifications')
         .select('*')
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
       if (!notifError && data) {
         window.cachedNotifications = data;
         window.renderNotifications();
-        const unreadCount = data.filter(n => !n.read && !n.isRead).length;
-        const badge = document.getElementById('bell-badge');
-        if (badge) {
-          badge.innerText = unreadCount;
-          if (unreadCount > 0) badge.classList.add('show');
-          else badge.classList.remove('show');
-        }
+        window.updateBellBadge();
       }
     } catch (err) {}
 
@@ -421,14 +627,14 @@ async function checkUserSession(user) {
       }
     }
 
-    // به‌روزرسانی کارت اعضای کل تیم روی داشبورد
+    // به‌‌روزرسانی کارت اعضای کل تیم روی داشبورد
     if (refElem) {
       const totalTeamCount = await calculateTeamMembersCount(user.id, user);
       refElem.textContent = totalTeamCount;
     }
 
   } catch (err) {
-    console.error('خطا در به‌‌روزرسانی اطلاعات کاربر:', err);
+    console.error('خطا در به‌‌‌‌روزرسانی اطلاعات کاربر:', err);
   }
 }
 
@@ -534,95 +740,4 @@ window.closeHelpModal = function() {
 window.closeMessageModal = function() {
   const modal = document.getElementById('m-msg');
   if (modal) modal.classList.remove('show');
-};
-
-window.setNotifFilter = function(filter, element) {
-  window.activeNotifFilter = filter;
-  const tabs = document.querySelectorAll('#notif-tabs .notif-tab');
-  tabs.forEach(tab => tab.classList.remove('active'));
-  
-  if (element) {
-    element.classList.add('active');
-  }
-  
-  window.renderNotifications();
-};
-
-window.getNotifCategory = function(n) {
-  const type = (n.type || '').toLowerCase();
-  const title = (n.title || '').toLowerCase();
-
-  if (type.includes('approved') || type.includes('confirm') || title.includes('تایید') || title.includes('موفق') || title.includes('شارژ شد')) {
-    return 'approved';
-  }
-  if (type.includes('rejected') || type.includes('canceled') || type.includes('cancel') || title.includes('رد') || title.includes('لغو') || title.includes('ناموفق')) {
-    return 'rejected';
-  }
-  return 'admin_message';
-};
-
-window.renderNotifications = function() {
-  const container = document.getElementById('modal-msg-container');
-  if (!container) return;
-
-  const filter = window.activeNotifFilter;
-  const filtered = window.cachedNotifications.filter(n => {
-    if (filter === 'all') return true;
-    return window.getNotifCategory(n) === filter;
-  });
-
-  if (filtered.length === 0) {
-    container.innerHTML = `<div style="text-align:center;padding:25px;color:#94a3b8;font-size:12px;"><i class="fas fa-inbox" style="font-size:24px;margin-bottom:8px;display:block;opacity:0.5;"></i>هیچ پیامی در این دسته‌بندی وجود ندارد.</div>`;
-    return;
-  }
-
-  let html = '';
-  filtered.forEach(n => {
-    const title = n.title || 'پیام سیستم';
-    const msg = n.message || n.text || n.body || '';
-    const category = window.getNotifCategory(n);
-
-    let borderStyle = "border:1px solid rgba(255,255,255,.08);";
-    let bgStyle = "background:rgba(255,255,255,.03);";
-    let icon = '<i class="fas fa-bullhorn" style="color:#38bdf8"></i>';
-    let tagHtml = '<span style="font-size:10px;background:rgba(56,189,248,0.2);color:#38bdf8;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">پیام مدیریت</span>';
-    let supportBtn = '';
-
-    if (category === 'approved') {
-      borderStyle = "border:1px solid rgba(34, 197, 94, 0.4);";
-      bgStyle = "background:rgba(34, 197, 94, 0.08);";
-      icon = '<i class="fas fa-check-circle" style="color:#22c55e"></i>';
-      tagHtml = '<span style="font-size:10px;background:rgba(34,197,94,0.2);color:#22c55e;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">تایید درخواست</span>';
-    } else if (category === 'rejected') {
-      borderStyle = "border:1px solid rgba(239, 68, 68, 0.4);";
-      bgStyle = "background:rgba(239, 68, 68, 0.08);";
-      icon = '<i class="fas fa-times-circle" style="color:#ef4444"></i>';
-      tagHtml = '<span style="font-size:10px;background:rgba(239,68,68,0.2);color:#ef4444;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">لغو درخواست</span>';
-      
-      supportBtn = `
-        <div style="margin-top:10px;padding-top:8px;border-top:1px dashed rgba(239,68,68,0.2);display:flex;justify-content:flex-end;">
-          <a href="support.html" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);" style="display:inline-flex;align-items:center;gap:6px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f8fafc;padding:5px 10px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:600;transition:0.2s;">
-            <i class="fas fa-headset" style="color:#ef4444;"></i>
-            <span>پیگیری از طریق پشتیبانی</span>
-          </a>
-        </div>
-      `;
-    }
-
-    html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle}">
-      <div class="msg-title-text" style="display:flex;align-items:center;gap:8px;">
-        ${icon}
-        <span>${title}</span>
-        ${tagHtml}
-      </div>
-      <div class="msg-desc-text" style="margin-top:6px;">${msg}</div>
-      ${supportBtn}
-    </div>`;
-  });
-
-  container.innerHTML = html;
-};
-
-window.switchNotifTab = function(tabName) {
-  window.setNotifFilter(tabName, document.querySelector(`.notif-tab[data-tab="${tabName}"]`));
 };
