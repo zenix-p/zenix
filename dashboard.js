@@ -264,11 +264,10 @@ let currLang = safeGetItem('zenix_lang') || 'fa';
 
 const ld = {
   fa: {
-    m1: 'صفحه اصلی', m2: 'کوانتیفیکیشن', m_poker: 'پوکر کازینویی', m3: 'واریز', m4: 'برداشت', m5: 'تراکنش', m6: 'پروفایل', m7: 'پشتیبانی', mAbout: 'درباره پلتفرم', m8: 'خروج',
+    m1: 'صفحه اصلی', m2: 'کوانتیفیکیشن', m_poker: 'کازینو', m3: 'واریز', m4: 'برداشت', m5: 'تراکنش', m6: 'پروفایل', m7: 'پشتیبانی', mAbout: 'درباره پلتفرم', m8: 'خروج',
     wel: 'خوش آمدید', sub: 'پنل مدیریت کاربری', st: 'تایید شده',
     ts1: 'موجودی', ts2: 'اعضای کل تیم',
     c1: 'کوانتیفیکیشن', d1: 'معاملات هوشمند',
-    c_poker: 'پوکر کازینویی', d_poker: 'رقابت با دیلر',
     c2: 'واریز', d2: 'شارژ حساب',
     c3: 'برداشت', d3: 'برداشت دارایی',
     c4: 'تیم', d4: 'زیرمجموعه‌ها',
@@ -280,21 +279,21 @@ const ld = {
     tAbL1t: 'هدف اصلی:', tAbL1d: 'اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.',
     tAbL2t: 'امنیت و زیرساخت:', tAbL2d: 'متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).',
     tAbL3t: 'ساختار چندسطحی (Referral & Team):', tAbL3d: 'ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.',
-    tAbL4t: 'احساس واقع‌گرایی:', tAbL4d: 'وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.',
+    tAbL4t: 'احساس واقع‌گرایی:', tAbL4d: 'وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌‌المللی و زنده سروکار دارد.',
     modalTitle: 'صندوق پیام‌ها و اعلان‌ها', tabAll: 'همه', tabApproved: 'تایید درخواست', tabRejected: 'لغو درخواست', tabAdmin: 'پیام مدیریت',
     node: 'سرور فعال (US-East)',
     helpTitle: 'راهنمای صفحه داشبورد',
     hpT1: 'کاربرد این صفحه (داشبورد) چیست؟', hpD1: 'داشبورد مرکز کنترل و خانه اصلی حساب کاربری شماست. از این صفحه می‌توانید کل دارایی‌ها، وضعیت حساب و وضعیت تیم خود را بررسی کنید و به تمام بخش‌های اصلی پلتفرم دسترسی سریع داشته باشید.',
     hpT2: 'کارت موجودی و زیرمجموعه‌ها', hpD2: 'در این قسمت می‌توانید مجموع کل دارایی‌های دلاری و تعداد اعضای تیم زیرمجموعه خود را به صورت لحظه‌ای مشاهده کنید.',
-    hpT3: 'بخش‌های دسترسی سریع', hpD3: 'دکمه‌های میانبر (کوانتیفیکیشن، پوکر کازینویی، واریز، برداشت، تیم، تراکنش‌ها و پروفایل) برای ورود آنی به بخش‌های مختلف پلتفرم تعبیه شده‌اند.',
-    hpT4: 'بازار زنده ارزهای دیجیتال', hpD4: 'نمایش لحظه‌ای تغییرات قیمت و درصد سود برترین ارزهای دیجیتال برای رصد بازار جهانی در یک نگاه.'
+    hpT3: 'بخش‌های دسترسی سریع', hpD3: 'دکمه‌های میانبر (کوانتیفیکیشن، واریز، برداشت، تیم، تراکنش‌ها و پروفایل) و دکمه شناور کازینو برای ورود آنی به بخش‌های مختلف پلتفرم تعبیه شده‌اند.',
+    hpT4: 'بازار زنده ارزهای دیجیتال', hpD4: 'نمایش لحظه‌ای تغییرات قیمت و درصد سود برترین ارزهای دیجیتال برای رصد بازار جهانی در یک نگاه.',
+    tFloatingCasino: 'کازینو'
   },
   en: {
-    m1: 'Home', m2: 'Quantification', m_poker: 'Casino Poker', m3: 'Deposit', m4: 'Withdraw', m5: 'Transactions', m6: 'Profile', m7: 'Support', mAbout: 'About Platform', m8: 'Logout',
+    m1: 'Home', m2: 'Quantification', m_poker: 'Casino', m3: 'Deposit', m4: 'Withdraw', m5: 'Transactions', m6: 'Profile', m7: 'Support', mAbout: 'About Platform', m8: 'Logout',
     wel: 'Welcome', sub: 'User Dashboard Panel', st: 'Verified',
     ts1: 'Balance', ts2: 'Total Team Members',
     c1: 'Quantification', d1: 'Smart Trading',
-    c_poker: 'Casino Poker', d_poker: 'Play against dealer',
     c2: 'Deposit', d2: 'Account Recharge',
     c3: 'Withdraw', d3: 'Asset Withdrawal',
     c4: 'Team', d4: 'Referral Network',
@@ -312,8 +311,9 @@ const ld = {
     helpTitle: 'Dashboard Guide',
     hpT1: 'What is the purpose of this page?', hpD1: 'The dashboard is your main control center. Here you can inspect total assets, account status, team metrics, and access all core features quickly.',
     hpT2: 'Balance & Team Cards', hpD2: 'View your live USD balance and team member count in real-time.',
-    hpT3: 'Quick Access Grid', hpD3: 'Shortcuts (Quantification, Casino Poker, Deposit, Withdraw, Team, Transactions, Profile) for instant navigation.',
-    hpT4: 'Live Crypto Market', hpD4: 'Real-time price changes and trends of top cryptocurrencies at a glance.'
+    hpT3: 'Quick Access Grid', hpD3: 'Shortcuts (Quantification, Deposit, Withdraw, Team, Transactions, Profile) and floating Casino button for instant navigation.',
+    hpT4: 'Live Crypto Market', hpD4: 'Real-time price changes and trends of top cryptocurrencies at a glance.',
+    tFloatingCasino: 'Casino'
   }
 };
 
@@ -344,7 +344,7 @@ function setLang(lang) {
     'm1': t.m1, 'm2': t.m2, 'm_poker': t.m_poker, 'm3': t.m3, 'm4': t.m4, 'm5': t.m5, 'm6': t.m6, 'm7': t.m7, 'm_about': t.mAbout, 'm8': t.m8,
     't-wel': t.wel, 't-sub': t.sub, 't-st': t.st,
     'ts1': t.ts1, 'ts2': t.ts2,
-    'c1': t.c1, 'd1': t.d1, 'c_poker': t.c_poker, 'd_poker': t.d_poker,
+    'c1': t.c1, 'd1': t.d1,
     'c2': t.c2, 'd2': t.d2, 'c3': t.c3, 'd3': t.d3,
     'c4': t.c4, 'd4': t.d4, 'c5': t.c5, 'd5': t.d5, 'c6': t.c6, 'd6': t.d6,
     't-live': t.tLive,
@@ -360,7 +360,8 @@ function setLang(lang) {
     't-ab-m-l4t': t.tAbL4t, 't-ab-m-l4d': t.tAbL4d,
     't-tab-all': t.tabAll, 't-tab-approved': t.tabApproved, 't-tab-rejected': t.tabRejected, 't-tab-admin': t.tabAdmin,
     't-node': t.node, 't-help-title': t.helpTitle,
-    't-hp-d1': t.hpD1, 't-hp-d2': t.hpD2, 't-hp-d3': t.hpD3, 't-hp-d4': t.hpD4
+    't-hp-d1': t.hpD1, 't-hp-d2': t.hpD2, 't-hp-d3': t.hpD3, 't-hp-d4': t.hpD4,
+    't-floating-casino': t.tFloatingCasino
   };
 
   Object.keys(map).forEach(id => {
@@ -634,7 +635,7 @@ async function checkUserSession(user) {
     }
 
   } catch (err) {
-    console.error('خطا در به‌‌‌‌روزرسانی اطلاعات کاربر:', err);
+    console.error('خطا در بهروزرسانی اطلاعات کاربر:', err);
   }
 }
 
