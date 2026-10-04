@@ -19,6 +19,8 @@
         .notif-tab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#94a3b8;padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;white-space:nowrap;transition:0.2s;display:flex;align-items:center;justify-content:center;gap:5px;flex:1 1 auto}
         .notif-tab:hover{background:rgba(56,189,248,.15);color:#38bdf8}
         .notif-tab.active{background:#38bdf8;color:#0f172a;font-weight:bold;border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.3)}
+        .tab-badge{background:rgba(255,255,255,.15);color:inherit;padding:1px 6px;border-radius:10px;font-size:10px;font-weight:700;line-height:1.2;min-width:16px;text-align:center;display:inline-block}
+        .notif-tab.active .tab-badge{background:rgba(15,23,42,.3);color:#0f172a}
         #modal-msg-container{overflow-y:auto;padding-right:6px;flex:1;min-height:0}
         #modal-msg-container::-webkit-scrollbar, .modal-content div::-webkit-scrollbar{width:5px}
         #modal-msg-container::-webkit-scrollbar-track, .modal-content div::-webkit-scrollbar-track{background:rgba(15,23,42,.6);border-radius:10px}
@@ -104,7 +106,7 @@
         </div>
     </div>
 
-    <!-- مودال اصلاح‌شده صندوق پیام‌ها و اعلان‌ها (کاملاً عین transactions.html) -->
+    <!-- مودال اصلاح‌شده صندوق پیام‌ها و اعلان‌ها به همراه بج شمارنده برای هر تب -->
     <div class="modal" id="m-msg">
         <div class="modal-content">
             <div class="modal-header">
@@ -112,16 +114,16 @@
                 <button class="modal-close" onclick="window.closeMessageModal()"><i class="fas fa-times"></i></button>
             </div>
             <div class="notif-tabs" id="notif-tabs">
-                <button type="button" class="notif-tab active" onclick="window.setNotifFilter('all', this)"><i class="fas fa-list"></i> <span id="t-tab-all">همه</span></button>
-                <button type="button" class="notif-tab" onclick="window.setNotifFilter('approved', this)"><i class="fas fa-check-circle" style="color:#22c55e"></i> <span id="t-tab-approved">تایید درخواست</span></button>
-                <button type="button" class="notif-tab" onclick="window.setNotifFilter('rejected', this)"><i class="fas fa-times-circle" style="color:#ef4444"></i> <span id="t-tab-rejected">لغو درخواست</span></button>
-                <button type="button" class="notif-tab" onclick="window.setNotifFilter('admin_message', this)"><i class="fas fa-bullhorn" style="color:#38bdf8"></i> <span id="t-tab-admin">پیام مدیریت</span></button>
+                <button type="button" class="notif-tab active" onclick="window.setNotifFilter('all', this)"><i class="fas fa-list"></i> <span id="t-tab-all">همه</span> <span class="tab-badge" id="cnt-tab-all">0</span></button>
+                <button type="button" class="notif-tab" onclick="window.setNotifFilter('approved', this)"><i class="fas fa-check-circle" style="color:#22c55e"></i> <span id="t-tab-approved">تایید درخواست</span> <span class="tab-badge" id="cnt-tab-approved">0</span></button>
+                <button type="button" class="notif-tab" onclick="window.setNotifFilter('rejected', this)"><i class="fas fa-times-circle" style="color:#ef4444"></i> <span id="t-tab-rejected">لغو درخواست</span> <span class="tab-badge" id="cnt-tab-rejected">0</span></button>
+                <button type="button" class="notif-tab" onclick="window.setNotifFilter('admin_message', this)"><i class="fas fa-bullhorn" style="color:#38bdf8"></i> <span id="t-tab-admin">پیام مدیریت</span> <span class="tab-badge" id="cnt-tab-admin">0</span></button>
             </div>
             <div id="modal-msg-container"><div style="text-align:center;padding:20px;color:#94a3b8">هیچ پیام جدیدی وجود ندارد.</div></div>
         </div>
     </div>
 
-    <!-- مودال مشاهده جزئیات پیام (عیناً افزوده شده مطابق transactions.html) -->
+    <!-- مودال مشاهده جزئیات پیام -->
     <div class="modal" id="m-msg-detail" style="z-index:1050;">
         <div class="modal-content">
             <div class="modal-header">
