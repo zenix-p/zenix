@@ -1,281 +1,208 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-// تنظیمات اتصال به Supabase
-const SUPABASE_URL = 'https://YOUR_SUPABASE_PROJECT_URL.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-let currentMessages = [];
-let activeFilter = 'all';
-
-document.addEventListener('DOMContentLoaded', async () => {
-    initNavigation();
-    initLanguage();
-    initHelpAndAboutModals();
-    await loadUserData();
-    await loadCryptoMarket();
-    await loadNotifications();
-});
-
-// مدیریت منوها و ناوبری
-function initNavigation() {
-    const menuBtn = document.getElementById('menu-btn');
-    const navMenu = document.getElementById('nav-menu');
-    const langBtn = document.getElementById('lang-btn');
-    const langMenu = document.getElementById('lang-menu');
-    const bellBtn = document.getElementById('bell-btn');
-
-    if (menuBtn && navMenu) {
-        menuBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            navMenu.classList.toggle('show');
-            if (langMenu) langMenu.classList.remove('show');
-        });
-    }
-
-    if (langBtn && langMenu) {
-        langBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            langMenu.classList.toggle('show');
-            if (navMenu) navMenu.classList.remove('show');
-        });
-    }
-
-    document.addEventListener('click', () => {
-        if (navMenu) navMenu.classList.remove('show');
-        if (langMenu) langMenu.classList.remove('show');
-    });
-
-    if (bellBtn) {
-        bellBtn.addEventListener('click', () => {
-            window.openMessageModal();
-        });
-    }
-}
-
-// انتخاب زبان
-function initLanguage() {
-    const langItems = document.querySelectorAll('#lang-menu .mi');
-    langItems.forEach(item => {
-        item.addEventListener('click', () => {
-            const lang = item.getAttribute('data-lang');
-            localStorage.setItem('zenix_lang', lang);
-        });
-    });
-}
-
-// بارگیری اطلاعات کاربر و آمار
-async function loadUserData() {
-    try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single();
-
-        if (profile) {
-            const balEl = document.getElementById('val-balance');
-            const refEl = document.getElementById('val-ref');
-            if (balEl) balEl.textContent = `$${parseFloat(profile.balance || 0).toFixed(2)}`;
-            if (refEl) refEl.textContent = profile.referral_count || 0;
-        }
-    } catch (err) {
-        console.error('خطا در دریافت اطلاعات کاربر:', err);
-    }
-}
-
-// بارگیری نرخ ارزهای دیجیتال
-async function loadCryptoMarket() {
-    const tickerContainer = document.getElementById('crypto-ticker-list');
-    if (!tickerContainer) return;
-
-    try {
-        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tether&vs_currencies=usd&include_24hr_change=true');
-        const data = await res.json();
-
-        const cryptos = [
-            { name: 'Bitcoin', symbol: 'BTC', price: data.bitcoin?.usd || 0, change: data.bitcoin?.usd_24h_change || 0, icon: 'fa-btc', color: '#f7931a' },
-            { name: 'Ethereum', symbol: 'ETH', price: data.ethereum?.usd || 0, change: data.ethereum?.usd_24h_change || 0, icon: 'fa-ethereum', color: '#627eea' },
-            { name: 'Tether', symbol: 'USDT', price: data.tether?.usd || 1, change: data.tether?.usd_24h_change || 0, icon: 'fa-dollar-sign', color: '#26a17b' }
-        ];
-
-        tickerContainer.innerHTML = cryptos.map(c => {
-            const isUp = c.change >= 0;
-            const changeClass = isUp ? 'price-up' : 'price-down';
-            const changeSign = isUp ? '+' : '';
-            return `
-                <div class="crypto-row">
-                    <div class="crypto-info">
-                        <div class="crypto-icon" style="background:${c.color}"><i class="fab ${c.icon}"></i></div>
-                        <div><strong>${c.symbol}</strong></div>
-                    </div>
-                    <div>
-                        <div>$${c.price.toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
-                        <div class="${changeClass}">${changeSign}${c.change.toFixed(2)}%</div>
-                    </div>
-                </div>
-            `;
-        }).join('');
-    } catch (err) {
-        console.error('خطا در دریافت نرخ ارزها:', err);
-    }
-}
-
-// بارگیری پیام‌ها و محاسبه پویای تعداد پیام هر تب
-async function loadNotifications() {
-    try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        const { data: msgs, error } = await supabase
-            .from('notifications')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        currentMessages = msgs || [];
-
-        // به‌روزرسانی بج زنگوله اصلی
-        const unreadCount = currentMessages.filter(m => !m.is_read).length;
-        const bellBadge = document.getElementById('bell-badge');
-        if (bellBadge) {
-            bellBadge.textContent = unreadCount;
-            if (unreadCount > 0) {
-                bellBadge.classList.add('show');
-            } else {
-                bellBadge.classList.remove('show');
-            }
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل کاربری</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Tahoma, Arial, sans-serif;
         }
 
-        // محاسبه و قرار دادن تعداد واقعی پیام‌ها روی تب‌ها
-        updateTabBadges(currentMessages);
+        body {
+            background-color: #f4f6f9;
+            padding: 20px;
+            direction: rtl;
+        }
 
-    } catch (err) {
-        console.error('خطا در دریافت پیام‌ها:', err);
-    }
-}
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
 
-// تابع شمارش و به‌روزرسانی اعداد روی تب‌های اعلان
-function updateTabBadges(msgs) {
-    const allCnt = msgs.length;
-    const approvedCnt = msgs.filter(m => m.type === 'approved' || m.status === 'approved' || m.type === 'deposit_success' || m.type === 'withdraw_success').length;
-    const rejectedCnt = msgs.filter(m => m.type === 'rejected' || m.status === 'rejected' || m.type === 'deposit_rejected' || m.type === 'withdraw_rejected').length;
-    const adminCnt = msgs.filter(m => m.type === 'admin_message' || m.type === 'admin' || m.type === 'system').length;
+        .tabs {
+            display: flex;
+            background-color: #e9ecef;
+            border-bottom: 2px solid #dee2e6;
+        }
 
-    const elAll = document.getElementById('cnt-tab-all');
-    const elApproved = document.getElementById('cnt-tab-approved');
-    const elRejected = document.getElementById('cnt-tab-rejected');
-    const elAdmin = document.getElementById('cnt-tab-admin');
+        .tab-button {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: none;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            color: #495057;
+            position: relative;
+            transition: background 0.3s;
+        }
 
-    if (elAll) elAll.textContent = allCnt;
-    if (elApproved) elApproved.textContent = approvedCnt;
-    if (elRejected) elRejected.textContent = rejectedCnt;
-    if (elAdmin) elAdmin.textContent = adminCnt;
-}
+        .tab-button:hover {
+            background-color: #f1f3f5;
+        }
 
-// رندر کردن لیست پیام‌ها داخل مودال
-function renderMessages() {
-    const container = document.getElementById('modal-msg-container');
-    if (!container) return;
+        .tab-button.active {
+            background-color: #ffffff;
+            color: #0d6efd;
+            border-bottom: 3px solid #0d6efd;
+        }
 
-    let filtered = currentMessages;
+        /* استایل نشانگر تعداد (Badge) */
+        .badge {
+            display: inline-block;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 12px;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
 
-    if (activeFilter === 'approved') {
-        filtered = currentMessages.filter(m => m.type === 'approved' || m.status === 'approved' || m.type === 'deposit_success' || m.type === 'withdraw_success');
-    } else if (activeFilter === 'rejected') {
-        filtered = currentMessages.filter(m => m.type === 'rejected' || m.status === 'rejected' || m.type === 'deposit_rejected' || m.type === 'withdraw_rejected');
-    } else if (activeFilter === 'admin_message') {
-        filtered = currentMessages.filter(m => m.type === 'admin_message' || m.type === 'admin' || m.type === 'system');
-    }
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
 
-    if (filtered.length === 0) {
-        container.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8">هیچ پیام جدیدی وجود ندارد.</div>';
-        return;
-    }
+        .tab-content.active {
+            display: block;
+        }
 
-    container.innerHTML = filtered.map(m => `
-        <div class="msg-body-box" onclick="window.openMsgDetail('${m.id}')" style="cursor:pointer;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                <div class="msg-title-text">${m.title || 'اعلان جدید'}</div>
-                <div style="font-size:10px;color:#64748b;">${new Date(m.created_at).toLocaleDateString('fa-IR')}</div>
-            </div>
-            <div class="msg-desc-text">${m.message || m.body || ''}</div>
+        .notification-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-item.unread {
+            background-color: #e7f5ff;
+        }
+
+        .btn-read {
+            background-color: #198754;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="tabs">
+        <button class="tab-button active" onclick="openTab(event, 'home')">خانه</button>
+        <button class="tab-button" onclick="openTab(event, 'notifications')">
+            اعلا‌ن‌ها
+            <span id="notificationBadge" class="badge">0</span>
+        </button>
+        <button class="tab-button" onclick="openTab(event, 'settings')">تنظیمات</button>
+    </div>
+
+    <div id="home" class="tab-content active">
+        <h2>صفحه اصلی</h2>
+        <p>به پنل کاربری خوش آمدید.</p>
+    </div>
+
+    <div id="notifications" class="tab-content">
+        <h2>اعلا‌ن‌های شما</h2>
+        <div id="notificationList">
+            <!-- لیست اعلانات -->
         </div>
-    `).join('');
-}
+    </div>
 
-// توابع مودال متصل به شیء window
-window.openMessageModal = () => {
-    const modal = document.getElementById('m-msg');
-    if (modal) {
-        modal.classList.add('show');
-        renderMessages();
-    }
-};
+    <div id="settings" class="tab-content">
+        <h2>تنظیمات</h2>
+        <p>تنظیمات حساب کاربری در این بخش قرار دارد.</p>
+    </div>
+</div>
 
-window.closeMessageModal = () => {
-    const modal = document.getElementById('m-msg');
-    if (modal) modal.classList.remove('show');
-};
+<script>
+    // داده‌های اولیه (بدون تغییر)
+    const notificationsData = [
+        { id: 1, title: 'پیام جدید از پشتیبانی', isRead: false },
+        { id: 2, title: 'تخفیف ویژه روز خریدار', isRead: false },
+        { id: 3, title: 'ورود موفق به حساب کاربری', isRead: true },
+        { id: 4, title: 'به‌روزرسانی سیستم انجام شد', isRead: false }
+    ];
 
-window.setNotifFilter = (filterType, btnEl) => {
-    activeFilter = filterType;
-    const tabs = document.querySelectorAll('.notif-tab');
-    tabs.forEach(t => t.classList.remove('active'));
-    if (btnEl) btnEl.classList.add('active');
-    renderMessages();
-};
+    // تابع تعویض تب‌ها
+    function openTab(evt, tabName) {
+        const tabContents = document.getElementsByClassName("tab-content");
+        for (let i = 0; i < tabContents.length; i++) {
+            tabContents[i].classList.remove("active");
+        }
 
-window.openMsgDetail = (msgId) => {
-    const msg = currentMessages.find(m => m.id === msgId);
-    if (!msg) return;
+        const tabButtons = document.getElementsByClassName("tab-button");
+        for (let i = 0; i < tabButtons.length; i++) {
+            tabButtons[i].classList.remove("active");
+        }
 
-    const detailModal = document.getElementById('m-msg-detail');
-    const titleEl = document.getElementById('detail-msg-title');
-    const bodyEl = document.getElementById('detail-msg-body');
-    const dateEl = document.getElementById('detail-msg-date');
-
-    if (titleEl) titleEl.innerHTML = `<i class="fas fa-envelope-open"></i> ${msg.title || 'جزئیات پیام'}`;
-    if (bodyEl) bodyEl.textContent = msg.message || msg.body || '';
-    if (dateEl) {
-        dateEl.style.display = 'block';
-        dateEl.textContent = new Date(msg.created_at).toLocaleString('fa-IR');
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
     }
 
-    if (detailModal) detailModal.classList.add('show');
-};
+    // [بخش اصلاح شده]: تابع به‌روزرسانی نشانگر تب اعلانات
+    function updateNotificationBadge() {
+        const unreadCount = notificationsData.filter(item => !item.isRead).length;
+        const badgeElement = document.getElementById("notificationBadge");
 
-window.closeMsgDetailModal = () => {
-    const detailModal = document.getElementById('m-msg-detail');
-    if (detailModal) detailModal.classList.remove('show');
-};
+        if (unreadCount > 0) {
+            badgeElement.textContent = unreadCount;
+            badgeElement.style.display = "inline-block";
+        } else {
+            badgeElement.style.display = "none";
+        }
+    }
 
-function initHelpAndAboutModals() {
-    const helpBtn = document.getElementById('help-btn');
-    if (helpBtn) {
-        helpBtn.addEventListener('click', () => {
-            const helpModal = document.getElementById('m-help');
-            if (helpModal) helpModal.classList.add('show');
+    // رندر کردن لیست اعلانات
+    function renderNotifications() {
+        const listContainer = document.getElementById("notificationList");
+        listContainer.innerHTML = "";
+
+        notificationsData.forEach(item => {
+            const div = document.createElement("div");
+            div.className = `notification-item ${item.isRead ? '' : 'unread'}`;
+            div.innerHTML = `
+                <span>${item.title}</span>
+                ${!item.isRead ? `<button class="btn-read" onclick="markAsRead(${item.id})">علامت به عنوان خوانده شده</button>` : '<span>خوانده شده</span>'}
+            `;
+            listContainer.appendChild(div);
         });
+
+        // به‌روزرسانی تعداد روی تب
+        updateNotificationBadge();
     }
-}
 
-window.closeHelpModal = () => {
-    const helpModal = document.getElementById('m-help');
-    if (helpModal) helpModal.classList.remove('show');
-};
+    // تغییر وضعیت خوانده شدن اعلان
+    function markAsRead(id) {
+        const notification = notificationsData.find(item => item.id === id);
+        if (notification) {
+            notification.isRead = true;
+            renderNotifications();
+        }
+    }
 
-window.openAboutModal = () => {
-    const aboutModal = document.getElementById('m-about');
-    if (aboutModal) aboutModal.classList.add('show');
-};
+    // اجرای اولیه هنگام بارگذاری صفحه
+    document.addEventListener("DOMContentLoaded", () => {
+        renderNotifications();
+    });
+</script>
 
-window.closeAboutModal = () => {
-    const aboutModal = document.getElementById('m-about');
-    if (aboutModal) aboutModal.classList.remove('show');
-};
+</body>
+</html>
