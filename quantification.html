@@ -58,13 +58,16 @@ header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1)
 .modal-close{background:rgba(255,255,255,.05);border:none;color:#94a3b8;cursor:pointer;font-size:14px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
 .modal-close:hover{background:rgba(239,68,68,.2);color:#ef4444}
 .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px;transition:0.2s}
-.msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:4px}
+.msg-body-box:hover{border-color:rgba(56,189,248,.5)!important;opacity:1!important;}
+.msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:0}
 .msg-desc-text{font-size:12px;color:#cbd5e1;line-height:1.5}
 
 .notif-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
 .notif-tab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#94a3b8;padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;white-space:nowrap;transition:0.2s;display:flex;align-items:center;justify-content:center;gap:5px;flex:1 1 auto}
 .notif-tab:hover{background:rgba(56,189,248,.15);color:#38bdf8}
 .notif-tab.active{background:#38bdf8;color:#0f172a;font-weight:bold;border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.3)}
+.tab-badge{background:rgba(255,255,255,.15);color:inherit;padding:1px 6px;border-radius:10px;font-size:10px;font-weight:700;line-height:1.2;min-width:16px;text-align:center;display:inline-block}
+.notif-tab.active .tab-badge{background:rgba(15,23,42,.3);color:#0f172a}
 
 #modal-msg-container{overflow-y:auto;padding-right:6px;flex:1;min-height:0}
 
@@ -191,22 +194,35 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
 <div style="margin-top:16px;background:rgba(30,41,59,.5);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px"><h3 style="font-size:13px;color:#38bdf8;margin-bottom:12px;display:flex;align-items:center;gap:8px"><span style="background:rgba(6,182,212,.15);color:#06b6d4;width:28px;height:28px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;border:1px solid rgba(6,182,212,.3);box-shadow:0 0 10px rgba(6,182,212,.2)"><i class="fas fa-history"></i></span><span data-i18n="tradeHistory">تاریخچه معاملات</span></h3><div id="history-list" style="display:flex;flex-direction:column;gap:8px;max-height:350px;overflow-y:auto"><div style="font-size:12px;color:#94a3b8;text-align:center" data-i18n="noHistory">هنوز معامله‌ای ثبت نشده است</div></div><button id="view-all-history-btn" onclick="window.toggleHistory()" style="display:none;width:100%;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);color:#38bdf8;padding:8px;border-radius:8px;font-size:11px;font-weight:700;margin-top:10px;cursor:pointer;align-items:center;justify-content:center;gap:6px;transition:all .2s ease"><i id="history-btn-icon" class="fas fa-list-ul"></i> <span id="history-btn-text" data-i18n="showFullHistory">مشاهده کامل تاریخچه</span></button></div>
 <div style="margin-top:16px;background:rgba(30,41,59,.5);border:1px solid rgba(56,189,248,.2);border-radius:12px;padding:14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="font-size:13px;color:#38bdf8;display:flex;align-items:center;gap:6px"><i class="fas fa-globe" style="color:#22c55e"></i> <span data-i18n="globalMarket">بازار ارز جهانی</span></h3><span style="font-size:10px;color:#94a3b8;display:flex;align-items:center;gap:4px"><i class="fas fa-arrows-rotate fa-spin" style="color:#38bdf8"></i> <span data-i18n="liveUpdates">به‌روزرسانی زنده</span></span></div><div id="market-list" style="display:flex;flex-direction:column;gap:8px"></div></div></div>
 
-<!-- مودال صندوق پیام‌ها -->
+<!-- مودال اصلاح‌شده صندوق پیام‌ها و اعلان‌ها به همراه بج شمارنده برای هر تب -->
 <div class="modal" id="m-msg">
     <div class="modal-content">
         <div class="modal-header">
             <span id="t-modal-title"><i class="fas fa-bell"></i> صندوق پیام‌ها و اعلان‌ها</span>
             <button class="modal-close" onclick="window.closeMessageModal()"><i class="fas fa-times"></i></button>
         </div>
-        
         <div class="notif-tabs" id="notif-tabs">
-            <button type="button" class="notif-tab active" onclick="window.setNotifFilter('all', this)"><i class="fas fa-list"></i> همه</button>
-            <button type="button" class="notif-tab" onclick="window.setNotifFilter('approved', this)"><i class="fas fa-check-circle" style="color:#22c55e"></i> تایید درخواست</button>
-            <button type="button" class="notif-tab" onclick="window.setNotifFilter('rejected', this)"><i class="fas fa-times-circle" style="color:#ef4444"></i> لغو درخواست</button>
-            <button type="button" class="notif-tab" onclick="window.setNotifFilter('admin_message', this)"><i class="fas fa-bullhorn" style="color:#38bdf8"></i> پیام مدیریت</button>
+            <button type="button" class="notif-tab active" onclick="window.setNotifFilter('all', this)"><i class="fas fa-list"></i> <span id="t-tab-all">همه</span> <span class="tab-badge" id="cnt-tab-all">0</span></button>
+            <button type="button" class="notif-tab" onclick="window.setNotifFilter('approved', this)"><i class="fas fa-check-circle" style="color:#22c55e"></i> <span id="t-tab-approved">تایید درخواست</span> <span class="tab-badge" id="cnt-tab-approved">0</span></button>
+            <button type="button" class="notif-tab" onclick="window.setNotifFilter('rejected', this)"><i class="fas fa-times-circle" style="color:#ef4444"></i> <span id="t-tab-rejected">لغو درخواست</span> <span class="tab-badge" id="cnt-tab-rejected">0</span></button>
+            <button type="button" class="notif-tab" onclick="window.setNotifFilter('admin_message', this)"><i class="fas fa-bullhorn" style="color:#38bdf8"></i> <span id="t-tab-admin">پیام مدیریت</span> <span class="tab-badge" id="cnt-tab-admin">0</span></button>
         </div>
-
         <div id="modal-msg-container"><div style="text-align:center;padding:20px;color:#94a3b8">هیچ پیام جدیدی وجود ندارد.</div></div>
+    </div>
+</div>
+
+<!-- مودال مشاهده جزئیات پیام (کاملاً عین داشبورد) -->
+<div class="modal" id="m-msg-detail" style="z-index:1050;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span id="detail-msg-title"><i class="fas fa-envelope-open"></i> مشاهده پیام</span>
+            <button class="modal-close" onclick="window.closeMsgDetailModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div style="overflow-y:auto;padding-right:6px">
+            <div id="detail-msg-date" style="font-size:11px;color:#94a3b8;direction:ltr;text-align:left;margin-bottom:10px;display:none;"></div>
+            <div id="detail-msg-body" style="font-size:13px;color:#cbd5e1;line-height:1.7;white-space:pre-wrap;margin-bottom:12px;"></div>
+            <div id="detail-msg-support"></div>
+        </div>
     </div>
 </div>
 
@@ -242,9 +258,9 @@ window.closeMessageModal = () => document.getElementById('m-msg')?.classList.rem
 window.showAllHistory=!1;
 window.toggleHistory=function(){window.showAllHistory=!window.showAllHistory;if(window.renderHistory)window.renderHistory();};
 window.LD={
-  fa:{dir:'rtl',adminMsg:'پیام مدیریت',welcomeText:'به پلتفرم زنیکس خوش آمدید.',home:'صفحه اصلی',quantification:'کوانتیفیکیشن',deposit:'واریز',receive:'برداشت',transactions:'تراکنش',profile:'پروفایل',support:'پشتیبانی',about:'درباره پلتفرم',logout:'خروج',tradingLevels:'سطوح معاملاتی',subWel:'سطح خود را بررسی و ربات را فعال کنید',active:'فعال',inactive:'غیرفعال (موجودی کمتر از $20)',nyTime:'ساعت نیویورک',bal:'موجودی',prof:'سود',usersCount:'نفرات',liveTrade:'وضعیت معامله جاری',todayProfit:'سود امروز',yesterdayProfit:'سود دیروز',tradeHistory:'تاریخچه معاملات',noHistory:'هنوز معامله‌ای ثبت نشده است',totalBalance:'موجودی کل حساب',dailyLimit:'پایان ظرفیت امروز',trading:'معامله',seconds:'ثانیه',success:'موفق!',tradeAmount:'مبلغ معامله',helpModalTitle:'راهنمای بخش کوانتیفیکیشن و سطوح VIP',whatIsQuantTitle:'سیستم کوانتیفیکیشن چیست؟',whatIsQuantDesc:'ربات هوشمند معاملات با بررسی لحظه‌ای قیمت رمز‌ارزها در صرافی‌های مختلف جهان، کوچک‌ترین اختلاف قیمت‌ها را کشف کرده و معاملات سودآور برپایه آربیتراژ و الگوریتم‌های هوش مصنوعی انجام می‌دهد.',vipRulesTitle:'شروط ورود و ارتقا به سطوح VIP',vipNote:'نکته مهم: شرط اصلی فعال‌سازی و ارتقا به هر سطح VIP، انجام واریزی مستقیم به همان میزان است. سود حاصل از معاملات پلتفرم، برای شرط واریزی جهت ارتقا سطوح محسوب نمی‌شود.',directDeposit:'واریزی مستقیم:',directInvite:'دعوت مستقیم:',balanceRange:'محدوده موجودی:',dailyProfit:'سود روزانه:',activationTitle:'نحوه فعال‌سازی و تقسیم سود',activationDesc:'حداقل واریزی جهت فعال‌سازی 20 دلار است. سود روزانه مشخص‌شده، به ۴ معامله ۱۰ ثانیه‌ای در طول روز تقسیم می‌شود؛ یعنی با انجام هر ۴ معامله، درصد سود کامل سطح VIP خود را به‌دست می‌آورید.',resetTitle:'بازنشانی روزانه (ساعت نیویورک)',resetDesc:'ظرفیت ۴ معامله در روز مطابق با ساعت رسمی نیویورک (NY Time) در پایان هر روز کاری صفر شده و مجدداً فعال می‌شود.',globalMarket:'بازار ارز جهانی',liveUpdates:'به‌روزرسانی زنده',showFullHistory:'مشاهده کامل تاریخچه',showLess:'بستن تاریخچه',aboutModalTitle:'درباره پلتفرم Zenix (هدف، ماهیت و ساختار)',abDesc:'پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.',abL1T:'هدف اصلی:',abL1D:'اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.',abL2T:'امنیت و زیرساخت:',abL2D:'متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).',abL3T:'ساختار چندسطحی (Referral & Team):',abL3D:'ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.',abL4T:'احساس واقع‌گرایی:',abL4D:'وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.',modalTitle:'صندوق پیام‌ها و اعلان‌ها',noMsg:'هیچ پیام جدیدی وجود ندارد.'},
-  en:{dir:'ltr',adminMsg:'Admin Message',welcomeText:'Welcome to Zenix platform.',home:'Home',quantification:'Quantification',deposit:'Deposit',receive:'Withdraw',transactions:'Transactions',profile:'Profile',support:'Support',about:'About Platform',logout:'Logout',tradingLevels:'Trading Levels',subWel:'Check your level and activate the bot',active:'Active',inactive:'Inactive (Balance < $20)',nyTime:'New York Time',bal:'Balance',prof:'Profit',usersCount:'Users',liveTrade:'Live Trade Status',todayProfit:'Today Profit',yesterdayProfit:'Yesterday Profit',tradeHistory:'Trade History',noHistory:'No trades recorded yet',totalBalance:'Total Balance',dailyLimit:'Daily Limit Reached',trading:'Trading',seconds:'sec',success:'Success!',tradeAmount:'Trade Amount',helpModalTitle:'Quantification & VIP Levels Guide',whatIsQuantTitle:'What is the Quantification System?',whatIsQuantDesc:'The smart trading bot analyzes real-time cryptocurrency prices across global exchanges to detect price differences and execute profitable trades based on arbitrage and AI algorithms.',vipRulesTitle:'Conditions for VIP Levels',vipNote:'Important Note: The main condition for activating and upgrading VIP levels is making a direct deposit of the required amount. Platform trading profit does not count towards deposit requirements.',directDeposit:'Direct Deposit:',directInvite:'Direct Referral:',balanceRange:'Balance Range:',dailyProfit:'Daily Profit:',activationTitle:'Activation & Profit Division',activationDesc:'Minimum deposit for activation is $20. The daily profit rate is divided into 4 10-second trades throughout the day; completing all 4 trades grants your level\'s full daily profit.',resetTitle:'Daily Reset (NY Time)',resetDesc:'The 4 daily trade limit resets at the end of each business day according to New York Time (NY Time).',globalMarket:'Global Crypto Market',liveUpdates:'Live Updates',showFullHistory:'View Full History',showLess:'Show Less',aboutModalTitle:'About Zenix Platform (Goal, Nature & Structure)',abDesc:'Zenix Platform is an innovative financial ecosystem in cryptocurrency and trading processing designed for a secure, automated, and profitable user experience.',abL1T:'Main Goal:',abL1D:'Automating trading processes via AI systems and quantification algorithms, enabling users to profit from market fluctuations without complex trading expertise.',abL2T:'Security & Infrastructure:',abL2D:'Backed by advanced encryption protocols, high-speed cloud processing nodes, and secure Supabase database storage.',abL3T:'Multi-level Structure (Referral & Team):',abL3D:'Creating a dynamic referral network so users receive multi-level rewards and sustainable passive income from team activity.',abL4T:'Realism & Live Data:',abL4D:'Live crypto ticker, volume indicators, network gas fees, and system notices ensure users interact with an active global platform.',modalTitle:'Notifications & Messages',noMsg:'No new messages found.'},
-  ar:{dir:'rtl',adminMsg:'رسالة الإدارة',welcomeText:'مرحباً بكم في منصة زينكس.',home:'الرئيسية',quantification:'التداول الكمي',deposit:'إيداع',receive:'سحب',transactions:'المعاملات',profile:'الملف الشخصي',support:'الدعم',about:'عن المنصة',logout:'تسجيل خروج',tradingLevels:'مستويات التداول',subWel:'تحقق من مستواك وفعل البوت',active:'نشط',inactive:'غير نشط (الرصيد أقل من $20)',nyTime:'توقيت نيويورك',bal:'الرصيد',prof:'الربح',usersCount:'المستخدمين',liveTrade:'حالة التداول المباشر',todayProfit:'ربح اليوم',yesterdayProfit:'ربح الأمس',tradeHistory:'سجل المعاملات',noHistory:'لم يتم تسجيل أي معاملات بعد',totalBalance:'إجمالي الرصيد',dailyLimit:'تم الوصول للحد اليومي',trading:'تداول',seconds:'ثانية',success:'ناجح!',tradeAmount:'مبلغ التداول',helpModalTitle:'دليل التداول الكمي ومستويات VIP',whatIsQuantTitle:'ما هو نظام التداول الكمي؟',whatIsQuantDesc:'يقوم بوت التداول الذكي بتحليل أسعار العملات الرقمية في البورصات العالمية لحظة بلحظة لاكتشاف الفروقات السعرية وإجراء صفقات مربحة بناءً على المراجحة وخوارزميات الذكاء الاصطناعي.',vipRulesTitle:'شروط الدخول والترقية لمستويات VIP',vipNote:'ملاحظة هامة: الشرط الأساسي لتفعيل وترقية أي مستوى VIP هو إجراء إيداع مباشر بالمبلغ المطلوب. أرباح التداول في المنصة لا تحتسب ضمن شرط الإيداع.',directDeposit:'الإيداع المباشر:',directInvite:'الدعوة المباشرة:',balanceRange:'نطاق الرصيد:',dailyProfit:'الربح اليومي:',activationTitle:'طريقة التفعيل وتقسيم الأرباح',activationDesc:'الحد الأدنى للإيداع للتفعيل هو 20 دولاراً. يتم تقسيم نسبة الربح اليومية على 4 صفقات تستغرق كل منها 10 ثوانٍ خلال اليوم.',resetTitle:'إعادة الضبط اليومية (توقيت نيويورك)',resetDesc:'يتم إعادة ضبط حد الصفقات الأربع يومياً وفقاً للتوقيت الرسمي لمدينة نيويورك (NY Time).',globalMarket:'سوق العملات العالمية',liveUpdates:'تحديثات مباشرة',showFullHistory:'عرض سجل المعاملات بالكامل',showLess:'عرض أقل',aboutModalTitle:'عن منصة Zenix (الهدف والطبيعة والهيكل)',abDesc:'منصة Zenix هي بيئة مالية مبتكرة وذكية في مجال العملات الرقمية صُممت لتقديم تجربة آمنة وآلية ومربحة للمستخدمين.',abL1T:'الهدف الرئيسي:',abL1D:'أتمتة عمليات التداول عبر الذكاء الاصطناعي وخوارزميات الكمية لتمكين المستخدمين من تحقيق أرباح دون الحاجة لخبرة تداول معقدة.',abL2T:'الأمان والبنية التحتية:',abL2D:'تعتمد على بروتوكولات تشفير متقدمة وعقد معالجة سحابية سريعة وقاعدة بيانات Supabase آمنة.',abL3T:'الهيكل متعدد المستويات:',abL3D:'إنشاء شبكة إحالة ديناميكية لتمكين المستخدمين من الحصول على مكافآت مستمرة من نشاط فريقهم.',abL4T:'بيانات حية وواقعية:',abL4D:'مؤشرات أسعار وحجم تداول ورسوم شبكة حية تضمن التفاعل مع منصة عالمية حقيقية.',modalTitle:'صندوق الرسائل والإشعارات',noMsg:'لا توجد رسائل جديدة.'}
+  fa:{dir:'rtl',adminMsg:'پیام مدیریت',welcomeText:'به پلتفرم زنیکس خوش آمدید.',home:'صفحه اصلی',quantification:'کوانتیفیکیشن',deposit:'واریز',receive:'برداشت',transactions:'تراکنش',profile:'پروفایل',support:'پشتیبانی',about:'درباره پلتفرم',logout:'خروج',tradingLevels:'سطوح معاملاتی',subWel:'سطح خود را بررسی و ربات را فعال کنید',active:'فعال',inactive:'غیرفعال (موجودی کمتر از $20)',nyTime:'ساعت نیویورک',bal:'موجودی',prof:'سود',usersCount:'نفرات',liveTrade:'وضعیت معامله جاری',todayProfit:'سود امروز',yesterdayProfit:'سود دیروز',tradeHistory:'تاریخچه معاملات',noHistory:'هنوز معامله‌ای ثبت نشده است',totalBalance:'موجودی کل حساب',dailyLimit:'پایان ظرفیت امروز',trading:'معامله',seconds:'ثانیه',success:'موفق!',tradeAmount:'مبلغ معامله',helpModalTitle:'راهنمای بخش کوانتیفیکیشن و سطوح VIP',whatIsQuantTitle:'سیستم کوانتیفیکیشن چیست؟',whatIsQuantDesc:'ربات هوشمند معاملات با بررسی لحظه‌ای قیمت رمز‌ارزها در صرافی‌های مختلف جهان، کوچک‌ترین اختلاف قیمت‌ها را کشف کرده و معاملات سودآور برپایه آربیتراژ و الگوریتم‌های هوش مصنوعی انجام می‌دهد.',vipRulesTitle:'شروط ورود و ارتقا به سطوح VIP',vipNote:'نکته مهم: شرط اصلی فعال‌سازی و ارتقا به هر سطح VIP، انجام واریزی مستقیم به همان میزان است. سود حاصل از معاملات پلتفرم، برای شرط واریزی جهت ارتقا سطوح محسوب نمی‌شود.',directDeposit:'واریزی مستقیم:',directInvite:'دعوت مستقیم:',balanceRange:'محدوده موجودی:',dailyProfit:'سود روزانه:',activationTitle:'نحوه فعال‌سازی و تقسیم سود',activationDesc:'حداقل واریزی جهت فعال‌سازی 20 دلار است. سود روزانه مشخص‌شده، به ۴ معامله ۱۰ ثانیه‌ای در طول روز تقسیم می‌شود؛ یعنی با انجام هر ۴ معامله، درصد سود کامل سطح VIP خود را به‌دست می‌آورید.',resetTitle:'بازنشانی روزانه (ساعت نیویورک)',resetDesc:'ظرفیت ۴ معامله در روز مطابق با ساعت رسمی نیویورک (NY Time) در پایان هر روز کاری صفر شده و مجدداً فعال می‌شود.',globalMarket:'بازار ارز جهانی',liveUpdates:'به‌روزرسانی زنده',showFullHistory:'مشاهده کامل تاریخچه',showLess:'بستن تاریخچه',aboutModalTitle:'درباره پلتفرم Zenix (هدف، ماهیت و ساختار)',abDesc:'پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.',abL1T:'هدف اصلی:',abL1D:'اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.',abL2T:'امنیت و زیرساخت:',abL2D:'متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).',abL3T:'ساختار چندسطحی (Referral & Team):',abL3D:'ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.',abL4T:'احساس واقع‌گرایی:',abL4D:'وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.',modalTitle:'صندوق پیام‌ها و اعلان‌ها',tabAll:'همه',tabApproved:'تایید درخواست',tabRejected:'لغو درخواست',tabAdmin:'پیام مدیریت',noMsg:'هیچ پیام جدیدی وجود ندارد.'},
+  en:{dir:'ltr',adminMsg:'Admin Message',welcomeText:'Welcome to Zenix platform.',home:'Home',quantification:'Quantification',deposit:'Deposit',receive:'Withdraw',transactions:'Transactions',profile:'Profile',support:'Support',about:'About Platform',logout:'Logout',tradingLevels:'Trading Levels',subWel:'Check your level and activate the bot',active:'Active',inactive:'Inactive (Balance < $20)',nyTime:'New York Time',bal:'Balance',prof:'Profit',usersCount:'Users',liveTrade:'Live Trade Status',todayProfit:'Today Profit',yesterdayProfit:'Yesterday Profit',tradeHistory:'Trade History',noHistory:'No trades recorded yet',totalBalance:'Total Balance',dailyLimit:'Daily Limit Reached',trading:'Trading',seconds:'sec',success:'Success!',tradeAmount:'Trade Amount',helpModalTitle:'Quantification & VIP Levels Guide',whatIsQuantTitle:'What is the Quantification System?',whatIsQuantDesc:'The smart trading bot analyzes real-time cryptocurrency prices across global exchanges to detect price differences and execute profitable trades based on arbitrage and AI algorithms.',vipRulesTitle:'Conditions for VIP Levels',vipNote:'Important Note: The main condition for activating and upgrading VIP levels is making a direct deposit of the required amount. Platform trading profit does not count towards deposit requirements.',directDeposit:'Direct Deposit:',directInvite:'Direct Referral:',balanceRange:'Balance Range:',dailyProfit:'Daily Profit:',activationTitle:'Activation & Profit Division',activationDesc:'Minimum deposit for activation is $20. The daily profit rate is divided into 4 10-second trades throughout the day; completing all 4 trades grants your level\'s full daily profit.',resetTitle:'Daily Reset (NY Time)',resetDesc:'The 4 daily trade limit resets at the end of each business day according to New York Time (NY Time).',globalMarket:'Global Crypto Market',liveUpdates:'Live Updates',showFullHistory:'View Full History',showLess:'Show Less',aboutModalTitle:'About Zenix Platform (Goal, Nature & Structure)',abDesc:'Zenix Platform is an innovative financial ecosystem in cryptocurrency and trading processing designed for a secure, automated, and profitable user experience.',abL1T:'Main Goal:',abL1D:'Automating trading processes via AI systems and quantification algorithms, enabling users to profit from market fluctuations without complex trading expertise.',abL2T:'Security & Infrastructure:',abL2D:'Backed by advanced encryption protocols, high-speed cloud processing nodes, and secure Supabase database storage.',abL3T:'Multi-level Structure (Referral & Team):',abL3D:'Creating a dynamic referral network so users receive multi-level rewards and sustainable passive income from team activity.',abL4T:'Realism & Live Data:',abL4D:'Live crypto ticker, volume indicators, network gas fees, and system notices ensure users interact with an active global platform.',modalTitle:'Notifications & Messages',tabAll:'All',tabApproved:'Approved Requests',tabRejected:'Rejected Requests',tabAdmin:'Admin Messages',noMsg:'No new messages found.'},
+  ar:{dir:'rtl',adminMsg:'رسالة الإدارة',welcomeText:'مرحباً بكم في منصة زينكس.',home:'الرئيسية',quantification:'التداول الكمي',deposit:'إيداع',receive:'سحب',transactions:'المعاملات',profile:'الملف الشخصي',support:'الدعم',about:'عن المنصة',logout:'تسجيل خروج',tradingLevels:'مستويات التداول',subWel:'تحقق من مستواك وفعل البوت',active:'نشط',inactive:'غير نشط (الرصيد أقل من $20)',nyTime:'توقيت نيويورك',bal:'الرصيد',prof:'الربح',usersCount:'المستخدمين',liveTrade:'حالة التداول المباشر',todayProfit:'ربح اليوم',yesterdayProfit:'ربح الأمس',tradeHistory:'سجل المعاملات',noHistory:'لم يتم تسجيل أي معاملات بعد',totalBalance:'إجمالي الرصيد',dailyLimit:'تم الوصول للحد اليومي',trading:'تداول',seconds:'ثانية',success:'ناجح!',tradeAmount:'مبلغ التداول',helpModalTitle:'دليل التداول الكمي ومستويات VIP',whatIsQuantTitle:'ما هو نظام التداول الكمي؟',whatIsQuantDesc:'يقوم بوت التداول الذكي بتحليل أسعار العملات الرقمية في البورصات العالمية لحظة بلحظة لاكتشاف الفروقات السعرية وإجراء صفقات مربحة بناءً على المراجحة وخوارزميات الذكاء الاصطناعي.',vipRulesTitle:'شروط الدخول والترقية لمستويات VIP',vipNote:'ملاحظة هامة: الشرط الأساسي لتفعيل وترقية أي مستوى VIP هو إجراء إيداع مباشر بالمبلغ المطلوب. أرباح التداول في المنصة لا تحتسب ضمن شرط الإيداع.',directDeposit:'الإيداع المباشر:',directInvite:'الدعوة المباشرة:',balanceRange:'نطاق الرصيد:',dailyProfit:'الربح اليومي:',activationTitle:'طريقة التفعيل وتقسيم الأرباح',activationDesc:'الحد الأدنى للإيداع للتفعيل هو 20 دولاراً. يتم تقسيم نسبة الربح اليومية على 4 صفقات تستغرق كل منها 10 ثوانٍ خلال اليوم.',resetTitle:'إعادة الضبط اليومية (توقيت نيويورك)',resetDesc:'يتم إعادة ضبط حد الصفقات الأربع يومياً وفقاً للتوقيت الرسمي لمدينة نيويورك (NY Time).',globalMarket:'سوق العملات العالمية',liveUpdates:'تحديثات مباشرة',showFullHistory:'عرض سجل المعاملات بالكامل',showLess:'عرض أقل',aboutModalTitle:'عن منصة Zenix (الهدف والطبيعة والهيكل)',abDesc:'منصة Zenix هي بيئة مالية مبتكرة وذكية في مجال العملات الرقمية صُممت لتقديم تجربة آمنة وآلية ومربحة للمستخدمين.',abL1T:'الهدف الرئيسي:',abL1D:'أتمتة عمليات التداول عبر الذكاء الاصطناعي وخوارزميات الكمية لتمكين المستخدمين من تحقيق أرباح دون الحاجة لخبرة تداول معقدة.',abL2T:'الأمان والبنية التحتية:',abL2D:'تعتمد على بروتوكولات تشفير متقدمة وعقد معالجة سحابية سريعة وقاعدة بيانات Supabase آمنة.',abL3T:'الهيكل متعدد المستويات:',abL3D:'إنشاء شبكة إحالة ديناميكية لتمكين المستخدمين من الحصول على مكافآت مستمرة من نشاط فريقهم.',abL4T:'بيانات حية وواقعية:',abL4D:'مؤشرات أسعار وحجم تداول ورسوم شبكة حية تضمن التفاعل مع منصة عالمية حقيقية.',modalTitle:'صندوق الرسائل والإشعارات',tabAll:'الكل',tabApproved:'طلبات مقبولة',tabRejected:'طلبات مرفوضة',tabAdmin:'رسائل الإدارة',noMsg:'لا توجد رسائل جديدة.'}
 };
 
 function setLang(l){
@@ -265,6 +281,17 @@ function setLang(l){
   
   let elModalTitle = document.getElementById('t-modal-title');
   if (elModalTitle && t.modalTitle) elModalTitle.innerHTML = `<i class="fas fa-bell"></i> ${t.modalTitle}`;
+
+  const tabMap = {
+    't-tab-all': t.tabAll,
+    't-tab-approved': t.tabApproved,
+    't-tab-rejected': t.tabRejected,
+    't-tab-admin': t.tabAdmin
+  };
+  Object.keys(tabMap).forEach(id => {
+    const el = document.getElementById(id);
+    if (el && tabMap[id]) el.textContent = tabMap[id];
+  });
 
   if(window.checkClickState)window.checkClickState();
   if(window.renderHistory)window.renderHistory();
@@ -343,9 +370,244 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let uUid=null,tProf=0,bBal=0;
 const tpEl=document.getElementById('today-profit-val'),tbEl=document.getElementById('total-balance-val'),hList=document.getElementById('history-list');
 
+// ==========================================
+// متغیرها و توابع مدیریت اعلان‌ها (کاملاً عیناً هماهنگ‌شده با داشبورد)
+// ==========================================
 window.cachedNotifications = [];
+window.currentFilteredNotifs = [];
 window.activeNotifFilter = 'all';
 window.actualUserKeys = [];
+
+window.formatGregorianDate = function(rawDate) {
+  if (!rawDate) return '';
+  const d = new Date(rawDate);
+  if (isNaN(d.getTime())) return '';
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+};
+
+window.getNotifCategory = function(n) {
+  const type = (n.type || '').toLowerCase();
+  const title = (n.title || '').toLowerCase();
+
+  if (type.includes('approved') || type.includes('confirm') || title.includes('تایید') || title.includes('موفق') || title.includes('شارژ شد')) {
+    return 'approved';
+  }
+  if (type.includes('rejected') || type.includes('canceled') || type.includes('cancel') || title.includes('رد') || title.includes('لغو') || title.includes('ناموفق')) {
+    return 'rejected';
+  }
+  return 'admin_message';
+};
+
+window.updateTabBadges = function() {
+  const notifs = window.cachedNotifications || [];
+  const allCount = notifs.length;
+  let approvedCount = 0;
+  let rejectedCount = 0;
+  let adminCount = 0;
+
+  notifs.forEach(n => {
+    const cat = window.getNotifCategory(n);
+    if (cat === 'approved') approvedCount++;
+    else if (cat === 'rejected') rejectedCount++;
+    else if (cat === 'admin_message') adminCount++;
+  });
+
+  const elAll = document.getElementById('cnt-tab-all');
+  const elApproved = document.getElementById('cnt-tab-approved');
+  const elRejected = document.getElementById('cnt-tab-rejected');
+  const elAdmin = document.getElementById('cnt-tab-admin');
+
+  if (elAll) elAll.innerText = allCount;
+  if (elApproved) elApproved.innerText = approvedCount;
+  if (elRejected) elRejected.innerText = rejectedCount;
+  if (elAdmin) elAdmin.innerText = adminCount;
+};
+
+window.updateBellBadge = function() {
+  const unreadCount = window.cachedNotifications.filter(n => !n.read && !n.isRead && !n.is_read).length;
+  const badge = document.getElementById('bell-badge');
+  if (badge) {
+    badge.innerText = unreadCount;
+    if (unreadCount > 0) badge.classList.add('show');
+    else badge.classList.remove('show');
+  }
+  window.updateTabBadges();
+};
+
+window.setNotifFilter = function(filter, element) {
+  window.activeNotifFilter = filter;
+  const tabs = document.querySelectorAll('#notif-tabs .notif-tab');
+  tabs.forEach(tab => tab.classList.remove('active'));
+  
+  if (element) {
+    element.classList.add('active');
+  }
+  
+  window.renderNotifications();
+};
+
+window.closeMsgDetailModal = function() {
+  const modal = document.getElementById('m-msg-detail');
+  if (modal) modal.classList.remove('show');
+};
+
+window.openMsgDetail = async function(idx) {
+  const n = window.currentFilteredNotifs[idx];
+  if (!n) return;
+
+  const isUnread = !n.read && !n.isRead && !n.is_read;
+
+  if (isUnread) {
+    n.is_read = true;
+    n.read = true;
+    n.isRead = true;
+
+    window.updateBellBadge();
+    window.renderNotifications();
+
+    try {
+      const { data, error } = await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('id', n.id)
+        .select();
+
+      if (error) {
+        console.warn('خطا در ستون is_read، تلاش برای ثبت در ستون read:', error);
+        const res2 = await supabase
+          .from('notifications')
+          .update({ read: true })
+          .eq('id', n.id);
+          
+        if (res2.error) {
+          console.warn('خطا در ستون read، تلاش برای ثبت در ستون isRead:', res2.error);
+          await supabase
+            .from('notifications')
+            .update({ isRead: true })
+            .eq('id', n.id);
+        }
+      }
+    } catch (err) {
+      console.error('خطای ارتباط با Supabase در به‌روزرسانی اعلان:', err);
+    }
+  }
+
+  const title = n.title || 'پیام سیستم';
+  const msg = n.message || n.text || n.body || '';
+  const category = window.getNotifCategory(n);
+  const dateStr = window.formatGregorianDate(n.created_at || n.date || n.created_date);
+
+  const detailTitle = document.getElementById('detail-msg-title');
+  const detailDate = document.getElementById('detail-msg-date');
+  const detailBody = document.getElementById('detail-msg-body');
+  const detailSupport = document.getElementById('detail-msg-support');
+
+  if (detailTitle) detailTitle.innerHTML = `<i class="fas fa-bell" style="color:#38bdf8"></i> ${title}`;
+  
+  if (detailDate) {
+    if (dateStr) {
+      detailDate.innerHTML = `<i class="far fa-clock" style="color:#38bdf8;margin-right:4px;"></i>${dateStr}`;
+      detailDate.style.display = 'block';
+    } else {
+      detailDate.style.display = 'none';
+    }
+  }
+
+  if (detailBody) detailBody.innerText = msg;
+
+  if (detailSupport) {
+      if (category === 'rejected') {
+          detailSupport.innerHTML = `
+          <div style="margin-top:15px;padding-top:10px;border-top:1px dashed rgba(239,68,68,0.3);display:flex;justify-content:flex-end;">
+            <a href="support.html" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);" style="display:inline-flex;align-items:center;gap:6px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f8fafc;padding:6px 12px;border-radius:6px;font-size:12px;text-decoration:none;font-weight:600;transition:0.2s;">
+              <i class="fas fa-headset" style="color:#ef4444;"></i>
+              <span>پیگیری از طریق پشتیبانی</span>
+            </a>
+          </div>`;
+      } else {
+          detailSupport.innerHTML = '';
+      }
+  }
+
+  document.getElementById('m-msg-detail')?.classList.add('show');
+};
+
+window.renderNotifications = function() {
+  window.updateTabBadges();
+  const container = document.getElementById('modal-msg-container');
+  if (!container) return;
+
+  const filter = window.activeNotifFilter;
+  const filtered = window.cachedNotifications.filter(n => {
+    if (filter === 'all') return true;
+    return window.getNotifCategory(n) === filter;
+  });
+
+  window.currentFilteredNotifs = filtered;
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div style="text-align:center;padding:25px;color:#94a3b8;font-size:12px;"><i class="fas fa-inbox" style="font-size:24px;margin-bottom:8px;display:block;opacity:0.5;"></i>هیچ پیامی در این دسته‌بندی وجود ندارد.</div>`;
+    return;
+  }
+
+  let html = '';
+  filtered.forEach((n, idx) => {
+    const title = n.title || 'پیام سیستم';
+    const category = window.getNotifCategory(n);
+    const isUnread = !n.read && !n.isRead && !n.is_read;
+    const dateStr = window.formatGregorianDate(n.created_at || n.date || n.created_date);
+
+    let borderStyle = "border:1px solid rgba(255,255,255,.08);";
+    let bgStyle = "background:rgba(255,255,255,.02);";
+    let icon = '<i class="fas fa-bullhorn" style="color:#38bdf8"></i>';
+    let tagHtml = '<span style="font-size:10px;background:rgba(56,189,248,0.2);color:#38bdf8;padding:2px 6px;border-radius:4px;font-weight:700;">پیام مدیریت</span>';
+
+    if (category === 'approved') {
+      borderStyle = isUnread ? "border:1px solid rgba(34, 197, 94, 0.6);" : "border:1px solid rgba(34, 197, 94, 0.2);";
+      bgStyle = isUnread ? "background:rgba(34, 197, 94, 0.12);" : "background:rgba(34, 197, 94, 0.03);";
+      icon = '<i class="fas fa-check-circle" style="color:#22c55e"></i>';
+      tagHtml = '<span style="font-size:10px;background:rgba(34,197,94,0.2);color:#22c55e;padding:2px 6px;border-radius:4px;font-weight:700;">تایید درخواست</span>';
+    } else if (category === 'rejected') {
+      borderStyle = isUnread ? "border:1px solid rgba(239, 68, 68, 0.6);" : "border:1px solid rgba(239, 68, 68, 0.2);";
+      bgStyle = isUnread ? "background:rgba(239, 68, 68, 0.12);" : "background:rgba(239, 68, 68, 0.03);";
+      icon = '<i class="fas fa-times-circle" style="color:#ef4444"></i>';
+      tagHtml = '<span style="font-size:10px;background:rgba(239,68,68,0.2);color:#ef4444;padding:2px 6px;border-radius:4px;font-weight:700;">لغو درخواست</span>';
+    } else {
+      bgStyle = isUnread ? "background:rgba(56, 189, 248, 0.12);" : "background:rgba(255, 255, 255, 0.02);";
+      borderStyle = isUnread ? "border:1px solid rgba(56, 189, 248, 0.5);" : "border:1px solid rgba(255, 255, 255, 0.08);";
+    }
+
+    const opacityStyle = isUnread ? "opacity:1;" : "opacity:0.65;";
+    const unreadDot = isUnread ? '<span style="width:9px;height:9px;background:#ef4444;border-radius:50%;display:inline-block;box-shadow:0 0 8px #ef4444;" title="خوانده نشده"></span>' : '';
+    const readBadge = isUnread 
+      ? '<span style="font-size:10px;background:#ef4444;color:#fff;padding:2px 7px;border-radius:10px;font-weight:800;box-shadow:0 0 8px rgba(239,68,68,0.5);">جدید</span>' 
+      : '<span style="font-size:10px;background:rgba(255,255,255,0.06);color:#94a3b8;padding:2px 6px;border-radius:10px;"><i class="fas fa-check" style="font-size:9px;color:#64748b;"></i> خوانده‌شده</span>';
+
+    const dateDisplay = dateStr ? `<div style="font-size:11px;color:${isUnread ? '#cbd5e1' : '#64748b'};margin-top:6px;direction:ltr;text-align:left;"><i class="far fa-clock" style="margin-right:4px;"></i>${dateStr}</div>` : '';
+
+    html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle} ${opacityStyle} cursor:pointer; position:relative; transition:all 0.2s;" onclick="window.openMsgDetail(${idx})">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div class="msg-title-text" style="display:flex;align-items:center;gap:8px;font-weight:${isUnread ? '800' : '500'};color:${isUnread ? '#f8fafc' : '#cbd5e1'};">
+          ${unreadDot}
+          ${icon}
+          <span>${title}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          ${tagHtml}
+          ${readBadge}
+        </div>
+      </div>
+      ${dateDisplay}
+    </div>`;
+  });
+
+  container.innerHTML = html;
+};
 
 function cleanDateStr(d) {
   if (!d) return '';
@@ -423,88 +685,6 @@ async function saveUserFields(dict) {
     if (updateErr) console.error("خطا در بروزرسانی اطلاعات معامله در Supabase:", updateErr);
   }
 }
-
-window.setNotifFilter = function(filter, btnElement) {
-  window.activeNotifFilter = filter;
-  document.querySelectorAll('.notif-tab').forEach(t => t.classList.remove('active'));
-  if(btnElement) btnElement.classList.add('active');
-  window.renderNotifications();
-};
-
-window.getNotifCategory = function(n) {
-  const type = (n.type || '').toLowerCase();
-  const title = (n.title || '').toLowerCase();
-
-  if (type.includes('approved') || type.includes('confirm') || title.includes('تایید') || title.includes('موفق') || title.includes('شارژ شد')) {
-    return 'approved';
-  }
-  if (type.includes('rejected') || type.includes('canceled') || type.includes('cancel') || title.includes('رد') || title.includes('لغو') || title.includes('ناموفق')) {
-    return 'rejected';
-  }
-  return 'admin_message';
-};
-
-window.renderNotifications = function() {
-  const container = document.getElementById('modal-msg-container');
-  if (!container) return;
-
-  const filter = window.activeNotifFilter;
-  const filtered = window.cachedNotifications.filter(n => {
-    if (filter === 'all') return true;
-    return window.getNotifCategory(n) === filter;
-  });
-
-  if (filtered.length === 0) {
-    container.innerHTML = `<div style="text-align:center;padding:25px;color:#94a3b8;font-size:12px;"><i class="fas fa-inbox" style="font-size:24px;margin-bottom:8px;display:block;opacity:0.5;"></i>هیچ پیامی در این دسته‌بندی وجود ندارد.</div>`;
-    return;
-  }
-
-  let html = '';
-  filtered.forEach(n => {
-    const title = n.title || 'پیام سیستم';
-    const msg = n.message || n.text || n.body || '';
-    const category = window.getNotifCategory(n);
-
-    let borderStyle = "border:1px solid rgba(255,255,255,.08);";
-    let bgStyle = "background:rgba(255,255,255,.03);";
-    let icon = '<i class="fas fa-bullhorn" style="color:#38bdf8"></i>';
-    let tagHtml = '<span style="font-size:10px;background:rgba(56,189,248,0.2);color:#38bdf8;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">پیام مدیریت</span>';
-    let supportBtn = '';
-
-    if (category === 'approved') {
-      borderStyle = "border:1px solid rgba(34, 197, 94, 0.4);";
-      bgStyle = "background:rgba(34, 197, 94, 0.08);";
-      icon = '<i class="fas fa-check-circle" style="color:#22c55e"></i>';
-      tagHtml = '<span style="font-size:10px;background:rgba(34,197,94,0.2);color:#22c55e;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">تایید درخواست</span>';
-    } else if (category === 'rejected') {
-      borderStyle = "border:1px solid rgba(239, 68, 68, 0.4);";
-      bgStyle = "background:rgba(239, 68, 68, 0.08);";
-      icon = '<i class="fas fa-times-circle" style="color:#ef4444"></i>';
-      tagHtml = '<span style="font-size:10px;background:rgba(239,68,68,0.2);color:#ef4444;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">لغو درخواست</span>';
-      
-      supportBtn = `
-        <div style="margin-top:10px;padding-top:8px;border-top:1px dashed rgba(239,68,68,0.2);display:flex;justify-content:flex-end;">
-          <a href="support.html" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);" style="display:inline-flex;align-items:center;gap:6px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f8fafc;padding:5px 10px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:600;transition:0.2s;">
-            <i class="fas fa-headset" style="color:#ef4444;"></i>
-            <span>پیگیری از طریق پشتیبانی</span>
-          </a>
-        </div>
-      `;
-    }
-
-    html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle}">
-      <div class="msg-title-text" style="display:flex;align-items:center;gap:8px;">
-        ${icon}
-        <span>${title}</span>
-        ${tagHtml}
-      </div>
-      <div class="msg-desc-text" style="margin-top:6px;">${msg}</div>
-      ${supportBtn}
-    </div>`;
-  });
-
-  container.innerHTML = html;
-};
 
 function getNYDateStr(){return new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York'}).format(new Date());}
 let todayNY=getNYDateStr(),cCnt=0,allTradesArray=[];
@@ -761,14 +941,12 @@ async function initQuantification() {
     if (tbEl) tbEl.innerText = `$${bBal.toFixed(2)}`;
     if (tpEl) tpEl.innerText = `$${tProf.toFixed(2)}`;
 
-    const { data: notifs } = await supabase.from('notifications').select('*').eq('user_id', uUid).order('created_at', { ascending: false });
-    if (notifs) {
+    // بارگیری و رندر زنده اعلان‌ها (کاملاً عین داشبورد)
+    const { data: notifs, error: notifError } = await supabase.from('notifications').select('*').eq('user_id', uUid).order('created_at', { ascending: false });
+    if (!notifError && notifs) {
       window.cachedNotifications = notifs;
-      const bellBadge = document.getElementById('bell-badge');
-      if (bellBadge && notifs.length > 0) {
-        bellBadge.innerText = notifs.length;
-        bellBadge.classList.add('show');
-      }
+      window.renderNotifications();
+      window.updateBellBadge();
     }
 
     setLang(localStorage.getItem('zenix_lang') || 'fa');
