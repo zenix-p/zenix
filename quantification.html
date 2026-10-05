@@ -105,16 +105,16 @@ header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1)
 .vip-cell b{color:#f8fafc;font-weight:700}
 footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05)}
 
-/* اصلاح استایل ردیف‌های بازار ارز جهانی جهت قرارگیری کاملاً یک‌خطی و ترازشده در یک ستون */
+/* اصلاح استایل ردیف‌های بازار ارز جهانی جهت قرارگیری کاملاً یک‌خطی، هم‌پیمانه و تراز عمودی قیمت‌ها */
 .crypto-row {
   background: rgba(255,255,255,.03) !important;
   padding: 10px 12px !important;
   border-radius: 8px !important;
   font-size: 12px !important;
-  display: flex !important;
-  flex-direction: row !important;
-  justify-content: space-between !important;
+  display: grid !important;
+  grid-template-columns: 1fr 125px 68px !important;
   align-items: center !important;
+  gap: 8px !important;
   border: 1px solid rgba(255,255,255,.05) !important;
   transition: all .3s ease !important;
   direction: ltr !important;
@@ -125,34 +125,21 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
   gap: 8px !important;
   direction: ltr !important;
   text-align: left !important;
-  order: 1 !important;
   min-width: 0 !important;
-  flex: 1 1 auto !important;
-  padding-right: 8px !important;
-}
-.crypto-right {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 10px !important;
-  text-align: right !important;
-  direction: ltr !important;
-  order: 2 !important;
-  flex-shrink: 0 !important;
+  overflow: hidden !important;
 }
 .crypto-text-box {
   text-align: left !important;
   min-width: 0 !important;
+  overflow: hidden !important;
 }
 .crypto-price-val {
   font-weight: 700 !important;
   color: #f8fafc !important;
   font-size: 12px !important;
   white-space: nowrap !important;
-  text-align: right !important;
-  min-width: 110px !important;
-  display: block !important;
+  text-align: left !important;
+  direction: ltr !important;
 }
 .crypto-change-val {
   font-size: 10px !important;
@@ -162,8 +149,8 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
   display: inline-block !important;
   white-space: nowrap !important;
   text-align: center !important;
-  min-width: 58px !important;
   box-sizing: border-box !important;
+  justify-self: end !important;
 }
 
 @keyframes pulse-dot {
@@ -220,7 +207,7 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
     </div>
 </div>
 
-<div class="modal" id="m-help"><div class="modal-content"><div class="modal-header"><span id="t-help-title" data-i18n="helpModalTitle">راهنمای بخش کوانتیفیکیشن و سطوح VIP</span><button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button></div><div style="overflow-y:auto;padding-right:6px"><div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-robot" style="color:#38bdf8"></i> <span data-i18n="whatIsQuantTitle">سیستم کوانتیفیکیشن چیست؟</span></div><div class="msg-desc-text" data-i18n="whatIsQuantDesc">ربات هوشمند معاملات با بررسی لحظه‌ای قیمت رمز‌ارزها در صرافی‌های مختلف جهان، کوچک‌ترین اختلاف قیمت‌ها را کشف کرده و معاملات سودآور برپایه آربیتراژ و الگوریتم‌های هوش مصنوعی انجام می‌دهد.</div></div><div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-layer-group" style="color:#a855f7"></i> <span data-i18n="vipRulesTitle">شروط ورود و ارتقا به سطوح VIP</span></div><p style="color:#fbbf24;font-size:11px;margin-bottom:10px;background:rgba(251,191,36,.1);padding:8px 10px;border-radius:8px;border:1px solid rgba(251,191,36,.25);line-height:1.6"><i class="fas fa-exclamation-triangle" style="margin-left:4px"></i> <span data-i18n="vipNote">نکته مهم: شرط اصلی فعال‌سازی و ارتقا به هر سطح VIP، انجام واریزی مستقیم به همان میزان است. سود حاصل از معاملات پلتفرم، برای شرط واریزی جهت ارتقا سطوح محسوب نمیشود.</span></p><div class="vip-level-list"><div class="vip-level-item"><div class="vip-level-header"><span class="vip-level-title"><i class="fas fa-crown" style="color:#fbbf24"></i> VIP 1</span></div><div class="vip-level-grid"><div class="vip-cell"><span><i class="fas fa-arrow-down" style="color:#22c55e"></i> <span data-i18n="directDeposit">واریزی مستقیم:</span></span> <b>$20</b></div><div class="vip-cell"><span><i class="fas fa-users" style="color:#a855f7"></i> <span data-i18n="directInvite">دعوت مستقیم:</span></span> <b>5</b></div><div class="vip-cell"><span><i class="fas fa-wallet" style="color:#38bdf8"></i> <span data-i18n="balanceRange">محدوده موجودی:</span></span> <b>$20 - $300</b></div><div class="vip-cell"><span><i class="fas fa-chart-line" style="color:#f59e0b"></i> <span data-i18n="dailyProfit">سود روزانه:</span></span> <b style="color:#22c55e">1.5%</b></div></div></div><div class="vip-level-item"><div class="vip-level-header"><span class="vip-level-title"><i class="fas fa-crown" style="color:#e2e8f0"></i> VIP 2</span></div><div class="vip-level-grid"><div class="vip-cell"><span><i class="fas fa-arrow-down" style="color:#22c55e"></i> <span data-i18n="directDeposit">واریزی مستقیم:</span></span> <b>$300</b></div><div class="vip-cell"><span><i class="fas fa-users" style="color:#a855f7"></i> <span data-i18n="directInvite">دعوت مستقیم:</span></span> <b>15</b></div><div class="vip-cell"><span><i class="fas fa-wallet" style="color:#38bdf8"></i> <span data-i18n="balanceRange">محدوده موجودی:</span></span> <b>$300 - $1000</b></div><div class="vip-cell"><span><i class="fas fa-chart-line" style="color:#f59e0b"></i> <span data-i18n="dailyProfit">سود روزانه:</span></span> <b style="color:#22c55e">2.0%</b></div></div></div><div class="vip-level-item"><div class="vip-level-header"><span class="vip-level-title"><i class="fas fa-crown" style="color:#f59e0b"></i> VIP 3</span></div><div class="vip-level-grid"><div class="vip-cell"><span><i class="fas fa-arrow-down" style="color:#22c55e"></i> <span data-i18n="directDeposit">واریزی مستقیم:</span></span> <b>$1000</b></div><div class="vip-cell"><span><i class="fas fa-users" style="color:#a855f7"></i> <span data-i18n="directInvite">دعوت مستقیم:</span></span> <b>25</b></div><div class="vip-cell"><span><i class="fas fa-wallet" style="color:#38bdf8"></i> <span data-i18n="balanceRange">محدوده موجودی:</span></span> <b>$1000 - $2500</b></div><div class="vip-cell"><span><i class="fas fa-chart-line" style="color:#f59e0b"></i> <span data-i18n="dailyProfit">سود روزانه:</span></span> <b style="color:#22c55e">2.5%</b></div></div></div><div class="vip-level-item"><div class="vip-level-header"><span class="vip-level-title"><i class="fas fa-crown" style="color:#38bdf8"></i> VIP 4</span></div><div class="vip-level-grid"><div class="vip-cell"><span><i class="fas fa-arrow-down" style="color:#22c55e"></i> <span data-i18n="directDeposit">واریزی مستقیم:</span></span> <b>$2500</b></div><div class="vip-cell"><span><i class="fas fa-users" style="color:#a855f7"></i> <span data-i18n="directInvite">دعوت مستقیم:</span></span> <b>35</b></div><div class="vip-cell"><span><i class="fas fa-wallet" style="color:#38bdf8"></i> <span data-i18n="balanceRange">محدوده موجودی:</span></span> <b>$2500 - $5000</b></div><div class="vip-cell"><span><i class="fas fa-chart-line" style="color:#f59e0b"></i> <span data-i18n="dailyProfit">سود روزانه:</span></span> <b style="color:#22c55e">3.0%</b></div></div></div><div class="vip-level-item"><div class="vip-level-header"><span class="vip-level-title"><i class="fas fa-crown" style="color:#ec4899"></i> VIP 5</span></div><div class="vip-level-grid"><div class="vip-cell"><span><i class="fas fa-arrow-down" style="color:#22c55e"></i> <span data-i18n="directDeposit">واریزی مستقیم:</span></span> <b>$5000</b></div><div class="vip-cell"><span><i class="fas fa-users" style="color:#a855f7"></i> <span data-i18n="directInvite">دعوت مستقیم:</span></span> <b>45</b></div><div class="vip-cell"><span><i class="fas fa-wallet" style="color:#38bdf8"></i> <span data-i18n="balanceRange">محدوده موجودی:</span></span> <b>$5000 - $10000</b></div><div class="vip-cell"><span><i class="fas fa-chart-line" style="color:#f59e0b"></i> <span data-i18n="dailyProfit">سود روزانه:</span></span> <b style="color:#22c55e">3.5%</b></div></div></div><div class="vip-level-item"><div class="vip-level-header"><span class="vip-level-title"><i class="fas fa-crown" style="color:#a855f7"></i> VIP 6</span></div><div class="vip-level-grid"><div class="vip-cell"><span><i class="fas fa-arrow-down" style="color:#22c55e"></i> <span data-i18n="directDeposit">واریزی مستقیم:</span></span> <b>$10000</b></div><div class="vip-cell"><span><i class="fas fa-users" style="color:#a855f7"></i> <span data-i18n="directInvite">دعوت مستقیم:</span></span> <b>60</b></div><div class="vip-cell"><span><i class="fas fa-wallet" style="color:#38bdf8"></i> <span data-i18n="balanceRange">محدوده موجودی:</span></span> <b>+$10000</b></div><div class="vip-cell"><span><i class="fas fa-chart-line" style="color:#f59e0b"></i> <span data-i18n="dailyProfit">سود روزانه:</span></span> <b style="color:#22c55e">4.0%</b></div></div></div></div></div><div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-play-circle" style="color:#22c55e"></i> <span data-i18n="activationTitle">نحوه فعال‌سازی و تقسیم سود</span></div><div class="msg-desc-text" data-i18n="activationDesc">حداقل واریزی جهت فعال‌سازی 20 دلار است. سود روزانه مشخص‌شده، به ۴ معامله ۱۰ ثانیه‌ای در طول روز تقسیم می‌شود؛ یعنی با انجام هر ۴ معامله، درصد سود کامل سطح VIP خود را به‌دست می‌آورید.</div></div><div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-clock" style="color:#fbbf24"></i> <span data-i18n="resetTitle">بازنشانی روزانه (ساعت نیویورک)</span></div><div class="msg-desc-text" data-i18n="resetDesc">ظرفیت ۴ معامله در روز مطابق با ساعت رسمی نیویورک (NY Time) در پایان هر روز کاری صفر شده و مجدداً فعال می‌شود.</div></div></div></div></div>
+<div class="modal" id="m-help"><div class="modal-content"><div class="modal-header"><span id="t-help-title" data-i18n="helpModalTitle">راهنمای بخش کوانتیفیکیشن و سطوح VIP</span><button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button></div><div style="overflow-y:auto;padding-right:6px"><div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-robot" style="color:#38bdf8"></i> <span data-i18n="whatIsQuantTitle">سیستم کوانتیفیکیشن چیست؟</span></div><div class="msg-desc-text" data-i18n="whatIsQuantDesc">ربات هوشمند معاملات با بررسی لحظه‌ای قیمت رمز‌ارزها در صرافی‌های مختلف جهان، کوچک‌ترین اختلاف قیمت‌ها را کشف کرده و معاملات سودآور برپایه آربیتراژ و الگوریتم‌های هوش مصنوعی انجام می‌دهد.</div></div><div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-layer-group" style="color:#a855f7"></i> <span data-i18n="vipRulesTitle">شروط ورود و ارتقا به سطوح VIP</span></div><p style="color:#fbbf24;font-size:11px;margin-bottom:10px;background:rgba(251,191,36,.1);padding:8px 10px;border-radius:8px;border:1px solid rgba(251,191,36,.25);line-height:1.6"><i class="fas fa-exclamation-triangle" style="margin-left:4px"></i> <span data-i18n="vipNote">نکته مهم: شرط اصلی فعال‌سازی و ارتقا به هر سطح VIP، انجام واریزی مستقیم به همان میزان است. سود حاصل از معاملات پلتفرم، برای شرط واریزی جهت ارتقا سطوح محسوب نمیشود.</span></p><div class="vip-level-list"><div class="vip-level-item"><div class="vip-level-header"><span class="vip-level-title"><i class="fas fa-crown" style="color:#fbbf24"></i> VIP 1</span></div><div class="vip-level-grid"><div class="vip-cell"><span><i class="fas fa-arrow-down" style="color:#22c55e"></i> <span data-i18n="directDeposit">واریزی مستقیم:</span></span> <b>$20</b></div><div class="vip-cell"><span><i class="fas fa-users" style="color:#a855f7"></i> <span data-i18n="directInvite">دعوت مستقیم:</span></span> <b>5</b></div><div class="vip-cell"><span><i class="fas fa-wallet" style="color:#38bdf8"></i> <span data-i18n="balanceRange">محدوده موجودی:</span></span> <b>$20 - $300</b></div><div class="vip-cell"><span><i class="fas fa-chart-line" style="color:#f59e0b"></i> <span data-i18n="dailyProfit">سود روزانه:</span></span> <b style="color:#22c55e">1.5%</b></div></div></div><div class="vip-level-item"><div class="vip-level-header"><span class="vip-level-title"><i class="fas fa-crown" style="color:#e2e8f0"></i> VIP 2</span></div><div class="vip-level-grid"><div class="vip-cell"><span><i class="fas fa-arrow-down" style="color:#22c55e"></i> <span data-i18n="directDeposit">واریزی مستقیم:</span></span> <b>$300</b></div><div class="vip-cell"><span><i class="fas fa-users" style="color:#a855f7"></i> <span data-i18n="directInvite">دعوت مستقیم:</span></span> <b>15</b></div><div class="vip-cell"><span><i class="fas fa-wallet" style="color:#38bdf8"></i> <span data-i18n="balanceRange">محدوده موجودی:</span></span> <b>$300 - $1000</b></div><div class="vip-cell"><span><i class="fas fa-chart-line" style="color:#f59e0b"></i> <span data-i18n="dailyProfit">سود روزانه:</span></span> <b style="color:#22c55e">2.0%</b></div></div></div><div class="vip-level-item"><div class="vip-level-header"><span class="vip-level-title"><i class="fas fa-crown" style="color:#f59e0b"></i> VIP 3</span></div><div class="vip-level-grid"><div class="vip-cell"><span><i class="fas fa-arrow-down" style="color:#22c55e"></i> <span data-i18n="directDeposit">واریزی مستقیم:</span></span> <b>$1000</b></div><div class="vip-cell"><span><i class="fas fa-users" style="color:#a855f7"></i> <span data-i18n="directInvite">دعوت مستقیم:</span></span> <b>25</b></div><div class="vip-cell"><span><i class="fas fa-wallet" style="color:#38bdf8"></i> <span data-i18n="balanceRange">محدوده موجودی:</span></span> <b>$1000 - $2500</b></div><div class="vip-cell"><span><i class="fas fa-chart-line" style="color:#f59e0b"></i> <span data-i18n="dailyProfit">سود روزانه:</span></span> <b style="color:#22c55e">2.5%</b></div></div></div><div class="vip-level-item"><div class="vip-level-header"><span class="vip-level-title"><i class="fas fa-crown" style="color:#38bdf8"></i> VIP 4</span></div><div class="vip-level-grid"><div class="vip-cell"><span><i class="fas fa-arrow-down" style="color:#22c55e"></i> <span data-i18n="directDeposit">واریزی مستقیم:</span></span> <b>$2500</b></div><div class="vip-cell"><span><i class="fas fa-users" style="color:#a855f7"></i> <span data-i18n="directInvite">دعوت مستقیم:</span></span> <b>35</b></div><div class="vip-cell"><span><i class="fas fa-wallet" style="color:#38bdf8"></i> <span data-i18n="balanceRange">محدوده موجودی:</span></span> <b>$2500 - $5000</b></div><div class="vip-cell"><span><i class="fas fa-chart-line" style="color:#f59e0b"></i> <span data-i18n="dailyProfit">سود روزانه:</span></span> <b style="color:#22c55e">3.0%</b></div></div></div><div class="vip-level-item"><div class="vip-level-header"><span class="vip-level-title"><i class="fas fa-crown" style="color:#ec4899"></i> VIP 5</span></div><div class="vip-level-grid"><div class="vip-cell"><span><i class="fas fa-arrow-down" style="color:#22c55e"></i> <span data-i18n="directDeposit">واریزی مستقیم:</span></span> <b>$5000</b></div><div class="vip-cell"><span><i class="fas fa-users" style="color:#a855f7"></i> <span data-i18n="directInvite">دعوت مستقیم:</span></span> <b>45</b></div><div class="vip-cell"><span><i class="fas fa-wallet" style="color:#38bdf8"></i> <span data-i18n="balanceRange">محدوده موجودی:</span></span> <b>$5000 - $10000</b></div><div class="vip-cell"><span><i class="fas fa-chart-line" style="color:#f59e0b"></i> <span data-i18n="dailyProfit">سود روزانه:</span></span> <b style="color:#22c55e">3.5%</b></div></div></div><div class="vip-level-item"><div class="vip-level-header"><span class="vip-level-title"><i class="fas fa-crown" style="color:#a855f7"></i> VIP 6</span></div><div class="vip-level-grid"><div class="vip-cell"><span><i class="fas fa-arrow-down" style="color:#22c55e"></i> <span data-i18n="directDeposit">واریزی مستقیم:</span></span> <b>$10000</b></div><div class="vip-cell"><span><i class="fas fa-users" style="color:#a855f7"></i> <span data-i18n="directInvite">دعوت مستقیم:</span></span> <b>60</b></div><div class="vip-cell"><span><i class="fas fa-wallet" style="color:#38bdf8"></i> <span data-i18n="balanceRange">محدوده موجودی:</span></span> <b>+$10000</b></div><div class="vip-cell"><span><i class="fas fa-chart-line" style="color:#f59e0b"></i> <span data-i18n="dailyProfit">سود روزانه:</span></span> <b style="color:#22c55e">4.0%</b></div></div></div></div></div><div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-play-circle" style="color:#22c55e"></i> <span data-i18n="activationTitle">نحوه فعال‌سازی و تقسیم سود</span></div><div class="msg-desc-text" data-i18n="activationDesc">حداقل واریزی جهت فعال‌سازی 20 دلار است. سود روزانه مشخص‌شده، به ۴ معامله ۱۰ ثانیه‌ای در طول روز تقسیم می‌شود؛ یعنی با انجام هر ۴ معامله، درصد سود کامل سطح VIP خود را به‌‌دست می‌آورید.</div></div><div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-clock" style="color:#fbbf24"></i> <span data-i18n="resetTitle">بازنشانی روزانه (ساعت نیویورک)</span></div><div class="msg-desc-text" data-i18n="resetDesc">ظرفیت ۴ معامله در روز مطابق با ساعت رسمی نیویورک (NY Time) در پایان هر روز کاری صفر شده و مجدداً فعال می‌شود.</div></div></div></div></div>
 
 <!-- مدال درباره پلتفرم Zenix -->
 <div class="modal" id="m-about">
@@ -291,26 +278,26 @@ document.onclick=()=>{[nM,lMenu].forEach(m=>m.classList.remove('show'));};
 document.querySelectorAll('.menu').forEach(m=>m.onclick=(e)=>e.stopPropagation());
 
 const marketData=[
-  {name:'Bitcoin',symbol:'BTC/USDT',price:96450.2,change:4.85,cls:'fab fa-bitcoin',color:'#f7931a'},
-  {name:'Ethereum',symbol:'ETH/USDT',price:3480.5,change:3.62,cls:'fab fa-ethereum',color:'#627eea'},
-  {name:'Solana',symbol:'SOL/USDT',price:185.25,change:8.12,cls:'fas fa-coins',color:'#14f195'},
-  {name:'Ripple',symbol:'XRP/USDT',price:2.35,change:6.4,cls:'fas fa-water',color:'#23292f'},
-  {name:'Binance Coin',symbol:'BNB/USDT',price:620.1,change:1.45,cls:'fas fa-cube',color:'#f3ba2f'},
-  {name:'Dogecoin',symbol:'DOGE/USDT',price:.284,change:7.3,cls:'fas fa-dog',color:'#c2a633'},
-  {name:'Cardano',symbol:'ADA/USDT',price:.952,change:2.1,cls:'fas fa-circle-dot',color:'#0033ad'},
-  {name:'Avalanche',symbol:'AVAX/USDT',price:38.4,change:5.9,cls:'fas fa-mountain',color:'#e84142'},
-  {name:'Sui',symbol:'SUI/USDT',price:3.45,change:9.8,cls:'fas fa-droplet',color:'#4a90e2'},
-  {name:'Chainlink',symbol:'LINK/USDT',price:18.2,change:4.15,cls:'fas fa-link',color:'#375bd2'},
-  {name:'Polkadot',symbol:'DOT/USDT',price:8.6,change:-.8,cls:'fas fa-circle-notch',color:'#e6007a'},
-  {name:'Near Protocol',symbol:'NEAR/USDT',price:6.75,change:6.4,cls:'fas fa-leaf',color:'#000000'},
-  {name:'Shiba Inu',symbol:'SHIB/USDT',price:.000024,change:3.2,cls:'fas fa-fire',color:'#ffa409'},
-  {name:'Pepe',symbol:'PEPE/USDT',price:.000019,change:11.4,cls:'fas fa-frog',color:'#52ab52'},
-  {name:'Uniswap',symbol:'UNI/USDT',price:11.8,change:2.8,cls:'fas fa-horse-head',color:'#ff007a'},
-  {name:'Aptos',symbol:'APT/USDT',price:12.3,change:5.1,cls:'fas fa-code-branch',color:'#2dd4bf'},
-  {name:'Stellar',symbol:'XLM/USDT',price:.42,change:8.9,cls:'fas fa-rocket',color:'#14b8a6'},
-  {name:'Cosmos',symbol:'ATOM/USDT',price:7.9,change:1.3,cls:'fas fa-atom',color:'#2e3148'},
-  {name:'Hedera',symbol:'HBAR/USDT',price:.26,change:12.1,cls:'fas fa-h',color:'#a855f7'},
-  {name:'Render',symbol:'RENDER/USDT',price:8.4,change:7.6,cls:'fas fa-draw-polygon',color:'#ef4444'}
+  {name:'Bitcoin',symbol:'BTC/USDT',price:96450.2,change:4.85,color:'#f7931a'},
+  {name:'Ethereum',symbol:'ETH/USDT',price:3480.5,change:3.62,color:'#627eea'},
+  {name:'Solana',symbol:'SOL/USDT',price:185.25,change:8.12,color:'#14f195'},
+  {name:'Ripple',symbol:'XRP/USDT',price:2.35,change:6.4,color:'#23292f'},
+  {name:'Binance Coin',symbol:'BNB/USDT',price:620.1,change:1.45,color:'#f3ba2f'},
+  {name:'Dogecoin',symbol:'DOGE/USDT',price:.284,change:7.3,color:'#c2a633'},
+  {name:'Cardano',symbol:'ADA/USDT',price:.952,change:2.1,color:'#0033ad'},
+  {name:'Avalanche',symbol:'AVAX/USDT',price:38.4,change:5.9,color:'#e84142'},
+  {name:'Sui',symbol:'SUI/USDT',price:3.45,change:9.8,color:'#4a90e2'},
+  {name:'Chainlink',symbol:'LINK/USDT',price:18.2,change:4.15,color:'#375bd2'},
+  {name:'Polkadot',symbol:'DOT/USDT',price:8.6,change:-.8,color:'#e6007a'},
+  {name:'Near Protocol',symbol:'NEAR/USDT',price:6.75,change:6.4,color:'#000000'},
+  {name:'Shiba Inu',symbol:'SHIB/USDT',price:.000024,change:3.2,color:'#ffa409'},
+  {name:'Pepe',symbol:'PEPE/USDT',price:.000019,change:11.4,color:'#52ab52'},
+  {name:'Uniswap',symbol:'UNI/USDT',price:11.8,change:2.8,color:'#ff007a'},
+  {name:'Aptos',symbol:'APT/USDT',price:12.3,change:5.1,color:'#2dd4bf'},
+  {name:'Stellar',symbol:'XLM/USDT',price:.42,change:8.9,color:'#14b8a6'},
+  {name:'Cosmos',symbol:'ATOM/USDT',price:7.9,change:1.3,color:'#2e3148'},
+  {name:'Hedera',symbol:'HBAR/USDT',price:.26,change:12.1,color:'#a855f7'},
+  {name:'Render',symbol:'RENDER/USDT',price:8.4,change:7.6,color:'#ef4444'}
 ];
 
 window.renderMarketList=function(){
@@ -320,18 +307,21 @@ window.renderMarketList=function(){
   let html='';
   top15.forEach(item=>{
     const isP=item.change>=0,cC=isP?'color:#22c55e;':'color:#ef4444;',bC=isP?'background:rgba(34,197,94,0.12);':'background:rgba(239,68,68,0.12);',sgn=isP?'+':'';
+    const symClean = item.symbol.split('/')[0].toLowerCase();
+    const symUpper = item.symbol.split('/')[0].toUpperCase();
+    const imgUrl1 = `https://cdn.jsdelivr.net/gh/prasangapokharel/crypto-icons@v1.0.0/crypto/${symClean}.svg`;
+    const imgUrl2 = `https://cdn.jsdelivr.net/gh/prasangapokharel/crypto-icons@v1.0.0/binance/${symUpper}.png`;
+
     html+=`<div class="crypto-row">
       <div class="crypto-left">
-        <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:${item.color};color:#fff;font-size:13px;flex-shrink:0;"><i class="${item.cls}"></i></span>
+        <img src="${imgUrl1}" alt="${item.name}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0;background:${item.color || '#1e293b'};" onerror="this.onerror=null;this.src='${imgUrl2}';" />
         <div class="crypto-text-box">
           <div style="font-weight:700;color:#f8fafc;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.name}</div>
           <div style="font-size:10px;color:#94a3b8;">${item.symbol}</div>
         </div>
       </div>
-      <div class="crypto-right">
-        <div class="crypto-price-val">$${item.price.toLocaleString('en-US',{minimumFractionDigits:item.price<1?4:2,maximumFractionDigits:item.price<1?4:2})} <span style="font-size:9px;color:#94a3b8;font-weight:500;">USDT</span></div>
-        <div class="crypto-change-val" style="${cC}${bC}">${sgn}${item.change.toFixed(2)}%</div>
-      </div>
+      <div class="crypto-price-val">$${item.price.toLocaleString('en-US',{minimumFractionDigits:item.price<1?4:2,maximumFractionDigits:item.price<1?4:2})} <span style="font-size:9px;color:#94a3b8;font-weight:500;">USDT</span></div>
+      <div class="crypto-change-val" style="${cC}${bC}">${sgn}${item.change.toFixed(2)}%</div>
     </div>`;
   });
   mList.innerHTML=html;
