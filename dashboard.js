@@ -63,6 +63,45 @@ window.formatGregorianDate = function(rawDate) {
   return `${year}-${month}-${day} ${hours}:${minutes}`;
 };
 
+window.getNotifCategory = function(n) {
+  const type = (n.type || '').toLowerCase();
+  const title = (n.title || '').toLowerCase();
+
+  if (type.includes('approved') || type.includes('confirm') || title.includes('تایید') || title.includes('موفق') || title.includes('شارژ شد')) {
+    return 'approved';
+  }
+  if (type.includes('rejected') || type.includes('canceled') || type.includes('cancel') || title.includes('رد') || title.includes('لغو') || title.includes('ناموفق')) {
+    return 'rejected';
+  }
+  return 'admin_message';
+};
+
+// محاسبه و به‌روزرسانی شماره‌های داخل تب‌های اعلان
+window.updateTabBadges = function() {
+  const notifs = window.cachedNotifications || [];
+  const allCount = notifs.length;
+  let approvedCount = 0;
+  let rejectedCount = 0;
+  let adminCount = 0;
+
+  notifs.forEach(n => {
+    const cat = window.getNotifCategory(n);
+    if (cat === 'approved') approvedCount++;
+    else if (cat === 'rejected') rejectedCount++;
+    else if (cat === 'admin_message') adminCount++;
+  });
+
+  const elAll = document.getElementById('cnt-tab-all');
+  const elApproved = document.getElementById('cnt-tab-approved');
+  const elRejected = document.getElementById('cnt-tab-rejected');
+  const elAdmin = document.getElementById('cnt-tab-admin');
+
+  if (elAll) elAll.innerText = allCount;
+  if (elApproved) elApproved.innerText = approvedCount;
+  if (elRejected) elRejected.innerText = rejectedCount;
+  if (elAdmin) elAdmin.innerText = adminCount;
+};
+
 window.updateBellBadge = function() {
   const unreadCount = window.cachedNotifications.filter(n => !n.read && !n.isRead && !n.is_read).length;
   const badge = document.getElementById('bell-badge');
@@ -71,6 +110,7 @@ window.updateBellBadge = function() {
     if (unreadCount > 0) badge.classList.add('show');
     else badge.classList.remove('show');
   }
+  window.updateTabBadges();
 };
 
 window.setNotifFilter = function(filter, element) {
@@ -83,19 +123,6 @@ window.setNotifFilter = function(filter, element) {
   }
   
   window.renderNotifications();
-};
-
-window.getNotifCategory = function(n) {
-  const type = (n.type || '').toLowerCase();
-  const title = (n.title || '').toLowerCase();
-
-  if (type.includes('approved') || type.includes('confirm') || title.includes('تایید') || title.includes('موفق') || title.includes('شارژ شد')) {
-    return 'approved';
-  }
-  if (type.includes('rejected') || type.includes('canceled') || type.includes('cancel') || title.includes('رد') || title.includes('لغو') || title.includes('ناموفق')) {
-    return 'rejected';
-  }
-  return 'admin_message';
 };
 
 window.closeMsgDetailModal = function() {
@@ -187,6 +214,7 @@ window.openMsgDetail = async function(idx) {
 };
 
 window.renderNotifications = function() {
+  window.updateTabBadges();
   const container = document.getElementById('modal-msg-container');
   if (!container) return;
 
@@ -628,7 +656,7 @@ async function checkUserSession(user) {
       }
     }
 
-    // به‌‌روزرسانی کارت اعضای کل تیم روی داشبورد
+    // به‌روزرسانی کارت اعضای کل تیم روی داشبورد
     if (refElem) {
       const totalTeamCount = await calculateTeamMembersCount(user.id, user);
       refElem.textContent = totalTeamCount;
