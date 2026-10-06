@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -11,64 +11,776 @@
     <link rel="icon" href="data:image/x-icon;base64,=">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     <style>
-        *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
-        body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
-        header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1);padding:10px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
-        
-        /* لوگوی مدرن و نئونی ZENIX */
-        .logo{display:flex;align-items:center;gap:12px;cursor:pointer;text-decoration:none;user-select:none}
-        .logo-icon{width:38px;height:38px;background:linear-gradient(135deg,#0ea5e9 0%,#8b5cf6 50%,#ec4899 100%);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:19px;font-weight:900;font-style:italic;transform:skewX(-8deg);box-shadow:0 0 18px rgba(14,165,233,0.5),inset 0 1px 1px rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.25);position:relative;overflow:hidden;transition:all .3s ease}
-        .logo-icon::after{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent,rgba(255,255,255,0.3),transparent);transform:rotate(30deg);animation:logoShine 3.5s infinite ease-in-out}
-        @keyframes logoShine{0%{transform:translateX(-100%) rotate(30deg)}25%,100%{transform:translateX(100%) rotate(30deg)}}
-        .logo-text{font-family:'Orbitron',sans-serif;font-size:22px;font-weight:900;letter-spacing:5px;text-transform:uppercase;background:linear-gradient(135deg,#38bdf8 0%,#a855f7 50%,#f43f5e 100%);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 10px rgba(56,189,248,0.5));position:relative;display:inline-block;transition:all .3s ease}
-        .logo:hover .logo-icon{transform:skewX(-8deg) scale(1.05);box-shadow:0 0 25px rgba(168,85,247,0.7)}
-        .logo:hover .logo-text{filter:drop-shadow(0 0 14px rgba(168,85,247,0.7))}
+        :root {
+            --bg-main: #080c14;
+            --card-bg: rgba(15, 23, 42, 0.7);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.35);
+            --accent: #06b6d4;
+            --accent-glow: rgba(6, 182, 212, 0.35);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
 
-        .hr{display:flex;align-items:center;gap:8px}.wrap{position:relative}.lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none}.badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;font-weight:700}.badge.show{display:flex}.menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;min-width:max-content;padding:6px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8)}[dir="rtl"] .wrap .menu{left:0}[dir="ltr"] .wrap .menu{right:0}.menu.show{display:block}.mi{padding:7px 10px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap}.mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}.c{max-width:900px;width:100%;margin:15px auto;padding:0 12px;flex:1}.wel{background:linear-gradient(135deg,rgba(2,132,199,.15),rgba(147,51,234,.15));border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}.wel h1{font-size:16px;margin-bottom:3px}.wel p{color:#94a3b8;font-size:11px}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:12px}.sc{border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden}.sc-bal{background:linear-gradient(135deg,rgba(15,23,42,.95),rgba(14,165,233,.18));border:1px solid rgba(56,189,248,.4)}.sc-ref{background:linear-gradient(135deg,rgba(15,23,42,.95),rgba(168,85,247,.18));border:1px solid rgba(168,85,247,.4)}.sc-bal .si{width:40px;height:40px;background:rgba(56,189,248,.2);border:1px solid #38bdf8;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#38bdf8;font-size:16px}.sc-ref .si{width:40px;height:40px;background:rgba(168,85,247,.2);border:1px solid #a855f7;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#c084fc;font-size:16px}.sn span{font-size:11px;color:#94a3b8;display:block;margin-bottom:2px}.sn h3{font-size:16px;font-weight:800;color:#fff}.banner-box{width:100%;max-height:150px;margin-bottom:12px;border-radius:12px;overflow:hidden;border:1px solid rgba(56,189,248,.35);box-shadow:0 10px 25px rgba(2,132,199,.15)}.banner-box img{width:100%;height:150px;display:block;object-fit:cover}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}.nc{background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px;text-decoration:none;color:inherit;display:flex;align-items:center;justify-content:space-between}.nc:hover{border-color:#38bdf8;background:rgba(15,23,42,1)}.ncl{display:flex;align-items:center;gap:10px}.nci{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px}.ninf h3{font-size:14px;color:#f8fafc;margin-bottom:2px}.ninf p{font-size:11px;color:#94a3b8}.nca{color:#64748b;font-size:12px}.market-box{background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px;margin-bottom:12px}#crypto-ticker-list{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}@media(max-width:768px){#crypto-ticker-list{grid-template-columns:1fr}}.crypto-row{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid rgba(255,255,255,0.05);font-size:12px;direction:ltr;transition:all .4s ease}.crypto-info{display:flex;align-items:center;gap:8px}.crypto-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff}.price-up{color:#22c55e!important;font-weight:bold}.price-down{color:#ef4444!important;font-weight:bold}.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px)}.modal.show{display:flex}.modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(56,189,248,.3);border-radius:20px;width:100%;max-width:460px;max-height:85vh;display:flex;flex-direction:column;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.9);overflow:hidden}.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;color:#38bdf8;font-weight:800;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;flex-shrink:0}.modal-close{background:rgba(255,255,255,.05);border:none;color:#94a3b8;cursor:pointer;font-size:14px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}.modal-close:hover{background:rgba(239,68,68,.2);color:#ef4444}
-        .notif-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
-        .notif-tab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#94a3b8;padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;white-space:nowrap;transition:0.2s;display:flex;align-items:center;justify-content:center;gap:5px;flex:1 1 auto}
-        .notif-tab:hover{background:rgba(56,189,248,.15);color:#38bdf8}
-        .notif-tab.active{background:#38bdf8;color:#0f172a;font-weight:bold;border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.3)}
-        .tab-badge{background:rgba(255,255,255,.15);color:inherit;padding:1px 6px;border-radius:10px;font-size:10px;font-weight:700;line-height:1.2;min-width:16px;text-align:center;display:inline-block}
-        .notif-tab.active .tab-badge{background:rgba(15,23,42,.3);color:#0f172a}
-        #modal-msg-container{overflow-y:auto;padding-right:6px;flex:1;min-height:0}
-        #modal-msg-container::-webkit-scrollbar, .modal-content div::-webkit-scrollbar{width:5px}
-        #modal-msg-container::-webkit-scrollbar-track, .modal-content div::-webkit-scrollbar-track{background:rgba(15,23,42,.6);border-radius:10px}
-        #modal-msg-container::-webkit-scrollbar-thumb, .modal-content div::-webkit-scrollbar-thumb{background:rgba(56,189,248,.35);border-radius:10px}
-        #modal-msg-container::-webkit-scrollbar-thumb:hover, .modal-content div::-webkit-scrollbar-thumb:hover{background:rgba(56,189,248,.7)}
-        #modal-msg-container, .modal-content div{scrollbar-width:thin;scrollbar-color:rgba(56,189,248,.35) rgba(15,23,42,.6)}
-        .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px;transition:0.2s}
-        .msg-body-box:hover{border-color:rgba(56,189,248,.5)!important;opacity:1!important;}
-        .msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:0}
-        .msg-desc-text{font-size:12px;color:#cbd5e1;line-height:1.5}footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
-        /* استایل دکمه شناور کازینو در سمت راست و پایین */
-        .floating-casino{position:fixed;right:18px;bottom:25px;z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;width:60px;height:60px;background:linear-gradient(135deg,#f43f5e,#a855f7,#0ea5e9);border:2px solid rgba(255,255,255,.4);border-radius:50%;color:#fff;text-decoration:none;box-shadow:0 0 20px rgba(244,63,94,.6),0 0 10px rgba(168,85,247,.5);transition:all .3s ease;animation:floatingCasinoPulse 2.5s infinite ease-in-out}.floating-casino:hover{transform:scale(1.12);box-shadow:0 0 30px rgba(244,63,94,.9),0 0 15px rgba(56,189,248,.8);color:#fff}.floating-casino i{font-size:22px}.floating-casino span{font-size:9px;font-weight:800;margin-top:2px;letter-spacing:.5px;text-shadow:0 1px 2px rgba(0,0,0,.8)}@keyframes floatingCasinoPulse{0%,100%{transform:scale(1);box-shadow:0 0 15px rgba(244,63,94,.5),0 0 10px rgba(168,85,247,.4)}50%{transform:translateY(-6px) scale(1.06);box-shadow:0 0 25px rgba(244,63,94,.85),0 0 20px rgba(56,189,248,.7)}}
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', 'Vazirmatn', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.15) 0%, transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.12) 0%, transparent 45%),
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+            min-height: 100vh;
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* هدر شیشه‌ای و درخشان */
+        header {
+            background: rgba(8, 12, 20, 0.85);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #0ea5e9, #9333ea);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 19px;
+            font-weight: 900;
+            font-style: italic;
+            transform: skewX(-6deg);
+            box-shadow: 0 0 18px rgba(14, 165, 233, 0.45);
+        }
+
+        .logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            font-style: italic;
+            transform: skewX(-6deg);
+            background: linear-gradient(135deg, #38bdf8, #c084fc, #f43f5e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+        }
+
+        .hr {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .wrap {
+            position: relative;
+        }
+
+        .lb {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            height: 38px;
+            width: 38px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #38bdf8;
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+
+        .lb:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(56, 189, 248, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: var(--danger);
+            color: #fff;
+            font-size: 9px;
+            width: 17px;
+            height: 17px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+        }
+
+        .badge.show {
+            display: flex;
+        }
+
+        /* منوی کشویی هدر */
+        .menu {
+            display: none;
+            position: absolute;
+            top: 46px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            min-width: max-content;
+            padding: 8px;
+            z-index: 999;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+        }
+
+        [dir="rtl"] .wrap .menu { left: 0; }
+        [dir="ltr"] .wrap .menu { right: 0; }
+
+        .menu.show {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .mi {
+            padding: 8px 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .mi:hover, .mi.active {
+            background: rgba(56, 189, 248, 0.12);
+            color: #38bdf8 !important;
+            font-weight: 700;
+        }
+
+        /* محتوای اصلی */
+        .c {
+            max-width: 920px;
+            width: 100%;
+            margin: 20px auto;
+            padding: 0 16px;
+            flex: 1;
+        }
+
+        /* کارت خوش‌آمدگویی */
+        .wel {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 18px 20px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.08));
+            pointer-events: none;
+        }
+
+        .wel h1 {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+
+        .wel p {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        /* آمار و موجودی */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .sc {
+            border-radius: 20px;
+            padding: 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(16px);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+        }
+
+        .sc:hover {
+            transform: translateY(-4px);
+        }
+
+        .sc-bal {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(14, 165, 233, 0.15));
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            box-shadow: 0 10px 25px rgba(14, 165, 233, 0.1);
+        }
+
+        .sc-ref {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(168, 85, 247, 0.15));
+            border: 1px solid rgba(168, 85, 247, 0.35);
+            box-shadow: 0 10px 25px rgba(168, 85, 247, 0.1);
+        }
+
+        .sc-bal .si {
+            width: 44px;
+            height: 44px;
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.5);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #38bdf8;
+            font-size: 18px;
+        }
+
+        .sc-ref .si {
+            width: 44px;
+            height: 44px;
+            background: rgba(168, 85, 247, 0.15);
+            border: 1px solid rgba(168, 85, 247, 0.5);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #c084fc;
+            font-size: 18px;
+        }
+
+        .sn span {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .sn h3 {
+            font-size: 20px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+
+        /* بنر تبلیغاتی */
+        .banner-box {
+            width: 100%;
+            max-height: 150px;
+            margin-bottom: 16px;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease;
+        }
+
+        .banner-box:hover {
+            transform: translateY(-2px);
+        }
+
+        .banner-box img {
+            width: 100%;
+            height: 150px;
+            display: block;
+            object-fit: cover;
+        }
+
+        /* شبکه دسترسی سریع */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .nc {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(12px);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nc:hover {
+            border-color: rgba(56, 189, 248, 0.5);
+            background: rgba(15, 23, 42, 0.95);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4), 0 0 15px rgba(56, 189, 248, 0.15);
+        }
+
+        .ncl {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nci {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .ninf h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .ninf p {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .nca {
+            color: var(--text-muted);
+            font-size: 13px;
+            transition: transform 0.2s ease;
+        }
+
+        .nc:hover .nca {
+            color: #38bdf8;
+            transform: translateX(-3px);
+        }
+
+        /* بازار رمزارزها و باکس‌های محتوایی */
+        .market-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 16px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        #crypto-ticker-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        @media(max-width: 768px) {
+            #crypto-ticker-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .crypto-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            font-size: 12px;
+            direction: ltr;
+            transition: all 0.25s ease;
+        }
+
+        .crypto-row:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+
+        .crypto-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .crypto-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .price-up {
+            color: var(--success) !important;
+            font-weight: 700;
+        }
+
+        .price-down {
+            color: var(--danger) !important;
+            font-weight: 700;
+        }
+
+        /* مودال‌ها */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(4, 8, 16, 0.85);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(12px);
+            padding: 16px;
+        }
+
+        .modal.show {
+            display: flex;
+            animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.98));
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 480px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(56, 189, 248, 0.15);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            color: #38bdf8;
+            font-weight: 800;
+            font-size: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            flex-shrink: 0;
+        }
+
+        .modal-close {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 14px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+
+        /* تب‌های اعلان */
+        .notif-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .notif-tab {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex: 1 1 auto;
+        }
+
+        .notif-tab:hover {
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+        }
+
+        .notif-tab.active {
+            background: #38bdf8;
+            color: #0f172a;
+            font-weight: 800;
+            border-color: #38bdf8;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+        }
+
+        .tab-badge {
+            background: rgba(255, 255, 255, 0.15);
+            color: inherit;
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 1.2;
+            min-width: 16px;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .notif-tab.active .tab-badge {
+            background: rgba(15, 23, 42, 0.3);
+            color: #0f172a;
+        }
+
+        #modal-msg-container {
+            overflow-y: auto;
+            padding-right: 6px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        #modal-msg-container::-webkit-scrollbar, .modal-content div::-webkit-scrollbar {
+            width: 5px;
+        }
+        #modal-msg-container::-webkit-scrollbar-track, .modal-content div::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 10px;
+        }
+        #modal-msg-container::-webkit-scrollbar-thumb, .modal-content div::-webkit-scrollbar-thumb {
+            background: rgba(56, 189, 248, 0.35);
+            border-radius: 10px;
+        }
+        #modal-msg-container::-webkit-scrollbar-thumb:hover, .modal-content div::-webkit-scrollbar-thumb:hover {
+            background: rgba(56, 189, 248, 0.7);
+        }
+        #modal-msg-container, .modal-content div {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(56, 189, 248, 0.35) rgba(15, 23, 42, 0.6);
+        }
+
+        .msg-body-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .msg-body-box:hover {
+            border-color: rgba(56, 189, 248, 0.5) !important;
+            opacity: 1 !important;
+        }
+
+        .msg-title-text {
+            font-size: 13px;
+            font-weight: 700;
+            color: #38bdf8;
+            margin-bottom: 0;
+        }
+
+        .msg-desc-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* فوتر */
+        footer {
+            text-align: center;
+            padding: 14px 20px;
+            font-size: 11px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 920px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* دکمه شناور کازینو در سمت راست و پایین صفحه */
+        .floating-casino {
+            position: fixed;
+            right: 20px;
+            bottom: 25px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 62px;
+            height: 62px;
+            background: linear-gradient(135deg, #f43f5e, #a855f7, #0ea5e9);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            color: #fff;
+            text-decoration: none;
+            box-shadow: 0 0 22px rgba(244, 63, 94, 0.65), 0 0 12px rgba(168, 85, 247, 0.5);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: floatingCasinoPulse 2.5s infinite ease-in-out;
+        }
+
+        .floating-casino:hover {
+            transform: scale(1.12);
+            box-shadow: 0 0 35px rgba(244, 63, 94, 0.9), 0 0 20px rgba(56, 189, 248, 0.8);
+            color: #fff;
+        }
+
+        .floating-casino i {
+            font-size: 22px;
+        }
+
+        .floating-casino span {
+            font-size: 9px;
+            font-weight: 800;
+            margin-top: 2px;
+            letter-spacing: .5px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        @keyframes floatingCasinoPulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 18px rgba(244, 63, 94, 0.55), 0 0 10px rgba(168, 85, 247, 0.4);
+            }
+            50% {
+                transform: translateY(-6px) scale(1.06);
+                box-shadow: 0 0 28px rgba(244, 63, 94, 0.85), 0 0 22px rgba(56, 189, 248, 0.7);
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- گزینه شناور کازینو در سمت راست پایین صفحه -->
+    <!-- دکمه شناور کازینو -->
     <a href="poker.html" class="floating-casino" id="floating-casino-btn" title="کازینو">
         <i class="fas fa-dice"></i>
         <span id="t-floating-casino">کازینو</span>
     </a>
 
+    <!-- هدر پلتفرم -->
     <header>
-        <div class="logo"><div class="logo-icon">Z</div><div class="logo-text">ZENIX</div></div>
+        <div class="logo">
+            <div class="logo-icon">Z</div>
+            <div class="logo-text">ZENIX</div>
+        </div>
         <div class="hr">
-            <div class="wrap"><button type="button" class="lb" id="bell-btn"><i class="fas fa-bell" style="color:#fbbf24"></i><span class="badge" id="bell-badge">0</span></button></div>
-            <div class="wrap"><button type="button" class="lb" id="help-btn" title="راهنمای صفحه داشبورد"><i class="fas fa-circle-question" style="color:#38bdf8"></i></button></div>
-            <a href="support.html" class="lb"><i class="fas fa-headset" style="color:#a855f7"></i></a>
             <div class="wrap">
-                <button type="button" class="lb" id="lang-btn"><i class="fas fa-globe" style="color:#22c55e"></i></button>
+                <button type="button" class="lb" id="bell-btn" title="اعلان‌ها">
+                    <i class="fas fa-bell" style="color:#fbbf24"></i>
+                    <span class="badge" id="bell-badge">0</span>
+                </button>
+            </div>
+            <div class="wrap">
+                <button type="button" class="lb" id="help-btn" title="راهنمای صفحه داشبورد">
+                    <i class="fas fa-circle-question" style="color:#38bdf8"></i>
+                </button>
+            </div>
+            <a href="support.html" class="lb" title="پشتیبانی"><i class="fas fa-headset" style="color:#a855f7"></i></a>
+            <div class="wrap">
+                <button type="button" class="lb" id="lang-btn" title="تغییر زبان"><i class="fas fa-globe" style="color:#22c55e"></i></button>
                 <div class="menu" id="lang-menu">
-                    <div class="mi" data-lang="fa">فارسی</div><div class="mi" data-lang="en">English</div><div class="mi" data-lang="ar">العربية</div><div class="mi" data-lang="tr">Türkçe</div><div class="mi" data-lang="ru">Русский</div><div class="mi" data-lang="es">Español</div><div class="mi" data-lang="fr">Français</div><div class="mi" data-lang="de">Deutsch</div>
+                    <div class="mi" data-lang="fa">فارسی</div>
+                    <div class="mi" data-lang="en">English</div>
+                    <div class="mi" data-lang="ar">العربية</div>
+                    <div class="mi" data-lang="tr">Türkçe</div>
+                    <div class="mi" data-lang="ru">Русский</div>
+                    <div class="mi" data-lang="es">Español</div>
+                    <div class="mi" data-lang="fr">Français</div>
+                    <div class="mi" data-lang="de">Deutsch</div>
                 </div>
             </div>
             <div class="wrap">
-                <button type="button" class="lb" id="menu-btn"><i class="fas fa-bars" style="color:#f43f5e"></i></button>
+                <button type="button" class="lb" id="menu-btn" title="منو"><i class="fas fa-bars" style="color:#f43f5e"></i></button>
                 <div class="menu" id="nav-menu">
                     <a href="dashboard.html" class="mi active"><i class="fas fa-home" style="color:#38bdf8"></i><span id="m1">صفحه اصلی</span></a>
                     <a href="quantification.html" class="mi"><i class="fas fa-robot" style="color:#a855f7"></i><span id="m2">کوانتیفیکیشن</span></a>
@@ -84,42 +796,112 @@
             </div>
         </div>
     </header>
+
+    <!-- محتوای اصلی داشبورد -->
     <div class="c">
-        <div class="wel"><div><h1 id="t-wel">خوش آمدید</h1><p id="t-sub">پنل مدیریت کاربری</p></div><div style="font-size:11px;background:rgba(56,189,248,.1);border:1px solid #38bdf8;padding:4px 8px;border-radius:6px;color:#38bdf8"><i class="fas fa-shield-check"></i> <span id="t-st">تایید شده</span></div></div>
+        <!-- پیام خوش‌آمدگویی -->
+        <div class="wel">
+            <div>
+                <h1 id="t-wel">خوش آمدید</h1>
+                <p id="t-sub">پنل مدیریت کاربری Zenix Pro</p>
+            </div>
+            <div style="font-size:11px;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.4);padding:5px 10px;border-radius:8px;color:#38bdf8;font-weight:700;">
+                <i class="fas fa-shield-check"></i> <span id="t-st">تایید شده</span>
+            </div>
+        </div>
+
+        <!-- کارت‌های موجودی و تیم -->
         <div class="stats">
-            <div class="sc sc-bal"><div class="si"><i class="fas fa-wallet" style="color:#38bdf8"></i></div><div class="sn"><span id="ts1">موجودی</span><h3 id="val-balance">$0.00</h3></div></div>
-            <div class="sc sc-ref"><div class="si"><i class="fas fa-users" style="color:#c084fc"></i></div><div class="sn"><span id="ts2">زیرمجموعه</span><h3 id="val-ref">0</h3></div></div>
+            <div class="sc sc-bal">
+                <div class="si"><i class="fas fa-wallet" style="color:#38bdf8"></i></div>
+                <div class="sn">
+                    <span id="ts1">موجودی</span>
+                    <h3 id="val-balance">$0.00</h3>
+                </div>
+            </div>
+            <div class="sc sc-ref">
+                <div class="si"><i class="fas fa-users" style="color:#c084fc"></i></div>
+                <div class="sn">
+                    <span id="ts2">زیرمجموعه</span>
+                    <h3 id="val-ref">0</h3>
+                </div>
+            </div>
         </div>
-        <div class="banner-box"><img src="https://i.postimg.cc/XvHYmsLK/Gemini-Generated-Image-d7mieqd7mieqd7mi.jpg" alt="Zenix Banner"></div>
+
+        <!-- بنر تصویری -->
+        <div class="banner-box">
+            <img src="https://i.postimg.cc/XvHYmsLK/Gemini-Generated-Image-d7mieqd7mieqd7mi.jpg" alt="Zenix Banner">
+        </div>
+
+        <!-- میانبرهای دسترسی سریع -->
         <div class="grid">
-            <a href="quantification.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.3);color:#c084fc"><i class="fas fa-robot"></i></div><div class="ninf"><h3 id="c1">کوانتیفیکیشن</h3><p id="d1">معاملات هوشمند</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i1"></i></div></a>
-            <a href="deposit.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#22c55e"><i class="fas fa-arrow-down"></i></div><div class="ninf"><h3 id="c2">واریز</h3><p id="d2">شارژ حساب</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i2"></i></div></a>
-            <a href="receive.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);color:#fbbf24"><i class="fas fa-arrow-up"></i></div><div class="ninf"><h3 id="c3">برداشت</h3><p id="d3">برداشت دارایی</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i3"></i></div></a>
-            <a href="team.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(236,72,153,.15);border:1px solid rgba(236,72,153,.3);color:#ec4899"><i class="fas fa-users"></i></div><div class="ninf"><h3 id="c4">تیم</h3><p id="d4">زیرمجموعه‌ها</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i4"></i></div></a>
-            <a href="transactions.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(6,182,212,.15);border:1px solid rgba(6,182,212,.3);color:#06b6d4"><i class="fas fa-history"></i></div><div class="ninf"><h3 id="c5">تراکنش‌ها</h3><p id="d5">تاریخچه مالی</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i5"></i></div></a>
-            <a href="profile.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);color:#38bdf8"><i class="fas fa-user-cog"></i></div><div class="ninf"><h3 id="c6">پروفایل</h3><p id="d6">تنظیمات امنیت</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i6"></i></div></a>
+            <a href="quantification.html" class="nc">
+                <div class="ncl">
+                    <div class="nci" style="background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.3);color:#c084fc"><i class="fas fa-robot"></i></div>
+                    <div class="ninf"><h3 id="c1">کوانتیفیکیشن</h3><p id="d1">معاملات هوشمند</p></div>
+                </div>
+                <div class="nca"><i class="fas fa-chevron-left" id="i1"></i></div>
+            </a>
+            <a href="deposit.html" class="nc">
+                <div class="ncl">
+                    <div class="nci" style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#22c55e"><i class="fas fa-arrow-down"></i></div>
+                    <div class="ninf"><h3 id="c2">واریز</h3><p id="d2">شارژ حساب</p></div>
+                </div>
+                <div class="nca"><i class="fas fa-chevron-left" id="i2"></i></div>
+            </a>
+            <a href="receive.html" class="nc">
+                <div class="ncl">
+                    <div class="nci" style="background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);color:#fbbf24"><i class="fas fa-arrow-up"></i></div>
+                    <div class="ninf"><h3 id="c3">برداشت</h3><p id="d3">برداشت دارایی</p></div>
+                </div>
+                <div class="nca"><i class="fas fa-chevron-left" id="i3"></i></div>
+            </a>
+            <a href="team.html" class="nc">
+                <div class="ncl">
+                    <div class="nci" style="background:rgba(236,72,153,.15);border:1px solid rgba(236,72,153,.3);color:#ec4899"><i class="fas fa-users"></i></div>
+                    <div class="ninf"><h3 id="c4">تیم</h3><p id="d4">زیرمجموعه‌ها</p></div>
+                </div>
+                <div class="nca"><i class="fas fa-chevron-left" id="i4"></i></div>
+            </a>
+            <a href="transactions.html" class="nc">
+                <div class="ncl">
+                    <div class="nci" style="background:rgba(6,182,212,.15);border:1px solid rgba(6,182,212,.3);color:#06b6d4"><i class="fas fa-history"></i></div>
+                    <div class="ninf"><h3 id="c5">تراکنش‌ها</h3><p id="d5">تاریخچه مالی</p></div>
+                </div>
+                <div class="nca"><i class="fas fa-chevron-left" id="i5"></i></div>
+            </a>
+            <a href="profile.html" class="nc">
+                <div class="ncl">
+                    <div class="nci" style="background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);color:#38bdf8"><i class="fas fa-user-cog"></i></div>
+                    <div class="ninf"><h3 id="c6">پروفایل</h3><p id="d6">تنظیمات امنیت</p></div>
+                </div>
+                <div class="nca"><i class="fas fa-chevron-left" id="i6"></i></div>
+            </a>
         </div>
+
+        <!-- قیمت‌های لحظه‌ای بازار ارزهای دیجیتال -->
         <div class="market-box">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-                <h3 style="font-size:13px;color:#38bdf8;" id="t-mkt"><i class="fas fa-chart-line" style="color:#22c55e"></i> بازار ارزهای دیجیتال (۳ ارز برتر از ۳۰ ارز رصد شده)</h3>
-                <span style="font-size:10px;color:#22c55e;background:rgba(34,197,94,0.15);padding:2px 8px;border-radius:10px;font-weight:600;"><i class="fas fa-circle" style="font-size:6px;vertical-align:middle;margin-left:3px;"></i> <span id="t-live">زنده</span></span>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <h3 style="font-size:14px;color:#38bdf8;font-weight:700;" id="t-mkt"><i class="fas fa-chart-line" style="color:#22c55e"></i> بازار ارزهای دیجیتال (۳ ارز برتر از ۳۰ ارز رصد شده)</h3>
+                <span style="font-size:10px;color:#22c55e;background:rgba(34,197,94,0.15);padding:3px 10px;border-radius:12px;font-weight:700;"><i class="fas fa-circle" style="font-size:6px;vertical-align:middle;margin-left:4px;"></i> <span id="t-live">زنده</span></span>
             </div>
             <div id="crypto-ticker-list"></div>
         </div>
         
+        <!-- توضیحات درباره پلتفرم -->
         <div class="market-box">
-            <h3 style="font-size:15px;color:#38bdf8;margin-bottom:10px;"><i class="fas fa-info-circle" style="color:#a855f7"></i> <span id="t-ab-title">درباره پلتفرم Zenix (هدف، ماهیت و ساختار)</span></h3>
-            <p style="font-size:14px;color:#cbd5e1;line-height:1.7;margin-bottom:10px;" id="t-ab-desc">پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.</p>
-            <ul style="font-size:13px;color:#94a3b8;padding-right:18px;line-height:1.7;margin-bottom:0;">
+            <h3 style="font-size:15px;color:#38bdf8;margin-bottom:12px;font-weight:800;"><i class="fas fa-info-circle" style="color:#a855f7"></i> <span id="t-ab-title">درباره پلتفرم Zenix (هدف، ماهیت و ساختار)</span></h3>
+            <p style="font-size:13px;color:#cbd5e1;line-height:1.8;margin-bottom:12px;" id="t-ab-desc">پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.</p>
+            <ul style="font-size:12px;color:#94a3b8;padding-right:18px;line-height:1.8;margin-bottom:0;">
                 <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-l1t">هدف اصلی:</strong> <span id="t-ab-l1d">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li>
                 <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-l2t">امنیت و زیرساخت:</strong> <span id="t-ab-l2d">متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).</span></li>
                 <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-l3t">ساختار چندسطحی (Referral & Team):</strong> <span id="t-ab-l3d">ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.</span></li>
-                <li><strong style="color:#f8fafc;" id="t-ab-l4t">احساس واقع‌گرایی:</strong> <span id="t-ab-l4d">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌‌المللی و زنده سروکار دارد.</span></li>
+                <li><strong style="color:#f8fafc;" id="t-ab-l4t">احساس واقع‌گرایی:</strong> <span id="t-ab-l4d">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.</span></li>
             </ul>
         </div>
     </div>
 
-    <!-- مودال اصلاح‌شده صندوق پیام‌ها و اعلان‌ها به همراه بج شمارنده برای هر تب -->
+    <!-- مودال اعلان‌ها -->
     <div class="modal" id="m-msg">
         <div class="modal-content">
             <div class="modal-header">
@@ -151,24 +933,32 @@
         </div>
     </div>
 
+    <!-- مودال درباره پلتفرم -->
     <div class="modal" id="m-about">
         <div class="modal-content">
-            <div class="modal-header"><span id="t-about-title">درباره پلتفرم Zenix (هدف، ماهیت و ساختار)</span><button class="modal-close" onclick="window.closeAboutModal()"><i class="fas fa-times"></i></button></div>
+            <div class="modal-header">
+                <span id="t-about-title">درباره پلتفرم Zenix (هدف، ماهیت و ساختار)</span>
+                <button class="modal-close" onclick="window.closeAboutModal()"><i class="fas fa-times"></i></button>
+            </div>
             <div style="overflow-y:auto;padding-right:4px">
                 <p style="font-size:13px;color:#cbd5e1;line-height:1.7;margin-bottom:10px;" id="t-ab-m-desc">پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.</p>
                 <ul style="font-size:12px;color:#94a3b8;padding-right:18px;line-height:1.7;margin-bottom:0;">
                     <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l1t">هدف اصلی:</strong> <span id="t-ab-m-l1d">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li>
                     <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l2t">امنیت و زیرساخت:</strong> <span id="t-ab-m-l2d">متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).</span></li>
                     <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l3t">ساختار چندسطحی (Referral & Team):</strong> <span id="t-ab-m-l3d">ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.</span></li>
-                    <li><strong style="color:#f8fafc;" id="t-ab-m-l4t">احساس واقع‌‌گرایی:</strong> <span id="t-ab-m-l4d">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.</span></li>
+                    <li><strong style="color:#f8fafc;" id="t-ab-m-l4t">احساس واقع‌گرایی:</strong> <span id="t-ab-m-l4d">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.</span></li>
                 </ul>
             </div>
         </div>
     </div>
 
+    <!-- مودال راهنما -->
     <div class="modal" id="m-help">
         <div class="modal-content">
-            <div class="modal-header"><span id="t-help-title">راهنمای صفحه داشبورد</span><button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button></div>
+            <div class="modal-header">
+                <span id="t-help-title">راهنمای صفحه داشبورد</span>
+                <button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button>
+            </div>
             <div style="overflow-y:auto;padding-right:4px">
                 <div class="msg-body-box">
                     <div class="msg-title-text" id="t-hp-t1"><i class="fas fa-home" style="color:#38bdf8"></i> کاربرد این صفحه (داشبورد) چیست؟</div>
@@ -190,10 +980,13 @@
         </div>
     </div>
 
+    <!-- فوتر -->
     <footer>
         <p>&copy; 2026 Zenix. All rights reserved.</p>
         <p style="color:#22c55e;"><i class="fas fa-circle" style="font-size:6px;"></i> <span id="t-node">سرور فعال (US-East)</span></p>
     </footer>
+
+    <!-- اسکریپت‌های مربوط به Supabase و منطق برنامه -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="module" src="dashboard.js?v=8"></script>
 </body>
