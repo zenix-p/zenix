@@ -2,597 +2,588 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>Zenix - تیم من</title>
-    <!-- جلوگیری از خطای 404 Favicon -->
-    <link rel="icon" href="data:image/x-icon;base64,=">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700" rel="stylesheet">
-    
-    <!-- FontAwesome با تنظیمات ضد Tracking Prevention -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-    
-    <!-- Supabase JS Library با تنظیمات ضد Tracking Prevention -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت تیم - ZENIX</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
-        body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
-        header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1);padding:10px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
-        .logo{display:flex;align-items:center;gap:10px}
-        .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#0ea5e9,#9333ea);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;font-style:italic;transform:skewX(-6deg);box-shadow:0 0 15px rgba(14,165,233,.4)}
-        .logo-text{font-family:'Orbitron',sans-serif;font-size:19px;font-weight:900;letter-spacing:2px;font-style:italic;transform:skewX(-6deg);background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 20px rgba(56,189,248,0.4)}
-        .hr{display:flex;align-items:center;gap:8px}
-        .wrap{position:relative}
-        .lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none}
-        .badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;font-weight:700}
-        .badge.show{display:flex}
-        .menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;min-width:170px;padding:6px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8)}
-        [dir="rtl"] .wrap .menu{left:0}
-        [dir="ltr"] .wrap .menu{right:0}
-        .menu.show{display:block}
-        .mi{padding:7px 10px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none}
-        .mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}
-        .c{max-width:900px;width:100%;margin:15px auto;padding:0 12px;flex:1}
-        .wel{background:linear-gradient(135deg,rgba(2,132,199,.15),rgba(147,51,234,.15));border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
-        .wel h1{font-size:16px;margin-bottom:3px}
-        .wel p{color:#94a3b8;font-size:11px}
-        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
-        .modal.show{display:flex}
-        .modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(56,189,248,.3);border-radius:20px;width:100%;max-width:440px;max-height:85vh;display:flex;flex-direction:column;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.9)}
-        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;color:#38bdf8;font-weight:800;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px}
-        .modal-close{background:rgba(255,255,255,.05);border:none;color:#94a3b8;cursor:pointer;font-size:14px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
-        .modal-close:hover{background:rgba(239,68,68,.2);color:#ef4444}
-        #modal-msg-container{overflow-y:auto;padding-right:4px}
-        .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px}
-        .msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:4px}
-        .msg-desc-text{font-size:12px;color:#cbd5e1;line-height:1.5}
-        footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --accent-color: #38bdf8;
+            --text-color: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); padding-bottom: 30px; }
+
+        /* هدر */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: rgba(15, 23, 42, 0.9); border-bottom: 1px solid var(--border-color); sticky: top; top: 0; z-index: 100; backdrop-filter: blur(10px); }
+        .header-title { font-size: 16px; font-weight: bold; color: var(--accent-color); }
+        .wrap { display: flex; align-items: center; gap: 10px; }
+        
+        /* دکمه زنگوله و مدال‌ها */
+        .lb { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 10px; color: #fff; cursor: pointer; position: relative; display: flex; align-items: center; justify-content: center; }
+        .badge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: #fff; font-size: 10px; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; display: none; align-items: center; justify-content: center; }
+        .badge.show { display: flex; }
+
+        .container { padding: 15px; max-width: 600px; margin: 0 auto; }
+
+        /* کارت‌ها */
+        .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 15px; margin-bottom: 15px; backdrop-filter: blur(8px); }
+        .card-title { font-size: 14px; font-weight: 600; color: var(--accent-color); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+
+        /* لینک دعوت */
+        .ref-box { display: flex; gap: 8px; margin-top: 10px; }
+        .ref-input { flex: 1; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color); color: #fff; padding: 10px; border-radius: 8px; font-size: 12px; direction: ltr; }
+        .btn-copy { background: var(--accent-color); color: #0f172a; border: none; padding: 0 15px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; }
+
+        /* خلاصه آمار */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+        .stat-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; text-align: center; }
+        .stat-val { font-size: 15px; font-weight: bold; color: #fff; margin-top: 4px; }
+        .stat-lbl { font-size: 11px; color: var(--text-secondary); }
+
+        /* تب‌های نسل‌ها */
+        .gen-tabs { display: flex; gap: 8px; margin-bottom: 15px; }
+        .gen-tab { flex: 1; padding: 10px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-secondary); font-size: 12px; text-align: center; cursor: pointer; }
+        .gen-tab.active { background: var(--accent-color); color: #0f172a; font-weight: bold; border-color: var(--accent-color); }
+
+        /* لیست اعضا */
+        .member-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border-color); font-size: 12px; }
+        .member-item:last-child { border-bottom: none; }
+
+        /* استایل مودال‌ها */
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 15px; backdrop-filter: blur(5px); }
+        .modal.show { display: flex; }
+        .modal-content { background: #1e293b; border: 1px solid var(--border-color); border-radius: 16px; width: 100%; max-width: 480px; max-height: 85vh; display: flex; flex-direction: column; padding: 18px; position: relative; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: bold; color: #fff; margin-bottom: 12px; }
+        .modal-close { background: none; border: none; color: var(--text-secondary); font-size: 16px; cursor: pointer; }
+
+        /* استایل نئونی تب‌های صندوق پیام */
+        .notif-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; padding-bottom: 6px; border-bottom: 1px solid rgba(255, 255, 255, .08); flex-shrink: 0; }
+        .notif-tab { background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .1); color: #94a3b8; padding: 5px 10px; border-radius: 20px; font-size: 11px; cursor: pointer; white-space: nowrap; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; flex: 1 1 auto; }
+        .notif-tab:hover { background: rgba(56, 189, 248, .15); color: #38bdf8; }
+        .notif-tab.active { background: #38bdf8; color: #0f172a; font-weight: bold; border-color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, .3); }
+        .tab-badge { background: rgba(255, 255, 255, .15); color: inherit; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700; line-height: 1.2; min-width: 16px; text-align: center; display: inline-block; }
+        .notif-tab.active .tab-badge { background: rgba(15, 23, 42, .3); color: #0f172a; }
+
+        #modal-msg-container { overflow-y: auto; padding-right: 6px; flex: 1; min-height: 0; }
+        #modal-msg-container::-webkit-scrollbar { width: 5px; }
+        #modal-msg-container::-webkit-scrollbar-track { background: rgba(15, 23, 42, .6); border-radius: 10px; }
+        #modal-msg-container::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, .35); border-radius: 10px; }
+        #modal-msg-container::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, .7); }
+        #modal-msg-container { scrollbar-width: thin; scrollbar-color: rgba(56, 189, 248, .35) rgba(15, 23, 42, .6); }
     </style>
 </head>
 <body>
+
+    <!-- هدر با دکمه زنگوله -->
     <header>
-        <div class="logo"><div class="logo-icon">Z</div><div class="logo-text">ZENIX</div></div>
-        <div class="hr">
-            <div class="wrap"><button type="button" class="lb" id="bell-btn"><i class="fas fa-bell" style="color:#fbbf24"></i><span class="badge" id="bell-badge">0</span></button></div>
-            <div class="wrap"><button type="button" class="lb" id="help-btn" title="راهنمای صفحه تیم"><i class="fas fa-circle-question" style="color:#38bdf8"></i></button></div>
-            <a href="support.html" class="lb"><i class="fas fa-headset" style="color:#a855f7"></i></a>
-            <div class="wrap">
-                <button type="button" class="lb" id="lang-btn"><i class="fas fa-globe" style="color:#22c55e"></i></button>
-                <div class="menu" id="lang-menu">
-                    <div class="mi" data-lang="fa">فارسی</div><div class="mi" data-lang="en">English</div><div class="mi" data-lang="ar">العربية</div><div class="mi" data-lang="tr">Türkçe</div><div class="mi" data-lang="ru">Русский</div><div class="mi" data-lang="es">Español</div><div class="mi" data-lang="fr">Français</div><div class="mi" data-lang="de">Deutsch</div>
-                </div>
-            </div>
-            <div class="wrap">
-                <button type="button" class="lb" id="menu-btn"><i class="fas fa-bars" style="color:#f43f5e"></i></button>
-                <div class="menu" id="nav-menu">
-                    <a href="dashboard.html" class="mi"><i class="fas fa-home" style="color:#38bdf8"></i><span id="m1">صفحه اصلی</span></a>
-                    <a href="quantification.html" class="mi"><i class="fas fa-robot" style="color:#a855f7"></i><span id="m2">کوانتیفیکیشن</span></a>
-                    <a href="deposit.html" class="mi"><i class="fas fa-arrow-down" style="color:#22c55e"></i><span id="m3">واریز</span></a>
-                    <a href="receive.html" class="mi"><i class="fas fa-arrow-up" style="color:#fbbf24"></i><span id="m4">برداشت</span></a>
-                    <a href="team.html" class="mi active"><i class="fas fa-users" style="color:#ec4899"></i><span id="m_team">تیم من</span></a>
-                    <a href="transactions.html" class="mi"><i class="fas fa-history" style="color:#06b6d4"></i><span id="m5">تراکنش</span></a>
-                    <a href="profile.html" class="mi"><i class="fas fa-user-cog" style="color:#ec4899"></i><span id="m6">پروفایل</span></a>
-                    <a href="support.html" class="mi"><i class="fas fa-headset" style="color:#a855f7"></i><span id="m7">پشتیبانی</span></a>
-                    <a href="#" class="mi" onclick="window.openAboutModal();return false;"><i class="fas fa-info-circle" style="color:#38bdf8"></i><span id="m_about">درباره پلتفرم</span></a>
-                    <a href="index.html" class="mi" id="logout-btn" style="color:#ef4444"><i class="fas fa-power-off"></i><span id="m8">خروج</span></a>
-                </div>
-            </div>
+        <button class="lb" onclick="window.location.href='dashboard.html'"><i class="fas fa-arrow-right"></i></button>
+        <span class="header-title" id="t-header-title">مدیریت تیم و ارجاع</span>
+        <div class="wrap">
+            <button type="button" class="lb" id="bell-btn">
+                <i class="fas fa-bell" style="color:#fbbf24"></i>
+                <span class="badge" id="bell-badge">0</span>
+            </button>
         </div>
     </header>
 
-    <div class="c">
-        <div class="wel">
-            <div><h1 id="t-team-title">مدیریت تیم و پاداش</h1><p id="t-team-sub">دعوت از دوستان و کسب درآمد دلاری</p></div>
-            <div style="font-size:12px;background:rgba(56,189,248,.1);border:1px solid #38bdf8;padding:6px 10px;border-radius:6px;color:#38bdf8;font-weight:600;"><i class="fas fa-chart-line"></i> <span id="t-reward-lbl">کل پاداش:</span> <span id="total-commission">0.00</span> USDT</div>
+    <div class="container">
+        <!-- کارت لینک دعوت -->
+        <div class="card">
+            <div class="card-title"><i class="fas fa-link"></i> <span id="t-ref-title">لینک اختصاصی دعوت</span></div>
+            <p style="font-size: 11px; color: var(--text-secondary);" id="t-ref-desc">با اشتراک‌گذاری این لینک، از کمیسیون معامله‌های تیم خود در ۳ نسل بهره‌مند شوید.</p>
+            <div class="ref-box">
+                <input type="text" id="ref-url" class="ref-input" readonly value="در حال دریافت...">
+                <button class="btn-copy" onclick="copyRefLink()" id="t-copy-btn">کپی</button>
+            </div>
         </div>
-        
-        <div style="background:rgba(30,41,59,0.8);border:1px solid rgba(56,189,248,0.3);border-radius:12px;padding:16px;margin-top:12px;">
-            <div id="status-box" style="display:none;padding:12px;border-radius:8px;font-size:12px;margin-bottom:12px;text-align:center;font-weight:600;"></div>
-            
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;text-align:center;">
-                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;"><div style="font-size:11px;color:#94a3b8;margin-bottom:4px;" id="t-c1">اعضای کل تیم</div><div style="font-size:16px;color:#38bdf8;font-weight:bold;" id="team-count">0</div></div>
-                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;"><div style="font-size:11px;color:#94a3b8;margin-bottom:4px;" id="t-c2">حجم معاملات تیم</div><div style="font-size:16px;color:#22c55e;font-weight:bold;" id="team-volume">0.00$</div></div>
-                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;"><div style="font-size:11px;color:#94a3b8;margin-bottom:4px;" id="t-c3">کمیسیون امروز</div><div style="font-size:16px;color:#eab308;font-weight:bold;" id="team-daily">0.00$</div></div>
-            </div>
 
-            <div style="font-size:14px;color:#38bdf8;font-weight:bold;margin-bottom:10px;" id="t-gen-title"><i class="fas fa-layer-group"></i> آمار نسل‌های تیم</div>
-            <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
-                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;font-size:12px;">
-                    <div><span style="color:#38bdf8;font-weight:bold;" id="t-l1-lbl">نسل ۱ (۱۰٪):</span> <span id="lvl1-count">0</span> نفر</div>
-                    <div style="display:flex;align-items:center;gap:10px;"><div style="color:#22c55e;font-weight:bold;" id="lvl1-comm">0.00 USDT</div><a href="team-members.html?level=1" style="background:rgba(56,189,248,0.15);border:1px solid #38bdf8;color:#38bdf8;padding:4px 10px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:bold;"><i class="fas fa-eye"></i> مشاهده</a></div>
-                </div>
-                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;font-size:12px;">
-                    <div><span style="color:#38bdf8;font-weight:bold;" id="t-l2-lbl">نسل ۲ (۷٪):</span> <span id="lvl2-count">0</span> نفر</div>
-                    <div style="display:flex;align-items:center;gap:10px;"><div style="color:#22c55e;font-weight:bold;" id="lvl2-comm">0.00 USDT</div><a href="team-members.html?level=2" style="background:rgba(56,189,248,0.15);border:1px solid #38bdf8;color:#38bdf8;padding:4px 10px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:bold;"><i class="fas fa-eye"></i> مشاهده</a></div>
-                </div>
-                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;font-size:12px;">
-                    <div><span style="color:#38bdf8;font-weight:bold;" id="t-l3-lbl">نسل ۳ (۳٪):</span> <span id="lvl3-count">0</span> نفر</div>
-                    <div style="display:flex;align-items:center;gap:10px;"><div style="color:#22c55e;font-weight:bold;" id="lvl3-comm">0.00 USDT</div><a href="team-members.html?level=3" style="background:rgba(56,189,248,0.15);border:1px solid #38bdf8;color:#38bdf8;padding:4px 10px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:bold;"><i class="fas fa-eye"></i> مشاهده</a></div>
-                </div>
+        <!-- خلاصه آمار -->
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-lbl" id="t-total-members">کل اعضا</div>
+                <div class="stat-val" id="val-total-members">0</div>
             </div>
-
-            <div style="font-size:14px;color:#38bdf8;font-weight:bold;margin-bottom:10px;" id="t-invite-lbl"><i class="fas fa-link"></i> لینک دعوت اختصاصی شما</div>
-            <div style="display:flex;background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:8px;overflow:hidden;margin-bottom:16px;">
-                <input type="text" id="invite-link" value="" readonly style="width:100%;background:transparent;border:none;color:#f8fafc;padding:12px;font-size:13px;outline:none;direction:ltr;text-align:left;">
-                <button type="button" onclick="copyInviteLink()" style="background:linear-gradient(135deg,#38bdf8,#0284c7);border:none;color:#fff;padding:0 18px;cursor:pointer;font-weight:bold;font-size:13px;display:flex;align-items:center;gap:6px;white-space:nowrap;"><i class="fas fa-clone"></i> <span id="t-btn-copy">کپی لینک</span></button>
+            <div class="stat-box">
+                <div class="stat-lbl" id="t-total-volume">حجم تیم</div>
+                <div class="stat-val" id="val-total-volume">$0.00</div>
             </div>
+            <div class="stat-box">
+                <div class="stat-lbl" id="t-total-comm">پاداش دریافتی</div>
+                <div class="stat-val" id="val-total-comm" style="color: #22c55e;">$0.00</div>
+            </div>
+        </div>
 
-            <div style="background:rgba(30,41,59,0.5);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;font-size:11px;color:#94a3b8;line-height:1.6;">
-                <div style="color:#38bdf8;font-weight:bold;margin-bottom:6px;" id="t-rules-title"><i class="fas fa-info-circle"></i> قوانین کمیسیون تیم:</div>
-                <span id="t-rules-desc">* کمیسیون نسل ۱ معادل ۱۰٪، نسل ۲ معادل ۷٪ و نسل ۳ معادل ۳٪ از سود معاملات تیم است.<br>* پاداش‌ها به صورت روزانه و خودکار به موجودی حساب شما افزوده می‌شوند.</span>
+        <!-- لیست اعضای نسل‌ها -->
+        <div class="card">
+            <div class="gen-tabs">
+                <div class="gen-tab active" onclick="switchGen(1, this)" id="t-gen1">نسل اول (10%)</div>
+                <div class="gen-tab" onclick="switchGen(2, this)" id="t-gen2">نسل دوم (5%)</div>
+                <div class="gen-tab" onclick="switchGen(3, this)" id="t-gen3">نسل سوم (2%)</div>
+            </div>
+            <div id="members-list">
+                <div style="text-align: center; padding: 20px; color: var(--text-secondary); font-size: 12px;">در حال بارگذاری لیست اعضا...</div>
             </div>
         </div>
     </div>
 
-    <!-- مدال پیام‌ها -->
+    <!-- مودال صندوق پیام‌ها و اعلان‌ها با تب‌بندی و شمارنده -->
     <div class="modal" id="m-msg">
         <div class="modal-content">
-            <div class="modal-header"><span id="t-modal-title">صندوق پیام‌های مدیریت</span><button class="modal-close" onclick="window.closeMessageModal()"><i class="fas fa-times"></i></button></div>
+            <div class="modal-header">
+                <span id="t-modal-title"><i class="fas fa-bell"></i> صندوق پیام‌ها و اعلان‌ها</span>
+                <button class="modal-close" onclick="window.closeMessageModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="notif-tabs" id="notif-tabs">
+                <button type="button" class="notif-tab active" onclick="window.setNotifFilter('all', this)"><i class="fas fa-list"></i> <span id="t-tab-all">همه</span> <span class="tab-badge" id="cnt-tab-all">0</span></button>
+                <button type="button" class="notif-tab" onclick="window.setNotifFilter('approved', this)"><i class="fas fa-check-circle" style="color:#22c55e"></i> <span id="t-tab-approved">تایید درخواست</span> <span class="tab-badge" id="cnt-tab-approved">0</span></button>
+                <button type="button" class="notif-tab" onclick="window.setNotifFilter('rejected', this)"><i class="fas fa-times-circle" style="color:#ef4444"></i> <span id="t-tab-rejected">لغو درخواست</span> <span class="tab-badge" id="cnt-tab-rejected">0</span></button>
+                <button type="button" class="notif-tab" onclick="window.setNotifFilter('admin_message', this)"><i class="fas fa-bullhorn" style="color:#38bdf8"></i> <span id="t-tab-admin">پیام مدیریت</span> <span class="tab-badge" id="cnt-tab-admin">0</span></button>
+            </div>
             <div id="modal-msg-container"><div style="text-align:center;padding:20px;color:#94a3b8">هیچ پیام جدیدی وجود ندارد.</div></div>
         </div>
     </div>
 
-    <!-- مدال درباره پلتفرم -->
-    <div class="modal" id="m-about">
+    <!-- مودال مشاهده جزئیات پیام -->
+    <div class="modal" id="m-msg-detail" style="z-index:1050;">
         <div class="modal-content">
-            <div class="modal-header"><span id="t-about-title">درباره پلتفرم Zenix (هدف، ماهیت و ساختار)</span><button class="modal-close" onclick="window.closeAboutModal()"><i class="fas fa-times"></i></button></div>
-            <div style="overflow-y:auto;padding-right:4px">
-                <p style="font-size:13px;color:#cbd5e1;line-height:1.7;margin-bottom:10px;" id="t-ab-m-desc">پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.</p>
-                <ul style="font-size:12px;color:#94a3b8;padding-right:18px;line-height:1.7;margin-bottom:0;">
-                    <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l1t">هدف اصلی:</strong> <span id="t-ab-m-l1d">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li>
-                    <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l2t">امنیت و زیرساخت:</strong> <span id="t-ab-m-l2d">متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن.</span></li>
-                    <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l3t">ساختار چندسطحی (Referral & Team):</strong> <span id="t-ab-m-l3d">ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.</span></li>
-                    <li><strong style="color:#f8fafc;" id="t-ab-m-l4t">احساس واقع‌گرایی:</strong> <span id="t-ab-m-l4d">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.</span></li>
-                </ul>
+            <div class="modal-header">
+                <span id="detail-msg-title"><i class="fas fa-envelope-open"></i> مشاهده پیام</span>
+                <button class="modal-close" onclick="window.closeMsgDetailModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div style="overflow-y:auto;padding-right:6px">
+                <div id="detail-msg-date" style="font-size:11px;color:#94a3b8;direction:ltr;text-align:left;margin-bottom:10px;display:none;"></div>
+                <div id="detail-msg-body" style="font-size:13px;color:#cbd5e1;line-height:1.7;white-space:pre-wrap;margin-bottom:12px;"></div>
+                <div id="detail-msg-support"></div>
             </div>
         </div>
     </div>
 
-    <!-- مدال راهنما -->
-    <div class="modal" id="m-help">
-        <div class="modal-content">
-            <div class="modal-header"><span id="t-help-title">راهنمای صفحه تیم</span><button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button></div>
-            <div style="overflow-y:auto;padding-right:4px">
-                <div class="msg-body-box">
-                    <div class="msg-title-text" id="t-hp-t1"><i class="fas fa-users" style="color:#ec4899"></i> کاربرد این صفحه (مدیریت تیم) چیست؟</div>
-                    <div class="msg-desc-text" id="t-hp-d1">از این صفحه می‌توانید لینک دعوت اختصاصی خود را دریافت کرده و آمار و کمیسیون دریافتی از اعضای زیرمجموعه خود در ۳ نسل مختلف را مشاهده کنید.</div>
-                </div>
-                <div class="msg-body-box">
-                    <div class="msg-title-text" id="t-hp-t2"><i class="fas fa-layer-group" style="color:#38bdf8"></i> پاداش‌ها و نرخ کمیسیون نسل‌ها</div>
-                    <div class="msg-desc-text" id="t-hp-d2">سود دعوت دوستان در ۳ سطح محاسبه می‌شود: نسل اول ۱۰٪، نسل دوم ۷٪ و نسل سوم ۳٪ از سود معاملات زیرمجموعه‌ها می‌باشد.</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <footer>
-        <p>&copy; 2026 Zenix. All rights reserved.</p>
-    </footer>
-
+    <!-- اسکریپت‌های عمومی و کنترل‌های UI -->
     <script>
-        function safeGetItem(key) {
-            try { return localStorage.getItem(key); } catch(e) { return null; }
-        }
-        function safeSetItem(key, val) {
-            try { localStorage.setItem(key, val); } catch(e) {}
-        }
-        function safeRemoveItem(key) {
-            try { localStorage.removeItem(key); } catch(e) {}
-        }
-
-        const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
-        const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
-
-        // پشتیبانی ایمن از حافظه مرورگر جهت جلوگیری از خطای Tracking Prevention
-        const customStorage = {
-            getItem: (key) => safeGetItem(key),
-            setItem: (key, value) => safeSetItem(key, value),
-            removeItem: (key) => safeRemoveItem(key)
-        };
-
-        var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-            auth: {
-                persistSession: true,
-                storage: customStorage,
-                autoRefreshToken: true,
-                detectSessionInUrl: true
-            }
-        });
-
-        let currLang = safeGetItem('zenix_lang') || 'fa';
-        let allMessages = [];
-        let currentUserId = null;
-
-        function generateUIDDigits(userId) {
-            if (!userId) return '000000';
-            let hash = 5381;
-            let str = String(userId);
-            for (let i = 0; i < str.length; i++) {
-                hash = ((hash << 5) + hash) + str.charCodeAt(i);
-            }
-            const num = Math.abs(hash % 900000) + 100000;
-            return num.toString();
-        }
-
-        const ld = {
-            fa: {
-                m1: 'صفحه اصلی', m2: 'کوانتیفیکیشن', m3: 'واریز', m4: 'برداشت', m_team: 'تیم من', m5: 'تراکنش', m6: 'پروفایل', m7: 'پشتیبانی',
-                m_about: 'درباره پلتفرم', m8: 'خروج', modalTitle: 'صندوق پیام‌های مدیریت', noMsg: 'هیچ پیام جدیدی از طرف مدیریت وجود ندارد.',
-                backMsg: 'بازگشت به لیست پیام‌ها', newBadge: 'جدید', helpTitle: 'راهنمای صفحه تیم', helpBtnTitle: 'راهنمای صفحه تیم',
-                teamTitle: 'مدیریت تیم و پاداش', teamSub: 'دعوت از دوستان و کسب درآمد دلاری', rewardLbl: 'کل پاداش:',
-                c1: 'اعضای کل تیم', c2: 'حجم معاملات تیم', c3: 'کمیسیون امروز', genTitle: 'آمار نسل‌های تیم',
-                l1Lbl: 'نسل ۱ (۱۰٪):', l2Lbl: 'نسل ۲ (۷٪):', l3Lbl: 'نسل ۳ (۳٪):', inviteLbl: 'لینک دعوت اختصاصی شما', btnCopy: 'کپی لینک',
-                rulesTitle: 'قوانین کمیسیون تیم:',
-                rulesDesc: '* کمیسیون نسل ۱ معادل ۱۰٪، نسل ۲ معادل ۷٪ و نسل ۳ معادل ۳٪ از سود معاملات تیم است.<br>* پاداش‌ها به صورت روزانه و خودکار به موجودی حساب شما افزوده می‌شوند.',
-                hpT1: 'کاربرد این صفحه (مدیریت تیم) چیست؟', hpD1: 'از این صفحه می‌توانید لینک دعوت اختصاصی خود را دریافت کرده و آمار و کمیسیون دریافتی از اعضای زیرمجموعه خود در ۳ نسل مختلف را مشاهده کنید.',
-                hpT2: 'پاداش‌ها و نرخ کمیسیون نسل‌ها', hpD2: 'سود دعوت دوستان در ۳ سطح محاسبه می‌شود: نسل اول ۱۰٪، نسل دوم ۷٪ و نسل سوم ۳٪ از سود معاملات زیرمجموعه‌ها می‌باشد.',
-                abTitle: 'درباره پلتفرم Zenix (هدف، ماهیت و ساختار)',
-                abDesc: 'پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.',
-                abL1T: 'هدف اصلی:', abL1D: 'اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.',
-                abL2T: 'امنیت و زیرساخت:', abL2D: 'متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن.',
-                abL3T: 'ساختار چندسطحی (Referral & Team):', abL3D: 'ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.',
-                abL4T: 'احساس واقع‌گرایی:', abL4D: 'وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.'
-            },
-            en: {
-                m1: 'Home', m2: 'Quantification', m3: 'Deposit', m4: 'Withdraw', m_team: 'My Team', m5: 'Transactions', m6: 'Profile', m7: 'Support',
-                m_about: 'About Platform', m8: 'Logout', modalTitle: 'Admin Messages', noMsg: 'No new messages from admin.',
-                backMsg: 'Back to Messages List', newBadge: 'NEW', helpTitle: 'Team Page Guide', helpBtnTitle: 'Team Page Guide',
-                teamTitle: 'Team Management & Rewards', teamSub: 'Invite friends and earn USD passive income', rewardLbl: 'Total Rewards:',
-                c1: 'Total Team Members', c2: 'Team Trading Volume', c3: 'Today Commission', genTitle: 'Team Generations Stats',
-                l1Lbl: 'Gen 1 (10%):', l2Lbl: 'Gen 2 (7%):', l3Lbl: 'Gen 3 (3%):', inviteLbl: 'Your Exclusive Referral Link', btnCopy: 'Copy Link',
-                rulesTitle: 'Team Commission Rules:',
-                rulesDesc: '* Gen 1 commission is 10%, Gen 2 is 7%, and Gen 3 is 3% of team trading profit.<br>* Rewards are automatically added to your wallet balance daily.',
-                hpT1: 'What is this page for?', hpD1: 'From this page you can get your exclusive referral link and view member counts and commissions from 3 team generations.',
-                hpT2: 'Generation Commission Rates', hpD2: 'Referral rewards are calculated in 3 tiers: Gen 1 (10%), Gen 2 (7%), and Gen 3 (3%) of team trading profit.',
-                abTitle: 'About Zenix Platform (Goal, Nature & Structure)',
-                abDesc: 'Zenix Platform is an innovative financial ecosystem in cryptocurrency and trading processing designed for a secure, automated, and profitable user experience.',
-                abL1T: 'Main Goal:', abL1D: 'Automating trading processes via AI systems and quantification algorithms, enabling users to profit from market fluctuations without complex trading expertise.',
-                abL2T: 'Security & Infrastructure:', abL2D: 'Backed by advanced encryption protocols, high-speed cloud processing nodes, and secure cloud database storage.',
-                abL3T: 'Multi-level Structure (Referral & Team):', abL3D: 'Creating a dynamic referral network so users receive multi-level rewards and sustainable passive income from team activity.',
-                abL4T: 'Realism & Live Data:', abL4D: 'Live crypto ticker, volume indicators, network gas fees, and system notices ensure users interact with an active global platform.'
-            }
-        };
-
-        async function fetchUserMessages(uid) {
-            try {
-                const { data } = await supabaseClient.from('notifications').select('*').eq('user_id', uid).order('created_at', { ascending: false });
-                return (data || []).map(dt => ({
-                    id: dt.id,
-                    subject: dt.title || dt.subject || 'Announcement',
-                    body: dt.message || dt.text || dt.body || '',
-                    time: dt.created_at || new Date().toISOString(),
-                    read: dt.read === true || dt.is_read === true
-                }));
-            } catch (e) {
-                return [];
-            }
-        }
-
-        window.openMessageModal = async () => {
-            let c = document.getElementById('modal-msg-container'), t = ld[currLang] || ld.fa;
-            if (currentUserId) {
-                allMessages = await fetchUserMessages(currentUserId);
-                let unread = allMessages.filter(m => !m.read).length, b = document.getElementById('bell-badge');
-                if (b) { b.textContent = unread; b.classList.toggle('show', unread > 0); }
-            }
-            if (allMessages.length > 0) renderMessageList();
-            else c.innerHTML = `<div style="text-align:center;padding:20px;color:#94a3b8">${t.noMsg}</div>`;
-            document.getElementById('m-msg')?.classList.add('show');
-        };
-
-        function renderMessageList() {
-            let c = document.getElementById('modal-msg-container'), t = ld[currLang] || ld.fa, html = '<div style="display:flex;flex-direction:column;gap:10px;">';
-            allMessages.forEach((m, idx) => {
-                let dTime = m.time || '';
-                let unread = !m.read;
-                html += `<div class="msg-body-box" style="cursor:pointer;border-right:${unread ? '3px solid #38bdf8' : '1px solid rgba(255,255,255,.08)'};" onclick="window.readAdminMessage(${idx})">
-                    <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <div class="msg-title-text" style="${unread ? 'color:#fff;font-weight:800;' : ''}"><i class="fas fa-envelope${unread ? '' : '-open'}-text" style="color:#38bdf8;margin-left:5px;"></i> ${m.subject}</div>
-                        ${unread ? `<span style="font-size:9px;background:#38bdf8;color:#0f172a;padding:2px 6px;border-radius:4px;font-weight:700;">${t.newBadge}</span>` : ''}
-                    </div>
-                    <div class="msg-desc-text" style="margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${m.body}</div>
-                    <div style="font-size:10px;color:#64748b;margin-top:6px;text-align:left" dir="ltr">${dTime}</div>
-                </div>`;
-            });
-            c.innerHTML = html + '</div>';
-        }
-
-        window.readAdminMessage = async idx => {
-            let m = allMessages[idx]; if (!m) return;
-            allMessages[idx].read = true;
-            if (currentUserId && m.id) {
-                try {
-                    await supabaseClient.from('notifications').update({ read: true, is_read: true }).eq('id', m.id);
-                } catch(e) {}
-            }
-            let unread = allMessages.filter(i => !i.read).length, b = document.getElementById('bell-badge');
-            if (b) { b.textContent = unread; b.classList.toggle('show', unread > 0); }
-
-            let c = document.getElementById('modal-msg-container'), t = ld[currLang] || ld.fa, dTime = m.time || '';
-            c.innerHTML = `<button onclick="window.openMessageModal()" style="background:none;border:none;color:#38bdf8;cursor:pointer;font-size:12px;margin-bottom:12px;display:flex;align-items:center;gap:5px;padding:0;"><i class="fas fa-arrow-right"></i> ${t.backMsg}</button>
-            <div class="msg-body-box" style="padding:16px;">
-                <div class="msg-title-text" style="font-size:15px;margin-bottom:8px;"><i class="fas fa-envelope-open-text" style="color:#38bdf8;"></i> ${m.subject}</div>
-                <div class="msg-desc-text" style="font-size:13px;line-height:1.8;color:#f8fafc;white-space:pre-wrap;">${m.body}</div>
-                <div style="font-size:11px;color:#64748b;margin-top:14px;text-align:left;border-top:1px solid rgba(255,255,255,.05);padding-top:8px;" dir="ltr">${dTime}</div>
-            </div>`;
-        };
-
+        // کنترل مودال اعلان‌ها
+        window.openMessageModal = () => document.getElementById('m-msg')?.classList.add('show');
         window.closeMessageModal = () => document.getElementById('m-msg')?.classList.remove('show');
-        window.closeHelpModal = () => document.getElementById('m-help')?.classList.remove('show');
-        window.closeAboutModal = () => document.getElementById('m-about')?.classList.remove('show');
 
-        window.openHelpModal = () => document.getElementById('m-help')?.classList.add('show');
-        window.openAboutModal = () => document.getElementById('m-about')?.classList.add('show');
+        const bellBtn = document.getElementById('bell-btn');
+        if (bellBtn) bellBtn.onclick = (e) => { e.stopPropagation(); window.openMessageModal(); };
 
-        document.getElementById('bell-btn')?.addEventListener('click', e => { e.stopPropagation(); window.openMessageModal(); });
-        document.getElementById('help-btn')?.addEventListener('click', e => { e.stopPropagation(); window.openHelpModal(); });
-
-        const mBtn = document.getElementById('menu-btn'), nMenu = document.getElementById('nav-menu'), lBtn = document.getElementById('lang-btn'), lMenu = document.getElementById('lang-menu');
-        function toggleM(m, e) { e?.stopPropagation(); [nMenu, lMenu].forEach(x => { if (x && x !== m) x.classList.remove('show'); }); m?.classList.toggle('show'); }
-        mBtn?.addEventListener('click', e => toggleM(nMenu, e));
-        lBtn?.addEventListener('click', e => toggleM(lMenu, e));
-        document.addEventListener('click', e => {
-            if (!e.target.closest('.menu') && !e.target.closest('#menu-btn') && !e.target.closest('#lang-btn')) {
-                [nMenu, lMenu].forEach(x => x?.classList.remove('show'));
+        // دیکشنری چند زبانه
+        const LD = {
+            fa: {
+                headerTitle: 'مدیریت تیم و ارجاع',
+                refTitle: 'لینک اختصاصی دعوت',
+                refDesc: 'با اشتراک‌گذاری این لینک، از کمیسیون معامله‌های تیم خود در ۳ نسل بهره‌مند شوید.',
+                copyBtn: 'کپی',
+                totalMembers: 'کل اعضا',
+                totalVolume: 'حجم تیم',
+                totalComm: 'پاداش دریافتی',
+                gen1: 'نسل اول (10%)',
+                gen2: 'نسل دوم (5%)',
+                gen3: 'نسل سوم (2%)',
+                modalTitle: 'صندوق پیام‌ها و اعلان‌ها',
+                tabAll: 'همه',
+                tabApproved: 'تایید درخواست',
+                tabRejected: 'لغو درخواست',
+                tabAdmin: 'پیام مدیریت',
+                noMsg: 'هیچ پیام جدیدی وجود ندارد.'
             }
-        });
+        };
 
-        async function loadTeamData(uid, sessionUser) {
-            try {
-                let codeDigits = generateUIDDigits(uid);
-                let myRefCode = 'MS-' + codeDigits;
-
-                try {
-                    const { data: myProfile } = await supabaseClient
-                        .from('profiles')
-                        .select('referral_code')
-                        .eq('id', uid)
-                        .maybeSingle();
-
-                    if (myProfile && myProfile.referral_code) {
-                        myRefCode = myProfile.referral_code;
-                    }
-                } catch(e) {
-                    console.log("خطا در دریافت کد دعوت از پروفایل:", e);
-                }
-
-                const inviteInput = document.getElementById('invite-link');
-                if (inviteInput) {
-                    const fullInviteUrl = new URL(`register.html?ref=${myRefCode}`, window.location.href).href;
-                    inviteInput.value = fullInviteUrl;
-                }
-
-                let rawList = [];
-
-                try {
-                    const { data: dbProfiles } = await supabaseClient
-                        .from('profiles')
-                        .select('*');
-                    
-                    if (dbProfiles && Array.isArray(dbProfiles)) {
-                        rawList.push(...dbProfiles);
-                    }
-                } catch(e) {
-                    console.log("خطا در دریافت لیست اعضا از دیتابیس:", e);
-                }
-
-                if (sessionUser && sessionUser.user_metadata) {
-                    let metaTeam = sessionUser.user_metadata.team_members || sessionUser.user_metadata.referrals || sessionUser.user_metadata.invited_users;
-                    if (Array.isArray(metaTeam)) rawList.push(...metaTeam);
-                }
-
-                ['zenix_registered_users', 'zenix_users', 'zenix_referrals', 'zenix_team_' + uid, 'zenix_all_users'].forEach(k => {
-                    let item = safeGetItem(k);
-                    if (item) {
-                        try {
-                            let parsed = JSON.parse(item);
-                            if (Array.isArray(parsed)) rawList.push(...parsed);
-                            else if (parsed && typeof parsed === 'object') rawList.push(parsed);
-                        } catch(e) {}
-                    }
-                });
-
-                let uniqueMap = new Map();
-                rawList.forEach(u => {
-                    if (u) {
-                        let key = u.user_id || u.id || u.email || u.username || JSON.stringify(u);
-                        uniqueMap.set(key, u);
-                    }
-                });
-                let allProfiles = Array.from(uniqueMap.values());
-
-                function isReferredBy(u, refUid, refCodeVal) {
-                    if (!u) return false;
-                    let uUid = u.user_id || u.id;
-                    if (uUid === refUid) return false;
-
-                    let digits = generateUIDDigits(refUid);
-                    let defaultCode = 'MS-' + digits;
-                    let legacyCode = 'SM-' + digits;
-
-                    let refs = [
-                        u.referred_by,
-                        u.referrer_id,
-                        u.invitation_code,
-                        u.ref_code,
-                        u.inviter,
-                        u.referral_code,
-                        u.ref
-                    ].map(x => x ? String(x).trim().toUpperCase() : '');
-
-                    const targetCodes = [
-                        String(refUid).toUpperCase(),
-                        defaultCode.toUpperCase(),
-                        legacyCode.toUpperCase(),
-                        digits.toUpperCase()
-                    ];
-                    if (refCodeVal) targetCodes.push(String(refCodeVal).toUpperCase());
-
-                    return refs.some(r => r && targetCodes.includes(r));
-                }
-
-                let lvl1Users = allProfiles.filter(u => isReferredBy(u, uid, myRefCode));
-
-                let lvl2Users = [];
-                if (lvl1Users.length > 0) {
-                    lvl2Users = allProfiles.filter(u => {
-                        let uUid = u.user_id || u.id;
-                        if (uUid === uid || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid)) return false;
-                        return lvl1Users.some(l1 => isReferredBy(u, l1.user_id || l1.id, l1.referral_code));
-                    });
-                }
-
-                let lvl3Users = [];
-                if (lvl2Users.length > 0) {
-                    lvl3Users = allProfiles.filter(u => {
-                        let uUid = u.user_id || u.id;
-                        if (uUid === uid || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid) || lvl2Users.some(l2 => (l2.user_id || l2.id) === uUid)) return false;
-                        return lvl2Users.some(l2 => isReferredBy(u, l2.user_id || l2.id, l2.referral_code));
-                    });
-                }
-
-                let l1Count = lvl1Users.length;
-                let l2Count = lvl2Users.length;
-                let l3Count = lvl3Users.length;
-
-                if (l1Count === 0 && sessionUser && sessionUser.user_metadata) {
-                    let directCount = sessionUser.user_metadata.referral_count || sessionUser.user_metadata.invited_count || 0;
-                    if (Number(directCount) > 0) {
-                        l1Count = Number(directCount);
-                    }
-                }
-
-                let totalCount = l1Count + l2Count + l3Count;
-
-                document.getElementById('lvl1-count').textContent = l1Count;
-                document.getElementById('lvl2-count').textContent = l2Count;
-                document.getElementById('lvl3-count').textContent = l3Count;
-                document.getElementById('team-count').textContent = totalCount;
-
-                let l1Comm = lvl1Users.reduce((sum, u) => sum + Number(u.commission || u.l1_commission || u.reward || 0), 0);
-                let l2Comm = lvl2Users.reduce((sum, u) => sum + Number(u.commission || u.l2_commission || u.reward || 0), 0);
-                let l3Comm = lvl3Users.reduce((sum, u) => sum + Number(u.commission || u.l3_commission || u.reward || 0), 0);
-                let totalComm = l1Comm + l2Comm + l3Comm;
-
-                let teamVol = [...lvl1Users, ...lvl2Users, ...lvl3Users].reduce((sum, u) => sum + Number(u.volume || u.trading_volume || 0), 0);
-                let teamDaily = [...lvl1Users, ...lvl2Users, ...lvl3Users].reduce((sum, u) => sum + Number(u.daily_commission || u.today_commission || 0), 0);
-
-                document.getElementById('lvl1-comm').textContent = `${l1Comm.toFixed(2)} USDT`;
-                document.getElementById('lvl2-comm').textContent = `${l2Comm.toFixed(2)} USDT`;
-                document.getElementById('lvl3-comm').textContent = `${l3Comm.toFixed(2)} USDT`;
-                document.getElementById('total-commission').textContent = totalComm.toFixed(2);
-
-                document.getElementById('team-volume').textContent = `${teamVol.toFixed(2)}$`;
-                document.getElementById('team-daily').textContent = `${teamDaily.toFixed(2)}$`;
-
-            } catch (err) {
-                console.error("Error loading team stats:", err);
-            }
-        }
-
-        supabaseClient.auth.onAuthStateChange(async (event, session) => {
-            if (session && session.user) {
-                currentUserId = session.user.id;
-                loadTeamData(session.user.id, session.user);
-
-                fetchUserMessages(session.user.id).then(msgs => {
-                    allMessages = msgs;
-                    let unread = allMessages.filter(m => !m.read).length, b = document.getElementById('bell-badge');
-                    if (b && unread > 0) { b.textContent = unread; b.classList.add('show'); }
-                });
-            } else {
-                window.location.href = "index.html";
-            }
-        });
-
-        function setLang(l) {
-            currLang = l;
-            safeSetItem('zenix_lang', l);
-            let t = ld[l] || ld.fa;
-            let r = l === 'fa' || l === 'ar';
-            
-            document.documentElement.setAttribute('dir', r ? 'rtl' : 'ltr');
-            document.documentElement.setAttribute('lang', l);
-
-            for (let i = 1; i <= 8; i++) {
-                let m = document.getElementById('m' + i);
-                if (m) m.textContent = t['m' + i] || '';
-            }
-
-            let mTeam = document.getElementById('m_team');
-            if (mTeam) mTeam.textContent = t.m_team;
+        function setLang(lang = 'fa') {
+            const t = LD[lang] || LD.fa;
+            document.getElementById('t-header-title').innerText = t.headerTitle;
+            document.getElementById('t-ref-title').innerText = t.refTitle;
+            document.getElementById('t-ref-desc').innerText = t.refDesc;
+            document.getElementById('t-copy-btn').innerText = t.copyBtn;
+            document.getElementById('t-total-members').innerText = t.totalMembers;
+            document.getElementById('t-total-volume').innerText = t.totalVolume;
+            document.getElementById('t-total-comm').innerText = t.totalComm;
+            document.getElementById('t-gen1').innerText = t.gen1;
+            document.getElementById('t-gen2').innerText = t.gen2;
+            document.getElementById('t-gen3').innerText = t.gen3;
 
             let elModalTitle = document.getElementById('t-modal-title');
-            if (elModalTitle) elModalTitle.textContent = t.modalTitle;
+            if (elModalTitle && t.modalTitle) elModalTitle.innerHTML = `<i class="fas fa-bell"></i> ${t.modalTitle}`;
 
-            let elAbout = document.getElementById('m_about');
-            if (elAbout) elAbout.textContent = t.m_about;
+            const tabMap = {
+                't-tab-all': t.tabAll,
+                't-tab-approved': t.tabApproved,
+                't-tab-rejected': t.tabRejected,
+                't-tab-admin': t.tabAdmin
+            };
+            Object.keys(tabMap).forEach(id => {
+                const el = document.getElementById(id);
+                if (el && tabMap[id]) el.textContent = tabMap[id];
+            });
+        }
 
-            let helpBtn = document.getElementById('help-btn');
-            if (helpBtn) helpBtn.setAttribute('title', t.helpBtnTitle || '');
+        function copyRefLink() {
+            const copyText = document.getElementById("ref-url");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value);
+            alert("لینک دعوت با موفقیت کپی شد.");
+        }
 
-            let elHelpTitle = document.getElementById('t-help-title');
-            if (elHelpTitle) elHelpTitle.textContent = t.helpTitle;
+        let currentActiveGen = 1;
+        function switchGen(gen, el) {
+            currentActiveGen = gen;
+            document.querySelectorAll('.gen-tab').forEach(t => t.classList.remove('active'));
+            if (el) el.classList.add('active');
+            if (window.renderTeamMembers) window.renderTeamMembers(gen);
+        }
 
-            ['t-team-title', 't-team-sub', 't-reward-lbl', 't-c1', 't-c2', 't-c3', 't-gen-title', 't-l1-lbl', 't-l2-lbl', 't-l3-lbl', 't-invite-lbl', 't-btn-copy', 't-rules-title'].forEach(key => {
-                let shortKey = key.replace('t-', '').replace(/-([a-z])/g, g => g[1].toUpperCase());
-                let el = document.getElementById(key);
-                if (el && t[shortKey]) el.textContent = t[shortKey];
+        document.addEventListener('DOMContentLoaded', () => setLang('fa'));
+    </script>
+
+    <!-- اسکریپت اصلی Supabase و مدیریت اعلان‌ها/تیم -->
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // ==========================================
+        // متغیرها و توابع مدیریت اعلان‌ها (کاملاً عیناً هماهنگ‌شده با کوانتیفیکیشن)
+        // ==========================================
+        window.cachedNotifications = [];
+        window.currentFilteredNotifs = [];
+        window.activeNotifFilter = 'all';
+        window.actualUserKeys = [];
+
+        window.formatGregorianDate = function(rawDate) {
+            if (!rawDate) return '';
+            const d = new Date(rawDate);
+            if (isNaN(d.getTime())) return '';
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            const hours = String(d.getHours()).padStart(2, '0');
+            const minutes = String(d.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}`;
+        };
+
+        window.getNotifCategory = function(n) {
+            const type = (n.type || '').toLowerCase();
+            const title = (n.title || '').toLowerCase();
+
+            if (type.includes('approved') || type.includes('confirm') || title.includes('تایید') || title.includes('موفق') || title.includes('شارژ شد')) {
+                return 'approved';
+            }
+            if (type.includes('rejected') || type.includes('canceled') || type.includes('cancel') || title.includes('رد') || title.includes('لغو') || title.includes('ناموفق')) {
+                return 'rejected';
+            }
+            return 'admin_message';
+        };
+
+        window.updateTabBadges = function() {
+            const notifs = window.cachedNotifications || [];
+            const allCount = notifs.length;
+            let approvedCount = 0;
+            let rejectedCount = 0;
+            let adminCount = 0;
+
+            notifs.forEach(n => {
+                const cat = window.getNotifCategory(n);
+                if (cat === 'approved') approvedCount++;
+                else if (cat === 'rejected') rejectedCount++;
+                else if (cat === 'admin_message') adminCount++;
             });
 
-            let elRulesDesc = document.getElementById('t-rules-desc');
-            if (elRulesDesc && t.rulesDesc) elRulesDesc.innerHTML = t.rulesDesc;
+            const elAll = document.getElementById('cnt-tab-all');
+            const elApproved = document.getElementById('cnt-tab-approved');
+            const elRejected = document.getElementById('cnt-tab-rejected');
+            const elAdmin = document.getElementById('cnt-tab-admin');
 
-            for (let i = 1; i <= 2; i++) {
-                let ht = document.getElementById('t-hp-t' + i);
-                let hd = document.getElementById('t-hp-d' + i);
-                if (ht && t['hpT' + i]) ht.innerHTML = `<i class="fas ${i===1?'fa-users':'fa-layer-group'}" style="color:${i===1?'#ec4899':'#38bdf8'}"></i> ` + t['hpT' + i];
-                if (hd && t['hpD' + i]) hd.textContent = t['hpD' + i];
+            if (elAll) elAll.innerText = allCount;
+            if (elApproved) elApproved.innerText = approvedCount;
+            if (elRejected) elRejected.innerText = rejectedCount;
+            if (elAdmin) elAdmin.innerText = adminCount;
+        };
+
+        window.updateBellBadge = function() {
+            const unreadCount = window.cachedNotifications.filter(n => !n.read && !n.isRead && !n.is_read).length;
+            const badge = document.getElementById('bell-badge');
+            if (badge) {
+                badge.innerText = unreadCount;
+                if (unreadCount > 0) badge.classList.add('show');
+                else badge.classList.remove('show');
+            }
+            window.updateTabBadges();
+        };
+
+        window.setNotifFilter = function(filter, element) {
+            window.activeNotifFilter = filter;
+            const tabs = document.querySelectorAll('#notif-tabs .notif-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            if (element) {
+                element.classList.add('active');
+            }
+            
+            window.renderNotifications();
+        };
+
+        window.closeMsgDetailModal = function() {
+            const modal = document.getElementById('m-msg-detail');
+            if (modal) modal.classList.remove('show');
+        };
+
+        window.openMsgDetail = async function(idx) {
+            const n = window.currentFilteredNotifs[idx];
+            if (!n) return;
+
+            const isUnread = !n.read && !n.isRead && !n.is_read;
+
+            if (isUnread) {
+                n.is_read = true;
+                n.read = true;
+                n.isRead = true;
+
+                window.updateBellBadge();
+                window.renderNotifications();
+
+                try {
+                    const { data, error } = await supabase
+                        .from('notifications')
+                        .update({ is_read: true })
+                        .eq('id', n.id)
+                        .select();
+
+                    if (error) {
+                        console.warn('خطا در ستون is_read، تلاش برای ثبت در ستون read:', error);
+                        const res2 = await supabase
+                            .from('notifications')
+                            .update({ read: true })
+                            .eq('id', n.id);
+                            
+                        if (res2.error) {
+                            console.warn('خطا در ستون read، تلاش برای ثبت در ستون isRead:', res2.error);
+                            await supabase
+                                .from('notifications')
+                                .update({ isRead: true })
+                                .eq('id', n.id);
+                        }
+                    }
+                } catch (err) {
+                    console.error('خطای ارتباط با Supabase در به‌روزرسانی اعلان:', err);
+                }
             }
 
-            ['t-about-title'].forEach(id => { let el = document.getElementById(id); if (el) el.textContent = t.abTitle; });
-            ['t-ab-m-desc'].forEach(id => { let el = document.getElementById(id); if (el) el.textContent = t.abDesc; });
+            const title = n.title || 'پیام سیستم';
+            const msg = n.message || n.text || n.body || '';
+            const category = window.getNotifCategory(n);
+            const dateStr = window.formatGregorianDate(n.created_at || n.date || n.created_date);
 
-            for (let i = 1; i <= 4; i++) {
-                let elT = document.getElementById('t-ab-m-l' + i + 't');
-                let elD = document.getElementById('t-ab-m-l' + i + 'd');
-                if (elT) elT.textContent = t['abL' + i + 'T'];
-                if (elD) elD.textContent = t['abL' + i + 'D'];
+            const detailTitle = document.getElementById('detail-msg-title');
+            const detailDate = document.getElementById('detail-msg-date');
+            const detailBody = document.getElementById('detail-msg-body');
+            const detailSupport = document.getElementById('detail-msg-support');
+
+            if (detailTitle) detailTitle.innerHTML = `<i class="fas fa-bell" style="color:#38bdf8"></i> ${title}`;
+            
+            if (detailDate) {
+                if (dateStr) {
+                    detailDate.innerHTML = `<i class="far fa-clock" style="color:#38bdf8;margin-right:4px;"></i>${dateStr}`;
+                    detailDate.style.display = 'block';
+                } else {
+                    detailDate.style.display = 'none';
+                }
+            }
+
+            if (detailBody) detailBody.innerText = msg;
+
+            if (detailSupport) {
+                if (category === 'rejected') {
+                    detailSupport.innerHTML = `
+                    <div style="margin-top:15px;padding-top:10px;border-top:1px dashed rgba(239,68,68,0.3);display:flex;justify-content:flex-end;">
+                        <a href="support.html" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);" style="display:inline-flex;align-items:center;gap:6px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f8fafc;padding:6px 12px;border-radius:6px;font-size:12px;text-decoration:none;font-weight:600;transition:0.2s;">
+                            <i class="fas fa-headset" style="color:#ef4444;"></i>
+                            <span>پیگیری از طریق پشتیبانی</span>
+                        </a>
+                    </div>`;
+                } else {
+                    detailSupport.innerHTML = '';
+                }
+            }
+
+            document.getElementById('m-msg-detail')?.classList.add('show');
+        };
+
+        window.renderNotifications = function() {
+            window.updateTabBadges();
+            const container = document.getElementById('modal-msg-container');
+            if (!container) return;
+
+            const filter = window.activeNotifFilter;
+            const filtered = window.cachedNotifications.filter(n => {
+                if (filter === 'all') return true;
+                return window.getNotifCategory(n) === filter;
+            });
+
+            window.currentFilteredNotifs = filtered;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div style="text-align:center;padding:25px;color:#94a3b8;font-size:12px;"><i class="fas fa-inbox" style="font-size:24px;margin-bottom:8px;display:block;opacity:0.5;"></i>هیچ پیامی در این دسته‌بندی وجود ندارد.</div>`;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach((n, idx) => {
+                const title = n.title || 'پیام سیستم';
+                const category = window.getNotifCategory(n);
+                const isUnread = !n.read && !n.isRead && !n.is_read;
+                const dateStr = window.formatGregorianDate(n.created_at || n.date || n.created_date);
+
+                let borderStyle = "border:1px solid rgba(255,255,255,.08);";
+                let bgStyle = "background:rgba(255,255,255,.02);";
+                let icon = '<i class="fas fa-bullhorn" style="color:#38bdf8"></i>';
+                let tagHtml = '<span style="font-size:10px;background:rgba(56,189,248,0.2);color:#38bdf8;padding:2px 6px;border-radius:4px;font-weight:700;">پیام مدیریت</span>';
+
+                if (category === 'approved') {
+                    borderStyle = isUnread ? "border:1px solid rgba(34, 197, 94, 0.6);" : "border:1px solid rgba(34, 197, 94, 0.2);";
+                    bgStyle = isUnread ? "background:rgba(34, 197, 94, 0.12);" : "background:rgba(34, 197, 94, 0.03);";
+                    icon = '<i class="fas fa-check-circle" style="color:#22c55e"></i>';
+                    tagHtml = '<span style="font-size:10px;background:rgba(34,197,94,0.2);color:#22c55e;padding:2px 6px;border-radius:4px;font-weight:700;">تایید درخواست</span>';
+                } else if (category === 'rejected') {
+                    borderStyle = isUnread ? "border:1px solid rgba(239, 68, 68, 0.6);" : "border:1px solid rgba(239, 68, 68, 0.2);";
+                    bgStyle = isUnread ? "background:rgba(239, 68, 68, 0.12);" : "background:rgba(239, 68, 68, 0.03);";
+                    icon = '<i class="fas fa-times-circle" style="color:#ef4444"></i>';
+                    tagHtml = '<span style="font-size:10px;background:rgba(239,68,68,0.2);color:#ef4444;padding:2px 6px;border-radius:4px;font-weight:700;">لغو درخواست</span>';
+                } else {
+                    bgStyle = isUnread ? "background:rgba(56, 189, 248, 0.12);" : "background:rgba(255, 255, 255, 0.02);";
+                    borderStyle = isUnread ? "border:1px solid rgba(56, 189, 248, 0.5);" : "border:1px solid rgba(255, 255, 255, 0.08);";
+                }
+
+                const opacityStyle = isUnread ? "opacity:1;" : "opacity:0.65;";
+                const unreadDot = isUnread ? `<span style="width:7px;height:7px;background:#38bdf8;border-radius:50%;display:inline-block;box-shadow:0 0 6px #38bdf8;"></span>` : '';
+
+                html += `<div class="msg-body-box" onclick="window.openMsgDetail(${idx})" style="${borderStyle} ${bgStyle} ${opacityStyle} cursor:pointer;margin-bottom:8px;padding:10px;border-radius:10px;transition:0.2s;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            ${icon}
+                            <strong style="font-size:12px;color:#f8fafc;">${title}</strong>
+                            ${unreadDot}
+                        </div>
+                        ${tagHtml}
+                    </div>
+                    ${dateStr ? `<div style="font-size:10px;color:#94a3b8;direction:ltr;text-align:left;margin-bottom:4px;"><i class="far fa-clock" style="margin-right:2px;"></i>${dateStr}</div>` : ''}
+                </div>`;
+            });
+
+            container.innerHTML = html;
+        };
+
+        async function fetchNotifications(userId, userKeys = []) {
+            try {
+                let query = supabase
+                    .from('notifications')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (userKeys && userKeys.length > 0) {
+                    const orConditions = userKeys.map(k => `user_id.eq.${k}`).join(',');
+                    query = query.or(orConditions);
+                } else if (userId) {
+                    query = query.eq('user_id', userId);
+                }
+
+                const { data, error } = await query;
+                if (error) {
+                    console.warn('خطا در دریافت اعلان‌ها:', error);
+                    return;
+                }
+
+                window.cachedNotifications = data || [];
+                window.updateBellBadge();
+                window.renderNotifications();
+            } catch (err) {
+                console.error('خطای عدم دسترسی به اعلان‌ها:', err);
             }
         }
 
-        document.querySelectorAll('#lang-menu .mi').forEach(i => i.addEventListener('click', () => setLang(i.dataset.lang)));
+        // ==========================================
+        // بارگذاری داده‌های تیم و مقداردهی اولیه
+        // ==========================================
+        let teamData = { gen1: [], gen2: [], gen3: [] };
 
-        document.getElementById('logout-btn')?.addEventListener('click', async e => {
-            e.preventDefault();
-            try { await supabaseClient.auth.signOut(); } catch(e) {}
-            window.location.href = 'index.html';
-        });
+        window.renderTeamMembers = function(gen) {
+            const listEl = document.getElementById('members-list');
+            const members = teamData[`gen${gen}`] || [];
+            
+            if (members.length === 0) {
+                listEl.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-secondary); font-size: 12px;">عضوی در این نسل یافت نشد.</div>`;
+                return;
+            }
 
-        window.showMsg = function(text, isErr) {
-            const box = document.getElementById('status-box');
-            if(!box) return;
-            box.style.display = 'block';
-            box.style.background = isErr ? 'rgba(239,68,68,0.15)' : 'rgba(34,197,94,0.15)';
-            box.style.border = isErr ? '#ef4444' : '1px solid #22c55e';
-            box.style.color = isErr ? '#ef4444' : '#22c55e';
-            box.innerHTML = text;
+            let html = '';
+            members.forEach(m => {
+                html += `
+                <div class="member-item">
+                    <div>
+                        <strong style="color: #fff;">${m.email || m.uid || 'کاربر'}</strong>
+                        <div style="font-size: 10px; color: var(--text-secondary);">${m.created_at ? window.formatGregorianDate(m.created_at) : ''}</div>
+                    </div>
+                    <div style="text-align: left;">
+                        <span style="color: var(--accent-color); font-weight: bold;">$${(m.volume || 0).toFixed(2)}</span>
+                    </div>
+                </div>`;
+            });
+            listEl.innerHTML = html;
         };
 
-        window.copyInviteLink = function() {
-            const c = document.getElementById("invite-link");
-            if(!c || !c.value) return;
-            c.select();
-            navigator.clipboard.writeText(c.value);
-            window.showMsg("📋 لینک دعوت اختصاصی شما با موفقیت در کلیپ‌بورد کپی شد.", false);
-        };
+        async function initPage() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session?.user) {
+                window.location.href = 'login.html';
+                return;
+            }
 
-        setLang(currLang);
+            const userId = session.user.id;
+            const uid = session.user.user_metadata?.uid || userId.substring(0, 8);
+
+            // ست کردن لینک دعوت
+            const origin = window.location.origin;
+            document.getElementById('ref-url').value = `${origin}/register.html?ref=${uid}`;
+
+            // کلیدهای شناسایی کاربر برای اعلان‌ها
+            window.actualUserKeys = [userId, uid, session.user.email].filter(Boolean);
+
+            // دریافت اعلان‌ها
+            await fetchNotifications(userId, window.actualUserKeys);
+
+            // دریافت اعضای تیم از دیتابیس
+            try {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+
+                if (profile) {
+                    document.getElementById('val-total-comm').innerText = `$${(profile.total_commission || 0).toFixed(2)}`;
+                }
+
+                // فراخوانی نمونه برای اعضا
+                const { data: g1 } = await supabase.from('profiles').select('*').eq('referred_by', uid);
+                teamData.gen1 = g1 || [];
+
+                const totalM = teamData.gen1.length + teamData.gen2.length + teamData.gen3.length;
+                document.getElementById('val-total-members').innerText = totalM;
+
+                window.renderTeamMembers(1);
+            } catch (err) {
+                console.error('خطا در دریافت اطلاعات تیم:', err);
+            }
+        }
+
+        initPage();
     </script>
 </body>
 </html>
