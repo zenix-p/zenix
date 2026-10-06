@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700;800;900&family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Rajdhani:wght@700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" crossorigin="anonymous" referrerpolicy="no-referrer">
 <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
 <style>
@@ -15,11 +15,98 @@
 body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
 header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1);padding:10px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
 
-/* استایل مدرن هندسی و نئونی لوگوی ZENIX در هدر */
-.logo{display:flex;align-items:center;gap:10px;padding:4px 12px 4px 6px;background:linear-gradient(135deg,rgba(14,165,233,.15),rgba(147,51,234,.18),rgba(244,63,94,.12));border:1px solid rgba(56,189,248,.35);border-radius:10px;position:relative;box-shadow:0 0 18px rgba(14,165,233,.25),inset 0 0 10px rgba(168,85,247,.15);clip-path:polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);transition:all .3s ease}
-.logo:hover{border-color:rgba(56,189,248,.6);box-shadow:0 0 25px rgba(56,189,248,.4),inset 0 0 15px rgba(168,85,247,.25)}
-.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,#0ea5e9,#9333ea,#f43f5e);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;font-style:italic;transform:skewX(-6deg);clip-path:polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);box-shadow:0 0 15px rgba(14,165,233,.6)}
-.logo-text{font-family:'Orbitron',sans-serif;font-size:20px;font-weight:900;letter-spacing:3px;font-style:italic;transform:skewX(-6deg);background:linear-gradient(135deg,#38bdf8 0%,#c084fc 50%,#f43f5e 100%);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 10px rgba(56,189,248,.6))}
+/* ==========================================
+   استایل فوق مدرن، نئونی و سه‌بعدی لوگوی ZENIX و Z
+   ========================================== */
+@keyframes logoShimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes logoGlowPulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(14, 165, 233, 0.35), inset 0 0 12px rgba(168, 85, 247, 0.2); }
+  50% { box-shadow: 0 0 25px rgba(168, 85, 247, 0.55), inset 0 0 18px rgba(56, 189, 248, 0.35); }
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 14px 5px 7px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.75) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: 12px;
+  position: relative;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: logoGlowPulse 4s infinite ease-in-out;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.logo::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: 12px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(56,189,248,0.6), rgba(192,132,252,0.6), rgba(244,63,94,0.6));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.logo:hover {
+  transform: translateY(-1px) scale(1.02);
+  border-color: rgba(192, 132, 252, 0.7);
+  box-shadow: 0 0 30px rgba(56, 189, 248, 0.5), 0 0 15px rgba(244, 63, 94, 0.3);
+}
+
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 50%, #f43f5e 100%);
+  background-size: 200% 200%;
+  animation: logoShimmer 6s ease infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-family: 'Chakra Petch', 'Orbitron', sans-serif;
+  font-size: 20px;
+  font-weight: 900;
+  font-style: normal;
+  border-radius: 9px;
+  clip-path: polygon(25% 0%, 75% 0%, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0% 75%, 0% 25%);
+  box-shadow: 0 0 18px rgba(14, 165, 233, 0.7), inset 0 0 8px rgba(255, 255, 255, 0.4);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  transition: transform 0.3s ease;
+}
+
+.logo:hover .logo-icon {
+  transform: rotate(5deg) scale(1.05);
+}
+
+.logo-text {
+  font-family: 'Chakra Petch', 'Orbitron', sans-serif;
+  font-size: 21px;
+  font-weight: 900;
+  letter-spacing: 3.5px;
+  background: linear-gradient(135deg, #38bdf8 0%, #c084fc 45%, #f43f5e 90%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.65));
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.logo:hover .logo-text {
+  filter: drop-shadow(0 0 16px rgba(192, 132, 252, 0.85));
+}
 
 .hr{display:flex;align-items:center;gap:8px}
 .wrap{position:relative}
@@ -112,7 +199,6 @@ header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1)
 .vip-cell b{color:#f8fafc;font-weight:700}
 footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05)}
 
-/* اصلاح استایل ردیف‌های بازار ارز جهانی جهت قرارگیری کاملاً یک‌خطی، هم‌پیمانه و تراز عمودی قیمت‌ها */
 .crypto-row {
   background: rgba(255,255,255,.03) !important;
   padding: 10px 12px !important;
@@ -215,7 +301,7 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
     </div>
 </div>
 
-<!-- مودال مشاهده جزئیات پیام (کاملاً عین داشبورد) -->
+<!-- مودال مشاهده جزئیات پیام -->
 <div class="modal" id="m-msg-detail" style="z-index:1050;">
     <div class="modal-content">
         <div class="modal-header">
@@ -270,7 +356,6 @@ window.LD={
 function setLang(l){
   const t=window.LD[l]||window.LD.fa;document.documentElement.dir=t.dir;document.documentElement.lang=l;localStorage.setItem('zenix_lang',l);
   
-  // به‌روزرسانی هایلایت آبی روی زبان فعال در منو
   document.querySelectorAll('#lang-menu .mi').forEach(item => {
     if (item.getAttribute('data-lang') === l) {
       item.classList.add('active');
@@ -384,9 +469,6 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let uUid=null,tProf=0,bBal=0;
 const tpEl=document.getElementById('today-profit-val'),tbEl=document.getElementById('total-balance-val'),hList=document.getElementById('history-list');
 
-// ==========================================
-// متغیرها و توابع مدیریت اعلان‌ها (کاملاً عیناً هماهنگ‌شده با داشبورد)
-// ==========================================
 window.cachedNotifications = [];
 window.currentFilteredNotifs = [];
 window.activeNotifFilter = 'all';
@@ -597,382 +679,24 @@ window.renderNotifications = function() {
     }
 
     const opacityStyle = isUnread ? "opacity:1;" : "opacity:0.65;";
-    const unreadDot = isUnread ? '<span style="width:9px;height:9px;background:#ef4444;border-radius:50%;display:inline-block;box-shadow:0 0 8px #ef4444;" title="خوانده نشده"></span>' : '';
-    const readBadge = isUnread 
-      ? '<span style="font-size:10px;background:#ef4444;color:#fff;padding:2px 7px;border-radius:10px;font-weight:800;box-shadow:0 0 8px rgba(239,68,68,0.5);">جدید</span>' 
-      : '<span style="font-size:10px;background:rgba(255,255,255,0.06);color:#94a3b8;padding:2px 6px;border-radius:10px;"><i class="fas fa-check" style="font-size:9px;color:#64748b;"></i> خوانده‌شده</span>';
+    const unreadDot = isUnread ? '<span style="width:9px;height:9px;background:#ef4444;border-radius:50%;display:inline-block;box-shadow:0 0 8px #ef4444"></span>' : '';
 
-    const dateDisplay = dateStr ? `<div style="font-size:11px;color:${isUnread ? '#cbd5e1' : '#64748b'};margin-top:6px;direction:ltr;text-align:left;"><i class="far fa-clock" style="margin-right:4px;"></i>${dateStr}</div>` : '';
-
-    html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle} ${opacityStyle} cursor:pointer; position:relative; transition:all 0.2s;" onclick="window.openMsgDetail(${idx})">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-        <div class="msg-title-text" style="display:flex;align-items:center;gap:8px;font-weight:${isUnread ? '800' : '500'};color:${isUnread ? '#f8fafc' : '#cbd5e1'};">
-          ${unreadDot}
-          ${icon}
-          <span>${title}</span>
-        </div>
+    html += `
+    <div class="msg-body-box" onclick="window.openMsgDetail(${idx})" style="cursor:pointer;${borderStyle}${bgStyle}${opacityStyle}margin-bottom:8px;padding:10px 12px;border-radius:10px;position:relative;transition:all 0.2s ease;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <div style="display:flex;align-items:center;gap:6px;">
-          ${tagHtml}
-          ${readBadge}
+          ${icon}
+          <span style="font-size:12px;font-weight:700;color:#f8fafc;">${title}</span>
+          ${unreadDot}
         </div>
+        ${tagHtml}
       </div>
-      ${dateDisplay}
+      ${dateStr ? `<div style="font-size:10px;color:#94a3b8;direction:ltr;text-align:left;margin-top:4px;"><i class="far fa-clock" style="color:#38bdf8;margin-right:3px;"></i>${dateStr}</div>` : ''}
     </div>`;
   });
 
   container.innerHTML = html;
 };
-
-function cleanDateStr(d) {
-  if (!d) return '';
-  return String(d).split('T')[0].split(' ')[0].trim();
-}
-
-async function getFreshUserServerData() {
-  try {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error || !user) return null;
-    return user;
-  } catch(e) {
-    console.error("خطا در گرفتن اطلاعات زنده سرور:", e);
-    return null;
-  }
-}
-
-async function saveUserFields(dict) {
-  if (!uUid) return;
-
-  const currentCount = dict.count !== undefined ? dict.count : cCnt;
-  const currentDate = dict.date !== undefined ? dict.date : todayNY;
-  const currentProfit = dict.profit !== undefined ? dict.profit : tProf;
-  const currentBalance = dict.balance !== undefined ? dict.balance : bBal;
-  const currentHistory = dict.history || allTradesArray;
-
-  try {
-    await supabase.auth.updateUser({
-      data: {
-        quantCount: currentCount,
-        quantDate: currentDate,
-        todayProfit: currentProfit,
-        tradeHistoryArray: currentHistory
-      }
-    });
-  } catch(e) {
-    console.warn("خطا در همگام‌سازی user_metadata:", e);
-  }
-
-  try {
-    const localData = {
-      count: currentCount,
-      date: currentDate,
-      profit: currentProfit,
-      balance: currentBalance,
-      history: currentHistory
-    };
-    localStorage.setItem(`zenix_quant_state_${uUid}`, JSON.stringify(localData));
-  } catch(e) {}
-
-  const payload = {};
-  const keys = window.actualUserKeys || [];
-  
-  const findCol = (candidates) => {
-    return keys.find(x => candidates.some(c => c.toLowerCase() === x.toLowerCase()));
-  };
-
-  const kCount = findCol(['quantCount', 'quant_count']);
-  if (dict.count !== undefined && kCount) payload[kCount] = currentCount;
-
-  const kDate = findCol(['quantDate', 'quant_date']);
-  if (dict.date !== undefined && kDate) payload[kDate] = currentDate;
-
-  const kProfit = findCol(['todayProfit', 'today_profit']);
-  if (dict.profit !== undefined && kProfit) payload[kProfit] = currentProfit;
-
-  const kBal = findCol(['balance']);
-  if (dict.balance !== undefined && kBal) payload[kBal] = currentBalance;
-
-  const kHist = findCol(['tradeHistoryArray', 'quantHistory', 'trades', 'history']);
-  if (dict.history !== undefined && kHist) payload[kHist] = currentHistory;
-
-  if (Object.keys(payload).length > 0) {
-    const { error: updateErr } = await supabase.from("users").update(payload).eq("id", uUid);
-    if (updateErr) console.error("خطا در بروزرسانی اطلاعات معامله در Supabase:", updateErr);
-  }
-}
-
-function getNYDateStr(){return new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York'}).format(new Date());}
-let todayNY=getNYDateStr(),cCnt=0,allTradesArray=[];
-
-function formatTradeDate(item){
-  if (!item) return '';
-  let d = null;
-  if (item.timestamp) {
-    d = typeof item.timestamp === 'number' ? new Date(item.timestamp) : new Date(item.timestamp);
-  } else if (item.time) {
-    d = new Date(item.time);
-  } else if (item.date) {
-    d = new Date(item.date);
-  }
-
-  if (d && !isNaN(d.getTime())) {
-    return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} - ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-  }
-  return item.dateStr || item.date || item.time || '';
-}
-
-function uC(){
-  const dateStr=getNYDateStr();
-  if(dateStr!==todayNY){
-    todayNY=dateStr;cCnt=0;tProf=0;
-    saveUserFields({ count: 0, date: todayNY, profit: 0, history: [] });
-    if(tpEl)tpEl.innerText='$0.00';
-    window.checkClickState();
-  }
-  const t=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date());
-  const c=document.getElementById('ny-clock-val');if(c)c.innerText=t;
-}
-setInterval(uC,1000);uC();
-
-const cList=[
-  {name:'Bitcoin',symbol:'BTC',cls:'fab fa-bitcoin',color:'#f7931a'},
-  {name:'Ethereum',symbol:'ETH',cls:'fab fa-ethereum',color:'#627eea'},
-  {name:'Solana',symbol:'SOL',cls:'fas fa-coins',color:'#14f195'},
-  {name:'Ripple',symbol:'XRP',cls:'fas fa-water',color:'#23292f'},
-  {name:'Cardano',symbol:'ADA',cls:'fas fa-circle-dot',color:'#0033ad'},
-  {name:'Dogecoin',symbol:'DOGE',cls:'fas fa-dog',color:'#c2a633'},
-  {name:'Binance Coin',symbol:'BNB',cls:'fas fa-cube',color:'#f3ba2f'}
-];
-
-window.checkClickState=function(){
-  const qBtn = document.getElementById('quant-btn');
-  if(!qBtn || !window.isBotActive) return;
-
-  const l=window.currentActiveLang||'fa',t=(window.LD&&window.LD[l])||(window.LD&&window.LD.fa)||{};
-  if(cCnt>=4){
-    qBtn.disabled=true;qBtn.style.opacity="0.5";qBtn.style.cursor="not-allowed";
-    qBtn.innerHTML=`<i class="fas fa-ban"></i> <span>${t.dailyLimit || 'پایان ظرفیت امروز'}</span>`;
-  }else{
-    qBtn.disabled=false;qBtn.style.opacity="1";qBtn.style.cursor="pointer";
-    qBtn.innerHTML=`<i class="fas fa-robot"></i> <span>${t.quantification || 'کوانتیفیکیشن'} (${cCnt}/4)</span>`;
-  }
-};
-
-window.renderHistory=function(){
-  if(!hList) return;
-  const l=window.currentActiveLang||'fa',t=(window.LD&&window.LD[l])||(window.LD&&window.LD.fa)||{};
-  const btn=document.getElementById('view-all-history-btn'),btnTxt=document.getElementById('history-btn-text'),btnIcon=document.getElementById('history-btn-icon');
-  
-  if(!allTradesArray || !Array.isArray(allTradesArray) || allTradesArray.length===0){
-    hList.innerHTML=`<div style="font-size:12px;color:#94a3b8;text-align:center;" data-i18n="noHistory">${t.noHistory || 'هنوز معامله‌ای ثبت نشده است'}</div>`;
-    if(btn)btn.style.display='none';
-    return;
-  }
-
-  if(btn){
-    btn.style.display = allTradesArray.length > 4 ? 'flex' : 'none';
-    if(btnTxt)btnTxt.innerText=window.showAllHistory?(t.showLess||'بستن تاریخچه'):(t.showFullHistory||'مشاهده کامل تاریخچه');
-    if(btnIcon)btnIcon.className=window.showAllHistory?'fas fa-chevron-up':'fas fa-list-ul';
-  }
-
-  const tradesToDisplay = window.showAllHistory ? allTradesArray : allTradesArray.slice(0, 4);
-  let htmlStr='';
-
-  tradesToDisplay.forEach(item=>{
-    if(!item) return;
-    const rawProf = item.profit ?? item.amount ?? item.profitAmount ?? 0;
-    const numProf = parseFloat(rawProf);
-    const profStr = isNaN(numProf) ? '0.00' : numProf.toFixed(2);
-    
-    const formattedDate = formatTradeDate(item);
-    const coinName = item.name || item.coinName || item.currency || 'Crypto';
-    const coinSym = item.symbol || item.coinSymbol || '';
-    const coinColor = item.color || '#38bdf8';
-    const coinIcon = item.cls || 'fas fa-coins';
-
-    htmlStr+=`<div style="background:rgba(255,255,255,0.03);padding:10px 12px;border-radius:8px;font-size:11px;display:flex;justify-content:space-between;margin-bottom:4px;align-items:center;border:1px solid rgba(255,255,255,0.05);">
-      <span style="color:#22c55e;font-weight:bold;font-size:12px;">+$${profStr}</span>
-      <span style="color:#94a3b8;font-size:10px;font-family:monospace;">${formattedDate}</span>
-      <span style="display:flex;align-items:center;gap:6px;"><span style="color:#f8fafc;font-weight:600;">${coinName} ${coinSym ? `(${coinSym})` : ''}</span><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:${coinColor};color:#fff;font-size:11px;"><i class="${coinIcon}"></i></span></span>
-    </div>`;
-  });
-  hList.innerHTML=htmlStr;
-};
-
-function bindQuantButton() {
-  const qBtn = document.getElementById('quant-btn');
-  if(!qBtn) return;
-
-  qBtn.onclick = async function(e){
-    e.preventDefault();
-    if(!window.isBotActive || !uUid) return;
-
-    qBtn.disabled = true;
-    qBtn.style.opacity = "0.5";
-
-    const freshUser = await getFreshUserServerData();
-    const currentNY = cleanDateStr(todayNY);
-    
-    let serverCount = cCnt;
-    let serverHist = allTradesArray;
-
-    if (freshUser) {
-      const meta = freshUser.user_metadata || {};
-      serverHist = meta.tradeHistoryArray || allTradesArray;
-      
-      const tradesTodayServer = serverHist.filter(t => {
-        if (!t) return false;
-        const tDate = cleanDateStr(t.nyDate || t.dateStr || t.date || t.timestamp);
-        return tDate === currentNY;
-      });
-
-      const sCountMeta = Number(meta.quantCount || 0);
-      const sDateMeta = cleanDateStr(meta.quantDate || '');
-
-      if (sDateMeta === currentNY) {
-        serverCount = Math.max(tradesTodayServer.length, sCountMeta);
-      } else {
-        serverCount = tradesTodayServer.length;
-      }
-    }
-
-    if (serverCount >= 4) {
-      cCnt = 4;
-      allTradesArray = serverHist;
-      window.renderHistory();
-      window.checkClickState();
-      return;
-    }
-
-    cCnt = serverCount + 1;
-
-    const l=window.currentActiveLang||'fa',t=(window.LD&&window.LD[l])||(window.LD&&window.LD.fa)||{};
-    let dailyRate=0.015;
-    if(bBal>=10000)dailyRate=0.04;
-    else if(bBal>=5000)dailyRate=0.035;
-    else if(bBal>=2500)dailyRate=0.03;
-    else if(bBal>=1000)dailyRate=0.025;
-    else if(bBal>=300)dailyRate=0.02;
-
-    const tradeAmount = bBal;
-    const p=(tradeAmount*dailyRate)/4;
-    const tBox=document.getElementById('trade-box'),tDet=document.getElementById('trade-details');
-    if(tBox) tBox.style.display='block';
-    const rc=cList[Math.floor(Math.random()*cList.length)];
-    let tLeft=10;
-
-    if(tDet) {
-      tDet.innerHTML=`
-        <div style="display:flex;flex-direction:column;gap:6px;align-items:center;width:100%;">
-          <div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;">
-            <i class="${rc.cls}" style="color:${rc.color}"></i> <span>${rc.name} (${rc.symbol})</span>
-          </div>
-          <div style="font-size:12px;color:#38bdf8;font-weight:bold;">
-            <i class="fas fa-spinner fa-spin"></i> ${t.trading || 'معامله'}... <span id="trade-timer-val">10</span> ${t.seconds || 'ثانیه'}
-          </div>
-        </div>`;
-    }
-
-    const timerInt = setInterval(async ()=>{
-      tLeft--;
-      const timerValEl = document.getElementById('trade-timer-val');
-      if(timerValEl) timerValEl.innerText = tLeft;
-
-      if(tLeft <= 0){
-        clearInterval(timerInt);
-        tProf += p;
-        bBal += p;
-
-        const newTrade = {
-          name: rc.name,
-          symbol: rc.symbol,
-          cls: rc.cls,
-          color: rc.color,
-          profit: p,
-          timestamp: Date.now(),
-          nyDate: currentNY,
-          dateStr: formatTradeDate({ timestamp: Date.now() })
-        };
-
-        allTradesArray.unshift(newTrade);
-
-        await saveUserFields({
-          count: cCnt,
-          date: currentNY,
-          profit: tProf,
-          balance: bBal,
-          history: allTradesArray
-        });
-
-        if(tpEl) tpEl.innerText = `$${tProf.toFixed(2)}`;
-        if(tbEl) tbEl.innerText = `$${bBal.toFixed(2)}`;
-
-        if(tDet) {
-          tDet.innerHTML = `<span style="color:#22c55e;font-weight:bold;"><i class="fas fa-check-circle"></i> ${t.success || 'موفق!'} +$${p.toFixed(2)}</span>`;
-        }
-
-        setTimeout(()=>{
-          if(tBox) tBox.style.display = 'none';
-          window.renderHistory();
-          window.checkClickState();
-        }, 2000);
-      }
-    }, 1000);
-  };
-}
-
-async function initQuantification() {
-  try {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error || !user) {
-      window.location.href = 'login.html';
-      return;
-    }
-    uUid = user.id;
-
-    const { data: dbUser } = await supabase.from('users').select('*').eq('id', uUid).single();
-    if (dbUser) {
-      window.actualUserKeys = Object.keys(dbUser);
-    }
-
-    const meta = user.user_metadata || {};
-    bBal = parseFloat(dbUser?.balance ?? meta.balance ?? 0);
-    
-    const currentNY = cleanDateStr(getNYDateStr());
-    const savedDate = cleanDateStr(meta.quantDate || dbUser?.quantDate || dbUser?.quant_date || '');
-
-    if (savedDate === currentNY) {
-      cCnt = parseInt(meta.quantCount || dbUser?.quantCount || dbUser?.quant_count || 0, 10);
-      tProf = parseFloat(meta.todayProfit || dbUser?.todayProfit || dbUser?.today_profit || 0);
-    } else {
-      cCnt = 0;
-      tProf = 0;
-    }
-
-    allTradesArray = meta.tradeHistoryArray || dbUser?.tradeHistoryArray || dbUser?.quantHistory || dbUser?.trades || [];
-
-    window.isBotActive = bBal >= 20;
-
-    if (tbEl) tbEl.innerText = `$${bBal.toFixed(2)}`;
-    if (tpEl) tpEl.innerText = `$${tProf.toFixed(2)}`;
-
-    // بارگیری و رندر زنده اعلان‌ها
-    const { data: notifs, error: notifError } = await supabase.from('notifications').select('*').eq('user_id', uUid).order('created_at', { ascending: false });
-    if (!notifError && notifs) {
-      window.cachedNotifications = notifs;
-      window.renderNotifications();
-      window.updateBellBadge();
-    }
-
-    setLang(localStorage.getItem('zenix_lang') || 'fa');
-    bindQuantButton();
-    window.checkClickState();
-    window.renderHistory();
-  } catch (err) {
-    console.error("Initialization error:", err);
-  }
-}
-
-document.addEventListener('DOMContentLoaded', initQuantification);
 </script>
 </body>
 </html>
