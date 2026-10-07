@@ -418,6 +418,15 @@
                         <div class="stat-icon" style="background:rgba(239,68,68,.15);color:#ef4444"><i class="fas fa-money-bill-transfer"></i></div>
                         <div class="stat-info"><span>برداشت‌های معلق</span><h3 id="st-w-req">0</h3></div>
                     </div>
+                    <!-- کارت‌های اضافه‌شده به بخش پایینی آمار -->
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:rgba(16,185,129,.15);color:#10b981"><i class="fas fa-arrow-down-to-bracket"></i></div>
+                        <div class="stat-info"><span>واریزی کاربران</span><h3 id="st-user-deposits">$0.00</h3></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:rgba(99,102,241,.15);color:#6366f1"><i class="fas fa-coins"></i></div>
+                        <div class="stat-info"><span>سود کاربران</span><h3 id="st-user-profit">$0.00</h3></div>
+                    </div>
                 </div>
             </div>
 
@@ -1111,6 +1120,9 @@
         async function loadData(){
             try {
                 let adminProfitTotal = 0;
+                let totUserDeposits = 0;
+                let totUserProfit = 0;
+
                 try {
                     const { data: statsData } = await supabaseClient
                         .from('system_stats')
@@ -1134,6 +1146,8 @@
                             let nameVal = u.fullname || u.fullName || u.full_name || u.name || meta.fullname || meta.fullName || meta.full_name || u.email?.split('@')[0] || 'کاربر جدید';
                             let phoneVal = u.phone || u.phone_number || u.mobile || meta.phone || meta.phone_number || '-';
 
+                            let pProfit = u.platformProfit !== undefined ? Number(u.platformProfit) : Number(u.profit || u.platform_profit || 0);
+
                             uMap[uid] = {
                                 ...u,
                                 _raw: u,
@@ -1142,7 +1156,7 @@
                                 email: u.email || meta.email || '',
                                 phone: phoneVal,
                                 balance: u.balance !== undefined ? Number(u.balance) : 0,
-                                platformProfit: u.platformProfit !== undefined ? Number(u.platformProfit) : Number(u.profit || u.platform_profit || 0),
+                                platformProfit: pProfit,
                                 status: u.status || 'active',
                                 isBanned: u.isBanned || u.is_banned || u.status === 'banned' || u.status === 'cancelled',
                                 createdAt: u.created_at || u.createdAt || new Date().toISOString(),
@@ -1169,6 +1183,10 @@
                             let st = String(tx.status || '').toLowerCase();
                             let typeStr = String(tx.type || tx.title || '').toLowerCase();
                             let isDeposit = typeStr.includes('deposit') || typeStr.includes('واریز') || typeStr.includes('charge');
+
+                            if (st === 'success' && isDeposit) {
+                                totUserDeposits += Number(tx.amount || 0);
+                            }
 
                             if (st === 'pending' && isDeposit) {
                                 let uid = tx.user_id || tx.userId || tx.user_id_fk || 'unknown';
@@ -1230,7 +1248,10 @@
 
                 Object.keys(uMap).forEach(uid => {
                     let u = uMap[uid];
-                    totU++; totB += Number(u.balance || 0);
+                    totU++; 
+                    totB += Number(u.balance || 0);
+                    totUserProfit += Number(u.platformProfit || u.profit || 0);
+
                     let idCode = getUserIdCode(uid);
                     let nameStr = getName(u);
                     let emailStr = u.email || '-';
@@ -1288,6 +1309,10 @@
                 document.getElementById('st-d-req').innerText=totD;
                 document.getElementById('st-w-req').innerText=totW;
                 
+                // به‌روزرسانی کارت‌های جدید واریزی و سود کاربران
+                document.getElementById('st-user-deposits').innerText = '$' + totUserDeposits.toLocaleString('en-US', {minimumFractionDigits:2});
+                document.getElementById('st-user-profit').innerText = '$' + totUserProfit.toLocaleString('en-US', {minimumFractionDigits:2});
+
                 if (prevD !== -1) {
                     let alertsList = [];
 
