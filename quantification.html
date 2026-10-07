@@ -625,7 +625,7 @@ window.renderNotifications = function() {
 
 function cleanDateStr(d) {
   if (!d) return '';
-  return String(d).split('T')[0].split(' ')[0].trim();
+  return String(d).replace(/\//g, '-').split('T')[0].split(' ')[0].trim();
 }
 
 async function getFreshUserServerData() {
@@ -969,6 +969,7 @@ async function initQuantification() {
         yProf = parseFloat(meta.yesterdayProfit || dbUser?.yesterdayProfit || dbUser?.yesterday_profit || 0);
       }
       tProf = 0;
+      await saveUserFields({ count: 0, date: currentNY, profit: 0, yesterdayProfit: yProf, history: allTradesArray });
     }
 
     // بررسی و محاسبه مستقیم سود دیروز از روی آرایه تاریخچه معاملات
