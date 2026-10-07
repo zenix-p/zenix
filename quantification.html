@@ -729,7 +729,8 @@ function formatTradeDate(item){
 function uC(){
   const dateStr=getNYDateStr();
   if(dateStr!==todayNY){
-    todayNY=dateStr;cCnt=0;
+    todayNY=dateStr;
+    cCnt=0;
     yProf=tProf;
     tProf=0;
     saveUserFields({ count: 0, date: todayNY, profit: 0, yesterdayProfit: yProf, history: allTradesArray });
@@ -951,13 +952,18 @@ async function initQuantification() {
 
     allTradesArray = meta.tradeHistoryArray || dbUser?.tradeHistoryArray || dbUser?.quantHistory || dbUser?.trades || [];
 
+    // محاسبه تاریخ دیروز به وقت نیویورک
+    const nyDateObj = new Date(new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
+    nyDateObj.setDate(nyDateObj.getDate() - 1);
+    const yesterdayNY = cleanDateStr(`${nyDateObj.getFullYear()}-${String(nyDateObj.getMonth() + 1).padStart(2, '0')}-${String(nyDateObj.getDate()).padStart(2, '0')}`);
+
     if (savedDate === currentNY) {
       cCnt = parseInt(meta.quantCount || dbUser?.quantCount || dbUser?.quant_count || 0, 10);
       tProf = parseFloat(meta.todayProfit || dbUser?.todayProfit || dbUser?.today_profit || 0);
       yProf = parseFloat(meta.yesterdayProfit || dbUser?.yesterdayProfit || dbUser?.yesterday_profit || 0);
     } else {
       cCnt = 0;
-      if (savedDate) {
+      if (savedDate === yesterdayNY) {
         yProf = parseFloat(meta.todayProfit || dbUser?.todayProfit || dbUser?.today_profit || 0);
       } else {
         yProf = parseFloat(meta.yesterdayProfit || dbUser?.yesterdayProfit || dbUser?.yesterday_profit || 0);
@@ -965,11 +971,7 @@ async function initQuantification() {
       tProf = 0;
     }
 
-    // محاسبه بر اساس تاریخچه معاملات دیروز به وقت نیویورک در صورت عدم وجود مقدار مستقیم
-    const nyNow = new Date(new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
-    nyNow.setDate(nyNow.getDate() - 1);
-    const yesterdayNY = cleanDateStr(nyNow.getFullYear() + '-' + String(nyNow.getMonth() + 1).padStart(2, '0') + '-' + String(nyNow.getDate()).padStart(2, '0'));
-
+    // بررسی و محاسبه مستقیم سود دیروز از روی آرایه تاریخچه معاملات
     if (allTradesArray && allTradesArray.length > 0) {
       let calcYProf = 0;
       allTradesArray.forEach(t => {
