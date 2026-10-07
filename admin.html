@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+[cite: 2]<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -101,7 +101,31 @@
             backdrop-filter: blur(6px); color: #38bdf8; font-weight: 600; white-space: nowrap;
         }
 
-        .sidebar .admin-tabs { display: flex; flex-direction: column; gap: 7px; border: 0; padding: 0; margin: 0; flex: 1; overflow-y: auto; }
+        /* Table Navigation Layout for Admin Tabs */
+        .sidebar .admin-tabs { 
+            width: 100%; 
+            border-collapse: separate; 
+            border-spacing: 0 7px; 
+            border: 0; 
+            padding: 0; 
+            margin: 0; 
+            flex: 1; 
+            overflow-y: auto; 
+            display: block; 
+        }
+        .sidebar .admin-tabs tbody { 
+            display: table; 
+            width: 100%; 
+            border-spacing: 0 7px; 
+        }
+        .sidebar .admin-tabs tr { 
+            width: 100%; 
+        }
+        .sidebar .admin-tabs td { 
+            width: 100%; 
+            padding: 0; 
+        }
+
         .tab-btn {
             background: rgba(255,255,255,.035); border: 1px solid var(--line-2); color: #94a3b8;
             padding: 12px 15px; border-radius: 12px; font-size: 12.5px; font-weight: 600;
@@ -288,11 +312,20 @@
             .sidebar .brand { flex-direction: row; justify-content: space-between; align-items: center; border-bottom: none; padding: 0 4px; margin-bottom: 0; }
             .sidebar .brand .admin-badge { display: none; }
             
-            /* Horizontal Scrollable Tabs on Mobile */
+            /* Horizontal Scrollable Table Tabs on Mobile */
             .sidebar .admin-tabs {
-                flex-direction: row; flex-wrap: nowrap; overflow-x: auto;
-                -webkit-overflow-scrolling: touch; padding-bottom: 4px; gap: 8px;
-                scroll-snap-type: x mandatory;
+                display: block; width: 100%; overflow-x: auto;
+                -webkit-overflow-scrolling: touch; padding-bottom: 4px;
+                border-spacing: 0;
+            }
+            .sidebar .admin-tabs tbody {
+                display: flex; flex-direction: row; flex-wrap: nowrap; gap: 8px; scroll-snap-type: x mandatory;
+            }
+            .sidebar .admin-tabs tr {
+                display: flex; flex-shrink: 0; scroll-snap-align: start;
+            }
+            .sidebar .admin-tabs td {
+                display: flex;
             }
             .sidebar .tab-btn {
                 width: auto; flex-shrink: 0; font-size: 11.5px; padding: 9px 13px;
@@ -341,18 +374,40 @@
             <div class="logo"><h2>ZENIX ADMIN</h2></div>
             <span class="admin-badge"><i class="fas fa-shield-alt"></i> مدیریت کل پلتفرم</span>
         </div>
-        <nav class="admin-tabs">
-            <button class="tab-btn active" onclick="switchTab('t-overview', this)"><i class="fas fa-chart-pie"></i> داشبورد اصلی</button>
-            <button class="tab-btn" onclick="switchTab('t-active', this)"><i class="fas fa-user-check"></i> کاربران فعال</button>
-            <button class="tab-btn" onclick="switchTab('t-pending', this)"><i class="fas fa-user-clock"></i> در انتظار احراز</button>
-            <button class="tab-btn" onclick="switchTab('t-banned', this)"><i class="fas fa-user-slash"></i> لغو شده</button>
-            <button class="tab-btn" onclick="switchTab('t-deposit', this)"><i class="fas fa-arrow-down"></i> واریزی‌ها <span class="tab-badge zero" id="d-badge">0</span></button>
-            <button class="tab-btn" onclick="switchTab('t-withdraw', this)"><i class="fas fa-money-bill-transfer"></i> برداشت‌ها <span class="tab-badge zero" id="w-badge">0</span></button>
-            <button class="tab-btn" onclick="switchTab('t-reqs', this)"><i class="fas fa-bell"></i> درخواست‌ها <span class="tab-badge zero" id="req-badge">0</span></button>
-            <button class="tab-btn" onclick="switchTab('t-chat', this)"><i class="fas fa-headset"></i> چت پشتیبانی <span class="tab-badge zero" id="chat-badge">0</span></button>
-            <button class="tab-btn" onclick="switchTab('t-messages', this)"><i class="fas fa-paper-plane"></i> ارسال پیام</button>
-            <button class="tab-btn mobile-logout-tab" id="mobile-logout-btn" style="display:none; color:#ef4444; border-color:rgba(239,68,68,0.3);"><i class="fas fa-sign-out-alt"></i> خروج</button>
-        </nav>
+        <table class="admin-tabs">
+            <tbody>
+                <tr>
+                    <td><button class="tab-btn active" onclick="switchTab('t-overview', this)"><i class="fas fa-chart-pie"></i> داشبورد اصلی</button></td>
+                </tr>
+                <tr>
+                    <td><button class="tab-btn" onclick="switchTab('t-active', this)"><i class="fas fa-user-check"></i> کاربران فعال</button></td>
+                </tr>
+                <tr>
+                    <td><button class="tab-btn" onclick="switchTab('t-pending', this)"><i class="fas fa-user-clock"></i> در انتظار احراز</button></td>
+                </tr>
+                <tr>
+                    <td><button class="tab-btn" onclick="switchTab('t-banned', this)"><i class="fas fa-user-slash"></i> لغو شده</button></td>
+                </tr>
+                <tr>
+                    <td><button class="tab-btn" onclick="switchTab('t-deposit', this)"><i class="fas fa-arrow-down"></i> واریزی‌ها <span class="tab-badge zero" id="d-badge">0</span></button></td>
+                </tr>
+                <tr>
+                    <td><button class="tab-btn" onclick="switchTab('t-withdraw', this)"><i class="fas fa-money-bill-transfer"></i> برداشت‌ها <span class="tab-badge zero" id="w-badge">0</span></button></td>
+                </tr>
+                <tr>
+                    <td><button class="tab-btn" onclick="switchTab('t-reqs', this)"><i class="fas fa-bell"></i> درخواست‌ها <span class="tab-badge zero" id="req-badge">0</span></button></td>
+                </tr>
+                <tr>
+                    <td><button class="tab-btn" onclick="switchTab('t-chat', this)"><i class="fas fa-headset"></i> چت پشتیبانی <span class="tab-badge zero" id="chat-badge">0</span></button></td>
+                </tr>
+                <tr>
+                    <td><button class="tab-btn" onclick="switchTab('t-messages', this)"><i class="fas fa-paper-plane"></i> ارسال پیام</button></td>
+                </tr>
+                <tr>
+                    <td><button class="tab-btn mobile-logout-tab" id="mobile-logout-btn" style="display:none; color:#ef4444; border-color:rgba(239,68,68,0.3);"><i class="fas fa-sign-out-alt"></i> خروج</button></td>
+                </tr>
+            </tbody>
+        </table>
         <button class="btn-logout" id="logout-btn"><i class="fas fa-sign-out-alt"></i> خروج از حساب</button>
       </aside>
 
@@ -1324,7 +1379,7 @@
             document.getElementById('modal-action-btn').innerHTML=`
                 <div style="display:flex;gap:8px;">
                     <button class="btn-action btn-edit" style="flex:1;justify-content:center;padding:8px" onclick="closeModal('m-details');openE('${uid}')"><i class="fas fa-edit"></i> ویرایش مشخصات</button>
-                    <button class="btn-action btn-approve" style="flex:1;justify-content:center;padding:8px" onclick="closeModal('m-details');switchTab('t-messages', document.querySelector('.admin-tabs button:nth-child(9)'));selectUserForMessage('${uid}');"><i class="fas fa-paper-plane"></i> ارسال پیام</button>
+                    <button class="btn-action btn-approve" style="flex:1;justify-content:center;padding:8px" onclick="closeModal('m-details');switchTab('t-messages', document.querySelectorAll('.admin-tabs .tab-btn')[8]);selectUserForMessage('${uid}');"><i class="fas fa-paper-plane"></i> ارسال پیام</button>
                 </div>
             `;
             document.getElementById('m-details').classList.add('show');
