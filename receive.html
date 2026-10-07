@@ -120,7 +120,7 @@
         }
         .mi:hover{background:rgba(56,189,248,.15);color:#38bdf8}
         .mi.active{
-            background:rgba(56,189,248,0.12) !important;
+            background:rgba(56,189,248,0.15) !important;
             color:#38bdf8 !important;
             font-weight:700 !important;
         }
@@ -263,7 +263,6 @@
                 <label class="fl">رمز تراکنش</label>
                 <input type="password" id="withdraw-pass" class="fi" placeholder="رمز تراکنش ۶ رقمی خود را وارد کنید">
                 
-                <!-- لینک فراموشی رمز اصلاح شده جهت هدایت به بخش تعویض رمز تراکنش در پروفایل -->
                 <div style="display:flex;justify-content:flex-end;margin-top:6px;">
                     <a href="profile.html?open=tx_pass#card-tx-pass" id="t-forgot-pass" style="font-size:11px;color:#38bdf8;text-decoration:none;transition:0.2s;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
                         <i class="fas fa-key" style="font-size:10px;margin-left:3px;"></i> فراموشی رمز تراکنش؟
@@ -292,7 +291,7 @@
         </div>
     </div>
 
-    <!-- مودال مشاهده جزئیات پیام (کاملاً عین داشبورد و کوانتیفیکیشن) -->
+    <!-- مودال مشاهده جزئیات پیام -->
     <div class="modal" id="m-msg-detail" style="z-index:1050;">
         <div class="modal-content">
             <div class="modal-header">
@@ -341,7 +340,40 @@
         let userData = null;
 
         // ==========================================
-        // متغیرها و توابع مدیریت اعلان‌ها (عیناً هماهنگ‌شده با کوانتیفیکیشن)
+        // تابع تغییر و هایلایت زبان فعال به رنگ آبی
+        // ==========================================
+        function setLang(l) {
+            const activeLang = l || localStorage.getItem('zenix_lang') || 'fa';
+            localStorage.setItem('zenix_lang', activeLang);
+
+            // اعمال هایلایت آبی رنگ روی گزینه زبان انتخابی در منو
+            document.querySelectorAll('#lang-menu .mi').forEach(item => {
+                if (item.getAttribute('data-lang') === activeLang) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            const isRtl = (activeLang === 'fa' || activeLang === 'ar');
+            document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
+            document.documentElement.lang = activeLang;
+        }
+
+        // تنظیم اولیه زبان بر اساس تنظیمات ذخیره‌شده
+        setLang(localStorage.getItem('zenix_lang') || 'fa');
+
+        // اتصال رویداد کلیک به گزینه‌های زبان منوی هدر
+        document.querySelectorAll('#lang-menu .mi').forEach(el => {
+            el.onclick = (e) => {
+                e.stopPropagation();
+                setLang(el.dataset.lang);
+                document.getElementById('lang-menu')?.classList.remove('show');
+            };
+        });
+
+        // ==========================================
+        // متغیرها و توابع مدیریت اعلان‌ها
         // ==========================================
         window.openMessageModal = () => document.getElementById('m-msg')?.classList.add('show');
         window.closeMessageModal = () => document.getElementById('m-msg')?.classList.remove('show');
@@ -689,7 +721,6 @@
                 window.onNetworkChange();
             }
 
-            // بارگیری و رندر زنده اعلان‌ها مطابق با فایل کوانتیفیکیشن
             const { data: notifs, error: notifError } = await supabaseClient
                 .from('notifications')
                 .select('*')
