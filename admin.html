@@ -1561,7 +1561,8 @@
                     <td>${dt}</td>
                 </tr>`;
             });
-            box.innerHTML=html+`</tbody></table></div>`;
+            html+=`</tbody></table></div>`;
+            box.innerHTML=html;
         }
 
         window.openReqDetails = uid => {
@@ -1569,194 +1570,184 @@
             if (!u) return;
             let idCode = getUserIdCode(uid);
             let nameStr = getName(u);
-            let newEmail = u.pendingEmail || u.newEmail || '-';
-            let dt = formatDate(u.requestTimestamp || u.updatedAt || u.createdAt);
+            let emailStr = u.pendingEmail || u.newEmail || u.email || '-';
+            let regDate = formatDate(u.createdAt);
 
-            document.getElementById('item-modal-title').innerText = 'جزئیات درخواست احراز / تغییر اطلاعات';
+            document.getElementById('item-modal-title').innerText = 'جزئیات درخواست کاربر';
             document.getElementById('item-details-body').innerHTML = `
                 <div class="detail-row"><span>شناسه کاربر:</span><span>${idCode}</span></div>
                 <div class="detail-row"><span>نام کاربر:</span><span>${nameStr}</span></div>
-                <div class="detail-row"><span>ایمیل فعلی:</span><span>${u.email||'-'}</span></div>
-                <div class="detail-row"><span>ایمیل جدید (درخواستی):</span><span style="color:#f59e0b;font-weight:bold">${newEmail}</span></div>
-                <div class="detail-row"><span>تاریخ و ساعت درخواست:</span><span>${dt}</span></div>
+                <div class="detail-row"><span>ایمیل درخواست شده:</span><span>${emailStr}</span></div>
+                <div class="detail-row"><span>تاریخ ثبت‌نام:</span><span>${regDate}</span></div>
             `;
 
             document.getElementById('item-modal-actions').innerHTML = `
-                <button class="btn-action btn-approve" style="flex:1;justify-content:center;padding:10px" onclick="closeModal('m-item-details');appEm('${uid}','${newEmail}')"><i class="fas fa-check"></i> تایید درخواست</button>
+                <button class="btn-action btn-approve" style="flex:1;justify-content:center;padding:10px" onclick="closeModal('m-item-details');appEm('${uid}','${emailStr}')"><i class="fas fa-check"></i> تایید درخواست</button>
                 <button class="btn-action btn-reject" style="flex:1;justify-content:center;padding:10px" onclick="closeModal('m-item-details');rejEm('${uid}')"><i class="fas fa-times"></i> رد درخواست</button>
             `;
             document.getElementById('m-item-details').classList.add('show');
         };
 
-        window.toggleBan=async(uid,ban)=>{
-            if(!confirm(ban?'آیا از لغو این حساب کاربر اطمینان دارید؟':'آیا از فعال‌سازی مجدد این حساب اطمینان دارید؟')) return;
+        window.appEm = async (uid, newEmail) => {
+            if (!confirm('آیا از تایید این درخواست اطمینان دارید؟')) return;
             try {
-                await supabaseClient.from('users').update({ status: ban ? 'banned' : 'active', is_banned: ban }).eq('id', uid);
-                showToast(ban ? 'حساب کاربر لغو گردید.' : 'حساب کاربر فعال گردید.');
-                loadData();
-            } catch(e) {
-                console.error("Error toggling ban:", e);
-                showToast("خطا در تغییر وضعیت کاربر", "error");
-            }
-        };
-
-        window.appEm=async(uid, email)=>{
-            if(!confirm(`آیا از تایید تغییر ایمیل به ${email} اطمینان دارید؟`)) return;
-            try {
-                await supabaseClient.from('users').update({
-                    email: email,
-                    pending_email: null,
-                    new_email: null,
-                    admin_approval_status: 'approved'
+                await supabaseClient.from('users').update({ 
+                    email: newEmail, 
+                    pendingEmail: null, 
+                    newEmail: null,
+                    adminApprovalStatus: 'approved'
                 }).eq('id', uid);
-                await sendNotificationToUser(uid, 'تایید درخواست', 'درخواست تغییر اطلاعات حساب شما با موفقیت تایید شد.');
-                showToast('ایمیل جدید تایید و اعمال گردید.');
+                await sendNotificationToUser(uid, 'تایید تغییرات/حساب', 'درخواست شما توسط مدیریت تایید گردید.');
+                showToast('درخواست با موفقیت تایید شد.');
                 loadData();
-            } catch(e) {
-                console.error("Error approving email:", e);
-                showToast("خطا در تایید تغییرات", "error");
+            } catch (err) {
+                console.error("Error approving request:", err);
+                showToast('خطا در تایید درخواست', 'error');
             }
         };
 
-        window.rejEm=async(uid)=>{
-            if(!confirm('آیا از رد درخواست این کاربر اطمینان دارید؟')) return;
+        window.rejEm = async (uid) => {
+            if (!confirm('آیا از رد این درخواست اطمینان دارید؟')) return;
             try {
-                await supabaseClient.from('users').update({
-                    pending_email: null,
-                    new_email: null,
-                    admin_approval_status: 'rejected'
+                await supabaseClient.from('users').update({ 
+                    pendingEmail: null, 
+                    newEmail: null,
+                    adminApprovalStatus: 'rejected'
                 }).eq('id', uid);
-                await sendNotificationToUser(uid, 'رد درخواست', 'درخواست تغییر اطلاعات حساب شما توسط مدیریت رد شد.');
-                showToast('درخواست کاربر رد گردید.');
+                await sendNotificationToUser(uid, 'رد درخواست', 'درخواست شما توسط مدیریت رد گردید.');
+                showToast('درخواست رد شد.');
                 loadData();
-            } catch(e) {
-                console.error("Error rejecting email:", e);
-                showToast("خطا در رد درخواست", "error");
+            } catch (err) {
+                console.error("Error rejecting request:", err);
+                showToast('خطا در رد درخواست', 'error');
             }
         };
 
-        window.openE=uid=>{
-            let u=uMap[uid];
-            if(!u) return;
-            document.getElementById('e-uid').value=uid;
-            document.getElementById('e-name').value=getName(u);
-            document.getElementById('e-email').value=u.email||'';
-            document.getElementById('e-phone').value=u.phone||'';
-            document.getElementById('e-bal').value=u.balance||0;
-            document.getElementById('e-profit').value=u.platformProfit || u.profit || 0;
+        window.toggleBan = async (uid, ban) => {
+            let actionText = ban ? 'لغو/مسدودسازی' : 'فعال‌سازی مجدد';
+            if (!confirm(`آیا از ${actionText} این کاربر اطمینان دارید؟`)) return;
+            try {
+                let statusVal = ban ? 'banned' : 'active';
+                await supabaseClient.from('users').update({ status: statusVal, isBanned: ban }).eq('id', uid);
+                await sendNotificationToUser(uid, 'تغییر وضعیت حساب', `حساب کاربری شما ${ban ? 'مسدود/لغو' : 'فعال'} گردید.`);
+                showToast(`کاربر با موفقیت ${ban ? 'مسدود' : 'فعال'} شد.`);
+                loadData();
+            } catch (err) {
+                console.error("Error toggling ban:", err);
+                showToast('خطا در تغییر وضعیت کاربر', 'error');
+            }
+        };
+
+        window.openE = uid => {
+            let u = uMap[uid];
+            if (!u) return;
+            document.getElementById('e-uid').value = uid;
+            document.getElementById('e-name').value = getName(u);
+            document.getElementById('e-email').value = u.email || '';
+            document.getElementById('e-phone').value = u.phone || '';
+            document.getElementById('e-bal').value = u.balance || 0;
+            document.getElementById('e-profit').value = u.platformProfit || u.profit || 0;
             document.getElementById('m-edit').classList.add('show');
         };
 
-        document.getElementById('f-edit').onsubmit=async e=>{
+        document.getElementById('f-edit')?.addEventListener('submit', async e => {
             e.preventDefault();
-            let uid=document.getElementById('e-uid').value;
-            let name=document.getElementById('e-name').value;
-            let email=document.getElementById('e-email').value;
-            let phone=document.getElementById('e-phone').value;
-            let bal=parseFloat(document.getElementById('e-bal').value)||0;
-            let profit=parseFloat(document.getElementById('e-profit').value)||0;
+            let uid = document.getElementById('e-uid').value;
+            let nameVal = document.getElementById('e-name').value;
+            let emailVal = document.getElementById('e-email').value;
+            let phoneVal = document.getElementById('e-phone').value;
+            let balVal = parseFloat(document.getElementById('e-bal').value) || 0;
+            let profitVal = parseFloat(document.getElementById('e-profit').value) || 0;
 
             try {
                 await supabaseClient.from('users').update({
-                    fullname: name,
-                    email: email,
-                    phone: phone,
-                    balance: bal,
-                    profit: profit,
-                    platform_profit: profit
+                    fullname: nameVal,
+                    email: emailVal,
+                    phone: phoneVal,
+                    balance: balVal,
+                    platformProfit: profitVal
                 }).eq('id', uid);
-
+                showToast('مشخصات کاربر با موفقیت ویرایش شد.');
                 closeModal('m-edit');
-                showToast('ویرایش اطلاعات با موفقیت ذخیره شد.');
                 loadData();
-            } catch(err) {
-                console.error("Error saving edits:", err);
-                showToast("خطا در ذخیره ویرایش", "error");
+            } catch (err) {
+                console.error("Error updating user:", err);
+                showToast('خطا در ویرایش اطلاعات کاربر', 'error');
             }
-        };
+        });
 
-        document.getElementById('f-broadcast').onsubmit=async e=>{
+        document.getElementById('f-broadcast')?.addEventListener('submit', async e => {
             e.preventDefault();
-            let title=document.getElementById('bc-title').value.trim();
-            let msg=document.getElementById('bc-msg').value.trim();
-            if(!title || !msg) return;
+            let title = document.getElementById('bc-title').value.trim();
+            let msg = document.getElementById('bc-msg').value.trim();
+            if (!title || !msg) return;
 
             try {
                 let uids = Object.keys(uMap);
-                for(let uid of uids) {
+                for (let uid of uids) {
                     await sendNotificationToUser(uid, title, msg);
                 }
-                document.getElementById('bc-title').value='';
-                document.getElementById('bc-msg').value='';
-                showToast('پیام همگانی با موفقیت برای تمام کاربران ارسال شد.');
-            } catch(err) {
-                console.error("Error broadcasting:", err);
-                showToast("خطا در ارسال پیام همگانی", "error");
+                showToast('پیام همگانی برای تمامی کاربران ارسال گردید.');
+                document.getElementById('bc-title').value = '';
+                document.getElementById('bc-msg').value = '';
+            } catch (err) {
+                console.error("Error sending broadcast:", err);
+                showToast('خطا در ارسال پیام همگانی', 'error');
             }
-        };
+        });
 
-        document.getElementById('f-single-msg').onsubmit=async e=>{
+        document.getElementById('f-single-msg')?.addEventListener('submit', async e => {
             e.preventDefault();
             let uid = document.getElementById('target-uid-hidden').value || document.getElementById('sm-uid').value;
             let title = document.getElementById('sm-title').value.trim();
             let msg = document.getElementById('sm-msg').value.trim();
 
-            if(!uid || !title || !msg) {
-                showToast("لطفاً کاربر، موضوع و متن پیام را وارد کنید.", "error");
+            if (!uid) {
+                showToast('لطفاً یک کاربر انتخاب کنید.', 'error');
                 return;
             }
+            if (!title || !msg) return;
 
             try {
                 await sendNotificationToUser(uid, title, msg);
-                document.getElementById('sm-title').value='';
-                document.getElementById('sm-msg').value='';
+                showToast('پیام با موفقیت برای کاربر ارسال شد.');
+                document.getElementById('sm-title').value = '';
+                document.getElementById('sm-msg').value = '';
                 clearSelectedUser();
-                showToast('پیام اختصاصی با موفقیت ارسال شد.');
-            } catch(err) {
+            } catch (err) {
                 console.error("Error sending single message:", err);
-                showToast("خطا در ارسال پیام", "error");
+                showToast('خطا در ارسال پیام', 'error');
             }
-        };
-
-        document.getElementById('sm-search')?.addEventListener('input', (e) => {
-            updateSelectOptions(e.target.value);
-        });
-
-        document.getElementById('sm-uid')?.addEventListener('change', (e) => {
-            if(e.target.value) {
-                selectUserForMessage(e.target.value);
-            }
-        });
-
-        ['s-act','s-pend','s-ban'].forEach(id=>{
-            document.getElementById(id)?.addEventListener('input',e=>{
-                let q=e.target.value.toLowerCase();
-                let tbodyId = id === 's-act' ? 'tb-act' : (id === 's-pend' ? 'tb-pend' : 'tb-ban');
-                document.querySelectorAll(`#${tbodyId} tr`).forEach(tr=>{
-                    let txt=tr.getAttribute('data-s')||'';
-                    tr.style.display=txt.includes(q)?'':'none';
-                });
-            });
         });
 
         document.getElementById('logout-btn')?.addEventListener('click', async () => {
-            if(confirm('آیا از خروج از حساب مدیریت اطمینان دارید؟')) {
-                await supabaseClient.auth.signOut();
-                window.location.href = 'index.html';
-            }
+            await supabaseClient.auth.signOut();
+            window.location.href = 'login.html';
         });
 
         document.getElementById('mobile-logout-btn')?.addEventListener('click', async () => {
-            if(confirm('آیا از خروج از حساب مدیریت اطمینان دارید؟')) {
-                await supabaseClient.auth.signOut();
-                window.location.href = 'index.html';
-            }
+            await supabaseClient.auth.signOut();
+            window.location.href = 'login.html';
         });
+
+        function filterTable(tableId, query) {
+            let q = query.toLowerCase();
+            let rows = document.querySelectorAll(`#${tableId} tr`);
+            rows.forEach(r => {
+                let s = r.getAttribute('data-s') || '';
+                r.style.display = s.includes(q) ? '' : 'none';
+            });
+        }
+
+        document.getElementById('s-act')?.addEventListener('input', e => filterTable('tb-act', e.target.value));
+        document.getElementById('s-pend')?.addEventListener('input', e => filterTable('tb-pend', e.target.value));
+        document.getElementById('s-ban')?.addEventListener('input', e => filterTable('tb-ban', e.target.value));
+        document.getElementById('sm-search')?.addEventListener('input', e => updateSelectOptions(e.target.value));
 
         updateSoundUI();
         loadData();
-        initRealtimeDataListeners();
         initSupportChatListener();
+        initRealtimeDataListeners();
     </script>
 </body>
 </html>
