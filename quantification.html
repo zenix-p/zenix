@@ -344,32 +344,101 @@ const marketData=[
   {name:'Render',symbol:'RENDER/USDT',price:8.4,change:7.6,color:'#ef4444'}
 ];
 
-window.renderMarketList=function(){
-  const mList=document.getElementById('market-list');if(!mList)return;
-  marketData.sort((a,b)=>b.change-a.change);
-  const top15=marketData.slice(0,15);
-  let html='';
-  top15.forEach(item=>{
-    const isP=item.change>=0,cC=isP?'color:#22c55e;':'color:#ef4444;',bC=isP?'background:rgba(34,197,94,0.12);':'background:rgba(239,68,68,0.12);',sgn=isP?'+':'';
+// نقشه لوگوهای اختصاصی و مستقیم برای هر نماد با لینک‌های بسیار پایدار و استاندارد CoinCap
+const cryptoLogos = {
+  'BTC': 'https://assets.coincap.io/assets/icons/btc@2x.png',
+  'ETH': 'https://assets.coincap.io/assets/icons/eth@2x.png',
+  'SOL': 'https://assets.coincap.io/assets/icons/sol@2x.png',
+  'XRP': 'https://assets.coincap.io/assets/icons/xrp@2x.png',
+  'BNB': 'https://assets.coincap.io/assets/icons/bnb@2x.png',
+  'DOGE': 'https://assets.coincap.io/assets/icons/doge@2x.png',
+  'ADA': 'https://assets.coincap.io/assets/icons/ada@2x.png',
+  'AVAX': 'https://assets.coincap.io/assets/icons/avax@2x.png',
+  'SUI': 'https://assets.coincap.io/assets/icons/sui@2x.png',
+  'LINK': 'https://assets.coincap.io/assets/icons/link@2x.png',
+  'DOT': 'https://assets.coincap.io/assets/icons/dot@2x.png',
+  'NEAR': 'https://assets.coincap.io/assets/icons/near@2x.png',
+  'SHIB': 'https://assets.coincap.io/assets/icons/shib@2x.png',
+  'PEPE': 'https://assets.coincap.io/assets/icons/pepe@2x.png',
+  'UNI': 'https://assets.coincap.io/assets/icons/uni@2x.png',
+  'APT': 'https://assets.coincap.io/assets/icons/apt@2x.png',
+  'XLM': 'https://assets.coincap.io/assets/icons/xlm@2x.png',
+  'ATOM': 'https://assets.coincap.io/assets/icons/atom@2x.png',
+  'HBAR': 'https://assets.coincap.io/assets/icons/hbar@2x.png',
+  'RENDER': 'https://assets.coincap.io/assets/icons/render@2x.png'
+};
+
+window.renderMarketList = function(){
+  const mList = document.getElementById('market-list');
+  if(!mList) return;
+  
+  marketData.sort((a, b) => b.change - a.change);
+  const top15 = marketData.slice(0, 15);
+  
+  // به‌روزرسانی یا ایجاد عناصر در‌جای DOM بدون نابود کردن و لود مجدد تصاویر (جلوگیری کامل از چشمک زدن)
+  top15.forEach(item => {
     const symClean = item.symbol.split('/')[0].toLowerCase();
     const symUpper = item.symbol.split('/')[0].toUpperCase();
-    const imgUrl1 = `https://cdn.jsdelivr.net/gh/prasangapokharel/crypto-icons@v1.0.0/crypto/${symClean}.svg`;
-    const imgUrl2 = `https://cdn.jsdelivr.net/gh/prasangapokharel/crypto-icons@v1.0.0/binance/${symUpper}.png`;
-
-    html+=`<div class="crypto-row">
-      <div class="crypto-left">
-        <img src="${imgUrl1}" alt="${item.name}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0;background:${item.color || '#1e293b'};" onerror="this.onerror=null;this.src='${imgUrl2}';" />
-        <div class="crypto-text-box">
-          <div style="font-weight:700;color:#f8fafc;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.name}</div>
-          <div style="font-size:10px;color:#94a3b8;">${item.symbol}</div>
+    const isP = item.change >= 0;
+    const cC = isP ? 'color:#22c55e;' : 'color:#ef4444;';
+    const bC = isP ? 'background:rgba(34,197,94,0.12);' : 'background:rgba(239,68,68,0.12);';
+    const sgn = isP ? '+' : '';
+    const formattedPrice = '$' + item.price.toLocaleString('en-US', {
+      minimumFractionDigits: item.price < 1 ? 4 : 2,
+      maximumFractionDigits: item.price < 1 ? 4 : 2
+    }) + ' <span style="font-size:9px;color:#94a3b8;font-weight:500;">USDT</span>';
+    const formattedChange = sgn + item.change.toFixed(2) + '%';
+    
+    let row = mList.querySelector(`[data-sym="${symUpper}"]`);
+    if (row) {
+      // فقط مقادیر متنی قیمت و درصد تغییر را آپدیت می‌کنیم تا تصویر دوباره بازخوانی نشود
+      const priceEl = row.querySelector('.crypto-price-val');
+      const changeEl = row.querySelector('.crypto-change-val');
+      if (priceEl && priceEl.innerHTML !== formattedPrice) priceEl.innerHTML = formattedPrice;
+      if (changeEl) {
+        changeEl.textContent = formattedChange;
+        changeEl.style.cssText = cC + bC;
+      }
+    } else {
+      // ایجاد اولیه ردیف جدید
+      const imgUrl = cryptoLogos[symUpper] || `https://assets.coincap.io/assets/icons/${symClean}@2x.png`;
+      const fallbackUrl = `https://cdn.jsdelivr.net/gh/atomiclabs/cryptocurrency-icons@1a63539be1313df88e14d3f72114205d32233750/128/color/${symClean}.png`;
+      
+      const newRow = document.createElement('div');
+      newRow.className = 'crypto-row';
+      newRow.setAttribute('data-sym', symUpper);
+      newRow.innerHTML = `
+        <div class="crypto-left">
+          <img src="${imgUrl}" alt="${item.name}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0;background:${item.color || '#1e293b'};" onerror="this.onerror=null;this.src='${fallbackUrl}';" />
+          <div class="crypto-text-box">
+            <div style="font-weight:700;color:#f8fafc;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.name}</div>
+            <div style="font-size:10px;color:#94a3b8;">${item.symbol}</div>
+          </div>
         </div>
-      </div>
-      <div class="crypto-price-val">$${item.price.toLocaleString('en-US',{minimumFractionDigits:item.price<1?4:2,maximumFractionDigits:item.price<1?4:2})} <span style="font-size:9px;color:#94a3b8;font-weight:500;">USDT</span></div>
-      <div class="crypto-change-val" style="${cC}${bC}">${sgn}${item.change.toFixed(2)}%</div>
-    </div>`;
+        <div class="crypto-price-val">${formattedPrice}</div>
+        <div class="crypto-change-val" style="${cC}${bC}">${formattedChange}</div>
+      `;
+      mList.appendChild(newRow);
+    }
   });
-  mList.innerHTML=html;
+
+  // مرتب‌سازی مجدد ردیف‌های موجود بر اساس تغییرات، بدون لود مجدد عکس‌ها
+  top15.forEach(item => {
+    const symUpper = item.symbol.split('/')[0].toUpperCase();
+    const row = mList.querySelector(`[data-sym="${symUpper}"]`);
+    if (row) mList.appendChild(row);
+  });
+
+  // حذف ارزهایی که از ۱۵ تای برتر خارج شده‌اند
+  const activeSymbols = new Set(top15.map(i => i.symbol.split('/')[0].toUpperCase()));
+  Array.from(mList.querySelectorAll('.crypto-row')).forEach(row => {
+    const sym = row.getAttribute('data-sym');
+    if (!activeSymbols.has(sym)) {
+      row.remove();
+    }
+  });
 };
+
 window.renderMarketList();
 setInterval(()=>{marketData.forEach(item=>{item.price=Math.max(.00001,item.price+(Math.random()-.49)*(item.price*.003));item.change+=(Math.random()-.49)*.25;});window.renderMarketList();},3000);
 </script>
