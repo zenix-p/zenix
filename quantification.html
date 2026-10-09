@@ -942,8 +942,10 @@ function bindQuantButton() {
     if(tDet) {
       tDet.innerHTML=`
         <div style="display:flex;flex-direction:column;gap:6px;align-items:center;width:100%;">
-          <div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;">
-            <i class="${rc.cls}" style="color:${rc.color}"></i> <span>${rc.name} (${rc.symbol})</span>
+          <div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;flex-wrap:wrap;">
+            <i class="${rc.cls}" style="color:${rc.color}"></i> <span><b>${rc.name}</b> (${rc.symbol})</span>
+            <span style="color:#64748b;">|</span>
+            <span style="color:#cbd5e1;">${t.tradeAmount || 'مبلغ معامله'}: <b style="color:#38bdf8;">$${tradeAmount.toFixed(2)}</b></span>
           </div>
           <div style="font-size:12px;color:#38bdf8;font-weight:bold;">
             <i class="fas fa-spinner fa-spin"></i> ${t.trading || 'معامله'}... <span id="trade-timer-val">10</span> ${t.seconds || 'ثانیه'}
@@ -986,7 +988,17 @@ function bindQuantButton() {
         if(tbEl) tbEl.innerText = `$${bBal.toFixed(2)}`;
 
         if(tDet) {
-          tDet.innerHTML = `<span style="color:#22c55e;font-weight:bold;"><i class="fas fa-check-circle"></i> ${t.success || 'موفق!'} +$${p.toFixed(2)}</span>`;
+          tDet.innerHTML = `
+            <div style="display:flex;flex-direction:column;gap:6px;align-items:center;width:100%;">
+              <div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;flex-wrap:wrap;">
+                <i class="${rc.cls}" style="color:${rc.color}"></i> <span><b>${rc.name}</b> (${rc.symbol})</span>
+                <span style="color:#64748b;">|</span>
+                <span style="color:#cbd5e1;">${t.tradeAmount || 'مبلغ معامله'}: <b style="color:#38bdf8;">$${tradeAmount.toFixed(2)}</b></span>
+              </div>
+              <div style="color:#22c55e;font-weight:bold;font-size:13px;">
+                <i class="fas fa-check-circle"></i> ${t.success || 'موفق!'} +$${p.toFixed(2)}
+              </div>
+            </div>`;
         }
 
         setTimeout(()=>{
