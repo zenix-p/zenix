@@ -24,11 +24,12 @@
         
         body {
             background: var(--bg-dark);
-            height: 100vh;
+            min-height: 100vh;
             color: #f8fafc;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            padding-bottom: 70px; /* فضای خالی برای نوار ثابت پایین */
+            overflow-x: hidden;
         }
 
         header {
@@ -97,13 +98,12 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-evenly;
-            padding: 4px 8px;
+            justify-content: center;
+            padding: 6px 8px;
             width: 100%;
             max-width: 500px;
             margin: 0 auto;
-            flex: 1;
-            overflow: hidden;
+            gap: 8px;
         }
 
         .top-section {
@@ -117,8 +117,8 @@
 
         .wheel-box {
             position: relative;
-            width: 210px;
-            height: 210px;
+            width: 175px;
+            height: 175px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -154,10 +154,10 @@
             justify-content: center;
         }
         .timer-circle {
-            width: 28px; height: 28px; border-radius: 50%;
+            width: 26px; height: 26px; border-radius: 50%;
             border: 2px solid var(--accent-blue);
             display: flex; justify-content: center; align-items: center;
-            font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 10px;
+            font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 9.5px;
             color: #fff; background: rgba(15, 23, 42, 0.9);
         }
         .status-text { font-size: 8.5px; font-weight: 800; color: var(--gold-accent); text-align: center; }
@@ -176,7 +176,7 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.9);
             display: grid;
             grid-template-columns: 22px repeat(12, 1fr) 26px;
-            grid-template-rows: repeat(3, 24px) 22px 22px;
+            grid-template-rows: repeat(3, 22px) 20px 20px;
             gap: 1px;
             width: 100%;
             max-width: 100%;
@@ -190,7 +190,7 @@
             align-items: center;
             font-family: 'Orbitron', sans-serif;
             font-weight: 800;
-            font-size: 8px;
+            font-size: 7.5px;
             color: #fff;
             cursor: pointer;
             position: relative;
@@ -199,19 +199,19 @@
         .cell:hover { background: rgba(250, 204, 21, 0.3); border-color: var(--gold-accent); }
         .cell.red-num { background: rgba(220, 38, 38, 0.85); }
         .cell.black-num { background: rgba(15, 23, 42, 0.9); }
-        .cell.zero-num { grid-row: 1 / span 3; background: #16a34a; font-size: 9px; }
+        .cell.zero-num { grid-row: 1 / span 3; background: #16a34a; font-size: 8.5px; }
 
-        .cell.outside-bet { font-size: 6px; font-weight: 800; background: rgba(15, 23, 42, 0.7); }
+        .cell.outside-bet { font-size: 5.5px; font-weight: 800; background: rgba(15, 23, 42, 0.7); }
         .cell.outside-red { background: rgba(220, 38, 38, 0.7); }
         .cell.outside-black { background: rgba(15, 23, 42, 0.9); }
 
         .chip-on-table {
             position: absolute;
-            width: 13px; height: 13px;
+            width: 12px; height: 12px;
             border-radius: 50%;
             border: 1px dashed #fff;
             font-family: 'Orbitron';
-            font-size: 4.5px;
+            font-size: 4px;
             font-weight: 900;
             display: flex; justify-content: center; align-items: center;
             color: #000;
@@ -226,27 +226,30 @@
         .chip-50 { background: #a855f7; color: #fff; }
         .chip-100 { background: #ef4444; color: #fff; }
 
-        /* نوار کنترل پایین صفحه با ژتون‌های بزرگ و واضح */
+        /* نوار کنترل پایین صفحه کاملاً ثابت و فیکس شده در پایین موبایل */
         .control-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
             background: rgba(15, 23, 42, 0.98);
             border-top: 1px solid var(--glass-border);
-            padding: 8px 10px;
+            padding: 8px 12px;
             backdrop-filter: blur(16px);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 200;
-            gap: 6px;
-            flex-shrink: 0;
-            overflow-x: auto;
+            z-index: 999;
+            gap: 8px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.8);
         }
 
-        .chip-rack { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+        .chip-rack { display: flex; gap: 8px; align-items: center; flex-shrink: 0; overflow-x: auto; padding: 2px 0; }
         .chip-select {
-            width: 36px; height: 36px; border-radius: 50%;
+            width: 38px; height: 38px; border-radius: 50%;
             border: 2px dashed #fff;
             display: flex; justify-content: center; align-items: center;
-            font-family: 'Orbitron'; font-weight: 900; font-size: 9px; color: #000;
+            font-family: 'Orbitron'; font-weight: 900; font-size: 10px; color: #000;
             cursor: pointer; flex-shrink: 0;
             box-shadow: 0 2px 6px rgba(0,0,0,0.6);
             transition: transform 0.2s, box-shadow 0.2s;
@@ -255,7 +258,7 @@
             border-style: solid; 
             border-color: var(--gold-accent); 
             transform: scale(1.15); 
-            box-shadow: 0 0 10px var(--gold-accent); 
+            box-shadow: 0 0 12px var(--gold-accent); 
         }
         
         .chip-select.chip-1 { background: #38bdf8; }
@@ -264,9 +267,9 @@
         .chip-select.chip-50 { background: #a855f7; color: #fff; }
         .chip-select.chip-100 { background: #ef4444; color: #fff; }
 
-        .action-btns { display: flex; gap: 4px; flex-shrink: 0; }
+        .action-btns { display: flex; gap: 5px; flex-shrink: 0; }
         .btn-act {
-            padding: 5px 8px; border-radius: 6px; border: none; font-weight: 800; font-size: 8.5px; cursor: pointer; color: #fff; white-space: nowrap;
+            padding: 6px 9px; border-radius: 6px; border: none; font-weight: 800; font-size: 8.5px; cursor: pointer; color: #fff; white-space: nowrap;
             box-shadow: 0 2px 4px rgba(0,0,0,0.4);
         }
         .btn-clear { background: #ef4444; }
@@ -353,7 +356,7 @@
         <div class="top-section">
             <div class="wheel-box">
                 <div class="wheel-pointer"></div>
-                <canvas id="rouletteWheel" width="210" height="210"></canvas>
+                <canvas id="rouletteWheel" width="175" height="175"></canvas>
             </div>
 
             <div class="status-center">
@@ -369,7 +372,7 @@
         </div>
     </div>
 
-    <!-- نوار انتخاب ژتون‌ها و دکمه‌های کنترل شرط -->
+    <!-- نوار ثابت و پایینی ژتون‌ها در موبایل -->
     <div class="control-bar">
         <div class="chip-rack">
             <div class="chip-select chip-1 active" onclick="selectChip(1, this)">$1</div>
