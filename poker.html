@@ -366,7 +366,6 @@
         </div>
     </div>
 
-    <!-- مودال راهنمای کامل، ساده و روان -->
     <div class="modal" id="m-help">
         <div class="modal-content" style="max-width: 330px;">
             <div class="modal-header">
@@ -374,40 +373,13 @@
                 <button class="modal-close" onclick="closeHelpModal()"><i class="fas fa-times"></i></button>
             </div>
             <div style="overflow-y:auto; max-height: 65vh; padding-right:4px; font-size:9.5px; color:#cbd5e1; line-height:1.6;">
-                
                 <p style="margin-bottom:8px;"><strong style="color:#facc15;">هدف بازی:</strong> پیش‌بینی اینکه توپ روی چه عددی در چرخ می‌ایستد.</p>
-
-                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">1. اعداد تکی (0 تا 36):</strong></p>
-                <p style="margin-right:8px; margin-bottom:6px; color:#94a3b8;">اگر روی هر عدد دلخواهی (مثلاً 5، 12، 24 یا حتی عدد سبز 0) ژتون بگذاری و توپ دقیقاً روی همان عدد بیفتد، مبلغت <strong>36 برابر</strong> می‌شود!</p>
-
-                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">2. بخش دوازده‌تایی‌ها (1st 12 , 2nd 12 , 3rd 12):</strong></p>
-                <p style="margin-right:8px; margin-bottom:6px; color:#94a3b8;">
-                    • <strong>1st 12:</strong> شامل اعداد ۱ تا ۱۲<br>
-                    • <strong>2nd 12:</strong> شامل اعداد ۱۳ تا ۲۴<br>
-                    • <strong>3rd 12:</strong> شامل اعداد ۲۵ تا ۳۶<br>
-                    *(ضریب برد روی این‌ها <strong>3 برابر</strong> است).*
-                </p>
-
-                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">3. ستون‌ها (2:1 در سمت راست میز):</strong></p>
-                <p style="margin-right:8px; margin-bottom:6px; color:#94a3b8;">روی هر کدام از ۳ ستون عمودی میز ژتون بگذاری، اگر عدد برنده در آن ستون باشد، مبلغت <strong>3 برابر</strong> می‌شود.</p>
-
-                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">4. رنگ‌ها (RED / BLACK):</strong></p>
-                <p style="margin-right:8px; margin-bottom:6px; color:#94a3b8;">اگر حدس بزنی توپ روی خانه قرمز (RED) یا مشکی (BLACK) می‌افتد، در صورت برد مبلغت <strong>2 برابر</strong> می‌شود.</p>
-
-                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">5. زوج و فرد (EVEN / ODD):</strong></p>
-                <p style="margin-right:8px; margin-bottom:6px; color:#94a3b8;">
-                    • <strong>EVEN:</strong> اعداد زوج (2, 4, 6... تا 36)<br>
-                    • <strong>ODD:</strong> اعداد فرد (1, 3, 5... تا 35)<br>
-                    *(ضریب برد <strong>2 برابر</strong>).*
-                </p>
-
-                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">6. نیمه اول و دوم (1-18 و 19-36):</strong></p>
-                <p style="margin-right:8px; color:#94a3b8;">
-                    • <strong>1-18:</strong> اعداد ۱ تا ۱۸<br>
-                    • <strong>19-36:</strong> اعداد ۱۹ تا ۳۶<br>
-                    *(ضریب برد <strong>2 برابر</strong>).*
-                </p>
-
+                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">1. اعداد تکی (0 تا 36):</strong> ضریب ۳۶ برابر</p>
+                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">2. دوازده‌تایی‌ها (1st 12 , 2nd 12 , 3rd 12):</strong> ضریب ۳ برابر</p>
+                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">3. ستون‌ها (2:1):</strong> ضریب ۳ برابر</p>
+                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">4. رنگ‌ها (RED / BLACK):</strong> ضریب ۲ برابر</p>
+                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">5. زوج و فرد (EVEN / ODD):</strong> ضریب ۲ برابر</p>
+                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">6. نیمه‌ها (1-18 و 19-36):</strong> ضریب ۲ برابر</p>
             </div>
         </div>
     </div>
@@ -454,13 +426,14 @@
             } catch(e){}
         }
 
-        async function syncCasinoBalanceWithDB(newBal) {
-            userBalance = Math.max(0, newBal);
-            updateStats();
+        async function fetchUserBalance() {
             if (!uUid) return;
             try {
-                await supabase.from('users').update({ casino_balance: userBalance }).eq('id', uUid);
-                await supabase.auth.updateUser({ data: { casino_balance: userBalance } });
+                const { data } = await supabase.from('users').select('casino_balance').eq('id', uUid).single();
+                if (data && data.casino_balance !== undefined) {
+                    userBalance = parseFloat(data.casino_balance);
+                    updateStats();
+                }
             } catch (e) {}
         }
 
@@ -472,7 +445,10 @@
                 return;
             }
             userBalance += amt;
-            await syncCasinoBalanceWithDB(userBalance);
+            if (uUid) {
+                await supabase.from('users').update({ casino_balance: userBalance }).eq('id', uUid);
+            }
+            updateStats();
             alert(`موجودی بازی به مبلغ $${amt.toFixed(2)} شارژ شد.`);
             if(amtInput) amtInput.value = '';
             closeCasinoDepositModal();
@@ -538,7 +514,7 @@
                     cell.style.gridColumn = `${c + 1}`;
                     cell.setAttribute('data-bet', num.toString());
                     cell.textContent = num;
-                    cell.onclick = () => placeBet(num.toString(), cell);
+                    cell.onclick = () => placeBet(num.toString());
                     table.appendChild(cell);
                 }
             }
@@ -551,7 +527,7 @@
                 const colTarget = `COL_${3 - r}`;
                 cell.setAttribute('data-bet', colTarget);
                 cell.textContent = '2:1';
-                cell.onclick = () => placeBet(colTarget, cell);
+                cell.onclick = () => placeBet(colTarget);
                 table.appendChild(cell);
             }
 
@@ -567,7 +543,7 @@
                 cell.style.gridColumn = d.colSpan;
                 cell.setAttribute('data-bet', d.target);
                 cell.textContent = d.name;
-                cell.onclick = () => placeBet(d.target, cell);
+                cell.onclick = () => placeBet(d.target);
                 table.appendChild(cell);
             });
 
@@ -586,7 +562,7 @@
                 cell.style.gridColumn = o.colSpan;
                 cell.setAttribute('data-bet', o.target);
                 cell.textContent = o.name;
-                cell.onclick = () => placeBet(o.target, cell);
+                cell.onclick = () => placeBet(o.target);
                 table.appendChild(cell);
             });
         }
@@ -598,32 +574,36 @@
             playSound(600, 'sine', 0.05);
         };
 
-        window.placeBet = async function(target, cellElem) {
+        // اتصال امن ثبت شرط به تابع سرورسايد place_casino_bet
+        window.placeBet = async function(target) {
             if (gameState !== 'BETTING') return;
             if (userBalance < selectedChipVal) {
-                if (confirm('موجودی بازی کافی نیست! شارژ شود؟')) {
-                    openCasinoDepositModal();
-                }
+                alert('موجودی کافی نیست!');
                 return;
             }
 
-            userBalance -= selectedChipVal;
-            userBets.push({ target, amount: selectedChipVal });
+            if (uUid) {
+                const { data, error } = await supabase.rpc('place_casino_bet', { p_target: target, p_amount: selectedChipVal });
+                if (error || !data.success) {
+                    alert(data?.message || 'خطا در ثبت شرط');
+                    return;
+                }
+                userBalance = data.new_balance;
+            } else {
+                userBalance -= selectedChipVal;
+            }
 
+            userBets.push({ target, amount: selectedChipVal });
             playSound(800, 'triangle', 0.08);
             renderChips();
             updateStats();
-            await syncCasinoBalanceWithDB(userBalance);
         };
 
         function renderChips() {
             document.querySelectorAll('.chip-on-table').forEach(c => c.remove());
-
             const betMap = {};
             userBets.forEach(b => {
-                if (!betMap[b.target]) {
-                    betMap[b.target] = 0;
-                }
+                if (!betMap[b.target]) betMap[b.target] = 0;
                 betMap[b.target] += b.amount;
             });
 
@@ -647,50 +627,47 @@
 
         window.clearUserBets = async function() {
             if (gameState !== 'BETTING') return;
+            // در صورت تمایل به لغو، موجودی بازگردانده می‌شود
             const totalRefund = userBets.reduce((sum, b) => sum + b.amount, 0);
             userBalance += totalRefund;
+            if (uUid && totalRefund > 0) {
+                await supabase.from('users').update({ casino_balance: userBalance }).eq('id', uUid);
+                // حذف شرط‌های PENDING کاربر از دیتابیس
+                await supabase.from('casino_bets').delete().eq('user_id', uUid).eq('status', 'PENDING');
+            }
             userBets = [];
             renderChips();
             updateStats();
             playSound(300, 'sine', 0.1);
-            await syncCasinoBalanceWithDB(userBalance);
         };
 
         window.doubleUserBets = async function() {
             if (gameState !== 'BETTING') return;
             const totalCurrent = userBets.reduce((sum, b) => sum + b.amount, 0);
-            if (totalCurrent <= 0) return;
-            if (userBalance < totalCurrent) {
+            if (totalCurrent <= 0 || userBalance < totalCurrent) {
                 alert('موجودی کافی نیست!');
                 return;
             }
-            userBalance -= totalCurrent;
-            const newBets = JSON.parse(JSON.stringify(userBets));
-            userBets = userBets.concat(newBets);
-            renderChips();
-            updateStats();
-            playSound(900, 'sine', 0.1);
-            await syncCasinoBalanceWithDB(userBalance);
+            // برای هر شرط موجود، یک شرط دیگر ثبت می‌کنیم
+            const currentCopy = [...userBets];
+            for (let b of currentCopy) {
+                await placeBet(b.target);
+            }
         };
 
         window.quadrupleUserBets = async function() {
             if (gameState !== 'BETTING') return;
             const totalCurrent = userBets.reduce((sum, b) => sum + b.amount, 0);
-            if (totalCurrent <= 0) return;
-            const costNeeded = totalCurrent * 3;
-            if (userBalance < costNeeded) {
+            if (totalCurrent <= 0 || userBalance < totalCurrent * 3) {
                 alert('موجودی کافی نیست!');
                 return;
             }
-            userBalance -= costNeeded;
-            const b1 = JSON.parse(JSON.stringify(userBets));
-            const b2 = JSON.parse(JSON.stringify(userBets));
-            const b3 = JSON.parse(JSON.stringify(userBets));
-            userBets = userBets.concat(b1, b2, b3);
-            renderChips();
-            updateStats();
-            playSound(1000, 'sine', 0.1);
-            await syncCasinoBalanceWithDB(userBalance);
+            for (let i = 0; i < 3; i++) {
+                const currentCopy = [...userBets];
+                for (let b of currentCopy) {
+                    await placeBet(b.target);
+                }
+            }
         };
 
         function updateStats() {
@@ -749,42 +726,40 @@
             }, 3100);
         }
 
+        // اتصال تسویه حساب امن به تابع سرورسايد settle_casino_bets
         async function evaluateResult(winNum) {
             gameState = 'RESULT';
             const isRed = redNumbers.includes(winNum);
-            const isEven = winNum !== 0 && winNum % 2 === 0;
-
             const winCell = document.querySelector(`[data-bet="${winNum}"]`);
             if (winCell) winCell.classList.add('winning-cell');
 
             let totalPayout = 0;
 
-            userBets.forEach(b => {
-                let won = false;
-                let multiplier = 0;
-
-                if (b.target === winNum.toString()) { won = true; multiplier = 36; }
-                else if (b.target === 'RED' && isRed) { won = true; multiplier = 2; }
-                else if (b.target === 'BLACK' && !isRed && winNum !== 0) { won = true; multiplier = 2; }
-                else if (b.target === 'EVEN' && isEven) { won = true; multiplier = 2; }
-                else if (b.target === 'ODD' && !isEven && winNum !== 0) { won = true; multiplier = 2; }
-                else if (b.target === 'LOW' && winNum >= 1 && winNum <= 18) { won = true; multiplier = 2; }
-                else if (b.target === 'HIGH' && winNum >= 19 && winNum <= 36) { won = true; multiplier = 2; }
-                else if (b.target === 'DOZ_1' && winNum >= 1 && winNum <= 12) { won = true; multiplier = 3; }
-                else if (b.target === 'DOZ_2' && winNum >= 13 && winNum <= 24) { won = true; multiplier = 3; }
-                else if (b.target === 'DOZ_3' && winNum >= 25 && winNum <= 36) { won = true; multiplier = 3; }
-
-                if (won) {
-                    totalPayout += b.amount * multiplier;
+            if (uUid && userBets.length > 0) {
+                const { data, error } = await supabase.rpc('settle_casino_bets', { p_win_num: winNum });
+                if (!error && data && data.success) {
+                    totalPayout = data.payout;
                 }
-            });
-
-            if (totalPayout > 0) {
+            } else {
+                // محاسبه محلی برای حالت تست بدون لاگین
+                userBets.forEach(b => {
+                    let won = false; let mult = 0;
+                    if (b.target === winNum.toString()) { won = true; mult = 36; }
+                    else if (b.target === 'RED' && isRed) { won = true; mult = 2; }
+                    else if (b.target === 'BLACK' && !isRed && winNum !== 0) { won = true; mult = 2; }
+                    else if (b.target === 'EVEN' && winNum !== 0 && winNum % 2 === 0) { won = true; mult = 2; }
+                    else if (b.target === 'ODD' && winNum !== 0 && winNum % 2 !== 0) { won = true; mult = 2; }
+                    else if (b.target === 'LOW' && winNum >= 1 && winNum <= 18) { won = true; mult = 2; }
+                    else if (b.target === 'HIGH' && winNum >= 19 && winNum <= 36) { won = true; mult = 2; }
+                    else if (b.target === 'DOZ_1' && winNum >= 1 && winNum <= 12) { won = true; mult = 3; }
+                    else if (b.target === 'DOZ_2' && winNum >= 13 && winNum <= 24) { won = true; mult = 3; }
+                    else if (b.target === 'DOZ_3' && winNum >= 25 && winNum <= 36) { won = true; mult = 3; }
+                    if (won) totalPayout += b.amount * mult;
+                });
                 userBalance += totalPayout;
-                await syncCasinoBalanceWithDB(userBalance);
             }
 
-            updateStats();
+            await fetchUserBalance();
 
             const colorName = winNum === 0 ? 'سبز' : (isRed ? 'قرمز' : 'مشکی');
             const msgEl = document.getElementById('status-msg');
@@ -826,16 +801,12 @@
             if (session && session.user) {
                 currentUser = session.user;
                 uUid = session.user.id;
-                try {
-                    const { data: dbUser } = await supabase.from('users').select('casino_balance').eq('id', uUid).single();
-                    if (dbUser?.casino_balance !== undefined) {
-                        userBalance = parseFloat(dbUser.casino_balance);
-                    }
-                } catch(e) {}
+                await fetchUserBalance();
             }
         });
 
-        updateStats();
+        // اجرای اولیه
+        fetchUserBalance();
         drawWheel();
         buildTable();
         startTimer();
