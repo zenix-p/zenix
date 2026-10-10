@@ -71,7 +71,21 @@
             flex-shrink: 0;
         }
 
-        .history-bar { display: flex; align-items: center; gap: 3px; background: rgba(0,0,0,0.4); padding: 2px 5px; border-radius: 12px; border: 1px solid var(--glass-border); overflow-x: auto; max-width: 42%; }
+        .user-welcome-tag {
+            font-size: 9.5px;
+            font-weight: 700;
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            padding: 2px 8px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .history-bar { display: flex; align-items: center; gap: 3px; background: rgba(0,0,0,0.4); padding: 2px 5px; border-radius: 12px; border: 1px solid var(--glass-border); overflow-x: auto; max-width: 35%; }
         .history-title { font-size: 8px; color: #94a3b8; font-weight: 700; white-space: nowrap; }
         .hist-num { width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 8px; font-weight: 800; font-family: 'Orbitron'; color: #fff; flex-shrink: 0; }
         .hist-red { background: #dc2626; }
@@ -298,6 +312,11 @@
     </header>
 
     <div class="game-bar">
+        <div id="user-welcome-display" class="user-welcome-tag" style="display: none;">
+            <i class="fas fa-user-circle" style="color:#facc15;"></i>
+            <span id="user-fullname-text">خوش آمدید کاربر</span>
+        </div>
+
         <div class="history-bar">
             <span class="history-title">نتایج:</span>
             <div id="history-list" style="display:flex; gap:2.5px;"></div>
@@ -429,12 +448,27 @@
         async function fetchUserBalance() {
             if (!uUid) return;
             try {
-                const { data } = await supabase.from('users').select('casino_balance').eq('id', uUid).single();
-                if (data && data.casino_balance !== undefined) {
-                    userBalance = parseFloat(data.casino_balance);
-                    updateStats();
+                const { data } = await supabase.from('users').select('casino_balance, fullname, full_name').eq('id', uUid).single();
+                if (data) {
+                    if (data.casino_balance !== undefined) {
+                        userBalance = parseFloat(data.casino_balance);
+                        updateStats();
+                    }
+                    const name = data.fullname || data.full_name || currentUser?.user_metadata?.fullname || currentUser?.user_metadata?.full_name;
+                    if (name) {
+                        renderWelcomeName(name);
+                    }
                 }
             } catch (e) {}
+        }
+
+        function renderWelcomeName(name) {
+            const welcomeDisplay = document.getElementById('user-welcome-display');
+            const welcomeText = document.getElementById('user-fullname-text');
+            if (welcomeDisplay && welcomeText && name) {
+                welcomeText.textContent = `خوش آمدید ${name}`;
+                welcomeDisplay.style.display = 'inline-flex';
+            }
         }
 
         window.processCasinoDeposit = async function() {
@@ -801,6 +835,10 @@
             if (session && session.user) {
                 currentUser = session.user;
                 uUid = session.user.id;
+                const name = session.user.user_metadata?.fullname || session.user.user_metadata?.full_name;
+                if (name) {
+                    renderWelcomeName(name);
+                }
                 await fetchUserBalance();
             }
         });
