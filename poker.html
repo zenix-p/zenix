@@ -117,8 +117,8 @@
 
         .wheel-box {
             position: relative;
-            width: 220px;
-            height: 220px;
+            width: 210px;
+            height: 210px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -226,33 +226,48 @@
         .chip-50 { background: #a855f7; color: #fff; }
         .chip-100 { background: #ef4444; color: #fff; }
 
+        /* نوار کنترل پایین صفحه با ژتون‌های بزرگ و واضح */
         .control-bar {
             background: rgba(15, 23, 42, 0.98);
             border-top: 1px solid var(--glass-border);
-            padding: 5px 6px;
+            padding: 8px 10px;
             backdrop-filter: blur(16px);
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 200;
-            gap: 3px;
+            gap: 6px;
             flex-shrink: 0;
             overflow-x: auto;
         }
 
-        .chip-rack { display: flex; gap: 2.5px; align-items: center; flex-shrink: 0; }
+        .chip-rack { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
         .chip-select {
-            width: 22px; height: 22px; border-radius: 50%;
-            border: 1.5px dashed #fff;
+            width: 36px; height: 36px; border-radius: 50%;
+            border: 2px dashed #fff;
             display: flex; justify-content: center; align-items: center;
-            font-family: 'Orbitron'; font-weight: 900; font-size: 6.5px; color: #000;
+            font-family: 'Orbitron'; font-weight: 900; font-size: 9px; color: #000;
             cursor: pointer; flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .chip-select.active { border-style: solid; border-color: var(--gold-accent); transform: scale(1.1); box-shadow: 0 0 5px var(--gold-accent); }
+        .chip-select.active { 
+            border-style: solid; 
+            border-color: var(--gold-accent); 
+            transform: scale(1.15); 
+            box-shadow: 0 0 10px var(--gold-accent); 
+        }
+        
+        .chip-select.chip-1 { background: #38bdf8; }
+        .chip-select.chip-5 { background: #facc15; }
+        .chip-select.chip-10 { background: #22c55e; }
+        .chip-select.chip-50 { background: #a855f7; color: #fff; }
+        .chip-select.chip-100 { background: #ef4444; color: #fff; }
 
-        .action-btns { display: flex; gap: 2.5px; flex-shrink: 0; }
+        .action-btns { display: flex; gap: 4px; flex-shrink: 0; }
         .btn-act {
-            padding: 3px 5px; border-radius: 4px; border: none; font-weight: 800; font-size: 7.5px; cursor: pointer; color: #fff; white-space: nowrap;
+            padding: 5px 8px; border-radius: 6px; border: none; font-weight: 800; font-size: 8.5px; cursor: pointer; color: #fff; white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
         }
         .btn-clear { background: #ef4444; }
         .btn-double { background: #0ea5e9; }
@@ -338,7 +353,7 @@
         <div class="top-section">
             <div class="wheel-box">
                 <div class="wheel-pointer"></div>
-                <canvas id="rouletteWheel" width="220" height="220"></canvas>
+                <canvas id="rouletteWheel" width="210" height="210"></canvas>
             </div>
 
             <div class="status-center">
@@ -354,6 +369,7 @@
         </div>
     </div>
 
+    <!-- نوار انتخاب ژتون‌ها و دکمه‌های کنترل شرط -->
     <div class="control-bar">
         <div class="chip-rack">
             <div class="chip-select chip-1 active" onclick="selectChip(1, this)">$1</div>
