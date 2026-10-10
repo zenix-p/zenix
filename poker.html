@@ -35,9 +35,9 @@
         header {
             background: rgba(15, 23, 42, .9);
             border-bottom: 1px solid rgba(255,255,255,.1);
-            padding: 5px 10px;
+            padding: 8px 10px;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             z-index: 100;
             backdrop-filter: blur(10px);
@@ -46,16 +46,6 @@
         .logo{display:flex;align-items:center;gap:6px}
         .logo-icon{width:26px;height:26px;background:linear-gradient(135deg,#0ea5e9,#9333ea);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;font-style:italic;transform:skewX(-6deg);box-shadow:0 0 8px rgba(14,165,233,.4)}
         .logo-text{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;letter-spacing:1px;font-style:italic;transform:skewX(-6deg);background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-        .hr{display:flex;align-items:center;gap:4px}
-        .wrap{position:relative}
-        .lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:28px;width:28px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:#38bdf8;text-decoration:none}
-        .badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:8px;width:13px;height:13px;border-radius:50%;display:none;align-items:center;justify-content:center;font-weight:700}
-        .badge.show{display:flex}
-        .menu{display:none;position:absolute;top:32px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;min-width:140px;padding:5px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8)}
-        [dir="rtl"] .wrap .menu{left:0}[dir="ltr"] .wrap .menu{right:0}
-        .menu.show{display:block}
-        .mi{padding:6px 9px;font-size:10.5px;color:#cbd5e1;cursor:pointer;border-radius:5px;display:flex;align-items:center;gap:7px;text-decoration:none;white-space:nowrap}
-        .mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}
 
         .game-bar {
             background: rgba(15, 23, 42, 0.85);
@@ -115,18 +105,18 @@
             gap: 5px;
         }
 
-        /* چرخ شانس بزرگ‌تر و باکیفیت‌تر */
+        /* چرخ شانس بزرگ‌تر‌شده (۲۶۰ پیکسل) */
         .wheel-box {
             position: relative;
-            width: 220px;
-            height: 220px;
+            width: 260px;
+            height: 260px;
             display: flex;
             justify-content: center;
             align-items: center;
             background: radial-gradient(circle, #2d160a 0%, #020617 70%);
             border-radius: 50%;
             border: 5px solid #42281d;
-            box-shadow: 0 0 20px rgba(0,0,0,0.9);
+            box-shadow: 0 0 25px rgba(0,0,0,0.9);
             flex-shrink: 0;
         }
         canvas#rouletteWheel { 
@@ -227,7 +217,7 @@
         .chip-50 { background: #a855f7; color: #fff; }
         .chip-100 { background: #ef4444; color: #fff; }
 
-        /* نوار ثابت و پایینی ژتون‌ها در موبایل (دقيقاً زیر دست و بالاتر از لبه پایین صفحه) */
+        /* نوار ثابت و پایینی ژتون‌ها در موبایل */
         .control-bar {
             position: fixed;
             bottom: 0;
@@ -296,42 +286,6 @@
             <div class="logo-icon">Z</div>
             <div class="logo-text">ZENIX</div>
         </div>
-        <div class="hr">
-            <div class="wrap">
-                <button type="button" class="lb" id="bell-btn"><i class="fas fa-bell" style="color:#fbbf24"></i><span class="badge" id="bell-badge">0</span></button>
-            </div>
-            <div class="wrap">
-                <button type="button" class="lb" id="help-btn" title="راهنمای بازی" onclick="window.openHelpModal()"><i class="fas fa-circle-question" style="color:#38bdf8"></i></button>
-            </div>
-            <a href="support.html" class="lb"><i class="fas fa-headset" style="color:#a855f7"></i></a>
-            <div class="wrap">
-                <button type="button" class="lb" id="lang-btn"><i class="fas fa-globe" style="color:#22c55e"></i></button>
-                <div class="menu" id="lang-menu">
-                    <div class="mi" data-lang="fa">فارسی</div>
-                    <div class="mi" data-lang="en">English</div>
-                    <div class="mi" data-lang="ar">العربية</div>
-                    <div class="mi" data-lang="tr">Türkçe</div>
-                    <div class="mi" data-lang="ru">Русский</div>
-                    <div class="mi" data-lang="es">Español</div>
-                    <div class="mi" data-lang="fr">Français</div>
-                    <div class="mi" data-lang="de">Deutsch</div>
-                </div>
-            </div>
-            <div class="wrap">
-                <button type="button" class="lb" id="menu-btn"><i class="fas fa-bars" style="color:#f43f5e"></i></button>
-                <div class="menu" id="nav-menu">
-                    <a href="dashboard.html" class="mi"><i class="fas fa-home" style="color:#38bdf8"></i><span>صفحه اصلی</span></a>
-                    <a href="quantification.html" class="mi"><i class="fas fa-robot" style="color:#a855f7"></i><span>کوانتیفیکیشن</span></a>
-                    <a href="deposit.html" class="mi"><i class="fas fa-arrow-down" style="color:#22c55e"></i><span>واریز</span></a>
-                    <a href="receive.html" class="mi"><i class="fas fa-arrow-up" style="color:#fbbf24"></i><span>برداشت</span></a>
-                    <a href="transactions.html" class="mi"><i class="fas fa-history" style="color:#06b6d4"></i><span>تراکنش</span></a>
-                    <a href="profile.html" class="mi"><i class="fas fa-user-cog" style="color:#ec4899"></i><span>پروفایل</span></a>
-                    <a href="support.html" class="mi"><i class="fas fa-headset" style="color:#a855f7"></i><span>پشتیبانی</span></a>
-                    <a href="#" class="mi" onclick="window.openAboutModal();return false;"><i class="fas fa-info-circle" style="color:#38bdf8"></i><span>درباره پلتفرم</span></a>
-                    <a href="#" class="mi" id="logout-btn" style="color:#ef4444"><i class="fas fa-power-off"></i><span>خروج</span></a>
-                </div>
-            </div>
-        </div>
     </header>
 
     <div class="game-bar">
@@ -357,8 +311,8 @@
         <div class="top-section">
             <div class="wheel-box">
                 <div class="wheel-pointer"></div>
-                <!-- چرخ بزرگ‌تر با سایز ۲۲۰ پیکسلی -->
-                <canvas id="rouletteWheel" width="220" height="220"></canvas>
+                <!-- چرخ شانس بزرگ‌تر با سایز ۲۶۰ پیکسلی -->
+                <canvas id="rouletteWheel" width="260" height="260"></canvas>
             </div>
 
             <div class="status-center">
@@ -374,7 +328,7 @@
         </div>
     </div>
 
-    <!-- نوار ثابت و پایینی ژتون‌ها در موبایل (کامل و در دیدرس) -->
+    <!-- نوار ثابت و پایینی ژتون‌ها در موبایل -->
     <div class="control-bar">
         <div class="chip-rack">
             <div class="chip-select chip-1 active" onclick="selectChip(1, this)">$1</div>
@@ -405,51 +359,6 @@
         </div>
     </div>
 
-    <div class="modal" id="m-help">
-        <div class="modal-content">
-            <div class="modal-header"><span>راهنمای بازی رولت</span><button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button></div>
-            <div style="overflow-y:auto;padding-right:4px; font-size:9px; color:#cbd5e1; line-height:1.3;">
-                <p style="margin-bottom:3px;"><strong style="color:#facc15;">• نحوه بازی:</strong> ژتون خود را انتخاب و روی خانه کلیک کنید.</p>
-                <p><strong style="color:#22c55e;">• ضرایب:</strong> تک عدد ۳۶x، رنگ/زوج‌فرد ۲x، ستون‌ها ۳x.</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="m-about">
-        <div class="modal-content">
-            <div class="modal-header"><span>درباره پلتفرم Zenix</span><button class="modal-close" onclick="window.closeAboutModal()"><i class="fas fa-times"></i></button></div>
-            <div style="overflow-y:auto;padding-right:4px; font-size:9px; color:#cbd5e1; line-height:1.3;">
-                <p>پلتفرم مالی Zenix.</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="m-msg">
-        <div class="modal-content">
-            <div class="modal-header"><span><i class="fas fa-bell"></i> اعلان‌ها</span><button class="modal-close" onclick="window.closeMessageModal()"><i class="fas fa-times"></i></button></div>
-            <div style="text-align:center;padding:8px;color:#94a3b8;font-size:9px;">هیچ پیامی نیست.</div>
-        </div>
-    </div>
-
-    <script>
-        window.openHelpModal=()=>document.getElementById('m-help')?.classList.add('show');
-        window.closeHelpModal=()=>document.getElementById('m-help')?.classList.remove('show');
-        window.openAboutModal=()=>document.getElementById('m-about')?.classList.add('show');
-        window.closeAboutModal=()=>document.getElementById('m-about')?.classList.remove('show');
-        window.openCasinoDepositModal=()=>document.getElementById('m-casino-deposit')?.classList.add('show');
-        window.closeCasinoDepositModal=()=>document.getElementById('m-casino-deposit')?.classList.remove('show');
-        window.openMessageModal=()=>document.getElementById('m-msg')?.classList.add('show');
-        window.closeMessageModal=()=>document.getElementById('m-msg')?.classList.remove('show');
-
-        const mB=document.getElementById('menu-btn'),nM=document.getElementById('nav-menu'),lB=document.getElementById('lang-btn'),lMenu=document.getElementById('lang-menu'),bB=document.getElementById('bell-btn');
-        function tM(o,e){e.stopPropagation();[nM,lMenu].forEach(m=>{if(m!==o)m.classList.remove('show');});o.classList.toggle('show');}
-        if(mB)mB.onclick=(e)=>tM(nM,e);
-        if(lB)lB.onclick=(e)=>tM(lMenu,e);
-        if(bB)bB.onclick=(e)=>{e.stopPropagation();window.openMessageModal();};
-        document.onclick=()=>{[nM,lMenu].forEach(m=>m.classList.remove('show'));};
-        document.querySelectorAll('.menu').forEach(m=>m.onclick=(e)=>e.stopPropagation());
-    </script>
-
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
@@ -468,6 +377,9 @@
         let gameState = 'BETTING'; 
         let countdown = 10;
         let timerInterval;
+
+        window.openCasinoDepositModal = () => document.getElementById('m-casino-deposit')?.classList.add('show');
+        window.closeCasinoDepositModal = () => document.getElementById('m-casino-deposit')?.classList.remove('show');
 
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playSound(freq, type = 'sine', duration = 0.1) {
@@ -529,7 +441,7 @@
 
                 ctx.beginPath();
                 ctx.moveTo(radius, radius);
-                ctx.arc(radius, radius, radius - 6, angle, angle + sliceAngle);
+                ctx.arc(radius, radius, radius - 7, angle, angle + sliceAngle);
                 ctx.closePath();
                 ctx.fill();
                 ctx.strokeStyle = '#facc15';
@@ -541,13 +453,13 @@
                 ctx.rotate(angle + sliceAngle / 2);
                 ctx.textAlign = 'right';
                 ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 10px Orbitron';
-                ctx.fillText(num.toString(), radius - 15, 4);
+                ctx.font = 'bold 11px Orbitron';
+                ctx.fillText(num.toString(), radius - 16, 4);
                 ctx.restore();
             }
 
             ctx.beginPath();
-            ctx.arc(radius, radius, 32, 0, 2 * Math.PI);
+            ctx.arc(radius, radius, 38, 0, 2 * Math.PI);
             ctx.fillStyle = '#2d160a';
             ctx.fill();
             ctx.strokeStyle = '#facc15';
@@ -870,15 +782,6 @@
         drawWheel();
         buildTable();
         startTimer();
-
-        const logoutBtn = document.getElementById('logout-btn');
-        if (logoutBtn) {
-            logoutBtn.onclick = async function(e) {
-                e.preventDefault();
-                try { await supabase.auth.signOut(); } catch(err) {}
-                window.location.href = 'index.html';
-            };
-        }
     </script>
 </body>
 </html>
