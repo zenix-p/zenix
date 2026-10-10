@@ -413,7 +413,7 @@ function bindQuantButton() {
 async function initQuantification() {
   try {
     const { data: { user }, error } = await supabase.auth.getUser();
-    if (error || !user) { window.location.href = 'login.html'; return; }
+    if (error || !user) { window.location.href = 'index.html'; return; }
     uUid = user.id;
     const { data: dbUser } = await supabase.from('users').select('*').eq('id', uUid).single();
     if (dbUser) window.actualUserKeys = Object.keys(dbUser);
@@ -449,6 +449,14 @@ async function initQuantification() {
     if (!notifError && notifs) { window.cachedNotifications = notifs; window.renderNotifications(); window.updateBellBadge(); }
     setLang(localStorage.getItem('zenix_lang') || 'fa');
     bindQuantButton();
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+      logoutBtn.onclick = async function(e) {
+        e.preventDefault();
+        try { await supabase.auth.signOut(); } catch(err) {}
+        window.location.href = 'index.html';
+      };
+    }
     const savedActiveTradeStr = localStorage.getItem(`zenix_active_trade_${uUid}`);
     let restoredActiveTrade = null;
     if (savedActiveTradeStr) {
