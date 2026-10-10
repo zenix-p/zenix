@@ -22,7 +22,6 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', 'Vazirmatn', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
         
-        /* قفل کردن صفحه در ارتفاع موبایل بدون اسکرول */
         body {
             background: var(--bg-dark);
             height: 100vh;
@@ -118,8 +117,8 @@
 
         .wheel-box {
             position: relative;
-            width: 225px;
-            height: 225px;
+            width: 220px;
+            height: 220px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -230,32 +229,34 @@
         .control-bar {
             background: rgba(15, 23, 42, 0.98);
             border-top: 1px solid var(--glass-border);
-            padding: 5px 8px;
+            padding: 5px 6px;
             backdrop-filter: blur(16px);
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 200;
-            gap: 4px;
+            gap: 3px;
             flex-shrink: 0;
+            overflow-x: auto;
         }
 
-        .chip-rack { display: flex; gap: 3px; align-items: center; overflow-x: auto; max-width: 65%; }
+        .chip-rack { display: flex; gap: 2.5px; align-items: center; flex-shrink: 0; }
         .chip-select {
-            width: 24px; height: 24px; border-radius: 50%;
+            width: 22px; height: 22px; border-radius: 50%;
             border: 1.5px dashed #fff;
             display: flex; justify-content: center; align-items: center;
-            font-family: 'Orbitron'; font-weight: 900; font-size: 7px; color: #000;
+            font-family: 'Orbitron'; font-weight: 900; font-size: 6.5px; color: #000;
             cursor: pointer; flex-shrink: 0;
         }
         .chip-select.active { border-style: solid; border-color: var(--gold-accent); transform: scale(1.1); box-shadow: 0 0 5px var(--gold-accent); }
 
-        .action-btns { display: flex; gap: 3px; flex-shrink: 0; }
+        .action-btns { display: flex; gap: 2.5px; flex-shrink: 0; }
         .btn-act {
-            padding: 4px 7px; border-radius: 4px; border: none; font-weight: 800; font-size: 8px; cursor: pointer; color: #fff; white-space: nowrap;
+            padding: 3px 5px; border-radius: 4px; border: none; font-weight: 800; font-size: 7.5px; cursor: pointer; color: #fff; white-space: nowrap;
         }
         .btn-clear { background: #ef4444; }
         .btn-double { background: #0ea5e9; }
+        .btn-quadruple { background: #8b5cf6; }
 
         .winning-cell { animation: winPulse 0.8s infinite alternate; border-color: var(--gold-accent) !important; z-index: 10; }
         @keyframes winPulse { from { box-shadow: 0 0 3px var(--gold-accent); } to { box-shadow: 0 0 10px var(--gold-accent); background: rgba(250, 204, 21, 0.6); } }
@@ -334,11 +335,10 @@
     </div>
 
     <div class="main-stage">
-        <!-- چرخ رولت بزرگ‌تر با کانواس ۲۲۵ پیکسلی و تایمر ۱۰ ثانیه‌ای زیر آن -->
         <div class="top-section">
             <div class="wheel-box">
                 <div class="wheel-pointer"></div>
-                <canvas id="rouletteWheel" width="225" height="225"></canvas>
+                <canvas id="rouletteWheel" width="210" height="210"></canvas>
             </div>
 
             <div class="status-center">
@@ -347,7 +347,6 @@
             </div>
         </div>
 
-        <!-- میز رولت کاملاً هماهنگ در پایین چرخ -->
         <div class="table-viewport">
             <div class="roulette-table" id="roulette-table">
                 <div class="cell zero-num" data-bet="0">0</div>
@@ -367,6 +366,7 @@
         <div class="action-btns">
             <button class="btn-act btn-clear" onclick="clearUserBets()"><i class="fas fa-trash"></i> پاک</button>
             <button class="btn-act btn-double" onclick="doubleUserBets()"><i class="fas fa-clone"></i> 2x</button>
+            <button class="btn-act btn-quadruple" onclick="quadrupleUserBets()"><i class="fas fa-layer-group"></i> 4x</button>
         </div>
     </div>
 
@@ -441,7 +441,7 @@
         
         let currentUser = null;
         let uUid = null;
-        let userBalance = 1500.00; // موجودی پیش‌فرض حالت زنده بدون نیاز به لاگین
+        let userBalance = 1500.00;
         let selectedChipVal = 1;
         let userBets = []; 
         let gameState = 'BETTING'; 
@@ -668,6 +668,26 @@
             await syncCasinoBalanceWithDB(userBalance);
         };
 
+        window.quadrupleUserBets = async function() {
+            if (gameState !== 'BETTING') return;
+            const totalCurrent = userBets.reduce((sum, b) => sum + b.amount, 0);
+            if (totalCurrent <= 0) return;
+            const costNeeded = totalCurrent * 3;
+            if (userBalance < costNeeded) {
+                alert('موجودی کافی نیست!');
+                return;
+            }
+            userBalance -= costNeeded;
+            const b1 = JSON.parse(JSON.stringify(userBets));
+            const b2 = JSON.parse(JSON.stringify(userBets));
+            const b3 = JSON.parse(JSON.stringify(userBets));
+            userBets = userBets.concat(b1, b2, b3);
+            renderChips();
+            updateStats();
+            playSound(1000, 'sine', 0.1);
+            await syncCasinoBalanceWithDB(userBalance);
+        };
+
         function updateStats() {
             const totalBet = userBets.reduce((sum, b) => sum + b.amount, 0);
             const betEl = document.getElementById('total-bet-val');
@@ -680,7 +700,7 @@
             countdown = 10;
             gameState = 'BETTING';
             const msgEl = document.getElementById('status-msg');
-            if(msgEl) msgEl.textContent = 'ژتون بگذارید';
+            if(msgEl) msgEl.textContent = 'ژتون خود را بگذارید';
             document.querySelectorAll('.cell').forEach(c => c.classList.remove('winning-cell'));
 
             timerInterval = setInterval(() => {
@@ -795,7 +815,6 @@
             if (histList.children.length > 5) histList.removeChild(histList.lastChild);
         }
 
-        // بررسی وضعیت لاگین به صورت اختیاری (خارج از حالت دمو/محدودکننده)
         supabase.auth.onAuthStateChange(async (event, session) => {
             if (session && session.user) {
                 currentUser = session.user;
@@ -809,7 +828,6 @@
             }
         });
 
-        // شروع خودکار بازی بدون نیاز به لاگین اجباری
         updateStats();
         drawWheel();
         buildTable();
