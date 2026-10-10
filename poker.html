@@ -116,11 +116,10 @@
             gap: 4px;
         }
 
-        /* چرخ شانس بزرگ‌تر و کاملاً هماهنگ با عرض موبایل */
         .wheel-box {
             position: relative;
-            width: 235px;
-            height: 235px;
+            width: 225px;
+            height: 225px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -170,7 +169,6 @@
             justify-content: center;
         }
 
-        /* میز شرط‌بندی فشرده و هماهنگ با صفحه */
         .roulette-table {
             background: var(--felt-green);
             border: 3px solid var(--felt-border);
@@ -336,7 +334,7 @@
     </div>
 
     <div class="main-stage">
-        <!-- چرخ رولت بزرگ‌تر با کانواس ۲۲۵ پیکسلی -->
+        <!-- چرخ رولت بزرگ‌تر با کانواس ۲۲۵ پیکسلی و تایمر ۱۰ ثانیه‌ای زیر آن -->
         <div class="top-section">
             <div class="wheel-box">
                 <div class="wheel-pointer"></div>
@@ -443,7 +441,7 @@
         
         let currentUser = null;
         let uUid = null;
-        let userBalance = 0;
+        let userBalance = 1500.00; // موجودی پیش‌فرض حالت زنده بدون نیاز به لاگین
         let selectedChipVal = 1;
         let userBets = []; 
         let gameState = 'BETTING'; 
@@ -467,9 +465,9 @@
         }
 
         async function syncCasinoBalanceWithDB(newBal) {
-            if (!uUid) return;
             userBalance = Math.max(0, newBal);
             updateStats();
+            if (!uUid) return;
             try {
                 await supabase.from('users').update({ casino_balance: userBalance }).eq('id', uUid);
                 await supabase.auth.updateUser({ data: { casino_balance: userBalance } });
@@ -797,26 +795,25 @@
             if (histList.children.length > 5) histList.removeChild(histList.lastChild);
         }
 
+        // بررسی وضعیت لاگین به صورت اختیاری (خارج از حالت دمو/محدودکننده)
         supabase.auth.onAuthStateChange(async (event, session) => {
             if (session && session.user) {
                 currentUser = session.user;
                 uUid = session.user.id;
-                
                 try {
                     const { data: dbUser } = await supabase.from('users').select('casino_balance').eq('id', uUid).single();
-                    userBalance = parseFloat(dbUser?.casino_balance ?? session.user.user_metadata?.casino_balance ?? 0);
-                } catch(e) {
-                    userBalance = parseFloat(session.user.user_metadata?.casino_balance ?? 0);
-                }
-
-                updateStats();
-                drawWheel();
-                buildTable();
-                startTimer();
-            } else {
-                window.location.href = 'index.html';
+                    if (dbUser?.casino_balance !== undefined) {
+                        userBalance = parseFloat(dbUser.casino_balance);
+                    }
+                } catch(e) {}
             }
         });
+
+        // شروع خودکار بازی بدون نیاز به لاگین اجباری
+        updateStats();
+        drawWheel();
+        buildTable();
+        startTimer();
 
         const logoutBtn = document.getElementById('logout-btn');
         if (logoutBtn) {
