@@ -98,7 +98,7 @@
             flex-direction: column;
             align-items: center;
             padding: 6px;
-            gap: 8px;
+            gap: 6px;
             width: 100%;
             max-width: 600px;
             margin: 0 auto;
@@ -109,33 +109,36 @@
             justify-content: space-around;
             align-items: center;
             width: 100%;
-            gap: 8px;
+            gap: 6px;
         }
 
         .wheel-box {
             position: relative;
-            width: 150px;
-            height: 150px;
+            width: 130px;
+            height: 130px;
             display: flex;
             justify-content: center;
             align-items: center;
             background: radial-gradient(circle, #2d160a 0%, #020617 70%);
             border-radius: 50%;
-            border: 4px solid #42281d;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            border: 3px solid #42281d;
+            box-shadow: 0 0 15px rgba(0,0,0,0.8);
             flex-shrink: 0;
         }
-        canvas#rouletteWheel { transform: rotate(0deg); transition: transform 0.05s linear; }
+        canvas#rouletteWheel { 
+            transform: rotate(0deg); 
+            will-change: transform; /* بهینه‌سازی رندر سخت‌افزاری برای جلوگیری از لگ */
+        }
 
         .wheel-pointer {
             position: absolute;
-            top: -5px;
+            top: -4px;
             left: 50%;
             transform: translateX(-50%);
             width: 0; height: 0;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-top: 12px solid var(--gold-accent);
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 10px solid var(--gold-accent);
             z-index: 10;
         }
 
@@ -143,17 +146,17 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
             flex: 1;
         }
         .timer-circle {
-            width: 42px; height: 42px; border-radius: 50%;
-            border: 2.5px solid var(--accent-blue);
+            width: 38px; height: 38px; border-radius: 50%;
+            border: 2px solid var(--accent-blue);
             display: flex; justify-content: center; align-items: center;
-            font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 14px;
+            font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 13px;
             color: #fff; background: rgba(15, 23, 42, 0.9);
         }
-        .status-text { font-size: 9px; font-weight: 800; color: var(--gold-accent); text-align: center; }
+        .status-text { font-size: 8.5px; font-weight: 800; color: var(--gold-accent); text-align: center; }
 
         .players-container {
             display: flex;
@@ -165,39 +168,38 @@
             background: rgba(15, 23, 42, 0.8);
             border: 1px solid var(--glass-border);
             border-radius: 6px;
-            padding: 3px 6px;
+            padding: 2px 5px;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
             flex: 1;
             min-width: 0;
         }
         .player-avatar {
-            width: 20px; height: 20px; border-radius: 50%; background-size: cover; background-position: center; border: 1px solid #64748b; flex-shrink: 0;
+            width: 18px; height: 18px; border-radius: 50%; background-size: cover; background-position: center; border: 1px solid #64748b; flex-shrink: 0;
         }
         .p-info { display: flex; flex-direction: column; overflow: hidden; }
-        .p-name { font-size: 8px; font-weight: 700; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .p-status { font-size: 7px; font-family: 'Orbitron'; color: var(--gold-accent); white-space: nowrap; }
+        .p-name { font-size: 7.5px; font-weight: 700; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .p-status { font-size: 6.5px; font-family: 'Orbitron'; color: var(--gold-accent); white-space: nowrap; }
 
-        /* میز رولت کاملاً واکنش‌گرا و فیت شده با صفحه موبایل بدون نیاز به اسکرول افقی */
+        /* انتقال میز رولت به پایین‌تر و فیت کردن آن در صفحه */
         .table-viewport {
             width: 100%;
             display: flex;
             justify-content: center;
-            padding: 2px 0;
+            padding: 4px 0 2px 0;
         }
 
         .roulette-table {
             background: var(--felt-green);
-            border: 5px solid var(--felt-border);
-            border-radius: 10px;
-            padding: 4px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+            border: 4px solid var(--felt-border);
+            border-radius: 8px;
+            padding: 3px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.9);
             display: grid;
-            /* مقیاس‌بندی ستون‌ها متناسب با صفحه موبایل */
-            grid-template-columns: 28px repeat(12, 1fr) 32px;
-            grid-template-rows: repeat(3, 32px) 28px 28px;
-            gap: 1.5px;
+            grid-template-columns: 26px repeat(12, 1fr) 30px;
+            grid-template-rows: repeat(3, 30px) 26px 26px;
+            gap: 1.2px;
             width: 100%;
             max-width: 100%;
         }
@@ -210,7 +212,7 @@
             align-items: center;
             font-family: 'Orbitron', sans-serif;
             font-weight: 800;
-            font-size: 9.5px;
+            font-size: 9px;
             color: #fff;
             cursor: pointer;
             position: relative;
@@ -219,23 +221,23 @@
         .cell:hover { background: rgba(250, 204, 21, 0.3); border-color: var(--gold-accent); }
         .cell.red-num { background: rgba(220, 38, 38, 0.85); }
         .cell.black-num { background: rgba(15, 23, 42, 0.9); }
-        .cell.zero-num { grid-row: 1 / span 3; background: #16a34a; font-size: 11px; }
+        .cell.zero-num { grid-row: 1 / span 3; background: #16a34a; font-size: 10px; }
 
-        .cell.outside-bet { font-size: 7.5px; font-weight: 800; background: rgba(15, 23, 42, 0.7); }
+        .cell.outside-bet { font-size: 7px; font-weight: 800; background: rgba(15, 23, 42, 0.7); }
         .cell.outside-red { background: rgba(220, 38, 38, 0.7); }
         .cell.outside-black { background: rgba(15, 23, 42, 0.9); }
 
         .chip-on-table {
             position: absolute;
-            width: 16px; height: 16px;
+            width: 15px; height: 15px;
             border-radius: 50%;
             border: 1px dashed #fff;
             font-family: 'Orbitron';
-            font-size: 6px;
+            font-size: 5.5px;
             font-weight: 900;
             display: flex; justify-content: center; align-items: center;
             color: #000;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.8);
             pointer-events: none;
             z-index: 5;
         }
@@ -247,7 +249,7 @@
         .chip-100 { background: #ef4444; color: #fff; }
 
         .bot-dot {
-            position: absolute; width: 4px; height: 4px; border-radius: 50%; top: -1px; right: -1px; border: 1px solid #fff;
+            position: absolute; width: 3.5px; height: 3.5px; border-radius: 50%; top: -1px; right: -1px; border: 1px solid #fff;
         }
 
         .control-bar {
@@ -266,10 +268,10 @@
 
         .chip-rack { display: flex; gap: 4px; align-items: center; overflow-x: auto; max-width: 65%; }
         .chip-select {
-            width: 30px; height: 30px; border-radius: 50%;
+            width: 28px; height: 28px; border-radius: 50%;
             border: 1.5px dashed #fff;
             display: flex; justify-content: center; align-items: center;
-            font-family: 'Orbitron'; font-weight: 900; font-size: 8px; color: #000;
+            font-family: 'Orbitron'; font-weight: 900; font-size: 7.5px; color: #000;
             cursor: pointer; flex-shrink: 0;
         }
         .chip-select.active { border-style: solid; border-color: var(--gold-accent); transform: scale(1.1); box-shadow: 0 0 8px var(--gold-accent); }
@@ -361,7 +363,7 @@
         <div class="top-section">
             <div class="wheel-box">
                 <div class="wheel-pointer"></div>
-                <canvas id="rouletteWheel" width="140" height="140"></canvas>
+                <canvas id="rouletteWheel" width="120" height="120"></canvas>
             </div>
 
             <div class="status-center">
@@ -389,7 +391,7 @@
             </div>
         </div>
 
-        <!-- میز رولت به طور کامل ریسپانسیو و منطبق با موبایل -->
+        <!-- میز رولت منتقل شده به پایین‌تر و متناسب با موبایل -->
         <div class="table-viewport">
             <div class="roulette-table" id="roulette-table">
                 <div class="cell zero-num" data-bet="0">0</div>
@@ -551,11 +553,11 @@
 
                 ctx.beginPath();
                 ctx.moveTo(radius, radius);
-                ctx.arc(radius, radius, radius - 4, angle, angle + sliceAngle);
+                ctx.arc(radius, radius, radius - 3.5, angle, angle + sliceAngle);
                 ctx.closePath();
                 ctx.fill();
                 ctx.strokeStyle = '#facc15';
-                ctx.lineWidth = 0.6;
+                ctx.lineWidth = 0.5;
                 ctx.stroke();
 
                 ctx.save();
@@ -563,17 +565,17 @@
                 ctx.rotate(angle + sliceAngle / 2);
                 ctx.textAlign = 'right';
                 ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 7px Orbitron';
-                ctx.fillText(num.toString(), radius - 8, 2.5);
+                ctx.font = 'bold 6.5px Orbitron';
+                ctx.fillText(num.toString(), radius - 7, 2);
                 ctx.restore();
             }
 
             ctx.beginPath();
-            ctx.arc(radius, radius, 20, 0, 2 * Math.PI);
+            ctx.arc(radius, radius, 18, 0, 2 * Math.PI);
             ctx.fillStyle = '#2d160a';
             ctx.fill();
             ctx.strokeStyle = '#facc15';
-            ctx.lineWidth = 1.5;
+            ctx.lineWidth = 1.2;
             ctx.stroke();
         }
 
@@ -785,7 +787,7 @@
 
             const canvas = document.getElementById('rouletteWheel');
             if(canvas) {
-                canvas.style.transition = 'transform 4s cubic-bezier(0.15, 0.9, 0.2, 1)';
+                canvas.style.transition = 'transform 3.5s cubic-bezier(0.1, 0.8, 0.1, 1)';
                 canvas.style.transform = `rotate(${targetDegree}deg)`;
             }
 
@@ -794,7 +796,7 @@
             setTimeout(() => {
                 clearInterval(spinSoundInt);
                 evaluateResult(winningNumber);
-            }, 4200);
+            }, 3600);
         }
 
         async function evaluateResult(winNum) {
@@ -855,7 +857,7 @@
                 renderChips();
                 updateStats();
                 startTimer();
-            }, 4000);
+            }, 3500);
         }
 
         function addHistory(num) {
