@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>پلینکو - Zenix Casino</title>
+    <link rel="icon" href="data:image/x-icon;base64,=">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-glow: #22c55e;
+            --accent-blue: #38bdf8;
+            --gold-accent: #facc15;
+            --bg-dark: #030712;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', 'Vazirmatn', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            background: var(--bg-dark);
+            min-height: 100vh;
+            color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 75px;
+            overflow-x: hidden;
+        }
+
+        header {
+            background: rgba(15, 23, 42, .95);
+            border-bottom: 1px solid rgba(255,255,255,.1);
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            flex-shrink: 0;
+        }
+        .game-header-title { font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 800; color: #facc15; letter-spacing: 0.5px; display: flex; align-items: center; gap: 5px; }
+        .guide-btn {
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: #38bdf8;
+            padding: 4px 9px;
+            border-radius: 6px;
+            font-size: 9px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: background 0.2s;
+        }
+        .guide-btn:hover { background: rgba(56, 189, 248, 0.3); }
+
+        .game-bar {
+            background: rgba(15, 23, 42, 0.85);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 6px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .user-welcome-tag {
+            font-size: 9.5px;
+            font-weight: 700;
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            padding: 2px 8px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .user-stats { display: flex; align-items: center; gap: 6px; }
+        .stat-pill { background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); padding: 3px 8px; border-radius: 12px; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+        .stat-val { font-family: 'Orbitron', sans-serif; font-weight: 800; color: var(--gold-accent); font-size: 10px; }
+        
+        .casino-deposit-btn {
+            background: linear-gradient(135deg, #facc15, #f97316);
+            color: #0f172a;
+            padding: 4px 9px;
+            border-radius: 12px;
+            border: none;
+            font-size: 8.5px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .main-stage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            width: 100%;
+            max-width: 440px;
+            margin: 0 auto;
+            gap: 10px;
+        }
+
+        .plinko-board-container {
+            position: relative;
+            width: 100%;
+            background: radial-gradient(circle, #0f172a 0%, #020617 80%);
+            border: 2px solid rgba(56, 189, 248, 0.2);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+        }
+
+        canvas#plinkoCanvas {
+            display: block;
+            background: transparent;
+        }
+
+        .control-panel {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-label {
+            font-size: 9.5px;
+            color: #94a3b8;
+            font-weight: 700;
+        }
+
+        .bet-input-box {
+            display: flex;
+            align-items: center;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 2px 8px;
+            gap: 5px;
+            flex: 1;
+        }
+        .bet-input {
+            background: transparent;
+            border: none;
+            color: var(--gold-accent);
+            font-family: 'Orbitron';
+            font-weight: 800;
+            font-size: 12px;
+            width: 100%;
+            outline: none;
+            text-align: center;
+        }
+
+        .btn-preset {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 9px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .btn-preset:hover { background: rgba(56, 189, 248, 0.2); border-color: var(--accent-blue); }
+
+        .drop-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #030712;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+            transition: transform 0.1s;
+        }
+        .drop-btn:active { transform: scale(0.98); }
+        .drop-btn:disabled { background: #475569; color: #94a3b8; box-shadow: none; cursor: not-allowed; }
+
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px);padding:10px;}
+        .modal.show{display:flex}
+        .modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(250,204,21,0.3);border-radius:12px;width:100%;max-width:340px;display:flex;flex-direction:column;padding:14px;box-shadow:0 15px 35px rgba(0,0,0,.9)}
+        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:#facc15;font-weight:800;font-size:11px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:5px}
+        .modal-close{background:rgba(255,255,255,.05);border:none;color:#94a3b8;cursor:pointer;font-size:10px;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+        .form-input{width:100%;background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px;color:#fff;font-size:10px;outline:none;margin-top:4px;margin-bottom:8px}
+        .btn-submit-deposit{width:100%;background:linear-gradient(135deg,#facc15,#f97316);color:#0f172a;border:none;padding:7px;border-radius:6px;font-weight:800;cursor:pointer;font-size:10px}
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="game-header-title"><i class="fas fa-circle-dot" style="color:#38bdf8;"></i> پلینکو (Plinko)</div>
+        <button class="guide-btn" onclick="openHelpModal()"><i class="fas fa-question-circle"></i> راهنما</button>
+    </header>
+
+    <div class="game-bar">
+        <div id="user-welcome-display" class="user-welcome-tag" style="display: none;">
+            <i class="fas fa-user-circle" style="color:#facc15;"></i>
+            <span id="user-fullname-text">خوش آمدید کاربر</span>
+        </div>
+
+        <div class="user-stats">
+            <div class="stat-pill">
+                <span style="font-size:7.5px; color:#94a3b8;">موجودی:</span>
+                <span class="stat-val" id="balance-val">$0.00</span>
+            </div>
+            <button class="casino-deposit-btn" onclick="openCasinoDepositModal()"><i class="fas fa-plus-circle"></i> شارژ</button>
+        </div>
+    </div>
+
+    <div class="main-stage">
+        <div class="plinko-board-container">
+            <canvas id="plinkoCanvas" width="380" height="420"></canvas>
+        </div>
+
+        <div class="control-panel">
+            <div class="control-row">
+                <span class="control-label">مبلغ شرط ($):</span>
+                <div class="bet-input-box">
+                    <input type="number" id="bet-amount" class="bet-input" value="10" min="1">
+                </div>
+                <button class="btn-preset" onclick="setBet(5)">5</button>
+                <button class="btn-preset" onclick="setBet(10)">10</button>
+                <button class="btn-preset" onclick="setBet(50)">50</button>
+                <button class="btn-preset" onclick="setMaxBet()">Max</button>
+            </div>
+            <button class="drop-btn" id="drop-btn" onclick="dropBall()">رها کردن توپ</button>
+        </div>
+    </div>
+
+    <div class="modal" id="m-casino-deposit">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span><i class="fas fa-wallet"></i> شارژ موجودی حساب</span>
+                <button class="modal-close" onclick="closeCasinoDepositModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div style="font-size:9.5px; color:#cbd5e1; margin-bottom:5px;">مبلغ شارژ (USDT):</div>
+            <input type="number" id="casino-deposit-amount" class="form-input" placeholder="مثال: 50" min="1">
+            <button class="btn-submit-deposit" onclick="processCasinoDeposit()"><i class="fas fa-check-circle"></i> تایید و شارژ</button>
+        </div>
+    </div>
+
+    <div class="modal" id="m-help">
+        <div class="modal-content" style="max-width: 320px;">
+            <div class="modal-header">
+                <span><i class="fas fa-graduation-cap" style="color:#facc15;"></i> راهنمای بازی پلینکو</span>
+                <button class="modal-close" onclick="closeHelpModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div style="overflow-y:auto; max-height: 60vh; font-size:9.5px; color:#cbd5e1; line-height:1.6;">
+                <p style="margin-bottom:8px;"><strong style="color:#facc15;">نحوه بازی:</strong> با تعیین مبلغ شرط و کلیک روی دکمه رها کردن، توپ از بالای تخته به سمت پایین سقوط می‌کند.</p>
+                <p style="margin-bottom:8px;"><strong style="color:#38bdf8;">ضرایب پایین صفحه:</strong> توپ با برخورد به پین‌ها مسیر خود را پیدا کرده و در یکی از خانه‌های ضریب‌دار (از 0.2x تا 25x) قرار می‌گیرد.</p>
+                <p style="margin-bottom:6px;"><strong style="color:#22c55e;">جایزه:</strong> مبلغ شرط شما در ضریب خانه نهایی ضرب شده و مستقیماً به موجودی شما اضافه می‌گردد.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.openHelpModal = () => document.getElementById('m-help')?.classList.add('show');
+        window.closeHelpModal = () => document.getElementById('m-help')?.classList.remove('show');
+        window.openCasinoDepositModal = () => document.getElementById('m-casino-deposit')?.classList.add('show');
+        window.closeCasinoDepositModal = () => document.getElementById('m-casino-deposit')?.classList.remove('show');
+        window.setBet = (val) => document.getElementById('bet-amount').value = val;
+        window.setMaxBet = () => {
+            const bal = window.userBalance || 0;
+            document.getElementById('bet-amount').value = Math.max(1, Math.floor(bal));
+        };
+    </script>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+        const SUPABASE_URL = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentUser = null;
+        let uUid = null;
+        window.userBalance = 1500.00;
+
+        const canvas = document.getElementById('plinkoCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const rows = 8;
+        const multipliers = [15, 5, 2, 0.5, 0.2, 0.5, 2, 5, 15];
+        const multColors = ['#ef4444', '#f97316', '#facc15', '#38bdf8', '#64748b', '#38bdf8', '#facc15', '#f97316', '#ef4444'];
+        
+        let pins = [];
+        let activeBalls = [];
+
+        function initPins() {
+            pins = [];
+            const startY = 50;
+            const rowHeight = 35;
+            const startX = canvas.width / 2;
+
+            for (let r = 0; r < rows; r++) {
+                const numPinsInRow = r + 3;
+                const rowWidth = (numPinsInRow - 1) * 26;
+                const rowStartX = startX - rowWidth / 2;
+
+                for (let p = 0; p < numPinsInRow; p++) {
+                    pins.push({
+                        x: rowStartX + p * 26,
+                        y: startY + r * rowHeight,
+                        radius: 3.5
+                    });
+                }
+            }
+        }
+
+        function drawBoard() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // رسم پین‌ها
+            ctx.fillStyle = '#94a3b8';
+            pins.forEach(pin => {
+                ctx.beginPath();
+                ctx.arc(pin.x, pin.y, pin.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // رسم خانه‌های ضریب پایین صفحه
+            const boxWidth = canvas.width / multipliers.length;
+            const boxY = canvas.height - 35;
+
+            multipliers.forEach((m, i) => {
+                ctx.fillStyle = multColors[i] + '33';
+                ctx.strokeStyle = multColors[i];
+                ctx.lineWidth = 1.5;
+                ctx.fillRect(i * boxWidth + 2, boxY, boxWidth - 4, 30);
+                ctx.strokeRect(i * boxWidth + 2, boxY, boxWidth - 4, 30);
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 9px Orbitron';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${m}x`, i * boxWidth + boxWidth / 2, boxY + 18);
+            });
+
+            // رسم توپ‌های در حال حرکت
+            activeBalls.forEach(ball => {
+                ctx.fillStyle = '#22c55e';
+                ctx.shadowColor = '#22c55e';
+                ctx.shadowBlur = 10;
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, 7, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            });
+        }
+
+        async function fetchUserBalance() {
+            if (!uUid) return;
+            try {
+                const { data } = await supabase.from('users').select('casino_balance, fullname, full_name').eq('id', uUid).single();
+                if (data) {
+                    if (data.casino_balance !== undefined) {
+                        window.userBalance = parseFloat(data.casino_balance);
+                        updateStats();
+                    }
+                    const name = data.fullname || data.full_name || currentUser?.user_metadata?.fullname;
+                    if (name) {
+                        const welcomeDisplay = document.getElementById('user-welcome-display');
+                        const welcomeText = document.getElementById('user-fullname-text');
+                        if (welcomeDisplay && welcomeText) {
+                            welcomeText.textContent = `خوش آمدید ${name}`;
+                            welcomeDisplay.style.display = 'inline-flex';
+                        }
+                    }
+                }
+            } catch (e) {}
+        }
+
+        function updateStats() {
+            const balEl = document.getElementById('balance-val');
+            if(balEl) balEl.textContent = `$${window.userBalance.toFixed(2)}`;
+        }
+
+        window.processCasinoDeposit = async function() {
+            const amtInput = document.getElementById('casino-deposit-amount');
+            const amt = parseFloat(amtInput?.value || 0);
+            if (amt <= 0) {
+                alert('لطفاً مبلغ معتبری وارد کنید.');
+                return;
+            }
+            window.userBalance += amt;
+            if (uUid) {
+                await supabase.from('users').update({ casino_balance: window.userBalance }).eq('id', uUid);
+            }
+            updateStats();
+            alert(`موجودی شما به مبلغ $${amt.toFixed(2)} شارژ شد.`);
+            if(amtInput) amtInput.value = '';
+            closeCasinoDepositModal();
+        };
+
+        window.dropBall = async function() {
+            const betInput = document.getElementById('bet-amount');
+            const betAmt = parseFloat(betInput?.value || 0);
+
+            if (betAmt <= 0 || window.userBalance < betAmt) {
+                alert('موجودی کافی نیست یا مبلغ نامعتبر است!');
+                return;
+            }
+
+            window.userBalance -= betAmt;
+            if (uUid) {
+                await supabase.from('users').update({ casino_balance: window.userBalance }).eq('id', uUid);
+            }
+            updateStats();
+
+            const dropX = canvas.width / 2 + (Math.random() * 10 - 5);
+            const newBall = {
+                x: dropX,
+                y: 15,
+                vx: (Math.random() - 0.5) * 2,
+                vy: 1,
+                bet: betAmt
+            };
+            activeBalls.push(newBall);
+        };
+
+        function updatePhysics() {
+            for (let i = activeBalls.length - 1; i >= 0; i--) {
+                let b = activeBalls[i];
+                b.vy += 0.2; // جاذبه
+                b.x += b.vx;
+                b.y += b.vy;
+
+                // برخورد با پین‌ها
+                pins.forEach(pin => {
+                    let dx = b.x - pin.x;
+                    let dy = b.y - pin.y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 7 + pin.radius) {
+                        let angle = Math.atan2(dy, dx);
+                        let speed = Math.sqrt(b.vx * b.vx + b.vy * b.vy) * 0.75;
+                        b.vx = Math.cos(angle) * speed + (Math.random() - 0.5) * 1.5;
+                        b.vy = Math.sin(angle) * speed;
+                        b.y = pin.y + Math.sin(angle) * (7 + pin.radius);
+                    }
+                });
+
+                // برخورد با دیواره‌ها
+                if (b.x < 10) { b.x = 10; b.vx *= -0.6; }
+                if (b.x > canvas.width - 10) { b.x = canvas.width - 10; b.vx *= -0.6; }
+
+                // رسیدن به پایین صفحه (خانه ضریب)
+                if (b.y >= canvas.height - 35) {
+                    const boxWidth = canvas.width / multipliers.length;
+                    let slotIndex = Math.floor(b.x / boxWidth);
+                    slotIndex = Math.max(0, Math.min(multipliers.length - 1, slotIndex));
+
+                    let mult = multipliers[slotIndex];
+                    let payout = b.bet * mult;
+
+                    window.userBalance += payout;
+                    if (uUid) {
+                        supabase.from('users').update({ casino_balance: window.userBalance }).eq('id', uUid).then();
+                    }
+                    updateStats();
+
+                    activeBalls.splice(i, 1);
+                }
+            }
+        }
+
+        function gameLoop() {
+            updatePhysics();
+            drawBoard();
+            requestAnimationFrame(gameLoop);
+        }
+
+        supabase.auth.onAuthStateChange(async (event, session) => {
+            if (session && session.user) {
+                currentUser = session.user;
+                uUid = session.user.id;
+                await fetchUserBalance();
+            }
+        });
+
+        initPins();
+        fetchUserBalance();
+        gameLoop();
+    </script>
+</body>
+</html>
