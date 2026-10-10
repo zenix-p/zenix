@@ -726,7 +726,13 @@
 
                 if (countdown <= 0) {
                     clearInterval(timerInterval);
-                    spinWheel();
+                    // بررسی اینکه آیا شرطی ثبت شده است یا خیر
+                    if (userBets.length > 0) {
+                        spinWheel();
+                    } else {
+                        if(msgEl) msgEl.textContent = 'لطفاً برای شروع چرخش ژتون بگذارید';
+                        startTimer(); // تکرار یا انتظار تا زمانی که شرط ثبت شود
+                    }
                 }
             }, 1000);
         }
