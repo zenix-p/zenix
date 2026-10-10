@@ -28,7 +28,7 @@
             color: #f8fafc;
             display: flex;
             flex-direction: column;
-            padding-bottom: 70px; /* فضای خالی برای نوار ثابت پایین */
+            padding-bottom: 75px; /* فضای کافی برای نوار ثابت ژتون‌ها در پایین */
             overflow-x: hidden;
         }
 
@@ -98,12 +98,12 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             padding: 6px 8px;
             width: 100%;
             max-width: 500px;
             margin: 0 auto;
-            gap: 8px;
+            gap: 10px;
         }
 
         .top-section {
@@ -112,20 +112,21 @@
             align-items: center;
             justify-content: center;
             width: 100%;
-            gap: 4px;
+            gap: 5px;
         }
 
+        /* چرخ شانس بزرگ‌تر و باکیفیت‌تر */
         .wheel-box {
             position: relative;
-            width: 175px;
-            height: 175px;
+            width: 220px;
+            height: 220px;
             display: flex;
             justify-content: center;
             align-items: center;
             background: radial-gradient(circle, #2d160a 0%, #020617 70%);
             border-radius: 50%;
-            border: 4px solid #42281d;
-            box-shadow: 0 0 16px rgba(0,0,0,0.85);
+            border: 5px solid #42281d;
+            box-shadow: 0 0 20px rgba(0,0,0,0.9);
             flex-shrink: 0;
         }
         canvas#rouletteWheel { 
@@ -136,13 +137,13 @@
 
         .wheel-pointer {
             position: absolute;
-            top: -5px;
+            top: -6px;
             left: 50%;
             transform: translateX(-50%);
             width: 0; height: 0;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-top: 11px solid var(--gold-accent);
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 13px solid var(--gold-accent);
             z-index: 10;
         }
 
@@ -150,17 +151,17 @@
             display: flex;
             flex-direction: row;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             justify-content: center;
         }
         .timer-circle {
-            width: 26px; height: 26px; border-radius: 50%;
+            width: 28px; height: 28px; border-radius: 50%;
             border: 2px solid var(--accent-blue);
             display: flex; justify-content: center; align-items: center;
-            font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 9.5px;
+            font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 10px;
             color: #fff; background: rgba(15, 23, 42, 0.9);
         }
-        .status-text { font-size: 8.5px; font-weight: 800; color: var(--gold-accent); text-align: center; }
+        .status-text { font-size: 9px; font-weight: 800; color: var(--gold-accent); text-align: center; }
 
         .table-viewport {
             width: 100%;
@@ -176,7 +177,7 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.9);
             display: grid;
             grid-template-columns: 22px repeat(12, 1fr) 26px;
-            grid-template-rows: repeat(3, 22px) 20px 20px;
+            grid-template-rows: repeat(3, 23px) 21px 21px;
             gap: 1px;
             width: 100%;
             max-width: 100%;
@@ -190,7 +191,7 @@
             align-items: center;
             font-family: 'Orbitron', sans-serif;
             font-weight: 800;
-            font-size: 7.5px;
+            font-size: 8px;
             color: #fff;
             cursor: pointer;
             position: relative;
@@ -199,19 +200,19 @@
         .cell:hover { background: rgba(250, 204, 21, 0.3); border-color: var(--gold-accent); }
         .cell.red-num { background: rgba(220, 38, 38, 0.85); }
         .cell.black-num { background: rgba(15, 23, 42, 0.9); }
-        .cell.zero-num { grid-row: 1 / span 3; background: #16a34a; font-size: 8.5px; }
+        .cell.zero-num { grid-row: 1 / span 3; background: #16a34a; font-size: 9px; }
 
-        .cell.outside-bet { font-size: 5.5px; font-weight: 800; background: rgba(15, 23, 42, 0.7); }
+        .cell.outside-bet { font-size: 6px; font-weight: 800; background: rgba(15, 23, 42, 0.7); }
         .cell.outside-red { background: rgba(220, 38, 38, 0.7); }
         .cell.outside-black { background: rgba(15, 23, 42, 0.9); }
 
         .chip-on-table {
             position: absolute;
-            width: 12px; height: 12px;
+            width: 13px; height: 13px;
             border-radius: 50%;
             border: 1px dashed #fff;
             font-family: 'Orbitron';
-            font-size: 4px;
+            font-size: 4.5px;
             font-weight: 900;
             display: flex; justify-content: center; align-items: center;
             color: #000;
@@ -226,7 +227,7 @@
         .chip-50 { background: #a855f7; color: #fff; }
         .chip-100 { background: #ef4444; color: #fff; }
 
-        /* نوار کنترل پایین صفحه کاملاً ثابت و فیکس شده در پایین موبایل */
+        /* نوار ثابت و پایینی ژتون‌ها در موبایل (دقيقاً زیر دست و بالاتر از لبه پایین صفحه) */
         .control-bar {
             position: fixed;
             bottom: 0;
@@ -241,7 +242,7 @@
             align-items: center;
             z-index: 999;
             gap: 8px;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.8);
+            box-shadow: 0 -4px 25px rgba(0,0,0,0.9);
         }
 
         .chip-rack { display: flex; gap: 8px; align-items: center; flex-shrink: 0; overflow-x: auto; padding: 2px 0; }
@@ -269,7 +270,7 @@
 
         .action-btns { display: flex; gap: 5px; flex-shrink: 0; }
         .btn-act {
-            padding: 6px 9px; border-radius: 6px; border: none; font-weight: 800; font-size: 8.5px; cursor: pointer; color: #fff; white-space: nowrap;
+            padding: 6px 10px; border-radius: 6px; border: none; font-weight: 800; font-size: 8.5px; cursor: pointer; color: #fff; white-space: nowrap;
             box-shadow: 0 2px 4px rgba(0,0,0,0.4);
         }
         .btn-clear { background: #ef4444; }
@@ -356,7 +357,8 @@
         <div class="top-section">
             <div class="wheel-box">
                 <div class="wheel-pointer"></div>
-                <canvas id="rouletteWheel" width="175" height="175"></canvas>
+                <!-- چرخ بزرگ‌تر با سایز ۲۲۰ پیکسلی -->
+                <canvas id="rouletteWheel" width="220" height="220"></canvas>
             </div>
 
             <div class="status-center">
@@ -372,7 +374,7 @@
         </div>
     </div>
 
-    <!-- نوار ثابت و پایینی ژتون‌ها در موبایل -->
+    <!-- نوار ثابت و پایینی ژتون‌ها در موبایل (کامل و در دیدرس) -->
     <div class="control-bar">
         <div class="chip-rack">
             <div class="chip-select chip-1 active" onclick="selectChip(1, this)">$1</div>
@@ -527,11 +529,11 @@
 
                 ctx.beginPath();
                 ctx.moveTo(radius, radius);
-                ctx.arc(radius, radius, radius - 5, angle, angle + sliceAngle);
+                ctx.arc(radius, radius, radius - 6, angle, angle + sliceAngle);
                 ctx.closePath();
                 ctx.fill();
                 ctx.strokeStyle = '#facc15';
-                ctx.lineWidth = 0.8;
+                ctx.lineWidth = 1;
                 ctx.stroke();
 
                 ctx.save();
@@ -539,17 +541,17 @@
                 ctx.rotate(angle + sliceAngle / 2);
                 ctx.textAlign = 'right';
                 ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 9.5px Orbitron';
-                ctx.fillText(num.toString(), radius - 13, 3.5);
+                ctx.font = 'bold 10px Orbitron';
+                ctx.fillText(num.toString(), radius - 15, 4);
                 ctx.restore();
             }
 
             ctx.beginPath();
-            ctx.arc(radius, radius, 30, 0, 2 * Math.PI);
+            ctx.arc(radius, radius, 32, 0, 2 * Math.PI);
             ctx.fillStyle = '#2d160a';
             ctx.fill();
             ctx.strokeStyle = '#facc15';
-            ctx.lineWidth = 1.5;
+            ctx.lineWidth = 2;
             ctx.stroke();
         }
 
