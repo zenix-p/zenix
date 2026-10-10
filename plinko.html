@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>پلینکو - Zenix Casino</title>
+    <title>بازی ۸ و ۹ - Zenix Casino</title>
     <link rel="icon" href="data:image/x-icon;base64,=">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,6 +15,8 @@
             --accent-blue: #38bdf8;
             --gold-accent: #facc15;
             --bg-dark: #030712;
+            --felt-green: #064e3b;
+            --felt-border: #022c22;
             --glass-border: rgba(255, 255, 255, 0.1);
         }
 
@@ -41,7 +43,7 @@
             backdrop-filter: blur(10px);
             flex-shrink: 0;
         }
-        .game-header-title { font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 800; color: #facc15; letter-spacing: 0.5px; display: flex; align-items: center; gap: 5px; }
+        .game-header-title { font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 800; color: #facc15; display: flex; align-items: center; gap: 5px; }
         .guide-btn {
             background: rgba(56, 189, 248, 0.15);
             border: 1px solid rgba(56, 189, 248, 0.3);
@@ -54,9 +56,7 @@
             display: flex;
             align-items: center;
             gap: 4px;
-            transition: background 0.2s;
         }
-        .guide-btn:hover { background: rgba(56, 189, 248, 0.3); }
 
         .game-bar {
             background: rgba(15, 23, 42, 0.85);
@@ -67,7 +67,6 @@
             align-items: center;
             gap: 8px;
             flex-shrink: 0;
-            flex-wrap: wrap;
         }
 
         .user-welcome-tag {
@@ -81,11 +80,10 @@
             display: flex;
             align-items: center;
             gap: 4px;
-            white-space: nowrap;
         }
 
         .user-stats { display: flex; align-items: center; gap: 6px; }
-        .stat-pill { background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); padding: 3px 8px; border-radius: 12px; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+        .stat-pill { background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); padding: 3px 8px; border-radius: 12px; display: flex; align-items: center; gap: 4px; }
         .stat-val { font-family: 'Orbitron', sans-serif; font-weight: 800; color: var(--gold-accent); font-size: 10px; }
         
         .casino-deposit-btn {
@@ -96,11 +94,10 @@
             border: none;
             font-size: 8.5px;
             font-weight: 800;
+            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 3px;
-            cursor: pointer;
-            white-space: nowrap;
         }
 
         .main-stage {
@@ -111,24 +108,77 @@
             width: 100%;
             max-width: 440px;
             margin: 0 auto;
-            gap: 10px;
+            gap: 12px;
+            flex: 1;
         }
 
-        .plinko-board-container {
-            position: relative;
+        .table-board {
             width: 100%;
-            background: radial-gradient(circle, #0f172a 0%, #020617 80%);
-            border: 2px solid rgba(56, 189, 248, 0.2);
+            background: var(--felt-green);
+            border: 3px solid var(--felt-border);
             border-radius: 14px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            padding: 15px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            min-height: 320px;
+            justify-content: space-between;
         }
 
-        canvas#plinkoCanvas {
-            display: block;
-            background: transparent;
+        .hand-section {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .hand-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 800;
+            color: #f8fafc;
+            font-family: 'Orbitron';
+        }
+
+        .cards-container {
+            display: flex;
+            gap: 8px;
+            min-height: 70px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .playing-card {
+            width: 45px;
+            height: 65px;
+            background: #fff;
+            color: #0f172a;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 4px;
+            font-family: 'Orbitron';
+            font-weight: 900;
+            font-size: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            animation: cardAppear 0.3s ease;
+        }
+        .playing-card.red { color: #dc2626; }
+        @keyframes cardAppear { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .game-status-banner {
+            text-align: center;
+            font-family: 'Orbitron';
+            font-weight: 800;
+            font-size: 11px;
+            color: var(--gold-accent);
+            background: rgba(0,0,0,0.4);
+            padding: 6px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
         }
 
         .control-panel {
@@ -147,12 +197,6 @@
             justify-content: space-between;
             align-items: center;
             gap: 8px;
-        }
-
-        .control-label {
-            font-size: 9.5px;
-            color: #94a3b8;
-            font-weight: 700;
         }
 
         .bet-input-box {
@@ -177,34 +221,24 @@
             text-align: center;
         }
 
-        .btn-preset {
-            background: rgba(255,255,255,0.06);
-            border: 1px solid var(--glass-border);
-            color: #fff;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 9px;
-            font-weight: 800;
-            cursor: pointer;
-        }
-        .btn-preset:hover { background: rgba(56, 189, 248, 0.2); border-color: var(--accent-blue); }
-
-        .drop-btn {
-            width: 100%;
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: #030712;
-            border: none;
+        .btn-action {
+            flex: 1;
             padding: 10px;
             border-radius: 8px;
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Orbitron';
             font-weight: 900;
-            font-size: 12px;
+            font-size: 11px;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+            border: none;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             transition: transform 0.1s;
         }
-        .drop-btn:active { transform: scale(0.98); }
-        .drop-btn:disabled { background: #475569; color: #94a3b8; box-shadow: none; cursor: not-allowed; }
+        .btn-action:active { transform: scale(0.98); }
+        .btn-hit { background: linear-gradient(135deg, #38bdf8, #0ea5e9); color: #030712; }
+        .btn-stand { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .btn-deal { background: linear-gradient(135deg, #22c55e, #16a34a); color: #030712; width: 100%; }
+        .btn-action:disabled { background: #475569; color: #94a3b8; cursor: not-allowed; box-shadow: none; }
 
         .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px);padding:10px;}
         .modal.show{display:flex}
@@ -218,14 +252,14 @@
 <body>
 
     <header>
-        <div class="game-header-title"><i class="fas fa-circle-dot" style="color:#38bdf8;"></i> پلینکو (Plinko)</div>
+        <div class="game-header-title"><i class="fas fa-diamond" style="color:#38bdf8;"></i> بازی ۸ و نه (Eight & Nine)</div>
         <button class="guide-btn" onclick="openHelpModal()"><i class="fas fa-question-circle"></i> راهنما</button>
     </header>
 
     <div class="game-bar">
         <div id="user-welcome-display" class="user-welcome-tag" style="display: none;">
             <i class="fas fa-user-circle" style="color:#facc15;"></i>
-            <span id="user-fullname-text">خوش آمدید کاربر</span>
+            <span id="user-fullname-text">خوش آمدید</span>
         </div>
 
         <div class="user-stats">
@@ -238,25 +272,47 @@
     </div>
 
     <div class="main-stage">
-        <div class="plinko-board-container">
-            <canvas id="plinkoCanvas" width="380" height="420"></canvas>
+        <div class="table-board">
+            <!-- دست دیلر -->
+            <div class="hand-section">
+                <div class="hand-info">
+                    <span>دیلر (بانک):</span>
+                    <span id="dealer-score">0</span>
+                </div>
+                <div class="cards-container" id="dealer-cards"></div>
+            </div>
+
+            <div class="game-status-banner" id="game-status-msg">مبلغ شرط را تعیین کرده و روی شروع بازی کلیک کنید</div>
+
+            <!-- دست بازیکن -->
+            <div class="hand-section">
+                <div class="hand-info">
+                    <span>دست شما:</span>
+                    <span id="player-score">0</span>
+                </div>
+                <div class="cards-container" id="player-cards"></div>
+            </div>
         </div>
 
-        <div class="control-panel">
+        <div class="control-panel" id="bet-control-panel">
             <div class="control-row">
-                <span class="control-label">مبلغ شرط ($):</span>
+                <span style="font-size:9.5px; color:#94a3b8; font-weight:700;">مبلغ شرط ($):</span>
                 <div class="bet-input-box">
                     <input type="number" id="bet-amount" class="bet-input" value="10" min="1">
                 </div>
-                <button class="btn-preset" onclick="setBet(5)">5</button>
-                <button class="btn-preset" onclick="setBet(10)">10</button>
-                <button class="btn-preset" onclick="setBet(50)">50</button>
-                <button class="btn-preset" onclick="setMaxBet()">Max</button>
             </div>
-            <button class="drop-btn" id="drop-btn" onclick="dropBall()">رها کردن توپ</button>
+            <button class="btn-action btn-deal" id="btn-start" onclick="startRound()">شروع بازی</button>
+        </div>
+
+        <div class="control-panel" id="action-control-panel" style="display: none;">
+            <div class="control-row">
+                <button class="btn-action btn-hit" onclick="playerHit()">کارت گرفتن (Hit)</button>
+                <button class="btn-action btn-stand" onclick="playerStand()">ایستادن (Stand)</button>
+            </div>
         </div>
     </div>
 
+    <!-- مودال شارژ و راهنما -->
     <div class="modal" id="m-casino-deposit">
         <div class="modal-content">
             <div class="modal-header">
@@ -272,13 +328,13 @@
     <div class="modal" id="m-help">
         <div class="modal-content" style="max-width: 320px;">
             <div class="modal-header">
-                <span><i class="fas fa-graduation-cap" style="color:#facc15;"></i> راهنمای بازی پلینکو</span>
+                <span><i class="fas fa-graduation-cap" style="color:#facc15;"></i> راهنمای بازی ۸ و نه</span>
                 <button class="modal-close" onclick="closeHelpModal()"><i class="fas fa-times"></i></button>
             </div>
             <div style="overflow-y:auto; max-height: 60vh; font-size:9.5px; color:#cbd5e1; line-height:1.6;">
-                <p style="margin-bottom:8px;"><strong style="color:#facc15;">نحوه بازی:</strong> با تعیین مبلغ شرط و کلیک روی دکمه رها کردن، توپ از بالای تخته به سمت پایین سقوط می‌کند.</p>
-                <p style="margin-bottom:8px;"><strong style="color:#38bdf8;">ضرایب پایین صفحه:</strong> توپ با برخورد به پین‌ها مسیر خود را پیدا کرده و در یکی از خانه‌های ضریب‌دار (از 0.2x تا 25x) قرار می‌گیرد.</p>
-                <p style="margin-bottom:6px;"><strong style="color:#22c55e;">جایزه:</strong> مبلغ شرط شما در ضریب خانه نهایی ضرب شده و مستقیماً به موجودی شما اضافه می‌گردد.</p>
+                <p style="margin-bottom:8px;"><strong style="color:#facc15;">هدف بازی:</strong> درست مانند بلک‌جک، باید مجموع امتیاز کارت‌های خود را به **۸ یا ۹** برسانید (یا نزدیک‌ترین مقدار).</p>
+                <p style="margin-bottom:8px;"><strong style="color:#ef4444;">قانون سوختن:</strong> اگر مجموع امتیاز کارت‌های شما از **۹** بیشتر شود، بلافاصله می‌سوزید و بازنده می‌شوید.</p>
+                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">ارزش کارت‌ها:</strong> کارت‌های ۲ تا ۹ ارزش خودشان را دارند. آس (A) معادل ۱ و کارت‌های تصویر (شاه، بی‌بی، سرباز) و ۱۰ معادل صفر یا ۱۰ محاسبه می‌شوند.</p>
             </div>
         </div>
     </div>
@@ -288,11 +344,6 @@
         window.closeHelpModal = () => document.getElementById('m-help')?.classList.remove('show');
         window.openCasinoDepositModal = () => document.getElementById('m-casino-deposit')?.classList.add('show');
         window.closeCasinoDepositModal = () => document.getElementById('m-casino-deposit')?.classList.remove('show');
-        window.setBet = (val) => document.getElementById('bet-amount').value = val;
-        window.setMaxBet = () => {
-            const bal = window.userBalance || 0;
-            document.getElementById('bet-amount').value = Math.max(1, Math.floor(bal));
-        };
     </script>
 
     <script type="module">
@@ -305,76 +356,24 @@
         let currentUser = null;
         let uUid = null;
         window.userBalance = 1500.00;
+        let currentBet = 10;
+        let playerHand = [];
+        let dealerHand = [];
+        let gameActive = false;
 
-        const canvas = document.getElementById('plinkoCanvas');
-        const ctx = canvas.getContext('2d');
+        const suits = ['♠', '♥', '♦', '♣'];
+        const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
-        const rows = 8;
-        const multipliers = [15, 5, 2, 0.5, 0.2, 0.5, 2, 5, 15];
-        const multColors = ['#ef4444', '#f97316', '#facc15', '#38bdf8', '#64748b', '#38bdf8', '#facc15', '#f97316', '#ef4444'];
-        
-        let pins = [];
-        let activeBalls = [];
-
-        function initPins() {
-            pins = [];
-            const startY = 50;
-            const rowHeight = 35;
-            const startX = canvas.width / 2;
-
-            for (let r = 0; r < rows; r++) {
-                const numPinsInRow = r + 3;
-                const rowWidth = (numPinsInRow - 1) * 26;
-                const rowStartX = startX - rowWidth / 2;
-
-                for (let p = 0; p < numPinsInRow; p++) {
-                    pins.push({
-                        x: rowStartX + p * 26,
-                        y: startY + r * rowHeight,
-                        radius: 3.5
-                    });
-                }
-            }
+        function getCardValue(card) {
+            if (card.val === 'A') return 1;
+            if (['10', 'J', 'Q', 'K'].includes(card.val)) return 0; // یا ارزش دلخواه
+            return parseInt(card.val);
         }
 
-        function drawBoard() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // رسم پین‌ها
-            ctx.fillStyle = '#94a3b8';
-            pins.forEach(pin => {
-                ctx.beginPath();
-                ctx.arc(pin.x, pin.y, pin.radius, 0, Math.PI * 2);
-                ctx.fill();
-            });
-
-            // رسم خانه‌های ضریب پایین صفحه
-            const boxWidth = canvas.width / multipliers.length;
-            const boxY = canvas.height - 35;
-
-            multipliers.forEach((m, i) => {
-                ctx.fillStyle = multColors[i] + '33';
-                ctx.strokeStyle = multColors[i];
-                ctx.lineWidth = 1.5;
-                ctx.fillRect(i * boxWidth + 2, boxY, boxWidth - 4, 30);
-                ctx.strokeRect(i * boxWidth + 2, boxY, boxWidth - 4, 30);
-
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 9px Orbitron';
-                ctx.textAlign = 'center';
-                ctx.fillText(`${m}x`, i * boxWidth + boxWidth / 2, boxY + 18);
-            });
-
-            // رسم توپ‌های در حال حرکت
-            activeBalls.forEach(ball => {
-                ctx.fillStyle = '#22c55e';
-                ctx.shadowColor = '#22c55e';
-                ctx.shadowBlur = 10;
-                ctx.beginPath();
-                ctx.arc(ball.x, ball.y, 7, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.shadowBlur = 0;
-            });
+        function calculateScore(hand) {
+            let sum = 0;
+            hand.forEach(c => sum += getCardValue(c));
+            return sum % 10; // محاسبه بر اساس قانون امتیاز پسماند یا جمع مستقیم (محدود به 9)
         }
 
         async function fetchUserBalance() {
@@ -407,95 +406,131 @@
         window.processCasinoDeposit = async function() {
             const amtInput = document.getElementById('casino-deposit-amount');
             const amt = parseFloat(amtInput?.value || 0);
-            if (amt <= 0) {
-                alert('لطفاً مبلغ معتبری وارد کنید.');
-                return;
-            }
+            if (amt <= 0) { alert('مبلغ نامعتبر است'); return; }
             window.userBalance += amt;
-            if (uUid) {
-                await supabase.from('users').update({ casino_balance: window.userBalance }).eq('id', uUid);
-            }
+            if (uUid) await supabase.from('users').update({ casino_balance: window.userBalance }).eq('id', uUid);
             updateStats();
-            alert(`موجودی شما به مبلغ $${amt.toFixed(2)} شارژ شد.`);
+            alert(`موجودی شارژ شد.`);
             if(amtInput) amtInput.value = '';
             closeCasinoDepositModal();
         };
 
-        window.dropBall = async function() {
-            const betInput = document.getElementById('bet-amount');
-            const betAmt = parseFloat(betInput?.value || 0);
+        function drawCard() {
+            const suit = suits[Math.floor(Math.random() * suits.length)];
+            const val = values[Math.floor(Math.random() * values.length)];
+            return { suit, val, isRed: suit === '♥' || suit === '♦' };
+        }
 
-            if (betAmt <= 0 || window.userBalance < betAmt) {
-                alert('موجودی کافی نیست یا مبلغ نامعتبر است!');
+        function renderHands(revealDealer = false) {
+            const pContainer = document.getElementById('player-cards');
+            const dContainer = document.getElementById('dealer-cards');
+            pContainer.innerHTML = '';
+            dContainer.innerHTML = '';
+
+            playerHand.forEach(c => {
+                pContainer.innerHTML += `<div class="playing-card ${c.isRed ? 'red' : ''}"><span>${c.val}</span><span style="align-self:center; font-size:16px;">${c.suit}</span><span style="align-self:flex-end;">${c.val}</span></div>`;
+            });
+
+            dealerHand.forEach((c, idx) => {
+                if (idx === 0 && !revealDealer && gameActive) {
+                    dContainer.innerHTML += `<div class="playing-card" style="background:#1e293b; color:#38bdf8; justify-content:center; align-items:center;"><i class="fas fa-lock"></i></div>`;
+                } else {
+                    dContainer.innerHTML += `<div class="playing-card ${c.isRed ? 'red' : ''}"><span>${c.val}</span><span style="align-self:center; font-size:16px;">${c.suit}</span><span style="align-self:flex-end;">${c.val}</span></div>`;
+                }
+            });
+
+            document.getElementById('player-score').textContent = calculateScore(playerHand);
+            document.getElementById('dealer-score').textContent = revealDealer ? calculateScore(dealerHand) : '?';
+        }
+
+        window.startRound = async function() {
+            const betInput = document.getElementById('bet-amount');
+            currentBet = parseFloat(betInput?.value || 0);
+
+            if (currentBet <= 0 || window.userBalance < currentBet) {
+                alert('موجودی کافی نیست!');
                 return;
             }
 
-            window.userBalance -= betAmt;
-            if (uUid) {
-                await supabase.from('users').update({ casino_balance: window.userBalance }).eq('id', uUid);
-            }
+            window.userBalance -= currentBet;
+            if (uUid) await supabase.from('users').update({ casino_balance: window.userBalance }).eq('id', uUid);
             updateStats();
 
-            const dropX = canvas.width / 2 + (Math.random() * 10 - 5);
-            const newBall = {
-                x: dropX,
-                y: 15,
-                vx: (Math.random() - 0.5) * 2,
-                vy: 1,
-                bet: betAmt
-            };
-            activeBalls.push(newBall);
+            playerHand = [drawCard(), drawCard()];
+            dealerHand = [drawCard(), drawCard()];
+            gameActive = true;
+
+            renderHands(false);
+            document.getElementById('game-status-msg').textContent = 'کارت بگیرید یا بایستید';
+            document.getElementById('bet-control-panel').style.display = 'none';
+            document.getElementById('action-control-panel').style.display = 'block';
+
+            // بررسی فوری اگر امتیاز ۸ یا ۹ باشد
+            const pScore = calculateScore(playerHand);
+            if (pScore === 8 || pScore === 9) {
+                document.getElementById('game-status-msg').textContent = 'امتیاز عالی! بررسی نتیجه...';
+                setTimeout(endRound, 1000);
+            }
         };
 
-        function updatePhysics() {
-            for (let i = activeBalls.length - 1; i >= 0; i--) {
-                let b = activeBalls[i];
-                b.vy += 0.2; // جاذبه
-                b.x += b.vx;
-                b.y += b.vy;
+        window.playerHit = function() {
+            if (!gameActive) return;
+            playerHand.push(drawCard());
+            renderHands(false);
 
-                // برخورد با پین‌ها
-                pins.forEach(pin => {
-                    let dx = b.x - pin.x;
-                    let dy = b.y - pin.y;
-                    let dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 7 + pin.radius) {
-                        let angle = Math.atan2(dy, dx);
-                        let speed = Math.sqrt(b.vx * b.vx + b.vy * b.vy) * 0.75;
-                        b.vx = Math.cos(angle) * speed + (Math.random() - 0.5) * 1.5;
-                        b.vy = Math.sin(angle) * speed;
-                        b.y = pin.y + Math.sin(angle) * (7 + pin.radius);
-                    }
-                });
-
-                // برخورد با دیواره‌ها
-                if (b.x < 10) { b.x = 10; b.vx *= -0.6; }
-                if (b.x > canvas.width - 10) { b.x = canvas.width - 10; b.vx *= -0.6; }
-
-                // رسیدن به پایین صفحه (خانه ضریب)
-                if (b.y >= canvas.height - 35) {
-                    const boxWidth = canvas.width / multipliers.length;
-                    let slotIndex = Math.floor(b.x / boxWidth);
-                    slotIndex = Math.max(0, Math.min(multipliers.length - 1, slotIndex));
-
-                    let mult = multipliers[slotIndex];
-                    let payout = b.bet * mult;
-
-                    window.userBalance += payout;
-                    if (uUid) {
-                        supabase.from('users').update({ casino_balance: window.userBalance }).eq('id', uUid).then();
-                    }
-                    updateStats();
-
-                    activeBalls.splice(i, 1);
-                }
+            const pScore = calculateScore(playerHand);
+            if (pScore > 9) {
+                gameActive = false;
+                document.getElementById('game-status-msg').textContent = 'سوختید! از ۹ بیشتر شد.';
+                finishGame(false);
             }
+        };
+
+        window.playerStand = function() {
+            if (!gameActive) return;
+            endRound();
+        };
+
+        function endRound() {
+            gameActive = false;
+            renderHands(true);
+
+            const pScore = calculateScore(playerHand);
+            const dScore = calculateScore(dealerHand);
+
+            let won = false;
+            if (pScore > 9) {
+                won = false;
+            } else if (dScore > 9) {
+                won = true;
+            } else if (pScore > dScore) {
+                won = true;
+            } else {
+                won = false;
+            }
+
+            finishGame(won, pScore === dScore);
         }
 
-        function gameLoop() {
-            updatePhysics();
-            drawBoard();
-            requestAnimationFrame(gameLoop);
+        async function finishGame(won, isDraw = false) {
+            document.getElementById('action-control-panel').style.display = 'none';
+            document.getElementById('bet-control-panel').style.display = 'block';
+
+            let msg = '';
+            if (isDraw && calculateScore(playerHand) <= 9) {
+                msg = 'مساوی! مبلغ شرط بازگشت داده شد.';
+                window.userBalance += currentBet;
+            } else if (won) {
+                const payout = currentBet * 2;
+                msg = `🎉 تبریک! برنده شدید ($${payout.toFixed(2)})`;
+                window.userBalance += payout;
+            } else {
+                msg = 'متأسفانه باختید.';
+            }
+
+            document.getElementById('game-status-msg').textContent = msg;
+            updateStats();
+            if (uUid) await supabase.from('users').update({ casino_balance: window.userBalance }).eq('id', uUid);
         }
 
         supabase.auth.onAuthStateChange(async (event, session) => {
@@ -506,9 +541,7 @@
             }
         });
 
-        initPins();
         fetchUserBalance();
-        gameLoop();
     </script>
 </body>
 </html>
