@@ -388,18 +388,16 @@
     <div class="modal" id="m-help">
         <div class="modal-content" style="max-width: 330px;">
             <div class="modal-header">
-                <span><i class="fas fa-graduation-cap" style="color:#facc15;"></i> راهنمای شرط‌بندی و بازی رولت واقعی</span>
+                <span><i class="fas fa-graduation-cap" style="color:#facc15;"></i> راهنمای استخر جوایز و سیستم پلتفرم</span>
                 <button class="modal-close" onclick="closeHelpModal()"><i class="fas fa-times"></i></button>
             </div>
             <div style="overflow-y:auto; max-height: 65vh; padding-right:4px; font-size:9.5px; color:#cbd5e1; line-height:1.6;">
-                <p style="margin-bottom:8px;"><strong style="color:#facc15;">مهم (پول واقعی):</strong> تمام شرط‌ها با موجودی واقعی حساب شما ثبت شده و مبالغ برد مستقیماً به حساب شما واریز می‌گردد.</p>
-                <p style="margin-bottom:8px;"><strong style="color:#facc15;">شرط چرخش گردونه:</strong> چرخ شانس تا زمانی که حداقل یک شرط معتبر روی میز ثبت نکنید، نخواهد چرخید.</p>
-                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">1. اعداد تکی (0 تا 36):</strong> ضریب ۳۶ برابر</p>
-                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">2. دوازده‌تایی‌ها (1st 12 , 2nd 12 , 3rd 12):</strong> ضریب ۳ برابر</p>
-                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">3. ستون‌ها (2:1):</strong> ضریب ۳ برابر</p>
-                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">4. رنگ‌ها (RED / BLACK):</strong> ضریب ۲ برابر</p>
-                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">5. زوج و فرد (EVEN / ODD):</strong> ضریب ۲ برابر</p>
-                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">6. نیمه‌ها (1-18 و 19-36):</strong> ضریب ۲ برابر</p>
+                <p style="margin-bottom:8px;"><strong style="color:#facc15;">مدل استخر جوایز (Pool-Based):</strong> تمام شرط‌بندی‌ها از پول واقعی کاربران جمع‌آوری شده و جوایز دقیقاً از همین استخر پرداخت می‌شوند.</p>
+                <p style="margin-bottom:8px;"><strong style="color:#facc15;">کمیسیون و عدم پرداخت از جیب پلتفرم:</strong> ابتدا سهم کارمزد پلتفرم از مجموع کل استخر کسر شده و باقی‌مانده آن میان کاربران برنده توزیع می‌گردد تا پلتفرم هرگز از سرمایه خود ضرر نکند.</p>
+                <p style="margin-bottom:8px;"><strong style="color:#facc15;">شرط چرخش گردونه:</strong> چرخ شانس تا زمانی که حداقل یک شرط واقعی ثبت نشود، حرکت نخواهد کرد.</p>
+                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">1. اعداد تکی (0 تا 36):</strong> سهم متناسب از استخر پس از کسر کارمزد</p>
+                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">2. دوازده‌تایی‌ها و ستون‌ها:</strong> تقسیم استخر بر اساس حجم شرط‌ها</p>
+                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">3. رنگ‌ها، زوج/فرد و نیمه‌ها:</strong> پرداخت سهم برندگان از استخر کل</p>
             </div>
         </div>
     </div>
@@ -662,12 +660,10 @@
 
         window.clearUserBets = async function() {
             if (gameState !== 'BETTING') return;
-            // در صورت تمایل به لغو، موجودی بازگردانده می‌شود
             const totalRefund = userBets.reduce((sum, b) => sum + b.amount, 0);
             userBalance += totalRefund;
             if (uUid && totalRefund > 0) {
                 await supabase.from('users').update({ casino_balance: userBalance }).eq('id', uUid);
-                // حذف شرط‌های PENDING کاربر از دیتابیس
                 await supabase.from('casino_bets').delete().eq('user_id', uUid).eq('status', 'PENDING');
             }
             userBets = [];
@@ -683,7 +679,6 @@
                 alert('موجودی کافی نیست!');
                 return;
             }
-            // برای هر شرط موجود، یک شرط دیگر ثبت می‌کنیم
             const currentCopy = [...userBets];
             for (let b of currentCopy) {
                 await placeBet(b.target);
@@ -727,7 +722,6 @@
 
                 if (countdown <= 0) {
                     clearInterval(timerInterval);
-                    // بررسی اینکه آیا شرطی ثبت شده است یا خیر
                     if (userBets.length > 0) {
                         spinWheel();
                     } else {
@@ -767,7 +761,6 @@
             }, 3100);
         }
 
-        // اتصال تسویه حساب امن به تابع سرورسايد settle_casino_bets
         async function evaluateResult(winNum) {
             gameState = 'RESULT';
             const isRed = redNumbers.includes(winNum);
@@ -782,7 +775,6 @@
                     totalPayout = data.payout;
                 }
             } else {
-                // محاسبه محلی برای حالت تست بدون لاگین
                 userBets.forEach(b => {
                     let won = false; let mult = 0;
                     if (b.target === winNum.toString()) { won = true; mult = 36; }
@@ -850,7 +842,6 @@
             }
         });
 
-        // اجرای اولیه
         fetchUserBalance();
         drawWheel();
         buildTable();
