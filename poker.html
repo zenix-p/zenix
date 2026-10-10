@@ -388,14 +388,13 @@
     <div class="modal" id="m-help">
         <div class="modal-content" style="max-width: 330px;">
             <div class="modal-header">
-                <span><i class="fas fa-graduation-cap" style="color:#facc15;"></i> راهنمای استخر جوایز و سیستم پلتفرم</span>
+                <span><i class="fas fa-graduation-cap" style="color:#facc15;"></i> راهنمای بازی و استخر جوایز</span>
                 <button class="modal-close" onclick="closeHelpModal()"><i class="fas fa-times"></i></button>
             </div>
             <div style="overflow-y:auto; max-height: 65vh; padding-right:4px; font-size:9.5px; color:#cbd5e1; line-height:1.6;">
-                <p style="margin-bottom:8px;"><strong style="color:#facc15;">مدل استخر جوایز (Pool-Based):</strong> تمام شرط‌بندی‌ها از پول واقعی کاربران جمع‌آوری شده و جوایز دقیقاً از همین استخر پرداخت می‌شوند.</p>
-                <p style="margin-bottom:8px;"><strong style="color:#facc15;">کمیسیون و عدم پرداخت از جیب پلتفرم:</strong> ابتدا سهم کارمزد پلتفرم از مجموع کل استخر کسر شده و باقی‌مانده آن میان کاربران برنده توزیع می‌گردد تا پلتفرم هرگز از سرمایه خود ضرر نکند.</p>
-                <p style="margin-bottom:8px;"><strong style="color:#facc15;">شرط چرخش گردونه:</strong> چرخ شانس تا زمانی که حداقل یک شرط واقعی ثبت نشود، حرکت نخواهد کرد.</p>
-                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">1. اعداد تکی (0 تا 36):</strong> سهم متناسب از استخر پس از کسر کارمزد</p>
+                <p style="margin-bottom:8px;"><strong style="color:#facc15;">ماهیت بازی:</strong> این بازی به صورت تک‌نفره و مجزا انجام نمی‌شود؛ جوایز دقیقاً از مجموع کل شرط‌های ثبت‌شده در بازی تأمین و پرداخت می‌گردد.</p>
+                <p style="margin-bottom:8px;"><strong style="color:#facc15;">شرط شروع چرخش:</strong> چرخ شانس زمانی شروع به دوران می‌کند که حتماً دو کاربر یا دو شرط (یا بیشتر) روی میز ثبت شده باشد.</p>
+                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">1. اعداد تکی (0 تا 36):</strong> سهم متناسب از استخر کل</p>
                 <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">2. دوازده‌تایی‌ها و ستون‌ها:</strong> تقسیم استخر بر اساس حجم شرط‌ها</p>
                 <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">3. رنگ‌ها، زوج/فرد و نیمه‌ها:</strong> پرداخت سهم برندگان از استخر کل</p>
             </div>
@@ -607,7 +606,6 @@
             playSound(600, 'sine', 0.05);
         };
 
-        // اتصال امن ثبت شرط به تابع سرورسايد place_casino_bet
         window.placeBet = async function(target) {
             if (gameState !== 'BETTING') return;
             if (userBalance < selectedChipVal) {
@@ -715,17 +713,30 @@
             if(msgEl) msgEl.textContent = 'ژتون خود را بگذارید';
             document.querySelectorAll('.cell').forEach(c => c.classList.remove('winning-cell'));
 
-            timerInterval = setInterval(() => {
+            if (timerInterval) clearInterval(timerInterval);
+
+            timerInterval = setInterval(async () => {
                 countdown--;
                 const timerEl = document.getElementById('timer-display');
                 if(timerEl) timerEl.textContent = countdown;
 
                 if (countdown <= 0) {
                     clearInterval(timerInterval);
-                    if (userBets.length > 0) {
+                    
+                    let totalBetsCount = userBets.length;
+                    if (uUid) {
+                        try {
+                            const { count } = await supabase.from('casino_bets').select('*', { count: 'exact', head: true }).eq('status', 'PENDING');
+                            if (count !== null && count !== undefined) {
+                                totalBetsCount = count;
+                            }
+                        } catch(e) {}
+                    }
+
+                    if (totalBetsCount >= 2) {
                         spinWheel();
                     } else {
-                        if(msgEl) msgEl.textContent = 'لطفاً برای شروع چرخش ژتون بگذارید';
+                        if(msgEl) msgEl.textContent = 'انتظار برای ثبت حداقل ۲ شرط یا کاربر...';
                         startTimer();
                     }
                 }
