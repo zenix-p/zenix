@@ -1,867 +1,477 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zenix Multiplayer 3D Roulette</title>
-    <link rel="icon" href="data:image/x-icon;base64,=">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-glow: #22c55e;
-            --accent-blue: #38bdf8;
-            --gold-accent: #facc15;
-            --bg-dark: #020617;
-            --felt-green: #064e3b;
-            --felt-border: #022c22;
-            --glass-border: rgba(255, 255, 255, 0.12);
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', 'Vazirmatn', sans-serif; user-select: none; }
-        body {
-            background: var(--bg-dark);
-            min-height: 100vh;
-            color: #f8fafc;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-            background-image: radial-gradient(circle at 50% 30%, #1e293b 0%, #020617 85%);
-        }
-
-        /* هدر اختصاصی و مستقل بازی */
-        header {
-            background: rgba(15, 23, 42, 0.95);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 12px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(12px);
-        }
-        .logo{display:flex;align-items:center;gap:10px}
-        .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#facc15,#eab308);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#0f172a;font-family:'Orbitron',sans-serif;font-size:20px;font-weight:900;box-shadow:0 0 15px rgba(250,204,21,0.4)}
-        .logo-text{font-family:'Orbitron',sans-serif;font-size:20px;font-weight:900;letter-spacing:2px;background:linear-gradient(135deg,#facc15,#f97316);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 20px rgba(250,204,21,0.3)}
-        
-        .header-actions{display:flex;align-items:center;gap:10px}
-        .lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:38px;width:38px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:#38bdf8;text-decoration:none;transition:0.2s}
-        .lb:hover{background:rgba(56,189,248,0.2);transform:scale(1.05)}
-
-        /* نوار آمار و آمار بازی */
-        .game-bar {
-            background: rgba(15, 23, 42, 0.7);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 10px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .history-bar { display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.4); padding: 4px 12px; border-radius: 20px; border: 1px solid var(--glass-border); }
-        .history-title { font-size: 11px; color: #94a3b8; font-weight: 700; margin-left: 6px; }
-        .hist-num { width: 26px; height: 26px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 11px; font-weight: 800; font-family: 'Orbitron'; color: #fff; }
-        .hist-red { background: #dc2626; }
-        .hist-black { background: #1e293b; border: 1px solid #475569; }
-        .hist-green { background: #16a34a; }
-
-        .user-stats { display: flex; align-items: center; gap: 12px; }
-        .stat-pill { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 6px 16px; border-radius: 30px; display: flex; align-items: center; gap: 8px; }
-        .stat-val { font-family: 'Orbitron', sans-serif; font-weight: 800; color: var(--gold-accent); font-size: 14px; }
-        
-        .casino-deposit-btn {
-            background: linear-gradient(135deg, #facc15, #f97316);
-            color: #0f172a;
-            padding: 7px 16px;
-            border-radius: 20px;
-            border: none;
-            font-size: 11px;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            box-shadow: 0 0 15px rgba(250, 204, 21, 0.4);
-            transition: 0.2s;
-        }
-        .casino-deposit-btn:hover { transform: scale(1.05); }
-
-        /* صحنه اصلی بازی */
-        .main-stage {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 15px;
-            gap: 15px;
-            max-width: 1200px;
-            margin: 0 auto;
-            width: 100%;
-            flex: 1;
-        }
-
-        .top-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            gap: 20px;
-        }
-
-        .players-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            width: 180px;
-        }
-        .player-card {
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 8px 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: 0.3s;
-        }
-        .player-avatar {
-            width: 36px; height: 36px; border-radius: 50%; background-size: cover; background-position: center; border: 2px solid #64748b;
-        }
-        .p-info { display: flex; flex-direction: column; }
-        .p-name { font-size: 12px; font-weight: 700; color: #e2e8f0; }
-        .p-status { font-size: 10px; font-family: 'Orbitron'; color: var(--gold-accent); }
-
-        .wheel-box {
-            position: relative;
-            width: 280px;
-            height: 280px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: radial-gradient(circle, #2d160a 0%, #020617 70%);
-            border-radius: 50%;
-            border: 8px solid #42281d;
-            box-shadow: 0 0 50px rgba(0,0,0,0.9), 0 0 30px rgba(250, 204, 21, 0.15);
-        }
-        canvas#rouletteWheel { transform: rotate(0deg); transition: transform 0.05s linear; }
-
-        .wheel-pointer {
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0; height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-top: 20px solid var(--gold-accent);
-            z-index: 10;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
-        }
-
-        .status-center {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            width: 180px;
-        }
-        .timer-circle {
-            width: 65px; height: 65px; border-radius: 50%;
-            border: 4px solid var(--accent-blue);
-            display: flex; justify-content: center; align-items: center;
-            font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 22px;
-            color: #fff; background: rgba(15, 23, 42, 0.8);
-            box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
-        }
-        .status-text { font-size: 12px; font-weight: 800; color: var(--gold-accent); text-align: center; }
-
-        .table-viewport {
-            perspective: 800px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            margin-top: 10px;
-            margin-bottom: 70px;
-        }
-
-        .roulette-table {
-            transform: rotateX(25deg);
-            background: var(--felt-green);
-            border: 14px solid var(--felt-border);
-            border-radius: 20px;
-            padding: 15px;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.95), inset 0 0 60px rgba(0,0,0,0.8);
-            display: grid;
-            grid-template-columns: 50px repeat(12, 1fr) 60px;
-            grid-template-rows: repeat(3, 48px) 40px 40px;
-            gap: 3px;
-            position: relative;
-            max-width: 950px;
-            width: 100%;
-        }
-
-        .cell {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 800;
-            font-size: 14px;
-            color: #fff;
-            cursor: pointer;
-            position: relative;
-            border-radius: 4px;
-            transition: 0.15s;
-        }
-        .cell:hover { background: rgba(250, 204, 21, 0.3); border-color: var(--gold-accent); }
-        .cell.red-num { background: rgba(220, 38, 38, 0.85); }
-        .cell.black-num { background: rgba(15, 23, 42, 0.9); }
-        .cell.zero-num { grid-row: 1 / span 3; background: #16a34a; font-size: 18px; }
-
-        .cell.outside-bet { font-size: 11px; font-weight: 800; background: rgba(15, 23, 42, 0.7); }
-        .cell.outside-red { background: rgba(220, 38, 38, 0.7); }
-        .cell.outside-black { background: rgba(15, 23, 42, 0.9); }
-
-        .chip-on-table {
-            position: absolute;
-            width: 24px; height: 24px;
-            border-radius: 50%;
-            border: 2px dashed #fff;
-            font-family: 'Orbitron';
-            font-size: 8px;
-            font-weight: 900;
-            display: flex; justify-content: center; align-items: center;
-            color: #000;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.8);
-            pointer-events: none;
-            z-index: 5;
-            animation: chipDrop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes chipDrop { from { transform: scale(2) translateY(-20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
-
-        .chip-1 { background: #38bdf8; }
-        .chip-5 { background: #facc15; }
-        .chip-10 { background: #22c55e; }
-        .chip-50 { background: #a855f7; color: #fff; }
-        .chip-100 { background: #ef4444; color: #fff; }
-
-        .bot-dot {
-            position: absolute; width: 8px; height: 8px; border-radius: 50%; top: -2px; right: -2px; border: 1px solid #fff;
-        }
-
-        .control-bar {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            background: rgba(15, 23, 42, 0.95);
-            border-top: 1px solid var(--glass-border);
-            padding: 10px 24px;
-            backdrop-filter: blur(16px);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 200;
-        }
-
-        .chip-rack { display: flex; gap: 10px; align-items: center; }
-        .chip-select {
-            width: 44px; height: 44px; border-radius: 50%;
-            border: 3px dashed #fff;
-            display: flex; justify-content: center; align-items: center;
-            font-family: 'Orbitron'; font-weight: 900; font-size: 11px; color: #000;
-            cursor: pointer; transition: 0.2s; box-shadow: 0 6px 12px rgba(0,0,0,0.5);
-        }
-        .chip-select:hover, .chip-select.active { transform: translateY(-6px) scale(1.1); border-style: solid; border-color: var(--gold-accent); box-shadow: 0 0 20px var(--gold-accent); }
-
-        .action-btns { display: flex; gap: 10px; }
-        .btn-act {
-            padding: 10px 18px; border-radius: 10px; border: none; font-weight: 800; font-size: 12px; cursor: pointer; color: #fff; transition: 0.2s;
-        }
-        .btn-clear { background: #ef4444; }
-        .btn-double { background: #0ea5e9; }
-
-        .winning-cell { animation: winPulse 0.8s infinite alternate; border-color: var(--gold-accent) !important; z-index: 10; }
-        @keyframes winPulse { from { box-shadow: 0 0 5px var(--gold-accent); } to { box-shadow: 0 0 25px var(--gold-accent); background: rgba(250, 204, 21, 0.6); } }
-
-        /* مودال‌ها */
-        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
-        .modal.show{display:flex}
-        .modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(250,204,21,0.3);border-radius:20px;width:100%;max-width:440px;max-height:85vh;display:flex;flex-direction:column;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.9)}
-        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;color:#facc15;font-weight:800;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px}
-        .modal-close{background:rgba(255,255,255,.05);border:none;color:#94a3b8;cursor:pointer;font-size:14px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
-        .modal-close:hover{background:rgba(239,68,68,.2);color:#ef4444}
-
-        .form-input{width:100%;background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:10px;color:#fff;font-size:13px;outline:none;margin-top:6px;margin-bottom:12px}
-        .btn-submit-deposit{width:100%;background:linear-gradient(135deg,#facc15,#f97316);color:#0f172a;border:none;padding:12px;border-radius:10px;font-weight:800;cursor:pointer;font-size:13px}
-    </style>
-</head>
-<body>
-
-    <header>
-        <div class="logo">
-            <div class="logo-icon"><i class="fas fa-dharmachakra"></i></div>
-            <div class="logo-text">ROULETTE CASINO</div>
-        </div>
-        
-        <div class="header-actions">
-            <button type="button" class="lb" id="help-btn" title="راهنمای بازی" onclick="window.openHelpModal()"><i class="fas fa-circle-question" style="color:#facc15"></i></button>
-            <a href="dashboard.html" class="lb" title="خروج به داشبورد"><i class="fas fa-right-from-bracket" style="color:#ef4444"></i></a>
-        </div>
-    </header>
-
-    <div class="game-bar">
-        <div class="history-bar">
-            <span class="history-title">نتایج اخیر:</span>
-            <div id="history-list" style="display:flex; gap:4px;"></div>
-        </div>
-
-        <div class="user-stats">
-            <div class="stat-pill">
-                <span style="font-size:11px; color:#94a3b8;">مجموع شرط:</span>
-                <span class="stat-val" id="total-bet-val" style="color:#38bdf8;">$0.00</span>
-            </div>
-            <div class="stat-pill">
-                <span style="font-size:11px; color:#94a3b8;">موجودی بازی:</span>
-                <span class="stat-val" id="balance-val">$0.00</span>
-            </div>
-            <button class="casino-deposit-btn" onclick="window.openCasinoDepositModal()"><i class="fas fa-plus-circle"></i> + شارژ موجودی بازی</button>
-        </div>
-    </div>
-
-    <div class="main-stage">
-        <div class="top-section">
-            <div class="players-container">
-                <div class="player-card">
-                    <div class="player-avatar" style="background-image:url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80')"></div>
-                    <div class="p-info"><span class="p-name">Alex</span><span class="p-status" id="bet-p1">در حال انتخاب...</span></div>
-                </div>
-                <div class="player-card">
-                    <div class="player-avatar" style="background-image:url('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80')"></div>
-                    <div class="p-info"><span class="p-name">Dmitry</span><span class="p-status" id="bet-p2">در حال انتخاب...</span></div>
-                </div>
-            </div>
-
-            <div class="wheel-box">
-                <div class="wheel-pointer"></div>
-                <canvas id="rouletteWheel" width="270" height="270"></canvas>
-            </div>
-
-            <div class="status-center">
-                <div class="timer-circle" id="timer-display">12</div>
-                <div class="status-text" id="status-msg">ژتون‌های خود را روی میز بگذارید</div>
-            </div>
-
-            <div class="players-container">
-                <div class="player-card">
-                    <div class="player-avatar" style="background-image:url('https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80')"></div>
-                    <div class="p-info"><span class="p-name">Sarah</span><span class="p-status" id="bet-p3">در حال انتخاب...</span></div>
-                </div>
-                <div class="player-card">
-                    <div class="player-avatar" style="background-image:url('https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=100&q=80')"></div>
-                    <div class="p-info"><span class="p-name">Marco</span><span class="p-status" id="bet-p4">در حال انتخاب...</span></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="table-viewport">
-            <div class="roulette-table" id="roulette-table">
-                <div class="cell zero-num" data-bet="0">0</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="control-bar">
-        <div class="chip-rack">
-            <span style="font-size:11px; color:#94a3b8; font-weight:700;">ارزش ژتون:</span>
-            <div class="chip-select chip-1 active" onclick="selectChip(1, this)">$1</div>
-            <div class="chip-select chip-5" onclick="selectChip(5, this)">$5</div>
-            <div class="chip-select chip-10" onclick="selectChip(10, this)">$10</div>
-            <div class="chip-select chip-50" onclick="selectChip(50, this)">$50</div>
-            <div class="chip-select chip-100" onclick="selectChip(100, this)">$100</div>
-        </div>
-
-        <div class="action-btns">
-            <button class="btn-act btn-clear" onclick="clearUserBets()"><i class="fas fa-trash"></i> پاک کردن</button>
-            <button class="btn-act btn-double" onclick="doubleUserBets()"><i class="fas fa-clone"></i> دو برابر</button>
-        </div>
-    </div>
-
-    <!-- مودال شارژ اختصاصی موجودی بازی -->
-    <div class="modal" id="m-casino-deposit">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span><i class="fas fa-wallet"></i> شارژ مجزای موجودی بازی (کازینو)</span>
-                <button class="modal-close" onclick="window.closeCasinoDepositModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <div style="font-size:12px; color:#cbd5e1; margin-bottom:10px; line-height:1.6;">
-                موجودی بازی کاملاً جدا از موجودی اصلی پلتفرم است. مبلغ مدنظر جهت شارژ مستقیم موجودی بازی را وارد فرمایید:
-            </div>
-            <label style="font-size:11px; color:#94a3b8;">مبلغ شارژ (USDT):</label>
-            <input type="number" id="casino-deposit-amount" class="form-input" placeholder="مثال: 50" min="1">
-            <button class="btn-submit-deposit" onclick="window.processCasinoDeposit()"><i class="fas fa-check-circle"></i> تایید و شارژ موجودی بازی</button>
-        </div>
-    </div>
-
-    <!-- مودال راهنما -->
-    <div class="modal" id="m-help">
-        <div class="modal-content">
-            <div class="modal-header"><span>راهنمای بازی رولت 3D</span><button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button></div>
-            <div style="overflow-y:auto;padding-right:4px; font-size:12px; color:#cbd5e1; line-height:1.7;">
-                <p style="margin-bottom:8px;"><strong style="color:#facc15;">• نحوه بازی:</strong> ژتون مورد نظر خود را انتخاب کرده و روی خانه دلخواه (اعداد تک، قرمز/مشکی، زوج/فرد یا دوازده‌تایی) کلیک کنید.</p>
-                <p style="margin-bottom:8px;"><strong style="color:#22c55e;">• ضریب برد:</strong></p>
-                <ul style="padding-right:15px; margin-bottom:8px;">
-                    <li>شرط مستقیم روی یک عدد: <strong>۳۶ برابر</strong></li>
-                    <li>شرط روی رنگ (قرمز/مشکی) یا زوج/فرد: <strong>۲ برابر</strong></li>
-                    <li>شرط روی ستون‌ها یا ۱۲تایی‌ها: <strong>۳ برابر</strong></li>
-                </ul>
-                <p><strong style="color:#38bdf8;">• تفکیک موجودی:</strong> موجودی این بازی مستقل از پلتفرم است و می‌توانید آن را جداگانه شارژ فرمایید.</p>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        window.openHelpModal=()=>document.getElementById('m-help')?.classList.add('show');
-        window.closeHelpModal=()=>document.getElementById('m-help')?.classList.remove('show');
-        window.openCasinoDepositModal=()=>document.getElementById('m-casino-deposit')?.classList.add('show');
-        window.closeCasinoDepositModal=()=>document.getElementById('m-casino-deposit')?.classList.remove('show');
-    </script>
-
-    <script type="module">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
-        const SUPABASE_URL = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        const wheelNumbers = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3];
-        const redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
-        
-        let currentUser = null;
-        let uUid = null;
-        let userBalance = 0; // casino_balance مستقل
-        let selectedChipVal = 1;
-        let userBets = []; 
-        let botBets = [];  
-        let gameState = 'BETTING'; 
-        let countdown = 12;
-        let timerInterval;
-
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSound(freq, type = 'sine', duration = 0.1) {
-            try {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.value = freq;
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
-            } catch(e){}
-        }
-
-        // همگام‌سازی ستون casino_balance به صورت کاملاً مجزا از balance
-        async function syncCasinoBalanceWithDB(newBal) {
-            if (!uUid) return;
-            userBalance = Math.max(0, newBal);
-            updateStats();
-            try {
-                await supabase.from('users').update({ casino_balance: userBalance }).eq('id', uUid);
-                await supabase.auth.updateUser({ data: { casino_balance: userBalance } });
-            } catch (e) {
-                console.warn("خطا در به‌روزرسانی موجودی بازی:", e);
-            }
-        }
-
-        window.processCasinoDeposit = async function() {
-            const amtInput = document.getElementById('casino-deposit-amount');
-            const amt = parseFloat(amtInput?.value || 0);
-            if (amt <= 0) {
-                alert('لطفاً مبلغ معتبری وارد کنید.');
-                return;
-            }
-            userBalance += amt;
-            await syncCasinoBalanceWithDB(userBalance);
-            alert(`حساب بازی شما به مبلغ $${amt.toFixed(2)} با موفقیت شارژ شد.`);
-            if(amtInput) amtInput.value = '';
-            window.closeCasinoDepositModal();
-        };
-
-        function drawWheel() {
-            const canvas = document.getElementById('rouletteWheel');
-            if(!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const numSlices = wheelNumbers.length;
-            const radius = canvas.width / 2;
-            const sliceAngle = (2 * Math.PI) / numSlices;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            for (let i = 0; i < numSlices; i++) {
-                const angle = i * sliceAngle;
-                const num = wheelNumbers[i];
-
-                if (num === 0) ctx.fillStyle = '#16a34a';
-                else if (redNumbers.includes(num)) ctx.fillStyle = '#dc2626';
-                else ctx.fillStyle = '#0f172a';
-
-                ctx.beginPath();
-                ctx.moveTo(radius, radius);
-                ctx.arc(radius, radius, radius - 8, angle, angle + sliceAngle);
-                ctx.closePath();
-                ctx.fill();
-                ctx.strokeStyle = '#facc15';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-
-                ctx.save();
-                ctx.translate(radius, radius);
-                ctx.rotate(angle + sliceAngle / 2);
-                ctx.textAlign = 'right';
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 10px Orbitron';
-                ctx.fillText(num.toString(), radius - 12, 4);
-                ctx.restore();
-            }
-
-            ctx.beginPath();
-            ctx.arc(radius, radius, 32, 0, 2 * Math.PI);
-            ctx.fillStyle = '#2d160a';
-            ctx.fill();
-            ctx.strokeStyle = '#facc15';
-            ctx.lineWidth = 3;
-            ctx.stroke();
-        }
-
-        function buildTable() {
-            const table = document.getElementById('roulette-table');
-            if(!table) return;
-
-            for (let r = 0; r < 3; r++) {
-                for (let c = 1; c <= 12; c++) {
-                    const num = (c - 1) * 3 + (3 - r);
-                    const cell = document.createElement('div');
-                    const isRed = redNumbers.includes(num);
-                    cell.className = `cell ${isRed ? 'red-num' : 'black-num'}`;
-                    cell.style.gridRow = `${r + 1}`;
-                    cell.style.gridColumn = `${c + 1}`;
-                    cell.setAttribute('data-bet', num.toString());
-                    cell.textContent = num;
-                    cell.onclick = () => placeBet(num.toString(), cell);
-                    table.appendChild(cell);
-                }
-            }
-
-            for (let r = 0; r < 3; r++) {
-                const cell = document.createElement('div');
-                cell.className = 'cell outside-bet';
-                cell.style.gridRow = `${r + 1}`;
-                cell.style.gridColumn = '14';
-                const colTarget = `COL_${3 - r}`;
-                cell.setAttribute('data-bet', colTarget);
-                cell.textContent = '2:1';
-                cell.onclick = () => placeBet(colTarget, cell);
-                table.appendChild(cell);
-            }
-
-            const dozenBets = [
-                { name: '1st 12', target: 'DOZ_1', colSpan: '2 / span 4' },
-                { name: '2nd 12', target: 'DOZ_2', colSpan: '6 / span 4' },
-                { name: '3rd 12', target: 'DOZ_3', colSpan: '10 / span 4' }
-            ];
-            dozenBets.forEach(d => {
-                const cell = document.createElement('div');
-                cell.className = 'cell outside-bet';
-                cell.style.gridRow = '4';
-                cell.style.gridColumn = d.colSpan;
-                cell.setAttribute('data-bet', d.target);
-                cell.textContent = d.name;
-                cell.onclick = () => placeBet(d.target, cell);
-                table.appendChild(cell);
-            });
-
-            const outsideBets = [
-                { name: '1-18', target: 'LOW', colSpan: '2 / span 2', cls: '' },
-                { name: 'EVEN', target: 'EVEN', colSpan: '4 / span 2', cls: '' },
-                { name: 'RED', target: 'RED', colSpan: '6 / span 2', cls: 'outside-red' },
-                { name: 'BLACK', target: 'BLACK', colSpan: '8 / span 2', cls: 'outside-black' },
-                { name: 'ODD', target: 'ODD', colSpan: '10 / span 2', cls: '' },
-                { name: '19-36', target: 'HIGH', colSpan: '12 / span 2', cls: '' }
-            ];
-            outsideBets.forEach(o => {
-                const cell = document.createElement('div');
-                cell.className = `cell outside-bet ${o.cls}`;
-                cell.style.gridRow = '5';
-                cell.style.gridColumn = o.colSpan;
-                cell.setAttribute('data-bet', o.target);
-                cell.textContent = o.name;
-                cell.onclick = () => placeBet(o.target, cell);
-                table.appendChild(cell);
-            });
-        }
-
-        window.selectChip = function(val, elem) {
-            selectedChipVal = val;
-            document.querySelectorAll('.chip-select').forEach(c => c.classList.remove('active'));
-            elem.classList.add('active');
-            playSound(600, 'sine', 0.05);
-        };
-
-        window.placeBet = async function(target, cellElem) {
-            if (gameState !== 'BETTING') return;
-            if (userBalance < selectedChipVal) {
-                if (confirm('موجودی بازی شما برای این شرط کافی نیست! آیا مایلید موجودی بازی خود را شارژ کنید؟')) {
-                    window.openCasinoDepositModal();
-                }
-                return;
-            }
-
-            userBalance -= selectedChipVal;
-            userBets.push({ target, amount: selectedChipVal, chipClass: `chip-${selectedChipVal}` });
-
-            playSound(800, 'triangle', 0.08);
-            renderChips();
-            updateStats();
-            await syncCasinoBalanceWithDB(userBalance);
-        };
-
-        function renderChips() {
-            document.querySelectorAll('.chip-on-table').forEach(c => c.remove());
-
-            userBets.forEach(b => {
-                const cell = document.querySelector(`[data-bet="${b.target}"]`);
-                if (cell) {
-                    const chip = document.createElement('div');
-                    chip.className = `chip-on-table ${b.chipClass}`;
-                    chip.textContent = `$${b.amount}`;
-                    cell.appendChild(chip);
-                }
-            });
-
-            botBets.forEach(b => {
-                const cell = document.querySelector(`[data-bet="${b.target}"]`);
-                if (cell) {
-                    const chip = document.createElement('div');
-                    chip.className = 'chip-on-table chip-10';
-                    chip.style.background = b.color;
-                    chip.style.color = '#fff';
-                    chip.innerHTML = `$${b.amount}<div class="bot-dot" style="background:${b.color}"></div>`;
-                    cell.appendChild(chip);
-                }
-            });
-        }
-
-        window.clearUserBets = async function() {
-            if (gameState !== 'BETTING') return;
-            const totalRefund = userBets.reduce((sum, b) => sum + b.amount, 0);
-            userBalance += totalRefund;
-            userBets = [];
-            renderChips();
-            updateStats();
-            playSound(300, 'sine', 0.1);
-            await syncCasinoBalanceWithDB(userBalance);
-        };
-
-        window.doubleUserBets = async function() {
-            if (gameState !== 'BETTING') return;
-            const totalCurrent = userBets.reduce((sum, b) => sum + b.amount, 0);
-            if (totalCurrent <= 0) return;
-            if (userBalance < totalCurrent) {
-                alert('موجودی کافی برای دوبرابر کردن شرط وجود ندارد!');
-                return;
-            }
-            userBalance -= totalCurrent;
-            const newBets = JSON.parse(JSON.stringify(userBets));
-            userBets = userBets.concat(newBets);
-            renderChips();
-            updateStats();
-            playSound(900, 'sine', 0.1);
-            await syncCasinoBalanceWithDB(userBalance);
-        };
-
-        function updateStats() {
-            const totalBet = userBets.reduce((sum, b) => sum + b.amount, 0);
-            const betEl = document.getElementById('total-bet-val');
-            const balEl = document.getElementById('balance-val');
-            if(betEl) betEl.textContent = `$${totalBet.toFixed(2)}`;
-            if(balEl) balEl.textContent = `$${userBalance.toFixed(2)}`;
-        }
-
-        function simulateBotBets() {
-            if (gameState !== 'BETTING') return;
-
-            const targets = ['RED', 'BLACK', 'EVEN', 'ODD', 'DOZ_1', 'DOZ_2', '7', '17', '23', '0', '36'];
-            const botColors = ['#38bdf8', '#a855f7', '#f43f5e', '#fbbf24'];
-
-            const randomBot = Math.floor(Math.random() * 4) + 1;
-            const randomTarget = targets[Math.floor(Math.random() * targets.length)];
-            const randomAmount = [1, 5, 10][Math.floor(Math.random() * 3)];
-
-            botBets.push({
-                target: randomTarget,
-                amount: randomAmount,
-                botId: randomBot,
-                color: botColors[randomBot - 1]
-            });
-
-            const botEl = document.getElementById(`bet-p${randomBot}`);
-            if(botEl) botEl.textContent = `شرط روی ${randomTarget}`;
-            renderChips();
-        }
-
-        function startTimer() {
-            countdown = 12;
-            gameState = 'BETTING';
-            botBets = [];
-            const msgEl = document.getElementById('status-msg');
-            if(msgEl) msgEl.textContent = 'ژتون‌های خود را قرار دهید';
-            document.querySelectorAll('.cell').forEach(c => c.classList.remove('winning-cell'));
-
-            timerInterval = setInterval(() => {
-                countdown--;
-                const timerEl = document.getElementById('timer-display');
-                if(timerEl) timerEl.textContent = countdown;
-
-                if (countdown > 2 && Math.random() > 0.4) {
-                    simulateBotBets();
-                }
-
-                if (countdown <= 0) {
-                    clearInterval(timerInterval);
-                    spinWheel();
-                }
-            }, 1000);
-        }
-
-        function spinWheel() {
-            gameState = 'SPINNING';
-            const msgEl = document.getElementById('status-msg');
-            const timerEl = document.getElementById('timer-display');
-            if(msgEl) msgEl.textContent = 'در حال چرخش چرخ رولت...';
-            if(timerEl) timerEl.textContent = '🌀';
-
-            const winningIndex = Math.floor(Math.random() * wheelNumbers.length);
-            const winningNumber = wheelNumbers[winningIndex];
-
-            const sliceAngle = 360 / wheelNumbers.length;
-            const targetDegree = 360 * 5 + (360 - (winningIndex * sliceAngle));
-
-            const canvas = document.getElementById('rouletteWheel');
-            if(canvas) {
-                canvas.style.transition = 'transform 4s cubic-bezier(0.15, 0.9, 0.2, 1)';
-                canvas.style.transform = `rotate(${targetDegree}deg)`;
-            }
-
-            let spinSoundInt = setInterval(() => playSound(200 + Math.random() * 100, 'square', 0.03), 100);
-
-            setTimeout(() => {
-                clearInterval(spinSoundInt);
-                evaluateResult(winningNumber);
-            }, 4200);
-        }
-
-        async function evaluateResult(winNum) {
-            gameState = 'RESULT';
-            const isRed = redNumbers.includes(winNum);
-            const isEven = winNum !== 0 && winNum % 2 === 0;
-
-            const winCell = document.querySelector(`[data-bet="${winNum}"]`);
-            if (winCell) winCell.classList.add('winning-cell');
-
-            let totalPayout = 0;
-
-            userBets.forEach(b => {
-                let won = false;
-                let multiplier = 0;
-
-                if (b.target === winNum.toString()) { won = true; multiplier = 36; }
-                else if (b.target === 'RED' && isRed) { won = true; multiplier = 2; }
-                else if (b.target === 'BLACK' && !isRed && winNum !== 0) { won = true; multiplier = 2; }
-                else if (b.target === 'EVEN' && isEven) { won = true; multiplier = 2; }
-                else if (b.target === 'ODD' && !isEven && winNum !== 0) { won = true; multiplier = 2; }
-                else if (b.target === 'LOW' && winNum >= 1 && winNum <= 18) { won = true; multiplier = 2; }
-                else if (b.target === 'HIGH' && winNum >= 19 && winNum <= 36) { won = true; multiplier = 2; }
-                else if (b.target === 'DOZ_1' && winNum >= 1 && winNum <= 12) { won = true; multiplier = 3; }
-                else if (b.target === 'DOZ_2' && winNum >= 13 && winNum <= 24) { won = true; multiplier = 3; }
-                else if (b.target === 'DOZ_3' && winNum >= 25 && winNum <= 36) { won = true; multiplier = 3; }
-
-                if (won) {
-                    totalPayout += b.amount * multiplier;
-                }
-            });
-
-            if (totalPayout > 0) {
-                userBalance += totalPayout;
-                await syncCasinoBalanceWithDB(userBalance);
-            }
-
-            updateStats();
-
-            const colorName = winNum === 0 ? 'سبز' : (isRed ? 'قرمز' : 'مشکی');
-            const msgEl = document.getElementById('status-msg');
-            if (totalPayout > 0) {
-                if(msgEl) msgEl.textContent = `🎉 عدد ${winNum} (${colorName}) - شما $${totalPayout.toFixed(2)} برنده شدید!`;
-                playSound(1200, 'sine', 0.4);
-            } else {
-                if(msgEl) msgEl.textContent = `عدد برنده: ${winNum} (${colorName})`;
-            }
-
-            addHistory(winNum);
-
-            setTimeout(() => {
-                const canvas = document.getElementById('rouletteWheel');
-                if(canvas) {
-                    canvas.style.transition = 'none';
-                    canvas.style.transform = 'rotate(0deg)';
-                }
-                userBets = [];
-                renderChips();
-                updateStats();
-                startTimer();
-            }, 4000);
-        }
-
-        function addHistory(num) {
-            const histList = document.getElementById('history-list');
-            if(!histList) return;
-            const elem = document.createElement('div');
-            const isRed = redNumbers.includes(num);
-            const cls = num === 0 ? 'hist-green' : (isRed ? 'hist-red' : 'hist-black');
-            elem.className = `hist-num ${cls}`;
-            elem.textContent = num;
-            histList.insertBefore(elem, histList.firstChild);
-            if (histList.children.length > 7) histList.removeChild(histList.lastChild);
-        }
-
-        // احراز هویت و فراخوانی casino_balance اختصاصی
-        supabase.auth.onAuthStateChange(async (event, session) => {
-            if (session && session.user) {
-                currentUser = session.user;
-                uUid = session.user.id;
-                
-                try {
-                    const { data: dbUser } = await supabase.from('users').select('casino_balance').eq('id', uUid).single();
-                    userBalance = parseFloat(dbUser?.casino_balance ?? session.user.user_metadata?.casino_balance ?? 0);
-                } catch(e) {
-                    userBalance = parseFloat(session.user.user_metadata?.casino_balance ?? 0);
-                }
-
-                updateStats();
-                drawWheel();
-                buildTable();
-                startTimer();
-            } else {
-                window.location.href = 'index.html';
-            }
-        });
-    </script>
-</body>
-</html>
+<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Zenix - کوانتیفیکیشن</title><link rel="icon" href="data:image/x-icon;base64,="><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://cdnjs.cloudflare.com"><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet"><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" crossorigin="anonymous" referrerpolicy="no-referrer"><noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript><style>*{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1);padding:10px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}.logo{display:flex;align-items:center;gap:10px}.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#0ea5e9,#9333ea);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;font-style:italic;transform:skewX(-6deg);box-shadow:0 0 15px rgba(14,165,233,.4)}.logo-text{font-family:'Orbitron',sans-serif;font-size:19px;font-weight:900;letter-spacing:2px;font-style:italic;transform:skewX(-6deg);background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 20px rgba(56,189,248,.4)}.hr{display:flex;align-items:center;gap:8px}.wrap{position:relative}.lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none}.badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;font-weight:700}.badge.show{display:flex}.menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;min-width:max-content;padding:6px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8)}[dir="rtl"] .wrap .menu{left:0}[dir="ltr"] .wrap .menu{right:0}.menu.show{display:block}.mi{padding:7px 12px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap}.mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}.c{max-width:800px;width:100%;margin:15px auto;padding:0 12px;flex:1}.wel{background:linear-gradient(135deg,rgba(2,132,199,.15),rgba(147,51,234,.15));border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}.wel h1{font-size:16px;margin-bottom:3px}.wel p{color:#94a3b8;font-size:11px}.quant-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}.q-card{background:linear-gradient(145deg,rgba(15,23,42,.9),rgba(30,41,59,.8));border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px;box-shadow:0 4px 15px rgba(0,0,0,.3);transition:all .25s ease}.q-card:hover{border-color:rgba(56,189,248,.4);transform:translateY(-2px);box-shadow:0 6px 20px rgba(14,165,233,.15)}.q-header{display:flex;justify-content:center;align-items:center;position:relative;margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,.06);padding-bottom:6px}.q-header h3{font-size:14px;font-weight:800;color:#38bdf8;display:flex;align-items:center;justify-content:center;gap:6px;text-align:center}.q-header .badge-active,.q-header .badge-lock{position:absolute;left:0}.badge-active{background:rgba(34,197,94,.15);color:#22c55e;font-size:10px;padding:2px 8px;border-radius:6px;font-weight:700;border:1px solid rgba(34,197,94,.3)}.badge-lock{background:rgba(239,68,68,.15);color:#ef4444;font-size:10px;padding:2px 8px;border-radius:6px;border:1px solid rgba(239,68,68,.3)}.q-desc{font-size:11px;color:#cbd5e1;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.03);padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.04)}.q-desc-title{display:flex;align-items:center;gap:6px;color:#94a3b8}.q-icon{width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:11px}.main-quant-box{text-align:center;margin:15px 0}.main-quant-btn{background:linear-gradient(135deg,#0284c7,#9333ea);color:#fff;border:none;padding:12px 24px;font-size:14px;font-weight:700;border-radius:10px;cursor:pointer;width:100%}.profit-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.profit-card{background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px}.p-title{font-size:10px;color:#94a3b8;display:block}.p-val{font-size:14px;font-weight:700;color:#fff}.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px)}.modal.show{display:flex}.modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(56,189,248,.3);border-radius:20px;width:100%;max-width:460px;max-height:85vh;display:flex;flex-direction:column;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.9);overflow:hidden}.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;color:#38bdf8;font-weight:800;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;flex-shrink:0}.modal-close{background:rgba(255,255,255,.05);border:none;color:#94a3b8;cursor:pointer;font-size:14px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}.modal-close:hover{background:rgba(239,68,68,.2);color:#ef4444}.msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px;transition:0.2s}.msg-body-box:hover{border-color:rgba(56,189,248,.5)!important;opacity:1!important}.msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:0}.msg-desc-text{font-size:12px;color:#cbd5e1;line-height:1.5}.notif-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}.notif-tab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#94a3b8;padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;white-space:nowrap;transition:0.2s;display:flex;align-items:center;justify-content:center;gap:5px;flex:1 1 auto}.notif-tab:hover{background:rgba(56,189,248,.15);color:#38bdf8}.notif-tab.active{background:#38bdf8;color:#0f172a;font-weight:bold;border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.3)}.tab-badge{background:rgba(255,255,255,.15);color:inherit;padding:1px 6px;border-radius:10px;font-size:10px;font-weight:700;line-height:1.2;min-width:16px;text-align:center;display:inline-block}.notif-tab.active .tab-badge{background:rgba(15,23,42,.3);color:#0f172a}#modal-msg-container{overflow-y:auto;padding-right:6px;flex:1;min-height:0}#modal-msg-container::-webkit-scrollbar,#history-list::-webkit-scrollbar,.modal-content div::-webkit-scrollbar{width:5px}#modal-msg-container::-webkit-scrollbar-track,#history-list::-webkit-scrollbar-track,.modal-content div::-webkit-scrollbar-track{background:rgba(15,23,42,.6);border-radius:10px}#modal-msg-container::-webkit-scrollbar-thumb,#history-list::-webkit-scrollbar-thumb,.modal-content div::-webkit-scrollbar-thumb{background:rgba(56,189,248,.35);border-radius:10px}#modal-msg-container::-webkit-scrollbar-thumb:hover,#history-list::-webkit-scrollbar-thumb:hover,.modal-content div::-webkit-scrollbar-thumb:hover{background:rgba(56,189,248,.7)}#modal-msg-container,#history-list,.modal-content div{scrollbar-width:thin;scrollbar-color:rgba(56,189,248,.35) rgba(15,23,42,.6)}.vip-level-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}.vip-level-item{background:rgba(15,23,42,.6);border:1px solid rgba(56,189,248,.2);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px}.vip-level-header{display:flex;justify-content:center;align-items:center;border-bottom:1px dashed rgba(255,255,255,.1);padding-bottom:5px}.vip-level-title{font-size:13px;font-weight:800;color:#38bdf8;display:flex;align-items:center;justify-content:center;gap:6px}.vip-level-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;font-size:11px}.vip-cell{background:rgba(255,255,255,.03);padding:6px 8px;border-radius:6px;display:flex;justify-content:space-between;align-items:center;color:#cbd5e1}.vip-cell span{color:#94a3b8;font-size:10.5px;display:flex;align-items:center;gap:4px}.vip-cell b{color:#f8fafc;font-weight:700}footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05)}.crypto-row{background:rgba(255,255,255,.03) !important;padding:10px 12px !important;border-radius:8px !important;font-size:12px !important;display:grid !important;grid-template-columns:1fr 125px 68px !important;align-items:center !important;gap:8px !important;border:1px solid rgba(255,255,255,.05) !important;transition:all .3s ease !important;direction:ltr !important}.crypto-left{display:flex !important;align-items:center !important;gap:8px !important;direction:ltr !important;text-align:left !important;min-width:0 !important;overflow:hidden !important}.crypto-text-box{text-align:left !important;min-width:0 !important;overflow:hidden !important}.crypto-price-val{font-weight:700 !important;color:#f8fafc !important;font-size:12px !important;white-space:nowrap !important;text-align:left !important;direction:ltr !important}.crypto-change-val{font-size:10px !important;font-weight:700 !important;padding:2px 6px !important;border-radius:4px !important;display:inline-block !important;white-space:nowrap !important;text-align:center !important;box-sizing:border-box !important;justify-self:end !important}@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1);box-shadow:0 0 10px #22c55e}50%{opacity:.4;transform:scale(.8);box-shadow:0 0 2px #22c55e}}</style></head><body>
+<header><div class="logo"><div class="logo-icon">Z</div><div class="logo-text">ZENIX</div></div><div class="hr"><div class="wrap"><button type="button" class="lb" id="bell-btn"><i class="fas fa-bell" style="color:#fbbf24"></i><span class="badge" id="bell-badge">0</span></button></div><div class="wrap"><button type="button" class="lb" id="help-btn" title="راهنمای بخش کوانتیفیکیشن" onclick="window.openHelpModal()"><i class="fas fa-circle-question" style="color:#38bdf8"></i></button></div><a href="support.html" class="lb"><i class="fas fa-headset" style="color:#a855f7"></i></a><div class="wrap"><button type="button" class="lb" id="lang-btn"><i class="fas fa-globe" style="color:#22c55e"></i></button><div class="menu" id="lang-menu"><div class="mi" data-lang="fa">فارسی</div><div class="mi" data-lang="en">English</div><div class="mi" data-lang="ar">العربية</div><div class="mi" data-lang="tr">Türkçe</div><div class="mi" data-lang="ru">Русский</div><div class="mi" data-lang="es">Español</div><div class="mi" data-lang="fr">Français</div><div class="mi" data-lang="de">Deutsch</div></div></div><div class="wrap"><button type="button" class="lb" id="menu-btn"><i class="fas fa-bars" style="color:#f43f5e"></i></button><div class="menu" id="nav-menu"><a href="dashboard.html" class="mi"><i class="fas fa-home" style="color:#38bdf8"></i><span data-i18n="home">صفحه اصلی</span></a><a href="quantification.html" class="mi active"><i class="fas fa-robot" style="color:#a855f7"></i><span data-i18n="quantification">کوانتیفیکیشن</span></a><a href="deposit.html" class="mi"><i class="fas fa-arrow-down" style="color:#22c55e"></i><span data-i18n="deposit">واریز</span></a><a href="receive.html" class="mi"><i class="fas fa-arrow-up" style="color:#fbbf24"></i><span data-i18n="receive">برداشت</span></a><a href="transactions.html" class="mi"><i class="fas fa-history" style="color:#06b6d4"></i><span data-i18n="transactions">تراکنش</span></a><a href="profile.html" class="mi"><i class="fas fa-user-cog" style="color:#ec4899"></i><span data-i18n="profile">پروفایل</span></a><a href="support.html" class="mi"><i class="fas fa-headset" style="color:#a855f7"></i><span data-i18n="support">پشتیبانی</span></a><a href="#" class="mi" onclick="window.openAboutModal();return false;"><i class="fas fa-info-circle" style="color:#38bdf8"></i><span data-i18n="about">درباره پلتفرم</span></a><a href="#" class="mi" id="logout-btn" style="color:#ef4444"><i class="fas fa-power-off"></i><span data-i18n="logout">خروج</span></a></div></div></div></header>
+<div class="c"><div class="wel"><div><h1 data-i18n="tradingLevels">سطوح معاملاتی</h1><p data-i18n="subWel">سطح خود را بررسی و ربات را فعال کنید</p></div><div id="status-badge" style="font-size:11px;background:rgba(239,68,68,.18);border:1px solid #ef4444;padding:4px 10px;border-radius:8px;color:#ef4444;font-weight:700;box-shadow:0 0 12px rgba(239,68,68,.35);transition:all .3s ease"><i class="fas fa-lock"></i> <span data-i18n="inactive">غیرفعال (موجودی کمتر از $20)</span></div></div>
+<div style="background:rgba(30,41,59,.9);border:1px solid rgba(56,189,248,.3);border-radius:12px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px"><div style="background:rgba(56,189,248,.15);color:#38bdf8;width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px"><i class="fas fa-wallet"></i></div><div><div style="font-size:10px;color:#94a3b8" data-i18n="totalBalance">موجودی کل حساب</div><div id="total-balance-val" style="font-size:16px;font-weight:700;color:#f8fafc">$0.00</div></div></div>
+<div style="background:linear-gradient(135deg,rgba(14,165,233,.12),rgba(147,51,234,.18),rgba(244,63,94,.12));border:1px solid rgba(168,85,247,.45);border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 8px 30px rgba(147,51,234,.25),inset 0 0 20px rgba(56,189,248,.1);text-align:center;position:relative;overflow:hidden"><div style="position:absolute;top:-50%;left:50%;transform:translateX(-50%);width:180px;height:180px;background:radial-gradient(circle,rgba(168,85,247,.3) 0%,rgba(56,189,248,.2) 50%,transparent 70%);filter:blur(25px);border-radius:50%;pointer-events:none"></div><div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;color:#f8fafc;margin-bottom:10px"><span style="display:inline-block;width:8px;height:8px;background:#22c55e;border-radius:50%;animation:pulse-dot 1.2s infinite;box-shadow:0 0 8px #22c55e"></span><span style="display:inline-flex;align-items:center;gap:6px;background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.35);padding:4px 12px;border-radius:20px;color:#38bdf8;font-weight:700;font-size:11px"><i class="fas fa-clock" style="color:#fbbf24"></i><span data-i18n="nyTime" style="letter-spacing:.5px">ساعت نیویورک</span></span></div><div style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(3,7,18,.85);border:1px solid rgba(168,85,247,.5);border-radius:14px;padding:10px 26px;box-shadow:0 0 20px rgba(168,85,247,.25),inset 0 0 12px rgba(56,189,248,.15)"><div id="ny-clock-val" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 10px rgba(192,132,252,.6));letter-spacing:2px">--:--:--</div><div id="ny-date-val" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:#94a3b8;margin-top:4px;letter-spacing:1px">----/--/--</div></div></div>
+<div class="quant-grid"><div class="q-card"><div class="q-header"><h3 style="color:#38bdf8"><i class="fas fa-crown" style="color:#fbbf24"></i> VIP 1</h3><span class="badge-lock" id="vip1-badge"><i class="fas fa-lock"></i></span></div><div class="q-desc"><span class="q-desc-title"><span class="q-icon" style="background:rgba(56,189,248,.15);color:#38bdf8"><i class="fas fa-wallet"></i></span><span data-i18n="bal">موجودی</span></span><b style="color:#f8fafc">$20 - $300</b></div><div class="q-desc"><span class="q-desc-title"><span class="q-icon" style="background:rgba(34,197,94,.15);color:#22c55e"><i class="fas fa-chart-line"></i></span><span data-i18n="prof">سود</span></span><b style="color:#22c55e">1.5%</b></div><div class="q-desc"><span class="q-desc-title"><span class="q-icon" style="background:rgba(192,132,252,.15);color:#c084fc"><i class="fas fa-users"></i></span><span data-i18n="usersCount">نفرات</span></span><b style="color:#f8fafc">5</b></div></div><div class="q-card"><div class="q-header"><h3 style="color:#38bdf8"><i class="fas fa-crown" style="color:#e2e8f0"></i> VIP 2</h3><span class="badge-lock" id="vip2-badge"><i class="fas fa-lock"></i></span></div><div class="q-desc"><span class="q-desc-title"><span class="q-icon" style="background:rgba(6,182,212,.15);color:#06b6d4"><i class="fas fa-wallet"></i></span><span data-i18n="bal">موجودی</span></span><b style="color:#f8fafc">$300 - $1000</b></div><div class="q-desc"><span class="q-desc-title"><span class="q-icon" style="background:rgba(34,197,94,.15);color:#22c55e"><i class="fas fa-chart-line"></i></span><span data-i18n="prof">سود</span></span><b style="color:#22c55e">2.0%</b></div><div class="q-desc"><span class="q-desc-title"><span class="q-icon" style="background:rgba(232,121,249,.15);color:#e879f9"><i class="fas fa-users"></i></span><span data-i18n="usersCount">نفرات</span></span><b style="color:#f8fafc">15</b></div></div><div class="q-card"><div class="q-header"><h3 style="color:#38bdf8"><i class="fas fa-crown" style="color:#f59e0b"></i> VIP 3</h3><span class="badge-lock" id="vip3-badge"><i class="fas fa-lock"></i></span></div><div class="q-desc"><span class="q-desc-title"><span class="q-icon" style="background:rgba(59,130,246,.15);color:#3b82f6"><i class="fas fa-wallet"></i></span><span data-i18n="bal">موجودی</span></span><b style="color:#f8fafc">$1000 - $2500</b></div><div class="q-desc"><span class="q-desc-title"><span class="q-icon" style="background:rgba(34,197,94,.15);color:#22c55e"><i class="fas fa-chart-line"></i></span><span data-i18n="prof">سود</span></span><b style="color:#22c55e">2.5%</b></div><div class="q-desc"><span class="q-desc-title"><span class="q-icon" style="background:rgba(168,85,247,.15);color:#a855f7"><i class="fas fa-users"></i></span><span data-i18n="usersCount">نفرات</span></span><b style="color:#f8fafc">25</b></div></div><div class="q-card"><div class="q-header"><h3 style="color:#38bdf8"><i class="fas fa-crown" style="color:#ec4899"></i> VIP 4</h3><span class="badge-lock" id="vip4-badge"><i class="fas fa-lock"></i></span></div><div class="q-desc"><span class="q-desc-title"><span class="q-icon" style="background:rgba(14,165,233,.15);color:#0ea5e9"><i class="fas fa-wallet"></i></span><span data-i18n="bal">موجودی</span></span><b style="color:#f8fafc">$2500 - $5000</b></div><div class="q-desc"><span class="q-desc-title"><span class="q-icon" style="background:rgba(34,197,94,.15);color:#22c55e"><i class="fas fa-chart-line"></i></span><span data-i18n="prof">سود</span></span><b style="color:#22c55e">3.0%</b></div><div class="q-desc"><span class="q-desc-title"><span class="q-icon" style="background:rgba(244,63,94,.15);color:#f43f5e"><i class="fas fa-users"></i></span><span data-i18n="usersCount">نفرات</span></span><b style="color:#f8fafc">35</b></div></div><div class="q-card"><div class="q-header"><h3 style="color:#38bdf8"><i class="fas fa-crown" style="color:#8b5cf6"></i> VIP 5</h3><span class="badge-lock" id="vip5-badge"><i class="fas fa-lock"></i></span></div><div class="q-desc"><span class="q-desc-title"><span class="q-icon" style="background:rgba(6,182,212,.15);color:#06b6d4"><i class="fas fa-wallet"></i></span><span data-i18n="bal">موجودی</span></span><b style="color:#f8fafc">$5000 - $10000</b></div><div class="q-desc"><span class="q-desc-title"><span class="q-icon" style="background:rgba(34,197,94,.15);color:#22c55e"><i class="fas fa-chart-line"></i></span><span data-i18n="prof">سود</span></span><b style="color:#22c55e">3.5%</b></div><div class="q-desc"><span class="q-desc-title"><span class="q-icon" style="background:rgba(251,191,36,.15);color:#fbbf24"><i class="fas fa-users"></i></span><span data-i18n="usersCount">نفرات</span></span><b style="color:#f8fafc">45</b></div></div><div class="q-card"><div class="q-header"><h3 style="color:#38bdf8"><i class="fas fa-crown" style="color:#f43f5e"></i> VIP 6</h3><span class="badge-lock" id="vip6-badge"><i class="fas fa-lock"></i></span></div><div class="q-desc"><span class="q-desc-title"><span class="q-icon" style="background:rgba(56,189,248,.15);color:#38bdf8"><i class="fas fa-wallet"></i></span><span data-i18n="bal">موجودی</span></span><b style="color:#f8fafc">$10000+</b></div><div class="q-desc"><span class="q-desc-title"><span class="q-icon" style="background:rgba(34,197,94,.15);color:#22c55e"><i class="fas fa-chart-line"></i></span><span data-i18n="prof">سود</span></span><b style="color:#22c55e">4.0%</b></div><div class="q-desc"><span class="q-desc-title"><span class="q-icon" style="background:rgba(52,211,153,.15);color:#34d399"><i class="fas fa-users"></i></span><span data-i18n="usersCount">نفرات</span></span><b style="color:#f8fafc">60</b></div></div></div>
+<div class="main-quant-box"><button class="main-quant-btn" id="quant-btn" disabled style="opacity:.5;cursor:not-allowed"><i class="fas fa-robot"></i> <span data-i18n="quantification">کوانتیفیکیشن</span></button></div>
+<div id="trade-box" style="display:none;background:rgba(30,41,59,.9);border:1px solid rgba(56,189,248,.4);border-radius:12px;padding:12px;margin-top:12px;text-align:center;color:#f8fafc"><div style="font-size:11px;color:#38bdf8;margin-bottom:6px;font-weight:600"><i class="fas fa-exchange-alt"></i> <span data-i18n="liveTrade">وضعیت معامله جاری</span></div><div id="trade-details" style="font-size:13px;font-weight:700;color:#22c55e;display:flex;align-items:center;justify-content:center;gap:6px">-</div></div>
+<div class="profit-grid" style="margin-top:16px"><div class="profit-card"><i class="fas fa-chart-line" style="color:#22c55e;font-size:20px"></i><div><span class="p-title" data-i18n="todayProfit">سود امروز</span><h4 class="p-val" id="today-profit-val">$0.00</h4></div></div><div class="profit-card"><i class="fas fa-calendar-day" style="color:#38bdf8;font-size:20px"></i><div><span class="p-title" data-i18n="yesterdayProfit">سود دیروز</span><h4 class="p-val" id="yesterday-profit-val">$0.00</h4></div></div></div>
+<div style="margin-top:16px;background:rgba(30,41,59,.5);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px"><h3 style="font-size:13px;color:#38bdf8;margin-bottom:12px;display:flex;align-items:center;gap:8px"><span style="background:rgba(6,182,212,.15);color:#06b6d4;width:28px;height:28px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;border:1px solid rgba(6,182,212,.3);box-shadow:0 0 10px rgba(6,182,212,.2)"><i class="fas fa-history"></i></span><span data-i18n="tradeHistory">تاریخچه معاملات</span></h3><div id="history-list" style="display:flex;flex-direction:column;gap:8px;max-height:350px;overflow-y:auto"><div style="font-size:12px;color:#94a3b8;text-align:center" data-i18n="noHistory">هنوز معامله‌ای ثبت نشده است</div></div><button id="view-all-history-btn" onclick="window.toggleHistory()" style="display:none;width:100%;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);color:#38bdf8;padding:8px;border-radius:8px;font-size:11px;font-weight:700;margin-top:10px;cursor:pointer;align-items:center;justify-content:center;gap:6px;transition:all .2s ease"><i id="history-btn-icon" class="fas fa-list-ul"></i> <span id="history-btn-text" data-i18n="showFullHistory">مشاهده کامل تاریخچه</span></button></div>
+<div style="margin-top:16px;background:rgba(30,41,59,.5);border:1px solid rgba(56,189,248,.2);border-radius:12px;padding:14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="font-size:13px;color:#38bdf8;display:flex;align-items:center;gap:6px"><i class="fas fa-globe" style="color:#22c55e"></i> <span data-i18n="globalMarket">بازار ارز جهانی</span></h3><span style="font-size:10px;color:#94a3b8;display:flex;align-items:center;gap:4px"><i class="fas fa-arrows-rotate fa-spin" style="color:#38bdf8"></i> <span data-i18n="liveUpdates">به‌روزرسانی زنده</span></span></div><div id="market-list" style="display:flex;flex-direction:column;gap:8px"></div></div></div>
+<div class="modal" id="m-msg"><div class="modal-content"><div class="modal-header"><span id="t-modal-title"><i class="fas fa-bell"></i> صندوق پیام‌ها و اعلان‌ها</span><button class="modal-close" onclick="window.closeMessageModal()"><i class="fas fa-times"></i></button></div><div class="notif-tabs" id="notif-tabs"><button type="button" class="notif-tab active" onclick="window.setNotifFilter('all', this)"><i class="fas fa-list"></i> <span id="t-tab-all">همه</span> <span class="tab-badge" id="cnt-tab-all">0</span></button><button type="button" class="notif-tab" onclick="window.setNotifFilter('approved', this)"><i class="fas fa-check-circle" style="color:#22c55e"></i> <span id="t-tab-approved">تایید درخواست</span> <span class="tab-badge" id="cnt-tab-approved">0</span></button><button type="button" class="notif-tab" onclick="window.setNotifFilter('rejected', this)"><i class="fas fa-times-circle" style="color:#ef4444"></i> <span id="t-tab-rejected">لغو درخواست</span> <span class="tab-badge" id="cnt-tab-rejected">0</span></button><button type="button" class="notif-tab" onclick="window.setNotifFilter('admin_message', this)"><i class="fas fa-bullhorn" style="color:#38bdf8"></i> <span id="t-tab-admin">پیام مدیریت</span> <span class="tab-badge" id="cnt-tab-admin">0</span></button></div><div id="modal-msg-container"><div style="text-align:center;padding:20px;color:#94a3b8">هیچ پیام جدیدی وجود ندارد.</div></div></div></div>
+<div class="modal" id="m-msg-detail" style="z-index:1050"><div class="modal-content"><div class="modal-header"><span id="detail-msg-title"><i class="fas fa-envelope-open"></i> مشاهده پیام</span><button class="modal-close" onclick="window.closeMsgDetailModal()"><i class="fas fa-times"></i></button></div><div style="overflow-y:auto;padding-right:6px"><div id="detail-msg-date" style="font-size:11px;color:#94a3b8;direction:ltr;text-align:left;margin-bottom:10px;display:none"></div><div id="detail-msg-body" style="font-size:13px;color:#cbd5e1;line-height:1.7;white-space:pre-wrap;margin-bottom:12px"></div><div id="detail-msg-support"></div></div></div></div>
+<div class="modal" id="m-help"><div class="modal-content"><div class="modal-header"><span id="t-help-title" data-i18n="helpModalTitle">راهنمای بخش کوانتیفیکیشن و سطوح VIP</span><button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button></div><div style="overflow-y:auto;padding-right:6px"><div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-robot" style="color:#38bdf8"></i> <span data-i18n="whatIsQuantTitle">سیستم کوانتیفیکیشن چیست؟</span></div><div class="msg-desc-text" data-i18n="whatIsQuantDesc">ربات هوشمند معاملات با بررسی لحظه‌ای قیمت رمز‌ارزها در صرافی‌های مختلف جهان، کوچک‌ترین اختلاف قیمت‌ها را کشف کرده و معاملات سودآور برپایه آربیتراژ و الگوریتم‌های هوش مصنوعی انجام می‌دهد.</div></div><div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-layer-group" style="color:#a855f7"></i> <span data-i18n="vipRulesTitle">شروط ورود و ارتقا به سطوح VIP</span></div><p style="color:#fbbf24;font-size:11px;margin-bottom:10px;background:rgba(251,191,36,.1);padding:8px 10px;border-radius:8px;border:1px solid rgba(251,191,36,.25);line-height:1.6"><i class="fas fa-exclamation-triangle" style="margin-left:4px"></i> <span data-i18n="vipNote">نکته مهم: شرط اصلی فعال‌سازی و ارتقا به هر سطح VIP، انجام واریزی مستقیم به همان میزان است. سود حاصل از معاملات پلتفرم، برای شرط واریزی جهت ارتقا سطوح محسوب نمیشود.</span></p><div class="vip-level-list"><div class="vip-level-item"><div class="vip-level-header"><span class="vip-level-title"><i class="fas fa-crown" style="color:#fbbf24"></i> VIP 1</span></div><div class="vip-level-grid"><div class="vip-cell"><span><i class="fas fa-arrow-down" style="color:#22c55e"></i> <span data-i18n="directDeposit">واریزی مستقیم:</span></span> <b>$20</b></div><div class="vip-cell"><span><i class="fas fa-users" style="color:#a855f7"></i> <span data-i18n="directInvite">دعوت مستقیم:</span></span> <b>5</b></div><div class="vip-cell"><span><i class="fas fa-wallet" style="color:#38bdf8"></i> <span data-i18n="balanceRange">محدوده موجودی:</span></span> <b>$20 - $300</b></div><div class="vip-cell"><span><i class="fas fa-chart-line" style="color:#f59e0b"></i> <span data-i18n="dailyProfit">سود روزانه:</span></span> <b style="color:#22c55e">1.5%</b></div></div></div><div class="vip-level-item"><div class="vip-level-header"><span class="vip-level-title"><i class="fas fa-crown" style="color:#e2e8f0"></i> VIP 2</span></div><div class="vip-level-grid"><div class="vip-cell"><span><i class="fas fa-arrow-down" style="color:#22c55e"></i> <span data-i18n="directDeposit">واریزی مستقیم:</span></span> <b>$300</b></div><div class="vip-cell"><span><i class="fas fa-users" style="color:#a855f7"></i> <span data-i18n="directInvite">دعوت مستقیم:</span></span> <b>15</b></div><div class="vip-cell"><span><i class="fas fa-wallet" style="color:#38bdf8"></i> <span data-i18n="balanceRange">محدوده موجودی:</span></span> <b>$300 - $1000</b></div><div class="vip-cell"><span><i class="fas fa-chart-line" style="color:#f59e0b"></i> <span data-i18n="dailyProfit">سود روزانه:</span></span> <b style="color:#22c55e">2.0%</b></div></div></div><div class="vip-level-item"><div class="vip-level-header"><span class="vip-level-title"><i class="fas fa-crown" style="color:#f59e0b"></i> VIP 3</span></div><div class="vip-level-grid"><div class="vip-cell"><span><i class="fas fa-arrow-down" style="color:#22c55e"></i> <span data-i18n="directDeposit">واریزی مستقیم:</span></span> <b>$1000</b></div><div class="vip-cell"><span><i class="fas fa-users" style="color:#a855f7"></i> <span data-i18n="directInvite">دعوت مستقیم:</span></span> <b>25</b></div><div class="vip-cell"><span><i class="fas fa-wallet" style="color:#38bdf8"></i> <span data-i18n="balanceRange">محدوده موجودی:</span></span> <b>$1000 - $2500</b></div><div class="vip-cell"><span><i class="fas fa-chart-line" style="color:#f59e0b"></i> <span data-i18n="dailyProfit">سود روزانه:</span></span> <b style="color:#22c55e">2.5%</b></div></div></div><div class="vip-level-item"><div class="vip-level-header"><span class="vip-level-title"><i class="fas fa-crown" style="color:#38bdf8"></i> VIP 4</span></div><div class="vip-level-grid"><div class="vip-cell"><span><i class="fas fa-arrow-down" style="color:#22c55e"></i> <span data-i18n="directDeposit">واریزی مستقیم:</span></span> <b>$2500</b></div><div class="vip-cell"><span><i class="fas fa-users" style="color:#a855f7"></i> <span data-i18n="directInvite">دعوت مستقیم:</span></span> <b>35</b></div><div class="vip-cell"><span><i class="fas fa-wallet" style="color:#38bdf8"></i> <span data-i18n="balanceRange">محدوده موجودی:</span></span> <b>$2500 - $5000</b></div><div class="vip-cell"><span><i class="fas fa-chart-line" style="color:#f59e0b"></i> <span data-i18n="dailyProfit">سود روزانه:</span></span> <b style="color:#22c55e">3.0%</b></div></div></div><div class="vip-level-item"><div class="vip-level-header"><span class="vip-level-title"><i class="fas fa-crown" style="color:#ec4899"></i> VIP 5</span></div><div class="vip-level-grid"><div class="vip-cell"><span><i class="fas fa-arrow-down" style="color:#22c55e"></i> <span data-i18n="directDeposit">واریزی مستقیم:</span></span> <b>$5000</b></div><div class="vip-cell"><span><i class="fas fa-users" style="color:#a855f7"></i> <span data-i18n="directInvite">دعوت مستقیم:</span></span> <b>45</b></div><div class="vip-cell"><span><i class="fas fa-wallet" style="color:#38bdf8"></i> <span data-i18n="balanceRange">محدوده موجودی:</span></span> <b>$5000 - $10000</b></div><div class="vip-cell"><span><i class="fas fa-chart-line" style="color:#f59e0b"></i> <span data-i18n="dailyProfit">سود روزانه:</span></span> <b style="color:#22c55e">3.5%</b></div></div></div><div class="vip-level-item"><div class="vip-level-header"><span class="vip-level-title"><i class="fas fa-crown" style="color:#a855f7"></i> VIP 6</span></div><div class="vip-level-grid"><div class="vip-cell"><span><i class="fas fa-arrow-down" style="color:#22c55e"></i> <span data-i18n="directDeposit">واریزی مستقیم:</span></span> <b>$10000</b></div><div class="vip-cell"><span><i class="fas fa-users" style="color:#a855f7"></i> <span data-i18n="directInvite">دعوت مستقیم:</span></span> <b>60</b></div><div class="vip-cell"><span><i class="fas fa-wallet" style="color:#38bdf8"></i> <span data-i18n="balanceRange">محدوده موجودی:</span></span> <b>+$10000</b></div><div class="vip-cell"><span><i class="fas fa-chart-line" style="color:#f59e0b"></i> <span data-i18n="dailyProfit">سود روزانه:</span></span> <b style="color:#22c55e">4.0%</b></div></div></div></div></div><div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-play-circle" style="color:#22c55e"></i> <span data-i18n="activationTitle">نحوه فعال‌‌سازی و تقسیم سود</span></div><div class="msg-desc-text" data-i18n="activationDesc">حداقل واریزی جهت فعال‌سازی 20 دلار است. سود روزانه مشخص‌شده، به ۴ معامله ۱۰ ثانیه‌ای در طول روز تقسیم می‌شود؛ یعنی با انجام هر ۴ معامله، درصد سود کامل سطح VIP خود را به‌دست می‌آورید.</div></div><div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-clock" style="color:#fbbf24"></i> <span data-i18n="resetTitle">بازنشانی روزانه (ساعت نیویورک)</span></div><div class="msg-desc-text" data-i18n="resetDesc">ظرفیت ۴ معامله در روز مطابق با ساعت رسمی نیویورک (NY Time) در پایان هر روز کاری صفر شده و مجدداً فعال می‌شود.</div></div></div></div></div>
+<div class="modal" id="m-about"><div class="modal-content"><div class="modal-header"><span data-i18n="aboutModalTitle">درباره پلتفرم Zenix (هدف، ماهیت و ساختار)</span><button class="modal-close" onclick="window.closeAboutModal()"><i class="fas fa-times"></i></button></div><div style="overflow-y:auto;padding-right:6px"><p style="font-size:13px;color:#cbd5e1;line-height:1.7;margin-bottom:10px" data-i18n="abDesc">پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.</p><ul style="font-size:12px;color:#94a3b8;padding-right:18px;line-height:1.7;margin-bottom:0"><li style="margin-bottom:6px"><strong style="color:#f8fafc" data-i18n="abL1T">هدف اصلی:</strong> <span data-i18n="abL1D">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li><li style="margin-bottom:6px"><strong style="color:#f8fafc" data-i18n="abL2T">امنیت و زیرساخت:</strong> <span data-i18n="abL2D">متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).</span></li><li style="margin-bottom:6px"><strong style="color:#f8fafc" data-i18n="abL3T">ساختار چندسطحی (Referral & Team):</strong> <span data-i18n="abL3D">ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.</span></li><li><strong style="color:#f8fafc" data-i18n="abL4T">احساس واقع‌گرایی:</strong> <span data-i18n="abL4D">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.</span></li></ul></div></div></div>
+<footer><p>&copy; 2026 Zenix</p></footer>
+<script>
+window.openHelpModal=()=>document.getElementById('m-help')?.classList.add('show');
+window.closeHelpModal=()=>document.getElementById('m-help')?.classList.remove('show');
+window.openAboutModal=()=>document.getElementById('m-about')?.classList.add('show');
+window.closeAboutModal=()=>document.getElementById('m-about')?.classList.remove('show');
+window.openMessageModal=()=>document.getElementById('m-msg')?.classList.add('show');
+window.closeMessageModal=()=>document.getElementById('m-msg')?.classList.remove('show');
+window.showAllHistory=!1;
+window.toggleHistory=function(){window.showAllHistory=!window.showAllHistory;if(window.renderHistory)window.renderHistory();};
+window.LD={
+  fa:{dir:'rtl',adminMsg:'پیام مدیریت',welcomeText:'به پلتفرم زنیکس خوش آمدید.',home:'صفحه اصلی',quantification:'کوانتیفیکیشن',deposit:'واریز',receive:'برداشت',transactions:'تراکنش',profile:'پروفایل',support:'پشتیبانی',about:'درباره پلتفرم',logout:'خروج',tradingLevels:'سطوح معاملاتی',subWel:'سطح خود را بررسی و ربات را فعال کنید',active:'فعال',inactive:'غیرفعال (موجودی کمتر از $20)',nyTime:'ساعت نیویورک',bal:'موجودی',prof:'سود',usersCount:'نفرات',liveTrade:'وضعیت معامله جاری',todayProfit:'سود امروز',yesterdayProfit:'سود دیروز',tradeHistory:'تاریخچه معاملات',noHistory:'هنوز معامله‌ای ثبت نشده است',totalBalance:'موجودی کل حساب',dailyLimit:'پایان ظرفیت امروز',trading:'معامله',seconds:'ثانیه',success:'موفق!',tradeAmount:'مبلغ معامله',helpModalTitle:'راهنمای بخش کوانتیفیکیشن و سطوح VIP',whatIsQuantTitle:'سیستم کوانتیفیکیشن چیست؟',whatIsQuantDesc:'ربات هوشمند معاملات با بررسی لحظه‌ای قیمت رمز‌ارزها در صرافی‌های مختلف جهان، کوچک‌ترین اختلاف قیمت‌ها را کشف کرده و معاملات سودآور برپایه آربیتراژ و الگوریتم‌های هوش مصنوعی انجام می‌دهد.',vipRulesTitle:'شروط ورود و ارتقا به سطوح VIP',vipNote:'نکته مهم: شرط اصلی فعال‌سازی و ارتقا به هر سطح VIP، انجام واریزی مستقیم به همان میزان است. سود حاصل از معاملات پلتفرم، برای شرط واریزی جهت ارتقا سطوح محسوب نمی‌شود.',directDeposit:'واریزی مستقیم:',directInvite:'دعوت مستقیم:',balanceRange:'محدوده موجودی:',dailyProfit:'سود روزانه:',activationTitle:'نحوه فعال‌سازی و تقسیم سود',activationDesc:'حداقل واریزی جهت فعال‌سازی 20 دلار است. سود روزانه مشخص‌شده، به ۴ معامله ۱۰ ثانیه‌ای در طول روز تقسیم می‌شود؛ یعنی با انجام هر ۴ معامله، درصد سود کامل سطح VIP خود را به‌دست می‌آورید.',resetTitle:'بازنشانی روزانه (ساعت نیویورک)',resetDesc:'ظرفیت ۴ معامله در روز مطابق با ساعت رسمی نیویورک (NY Time) در پایان هر روز کاری صفر شده و مجدداً فعال می‌شود.',globalMarket:'بازار ارز جهانی',liveUpdates:'به‌روزرسانی زنده',showFullHistory:'مشاهده کامل تاریخچه',showLess:'بستن تاریخچه',aboutModalTitle:'درباره پلتفرم Zenix (هدف، ماهیت و ساختار)',abDesc:'پلتفرم Zenix یک اکوسیستم مالی نوین و هوشمند در حوزه ارزهای دیجیتال و پردازش‌های معاملاتی است که با هدف ایجاد بستری امن، خودکار و سودآور برای کاربران طراحی شده است.',abL1T:'هدف اصلی:',abL1D:'اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.',abL2T:'امنیت و زیرساخت:',abL2D:'متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).',abL3T:'ساختار چندسطحی (Referral & Team):',abL3D:'ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.',abL4T:'احساس واقع‌گرایی:',abL4D:'وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.',modalTitle:'صندوق پیام‌ها و اعلان‌ها',tabAll:'همه',tabApproved:'تایید درخواست',tabRejected:'لغو درخواست',tabAdmin:'پیام مدیریت',noMsg:'هیچ پیام جدیدی وجود ندارد.'},
+  en:{dir:'ltr',adminMsg:'Admin Message',welcomeText:'Welcome to Zenix platform.',home:'Home',quantification:'Quantification',deposit:'Deposit',receive:'Withdraw',transactions:'Transactions',profile:'Profile',support:'Support',about:'About Platform',logout:'Logout',tradingLevels:'Trading Levels',subWel:'Check your level and activate the bot',active:'Active',inactive:'Inactive (Balance < $20)',nyTime:'New York Time',bal:'Balance',prof:'Profit',usersCount:'Users',liveTrade:'Live Trade Status',todayProfit:'Today Profit',yesterdayProfit:'Yesterday Profit',tradeHistory:'Trade History',noHistory:'No trades recorded yet',totalBalance:'Total Balance',dailyLimit:'Daily Limit Reached',trading:'Trading',seconds:'sec',success:'Success!',tradeAmount:'Trade Amount',helpModalTitle:'Quantification & VIP Levels Guide',whatIsQuantTitle:'What is the Quantification System?',whatIsQuantDesc:'The smart trading bot analyzes real-time cryptocurrency prices across global exchanges to detect price differences and execute profitable trades based on arbitrage and AI algorithms.',vipRulesTitle:'Conditions for VIP Levels',vipNote:'Important Note: The main condition for activating and upgrading VIP levels is making a direct deposit of the required amount. Platform trading profit does not count towards deposit requirements.',directDeposit:'Direct Deposit:',directInvite:'Direct Referral:',balanceRange:'Balance Range:',dailyProfit:'Daily Profit:',activationTitle:'Activation & Profit Division',activationDesc:'Minimum deposit for activation is $20. The daily profit rate is divided into 4 10-second trades throughout the day; completing all 4 trades grants your level\'s full daily profit.',resetTitle:'Daily Reset (NY Time)',resetDesc:'The 4 daily trade limit resets at the end of each business day according to New York Time (NY Time).',globalMarket:'Global Crypto Market',liveUpdates:'Live Updates',showFullHistory:'View Full History',showLess:'Show Less',aboutModalTitle:'About Zenix Platform (Goal, Nature & Structure)',abDesc:'Zenix Platform is an innovative financial ecosystem in cryptocurrency and trading processing designed for a secure, automated, and profitable user experience.',abL1T:'Main Goal:',abL1D:'Automating trading processes via AI systems and quantification algorithms, enabling users to profit from market fluctuations without complex trading expertise.',abL2T:'Security & Infrastructure:',abL2D:'Backed by advanced encryption protocols, high-speed cloud processing nodes, and secure Supabase database storage.',abL3T:'Multi-level Structure (Referral & Team):',abL3D:'Creating a dynamic referral network so users receive multi-level rewards and sustainable passive income from team activity.',abL4T:'Realism & Live Data:',abL4D:'Live crypto ticker, volume indicators, network gas fees, and system notices ensure users interact with an active global platform.',modalTitle:'Notifications & Messages',tabAll:'All',tabApproved:'Approved Requests',tabRejected:'Rejected Requests',tabAdmin:'Admin Messages',noMsg:'No new messages found.'},
+  ar:{dir:'rtl',adminMsg:'رسالة الإدارة',welcomeText:'مرحباً بكم في منصة زينكس.',home:'الرئيسية',quantification:'التداول الكمي',deposit:'إيداع',receive:'سحب',transactions:'المعاملات',profile:'الملف الشخصي',support:'الدعم',about:'عن المنصة',logout:'تسجيل خروج',tradingLevels:'مستويات التداول',subWel:'تحقق من مستواك وفعل البوت',active:'نشط',inactive:'غير نشط (الرصيد أقل من $20)',nyTime:'توقيت نيويورك',bal:'الرصيد',prof:'الربح',usersCount:'المستخدمين',liveTrade:'حالة التداول المباشر',todayProfit:'ربح اليوم',yesterdayProfit:'ربح الأمس',tradeHistory:'سجل المعاملات',noHistory:'لم يتم تسجيل أي معاملات بعد',totalBalance:'إجمالي الرصيد',dailyLimit:'تم الوصول للحد اليومي',trading:'تداول',seconds:'ثانية',success:'ناجح!',tradeAmount:'مبلغ التداول',helpModalTitle:'دليل التداول الكمي ومستويات VIP',whatIsQuantTitle:'ما هو نظام التداول الكمي؟',whatIsQuantDesc:'يقوم بوت التداول الذكي بتحليل أسعار العملات الرقمية في البورصات العالمية لحظة بلمحة لاكتشاف الفروقات السعرية وإجراء صفقات مربحة بناءً على المراجحة وخوارزميات الذكاء الاصطناعي.',vipRulesTitle:'شروط الدخول والترقية لمستويات VIP',vipNote:'ملاحظة هامة: الشرط الأساسي لتفعيل وترقية أي مستوى VIP هو إجراء إيداع مباشر بالمبلغ المطلوب. أرباح التداول في المنصة لا تحتسب ضمن شرط الإيداع.',directDeposit:'الإيداع المباشر:',directInvite:'الدعوة المباشرة:',balanceRange:'نطاق الرصيد:',dailyProfit:'الربح اليومي:',activationTitle:'طريقة التفعيل وتقسيم الأرباح',activationDesc:'الحد الأدنى للإيداع للتفعيل هو 20 دولاراً. يتم تقسيم نسبة الربح اليومية على 4 صفقات تستغرق كل منها 10 ثوانٍ خلال اليوم.',resetTitle:'إعادة الضبط اليومية (توقيت نيويورك)',resetDesc:'يتم إعادة ضبط حد الصفقات الأربع يومياً وفقاً للتوقيت الرسمي لمدينة نيويورك (NY Time).',globalMarket:'سوق العملات العالمية',liveUpdates:'تحديثات مباشرة',showFullHistory:'عرض سجل المعاملات بالكامل',showLess:'عرض أقل',aboutModalTitle:'عن منصة Zenix (الهدف والطبيعة والهيكل)',abDesc:'منصة Zenix هي بيئة مالية مبتكرة وذكية في مجال العملات الرقمية صُممت لتقديم تجربة آمنة وآلية ومربحة للمستخدمين.',abL1T:'الهدف الرئيسي:',abL1D:'أتمتة عمليات التداول عبر الذكاء الاصطناعي وخوارزميات الكمية لتمكين المستخدمين من تحقيق أرباح دون الحاجة لخبرة تداول معقدة.',abL2T:'الأمان والبنية التحتية:',abL2D:'تعتمد على بروتوكولات تشفير متقدمة وعقد معالجة سحابية سريعة وقاعدة بيانات Supabase آمنة.',abL3T:'الهيكل متعدد المستويات:',abL3D:'إنشاء شبكة إحالة ديناميكية لتمكين المستخدمين من الحصول على مكافآت مستمرة من نشاط فريقهم.',abL4T:'بيانات حية وواقعية:',abL4D:'مؤشرات أسعار وحجم تداول ورسوم شبكة حية تضمن التفاعل مع منصة عالمية حقيقية.',modalTitle:'صندوق الرسائل والإشعارات',tabAll:'الكل',tabApproved:'طلبات مقبولة',tabRejected:'طلبات مرفوضة',tabAdmin:'رسائل الإدارة',noMsg:'لا توجد رسائل جديدة.'}
+};
+
+window.updateVIPBadges=function(){
+  const l=window.currentActiveLang||'fa',t=(window.LD&&window.LD[l])||(window.LD&&window.LD.fa)||{};
+  const vips=[{id:'vip1-badge',min:20},{id:'vip2-badge',min:300},{id:'vip3-badge',min:1000},{id:'vip4-badge',min:2500},{id:'vip5-badge',min:5000},{id:'vip6-badge',min:10000}];
+  vips.forEach(v=>{
+    const el=document.getElementById(v.id);
+    if(!el)return;
+    if(window.bBal>=v.min){
+      el.className='badge-active';
+      el.innerHTML=`<i class="fas fa-check"></i> <span>${t.active||'فعال'}</span>`;
+    }else{
+      el.className='badge-lock';
+      el.innerHTML=`<i class="fas fa-lock"></i>`;
+    }
+  });
+};
+
+function setLang(l){
+  const t=window.LD[l]||window.LD.fa;document.documentElement.dir=t.dir;document.documentElement.lang=l;localStorage.setItem('zenix_lang',l);
+  document.querySelectorAll('#lang-menu .mi').forEach(item=>{if(item.getAttribute('data-lang')===l){item.classList.add('active');}else{item.classList.remove('active');}});
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(t[k])el.innerText=t[k];});
+  window.currentActiveLang=l;
+  const statusB=document.getElementById('status-badge');
+  if(statusB){
+    if(window.isBotActive){
+      statusB.style.background="rgba(34,197,94,.18)";statusB.style.borderColor="#22c55e";statusB.style.color="#22c55e";statusB.style.boxShadow="0 0 12px rgba(34,197,94,.4)";
+      statusB.innerHTML=`<i class="fas fa-robot"></i> <span>${t.active}</span>`;
+    }else{
+      statusB.style.background="rgba(239,68,68,.18)";statusB.style.borderColor="#ef4444";statusB.style.color="#ef4444";statusB.style.boxShadow="0 0 12px rgba(239,68,68,.4)";
+      statusB.innerHTML=`<i class="fas fa-lock"></i> <span>${t.inactive}</span>`;
+    }
+  }
+  if(window.updateVIPBadges)window.updateVIPBadges();
+  let elModalTitle=document.getElementById('t-modal-title');if(elModalTitle&&t.modalTitle)elModalTitle.innerHTML=`<i class="fas fa-bell"></i> ${t.modalTitle}`;
+  const tabMap={'t-tab-all':t.tabAll,'t-tab-approved':t.tabApproved,'t-tab-rejected':t.tabRejected,'t-tab-admin':t.tabAdmin};
+  Object.keys(tabMap).forEach(id=>{const el=document.getElementById(id);if(el&&tabMap[id])el.textContent=tabMap[id];});
+  if(window.checkClickState)window.checkClickState();if(window.renderHistory)window.renderHistory();if(window.renderMarketList)window.renderMarketList();
+}
+setLang(localStorage.getItem('zenix_lang')||'fa');
+
+const mB=document.getElementById('menu-btn'),nM=document.getElementById('nav-menu'),lB=document.getElementById('lang-btn'),lMenu=document.getElementById('lang-menu'),bB=document.getElementById('bell-btn');
+document.querySelectorAll('#lang-menu .mi').forEach(el=>{el.onclick=(e)=>{e.stopPropagation();setLang(el.dataset.lang);lMenu.classList.remove('show');};});
+function tM(o,e){e.stopPropagation();[nM,lMenu].forEach(m=>{if(m!==o)m.classList.remove('show');});o.classList.toggle('show');}
+if(mB)mB.onclick=(e)=>tM(nM,e);if(lB)lB.onclick=(e)=>tM(lMenu,e);if(bB)bB.onclick=(e)=>{e.stopPropagation();window.openMessageModal();};
+document.onclick=()=>{[nM,lMenu].forEach(m=>m.classList.remove('show'));};
+document.querySelectorAll('.menu').forEach(m=>m.onclick=(e)=>e.stopPropagation());
+
+const marketData=[
+  {name:'Bitcoin',symbol:'BTC/USDT',price:96450.2,change:4.85,color:'#f7931a'},{name:'Ethereum',symbol:'ETH/USDT',price:3480.5,change:3.62,color:'#627eea'},{name:'Solana',symbol:'SOL/USDT',price:185.25,change:8.12,color:'#14f195'},{name:'Ripple',symbol:'XRP/USDT',price:2.35,change:6.4,color:'#23292f'},{name:'Binance Coin',symbol:'BNB/USDT',price:620.1,change:1.45,color:'#f3ba2f'},{name:'Dogecoin',symbol:'DOGE/USDT',price:.284,change:7.3,color:'#c2a633'},{name:'Cardano',symbol:'ADA/USDT',price:.952,change:2.1,color:'#0033ad'},{name:'Avalanche',symbol:'AVAX/USDT',price:38.4,change:5.9,color:'#e84142'},{name:'Sui',symbol:'SUI/USDT',price:3.45,change:9.8,color:'#4a90e2'},{name:'Chainlink',symbol:'LINK/USDT',price:18.2,change:4.15,color:'#375bd2'},{name:'Polkadot',symbol:'DOT/USDT',price:8.6,change:-.8,color:'#e6007a'},{name:'Near Protocol',symbol:'NEAR/USDT',price:6.75,change:6.4,color:'#000000'},{name:'Shiba Inu',symbol:'SHIB/USDT',price:.000024,change:3.2,color:'#ffa409'},{name:'Pepe',symbol:'PEPE/USDT',price:.000019,change:11.4,color:'#52ab52'},{name:'Uniswap',symbol:'UNI/USDT',price:11.8,change:2.8,color:'#ff007a'},{name:'Aptos',symbol:'APT/USDT',price:12.3,change:5.1,color:'#2dd4bf'},{name:'Stellar',symbol:'XLM/USDT',price:.42,change:8.9,color:'#14b8a6'},{name:'Cosmos',symbol:'ATOM/USDT',price:7.9,change:1.3,color:'#2e3148'},{name:'Hedera',symbol:'HBAR/USDT',price:.26,change:12.1,color:'#a855f7'},{name:'Render',symbol:'RENDER/USDT',price:8.4,change:7.6,color:'#ef4444'}
+];
+const cryptoLogos={'BTC':'https://assets.coincap.io/assets/icons/btc@2x.png','ETH':'https://assets.coincap.io/assets/icons/eth@2x.png','SOL':'https://assets.coincap.io/assets/icons/sol@2x.png','XRP':'https://assets.coincap.io/assets/icons/xrp@2x.png','BNB':'https://assets.coincap.io/assets/icons/bnb@2x.png','DOGE':'https://assets.coincap.io/assets/icons/doge@2x.png','ADA':'https://assets.coincap.io/assets/icons/ada@2x.png','AVAX':'https://assets.coincap.io/assets/icons/avax@2x.png','SUI':'https://assets.coincap.io/assets/icons/sui@2x.png','LINK':'https://assets.coincap.io/assets/icons/link@2x.png','DOT':'https://assets.coincap.io/assets/icons/dot@2x.png','NEAR':'https://assets.coincap.io/assets/icons/near@2x.png','SHIB':'https://assets.coincap.io/assets/icons/shib@2x.png','PEPE':'https://assets.coincap.io/assets/icons/pepe@2x.png','UNI':'https://assets.coincap.io/assets/icons/uni@2x.png','APT':'https://assets.coincap.io/assets/icons/apt@2x.png','XLM':'https://assets.coincap.io/assets/icons/xlm@2x.png','ATOM':'https://assets.coincap.io/assets/icons/atom@2x.png','HBAR':'https://assets.coincap.io/assets/icons/hbar@2x.png','RENDER':'https://assets.coincap.io/assets/icons/render@2x.png'};
+
+window.renderMarketList=function(){
+  const mList=document.getElementById('market-list');if(!mList)return;
+  marketData.sort((a,b)=>b.change-a.change);const top15=marketData.slice(0,15);
+  top15.forEach(item=>{
+    const symClean=item.symbol.split('/')[0].toLowerCase(),symUpper=item.symbol.split('/')[0].toUpperCase(),isP=item.change>=0,cC=isP?'color:#22c55e;':'color:#ef4444;',bC=isP?'background:rgba(34,197,94,0.12);':'background:rgba(239,68,68,0.12);',sgn=isP?'+':'';
+    const formattedPrice='$'+item.price.toLocaleString('en-US',{minimumFractionDigits:item.price<1?4:2,maximumFractionDigits:item.price<1?4:2})+' <span style="font-size:9px;color:#94a3b8;font-weight:500;">USDT</span>',formattedChange=sgn+item.change.toFixed(2)+'%';
+    let row=mList.querySelector(`[data-sym="${symUpper}"]`);
+    if(row){
+      const priceEl=row.querySelector('.crypto-price-val'),changeEl=row.querySelector('.crypto-change-val');
+      if(priceEl&&priceEl.innerHTML!==formattedPrice)priceEl.innerHTML=formattedPrice;
+      if(changeEl){changeEl.textContent=formattedChange;changeEl.style.cssText=cC+bC;}
+    }else{
+      const imgUrl=cryptoLogos[symUpper]||`https://assets.coincap.io/assets/icons/${symClean}@2x.png`,fallbackUrl=`https://cdn.jsdelivr.net/gh/atomiclabs/cryptocurrency-icons@1a63539be1313df88e14d3f72114205d32233750/128/color/${symClean}.png`;
+      const newRow=document.createElement('div');newRow.className='crypto-row';newRow.setAttribute('data-sym',symUpper);
+      newRow.innerHTML=`<div class="crypto-left"><img src="${imgUrl}" alt="${item.name}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0;background:${item.color||'#1e293b'};" onerror="this.onerror=null;this.src='${fallbackUrl}';" /><div class="crypto-text-box"><div style="font-weight:700;color:#f8fafc;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.name}</div><div style="font-size:10px;color:#94a3b8;">${item.symbol}</div></div></div><div class="crypto-price-val">${formattedPrice}</div><div class="crypto-change-val" style="${cC}${bC}">${formattedChange}</div>`;
+      mList.appendChild(newRow);
+    }
+  });
+  top15.forEach(item=>{const symUpper=item.symbol.split('/')[0].toUpperCase(),row=mList.querySelector(`[data-sym="${symUpper}"]`);if(row)mList.appendChild(row);});
+  const activeSymbols=new Set(top15.map(i=>i.symbol.split('/')[0].toUpperCase()));
+  Array.from(mList.querySelectorAll('.crypto-row')).forEach(row=>{const sym=row.getAttribute('data-sym');if(!activeSymbols.has(sym))row.remove();});
+};
+window.renderMarketList();
+setInterval(()=>{marketData.forEach(item=>{item.price=Math.max(.00001,item.price+(Math.random()-.49)*(item.price*.003));item.change+=(Math.random()-.49)*.25;});window.renderMarketList();},3000);
+</script>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const SUPABASE_URL = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let uUid=null,tProf=0,yProf=0,bBal=0;
+window.bBal=0;
+const tpEl=document.getElementById('today-profit-val'),ypEl=document.getElementById('yesterday-profit-val'),tbEl=document.getElementById('total-balance-val'),hList=document.getElementById('history-list');
+
+window.cachedNotifications = [];
+window.currentFilteredNotifs = [];
+window.activeNotifFilter = 'all';
+window.actualUserKeys = [];
+
+window.formatGregorianDate = function(rawDate) {
+  if (!rawDate) return '';
+  const d = new Date(rawDate);
+  if (isNaN(d.getTime())) return '';
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+};
+
+window.getNotifCategory = function(n) {
+  const type = (n.type || '').toLowerCase();
+  const title = (n.title || '').toLowerCase();
+  if (type.includes('approved') || type.includes('confirm') || title.includes('تایید') || title.includes('موفق') || title.includes('شارژ شد')) return 'approved';
+  if (type.includes('rejected') || type.includes('canceled') || type.includes('cancel') || title.includes('رد') || title.includes('لغو') || title.includes('ناموفق')) return 'rejected';
+  return 'admin_message';
+};
+
+window.updateTabBadges = function() {
+  const notifs = window.cachedNotifications || [];
+  let approvedCount = 0, rejectedCount = 0, adminCount = 0;
+  notifs.forEach(n => {
+    const cat = window.getNotifCategory(n);
+    if (cat === 'approved') approvedCount++;
+    else if (cat === 'rejected') rejectedCount++;
+    else if (cat === 'admin_message') adminCount++;
+  });
+  const elAll = document.getElementById('cnt-tab-all'), elApproved = document.getElementById('cnt-tab-approved'), elRejected = document.getElementById('cnt-tab-rejected'), elAdmin = document.getElementById('cnt-tab-admin');
+  if (elAll) elAll.innerText = notifs.length;
+  if (elApproved) elApproved.innerText = approvedCount;
+  if (elRejected) elRejected.innerText = rejectedCount;
+  if (elAdmin) elAdmin.innerText = adminCount;
+};
+
+window.updateBellBadge = function() {
+  const unreadCount = window.cachedNotifications.filter(n => !n.read && !n.isRead && !n.is_read).length;
+  const badge = document.getElementById('bell-badge');
+  if (badge) {
+    badge.innerText = unreadCount;
+    if (unreadCount > 0) badge.classList.add('show'); else badge.classList.remove('show');
+  }
+  window.updateTabBadges();
+};
+
+window.setNotifFilter = function(filter, element) {
+  window.activeNotifFilter = filter;
+  document.querySelectorAll('#notif-tabs .notif-tab').forEach(tab => tab.classList.remove('active'));
+  if (element) element.classList.add('active');
+  window.renderNotifications();
+};
+
+window.closeMsgDetailModal = function() {
+  const modal = document.getElementById('m-msg-detail');
+  if (modal) modal.classList.remove('show');
+};
+
+window.openMsgDetail = async function(idx) {
+  const n = window.currentFilteredNotifs[idx];
+  if (!n) return;
+  const isUnread = !n.read && !n.isRead && !n.is_read;
+  if (isUnread) {
+    n.is_read = true; n.read = true; n.isRead = true;
+    window.updateBellBadge();
+    window.renderNotifications();
+    try {
+      const { error } = await supabase.from('notifications').update({ is_read: true }).eq('id', n.id).select();
+      if (error) {
+        const res2 = await supabase.from('notifications').update({ read: true }).eq('id', n.id);
+        if (res2.error) await supabase.from('notifications').update({ isRead: true }).eq('id', n.id);
+      }
+    } catch (err) {}
+  }
+  const title = n.title || 'پیام سیستم', msg = n.message || n.text || n.body || '', category = window.getNotifCategory(n), dateStr = window.formatGregorianDate(n.created_at || n.date || n.created_date);
+  const detailTitle = document.getElementById('detail-msg-title'), detailDate = document.getElementById('detail-msg-date'), detailBody = document.getElementById('detail-msg-body'), detailSupport = document.getElementById('detail-msg-support');
+  if (detailTitle) detailTitle.innerHTML = `<i class="fas fa-bell" style="color:#38bdf8"></i> ${title}`;
+  if (detailDate) {
+    if (dateStr) { detailDate.innerHTML = `<i class="far fa-clock" style="color:#38bdf8;margin-right:4px;"></i>${dateStr}`; detailDate.style.display = 'block'; }
+    else detailDate.style.display = 'none';
+  }
+  if (detailBody) detailBody.innerText = msg;
+  if (detailSupport) {
+    if (category === 'rejected') {
+      detailSupport.innerHTML = `<div style="margin-top:15px;padding-top:10px;border-top:1px dashed rgba(239,68,68,0.3);display:flex;justify-content:flex-end;"><a href="support.html" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);" style="display:inline-flex;align-items:center;gap:6px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f8fafc;padding:6px 12px;border-radius:6px;font-size:12px;text-decoration:none;font-weight:600;transition:0.2s;"><i class="fas fa-headset" style="color:#ef4444;"></i><span>پیگیری از طریق پشتیبانی</span></a></div>`;
+    } else detailSupport.innerHTML = '';
+  }
+  document.getElementById('m-msg-detail')?.classList.add('show');
+};
+
+window.renderNotifications = function() {
+  window.updateTabBadges();
+  const container = document.getElementById('modal-msg-container');
+  if (!container) return;
+  const filter = window.activeNotifFilter;
+  const filtered = window.cachedNotifications.filter(n => filter === 'all' || window.getNotifCategory(n) === filter);
+  window.currentFilteredNotifs = filtered;
+  if (filtered.length === 0) {
+    container.innerHTML = `<div style="text-align:center;padding:25px;color:#94a3b8;font-size:12px;"><i class="fas fa-inbox" style="font-size:24px;margin-bottom:8px;display:block;opacity:0.5;"></i>هیچ پیامی در این دسته‌بندی وجود ندارد.</div>`;
+    return;
+  }
+  let html = '';
+  filtered.forEach((n, idx) => {
+    const title = n.title || 'پیام سیستم', category = window.getNotifCategory(n), isUnread = !n.read && !n.isRead && !n.is_read, dateStr = window.formatGregorianDate(n.created_at || n.date || n.created_date);
+    let borderStyle = "border:1px solid rgba(255,255,255,.08);", bgStyle = "background:rgba(255,255,255,.02);", icon = '<i class="fas fa-bullhorn" style="color:#38bdf8"></i>', tagHtml = '<span style="font-size:10px;background:rgba(56,189,248,0.2);color:#38bdf8;padding:2px 6px;border-radius:4px;font-weight:700;">پیام مدیریت</span>';
+    if (category === 'approved') {
+      borderStyle = isUnread ? "border:1px solid rgba(34, 197, 94, 0.6);" : "border:1px solid rgba(34, 197, 94, 0.2);";
+      bgStyle = isUnread ? "background:rgba(34, 197, 94, 0.12);" : "background:rgba(34, 197, 94, 0.03);";
+      icon = '<i class="fas fa-check-circle" style="color:#22c55e"></i>';
+      tagHtml = '<span style="font-size:10px;background:rgba(34,197,94,0.2);color:#22c55e;padding:2px 6px;border-radius:4px;font-weight:700;">تایید درخواست</span>';
+    } else if (category === 'rejected') {
+      borderStyle = isUnread ? "border:1px solid rgba(239, 68, 68, 0.6);" : "border:1px solid rgba(239, 68, 68, 0.2);";
+      bgStyle = isUnread ? "background:rgba(239, 68, 68, 0.12);" : "background:rgba(239, 68, 68, 0.03);";
+      icon = '<i class="fas fa-times-circle" style="color:#ef4444"></i>';
+      tagHtml = '<span style="font-size:10px;background:rgba(239,68,68,0.2);color:#ef4444;padding:2px 6px;border-radius:4px;font-weight:700;">لغو درخواست</span>';
+    } else {
+      bgStyle = isUnread ? "background:rgba(56, 189, 248, 0.12);" : "background:rgba(255, 255, 255, 0.02);";
+      borderStyle = isUnread ? "border:1px solid rgba(56, 189, 248, 0.5);" : "border:1px solid rgba(255, 255, 255, 0.08);";
+    }
+    const opacityStyle = isUnread ? "opacity:1;" : "opacity:0.65;", unreadDot = isUnread ? '<span style="width:9px;height:9px;background:#ef4444;border-radius:50%;display:inline-block;box-shadow:0 0 8px #ef4444;" title="خوانده نشده"></span>' : '';
+    const readBadge = isUnread ? '<span style="font-size:10px;background:#ef4444;color:#fff;padding:2px 7px;border-radius:10px;font-weight:800;box-shadow:0 0 8px rgba(239,68,68,0.5);">جدید</span>' : '<span style="font-size:10px;background:rgba(255,255,255,0.06);color:#94a3b8;padding:2px 6px;border-radius:10px;"><i class="fas fa-check" style="font-size:9px;color:#64748b;"></i> خوانده‌شده</span>';
+    const dateDisplay = dateStr ? `<div style="font-size:11px;color:${isUnread ? '#cbd5e1' : '#64748b'};margin-top:6px;direction:ltr;text-align:left;"><i class="far fa-clock" style="margin-right:4px;"></i>${dateStr}</div>` : '';
+    html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle} ${opacityStyle} cursor:pointer; position:relative; transition:all 0.2s;" onclick="window.openMsgDetail(${idx})"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><div class="msg-title-text" style="display:flex;align-items:center;gap:8px;font-weight:${isUnread ? '800' : '500'};color:${isUnread ? '#f8fafc' : '#cbd5e1'};">${unreadDot}${icon}<span>${title}</span></div><div style="display:flex;align-items:center;gap:6px;">${tagHtml}${readBadge}</div></div>${dateDisplay}</div>`;
+  });
+  container.innerHTML = html;
+};
+
+function cleanDateStr(d) { if (!d) return ''; return String(d).replace(/\//g, '-').split('T')[0].split(' ')[0].trim(); }
+
+async function getFreshUserServerData() {
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (error || !user) return null;
+    return user;
+  } catch(e) { return null; }
+}
+
+async function saveUserFields(dict) {
+  if (!uUid) return;
+  const currentCount = dict.count !== undefined ? dict.count : cCnt;
+  const currentDate = dict.date !== undefined ? dict.date : todayNY;
+  const currentProfit = dict.profit !== undefined ? dict.profit : tProf;
+  const currentYesterdayProfit = dict.yesterdayProfit !== undefined ? dict.yesterdayProfit : yProf;
+  const currentBalance = dict.balance !== undefined ? dict.balance : bBal;
+  const currentHistory = dict.history || allTradesArray;
+  try {
+    await supabase.auth.updateUser({ data: { quantCount: currentCount, quantDate: currentDate, todayProfit: currentProfit, yesterdayProfit: currentYesterdayProfit, tradeHistoryArray: currentHistory } });
+  } catch(e) {}
+  try {
+    localStorage.setItem(`zenix_quant_state_${uUid}`, JSON.stringify({ count: currentCount, date: currentDate, profit: currentProfit, yesterdayProfit: currentYesterdayProfit, balance: currentBalance, history: currentHistory }));
+  } catch(e) {}
+  const payload = {}, keys = window.actualUserKeys || [];
+  const findCol = (candidates) => keys.find(x => candidates.some(c => c.toLowerCase() === x.toLowerCase()));
+  const kCount = findCol(['quantCount', 'quant_count']); if (dict.count !== undefined && kCount) payload[kCount] = currentCount;
+  const kDate = findCol(['quantDate', 'quant_date']); if (dict.date !== undefined && kDate) payload[kDate] = currentDate;
+  const kProfit = findCol(['todayProfit', 'today_profit']); if (dict.profit !== undefined && kProfit) payload[kProfit] = currentProfit;
+  const kYProfit = findCol(['yesterdayProfit', 'yesterday_profit', 'yesterdayProfitVal']); if (dict.yesterdayProfit !== undefined && kYProfit) payload[kYProfit] = currentYesterdayProfit;
+  const kBal = findCol(['balance']); if (dict.balance !== undefined && kBal) payload[kBal] = currentBalance;
+  const kHist = findCol(['tradeHistoryArray', 'quantHistory', 'trades', 'history']); if (dict.history !== undefined && kHist) payload[kHist] = currentHistory;
+  if (Object.keys(payload).length > 0) {
+    await supabase.from("users").update(payload).eq("id", uUid);
+  }
+}
+
+function getNYDateStr(){return new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York'}).format(new Date());}
+let todayNY=getNYDateStr(),cCnt=0,allTradesArray=[],currentTradeInterval=null;
+
+function formatTradeDate(item){
+  if (!item) return '';
+  let d = null;
+  if (item.timestamp) d = typeof item.timestamp === 'number' ? new Date(item.timestamp) : new Date(item.timestamp);
+  else if (item.time) d = new Date(item.time);
+  else if (item.date) d = new Date(item.date);
+  if (d && !isNaN(d.getTime())) return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} - ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  return item.dateStr || item.date || item.time || '';
+}
+
+function uC(){
+  const dateStr=getNYDateStr();
+  if(dateStr!==todayNY){
+    todayNY=dateStr; cCnt=0; yProf=tProf; tProf=0;
+    saveUserFields({ count: 0, date: todayNY, profit: 0, yesterdayProfit: yProf, history: allTradesArray });
+    if(tpEl)tpEl.innerText='$0.00'; if(ypEl)ypEl.innerText=`$${yProf.toFixed(2)}`;
+    window.checkClickState();
+  }
+  const t=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date());
+  const c=document.getElementById('ny-clock-val');if(c)c.innerText=t;
+  const dEl=document.getElementById('ny-date-val');if(dEl)dEl.innerText=dateStr;
+}
+setInterval(uC,1000);uC();
+
+const cList=[{name:'Bitcoin',symbol:'BTC',cls:'fab fa-bitcoin',color:'#f7931a'},{name:'Ethereum',symbol:'ETH',cls:'fab fa-ethereum',color:'#627eea'},{name:'Solana',symbol:'SOL',cls:'fas fa-coins',color:'#14f195'},{name:'Ripple',symbol:'XRP',cls:'fas fa-water',color:'#23292f'},{name:'Cardano',symbol:'ADA',cls:'fas fa-circle-dot',color:'#0033ad'},{name:'Dogecoin',symbol:'DOGE',cls:'fas fa-dog',color:'#c2a633'},{name:'Binance Coin',symbol:'BNB',cls:'fas fa-cube',color:'#f3ba2f'}];
+
+window.checkClickState=function(){
+  const qBtn = document.getElementById('quant-btn');
+  if(!qBtn || !window.isBotActive) return;
+  const l=window.currentActiveLang||'fa',t=(window.LD&&window.LD[l])||(window.LD&&window.LD.fa)||{};
+  if(uUid && localStorage.getItem(`zenix_active_trade_${uUid}`)){ qBtn.disabled=true;qBtn.style.opacity="0.5";qBtn.style.cursor="not-allowed"; return; }
+  if(cCnt>=4){ qBtn.disabled=true;qBtn.style.opacity="0.5";qBtn.style.cursor="not-allowed"; qBtn.innerHTML=`<i class="fas fa-ban"></i> <span>${t.dailyLimit || 'پایان ظرفیت امروز'}</span>`; }
+  else{ qBtn.disabled=false;qBtn.style.opacity="1";qBtn.style.cursor="pointer"; qBtn.innerHTML=`<i class="fas fa-robot"></i> <span>${t.quantification || 'کوانتیفیکیشن'} (${cCnt}/4)</span>`; }
+};
+
+window.renderHistory=function(){
+  if(!hList) return;
+  const l=window.currentActiveLang||'fa',t=(window.LD&&window.LD[l])||(window.LD&&window.LD.fa)||{};
+  const btn=document.getElementById('view-all-history-btn'),btnTxt=document.getElementById('history-btn-text'),btnIcon=document.getElementById('history-btn-icon');
+  if(!allTradesArray || !Array.isArray(allTradesArray) || allTradesArray.length===0){
+    hList.innerHTML=`<div style="font-size:12px;color:#94a3b8;text-align:center;" data-i18n="noHistory">${t.noHistory || 'هنوز معامله‌ای ثبت نشده است'}</div>`;
+    if(btn)btn.style.display='none';
+    return;
+  }
+  if(btn){
+    btn.style.display = allTradesArray.length > 4 ? 'flex' : 'none';
+    if(btnTxt)btnTxt.innerText=window.showAllHistory?(t.showLess||'بستن تاریخچه'):(t.showFullHistory||'مشاهده کامل تاریخچه');
+    if(btnIcon)btnIcon.className=window.showAllHistory?'fas fa-chevron-up':'fas fa-list-ul';
+  }
+  const tradesToDisplay = window.showAllHistory ? allTradesArray : allTradesArray.slice(0, 4);
+  let htmlStr='';
+  tradesToDisplay.forEach(item=>{
+    if(!item) return;
+    const rawProf = item.profit ?? item.amount ?? item.profitAmount ?? 0;
+    const profStr = isNaN(parseFloat(rawProf)) ? '0.00' : parseFloat(rawProf).toFixed(2);
+    const formattedDate = formatTradeDate(item), coinName = item.name || item.coinName || item.currency || 'Crypto', coinSym = item.symbol || item.coinSymbol || '', coinColor = item.color || '#38bdf8', coinIcon = item.cls || 'fas fa-coins';
+    htmlStr+=`<div style="background:rgba(255,255,255,0.03);padding:10px 12px;border-radius:8px;font-size:11px;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px;margin-bottom:4px;align-items:center;border:1px solid rgba(255,255,255,0.05);"><span style="color:#22c55e;font-weight:bold;font-size:12px;justify-self:start;white-space:nowrap;">+$${profStr}</span><span style="color:#94a3b8;font-size:10px;font-family:monospace;justify-self:center;text-align:center;white-space:nowrap;padding:0 4px;">${formattedDate}</span><span style="display:flex;align-items:center;gap:6px;justify-self:end;white-space:nowrap;max-width:100%;overflow:hidden;"><span style="color:#f8fafc;font-weight:600;overflow:hidden;text-overflow:ellipsis;">${coinName} ${coinSym ? `(${coinSym})` : ''}</span><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:${coinColor};color:#fff;font-size:11px;flex-shrink:0;"><i class="${coinIcon}"></i></span></span></div>`;
+  });
+  hList.innerHTML=htmlStr;
+};
+
+async function finalizeTrade(activeTrade) {
+  if (uUid) localStorage.removeItem(`zenix_active_trade_${uUid}`);
+  tProf += activeTrade.profit;
+  bBal += activeTrade.profit;
+  window.bBal = bBal;
+  const newTrade = { name: activeTrade.coin.name, symbol: activeTrade.coin.symbol, cls: activeTrade.coin.cls, color: activeTrade.coin.color, profit: activeTrade.profit, timestamp: activeTrade.endTime || Date.now(), nyDate: activeTrade.nyDate, dateStr: formatTradeDate({ timestamp: activeTrade.endTime || Date.now() }) };
+  allTradesArray.unshift(newTrade);
+  await saveUserFields({ count: activeTrade.targetCount, date: activeTrade.nyDate, profit: tProf, balance: bBal, history: allTradesArray });
+  if(tpEl) tpEl.innerText = `$${tProf.toFixed(2)}`;
+  if(tbEl) tbEl.innerText = `$${bBal.toFixed(2)}`;
+  if(window.updateVIPBadges) window.updateVIPBadges();
+  const tBox=document.getElementById('trade-box'),tDet=document.getElementById('trade-details'),l=window.currentActiveLang||'fa',t=(window.LD&&window.LD[l])||(window.LD&&window.LD.fa)||{};
+  if(tBox) tBox.style.display = 'block';
+  if(tDet) { tDet.innerHTML = `<div style="display:flex;flex-direction:column;gap:6px;align-items:center;width:100%;"><div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;flex-wrap:wrap;"><i class="${activeTrade.coin.cls}" style="color:${activeTrade.coin.color}"></i> <span><b>${activeTrade.coin.name}</b> (${activeTrade.coin.symbol})</span><span style="color:#64748b;">|</span><span style="color:#cbd5e1;">${t.tradeAmount || 'مبلغ معامله'}: <b style="color:#38bdf8;">$${activeTrade.tradeAmount.toFixed(2)}</b></span></div><div style="color:#22c55e;font-weight:bold;font-size:13px;"><i class="fas fa-check-circle"></i> ${t.success || 'موفق!'} +$${activeTrade.profit.toFixed(2)}</div></div>`; }
+  setTimeout(()=>{ if(tBox) tBox.style.display = 'none'; window.renderHistory(); window.checkClickState(); }, 2000);
+}
+
+function startTradeCountdown(activeTrade) {
+  const qBtn = document.getElementById('quant-btn');
+  if(qBtn) { qBtn.disabled = true; qBtn.style.opacity = "0.5"; }
+  const tBox=document.getElementById('trade-box'),tDet=document.getElementById('trade-details');
+  if(tBox) tBox.style.display='block';
+  const l=window.currentActiveLang||'fa',t=(window.LD&&window.LD[l])||(window.LD&&window.LD.fa)||{}, rc = activeTrade.coin, tradeAmount = activeTrade.tradeAmount;
+  if(currentTradeInterval) clearInterval(currentTradeInterval);
+  const updateUI = () => {
+    let tLeft = Math.ceil((activeTrade.endTime - Date.now()) / 1000);
+    if(tLeft < 0) tLeft = 0;
+    if(tDet) { tDet.innerHTML=`<div style="display:flex;flex-direction:column;gap:6px;align-items:center;width:100%;"><div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;flex-wrap:wrap;"><i class="${rc.cls}" style="color:${rc.color}"></i> <span><b>${rc.name}</b> (${rc.symbol})</span><span style="color:#64748b;">|</span><span style="color:#cbd5e1;">${t.tradeAmount || 'مبلغ معامله'}: <b style="color:#38bdf8;">$${tradeAmount.toFixed(2)}</b></span></div><div style="font-size:12px;color:#38bdf8;font-weight:bold;"><i class="fas fa-spinner fa-spin"></i> ${t.trading || 'معامله'}... <span id="trade-timer-val">${tLeft}</span> ${t.seconds || 'ثانیه'}</div></div>`; }
+    if(tLeft <= 0) { if(currentTradeInterval) clearInterval(currentTradeInterval); cCnt = activeTrade.targetCount; finalizeTrade(activeTrade); }
+  };
+  updateUI();
+  currentTradeInterval = setInterval(updateUI, 1000);
+}
+
+function bindQuantButton() {
+  const qBtn = document.getElementById('quant-btn');
+  if(!qBtn) return;
+  qBtn.onclick = async function(e){
+    e.preventDefault();
+    if(!window.isBotActive || !uUid || localStorage.getItem(`zenix_active_trade_${uUid}`)) return;
+    qBtn.disabled = true; qBtn.style.opacity = "0.5";
+    const freshUser = await getFreshUserServerData(), currentNY = cleanDateStr(todayNY);
+    let serverCount = cCnt, serverHist = allTradesArray;
+    if (freshUser) {
+      const meta = freshUser.user_metadata || {};
+      serverHist = meta.tradeHistoryArray || allTradesArray;
+      const tradesTodayServer = serverHist.filter(t => t && cleanDateStr(t.nyDate || t.dateStr || t.date || t.timestamp) === currentNY);
+      const sCountMeta = Number(meta.quantCount || 0), sDateMeta = cleanDateStr(meta.quantDate || '');
+      serverCount = (sDateMeta === currentNY) ? Math.max(tradesTodayServer.length, sCountMeta) : tradesTodayServer.length;
+    }
+    if (serverCount >= 4) { cCnt = 4; allTradesArray = serverHist; window.renderHistory(); window.checkClickState(); return; }
+    let dailyRate=0.015;
+    if(bBal>=10000)dailyRate=0.04; else if(bBal>=5000)dailyRate=0.035; else if(bBal>=2500)dailyRate=0.03; else if(bBal>=1000)dailyRate=0.025; else if(bBal>=300)dailyRate=0.02;
+    const tradeAmount = bBal, p=(tradeAmount*dailyRate)/4, rc=cList[Math.floor(Math.random()*cList.length)], now = Date.now();
+    const activeTrade = { startTime: now, endTime: now + 10000, coin: rc, tradeAmount: tradeAmount, profit: p, targetCount: serverCount + 1, nyDate: currentNY };
+    localStorage.setItem(`zenix_active_trade_${uUid}`, JSON.stringify(activeTrade));
+    cCnt = serverCount + 1;
+    startTradeCountdown(activeTrade);
+  };
+}
+
+async function initQuantification() {
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (error || !user) { window.location.href = 'login.html'; return; }
+    uUid = user.id;
+    const { data: dbUser } = await supabase.from('users').select('*').eq('id', uUid).single();
+    if (dbUser) window.actualUserKeys = Object.keys(dbUser);
+    const meta = user.user_metadata || {};
+    bBal = parseFloat(dbUser?.balance ?? meta.balance ?? 0);
+    window.bBal = bBal;
+    const currentNY = cleanDateStr(getNYDateStr()), savedDate = cleanDateStr(meta.quantDate || dbUser?.quantDate || dbUser?.quant_date || '');
+    allTradesArray = meta.tradeHistoryArray || dbUser?.tradeHistoryArray || dbUser?.quantHistory || dbUser?.trades || [];
+    const nyDateObj = new Date(new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
+    nyDateObj.setDate(nyDateObj.getDate() - 1);
+    const yesterdayNY = cleanDateStr(`${nyDateObj.getFullYear()}-${String(nyDateObj.getMonth() + 1).padStart(2, '0')}-${String(nyDateObj.getDate()).padStart(2, '0')}`);
+    if (savedDate === currentNY) {
+      cCnt = parseInt(meta.quantCount || dbUser?.quantCount || dbUser?.quant_count || 0, 10);
+      tProf = parseFloat(meta.todayProfit || dbUser?.todayProfit || dbUser?.today_profit || 0);
+      yProf = parseFloat(meta.yesterdayProfit || dbUser?.yesterdayProfit || dbUser?.yesterday_profit || 0);
+    } else {
+      cCnt = 0;
+      yProf = (savedDate === yesterdayNY) ? parseFloat(meta.todayProfit || dbUser?.todayProfit || dbUser?.today_profit || 0) : parseFloat(meta.yesterdayProfit || dbUser?.yesterdayProfit || dbUser?.yesterday_profit || 0);
+      tProf = 0;
+      await saveUserFields({ count: 0, date: currentNY, profit: 0, yesterdayProfit: yProf, history: allTradesArray });
+    }
+    if (allTradesArray && allTradesArray.length > 0) {
+      let calcYProf = 0;
+      allTradesArray.forEach(t => { if (t && cleanDateStr(t.nyDate || t.dateStr || t.date || t.timestamp) === yesterdayNY) calcYProf += parseFloat(t.profit ?? t.amount ?? t.profitAmount ?? 0); });
+      if (calcYProf > 0) yProf = calcYProf;
+    }
+    window.isBotActive = bBal >= 20;
+    if (tbEl) tbEl.innerText = `$${bBal.toFixed(2)}`;
+    if (tpEl) tpEl.innerText = `$${tProf.toFixed(2)}`;
+    if (ypEl) ypEl.innerText = `$${yProf.toFixed(2)}`;
+    if (window.updateVIPBadges) window.updateVIPBadges();
+    const { data: notifs, error: notifError } = await supabase.from('notifications').select('*').eq('user_id', uUid).order('created_at', { ascending: false });
+    if (!notifError && notifs) { window.cachedNotifications = notifs; window.renderNotifications(); window.updateBellBadge(); }
+    setLang(localStorage.getItem('zenix_lang') || 'fa');
+    bindQuantButton();
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+      logoutBtn.onclick = async function(e) {
+        e.preventDefault();
+        try { await supabase.auth.signOut(); } catch(err) {}
+        window.location.href = 'login.html';
+      };
+    }
+    const savedActiveTradeStr = localStorage.getItem(`zenix_active_trade_${uUid}`);
+    let restoredActiveTrade = null;
+    if (savedActiveTradeStr) {
+      try {
+        const parsed = JSON.parse(savedActiveTradeStr);
+        if (parsed && parsed.nyDate === currentNY) restoredActiveTrade = parsed;
+        else localStorage.removeItem(`zenix_active_trade_${uUid}`);
+      } catch(e) { localStorage.removeItem(`zenix_active_trade_${uUid}`); }
+    }
+    if (restoredActiveTrade) {
+      const now = Date.now();
+      if (now >= restoredActiveTrade.endTime) { cCnt = restoredActiveTrade.targetCount; await finalizeTrade(restoredActiveTrade); }
+      else { cCnt = restoredActiveTrade.targetCount; startTradeCountdown(restoredActiveTrade); }
+    } else { window.checkClickState(); window.renderHistory(); }
+  } catch (err) {}
+}
+document.addEventListener('DOMContentLoaded', initQuantification);
+</script></body></html>
