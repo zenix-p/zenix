@@ -338,7 +338,7 @@
         <div class="top-section">
             <div class="wheel-box">
                 <div class="wheel-pointer"></div>
-                <canvas id="rouletteWheel" width="210" height="210"></canvas>
+                <canvas id="rouletteWheel" width="220" height="220"></canvas>
             </div>
 
             <div class="status-center">
@@ -618,7 +618,7 @@
             }
 
             userBalance -= selectedChipVal;
-            userBets.push({ target, amount: selectedChipVal, chipClass: `chip-${selectedChipVal}` });
+            userBets.push({ target, amount: selectedChipVal });
 
             playSound(800, 'triangle', 0.08);
             renderChips();
@@ -629,12 +629,27 @@
         function renderChips() {
             document.querySelectorAll('.chip-on-table').forEach(c => c.remove());
 
+            const betMap = {};
             userBets.forEach(b => {
-                const cell = document.querySelector(`[data-bet="${b.target}"]`);
+                if (!betMap[b.target]) {
+                    betMap[b.target] = 0;
+                }
+                betMap[b.target] += b.amount;
+            });
+
+            Object.keys(betMap).forEach(target => {
+                const cell = document.querySelector(`[data-bet="${target}"]`);
                 if (cell) {
+                    const total = betMap[target];
                     const chip = document.createElement('div');
-                    chip.className = `chip-on-table ${b.chipClass}`;
-                    chip.textContent = `$${b.amount}`;
+                    let cls = 'chip-1';
+                    if (total >= 100) cls = 'chip-100';
+                    else if (total >= 50) cls = 'chip-50';
+                    else if (total >= 10) cls = 'chip-10';
+                    else if (total >= 5) cls = 'chip-5';
+
+                    chip.className = `chip-on-table ${cls}`;
+                    chip.textContent = `$${total}`;
                     cell.appendChild(chip);
                 }
             });
@@ -725,8 +740,10 @@
             const winningIndex = Math.floor(Math.random() * wheelNumbers.length);
             const winningNumber = wheelNumbers[winningIndex];
 
-            const sliceAngle = 360 / wheelNumbers.length;
-            const targetDegree = 360 * 4 + (360 - (winningIndex * sliceAngle));
+            const sliceAngleDeg = 360 / wheelNumbers.length;
+            const sliceCenterAngle = winningIndex * sliceAngleDeg + sliceAngleDeg / 2;
+            const baseRotation = 270 - sliceCenterAngle;
+            const targetDegree = 360 * 5 + baseRotation;
 
             const canvas = document.getElementById('rouletteWheel');
             if(canvas) {
