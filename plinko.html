@@ -296,7 +296,7 @@
         .playing-card.red { color: #dc2626; }
         .card-symbol { font-size: 9px; align-self: center; line-height: 1; }
 
-        /* انیمیشن کارت پروازی */
+        /* انیمیشن کارت پروازی بهینه‌شده و روان‌تر */
         .flying-card-item {
             position: absolute;
             width: 20px;
@@ -306,8 +306,9 @@
             border-radius: 3px;
             z-index: 500;
             box-shadow: 0 4px 12px rgba(0,0,0,0.8);
-            transition: all 1.3s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: all 0.55s cubic-bezier(0.25, 1, 0.5, 1);
             pointer-events: none;
+            will-change: left, top, transform, opacity;
         }
 
         .live-status-banner {
@@ -409,7 +410,7 @@
         </div>
         <div class="live-badge">
             <i class="fa-solid fa-circle" style="font-size: 5px;"></i>
-            <span>۲۰ بازیکن (دو ستون)</span>
+            <span>۲۰ بازیکن (بدون لگ)</span>
         </div>
     </header>
 
@@ -486,7 +487,7 @@
         </div>
 
         <div class="live-status-banner" id="statusBanner">
-            شرط خود را انتخاب کرده و دکمه توزیع کارت را بزنید تا کارت اول و دوم به نوبت به دور میز پخش شوند.
+            شرط خود را انتخاب کرده و دکمه توزیع کارت را بزنید تا کارت اول و دوم با سرعت به دور میز پخش شوند.
         </div>
 
         <div class="control-panel">
@@ -504,7 +505,7 @@
             </div>
             
             <div class="control-row">
-                <button class="btn-action btn-deal" onclick="startBaccaratRound()">توزیع آهسته کارت‌ها (دوره‌ای)</button>
+                <button class="btn-action btn-deal" onclick="startBaccaratRound()">توزیع سریع کارت‌ها (روان و بهینه)</button>
             </div>
         </div>
     </div>
@@ -607,16 +608,11 @@
             return { val, symbol: suit.symbol, cssClass: suit.class, score: scoreVal };
         }
 
-        function flyCardToSeat(seatElement) {
+        function flyCardToSeat(targetCoords) {
             return new Promise((resolve) => {
                 const arenaWrapper = document.getElementById('arenaWrapper');
-                const rectWrapper = arenaWrapper.getBoundingClientRect();
-                const rectSeat = seatElement.getBoundingClientRect();
-
-                const startX = rectWrapper.width / 2 - 10;
-                const startY = 60;
-                const targetX = rectSeat.left - rectWrapper.left + rectSeat.width / 2 - 10;
-                const targetY = rectSeat.top - rectWrapper.top + rectSeat.height / 2 - 15;
+                const startX = arenaWrapper.clientWidth / 2 - 10;
+                const startY = 50;
 
                 const cardFly = document.createElement('div');
                 cardFly.className = 'flying-card-item';
@@ -624,41 +620,52 @@
                 cardFly.style.top = `${startY}px`;
                 arenaWrapper.appendChild(cardFly);
 
-                setTimeout(() => {
-                    cardFly.style.left = `${targetX}px`;
-                    cardFly.style.top = `${targetY}px`;
+                requestAnimationFrame(() => {
+                    cardFly.style.left = `${targetCoords.x}px`;
+                    cardFly.style.top = `${targetCoords.y}px`;
                     cardFly.style.transform = 'scale(0.85) rotate(10deg)';
                     cardFly.style.opacity = '0.95';
-                }, 40);
+                });
 
                 setTimeout(() => {
                     cardFly.remove();
                     resolve();
-                }, 1300);
+                }, 550); // سرعت انیمیشن کارت سریع‌تر شد
             });
         }
 
         async function dealCardsInRounds() {
             const banner = document.getElementById('statusBanner');
+            const arenaWrapper = document.getElementById('arenaWrapper');
+            const wrapperRect = arenaWrapper.getBoundingClientRect();
+
+            // کش کردن مختصات صندلی‌ها پیش از شروع حلقه برای جلوگیری از لگ (Layout Thrashing)
+            const cachedCoords = seatRefs.map(ref => {
+                const r = ref.element.getBoundingClientRect();
+                return {
+                    x: r.left - wrapperRect.left + r.width / 2 - 10,
+                    y: r.top - wrapperRect.top + r.height / 2 - 15
+                };
+            });
 
             // کارت اول
-            banner.innerText = "دیلر در حال پخش «کارت اول» به تمام بازیکنان دور میز است...";
+            banner.innerText = "دیلر در حال پخش «کارت اول» با سرعت بالا به بازیکنان است...";
             const cardData1 = Array.from({length: 20}, () => getRandomCard());
 
             for (let i = 0; i < 20; i++) {
-                await flyCardToSeat(seatRefs[i].element);
+                await flyCardToSeat(cachedCoords[i]);
                 document.getElementById(`seatCard1-${i}`).innerText = `${cardData1[i].val}${cardData1[i].symbol}`;
-                await new Promise(r => setTimeout(r, 90));
+                await new Promise(r => setTimeout(r, 40)); // فاصله زمانی کمتر برای سرعت بیشتر
             }
 
             // کارت دوم
-            banner.innerText = "پخش کارت اول تمام شد. اکنون «کارت دوم» به بازیکنان داده می‌شود...";
+            banner.innerText = "پخش کارت اول تمام شد. در حال پخش «کارت دوم»...";
             const cardData2 = Array.from({length: 20}, () => getRandomCard());
 
             for (let i = 0; i < 20; i++) {
-                await flyCardToSeat(seatRefs[i].element);
+                await flyCardToSeat(cachedCoords[i]);
                 document.getElementById(`seatCard2-${i}`).innerText = `${cardData2[i].val}${cardData2[i].symbol}`;
-                await new Promise(r => setTimeout(r, 90));
+                await new Promise(r => setTimeout(r, 40)); // فاصله زمانی کمتر برای سرعت بیشتر
             }
         }
 
@@ -683,7 +690,7 @@
             await dealCardsInRounds();
 
             const banner = document.getElementById('statusBanner');
-            banner.innerText = "توزیع صندلی‌ها کامل شد. باز شدن کارت‌های اصلی میز (Player & Banker)...";
+            banner.innerText = "توزیع دوره‌ای کارت‌ها کامل شد. باز شدن کارت‌های اصلی میز (Player & Banker)...";
 
             setTimeout(() => {
                 const p1 = getRandomCard();
@@ -724,7 +731,7 @@
 
                 balanceEl.innerText = currentBalance.toLocaleString();
                 banner.innerText = resultText;
-            }, 1000);
+            }, 800);
         }
     </script>
 </body>
