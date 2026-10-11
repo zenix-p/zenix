@@ -20,14 +20,24 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', 'Vazirmatn', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
         
+        html { 
+            min-height: 100%; 
+            background: #07100e; 
+            overflow-x: hidden;
+        }
+
         body {
-            background: var(--bg-dark);
+            position: relative;
+            isolation: isolate;
             min-height: 100vh;
+            min-height: 100svh;
+            background: var(--bg-dark);
             color: #f8fafc;
             display: flex;
             flex-direction: column;
-            padding-bottom: 75px;
+            padding-bottom: env(safe-area-inset-bottom, 20px);
             overflow-x: hidden;
+            width: 100%;
         }
 
         header {
@@ -40,6 +50,7 @@
             z-index: 100;
             backdrop-filter: blur(10px);
             flex-shrink: 0;
+            width: 100%;
         }
         .game-header-title { font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 800; color: #facc15; display: flex; align-items: center; gap: 5px; }
         .live-badge { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; padding: 2px 6px; border-radius: 6px; font-size: 8px; font-weight: 800; display: flex; align-items: center; gap: 3px; }
@@ -53,6 +64,7 @@
             align-items: center;
             gap: 8px;
             flex-shrink: 0;
+            width: 100%;
         }
 
         .user-welcome-tag {
@@ -96,18 +108,19 @@
             margin: 0 auto;
             gap: 10px;
             flex: 1;
+            box-sizing: border-box;
         }
 
-        /* طراحی میز هلالی و کازینویی واقعی */
+        /* طراحی میز هلالی و کازینویی واقعی (بدون تغییر طراحی) */
         .casino-felt-table {
             width: 100%;
             background: radial-gradient(circle at 50% 20%, #065f46 0%, #064e3b 50%, #022c22 100%);
             border: 5px solid #1e293b;
-            border-top-left-radius: 120px;
-            border-top-right-radius: 120px;
+            border-top-left-radius: 200px;
+            border-top-right-radius: 200px;
             border-bottom-left-radius: 20px;
             border-bottom-right-radius: 20px;
-            padding: 12px;
+            padding: 15px;
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -115,7 +128,7 @@
             position: relative;
         }
 
-        /* جایگاه دیلر و کفش کارت (Shoe & Chip Tray) در مرکز بالای میز */
+        /* جایگاه دیلر و کفش کارت در مرکز بالای میز */
         .dealer-tray-section {
             background: rgba(15, 23, 42, 0.85);
             border: 2px solid #ca8a04;
@@ -287,42 +300,50 @@
         .form-input{width:100%;background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px;color:#fff;font-size:10px;outline:none;margin-top:4px;margin-bottom:8px}
         .btn-submit-deposit{width:100%;background:linear-gradient(135deg,#facc15,#f97316);color:#0f172a;border:none;padding:7px;border-radius:6px;font-weight:800;cursor:pointer;font-size:10px}
 
-        /* Media queries for extra small mobile screens */
-        @media (max-width: 380px) {
-            .casino-felt-table {
-                border-top-left-radius: 90px;
-                border-top-right-radius: 90px;
-                padding: 8px;
+        /* اصلاحات برای موبایل‌های خیلی کوچک جهت جلوگیری از بیرون زدگی */
+        @media (max-width: 360px) {
+            .main-stage {
+                padding: 4px;
+                gap: 6px;
             }
-            .playing-card {
-                width: 34px;
-                height: 50px;
-                font-size: 9px;
+            .casino-felt-table {
+                padding: 10px;
+                border-top-left-radius: 140px;
+                border-top-right-radius: 140px;
             }
         }
     </style>
 </head>
 <body>
+
     <header>
         <div class="game-header-title">
-            <span class="live-badge"><i class="fa-solid fa-circle"></i> زنده</span>
-            میز کازینویی باکارات - Zenix Casino
+            <i class="fa-solid fa-gem"></i> Zenix Baccarat
+        </div>
+        <div class="live-badge">
+            <i class="fa-solid fa-circle" style="font-size: 5px;"></i> زنده
         </div>
     </header>
 
     <div class="game-bar">
-        <div class="user-welcome-tag"><i class="fa-solid fa-user"></i> خوش آمدید</div>
+        <div class="user-welcome-tag">
+            <i class="fa-solid fa-user-circle"></i> کاربر گرامی
+        </div>
         <div class="user-stats">
             <div class="stat-pill">
-                <i class="fa-solid fa-wallet" style="color: var(--gold-accent); font-size: 9px;"></i>
-                <span class="stat-val">10,000</span>
+                <span style="font-size: 8px; color: #94a3b8;">موجودی:</span>
+                <span class="stat-val" id="userBalance">50,000</span>
             </div>
+            <button class="casino-deposit-btn" onclick="openDepositModal()">
+                <i class="fa-solid fa-plus"></i> شارژ
+            </button>
         </div>
-        <button class="casino-deposit-btn"><i class="fa-solid fa-plus"></i> شارژ</button>
     </div>
 
     <div class="main-stage">
+        <!-- میز هلالی و کازینویی واقعی -->
         <div class="casino-felt-table">
+            <!-- جایگاه دیلر و کفش کارت -->
             <div class="dealer-tray-section">
                 <div class="chip-rack">
                     <span class="casino-chip chip-red"></span>
@@ -330,33 +351,103 @@
                     <span class="casino-chip chip-blue"></span>
                     <span class="casino-chip chip-black"></span>
                 </div>
-            </div>
-            <div class="live-status-banner">آماده برای شروع دور جدید</div>
-            <div class="arena-layout">
-                <div class="arena-box player-side">
-                    <div class="arena-title"><span>بازیکن</span><span id="player-score" class="stat-val">0</span></div>
-                    <div class="cards-row" id="player-cards"></div>
+                <div style="font-family: 'Orbitron'; font-size: 9px; color: #cbd5e1; font-weight: 700;">
+                    SHOHE 8-DECK
                 </div>
+            </div>
+
+            <div class="live-status-banner" id="gameStatusBanner">
+                لطفاً مبلغ خود را انتخاب کرده و شرط ثبت کنید
+            </div>
+
+            <!-- ناحیه بازی بازیکن و دیلر روی نمد میز -->
+            <div class="arena-layout">
+                <!-- جایگاه بازیکن (Player) -->
+                <div class="arena-box player-side">
+                    <div class="arena-title">
+                        <span>بازیکن</span>
+                        <span id="playerScore" style="color: #38bdf8;">0</span>
+                    </div>
+                    <div class="cards-row" id="playerCards">
+                        <!-- کارت‌ها اینجا اضافه می‌شوند -->
+                    </div>
+                </div>
+
+                <!-- جایگاه بانکر (Banker) -->
                 <div class="arena-box banker-side">
-                    <div class="arena-title"><span>بانکر</span><span id="banker-score" class="stat-val">0</span></div>
-                    <div class="cards-row" id="banker-cards"></div>
+                    <div class="arena-title">
+                        <span>بانکر</span>
+                        <span id="bankerScore" style="color: #ef4444;">0</span>
+                    </div>
+                    <div class="cards-row" id="bankerCards">
+                        <!-- کارت‌ها اینجا اضافه می‌شوند -->
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- کنترل پنل پایین صفحه -->
         <div class="control-panel">
             <div class="control-row">
                 <div class="bet-input-box">
-                    <i class="fa-solid fa-coins" style="color: var(--gold-accent); font-size: 10px;"></i>
-                    <input type="number" id="bet-amount" class="bet-input" value="100" min="10">
+                    <span style="font-size: 8px; color: #94a3b8;">مبلغ شرط:</span>
+                    <input type="number" id="betAmount" class="bet-input" value="1000">
                 </div>
             </div>
-            <div class="control-row">
-                <button class="btn-action btn-yes" id="btn-player">شرط بازیکن</button>
-                <button class="btn-action btn-no" id="btn-banker">شرط بانکر</button>
+            <div class="control-row" style="gap: 6px;">
+                <button class="btn-action btn-yes" onclick="placeBet('player')">بازیکن (برد)</button>
+                <button class="btn-action btn-no" onclick="placeBet('banker')">بانکر (برد)</button>
             </div>
-            <button class="btn-action btn-deal" id="btn-deal">شروع و پخش کارت</button>
+            <div class="control-row">
+                <button class="btn-action btn-deal" onclick="startDeal()">شروع بازی / کارت‌دهی</button>
+            </div>
         </div>
     </div>
+
+    <!-- مدال شارژ حساب -->
+    <div class="modal" id="depositModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>شارژ کیف پول کازینو</span>
+                <button class="modal-close" onclick="closeDepositModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <label style="font-size: 9px; color: #94a3b8; margin-bottom: 2px; display: block;">مبلغ به تومان:</label>
+            <input type="number" id="depositInput" class="form-input" value="100000">
+            <button class="btn-submit-deposit" onclick="submitDeposit()">تایید و افزایش موجودی</button>
+        </div>
+    </div>
+
+    <script>
+        function openDepositModal() {
+            document.getElementById('depositModal').classList.add('show');
+        }
+        function closeDepositModal() {
+            document.getElementById('depositModal').classList.remove('show');
+        }
+        function submitDeposit() {
+            alert('موجودی با موفقیت افزوده شد.');
+            closeDepositModal();
+        }
+        function placeBet(type) {
+            alert('شرط شما روی ' + (type === 'player' ? 'بازیکن' : 'بانکر') + ' ثبت شد.');
+        }
+        function startDeal() {
+            // نمونه ساده برای کارت‌دهی تستی
+            const pCards = document.getElementById('playerCards');
+            pCards.innerHTML = `
+                <div class="playing-card red"><span>9</span><span class="card-symbol">♥</span><span>9</span></div>
+                <div class="playing-card"><span>8</span><span class="card-symbol">♠</span><span>8</span></div>
+            `;
+            document.getElementById('playerScore').innerText = '7';
+
+            const bCards = document.getElementById('bankerCards');
+            bCards.innerHTML = `
+                <div class="playing-card red"><span>K</span><span class="card-symbol">♦</span><span>K</span></div>
+                <div class="playing-card red"><span>6</span><span class="card-symbol">♥</span><span>6</span></div>
+            `;
+            document.getElementById('bankerScore').innerText = '6';
+            document.getElementById('gameStatusBanner').innerText = 'بازیکن برنده شد!';
+        }
+    </script>
 </body>
 </html>
