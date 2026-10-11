@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="theme-color" content="#031b16">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>بازی زنده باکارت - Zenix Live Baccarat</title>
+    <title>میز ۲۰ نفره باکارت زنده - Zenix Live Baccarat 20-Player</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -29,13 +29,13 @@
             position: relative;
         }
 
-        /* پس‌زمینه استودیوی لوکس کازینو و دیلر زنده */
+        /* پس‌زمینه استودیوی لوکس کازینو */
         body::before {
             content: "";
             position: fixed;
             inset: 0;
             z-index: -1;
-            background-image: linear-gradient(180deg, rgba(3, 15, 11, 0.45) 0%, rgba(3, 7, 18, 0.85) 60%, rgba(3, 7, 18, 0.95) 100%), 
+            background-image: linear-gradient(180deg, rgba(3, 15, 11, 0.5) 0%, rgba(3, 7, 18, 0.85) 60%, rgba(3, 7, 18, 0.98) 100%), 
                               url("https://images.unsplash.com/photo-1511193311914-0346f16efe90?q=80&w=1920&auto=format&fit=crop");
             background-position: center center;
             background-repeat: no-repeat;
@@ -105,25 +105,24 @@
             align-items: center;
             padding: 16px;
             width: 100%;
-            max-width: 650px;
+            max-width: 850px;
             margin: 0 auto;
             gap: 14px;
             flex: 1;
-            justify-content: center;
         }
 
-        /* میز باکارت ماهوت سبز */
+        /* میز باکارت ماهوت سبز با ظرفیت ۲۰ نفره */
         .casino-felt-table {
             width: 100%;
-            background: radial-gradient(circle at 50% 30%, rgba(6, 95, 70, 0.92) 0%, rgba(6, 78, 59, 0.96) 60%, rgba(2, 44, 34, 0.99) 100%);
+            background: radial-gradient(circle at 50% 30%, rgba(6, 95, 70, 0.94) 0%, rgba(6, 78, 59, 0.98) 70%, rgba(2, 44, 34, 0.99) 100%);
             border: 4px solid #1e293b;
             border-radius: 24px;
-            padding: 18px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 14px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 0 30px rgba(0,0,0,0.5);
-            backdrop-filter: blur(5px);
+            gap: 12px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.85), inset 0 0 35px rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
         }
 
         .dealer-tray-section {
@@ -146,8 +145,8 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
         .casino-chip {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             border: 2px dashed #fff;
             display: inline-block;
@@ -158,6 +157,57 @@
         .chip-blue { background: #2563eb; }
         .chip-black { background: #111827; }
 
+        /* صندلی‌های ۲۰ نفره آنلاین دور میز */
+        .seats-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.3);
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .seats-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            max-height: 140px;
+            overflow-y: auto;
+            padding: 2px;
+        }
+        .seats-container::-webkit-scrollbar { width: 3px; }
+        .seats-container::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+        .seat-card {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            padding: 4px 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 9px;
+        }
+        .seat-card.active { border-color: rgba(56, 189, 248, 0.4); }
+        .seat-card.empty { border-style: dashed; opacity: 0.5; }
+        .seat-avatar { 
+            width: 20px; 
+            height: 20px; 
+            border-radius: 50%; 
+            background: #0f172a; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: #38bdf8; 
+            font-size: 9px; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            flex-shrink: 0;
+        }
+
         .live-status-banner {
             text-align: center;
             font-family: 'Vazirmatn';
@@ -165,7 +215,7 @@
             font-size: 11px;
             color: var(--gold-accent);
             background: rgba(0, 0, 0, 0.5);
-            padding: 8px;
+            padding: 7px;
             border-radius: 8px;
             border: 1px solid var(--glass-border);
             width: 100%;
@@ -174,18 +224,18 @@
         .arena-layout {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 10px;
         }
 
         .arena-box {
             background: rgba(0, 0, 0, 0.4);
             border: 1px solid var(--glass-border);
             border-radius: 12px;
-            padding: 12px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         .arena-box.player-side { border-color: rgba(56,189,248,0.5); }
         .arena-box.banker-side { border-color: rgba(239,68,68,0.5); }
@@ -203,32 +253,32 @@
         .cards-row {
             display: flex;
             gap: 6px;
-            min-height: 70px;
+            min-height: 62px;
             align-items: center;
             justify-content: center;
         }
 
         .playing-card {
-            width: 44px;
-            height: 64px;
+            width: 40px;
+            height: 58px;
             background: #ffffff;
             color: #0f172a;
             border-radius: 6px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 4px;
+            padding: 3px;
             font-family: 'Orbitron';
             font-weight: 900;
-            font-size: 11px;
+            font-size: 10px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.7);
             border: 1px solid #cbd5e1;
             animation: cardDeal 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .playing-card.red { color: #dc2626; }
-        .card-symbol { font-size: 15px; align-self: center; line-height: 1; }
+        .card-symbol { font-size: 14px; align-self: center; line-height: 1; }
         @keyframes cardDeal { 
-            0% { transform: translateY(-50px) scale(0.3) rotate(-15deg); opacity: 0; } 
+            0% { transform: translateY(-40px) scale(0.3) rotate(-15deg); opacity: 0; } 
             100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; } 
         }
 
@@ -293,7 +343,7 @@
         .btn-tie { background: linear-gradient(135deg, #10b981, #059669); color: #030712; }
         .btn-deal { background: linear-gradient(135deg, #facc15, #f97316); color: #030712; width: 100%; margin-top: 4px; }
 
-        /* مودال شارژ حساب */
+        /* مودال شارژ */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2,6,23,0.85); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(10px); padding: 16px; }
         .modal.show { display: flex; }
         .modal-content { background: linear-gradient(135deg, #0f172a, #1e293b); border: 1px solid rgba(250,204,21,0.3); border-radius: 16px; width: 100%; max-width: 360px; display: flex; flex-direction: column; padding: 18px; box-shadow: 0 20px 40px rgba(0,0,0,0.9); }
@@ -308,18 +358,18 @@
     <header>
         <div class="game-header-title">
             <i class="fa-solid fa-crown" style="color: #facc15;"></i>
-            <span>ZENIX LIVE BACCARAT</span>
+            <span>ZENIX LIVE BACCARAT (20-PLAYER TABLE)</span>
         </div>
         <div class="live-badge">
             <i class="fa-solid fa-circle" style="font-size: 6px;"></i>
-            <span>پخش زنده میز ۰۴</span>
+            <span>پخش زنده میز ۰۴ VIP</span>
         </div>
     </header>
 
     <div class="game-bar">
         <div class="user-welcome-tag">
             <i class="fa-solid fa-user-circle"></i>
-            <span>بازیکن VIP</span>
+            <span>بازیکن VIP (صندلی ۱)</span>
         </div>
         
         <div class="user-stats">
@@ -350,12 +400,22 @@
                     <span class="casino-chip chip-black"></span>
                 </div>
                 <div style="font-family:'Orbitron'; font-size:9px; color:#ca8a04; border:1px solid #ca8a04; padding:3px 8px; border-radius:4px;">
-                    BACCARAT VIP
+                    TABLE #20-VIP
                 </div>
             </div>
 
+            <!-- صندلی‌های ۲۰ نفره دور میز باکارت -->
+            <div class="seats-section-title">
+                <span>بازیکنان آنلاین دور میز (۲۰ نفر):</span>
+                <span style="font-size: 9px; color: #22c55e;">● ۱۸ آنلاین و فعال | ۲ صندلی خالی</span>
+            </div>
+            
+            <div class="seats-container" id="seatsGrid">
+                <!-- تولید خودکار توسط جاوا اسکریپت -->
+            </div>
+
             <div class="live-status-banner" id="statusBanner">
-                لطفا نوع شرط خود را انتخاب کرده و دکمه توزیع کارت را بزنید.
+                نوع شرط خود را انتخاب کرده و دکمه توزیع کارت را بزنید.
             </div>
 
             <div class="arena-layout">
@@ -424,6 +484,32 @@
     </div>
 
     <script>
+        // ساخت خودکار ۲۰ صندلی دور میز باکارت
+        const playerNames = [
+            "شما (صندلی ۱)", "آریا", "کوروش", "سارا_م", "دانیال", 
+            "رضا_ب", "نیما_ایکس", "الناز_ف", "پرهام", "سهیل", 
+            "آوین", "مهرشاد", "کامران", "شایان", "باربد", 
+            "آتوسا", "سهراب", "بهنام", "صندلی خالی #۱۹", "صندلی خالی #۲۰"
+        ];
+
+        const seatsGrid = document.getElementById('seatsGrid');
+        playerNames.forEach((name, index) => {
+            const isEmpty = name.includes('صندلی خالی');
+            const isUser = index === 0;
+
+            const seatDiv = document.createElement('div');
+            seatDiv.className = `seat-card ${isEmpty ? 'empty' : 'active'}`;
+            seatDiv.innerHTML = `
+                <div class="seat-avatar">
+                    <i class="fa-solid ${isEmpty ? 'fa-chair' : 'fa-user'}"></i>
+                </div>
+                <div style="font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: ${isUser ? '#facc15' : '#fff'};">
+                    ${name}
+                </div>
+            `;
+            seatsGrid.appendChild(seatDiv);
+        });
+
         let selectedBet = 'PLAYER';
 
         function selectBetType(type) {
@@ -459,7 +545,6 @@
             const val = values[Math.floor(Math.random() * values.length)];
             const suit = suits[Math.floor(Math.random() * suits.length)];
             
-            // محاسبه امتیاز باکارت
             let scoreVal = 0;
             if(['10', 'J', 'Q', 'K'].includes(val)) scoreVal = 0;
             else if(val === 'A') scoreVal = 1;
@@ -478,15 +563,13 @@
                 return;
             }
 
-            // کسر مبلغ شرط از موجودی
             currentBalance -= betVal;
             balanceEl.innerText = currentBalance.toLocaleString();
 
             const banner = document.getElementById('statusBanner');
-            banner.innerText = "دیلر در حال کشیدن کارت‌های باکارت است...";
+            banner.innerText = "دیلر در حال کشیدن کارت‌های باکارت برای ۲۰ بازیکن است...";
 
             setTimeout(() => {
-                // تولید ۲ کارت برای بازیکن و ۲ کارت برای بانکر
                 const p1 = getRandomCard();
                 const p2 = getRandomCard();
                 const b1 = getRandomCard();
@@ -495,36 +578,32 @@
                 const pScore = (p1.score + p2.score) % 10;
                 const bScore = (b1.score + b2.score) % 10;
 
-                // رندر کارت‌های بازیکن
                 document.getElementById('playerCards').innerHTML = `
                     <div class="playing-card ${p1.cssClass}"><div>${p1.val}</div><div class="card-symbol">${p1.symbol}</div><div style="transform: rotate(180deg);">${p1.val}</div></div>
                     <div class="playing-card ${p2.cssClass}"><div>${p2.val}</div><div class="card-symbol">${p2.symbol}</div><div style="transform: rotate(180deg);">${p2.val}</div></div>
                 `;
                 document.getElementById('playerScore').innerText = pScore;
 
-                // رندر کارت‌های بانکر
                 document.getElementById('bankerCards').innerHTML = `
                     <div class="playing-card ${b1.cssClass}"><div>${b1.val}</div><div class="card-symbol">${b1.symbol}</div><div style="transform: rotate(180deg);">${b1.val}</div></div>
                     <div class="playing-card ${b2.cssClass}"><div>${b2.val}</div><div class="card-symbol">${b2.symbol}</div><div style="transform: rotate(180deg);">${b2.val}</div></div>
                 `;
                 document.getElementById('bankerScore').innerText = bScore;
 
-                // تعیین برنده
                 let winner = '';
                 if (pScore > bScore) winner = 'PLAYER';
                 else if (bScore > pScore) winner = 'BANKER';
                 else winner = 'TIE';
 
-                let resultText = `برنده دست: ${winner === 'PLAYER' ? 'بازیکن' : winner === 'BANKER' ? 'بانکر' : 'مساوی'}. `;
+                let resultText = `نتیجه دست: ${winner === 'PLAYER' ? 'بازیکن' : winner === 'BANKER' ? 'بانکر' : 'مساوی'}. `;
 
                 if (selectedBet === winner) {
                     let multiplier = (winner === 'TIE') ? 8 : (winner === 'BANKER' ? 1.95 : 2);
                     let winnings = Math.floor(betVal * multiplier);
                     currentBalance += winnings;
-                    balanceelf = currentBalance;
-                    resultText += `تبریک! شما برنده شدید و ${winnings.toLocaleString()} تومان جایزه گرفتید!`;
+                    resultText += `تبریک! شما برنده شدید و ${winnings.toLocaleString()} تومان دریافت کردید!`;
                 } else {
-                    resultText += `متأسفانه این دست را باختید.`;
+                    resultText += `این دست رو باختید.`;
                 }
 
                 balanceEl.innerText = currentBalance.toLocaleString();
