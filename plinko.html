@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>باکارات آنلاین - Zenix Casino</title>
+    <title>باکارات زنده (میز ۲۰ نفره) - Zenix Casino</title>
     <link rel="icon" href="data:image/x-icon;base64,=">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,6 +44,7 @@
             flex-shrink: 0;
         }
         .game-header-title { font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 800; color: #facc15; display: flex; align-items: center; gap: 5px; }
+        .live-badge { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; padding: 2px 6px; border-radius: 6px; font-size: 8px; font-weight: 800; display: flex; align-items: center; gap: 3px; }
         .guide-btn {
             background: rgba(56, 189, 248, 0.15);
             border: 1px solid rgba(56, 189, 248, 0.3);
@@ -106,7 +107,7 @@
             align-items: center;
             padding: 8px;
             width: 100%;
-            max-width: 480px;
+            max-width: 520px;
             margin: 0 auto;
             gap: 10px;
             flex: 1;
@@ -117,80 +118,108 @@
             background: var(--felt-green);
             border: 3px solid var(--felt-border);
             border-radius: 14px;
-            padding: 12px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             gap: 10px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
 
-        .arena-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        .arena-box {
-            background: rgba(0,0,0,0.35);
-            border: 1px solid var(--glass-border);
+        /* استودیو دیلر */
+        .dealer-studio {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(250,204,21,0.4);
             border-radius: 10px;
             padding: 8px;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-        }
-        .arena-box.player-side { border-color: rgba(56,189,248,0.4); }
-        .arena-box.banker-side { border-color: rgba(239,68,68,0.4); }
-
-        .arena-title {
-            font-family: 'Orbitron';
-            font-size: 10px;
-            font-weight: 800;
-            color: #facc15;
-            display: flex;
             justify-content: space-between;
-            width: 100%;
-        }
-
-        .cards-row {
-            display: flex;
-            gap: 5px;
-            min-height: 55px;
             align-items: center;
-            justify-content: center;
         }
+        .dealer-info { display: flex; align-items: center; gap: 6px; }
+        .dealer-avatar { width: 32px; height: 32px; border-radius: 50%; background: #facc15; color: #0f172a; display: flex; justify-content: center; align-items: center; font-weight: 900; font-size: 14px; }
 
-        .playing-card {
-            width: 36px;
-            height: 52px;
-            background: #fff;
-            color: #0f172a;
-            border-radius: 5px;
+        .dealer-cards-area {
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 3px;
-            font-family: 'Orbitron';
-            font-weight: 900;
-            font-size: 10.5px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
-            animation: cardAppear 0.3s ease;
+            gap: 4px;
+            align-items: center;
         }
-        .playing-card.red { color: #dc2626; }
-        @keyframes cardAppear { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        .game-status-banner {
+        .live-status-banner {
             text-align: center;
             font-family: 'Orbitron';
             font-weight: 800;
-            font-size: 10px;
+            font-size: 9.5px;
             color: var(--gold-accent);
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
             padding: 6px;
             border-radius: 6px;
             border: 1px solid var(--glass-border);
         }
+
+        /* کانتینر صندلی‌های ۲۰ نفره */
+        .seats-viewport {
+            max-height: 220px;
+            overflow-y: auto;
+            padding-right: 3px;
+        }
+        .seats-viewport::-webkit-scrollbar { width: 4px; }
+        .seats-viewport::-webkit-scrollbar-thumb { background: rgba(250,204,21,0.3); border-radius: 4px; }
+
+        .seats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+        }
+
+        .player-seat {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 5px 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .player-seat.user-seat {
+            border-color: var(--gold-accent);
+            background: rgba(250, 204, 21, 0.12);
+            box-shadow: 0 0 10px rgba(250,204,21,0.2);
+        }
+
+        .seat-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 8.5px;
+            font-weight: 800;
+            color: #f8fafc;
+            font-family: 'Orbitron';
+        }
+
+        .cards-row {
+            display: flex;
+            gap: 3px;
+            min-height: 45px;
+            align-items: center;
+        }
+
+        .playing-card {
+            width: 30px;
+            height: 44px;
+            background: #fff;
+            color: #0f172a;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 2px;
+            font-family: 'Orbitron';
+            font-weight: 900;
+            font-size: 9.5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            animation: cardAppear 0.3s ease;
+        }
+        .playing-card.red { color: #dc2626; }
+        @keyframes cardAppear { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
         .control-panel {
             width: 100%;
@@ -208,31 +237,6 @@
             justify-content: space-between;
             align-items: center;
             gap: 6px;
-        }
-
-        .bet-type-btns {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
-            width: 100%;
-        }
-
-        .btn-bet-type {
-            background: rgba(255,255,255,0.06);
-            border: 1px solid var(--glass-border);
-            color: #fff;
-            padding: 6px;
-            border-radius: 6px;
-            font-size: 9px;
-            font-weight: 800;
-            cursor: pointer;
-            font-family: 'Orbitron';
-            text-align: center;
-        }
-        .btn-bet-type.active {
-            background: var(--gold-accent);
-            color: #0f172a;
-            border-color: var(--gold-accent);
         }
 
         .bet-input-box {
@@ -257,19 +261,21 @@
             text-align: center;
         }
 
-        .btn-deal {
-            width: 100%;
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: #030712;
-            border: none;
-            padding: 10px;
+        .btn-action {
+            flex: 1;
+            padding: 9px;
             border-radius: 8px;
             font-family: 'Orbitron';
             font-weight: 900;
-            font-size: 11px;
+            font-size: 10px;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(34,197,94,0.4);
+            border: none;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
+        .btn-yes { background: linear-gradient(135deg, #22c55e, #16a34a); color: #030712; }
+        .btn-no { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .btn-deal { background: linear-gradient(135deg, #38bdf8, #0ea5e9); color: #030712; width: 100%; }
 
         .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px);padding:10px;}
         .modal.show{display:flex}
@@ -283,8 +289,11 @@
 <body>
 
     <header>
-        <div class="game-header-title"><i class="fas fa-dice" style="color:#38bdf8;"></i> باکارات آنلاین (Baccarat)</div>
-        <button class="guide-btn" onclick="openHelpModal()"><i class="fas fa-question-circle"></i> راهنما</button>
+        <div class="game-header-title"><i class="fas fa-dice" style="color:#38bdf8;"></i> باکارات زنده (میز ۲۰ نفره)</div>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <div class="live-badge"><i class="fas fa-circle" style="font-size:6px;"></i> زنده</div>
+            <button class="guide-btn" onclick="openHelpModal()"><i class="fas fa-question-circle"></i> راهنما</button>
+        </div>
     </header>
 
     <div class="game-bar">
@@ -304,42 +313,46 @@
 
     <div class="main-stage">
         <div class="table-board">
-            <div class="arena-row">
-                <!-- دست بازیکن (Player) -->
-                <div class="arena-box player-side">
-                    <div class="arena-title">
-                        <span>بازیکن (Player)</span>
-                        <span id="player-score">0</span>
+            <!-- استودیوی دیلر -->
+            <div class="dealer-studio">
+                <div class="dealer-info">
+                    <div class="dealer-avatar"><i class="fas fa-user-tie"></i></div>
+                    <div>
+                        <div style="font-size:9px; color:#94a3b8; font-weight:700;">دیلر میز</div>
+                        <div style="font-family:'Orbitron'; font-size:10px; font-weight:800; color:#facc15;">لِوَن (Live Dealer)</div>
                     </div>
-                    <div class="cards-row" id="player-cards"></div>
                 </div>
-
-                <!-- دست بانکر / دیلر (Banker) -->
-                <div class="arena-box banker-side">
-                    <div class="arena-title">
-                        <span>بانکر (Banker)</span>
-                        <span id="banker-score">0</span>
-                    </div>
-                    <div class="cards-row" id="banker-cards"></div>
+                <div class="dealer-cards-area" id="dealer-cards">
+                    <!-- کارت‌های دیلر تا قبل از پایان بازی مخفی است -->
                 </div>
             </div>
 
-            <div class="game-status-banner" id="game-status-msg">نوع شرط و مبلغ را انتخاب کرده و دکمه شروع را بزنید</div>
+            <div class="live-status-banner" id="game-status-msg">آماده شروع دور جدید روی میز ۲۰ نفره</div>
+
+            <!-- اسکرول‌پید صندلی‌های ۲۰ بازیکن -->
+            <div class="seats-viewport">
+                <div class="seats-grid" id="seats-grid-container">
+                    <!-- به صورت داینامیک ۲۰ صندلی ساخته می‌شود -->
+                </div>
+            </div>
         </div>
 
         <div class="control-panel" id="bet-control-panel">
-            <div class="bet-type-btns">
-                <button class="btn-bet-type active" id="btn-bet-player" onclick="setBetType('PLAYER')">بازیکن (2x)</button>
-                <button class="btn-bet-type" id="btn-bet-tie" onclick="setBetType('TIE')">مساوی (8x)</button>
-                <button class="btn-bet-type" id="btn-bet-banker" onclick="setBetType('BANKER')">بانکر (1.95x)</button>
-            </div>
             <div class="control-row">
                 <span style="font-size:9.5px; color:#94a3b8; font-weight:700;">مبلغ شرط ($):</span>
                 <div class="bet-input-box">
                     <input type="number" id="bet-amount" class="bet-input" value="10" min="1">
                 </div>
             </div>
-            <button class="btn-deal" onclick="startBaccaratRound()">شروع بازی (پخش کارت)</button>
+            <button class="btn-action btn-deal" id="btn-start" onclick="startLiveRound()">شروع بازی (پخش کارت توسط دیلر)</button>
+        </div>
+
+        <div class="control-panel" id="action-control-panel" style="display: none;">
+            <div class="live-status-banner" style="margin-bottom:4px; color:#38bdf8;">دیلر می‌پرسد: آیا کارت سوم می‌خواهید؟</div>
+            <div class="control-row">
+                <button class="btn-action btn-yes" onclick="answerThirdCard(true)">بله، کارت بده</button>
+                <button class="btn-action btn-no" onclick="answerThirdCard(false)">خیر، می‌ایستم</button>
+            </div>
         </div>
     </div>
 
@@ -359,13 +372,14 @@
     <div class="modal" id="m-help">
         <div class="modal-content" style="max-width: 320px;">
             <div class="modal-header">
-                <span><i class="fas fa-graduation-cap" style="color:#facc15;"></i> راهنمای بازی باکارات</span>
+                <span><i class="fas fa-graduation-cap" style="color:#facc15;"></i> راهنمای میز باکارات زنده ۲۰ نفره</span>
                 <button class="modal-close" onclick="closeHelpModal()"><i class="fas fa-times"></i></button>
             </div>
             <div style="overflow-y:auto; max-height: 60vh; font-size:9.5px; color:#cbd5e1; line-height:1.6;">
-                <p style="margin-bottom:8px;"><strong style="color:#facc15;">هدف بازی:</strong> پیش‌بینی کنید که دست «بازیکن (Player)» یا «بانکر (Banker)» به امتیاز ۹ نزدیک‌تر خواهد بود یا مساوی می‌شود.</p>
-                <p style="margin-bottom:8px;"><strong style="color:#38bdf8;">ارزش کارت‌ها:</strong> کارت‌های ۱۰، شاه، بی‌بی و سرباز امتیاز **صفر** دارند. آس معادل **۱** و بقیه کارت‌ها ارزش روی خود را دارند. مجموع امتیاز بر اساس رقم یکان محاسبه می‌شود.</p>
-                <p style="margin-bottom:6px;"><strong style="color:#22c55e;">ناتورال (Natural):</strong> اگر امتیاز اولیه بازیکن یا بانکر ۸ یا ۹ باشد، بازی بلافاصله با آن دست برنده به پایان می‌رسد.</p>
+                <p style="margin-bottom:8px;"><strong style="color:#facc15;">میز ۲۰ نفره:</strong> در این میز زنده، شما به همراه ۱۹ بازیکن دیگر حضور دارید و دیلر به نوبت کارت‌ها را پخش می‌کند.</p>
+                <p style="margin-bottom:8px;"><strong style="color:#38bdf8;">روند پخش کارت:</strong> در دو دور اولیه، دیلر کارت‌ها را بین بازیکنان و خود تقسیم می‌کند.</p>
+                <p style="margin-bottom:8px;"><strong style="color:#ef4444;">پرسش کارت سوم:</strong> دیلر از شما (و به صورت اتوماتیک از سایر بازیکنان) می‌پرسد که آیا کارت سوم می‌خواهید یا خیر.</p>
+                <p style="margin-bottom:6px;"><strong style="color:#22c55e;">رو شدن کارت‌ها:</strong> دیلر تا پایان تصمیم‌گیری همه بازیکنان، کارت‌های خود را مخفی نگه می‌دارد و سپس برای مشخص شدن برنده کارت‌ها را رو می‌کند.</p>
             </div>
         </div>
     </div>
@@ -388,24 +402,28 @@
         let uUid = null;
         window.userBalance = 1500.00;
         let currentBet = 10;
-        let selectedBetType = 'PLAYER'; // PLAYER, BANKER, TIE
 
-        let playerHand = [];
-        let bankerHand = [];
+        // ایجاد ۲۰ بازیکن (صندلی ۱ شما هستید، صندلی ۲ تا ۲۰ ربات‌های حرفه‌ای)
+        const botNamesList = ['آرش', 'سارا', 'کوروش', 'مینا', 'رضا', 'کامران', 'لیلا', 'نیما', 'پویا', 'هدی', 'بابک', 'نازنین', 'فرید', 'الهام', 'سهراب', 'پارسا', 'غزل', 'کیارش', 'رویا'];
+        let players = [];
+        for (let i = 0; i < 20; i++) {
+            players.push({
+                id: i,
+                name: i === 0 ? 'شما (صندلی ۱)' : `${botNamesList[i - 1]} (صندلی ${i + 1})`,
+                isUser: i === 0,
+                hand: [],
+                status: 'PLAYING'
+            });
+        }
+
+        let dealerHand = [];
+        let gamePhase = 'WAITING';
 
         const suits = ['♠', '♥', '♦', '♣'];
         const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
-        window.setBetType = function(type) {
-            selectedBetType = type;
-            document.querySelectorAll('.btn-bet-type').forEach(b => b.classList.remove('active'));
-            if (type === 'PLAYER') document.getElementById('btn-bet-player').classList.add('active');
-            else if (type === 'BANKER') document.getElementById('btn-bet-banker').classList.add('active');
-            else if (type === 'TIE') document.getElementById('btn-bet-tie').classList.add('active');
-        };
-
         function getCardValue(card) {
-            if (['10', 'J', 'Q', 'K'].includes(card.val)) return 0;
+            if (['10', 'J', 'Q', 'K'].includes(card.val)) return 0; // ۱۰، شاه، بی‌بی، سرباز امتیاز ندارند
             if (card.val === 'A') return 1;
             return parseInt(card.val);
         }
@@ -413,7 +431,7 @@
         function calculateScore(hand) {
             let sum = 0;
             hand.forEach(c => sum += getCardValue(c));
-            return sum % 10; // رقم یکان مجموع امتیاز
+            return sum % 10;
         }
 
         async function fetchUserBalance() {
@@ -461,25 +479,41 @@
             return { suit, val, isRed: suit === '♥' || suit === '♦' };
         }
 
-        function renderHands(reveal = true) {
-            const pContainer = document.getElementById('player-cards');
-            const bContainer = document.getElementById('banker-cards');
-            pContainer.innerHTML = '';
-            bContainer.innerHTML = '';
+        function renderTable(revealDealer = false) {
+            const grid = document.getElementById('seats-grid-container');
+            grid.innerHTML = '';
 
-            playerHand.forEach(c => {
-                pContainer.innerHTML += `<div class="playing-card ${c.isRed ? 'red' : ''}"><span>${c.val}</span><span style="align-self:center; font-size:14px;">${c.suit}</span><span style="align-self:flex-end;">${c.val}</span></div>`;
+            players.forEach(p => {
+                let cardsHtml = '';
+                p.hand.forEach(c => {
+                    cardsHtml += `<div class="playing-card ${c.isRed ? 'red' : ''}"><span>${c.val}</span><span style="align-self:center; font-size:11px;">${c.suit}</span><span style="align-self:flex-end;">${c.val}</span></div>`;
+                });
+                const scoreText = (revealDealer || p.isUser) ? calculateScore(p.hand) : '??';
+
+                grid.innerHTML += `
+                    <div class="player-seat ${p.isUser ? 'user-seat' : ''}">
+                        <div class="seat-header">
+                            <span>${p.name}</span>
+                            <span>امتیاز: ${scoreText}</span>
+                        </div>
+                        <div class="cards-row">${cardsHtml}</div>
+                    </div>
+                `;
             });
 
-            bankerHand.forEach(c => {
-                bContainer.innerHTML += `<div class="playing-card ${c.isRed ? 'red' : ''}"><span>${c.val}</span><span style="align-self:center; font-size:14px;">${c.suit}</span><span style="align-self:flex-end;">${c.val}</span></div>`;
+            // دیلر
+            const dContainer = document.getElementById('dealer-cards');
+            dContainer.innerHTML = '';
+            dealerHand.forEach((c, idx) => {
+                if (idx === 0 && !revealDealer) {
+                    dContainer.innerHTML += `<div class="playing-card" style="background:#1e293b; color:#38bdf8; justify-content:center; align-items:center;"><i class="fas fa-lock"></i></div>`;
+                } else {
+                    dContainer.innerHTML += `<div class="playing-card ${c.isRed ? 'red' : ''}"><span>${c.val}</span><span style="align-self:center; font-size:11px;">${c.suit}</span><span style="align-self:flex-end;">${c.val}</span></div>`;
+                }
             });
-
-            document.getElementById('player-score').textContent = calculateScore(playerHand);
-            document.getElementById('banker-score').textContent = calculateScore(bankerHand);
         }
 
-        window.startBaccaratRound = async function() {
+        window.startLiveRound = async function() {
             const betInput = document.getElementById('bet-amount');
             currentBet = parseFloat(betInput?.value || 0);
 
@@ -492,68 +526,95 @@
             if (uUid) await supabase.from('users').update({ casino_balance: window.userBalance }).eq('id', uUid);
             updateStats();
 
-            // پخش دو کارت اولیه برای بازیکن و بانکر
-            playerHand = [drawCard(), drawCard()];
-            bankerHand = [drawCard(), drawCard()];
+            players.forEach(p => { p.hand = []; p.status = 'PLAYING'; });
+            dealerHand = [];
 
-            renderHands(true);
+            document.getElementById('game-status-msg').textContent = 'دیلر در حال پخش دور اول و دوم کارت‌ها...';
 
-            let pScore = calculateScore(playerHand);
-            let bScore = calculateScore(bankerHand);
+            // پخش دو دور کارت برای هر ۲۰ بازیکن و دیلر
+            players.forEach(p => p.hand.push(drawCard()));
+            dealerHand.push(drawCard());
 
-            // قوانین کارت سوم استاندارد باکارات
-            let playerThirdCard = null;
-            if (pScore <= 5 && bScore < 8 && pScore < 8) {
-                playerThirdCard = drawCard();
-                playerHand.push(playerThirdCard);
+            players.forEach(p => p.hand.push(drawCard()));
+            dealerHand.push(drawCard());
+
+            setTimeout(() => {
+                gamePhase = 'USER_TURN';
+                renderTable(false);
+                document.getElementById('game-status-msg').textContent = 'دیلر کارت‌ها را پخش کرد. منتظر پاسخ شما برای کارت سوم...';
+                document.getElementById('bet-control-panel').style.display = 'none';
+                document.getElementById('action-control-panel').style.display = 'block';
+            }, 1000);
+        };
+
+        window.answerThirdCard = function(wantThird) {
+            if (gamePhase !== 'USER_TURN') return;
+
+            if (wantThird && players[0].hand.length < 3) {
+                players[0].hand.push(drawCard());
             }
 
-            let pThirdVal = playerThirdCard ? getCardValue(playerThirdCard) : -1;
-            if (bankerHand.length === 2 && pScore < 8 && bScore < 8) {
-                let shouldDrawBanker = false;
-                if (bScore <= 2) shouldDrawBanker = true;
-                else if (bScore === 3 && pThirdVal !== 8) shouldDrawBanker = true;
-                else if (bScore === 4 && [2,3,4,5,6,7].includes(pThirdVal)) shouldDrawBanker = true;
-                else if (bScore === 5 && [4,5,6,7].includes(pThirdVal)) shouldDrawBanker = true;
-                else if (bScore === 6 && [6,7].includes(pThirdVal)) shouldDrawBanker = true;
+            renderTable(false);
+            document.getElementById('action-control-panel').style.display = 'none';
+            document.getElementById('game-status-msg').textContent = 'دیلر در حال بررسی تصمیمات سایر بازیکنان میز...';
 
-                if (shouldDrawBanker) {
-                    bankerHand.push(drawCard());
+            setTimeout(() => {
+                // تصمیم‌گیری اتوماتیک سایر بازیکنان (ربات‌ها)
+                for (let i = 1; i < players.length; i++) {
+                    let sc = calculateScore(players[i].hand);
+                    if (sc < 6 && Math.random() > 0.4 && players[i].hand.length < 3) {
+                        players[i].hand.push(drawCard());
+                    }
                 }
-            }
+                renderTable(false);
+                runDealerTurn();
+            }, 1200);
+        };
 
-            renderHands(true);
-            pScore = calculateScore(playerHand);
-            bScore = calculateScore(bankerHand);
+        function runDealerTurn() {
+            document.getElementById('game-status-msg').textContent = 'نوبت دیلر... بررسی امتیاز بانکی';
+            setTimeout(() => {
+                let dScore = calculateScore(dealerHand);
+                if (dScore < 6 && dealerHand.length < 3) {
+                    dealerHand.push(drawCard());
+                }
+                resolveShowdown();
+            }, 1200);
+        }
 
-            let winner = '';
-            if (pScore > bScore) winner = 'PLAYER';
-            else if (bScore > pScore) winner = 'BANKER';
-            else winner = 'TIE';
+        async function resolveShowdown() {
+            gamePhase = 'SHOWDOWN';
+            renderTable(true); // رو شدن کارت‌های دیلر برای همه
 
-            let payout = 0;
+            const pScore = calculateScore(players[0].hand);
+            const dScore = calculateScore(dealerHand);
+
+            let won = false;
+            let isDraw = false;
+
+            if (pScore > dScore) won = true;
+            else if (pScore === dScore) isDraw = true;
+            else won = false;
+
+            document.getElementById('bet-control-panel').style.display = 'block';
+
             let msg = '';
-
-            if (selectedBetType === winner) {
-                if (winner === 'TIE') {
-                    payout = currentBet * 9; // ضریب برد مساوی
-                    msg = `🎉 مساوی شد! پیش‌بینی درست شما برنده شد ($${payout.toFixed(2)})`;
-                } else if (winner === 'BANKER') {
-                    payout = currentBet * 1.95; // کمیسیون بانکر
-                    msg = `🎉 بانکر برنده شد! پیش‌بینی درست شما ($${payout.toFixed(2)})`;
-                } else {
-                    payout = currentBet * 2;
-                    msg = `🎉 بازیکن برنده شد! پیش‌بینی درست شما ($${payout.toFixed(2)})`;
-                }
+            if (isDraw) {
+                msg = `مساوی با دیلر (امتیاز شما: ${pScore}، دیلر: ${dScore}). مبلغ شرط برگشت.`;
+                window.userBalance += currentBet;
+            } else if (won) {
+                const payout = currentBet * 2;
+                msg = `🎉 تبریک! شما برنده شدید (امتیاز شما: ${pScore}، دیلر: ${dScore}) - جایزه: $${payout.toFixed(2)}`;
                 window.userBalance += payout;
             } else {
-                msg = `بازنده شدید! برنده این دور: ${winner === 'PLAYER' ? 'بازیکن' : (winner === 'BANKER' ? 'بانکر' : 'مساوی')}`;
+                msg = `دیلر برنده شد (امتیاز شما: ${pScore}، دیلر: ${dScore}). باختید.`;
             }
 
             document.getElementById('game-status-msg').textContent = msg;
             updateStats();
             if (uUid) await supabase.from('users').update({ casino_balance: window.userBalance }).eq('id', uUid);
-        };
+            gamePhase = 'WAITING';
+        }
 
         supabase.auth.onAuthStateChange(async (event, session) => {
             if (session && session.user) {
