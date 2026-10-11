@@ -20,12 +20,13 @@
         
         body {
             background: #030712;
-            min-height: 100vh;
-            min-height: 100svh;
+            height: 100vh;
+            height: 100svh;
             color: #f8fafc;
             display: flex;
             flex-direction: column;
-            overflow-x: hidden;
+            justify-content: space-between;
+            overflow: hidden;
             position: relative;
         }
 
@@ -45,12 +46,13 @@
         header {
             background: rgba(15, 23, 42, 0.85);
             border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding: 8px 12px;
+            padding: 6px 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 100;
             backdrop-filter: blur(12px);
+            flex-shrink: 0;
         }
 
         .game-header-title { font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 800; color: #facc15; display: flex; align-items: center; gap: 5px; }
@@ -59,12 +61,13 @@
         .game-bar {
             background: rgba(15, 23, 42, 0.75);
             border-bottom: 1px solid var(--glass-border);
-            padding: 6px 12px;
+            padding: 5px 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             backdrop-filter: blur(10px);
             z-index: 10;
+            flex-shrink: 0;
         }
 
         .user-welcome-tag {
@@ -87,7 +90,7 @@
         .casino-deposit-btn {
             background: linear-gradient(135deg, #facc15, #f97316);
             color: #0f172a;
-            padding: 4px 8px;
+            padding: 3px 8px;
             border-radius: 6px;
             border: none;
             font-size: 9px;
@@ -102,15 +105,17 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 8px;
+            justify-content: space-between;
+            padding: 6px 10px;
             width: 100%;
             max-width: 950px;
             margin: 0 auto;
-            gap: 8px;
+            gap: 6px;
             flex: 1;
+            overflow: hidden;
         }
 
-        /* ساختار هماهنگ برای موبایل: دو ستون ۱۰تایی چپ و راست + میز مرکزی */
+        /* ساختار هماهنگ برای موبایل و وب: دو ستون ۱۰تایی و میز مرکزی */
         .table-arena-wrapper {
             display: flex;
             justify-content: space-between;
@@ -118,15 +123,17 @@
             width: 100%;
             gap: 6px;
             position: relative;
+            flex: 1;
+            min-height: 0;
         }
 
         .seats-column {
             width: 135px;
-            max-height: 270px;
+            height: 100%;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 4px;
             padding: 2px;
         }
         .seats-column::-webkit-scrollbar { width: 3px; }
@@ -136,13 +143,13 @@
             background: rgba(15, 23, 42, 0.9);
             border: 1px solid rgba(255,255,255,0.12);
             border-radius: 6px;
-            padding: 4px 6px;
+            padding: 3px 5px;
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 2px;
             font-size: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            transition: all 0.2s ease;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.5);
+            flex-shrink: 0;
         }
         .seat-node.user-seat {
             border-color: #facc15;
@@ -163,8 +170,8 @@
         }
 
         .seat-avatar { 
-            width: 14px; 
-            height: 14px; 
+            width: 13px; 
+            height: 13px; 
             border-radius: 50%; 
             background: #0f172a; 
             display: flex; 
@@ -191,8 +198,8 @@
         }
 
         .seat-card-slot {
-            min-width: 18px;
-            height: 16px;
+            min-width: 17px;
+            height: 15px;
             font-size: 7px;
             font-family: 'Orbitron';
             color: #facc15;
@@ -207,15 +214,15 @@
         /* میز مرکزی ماهوت سبز کازینو */
         .felt-table-center {
             flex: 1;
-            max-width: 380px;
+            max-width: 360px;
             background: radial-gradient(circle at 50% 30%, rgba(6, 95, 70, 0.95) 0%, rgba(4, 55, 41, 0.99) 70%, rgba(2, 30, 22, 1) 100%);
             border: 4px solid #d97706;
-            border-radius: 18px;
-            padding: 10px;
+            border-radius: 16px;
+            padding: 8px 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.8), inset 0 0 25px rgba(0,0,0,0.6);
             position: relative;
         }
@@ -235,7 +242,7 @@
         .arena-layout {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            gap: 6px;
             width: 100%;
         }
 
@@ -243,11 +250,11 @@
             background: rgba(0, 0, 0, 0.45);
             border: 1px solid var(--glass-border);
             border-radius: 8px;
-            padding: 6px;
+            padding: 5px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
         }
         .arena-box.player-side { border-color: rgba(56,189,248,0.5); }
         .arena-box.banker-side { border-color: rgba(239,68,68,0.5); }
@@ -265,14 +272,14 @@
         .cards-row {
             display: flex;
             gap: 4px;
-            min-height: 42px;
+            min-height: 38px;
             align-items: center;
             justify-content: center;
         }
 
         .playing-card {
-            width: 28px;
-            height: 42px;
+            width: 26px;
+            height: 38px;
             background: #ffffff;
             color: #0f172a;
             border-radius: 4px;
@@ -283,22 +290,22 @@
             font-family: 'Orbitron';
             font-weight: 900;
             font-size: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.7);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.7);
             border: 1px solid #cbd5e1;
         }
         .playing-card.red { color: #dc2626; }
-        .card-symbol { font-size: 10px; align-self: center; line-height: 1; }
+        .card-symbol { font-size: 9px; align-self: center; line-height: 1; }
 
-        /* انیمیشن کارت پروازی کندتر و نرم‌تر */
+        /* انیمیشن کارت پروازی */
         .flying-card-item {
             position: absolute;
-            width: 22px;
-            height: 32px;
+            width: 20px;
+            height: 30px;
             background: #ffffff;
             border: 1px solid #94a3b8;
             border-radius: 3px;
             z-index: 500;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.8);
             transition: all 1.3s cubic-bezier(0.25, 1, 0.5, 1);
             pointer-events: none;
         }
@@ -310,11 +317,12 @@
             font-size: 10px;
             color: var(--gold-accent);
             background: rgba(0, 0, 0, 0.7);
-            padding: 6px 10px;
+            padding: 5px 10px;
             border-radius: 8px;
             border: 1px solid var(--glass-border);
             width: 100%;
             max-width: 520px;
+            flex-shrink: 0;
         }
 
         .control-panel {
@@ -323,12 +331,14 @@
             background: rgba(15, 23, 42, 0.95);
             border: 1px solid var(--glass-border);
             border-radius: 12px;
-            padding: 10px;
+            padding: 8px 10px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 5px;
             backdrop-filter: blur(10px);
             box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+            flex-shrink: 0;
+            margin-bottom: 4px;
         }
 
         .control-row {
@@ -344,7 +354,7 @@
             background: rgba(0,0,0,0.5);
             border: 1px solid var(--glass-border);
             border-radius: 6px;
-            padding: 3px 8px;
+            padding: 2px 8px;
             gap: 4px;
             flex: 1;
         }
@@ -362,7 +372,7 @@
 
         .btn-action {
             flex: 1;
-            padding: 8px;
+            padding: 7px;
             border-radius: 6px;
             font-family: 'Vazirmatn';
             font-weight: 800;
@@ -370,7 +380,7 @@
             cursor: pointer;
             border: none;
             color: #fff;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
             transition: transform 0.1s ease, filter 0.2s ease;
         }
         .btn-action:hover { filter: brightness(1.1); }
@@ -395,11 +405,11 @@
     <header>
         <div class="game-header-title">
             <i class="fa-solid fa-crown" style="color: #facc15;"></i>
-            <span>ZENIX BACCARAT (MOBILE APP)</span>
+            <span>ZENIX BACCARAT (WEB APP)</span>
         </div>
         <div class="live-badge">
             <i class="fa-solid fa-circle" style="font-size: 5px;"></i>
-            <span>دو دسته ۱۰تایی</span>
+            <span>۲۰ بازیکن (دو ستون)</span>
         </div>
     </header>
 
@@ -524,7 +534,6 @@
         const rightColumn = document.getElementById('rightSeatsColumn');
         const seatRefs = [];
 
-        // ایجاد صندلی‌ها: ۱۰ تای اول در ستون چپ، ۱۰ تای دوم در ستون راست
         playerNames.forEach((name, i) => {
             const isUser = i === 0;
             const isEmpty = name.includes('صندلی #');
@@ -598,17 +607,16 @@
             return { val, symbol: suit.symbol, cssClass: suit.class, score: scoreVal };
         }
 
-        // تابع کمکی برای پرواز آهسته یک کارت از مرکز میز به سمت عنصر صندلی مشخص
-        function flyCardToSeat(seatElement, cardText) {
+        function flyCardToSeat(seatElement) {
             return new Promise((resolve) => {
                 const arenaWrapper = document.getElementById('arenaWrapper');
                 const rectWrapper = arenaWrapper.getBoundingClientRect();
                 const rectSeat = seatElement.getBoundingClientRect();
 
-                const startX = rectWrapper.width / 2 - 11;
-                const startY = 80;
-                const targetX = rectSeat.left - rectWrapper.left + rectSeat.width / 2 - 11;
-                const targetY = rectSeat.top - rectWrapper.top + rectSeat.height / 2 - 16;
+                const startX = rectWrapper.width / 2 - 10;
+                const startY = 60;
+                const targetX = rectSeat.left - rectWrapper.left + rectSeat.width / 2 - 10;
+                const targetY = rectSeat.top - rectWrapper.top + rectSeat.height / 2 - 15;
 
                 const cardFly = document.createElement('div');
                 cardFly.className = 'flying-card-item';
@@ -626,38 +634,31 @@
                 setTimeout(() => {
                     cardFly.remove();
                     resolve();
-                }, 1300); // سرعت انیمیشن پرواز کارت
+                }, 1300);
             });
         }
 
-        // توزیع مرحله‌ای: اول کارت اول به همه، بعد کارت دوم به همه با سرعت کمتر
         async function dealCardsInRounds() {
             const banner = document.getElementById('statusBanner');
 
-            // --- مرحله اول: پخش کارت اول به همه بازیکنان ---
+            // کارت اول
             banner.innerText = "دیلر در حال پخش «کارت اول» به تمام بازیکنان دور میز است...";
-            const cardData1 = [];
-            for (let i = 0; i < 20; i++) {
-                cardData1.push(getRandomCard());
-            }
+            const cardData1 = Array.from({length: 20}, () => getRandomCard());
 
             for (let i = 0; i < 20; i++) {
-                await flyCardToSeat(seatRefs[i].element, `${cardData1[i].val}${cardData1[i].symbol}`);
+                await flyCardToSeat(seatRefs[i].element);
                 document.getElementById(`seatCard1-${i}`).innerText = `${cardData1[i].val}${cardData1[i].symbol}`;
-                await new Promise(r => setTimeout(r, 120)); // مکث کوتاه بین کارت‌ها
+                await new Promise(r => setTimeout(r, 90));
             }
 
-            // --- مرحله دوم: پخش کارت دوم به همه بازیکنان ---
+            // کارت دوم
             banner.innerText = "پخش کارت اول تمام شد. اکنون «کارت دوم» به بازیکنان داده می‌شود...";
-            const cardData2 = [];
-            for (let i = 0; i < 20; i++) {
-                cardData2.push(getRandomCard());
-            }
+            const cardData2 = Array.from({length: 20}, () => getRandomCard());
 
             for (let i = 0; i < 20; i++) {
-                await flyCardToSeat(seatRefs[i].element, `${cardData2[i].val}${cardData2[i].symbol}`);
+                await flyCardToSeat(seatRefs[i].element);
                 document.getElementById(`seatCard2-${i}`).innerText = `${cardData2[i].val}${cardData2[i].symbol}`;
-                await new Promise(r => setTimeout(r, 120));
+                await new Promise(r => setTimeout(r, 90));
             }
         }
 
@@ -674,17 +675,15 @@
             currentBalance -= betVal;
             balanceEl.innerText = currentBalance.toLocaleString();
 
-            // ریست کردن کارت‌های قبلی صندلی‌ها و میز
             for(let i=0; i<20; i++) {
                 document.getElementById(`seatCard1-${i}`).innerText = '--';
                 document.getElementById(`seatCard2-${i}`).innerText = '--';
             }
 
-            // شروع توزیع دوره‌ای صندلی‌ها
             await dealCardsInRounds();
 
             const banner = document.getElementById('statusBanner');
-            banner.innerText = "توزیع کارت صندلی‌ها کامل شد. اکنون کارت‌های اصلی میز (Player & Banker) باز می‌شوند...";
+            banner.innerText = "توزیع صندلی‌ها کامل شد. باز شدن کارت‌های اصلی میز (Player & Banker)...";
 
             setTimeout(() => {
                 const p1 = getRandomCard();
