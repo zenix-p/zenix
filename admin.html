@@ -483,7 +483,7 @@
             <div id="t-pending" class="tab-content">
                 <div class="panel-box">
                     <div class="panel-header">
-                        <div class="panel-title"><i class="fas fa-user-clock"></i> کاربران با درخواست‌های در انتظار</div>
+                        <div class="panel-title"><i class="fas fa-user-clock"></i> کاربران با درخواست‌های در انتظار (تغییر ایمیل / احراز)</div>
                         <div class="search-box"><input type="text" id="s-pend" placeholder="جستجو..."><i class="fas fa-search"></i></div>
                     </div>
                     <div class="table-responsive">
@@ -492,10 +492,10 @@
                                 <tr>
                                     <th>شناسه</th>
                                     <th>نام و نام خانوادگی</th>
-                                    <th>ایمیل</th>
+                                    <th>ایمیل فعلی</th>
+                                    <th>ایمیل جدید درخواستی</th>
                                     <th>تلفن</th>
                                     <th>موجودی</th>
-                                    <th>سود از پلتفرم</th>
                                     <th>عملیات</th>
                                 </tr>
                             </thead>
@@ -899,7 +899,6 @@
                             if (bet.status === 'WON') {
                                 stColor = '#22c55e';
                                 stText = 'برنده';
-                                // Approximate multiplier logic for display
                                 totalPayouts += amt * (bet.target.length <= 2 || !isNaN(bet.target) ? 36 : 2);
                             } else if (bet.status === 'LOST') {
                                 stColor = '#ef4444';
@@ -1101,6 +1100,61 @@
             smSelect.value = currentVal;
         }
 
+        window.appEm = async (uid, newEmail) => {
+            if (!confirm(`آیا از تایید تغییر ایمیل به ${newEmail} اطمینان دارید؟`)) return;
+            try {
+                const { error } = await supabaseClient.from('users').update({
+                    email: newEmail,
+                    pending_email: null,
+                    pendingEmail: null,
+                    admin_approval_status: 'approved',
+                    adminApprovalStatus: 'approved'
+                }).eq('id', uid);
+
+                if (error) throw error;
+                await sendNotificationToUser(uid, 'تایید تغییر ایمیل', `درخواست تغییر ایمیل شما به ${newEmail} با موفقیت توسط ادمین تایید شد.`);
+                showToast('درخواست تغییر ایمیل تایید و اعمال شد.');
+                loadData();
+            } catch (e) {
+                showToast('خطا در تایید درخواست: ' + e.message, 'error');
+            }
+        };
+
+        window.rejEm = async (uid) => {
+            if (!confirm('آیا از رد درخواست تغییر ایمیل اطمینان دارید؟')) return;
+            try {
+                const { error } = await supabaseClient.from('users').update({
+                    pending_email: null,
+                    pendingEmail: null,
+                    admin_approval_status: 'rejected',
+                    adminApprovalStatus: 'rejected'
+                }).eq('id', uid);
+
+                if (error) throw error;
+                await sendNotificationToUser(uid, 'لغو درخواست تغییر ایمیل', 'درخواست تغییر ایمیل شما توسط ادمین رد شد.');
+                showToast('درخواست تغییر ایمیل رد شد.');
+                loadData();
+            } catch (e) {
+                showToast('خطا در رد درخواست: ' + e.message, 'error');
+            }
+        };
+
+        window.toggleBan = async (uid, banState) => {
+            let actionText = banState ? 'لغو و مسدودسازی' : 'فعال‌سازی مجدد';
+            if (!confirm(`آیا از ${actionText} این کاربر اطمینان دارید؟`)) return;
+            try {
+                const { error } = await supabaseClient.from('users').update({
+                    status: banState ? 'cancelled' : 'active'
+                }).eq('id', uid);
+
+                if (error) throw error;
+                showToast(`وضعیت کاربر به ${actionText} تغییر یافت.`);
+                loadData();
+            } catch (e) {
+                showToast('خطا در تغییر وضعیت کاربر: ' + e.message, 'error');
+            }
+        };
+
         window.selectUserForMessage = uid => {
             let u = uMap[uid];
             if(!u) return;
@@ -1206,7 +1260,8 @@
                     let search = `${idCode} ${nameStr} ${emailStr} ${phoneStr} ${regStr}`.toLowerCase();
 
                     let isBanned = (u.status === 'cancelled' || u.status === 'banned' || u.isBanned === true);
-                    let hasPend = (u.pendingEmail || u.newEmail || u.adminApprovalStatus === 'pending');
+                    let hasPend = (u.pending_email || u.pendingEmail || u.admin_approval_status === 'pending' || u.adminApprovalStatus === 'pending');
+                    let requestedEmail = u.pending_email || u.pendingEmail || u.newEmail || '-';
 
                     if (u.pendingWithdrawal && String(u.pendingWithdrawal.status || 'pending').toLowerCase() === 'pending') {
                         totW++;
@@ -1216,33 +1271,78 @@
                     let balStr = `$${Number(u.balance||0).toLocaleString()}`;
                     let profitStr = `$${Number(u.platformProfit||0).toLocaleString()}`;
 
-                    let rowHtml = `<tr data-s="${search}">
-                        <td><span class="badge-id" onclick="openDetails('${uid}')">${idCode}</span></td>
-                        <td><b>${nameStr}</b></td>
-                        <td>${emailStr}</td>
-                        <td dir="ltr" style="text-align:right">${phoneStr}</td>
-                        <td style="color:#22c55e;font-weight:bold">${balStr}</td>
-                        <td style="color:#38bdf8;font-weight:bold">${profitStr}</td>`;
-
                     if(isBanned){
                         cBan++;
-                        rowHtml += `<td><button class="btn-action btn-approve" onclick="toggleBan('${uid}',false)"><i class="fas fa-undo"></i> فعال‌‌سازی</button></td></tr>`;
+                        let rowHtml = `<tr data-s="${search}">
+                            <td><span class="badge-id" onclick="openDetails('${uid}')">${idCode}</span></td>
+                            <td><b>${nameStr}</b></td>
+                            <td>${emailStr}</td>
+                            <td dir="ltr" style="text-align:right">${phoneStr}</td>
+                            <td style="color:#22c55e;font-weight:bold">${balStr}</td>
+                            <td style="color:#38bdf8;font-weight:bold">${profitStr}</td>
+                            <td><button class="btn-action btn-approve" onclick="toggleBan('${uid}',false)"><i class="fas fa-undo"></i> فعال‌‌سازی</button></td></tr>`;
                         if(tbBan) tbBan.innerHTML += rowHtml;
                     }else if(hasPend){
                         cPend++; totR++;
-                        reqList.push({uid, u, time: u.requestTimestamp||u.createdAt});
-                        rowHtml += `<td>
-                            <button class="btn-action btn-approve" onclick="appEm('${uid}','${u.pendingEmail||u.newEmail||emailStr}')">تایید</button>
-                            <button class="btn-action btn-reject" onclick="rejEm('${uid}')">رد</button>
-                        </td></tr>`;
+                        reqList.push({uid, u, requestedEmail, time: u.request_timestamp||u.requestTimestamp||u.createdAt});
+                        let rowHtml = `<tr data-s="${search}">
+                            <td><span class="badge-id" onclick="openDetails('${uid}')">${idCode}</span></td>
+                            <td><b>${nameStr}</b></td>
+                            <td>${emailStr}</td>
+                            <td style="color:#fbbf24;font-weight:bold">${requestedEmail}</td>
+                            <td dir="ltr" style="text-align:right">${phoneStr}</td>
+                            <td style="color:#22c55e;font-weight:bold">${balStr}</td>
+                            <td>
+                                <button class="btn-action btn-approve" onclick="appEm('${uid}','${requestedEmail}')">تایید</button>
+                                <button class="btn-action btn-reject" onclick="rejEm('${uid}')">رد</button>
+                            </td></tr>`;
                         if(tbPend) tbPend.innerHTML += rowHtml;
                     }else{
                         cAct++;
-                        rowHtml += `<td>${regStr}</td>
-                        <td><button class="btn-action btn-ban" onclick="toggleBan('${uid}',true)">لغو کاربر</button></td></tr>`;
+                        let rowHtml = `<tr data-s="${search}">
+                            <td><span class="badge-id" onclick="openDetails('${uid}')">${idCode}</span></td>
+                            <td><b>${nameStr}</b></td>
+                            <td>${emailStr}</td>
+                            <td dir="ltr" style="text-align:right">${phoneStr}</td>
+                            <td style="color:#22c55e;font-weight:bold">${balStr}</td>
+                            <td style="color:#38bdf8;font-weight:bold">${profitStr}</td>
+                            <td>${regStr}</td>
+                            <td><button class="btn-action btn-ban" onclick="toggleBan('${uid}',true)">لغو کاربر</button></td></tr>`;
                         if(tbAct) tbAct.innerHTML += rowHtml;
                     }
                 });
+
+                // رندر کردن باکس درخواست‌ها
+                let reqContainer = document.getElementById('req-container');
+                if (reqContainer) {
+                    if (reqList.length === 0) {
+                        reqContainer.innerHTML = `<div style="text-align:center;padding:25px;color:#94a3b8">هیچ درخواستی در انتظار بررسی نیست.</div>`;
+                    } else {
+                        let reqHtml = '';
+                        reqList.forEach(item => {
+                            reqHtml += `
+                                <div style="background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                                    <div>
+                                        <div style="font-weight:bold; color:#38bdf8; font-size:13px; margin-bottom:4px;">
+                                            <i class="fas fa-envelope"></i> درخواست تغییر ایمیل (${getUserIdCode(item.uid)})
+                                        </div>
+                                        <div style="color:#cbd5e1; font-size:12px;">
+                                            نام: <b>${getName(item.u)}</b> | ایمیل جدید: <b style="color:#fbbf24">${item.requestedEmail}</b>
+                                        </div>
+                                        <div style="color:#64748b; font-size:10px; margin-top:4px;">
+                                            زمان ثبت: ${formatDate(item.time)}
+                                        </div>
+                                    </div>
+                                    <div style="display:flex; gap:8px;">
+                                        <button class="btn-action btn-approve" onclick="appEm('${item.uid}','${item.requestedEmail}')"><i class="fas fa-check"></i> تایید درخواست</button>
+                                        <button class="btn-action btn-reject" onclick="rejEm('${item.uid}')"><i class="fas fa-times"></i> رد درخواست</button>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        reqContainer.innerHTML = reqHtml;
+                    }
+                }
 
                 updateSelectOptions(document.getElementById('sm-search')?.value || '');
 
@@ -1259,7 +1359,7 @@
                     let alertsList = [];
                     if (totD > prevD) alertsList.push("واریز وجه");
                     if (totW > prevW) alertsList.push("برداشت وجه");
-                    if (totR > prevR) alertsList.push("احراز هویت");
+                    if (totR > prevR) alertsList.push("احراز هویت / تغییر ایمیل");
                     if (alertsList.length > 0) {
                         playAlertSound();
                         sendNtfyAlert("🔔 درخواست جدید در پنل Zenix", `نوع درخواست: ${alertsList.join("، ")}`);
