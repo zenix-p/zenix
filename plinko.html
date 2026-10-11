@@ -132,7 +132,7 @@
         }
 
         .seats-column {
-            width: 145px;
+            width: 150px;
             height: 100%;
             overflow-y: auto;
             display: flex;
@@ -157,6 +157,10 @@
             flex-shrink: 0;
             transform: translateZ(10px);
             transition: transform 0.2s, border-color 0.2s;
+        }
+        .seat-node:hover {
+            transform: translateZ(25px) scale(1.03);
+            border-color: #facc15;
         }
         .seat-node.user-seat {
             border-color: #facc15;
@@ -203,17 +207,17 @@
             display: flex;
             gap: 3px;
             justify-content: flex-end;
-            min-height: 22px;
+            min-height: 24px;
             align-items: center;
         }
 
-        /* کارت‌های واقعی کوچک برای صندلی‌ها */
+        /* کارت واقعی کوچک برای صندلی‌ها */
         .mini-playing-card {
-            width: 18px;
-            height: 24px;
+            width: 20px;
+            height: 26px;
             background: #ffffff;
             color: #0f172a;
-            border-radius: 2px;
+            border-radius: 3px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -226,7 +230,7 @@
             border: 1px solid #cbd5e1;
         }
         .mini-playing-card.red { color: #dc2626; }
-        .mini-card-symbol { font-size: 9px; line-height: 1; }
+        .mini-card-symbol { font-size: 8px; line-height: 1; }
 
         /* میز مرکزی سه‌بعدی ماهوت سبز کازینو */
         .felt-table-center {
@@ -290,15 +294,15 @@
         .cards-row {
             display: flex;
             gap: 4px;
-            min-height: 42px;
+            min-height: 44px;
             align-items: center;
             justify-content: center;
         }
 
         /* کارت‌های بزرگ و واقعی میز مرکزی */
         .playing-card {
-            width: 28px;
-            height: 40px;
+            width: 30px;
+            height: 42px;
             background: #ffffff;
             color: #0f172a;
             border-radius: 4px;
@@ -315,11 +319,11 @@
         .playing-card.red { color: #dc2626; }
         .card-symbol { font-size: 11px; align-self: center; line-height: 1; }
 
-        /* المان کارت پروازی واحد با شتاب‌دهی سخت‌افزاری GPU (بدون لگ) */
+        /* المان کارت پروازی واحد با شتاب‌دهی سخت‌افزاری GPU */
         .flying-card-item {
             position: absolute;
-            width: 20px;
-            height: 28px;
+            width: 22px;
+            height: 30px;
             background: #ffffff;
             border: 1px solid #94a3b8;
             border-radius: 3px;
@@ -432,7 +436,7 @@
         </div>
         <div class="live-badge">
             <i class="fa-solid fa-circle" style="font-size: 5px;"></i>
-            <span>کارت‌های واقعی و گرافیکی</span>
+            <span>ورق‌های واقعی و استاندارد</span>
         </div>
     </header>
 
@@ -484,9 +488,9 @@
                         </div>
                         <div class="cards-row" id="playerCards">
                             <div class="playing-card red">
-                                <div>--</div>
+                                <div>A</div>
                                 <div class="card-symbol">♥</div>
-                                <div style="transform: rotate(180deg);">--</div>
+                                <div style="transform: rotate(180deg);">A</div>
                             </div>
                         </div>
                     </div>
@@ -498,9 +502,9 @@
                         </div>
                         <div class="cards-row" id="bankerCards">
                             <div class="playing-card red">
-                                <div>--</div>
+                                <div>K</div>
                                 <div class="card-symbol">♦</div>
-                                <div style="transform: rotate(180deg);">--</div>
+                                <div style="transform: rotate(180deg);">K</div>
                             </div>
                         </div>
                     </div>
@@ -623,13 +627,14 @@
             }
         }
 
+        // تابع تولید کارت کاملاً استاندارد و واقعی (شامل اعداد و کارت‌های تصویر J, Q, K, A)
         function getRandomCard() {
             const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
             const suits = [
-                { symbol: '♠', class: '' },
-                { symbol: '♣', class: '' },
-                { symbol: '♥', class: 'red' },
-                { symbol: '♦', class: 'red' }
+                { symbol: '♠', name: 'spade', class: '' },
+                { symbol: '♣', name: 'club', class: '' },
+                { symbol: '♥', name: 'heart', class: 'red' },
+                { symbol: '♦', name: 'diamond', class: 'red' }
             ];
             const val = values[Math.floor(Math.random() * values.length)];
             const suit = suits[Math.floor(Math.random() * suits.length)];
@@ -642,7 +647,7 @@
             return { val, symbol: suit.symbol, cssClass: suit.class, score: scoreVal };
         }
 
-        // تابع ساخت HTML کارت واقعی صندلی
+        // رندر کارت واقعی کوچک برای صندلی‌ها
         function renderMiniCard(cardObj) {
             return `
                 <div class="mini-playing-card ${cardObj.cssClass}">
@@ -653,7 +658,18 @@
             `;
         }
 
-        // تابع پرواز کارت با شتاب‌دهی GPU
+        // رندر کارت بزرگ و واقعی برای میز مرکزی (Player & Banker)
+        function renderLargeCard(cardObj) {
+            return `
+                <div class="playing-card ${cardObj.cssClass}">
+                    <div>${cardObj.val}</div>
+                    <div class="card-symbol">${cardObj.symbol}</div>
+                    <div style="transform: rotate(180deg);">${cardObj.val}</div>
+                </div>
+            `;
+        }
+
+        // انیمیشن روان پرواز کارت با GPU
         function flyCardToSeat(targetCoords, startCoords) {
             return new Promise((resolve) => {
                 const cardFly = document.getElementById('sharedFlyingCard');
@@ -697,7 +713,7 @@
                 };
             });
 
-            // کارت اول (واقعی)
+            // کارت اول
             banner.innerText = "دیلر در حال توزیع «کارت اول» واقعی به دور میز است...";
             const cardData1 = Array.from({length: 20}, () => getRandomCard());
 
@@ -707,7 +723,7 @@
                 await new Promise(r => setTimeout(r, 15));
             }
 
-            // کارت دوم (واقعی)
+            // کارت دوم
             banner.innerText = "پخش کارت اول تمام شد. در حال توزیع «کارت دوم»...";
             const cardData2 = Array.from({length: 20}, () => getRandomCard());
 
@@ -768,7 +784,7 @@
             if (wantsThirdCard) {
                 const extraCard = getRandomCard();
                 document.getElementById(`seatCard1-0`).innerHTML = renderMiniCard(extraCard);
-                banner.innerText = `شما کارت سوم (${extraCard.val}${extraCard.symbol}) را برداشتید. محاسبه امتیاز نهایی میز...`;
+                banner.innerText = `شما کارت سوم (${extraCard.val} ${extraCard.symbol}) را برداشتید. محاسبه امتیاز نهایی میز...`;
             } else {
                 banner.innerText = "شما ایست دادید. محاسبه امتیاز نهایی میز...";
             }
@@ -786,16 +802,10 @@
                     pScore = (pScore + 3) % 10;
                 }
 
-                document.getElementById('playerCards').innerHTML = `
-                    <div class="playing-card ${p1.cssClass}"><div>${p1.val}</div><div class="card-symbol">${p1.symbol}</div><div style="transform: rotate(180deg);">${p1.val}</div></div>
-                    <div class="playing-card ${p2.cssClass}"><div>${p2.val}</div><div class="card-symbol">${p2.symbol}</div><div style="transform: rotate(180deg);">${p2.val}</div></div>
-                `;
+                document.getElementById('playerCards').innerHTML = renderLargeCard(p1) + renderLargeCard(p2);
                 document.getElementById('playerScore').innerText = pScore;
 
-                document.getElementById('bankerCards').innerHTML = `
-                    <div class="playing-card ${b1.cssClass}"><div>${b1.val}</div><div class="card-symbol">${b1.symbol}</div><div style="transform: rotate(180deg);">${b1.val}</div></div>
-                    <div class="playing-card ${b2.cssClass}"><div>${b2.val}</div><div class="card-symbol">${b2.symbol}</div><div style="transform: rotate(180deg);">${b2.val}</div></div>
-                `;
+                document.getElementById('bankerCards').innerHTML = renderLargeCard(b1) + renderLargeCard(b2);
                 document.getElementById('bankerScore').innerText = bScore;
 
                 let winner = '';
