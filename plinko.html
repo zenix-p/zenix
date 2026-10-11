@@ -2196,7 +2196,7 @@
     // Desktop/landscape uses cover; portrait phones show the complete table at width-fit.
     // In portrait, the table image begins below the flowing mobile header and account bar.
     const mobilePortrait = window.matchMedia('(max-width: 700px) and (orientation: portrait)').matches;
-    const scale = mobilePortrait ? (vw / SOURCE_W) : Math.max(vh / SOURCE_H, vw / SOURCE_W);
+    const scale = mobilePortrait ? (Math.max(1, vh - headerH - gameBarH) / SOURCE_H) : Math.max(vh / SOURCE_H, vw / SOURCE_W);
     const imageW = SOURCE_W * scale;
     const imageH = SOURCE_H * scale;
     const imageLeft = (vw - imageW) / 2;
@@ -2362,6 +2362,64 @@
   @media (max-width:700px) and (orientation:landscape) {
     html, body { width:100% !important; height:100% !important; overflow:hidden !important; }
     body::before { position:fixed !important; inset:0 !important; width:100vw !important; height:100svh !important; background-size:100% 100%,cover !important; }
+  }
+</style>
+
+
+
+<style id="mobile-dealer-framing-fix">
+  /* Portrait phones: start the casino image below the app bars and fill the remaining screen height.
+     This prevents the fixed header from covering the dealer's face. */
+  @media (max-width:700px) and (orientation:portrait) {
+    body::before {
+      position:absolute !important;
+      top:calc(77px + var(--mobile-safe-top, 0px)) !important;
+      left:0 !important; right:auto !important; bottom:auto !important;
+      width:100vw !important;
+      height:calc(100svh - 77px - var(--mobile-safe-top, 0px)) !important;
+      inset-inline:0 auto !important;
+      background-repeat:no-repeat,no-repeat !important;
+      background-position:center top,center top !important;
+      /* Scale from height on phones so the whole dealer remains in view; horizontal crop is intentional. */
+      background-size:100% 100%,auto 100% !important;
+      transform:none !important;
+    }
+    .main-stage, .casino-felt-table {
+      height:calc(100svh - 77px - var(--mobile-safe-top, 0px)) !important;
+      min-height:0 !important; max-height:none !important;
+    }
+    .main-stage { margin:0 !important; padding:0 !important; }
+    .casino-felt-table { flex:0 0 auto !important; }
+    #twenty-seat-map {
+      position:absolute !important; inset:0 !important;
+      width:100% !important; height:100% !important;
+      overflow:visible !important; pointer-events:none !important;
+    }
+    #twenty-seat-map .user-station { pointer-events:auto !important; }
+    .control-panel {
+      position:fixed !important;
+      left:50% !important; right:auto !important;
+      bottom:calc(8px + var(--mobile-safe-bottom, 0px)) !important;
+      transform:translateX(-50%) !important;
+      width:calc(100vw - 14px) !important;
+      max-width:520px !important;
+      margin:0 !important;
+      z-index:80 !important;
+    }
+    .live-status-banner {
+      position:fixed !important;
+      left:50% !important; right:auto !important;
+      top:auto !important;
+      bottom:calc(98px + var(--mobile-safe-bottom, 0px)) !important;
+      transform:translateX(-50%) !important;
+      width:calc(100vw - 18px) !important;
+      max-width:520px !important;
+      z-index:78 !important;
+    }
+  }
+  @media (max-width:380px) and (orientation:portrait) {
+    .live-status-banner { bottom:calc(104px + var(--mobile-safe-bottom, 0px)) !important; }
+    .control-panel { width:calc(100vw - 10px) !important; }
   }
 </style>
 
