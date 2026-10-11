@@ -296,7 +296,7 @@
         .playing-card.red { color: #dc2626; }
         .card-symbol { font-size: 9px; align-self: center; line-height: 1; }
 
-        /* انیمیشن کارت پروازی بهینه‌شده و روان‌تر */
+        /* انیمیشن کارت پروازی بهینه‌شده با GPU Acceleration (بدون کوچک‌ترین لگ) */
         .flying-card-item {
             position: absolute;
             width: 20px;
@@ -306,9 +306,9 @@
             border-radius: 3px;
             z-index: 500;
             box-shadow: 0 4px 12px rgba(0,0,0,0.8);
-            transition: all 0.55s cubic-bezier(0.25, 1, 0.5, 1);
             pointer-events: none;
-            will-change: left, top, transform, opacity;
+            will-change: transform, opacity;
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
         }
 
         .live-status-banner {
@@ -410,7 +410,7 @@
         </div>
         <div class="live-badge">
             <i class="fa-solid fa-circle" style="font-size: 5px;"></i>
-            <span>۲۰ بازیکن (بدون لگ)</span>
+            <span>۲۰ بازیکن (روان و بهینه)</span>
         </div>
     </header>
 
@@ -446,8 +446,8 @@
                     <span style="font-size: 9px; color: #cbd5e1; font-weight: 700;">
                         <i class="fa-solid fa-user-tie" style="color: #facc15;"></i> دیلر: سارا
                     </span>
-                    <span style="font-family:'Orbitron'; font-size:7px; color:#facc15; border:1px solid #facc15; padding:2px 5px; border-radius:3px;">
-                        VIP TABLE
+                    <span style="font-family:'Orbitron'; font-size:7px; color:#facc15; border:1px solid #facc15; padding:2px 5px; border-radius:3px;" id="deckStatus">
+                        SHOE READY
                     </span>
                 </div>
 
@@ -487,7 +487,7 @@
         </div>
 
         <div class="live-status-banner" id="statusBanner">
-            شرط خود را انتخاب کرده و دکمه توزیع کارت را بزنید تا کارت اول و دوم با سرعت به دور میز پخش شوند.
+            شرط خود را انتخاب کرده و دکمه توزیع کارت را بزنید تا کارت اول و دوم با سرعت بالا و بدون لگ پخش شوند.
         </div>
 
         <div class="control-panel">
@@ -505,7 +505,7 @@
             </div>
             
             <div class="control-row">
-                <button class="btn-action btn-deal" onclick="startBaccaratRound()">توزیع سریع کارت‌ها (روان و بهینه)</button>
+                <button class="btn-action btn-deal" id="dealBtn" onclick="startBaccaratRound()">توزیع سریع کارت‌ها (GPU Accelerated)</button>
             </div>
         </div>
     </div>
@@ -534,6 +534,7 @@
         const leftColumn = document.getElementById('leftSeatsColumn');
         const rightColumn = document.getElementById('rightSeatsColumn');
         const seatRefs = [];
+        let isGameBusy = false;
 
         playerNames.forEach((name, i) => {
             const isUser = i === 0;
@@ -608,29 +609,30 @@
             return { val, symbol: suit.symbol, cssClass: suit.class, score: scoreVal };
         }
 
-        function flyCardToSeat(targetCoords) {
+        // تابع پرواز کارت با استفاده از GPU Transform برای حذف کامل لگ در موبایل و دسکتاپ
+        function flyCardToSeat(targetCoords, startCoords) {
             return new Promise((resolve) => {
                 const arenaWrapper = document.getElementById('arenaWrapper');
-                const startX = arenaWrapper.clientWidth / 2 - 10;
-                const startY = 50;
-
+                
                 const cardFly = document.createElement('div');
                 cardFly.className = 'flying-card-item';
-                cardFly.style.left = `${startX}px`;
-                cardFly.style.top = `${startY}px`;
+                // شروع از مبدأ دیلر در مرکز
+                cardFly.style.left = `${startCoords.x}px`;
+                cardFly.style.top = `${startCoords.y}px`;
                 arenaWrapper.appendChild(cardFly);
 
+                const deltaX = targetCoords.x - startCoords.x;
+                const deltaY = targetCoords.y - startCoords.y;
+
                 requestAnimationFrame(() => {
-                    cardFly.style.left = `${targetCoords.x}px`;
-                    cardFly.style.top = `${targetCoords.y}px`;
-                    cardFly.style.transform = 'scale(0.85) rotate(10deg)';
+                    cardFly.style.transform = `translate3d(${deltaX}px, ${deltaY}px, 0) scale(0.85) rotate(10deg)`;
                     cardFly.style.opacity = '0.95';
                 });
 
                 setTimeout(() => {
                     cardFly.remove();
                     resolve();
-                }, 550); // سرعت انیمیشن کارت سریع‌تر شد
+                }, 380); // انیمیشن سریع‌تر و روان‌تر
             });
         }
 
@@ -639,7 +641,12 @@
             const arenaWrapper = document.getElementById('arenaWrapper');
             const wrapperRect = arenaWrapper.getBoundingClientRect();
 
-            // کش کردن مختصات صندلی‌ها پیش از شروع حلقه برای جلوگیری از لگ (Layout Thrashing)
+            const startCoords = {
+                x: wrapperRect.width / 2 - 10,
+                y: 40
+            };
+
+            // کش کردن مختصات صندلی‌ها پیش از شروع برای جلوگیری از Layout Thrashing (لگ)
             const cachedCoords = seatRefs.map(ref => {
                 const r = ref.element.getBoundingClientRect();
                 return {
@@ -648,34 +655,40 @@
                 };
             });
 
-            // کارت اول
-            banner.innerText = "دیلر در حال پخش «کارت اول» با سرعت بالا به بازیکنان است...";
+            // پخش کارت اول
+            banner.innerText = "دیلر در حال پخش «کارت اول» به بازیکنان...";
             const cardData1 = Array.from({length: 20}, () => getRandomCard());
 
             for (let i = 0; i < 20; i++) {
-                await flyCardToSeat(cachedCoords[i]);
+                await flyCardToSeat(cachedCoords[i], startCoords);
                 document.getElementById(`seatCard1-${i}`).innerText = `${cardData1[i].val}${cardData1[i].symbol}`;
-                await new Promise(r => setTimeout(r, 40)); // فاصله زمانی کمتر برای سرعت بیشتر
+                await new Promise(r => setTimeout(r, 25)); // فواصل زمانی بسیار کوتاه برای سرعت عالی
             }
 
-            // کارت دوم
+            // پخش کارت دوم
             banner.innerText = "پخش کارت اول تمام شد. در حال پخش «کارت دوم»...";
             const cardData2 = Array.from({length: 20}, () => getRandomCard());
 
             for (let i = 0; i < 20; i++) {
-                await flyCardToSeat(cachedCoords[i]);
+                await flyCardToSeat(cachedCoords[i], startCoords);
                 document.getElementById(`seatCard2-${i}`).innerText = `${cardData2[i].val}${cardData2[i].symbol}`;
-                await new Promise(r => setTimeout(r, 40)); // فاصله زمانی کمتر برای سرعت بیشتر
+                await new Promise(r => setTimeout(r, 25));
             }
         }
 
         async function startBaccaratRound() {
+            if (isGameBusy) return;
+            isGameBusy = true;
+            document.getElementById('dealBtn').style.opacity = '0.6';
+
             const betVal = parseInt(document.getElementById('betAmount').value);
             const balanceEl = document.getElementById('userBalance');
             let currentBalance = parseInt(balanceEl.innerText.replace(/,/g, ''));
 
             if (betVal > currentBalance) {
                 alert('موجودی شما برای این مقدار شرط کافی نیست! لطفاً حساب خود را شارژ کنید.');
+                isGameBusy = false;
+                document.getElementById('dealBtn').style.opacity = '1';
                 return;
             }
 
@@ -731,7 +744,10 @@
 
                 balanceEl.innerText = currentBalance.toLocaleString();
                 banner.innerText = resultText;
-            }, 800);
+                
+                isGameBusy = false;
+                document.getElementById('dealBtn').style.opacity = '1';
+            }, 600);
         }
     </script>
 </body>
