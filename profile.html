@@ -306,7 +306,6 @@
             </div>
         </div>
 
-        <!-- افزودن شناسه card-tx-pass جهت باز شدن خودکار هنگام تغییر رمز تراکنش -->
         <div class="card" id="card-tx-pass">
             <div class="hd" onclick="window.tc(this)">
                 <h3 style="color:#38bdf8;font-size:15px;margin:0;"><i class="fas fa-key"></i> <span>تغییر رمز تراکنش</span></h3>
@@ -465,6 +464,22 @@
             const sBtn=document.getElementById('c-select-btn'), sList=document.getElementById('c-list');
             if(sBtn) sBtn.onclick=e=>{ e.stopPropagation(); sList.classList.toggle('show'); };
             window.addEventListener('click',e=>{ if(sList && !e.target.closest('#c-dropdown')) sList.classList.remove('show'); },true);
+
+            // بررسی و بازیابی تایمرهای فعال ارسال کد پس از ریفرش صفحه
+            ['pwd-email', 'tr-email', 'wal-email'].forEach(id => {
+                const expireTime = parseInt(localStorage.getItem('otp_cooldown_' + id) || '0', 10);
+                if (expireTime > Date.now()) {
+                    const inputEl = document.getElementById(id);
+                    if (inputEl) {
+                        const btnEl = inputEl.closest('.fg')?.querySelector('button');
+                        if (btnEl) {
+                            runCountdown(btnEl, id);
+                        }
+                    }
+                } else {
+                    localStorage.removeItem('otp_cooldown_' + id);
+                }
+            });
 
             /* باز کردن خودکار بخش تعویض رمز تراکنش یا ورود بر اساس URL */
             const urlParams = new URLSearchParams(window.location.search);
@@ -683,6 +698,35 @@
           container.innerHTML = html;
         };
 
+        function runCountdown(btnEl, emailInputId) {
+          const origText = 'ارسال کد به ایمیل';
+          const expireTime = parseInt(localStorage.getItem('otp_cooldown_' + emailInputId) || '0', 10);
+          const remaining = Math.ceil((expireTime - Date.now()) / 1000);
+
+          if (remaining <= 0) {
+            btnEl.disabled = false;
+            btnEl.textContent = origText;
+            localStorage.removeItem('otp_cooldown_' + emailInputId);
+            return;
+          }
+
+          btnEl.disabled = true;
+          let countdown = remaining;
+          btnEl.textContent = `${countdown} ثانیه`;
+
+          const timer = setInterval(() => {
+            countdown--;
+            if (countdown <= 0) {
+              clearInterval(timer);
+              btnEl.disabled = false;
+              btnEl.textContent = origText;
+              localStorage.removeItem('otp_cooldown_' + emailInputId);
+            } else {
+              btnEl.textContent = `${countdown} ثانیه`;
+            }
+          }, 1000);
+        }
+
         window.sendEmailCode = async function(emailInputId, btnEl) {
           const emailInput = document.getElementById(emailInputId);
           const email = emailInput && emailInput.value ? emailInput.value.trim() : (currentUser ? currentUser.email : '');
@@ -725,19 +769,12 @@
 
             window.showToast(`کد تایید به ایمیل ${email} ارسال شد.`, 'success', 5000);
 
+            // ذخیره زمان انقضای تایمر در لوکال استوریج جهت ماندگاری پس از ریفرش
+            const expireTime = Date.now() + 60000;
+            localStorage.setItem('otp_cooldown_' + emailInputId, expireTime);
+
             if (btnEl) {
-              let countdown = 60;
-              btnEl.textContent = `${countdown} ثانیه`;
-              const timer = setInterval(() => {
-                countdown--;
-                if (countdown <= 0) {
-                  clearInterval(timer);
-                  btnEl.disabled = false;
-                  btnEl.textContent = origText;
-                } else {
-                  btnEl.textContent = `${countdown} ثانیه`;
-                }
-              }, 1000);
+              runCountdown(btnEl, emailInputId);
             }
           } catch (error) {
             if (btnEl) {
