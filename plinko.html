@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>بازی ۸ و ۹ - Zenix Casino</title>
+    <title>بازی ۸ و نه - Zenix Casino</title>
     <link rel="icon" href="data:image/x-icon;base64,=">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -238,7 +238,6 @@
         .btn-hit { background: linear-gradient(135deg, #38bdf8, #0ea5e9); color: #030712; }
         .btn-stand { background: linear-gradient(135deg, #ef4444, #dc2626); }
         .btn-deal { background: linear-gradient(135deg, #22c55e, #16a34a); color: #030712; width: 100%; }
-        .btn-action:disabled { background: #475569; color: #94a3b8; cursor: not-allowed; box-shadow: none; }
 
         .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px);padding:10px;}
         .modal.show{display:flex}
@@ -277,7 +276,7 @@
             <div class="hand-section">
                 <div class="hand-info">
                     <span>دیلر (بانک):</span>
-                    <span id="dealer-score">0</span>
+                    <span id="dealer-score">?</span>
                 </div>
                 <div class="cards-container" id="dealer-cards"></div>
             </div>
@@ -301,18 +300,18 @@
                     <input type="number" id="bet-amount" class="bet-input" value="10" min="1">
                 </div>
             </div>
-            <button class="btn-action btn-deal" id="btn-start" onclick="startRound()">شروع بازی</button>
+            <button class="btn-action btn-deal" id="btn-start" onclick="startRound()">شروع بازی (پخش کارت)</button>
         </div>
 
         <div class="control-panel" id="action-control-panel" style="display: none;">
             <div class="control-row">
-                <button class="btn-action btn-hit" onclick="playerHit()">کارت گرفتن (Hit)</button>
-                <button class="btn-action btn-stand" onclick="playerStand()">ایستادن (Stand)</button>
+                <button class="btn-action btn-hit" onclick="playerHit()">کارت سوم (بله)</button>
+                <button class="btn-action btn-stand" onclick="playerStand()">ایستادن (خیر)</button>
             </div>
         </div>
     </div>
 
-    <!-- مودال شارژ و راهنما -->
+    <!-- مودال‌های راهنما و شارژ -->
     <div class="modal" id="m-casino-deposit">
         <div class="modal-content">
             <div class="modal-header">
@@ -332,9 +331,9 @@
                 <button class="modal-close" onclick="closeHelpModal()"><i class="fas fa-times"></i></button>
             </div>
             <div style="overflow-y:auto; max-height: 60vh; font-size:9.5px; color:#cbd5e1; line-height:1.6;">
-                <p style="margin-bottom:8px;"><strong style="color:#facc15;">هدف بازی:</strong> درست مانند بلک‌جک، باید مجموع امتیاز کارت‌های خود را به **۸ یا ۹** برسانید (یا نزدیک‌ترین مقدار).</p>
-                <p style="margin-bottom:8px;"><strong style="color:#ef4444;">قانون سوختن:</strong> اگر مجموع امتیاز کارت‌های شما از **۹** بیشتر شود، بلافاصله می‌سوزید و بازنده می‌شوید.</p>
-                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">ارزش کارت‌ها:</strong> کارت‌های ۲ تا ۹ ارزش خودشان را دارند. آس (A) معادل ۱ و کارت‌های تصویر (شاه، بی‌بی، سرباز) و ۱۰ معادل صفر یا ۱۰ محاسبه می‌شوند.</p>
+                <p style="margin-bottom:8px;"><strong style="color:#facc15;">روند پخش کارت:</strong> در دو دور اولیه، هر بازیکن و دیلر هر کدام ۲ کارت دریافت می‌کنند (دور اول یک کارت، دور دوم یک کارت).</p>
+                <p style="margin-bottom:8px;"><strong style="color:#38bdf8;">ارزش کارت‌ها:</strong> کارت‌های ۱۰، شاه، بی‌بی و سرباز ارزش (امتیاز) ندارند و صفر محسوب می‌شوند. کارت‌های ۲ تا ۹ ارزش خودشان را دارند و آس معادل ۱ است.</p>
+                <p style="margin-bottom:6px;"><strong style="color:#22c55e;">کارت سوم:</strong> دیلر منتظر می‌ماند تا شما درخواست کارت سوم کنید یا بایستید. پس از تصمیم شما، دیلر کارت‌های خود را رو می‌کند و برنده مشخص می‌شود.</p>
             </div>
         </div>
     </div>
@@ -359,21 +358,21 @@
         let currentBet = 10;
         let playerHand = [];
         let dealerHand = [];
-        let gameActive = false;
+        let gamePhase = 'WAITING'; // WAITING, PLAYER_DECISION, SHOWDOWN
 
         const suits = ['♠', '♥', '♦', '♣'];
         const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
         function getCardValue(card) {
+            if (['10', 'J', 'Q', 'K'].includes(card.val)) return 0; // ۱۰، شاه، بی‌بی، سرباز امتیاز ندارند
             if (card.val === 'A') return 1;
-            if (['10', 'J', 'Q', 'K'].includes(card.val)) return 0; // یا ارزش دلخواه
             return parseInt(card.val);
         }
 
         function calculateScore(hand) {
             let sum = 0;
             hand.forEach(c => sum += getCardValue(c));
-            return sum % 10; // محاسبه بر اساس قانون امتیاز پسماند یا جمع مستقیم (محدود به 9)
+            return sum % 10; // مجموع امتیاز بر اساس رقم یکان (یا سقف امتیاز بازی)
         }
 
         async function fetchUserBalance() {
@@ -432,7 +431,7 @@
             });
 
             dealerHand.forEach((c, idx) => {
-                if (idx === 0 && !revealDealer && gameActive) {
+                if (idx === 0 && !revealDealer) {
                     dContainer.innerHTML += `<div class="playing-card" style="background:#1e293b; color:#38bdf8; justify-content:center; align-items:center;"><i class="fas fa-lock"></i></div>`;
                 } else {
                     dContainer.innerHTML += `<div class="playing-card ${c.isRed ? 'red' : ''}"><span>${c.val}</span><span style="align-self:center; font-size:16px;">${c.suit}</span><span style="align-self:flex-end;">${c.val}</span></div>`;
@@ -456,81 +455,83 @@
             if (uUid) await supabase.from('users').update({ casino_balance: window.userBalance }).eq('id', uUid);
             updateStats();
 
-            playerHand = [drawCard(), drawCard()];
-            dealerHand = [drawCard(), drawCard()];
-            gameActive = true;
+            // پخش دو دور کارت (دور اول یک کارت، دور دوم یک کارت برای هر نفر)
+            playerHand = [];
+            dealerHand = [];
+
+            // دور اول
+            playerHand.push(drawCard());
+            dealerHand.push(drawCard());
+            // دور دوم
+            playerHand.push(drawCard());
+            dealerHand.push(drawCard());
+
+            gamePhase = 'PLAYER_DECISION';
 
             renderHands(false);
-            document.getElementById('game-status-msg').textContent = 'کارت بگیرید یا بایستید';
+            document.getElementById('game-status-msg').textContent = 'دو کارت پخش شد. آیا درخواست کارت سوم دارید؟';
             document.getElementById('bet-control-panel').style.display = 'none';
             document.getElementById('action-control-panel').style.display = 'block';
-
-            // بررسی فوری اگر امتیاز ۸ یا ۹ باشد
-            const pScore = calculateScore(playerHand);
-            if (pScore === 8 || pScore === 9) {
-                document.getElementById('game-status-msg').textContent = 'امتیاز عالی! بررسی نتیجه...';
-                setTimeout(endRound, 1000);
-            }
         };
 
         window.playerHit = function() {
-            if (!gameActive) return;
-            playerHand.push(drawCard());
-            renderHands(false);
-
-            const pScore = calculateScore(playerHand);
-            if (pScore > 9) {
-                gameActive = false;
-                document.getElementById('game-status-msg').textContent = 'سوختید! از ۹ بیشتر شد.';
-                finishGame(false);
+            if (gamePhase !== 'PLAYER_DECISION') return;
+            // حداکثر 3 کارت
+            if (playerHand.length < 3) {
+                playerHand.push(drawCard());
             }
+            renderHands(false);
+            document.getElementById('game-status-msg').textContent = 'کارت سوم دریافت شد. در حال بررسی و رو شدن کارت‌ها...';
+            setTimeout(resolveShowdown, 1000);
         };
 
         window.playerStand = function() {
-            if (!gameActive) return;
-            endRound();
+            if (gamePhase !== 'PLAYER_DECISION') return;
+            document.getElementById('game-status-msg').textContent = 'روی دست خود ایستادید. در حال رو شدن کارت‌های دیلر...';
+            setTimeout(resolveShowdown, 1000);
         };
 
-        function endRound() {
-            gameActive = false;
-            renderHands(true);
+        function resolveShowdown() {
+            gamePhase = 'SHOWDOWN';
+            renderHands(true); // رو شدن کارت‌های دیلر
 
             const pScore = calculateScore(playerHand);
             const dScore = calculateScore(dealerHand);
 
             let won = false;
-            if (pScore > 9) {
-                won = false;
-            } else if (dScore > 9) {
+            let isDraw = false;
+
+            if (pScore > dScore) {
                 won = true;
-            } else if (pScore > dScore) {
-                won = true;
+            } else if (pScore === dScore) {
+                isDraw = true;
             } else {
                 won = false;
             }
 
-            finishGame(won, pScore === dScore);
+            finishGame(won, isDraw);
         }
 
-        async function finishGame(won, isDraw = false) {
+        async function finishGame(won, isDraw) {
             document.getElementById('action-control-panel').style.display = 'none';
             document.getElementById('bet-control-panel').style.display = 'block';
 
             let msg = '';
-            if (isDraw && calculateScore(playerHand) <= 9) {
+            if (isDraw) {
                 msg = 'مساوی! مبلغ شرط بازگشت داده شد.';
                 window.userBalance += currentBet;
             } else if (won) {
                 const payout = currentBet * 2;
-                msg = `🎉 تبریک! برنده شدید ($${payout.toFixed(2)})`;
+                msg = `🎉 تبریک! شما برنده شدید ($${payout.toFixed(2)})`;
                 window.userBalance += payout;
             } else {
-                msg = 'متأسفانه باختید.';
+                msg = 'دیلر برنده شد. متأسفانه باختید.';
             }
 
             document.getElementById('game-status-msg').textContent = msg;
             updateStats();
             if (uUid) await supabase.from('users').update({ casino_balance: window.userBalance }).eq('id', uUid);
+            gamePhase = 'WAITING';
         }
 
         supabase.auth.onAuthStateChange(async (event, session) => {
