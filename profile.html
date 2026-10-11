@@ -1018,10 +1018,41 @@
           document.getElementById('selfie-capture').click();
         };
 
-        window.handleSelfieCapture = function(input) {
+        window.handleSelfieCapture = async function(input) {
           if (input.files && input.files[0]) {
-            document.getElementById('admin-status-box').style.display = 'block';
-            window.showToast('تصویر سلفی ارسال شد و در انتظار بررسی ادمین قرار گرفت.', 'info', 5000);
+            const newEmailInput = document.getElementById('email-new');
+            const newEmail = newEmailInput ? newEmailInput.value.trim() : '';
+
+            if (!newEmail || !newEmail.includes('@')) {
+              window.showToast('لطفاً ابتدا ایمیل جدید و معتبر را وارد کنید.', 'error', 4000);
+              return;
+            }
+
+            if (!currentUser) {
+              window.showToast('نشست کاربر یافت نشد. لطفاً مجدداً وارد شوید.', 'error', 4000);
+              return;
+            }
+
+            try {
+              window.showToast('در حال ارسال درخواست به ادمین...', 'info', 4000);
+
+              const { error } = await supabaseClient
+                .from('users')
+                .update({
+                  pendingEmail: newEmail,
+                  adminApprovalStatus: 'pending',
+                  requestTimestamp: new Date().toISOString()
+                })
+                .eq('id', currentUser.id);
+
+              if (error) throw error;
+
+              document.getElementById('admin-status-box').style.display = 'block';
+              window.showToast('درخواست تغییر ایمیل با موفقیت برای ادمین ارسال شد.', 'success', 5000);
+            } catch (e) {
+              console.error('خطا در ارسال درخواست به ادمین:', e);
+              window.showToast('خطا در ثبت درخواست: ' + e.message, 'error', 5000);
+            }
           }
         };
 
