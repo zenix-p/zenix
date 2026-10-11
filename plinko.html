@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="theme-color" content="#031b16">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>میز سه‌بعدی ۲۰ نفره باکارت - Zenix Web App</title>
+    <title>میز سه‌بعدی ۲۰ نفره باکارت - Zenix 3D Web App</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -28,6 +28,7 @@
             justify-content: space-between;
             overflow: hidden;
             position: relative;
+            perspective: 1400px; /* ایجاد فضای سه‌بعدی سراسری */
         }
 
         /* پس‌زمینه استودیوی لوکس کازینو */
@@ -113,9 +114,10 @@
             gap: 6px;
             flex: 1;
             overflow: hidden;
+            transform-style: preserve-3d;
         }
 
-        /* ساختار هماهنگ برای موبایل و وب: دو ستون ۱۰تایی و میز مرکزی */
+        /* ساختار سه‌بعدی میز و ستون‌های بازیکنان */
         .table-arena-wrapper {
             display: flex;
             justify-content: space-between;
@@ -125,6 +127,8 @@
             position: relative;
             flex: 1;
             min-height: 0;
+            transform-style: preserve-3d;
+            transform: rotateX(4deg); /* زاویه دید سه‌بعدی ملایم */
         }
 
         .seats-column {
@@ -135,25 +139,33 @@
             flex-direction: column;
             gap: 4px;
             padding: 2px;
+            transform-style: preserve-3d;
         }
         .seats-column::-webkit-scrollbar { width: 3px; }
         .seats-column::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
 
         .seat-node {
-            background: rgba(15, 23, 42, 0.9);
-            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid rgba(255,255,255,0.15);
             border-radius: 6px;
             padding: 3px 5px;
             display: flex;
             flex-direction: column;
             gap: 2px;
             font-size: 8px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.5);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.6);
             flex-shrink: 0;
+            transform: translateZ(10px);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .seat-node:hover {
+            transform: translateZ(25px) scale(1.03);
+            border-color: #facc15;
         }
         .seat-node.user-seat {
             border-color: #facc15;
-            background: rgba(250, 204, 21, 0.15);
+            background: rgba(250, 204, 21, 0.2);
+            box-shadow: 0 0 12px rgba(250, 204, 21, 0.4);
         }
         .seat-node.empty { opacity: 0.5; border-style: dashed; }
 
@@ -203,28 +215,29 @@
             font-size: 7px;
             font-family: 'Orbitron';
             color: #facc15;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
             border-radius: 3px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(250,204,21,0.2);
+            border: 1px solid rgba(250,204,21,0.3);
         }
 
-        /* میز مرکزی ماهوت سبز کازینو */
+        /* میز مرکزی سه‌بعدی ماهوت سبز کازینو */
         .felt-table-center {
             flex: 1;
             max-width: 360px;
-            background: radial-gradient(circle at 50% 30%, rgba(6, 95, 70, 0.95) 0%, rgba(4, 55, 41, 0.99) 70%, rgba(2, 30, 22, 1) 100%);
-            border: 4px solid #d97706;
-            border-radius: 16px;
+            background: radial-gradient(circle at 50% 30%, rgba(6, 95, 70, 0.96) 0%, rgba(4, 55, 41, 0.99) 70%, rgba(2, 30, 22, 1) 100%);
+            border: 5px solid #d97706;
+            border-radius: 18px;
             padding: 8px 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 6px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.8), inset 0 0 25px rgba(0,0,0,0.6);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.9), inset 0 0 35px rgba(0,0,0,0.7);
             position: relative;
+            transform: translateZ(25px); /* برجستگی سه‌بعدی میز در مرکز */
         }
 
         .dealer-tray-section {
@@ -296,7 +309,7 @@
         .playing-card.red { color: #dc2626; }
         .card-symbol { font-size: 9px; align-self: center; line-height: 1; }
 
-        /* انیمیشن کارت پروازی بهینه‌شده با GPU Acceleration (بدون کوچک‌ترین لگ) */
+        /* المان کارت پروازی واحد با بهینه‌سازی GPU (بدون کوچک‌ترین لگ) */
         .flying-card-item {
             position: absolute;
             width: 20px;
@@ -305,10 +318,11 @@
             border: 1px solid #94a3b8;
             border-radius: 3px;
             z-index: 500;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.8);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.9);
             pointer-events: none;
             will-change: transform, opacity;
-            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
+            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
+            display: none;
         }
 
         .live-status-banner {
@@ -324,6 +338,7 @@
             width: 100%;
             max-width: 520px;
             flex-shrink: 0;
+            transform: translateZ(15px);
         }
 
         .control-panel {
@@ -337,9 +352,10 @@
             flex-direction: column;
             gap: 5px;
             backdrop-filter: blur(10px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.9);
             flex-shrink: 0;
             margin-bottom: 4px;
+            transform: translateZ(20px);
         }
 
         .control-row {
@@ -405,19 +421,19 @@
 
     <header>
         <div class="game-header-title">
-            <i class="fa-solid fa-crown" style="color: #facc15;"></i>
-            <span>ZENIX BACCARAT (WEB APP)</span>
+            <i class="fa-solid fa-cube" style="color: #facc15;"></i>
+            <span>ZENIX 3D BACCARAT (WEB APP)</span>
         </div>
         <div class="live-badge">
             <i class="fa-solid fa-circle" style="font-size: 5px;"></i>
-            <span>۲۰ بازیکن (روان و بهینه)</span>
+            <span>میز سه‌بعدی و تعاملی</span>
         </div>
     </header>
 
     <div class="game-bar">
         <div class="user-welcome-tag">
             <i class="fa-solid fa-user-circle"></i>
-            <span>شما (صندلی ۱)</span>
+            <span>شما (صندلی ۱ - VIP)</span>
         </div>
         
         <div class="user-stats">
@@ -435,19 +451,22 @@
 
     <div class="main-stage">
         
-        <!-- بدنه اصلی بازی: ستون چپ (۱۰ نفر) + میز مرکزی + ستون راست (۱۰ نفر) -->
+        <!-- بدنه سه‌بعدی بازی: ستون چپ + میز مرکزی سه‌بعدی + ستون راست -->
         <div class="table-arena-wrapper" id="arenaWrapper">
+            <!-- عنصر واحد کارت پروازی برای جلوگیری از لگ (GPU Accelerated) -->
+            <div class="flying-card-item" id="sharedFlyingCard"></div>
+
             <!-- ستون چپ: ۱۰ صندلی اول -->
             <div class="seats-column" id="leftSeatsColumn"></div>
 
-            <!-- میز مرکزی باکارت -->
+            <!-- میز مرکزی سه‌بعدی باکارت -->
             <div class="felt-table-center" id="feltTableCenter">
                 <div class="dealer-tray-section">
                     <span style="font-size: 9px; color: #cbd5e1; font-weight: 700;">
                         <i class="fa-solid fa-user-tie" style="color: #facc15;"></i> دیلر: سارا
                     </span>
-                    <span style="font-family:'Orbitron'; font-size:7px; color:#facc15; border:1px solid #facc15; padding:2px 5px; border-radius:3px;" id="deckStatus">
-                        SHOE READY
+                    <span style="font-family:'Orbitron'; font-size:7px; color:#facc15; border:1px solid #facc15; padding:2px 5px; border-radius:3px;">
+                        3D VIP TABLE
                     </span>
                 </div>
 
@@ -487,25 +506,32 @@
         </div>
 
         <div class="live-status-banner" id="statusBanner">
-            شرط خود را انتخاب کرده و دکمه توزیع کارت را بزنید تا کارت اول و دوم با سرعت بالا و بدون لگ پخش شوند.
+            شرط خود را انتخاب کرده و دکمه توزیع کارت را بزنید.
         </div>
 
         <div class="control-panel">
-            <div class="control-row">
+            <div class="control-row" id="bettingInputRow">
                 <span style="font-size: 10px; color: #94a3b8;">مبلغ شرط (تومان):</span>
                 <div class="bet-input-box">
                     <input type="number" class="bet-input" id="betAmount" value="50000" step="10000">
                 </div>
             </div>
 
-            <div class="control-row">
+            <div class="control-row" id="bettingButtonsRow">
                 <button class="btn-action btn-player" onclick="selectBetType('PLAYER')">بازیکن (ضریب ۲)</button>
                 <button class="btn-action btn-tie" onclick="selectBetType('TIE')">مساوی (ضریب ۸)</button>
                 <button class="btn-action btn-banker" onclick="selectBetType('BANKER')">بانکر (ضریب ۱.۹۵)</button>
             </div>
             
-            <div class="control-row">
-                <button class="btn-action btn-deal" id="dealBtn" onclick="startBaccaratRound()">توزیع سریع کارت‌ها (GPU Accelerated)</button>
+            <div class="control-row" id="actionDealRow">
+                <button class="btn-action btn-deal" id="dealBtn" onclick="startBaccaratRound()">توزیع سه‌بعدی کارت‌ها (شروع بازی)</button>
+            </div>
+
+            <!-- بخش پرسش کارت سوم از کاربر (مخفی در حالت عادی) -->
+            <div class="control-row" id="userDecisionRow" style="display: none; gap: 6px;">
+                <span style="font-size: 10px; color: #facc15; font-weight: 700;">آیا برای خودت کارت سوم می‌خواهی؟</span>
+                <button class="btn-action btn-player" onclick="resolveUserChoice(true)">کارت می‌خواهم</button>
+                <button class="btn-action btn-banker" onclick="resolveUserChoice(false)">ایست (بس است)</button>
             </div>
         </div>
     </div>
@@ -535,6 +561,7 @@
         const rightColumn = document.getElementById('rightSeatsColumn');
         const seatRefs = [];
         let isGameBusy = false;
+        let resolveUserDecision = null; // برای مدیریت پرامپت کارت سوم کاربر
 
         playerNames.forEach((name, i) => {
             const isUser = i === 0;
@@ -609,30 +636,30 @@
             return { val, symbol: suit.symbol, cssClass: suit.class, score: scoreVal };
         }
 
-        // تابع پرواز کارت با استفاده از GPU Transform برای حذف کامل لگ در موبایل و دسکتاپ
+        // تابع پرواز کارت فوق‌العاده روان بدون لگ (استفاده از یک المان مشترک کش‌شده)
         function flyCardToSeat(targetCoords, startCoords) {
             return new Promise((resolve) => {
-                const arenaWrapper = document.getElementById('arenaWrapper');
-                
-                const cardFly = document.createElement('div');
-                cardFly.className = 'flying-card-item';
-                // شروع از مبدأ دیلر در مرکز
+                const cardFly = document.getElementById('sharedFlyingCard');
+                cardFly.style.display = 'block';
+                cardFly.style.transform = `translate3d(0px, 0px, 0) scale(0.4) rotate(0deg)`;
+                cardFly.style.opacity = '0';
+
+                // تنظیم موقعیت شروع در مرکز میز
                 cardFly.style.left = `${startCoords.x}px`;
                 cardFly.style.top = `${startCoords.y}px`;
-                arenaWrapper.appendChild(cardFly);
 
                 const deltaX = targetCoords.x - startCoords.x;
                 const deltaY = targetCoords.y - startCoords.y;
 
                 requestAnimationFrame(() => {
                     cardFly.style.transform = `translate3d(${deltaX}px, ${deltaY}px, 0) scale(0.85) rotate(10deg)`;
-                    cardFly.style.opacity = '0.95';
+                    cardFly.style.opacity = '1';
                 });
 
                 setTimeout(() => {
-                    cardFly.remove();
+                    cardFly.style.display = 'none';
                     resolve();
-                }, 380); // انیمیشن سریع‌تر و روان‌تر
+                }, 300); // سرعت انیمیشن پرواز
             });
         }
 
@@ -643,10 +670,9 @@
 
             const startCoords = {
                 x: wrapperRect.width / 2 - 10,
-                y: 40
+                y: 50
             };
 
-            // کش کردن مختصات صندلی‌ها پیش از شروع برای جلوگیری از Layout Thrashing (لگ)
             const cachedCoords = seatRefs.map(ref => {
                 const r = ref.element.getBoundingClientRect();
                 return {
@@ -655,24 +681,43 @@
                 };
             });
 
-            // پخش کارت اول
-            banner.innerText = "دیلر در حال پخش «کارت اول» به بازیکنان...";
+            // کارت اول
+            banner.innerText = "دیلر در حال توزیع «کارت اول» به دور میز است...";
             const cardData1 = Array.from({length: 20}, () => getRandomCard());
 
             for (let i = 0; i < 20; i++) {
                 await flyCardToSeat(cachedCoords[i], startCoords);
                 document.getElementById(`seatCard1-${i}`).innerText = `${cardData1[i].val}${cardData1[i].symbol}`;
-                await new Promise(r => setTimeout(r, 25)); // فواصل زمانی بسیار کوتاه برای سرعت عالی
+                await new Promise(r => setTimeout(r, 15));
             }
 
-            // پخش کارت دوم
-            banner.innerText = "پخش کارت اول تمام شد. در حال پخش «کارت دوم»...";
+            // کارت دوم
+            banner.innerText = "پخش کارت اول تمام شد. در حال توزیع «کارت دوم»...";
             const cardData2 = Array.from({length: 20}, () => getRandomCard());
 
             for (let i = 0; i < 20; i++) {
                 await flyCardToSeat(cachedCoords[i], startCoords);
                 document.getElementById(`seatCard2-${i}`).innerText = `${cardData2[i].val}${cardData2[i].symbol}`;
-                await new Promise(r => setTimeout(r, 25));
+                await new Promise(r => setTimeout(r, 15));
+            }
+        }
+
+        // تابع دریافت پاسخ کاربر برای کارت سوم
+        function askUserForThirdCard() {
+            return new Promise((resolve) => {
+                resolveUserDecision = resolve;
+                document.getElementById('actionDealRow').style.display = 'none';
+                document.getElementById('userDecisionRow').style.display = 'flex';
+                document.getElementById('statusBanner').innerText = "کارت دوم پخش شد! لطفاً تصمیم خود را برای کارت سوم اعلام کنید.";
+            });
+        }
+
+        function resolveUserChoice(wantsCard) {
+            document.getElementById('userDecisionRow').style.display = 'none';
+            document.getElementById('actionDealRow').style.display = 'flex';
+            if (resolveUserDecision) {
+                resolveUserDecision(wantsCard);
+                resolveUserDecision = null;
             }
         }
 
@@ -700,10 +745,21 @@
                 document.getElementById(`seatCard2-${i}`).innerText = '--';
             }
 
+            // توزیع کارت اول و دوم به همه صندلی‌ها
             await dealCardsInRounds();
 
+            // پرسش از کاربر برای کارت سوم پس از پخش کارت دوم
+            const wantsThirdCard = await askUserForThirdCard();
+
             const banner = document.getElementById('statusBanner');
-            banner.innerText = "توزیع دوره‌ای کارت‌ها کامل شد. باز شدن کارت‌های اصلی میز (Player & Banker)...";
+            if (wantsThirdCard) {
+                const extraCard = getRandomCard();
+                // اضافه کردن کارت سوم به اسلات نمایشی صندلی شما (صندلی 0)
+                document.getElementById(`seatCard1-0`).innerText += ` + ${extraCard.val}`;
+                banner.innerText = `شما کارت سوم (${extraCard.val}${extraCard.symbol}) را برداشتید. محاسبه امتیاز نهایی میز...`;
+            } else {
+                banner.innerText = "شما ایست دادید. محاسبه امتیاز نهایی میز...";
+            }
 
             setTimeout(() => {
                 const p1 = getRandomCard();
@@ -711,8 +767,12 @@
                 const b1 = getRandomCard();
                 const b2 = getRandomCard();
 
-                const pScore = (p1.score + p2.score) % 10;
-                const bScore = (b1.score + b2.score) % 10;
+                let pScore = (p1.score + p2.score) % 10;
+                let bScore = (b1.score + b2.score) % 10;
+
+                if (wantsThirdCard) {
+                    pScore = (pScore + 3) % 10; // تاثیر فرضی کارت سوم بر امتیاز
+                }
 
                 document.getElementById('playerCards').innerHTML = `
                     <div class="playing-card ${p1.cssClass}"><div>${p1.val}</div><div class="card-symbol">${p1.symbol}</div><div style="transform: rotate(180deg);">${p1.val}</div></div>
@@ -731,7 +791,7 @@
                 else if (bScore > pScore) winner = 'BANKER';
                 else winner = 'TIE';
 
-                let resultText = `نتیجه میز: ${winner === 'PLAYER' ? 'بازیکن' : winner === 'BANKER' ? 'بانکر' : 'مساوی'}. `;
+                let resultText = `نتیجه نهایی: ${winner === 'PLAYER' ? 'بازیکن' : winner === 'BANKER' ? 'بانکر' : 'مساوی'}. `;
 
                 if (selectedBet === winner) {
                     let multiplier = (winner === 'TIE') ? 8 : (winner === 'BANKER' ? 1.95 : 2);
@@ -747,7 +807,7 @@
                 
                 isGameBusy = false;
                 document.getElementById('dealBtn').style.opacity = '1';
-            }, 600);
+            }, 800);
         }
     </script>
 </body>
