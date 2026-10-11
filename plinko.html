@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>باکارات دو نفره (شما و دیلر) - Zenix Casino</title>
+    <title>باکارات زنده (کارت‌های واقعی) - Zenix Casino</title>
     <link rel="icon" href="data:image/x-icon;base64,=">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -128,42 +128,48 @@
             position: relative;
         }
 
-        /* استودیوی سه بعدی دیلر */
+        /* استودیوی سه بعدی دیلر همراه با شمارنده کفش کارت‌ها */
         .dealer-3d-studio {
             background: linear-gradient(180deg, rgba(15,23,42,0.95) 0%, rgba(3,7,18,0.9) 100%);
             border: 1px solid rgba(250,204,21,0.4);
             border-radius: 12px;
-            padding: 12px;
+            padding: 10px 14px;
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-            gap: 8px;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
         }
 
+        .dealer-info-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .dealer-avatar-3d {
-            width: 60px;
-            height: 60px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             background: linear-gradient(135deg, #facc15, #f97316);
             color: #0f172a;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 26px;
-            box-shadow: 0 0 20px rgba(250,204,21,0.6);
+            font-size: 20px;
+            box-shadow: 0 0 15px rgba(250,204,21,0.5);
             position: relative;
         }
-        .dealer-avatar-3d::after {
-            content: '';
-            position: absolute;
-            bottom: 3px;
-            right: 3px;
-            width: 12px;
-            height: 12px;
-            background: #22c55e;
-            border-radius: 50%;
-            border: 2px solid #0f172a;
+
+        /* شمارنده تعداد کارت‌های باقی‌مانده در میز */
+        .shoe-counter-badge {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(250,204,21,0.4);
+            border-radius: 8px;
+            padding: 4px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Orbitron';
         }
 
         .arena-row {
@@ -199,15 +205,16 @@
         .cards-row {
             display: flex;
             gap: 5px;
-            min-height: 55px;
+            min-height: 60px;
             align-items: center;
             justify-content: center;
         }
 
+        /* استایل واقعی و استاندارد کارت پاسور */
         .playing-card {
-            width: 36px;
-            height: 52px;
-            background: #fff;
+            width: 38px;
+            height: 56px;
+            background: #ffffff;
             color: #0f172a;
             border-radius: 5px;
             display: flex;
@@ -216,12 +223,14 @@
             padding: 3px;
             font-family: 'Orbitron';
             font-weight: 900;
-            font-size: 10.5px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.6);
+            font-size: 10px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.7);
+            border: 1px solid #cbd5e1;
             animation: cardDeal 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             transform-origin: center;
         }
         .playing-card.red { color: #dc2626; }
+        .card-symbol { font-size: 14px; align-self: center; line-height: 1; }
         @keyframes cardDeal { 
             0% { transform: translateY(-70px) scale(0.3) rotate(-20deg); opacity: 0; } 
             100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; } 
@@ -308,7 +317,7 @@
 <body>
 
     <header>
-        <div class="game-header-title"><i class="fas fa-dice" style="color:#38bdf8;"></i> باکارات زنده (شما و دیلر)</div>
+        <div class="game-header-title"><i class="fas fa-dice" style="color:#38bdf8;"></i> باکارات زنده (کارت‌های واقعی)</div>
         <div style="display:flex; align-items:center; gap:8px;">
             <div class="live-badge"><i class="fas fa-circle" style="font-size:6px;"></i> زنده</div>
             <button class="guide-btn" onclick="openHelpModal()"><i class="fas fa-question-circle"></i> راهنما</button>
@@ -332,14 +341,20 @@
 
     <div class="main-stage">
         <div class="table-board">
-            <!-- استودیوی سه بعدی دیلر (تنها شخص نشسته پشت میز) -->
+            <!-- استودیوی سه بعدی دیلر + شمارنده کفش کارت‌های میز -->
             <div class="dealer-3d-studio">
-                <div class="dealer-avatar-3d">
-                    <i class="fas fa-user-tie"></i>
+                <div class="dealer-info-left">
+                    <div class="dealer-avatar-3d">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:8px; color:#94a3b8; font-weight:700;">دیلر میز</div>
+                        <div style="font-family:'Orbitron'; font-size:10px; font-weight:800; color:#facc15;">لِوَن (Live Dealer)</div>
+                    </div>
                 </div>
-                <div style="text-align:center;">
-                    <div style="font-size:8.5px; color:#94a3b8; font-weight:700;">دیلر زنده میز</div>
-                    <div style="font-family:'Orbitron'; font-size:10px; font-weight:800; color:#facc15;">لِوَن (Live Dealer)</div>
+                <div class="shoe-counter-badge">
+                    <span style="font-size:7px; color:#94a3b8;">کارت‌های میز:</span>
+                    <span style="font-size:12px; font-weight:900; color:#22c55e;" id="shoe-count">52</span>
                 </div>
             </div>
 
@@ -373,7 +388,7 @@
                     <input type="number" id="bet-amount" class="bet-input" value="10" min="1">
                 </div>
             </div>
-            <button class="btn-action btn-deal" id="btn-start" onclick="startLiveRound()">شروع بازی (بور و پخش تکی کارت‌ها)</button>
+            <button class="btn-action btn-deal" id="btn-start" onclick="startLiveRound()">شروع بازی (پخش تکی کارت‌ها)</button>
         </div>
 
         <div class="control-panel" id="action-control-panel" style="display: none;">
@@ -401,13 +416,12 @@
     <div class="modal" id="m-help">
         <div class="modal-content" style="max-width: 320px;">
             <div class="modal-header">
-                <span><i class="fas fa-graduation-cap" style="color:#facc15;"></i> راهنمای بازی باکارات دو نفره</span>
+                <span><i class="fas fa-graduation-cap" style="color:#facc15;"></i> راهنمای بازی باکارات زنده</span>
                 <button class="modal-close" onclick="closeHelpModal()"><i class="fas fa-times"></i></button>
             </div>
             <div style="overflow-y:auto; max-height: 60vh; font-size:9.5px; color:#cbd5e1; line-height:1.6;">
-                <p style="margin-bottom:8px;"><strong style="color:#facc15;">پخش تکی کارت‌ها:</strong> دیلر کارت‌ها را به صورت زنده و تک‌تکه برای شما و خودش پخش می‌کند.</p>
-                <p style="margin-bottom:8px;"><strong style="color:#38bdf8;">پرسش کارت سوم:</strong> دیلر پس از دور دوم از شما می‌پرسد که آیا کارت سوم نیاز دارید یا خیر.</p>
-                <p style="margin-bottom:6px;"><strong style="color:#22c55e;">هدف:</strong> نزدیک شدن به امتیاز ۹ بدون رد شدن از آن.</p>
+                <p style="margin-bottom:8px;"><strong style="color:#facc15;">کارت‌های واقعی:</strong> کارت‌ها دارای نمادهای استاندارد (شاه، بی‌بی، سرباز و آس) با طراحی واقعی پاسور هستند.</p>
+                <p style="margin-bottom:8px;"><strong style="color:#38bdf8;">شمارنده میز:</strong> تعداد کل کارت‌های باقی‌مانده در کفش میز به صورت زنده نمایش داده می‌شود.</p>
             </div>
         </div>
     </div>
@@ -430,6 +444,7 @@
         let uUid = null;
         window.userBalance = 1500.00;
         let currentBet = 10;
+        let shoeCardsCount = 52;
 
         let playerHand = [];
         let bankerHand = [];
@@ -475,6 +490,7 @@
         function updateStats() {
             const balEl = document.getElementById('balance-val');
             if(balEl) balEl.textContent = `$${window.userBalance.toFixed(2)}`;
+            document.getElementById('shoe-count').textContent = shoeCardsCount;
         }
 
         window.processCasinoDeposit = async function() {
@@ -492,6 +508,8 @@
         function drawCard() {
             const suit = suits[Math.floor(Math.random() * suits.length)];
             const val = values[Math.floor(Math.random() * values.length)];
+            shoeCardsCount = Math.max(30, shoeCardsCount - 1);
+            updateStats();
             return { suit, val, isRed: suit === '♥' || suit === '♦' };
         }
 
@@ -502,14 +520,24 @@
             bContainer.innerHTML = '';
 
             playerHand.forEach(c => {
-                pContainer.innerHTML += `<div class="playing-card ${c.isRed ? 'red' : ''}"><span>${c.val}</span><span style="align-self:center; font-size:12px;">${c.suit}</span><span style="align-self:flex-end;">${c.val}</span></div>`;
+                pContainer.innerHTML += `
+                    <div class="playing-card ${c.isRed ? 'red' : ''}">
+                        <span>${c.val}</span>
+                        <span class="card-symbol">${c.suit}</span>
+                        <span style="align-self:flex-end; transform:rotate(180deg);">${c.val}</span>
+                    </div>`;
             });
 
             bankerHand.forEach((c, idx) => {
                 if (idx === 0 && !revealDealer) {
                     bContainer.innerHTML += `<div class="playing-card" style="background:#1e293b; color:#38bdf8; justify-content:center; align-items:center;"><i class="fas fa-lock"></i></div>`;
                 } else {
-                    bContainer.innerHTML += `<div class="playing-card ${c.isRed ? 'red' : ''}"><span>${c.val}</span><span style="align-self:center; font-size:12px;">${c.suit}</span><span style="align-self:flex-end;">${c.val}</span></div>`;
+                    bContainer.innerHTML += `
+                        <div class="playing-card ${c.isRed ? 'red' : ''}">
+                            <span>${c.val}</span>
+                            <span class="card-symbol">${c.suit}</span>
+                            <span style="align-self:flex-end; transform:rotate(180deg);">${c.val}</span>
+                        </div>`;
                 }
             });
 
@@ -517,34 +545,29 @@
             document.getElementById('banker-score').textContent = revealDealer ? calculateScore(bankerHand) : '?';
         }
 
-        // پخش تک‌تکه و زنده کارت‌ها توسط دیلر برای شما و خودش
         async function dealCardsSequentially() {
             playerHand = [];
             bankerHand = [];
             renderHands(false);
 
-            document.getElementById('game-status-msg').textContent = 'دیلر در حال بور کردن و بر زدن کارت‌ها... 🃏';
-            await new Promise(r => setTimeout(r, 700));
+            document.getElementById('game-status-msg').textContent = 'دیلر در حال بر زدن کارت‌ها... 🃏';
+            await new Promise(r => setTimeout(r, 600));
 
-            // کارت اول بازیکن
             document.getElementById('game-status-msg').textContent = 'دیلر کارت اول را به شما می‌دهد...';
             playerHand.push(drawCard());
             renderHands(false);
-            await new Promise(r => setTimeout(r, 400));
+            await new Promise(r => setTimeout(r, 350));
 
-            // کارت اول دیلر
             document.getElementById('game-status-msg').textContent = 'دیلر کارت اول را برای خودش بر می‌دارد...';
             bankerHand.push(drawCard());
             renderHands(false);
-            await new Promise(r => setTimeout(r, 400));
+            await new Promise(r => setTimeout(r, 350));
 
-            // کارت دوم بازیکن
             document.getElementById('game-status-msg').textContent = 'دیلر کارت دوم را به شما می‌دهد...';
             playerHand.push(drawCard());
             renderHands(false);
-            await new Promise(r => setTimeout(r, 400));
+            await new Promise(r => setTimeout(r, 350));
 
-            // کارت دوم دیلر
             document.getElementById('game-status-msg').textContent = 'دیلر کارت دوم را برای خودش بر می‌دارد...';
             bankerHand.push(drawCard());
             renderHands(false);
@@ -578,7 +601,7 @@
                 document.getElementById('game-status-msg').textContent = 'دیلر در حال دادن کارت سوم به شماست...';
                 playerHand.push(drawCard());
                 renderHands(false);
-                await new Promise(r => setTimeout(r, 600));
+                await new Promise(r => setTimeout(r, 500));
             }
 
             document.getElementById('action-control-panel').style.display = 'none';
@@ -593,12 +616,12 @@
                     bankerHand.push(drawCard());
                 }
                 resolveShowdown();
-            }, 1000);
+            }, 900);
         }
 
         async function resolveShowdown() {
             gamePhase = 'SHOWDOWN';
-            renderHands(true); // رو شدن کارت‌های دیلر
+            renderHands(true);
 
             const pScore = calculateScore(playerHand);
             const dScore = calculateScore(bankerHand);
@@ -639,6 +662,7 @@
         });
 
         fetchUserBalance();
+        updateStats();
     </script>
 </body>
 </html>
