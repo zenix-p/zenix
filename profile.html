@@ -769,7 +769,6 @@
 
             window.showToast(`کد تایید به ایمیل ${email} ارسال شد.`, 'success', 5000);
 
-            // ذخیره زمان انقضای تایمر در لوکال استوریج جهت ماندگاری پس از ریفرش
             const expireTime = Date.now() + 60000;
             localStorage.setItem('otp_cooldown_' + emailInputId, expireTime);
 
@@ -1039,9 +1038,9 @@
               const { error } = await supabaseClient
                 .from('users')
                 .update({
-                  pendingEmail: newEmail,
-                  adminApprovalStatus: 'pending',
-                  requestTimestamp: new Date().toISOString()
+                  pending_email: newEmail,
+                  admin_approval_status: 'pending',
+                  request_timestamp: new Date().toISOString()
                 })
                 .eq('id', currentUser.id);
 
