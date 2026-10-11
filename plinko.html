@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="theme-color" content="#031b16">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>میز باکارات ۲۰ نفره - Zenix Casino</title>
+    <title>میز زنده کازینو - Zenix Live Casino</title>
     <link rel="icon" href="data:image/x-icon;base64,=">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,146 +12,463 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --felt-green: #075b42;
-            --felt-border: #3a2414;
-            --gold-accent: #f8d66d;
-            --bg-dark: #07100e;
-            --glass-border: rgba(255, 239, 190, .25);
+            --gold-accent: #facc15;
+            --bg-dark: #030712;
+            --glass-border: rgba(255, 255, 255, 0.15);
         }
 
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            font-family: 'Plus Jakarta Sans', 'Vazirmatn', sans-serif; 
-            user-select: none; 
-            -webkit-tap-highlight-color: transparent; 
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', 'Vazirmatn', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
         
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: var(--bg-dark);
-            color: #fffdf4;
-        }
-
-        .game-wrapper {
+        body {
+            background: #030712;
+            min-height: 100vh;
+            min-height: 100svh;
+            color: #f8fafc;
             display: flex;
             flex-direction: column;
-            width: 100%;
-            height: 100vh;
-            height: 100svh;
-            max-width: 500px; /* استاندارد نمایش موبایلی و وب‌اپ برای ابعاد برابر */
-            margin: 0 auto;
+            overflow-x: hidden;
             position: relative;
-            background: #04150f;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+        }
+
+        /* پس‌زمینه استودیوی لوکس کازینو و دیلر زنده */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background-image: linear-gradient(180deg, rgba(3, 15, 11, 0.45) 0%, rgba(3, 7, 18, 0.85) 60%, rgba(3, 7, 18, 0.95) 100%), 
+                              url("https://images.unsplash.com/photo-1511193311914-0346f16efe90?q=80&w=1920&auto=format&fit=crop");
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
         }
 
         header {
-            background: linear-gradient(90deg, rgba(3,12,10,.95), rgba(13,24,20,.8));
-            border-bottom: 1px solid rgba(255,222,130,.28);
-            padding: 8px 12px;
+            background: rgba(15, 23, 42, 0.85);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 10px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 100;
-            backdrop-filter: blur(10px);
-            flex-shrink: 0;
-            height: 44px;
-        }
-        .game-header-title { 
-            font-family: 'Vazirmatn', sans-serif; 
-            font-size: 13px; 
-            font-weight: 800; 
-            color: #ffe7a2; 
-            display: flex; 
-            align-items: center; 
-            gap: 5px; 
-            text-shadow: 0 2px 7px #000;
-        }
-        .live-badge { 
-            background: rgba(112,18,18,.55); 
-            border: 1px solid rgba(255,88,88,.9); 
-            color: #ffd6d6; 
-            padding: 2px 6px; 
-            border-radius: 6px; 
-            font-size: 9px; 
-            font-weight: 800; 
-            display: flex; 
-            align-items: center; 
-            gap: 3px; 
+            backdrop-filter: blur(12px);
         }
 
+        .game-header-title { font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 800; color: #facc15; display: flex; align-items: center; gap: 6px; }
+        .live-badge { background: rgba(239, 68, 68, 0.25); border: 1px solid #ef4444; color: #ef4444; padding: 3px 8px; border-radius: 6px; font-size: 9px; font-weight: 800; display: flex; align-items: center; gap: 4px; }
+
         .game-bar {
-            background: rgba(5,18,14,.85);
-            border-bottom: 1px solid rgba(255,222,130,.18);
-            padding: 6px 12px;
+            background: rgba(15, 23, 42, 0.75);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 8px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-            height: 38px;
-            z-index: 90;
+            backdrop-filter: blur(10px);
+            z-index: 10;
         }
 
         .user-welcome-tag {
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 700;
             color: #38bdf8;
             background: rgba(56, 189, 248, 0.1);
             border: 1px solid rgba(56, 189, 248, 0.25);
-            padding: 2px 8px;
-            border-radius: 10px;
+            padding: 3px 10px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
         }
 
-        .user-stats { display: flex; align-items: center; gap: 6px; }
-        .stat-pill { 
-            background: rgba(0,0,0,.42); 
-            border: 1px solid rgba(255,226,149,.26); 
-            padding: 3px 8px; 
-            border-radius: 12px; 
-            display: flex; 
-            align-items: center; 
-            gap: 4px; 
-        }
-        .stat-val { font-family: 'Orbitron', sans-serif; font-weight: 800; color: #ffdc79; font-size: 11px; }
+        .user-stats { display: flex; align-items: center; gap: 8px; }
+        .stat-pill { background: rgba(0,0,0,0.5); border: 1px solid rgba(250, 204, 21, 0.3); padding: 4px 10px; border-radius: 12px; display: flex; align-items: center; gap: 5px; }
+        .stat-val { font-family: 'Orbitron', sans-serif; font-weight: 800; color: var(--gold-accent); font-size: 11px; }
         
         .casino-deposit-btn {
             background: linear-gradient(135deg, #facc15, #f97316);
             color: #0f172a;
-            padding: 4px 10px;
-            border-radius: 8px;
+            padding: 5px 12px;
+            border-radius: 10px;
             border: none;
-            font-size: 9.5px;
+            font-size: 10px;
             font-weight: 800;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 3px;
-            box-shadow: 0 3px 10px rgba(0,0,0,.24);
+            gap: 4px;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
         }
 
-        /* بخش اصلی صحنه و تصویر میز */
         .main-stage {
-            flex: 1;
-            position: relative;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            padding: 16px;
+            width: 100%;
+            max-width: 650px;
+            margin: 0 auto;
+            gap: 14px;
+            flex: 1;
+            justify-content: center;
         }
 
-        /* پس‌زمینه اختصاصی تصویر هماهنگ با میز */
-        .table-container {
-            position: absolute;
-            inset: 0;
+        /* میز کازینو */
+        .casino-felt-table {
             width: 100%;
-            height: 100%;
-            background-image: linear-gradient(180deg, rgba(1,8,8,.16), rgba(1,8,8,.08) 48%, rgba(1,8,8,.30)), url("data:image/jpeg;base64,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
+            background: radial-gradient(circle at 50% 30%, rgba(6, 95, 70, 0.9) 0%, rgba(6, 78, 59, 0.95) 60%, rgba(2, 44, 34, 0.98) 100%);
+            border: 4px solid #1e293b;
+            border-radius: 24px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 0 30px rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            position: relative;
+        }
+
+        .dealer-tray-section {
+            background: rgba(15, 23, 42, 0.9);
+            border: 2px solid #ca8a04;
+            border-radius: 10px;
+            padding: 8px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+        }
+
+        .chip-rack {
+            display: flex;
+            gap: 5px;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .casino-chip {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px dashed #fff;
+            display: inline-block;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+        .chip-red { background: #dc2626; }
+        .chip-green { background: #16a34a; }
+        .chip-blue { background: #2563eb; }
+        .chip-black { background: #111827; }
+
+        .live-status-banner {
+            text-align: center;
+            font-family: 'Vazirmatn';
+            font-weight: 700;
+            font-size: 12px;
+            color: var(--gold-accent);
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            width: 100%;
+        }
+
+        .arena-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .arena-box {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .arena-box.player-side { border-color: rgba(56,189,248,0.5); }
+        .arena-box.banker-side { border-color: rgba(239,68,68,0.5); }
+
+        .arena-title {
+            font-family: 'Orbitron';
+            font-size: 11px;
+            font-weight: 800;
+            color: #facc15;
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .cards-row {
+            display: flex;
+            gap: 6px;
+            min-height: 70px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .playing-card {
+            width: 44px;
+            height: 64px;
+            background: #ffffff;
+            color: #0f172a;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 4px;
+            font-family: 'Orbitron';
+            font-weight: 900;
+            font-size: 11px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.7);
+            border: 1px solid #cbd5e1;
+            animation: cardDeal 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .playing-card.red { color: #dc2626; }
+        .card-symbol { font-size: 16px; align-self: center; line-height: 1; }
+        @keyframes cardDeal { 
+            0% { transform: translateY(-50px) scale(0.3) rotate(-15deg); opacity: 0; } 
+            100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; } 
+        }
+
+        .control-panel {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bet-input-box {
+            display: flex;
+            align-items: center;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 4px 10px;
+            gap: 6px;
+            flex: 1;
+        }
+        .bet-input {
+            background: transparent;
+            border: none;
+            color: var(--gold-accent);
+            font-family: 'Orbitron';
+            font-weight: 800;
+            font-size: 13px;
+            width: 100%;
+            outline: none;
+            text-align: center;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: 'Vazirmatn';
+            font-weight: 800;
+            font-size: 11px;
+            cursor: pointer;
+            border: none;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: transform 0.1s ease, filter 0.2s ease;
+        }
+        .btn-action:hover { filter: brightness(1.1); }
+        .btn-action:active { transform: scale(0.98); }
+        .btn-yes { background: linear-gradient(135deg, #22c55e, #16a34a); color: #030712; }
+        .btn-no { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .btn-deal { background: linear-gradient(135deg, #facc15, #f97316); color: #030712; width: 100%; }
+
+        /* مودال شارژ حساب */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2,6,23,0.85); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(10px); padding: 16px; }
+        .modal.show { display: flex; }
+        .modal-content { background: linear-gradient(135deg, #0f172a, #1e293b); border: 1px solid rgba(250,204,21,0.3); border-radius: 16px; width: 100%; max-width: 360px; display: flex; flex-direction: column; padding: 18px; box-shadow: 0 20px 40px rgba(0,0,0,0.9); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: #facc15; font-weight: 800; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px; }
+        .modal-close { background: rgba(255,255,255,0.05); border: none; color: #94a3b8; cursor: pointer; font-size: 12px; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .form-input { width: 100%; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 10px; color: #fff; font-size: 12px; outline: none; margin-top: 6px; margin-bottom: 12px; }
+        .btn-submit-deposit { width: 100%; background: linear-gradient(135deg, #facc15, #f97316); color: #0f172a; border: none; padding: 10px; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="game-header-title">
+            <i class="fa-solid fa-crown" style="color: #facc15;"></i>
+            <span>ZENIX LIVE CASINO</span>
+        </div>
+        <div class="live-badge">
+            <i class="fa-solid fa-circle" style="font-size: 6px; animation: pulse 1.5s infinite;"></i>
+            <span>پخش زنده</span>
+        </div>
+    </header>
+
+    <div class="game-bar">
+        <div class="user-welcome-tag">
+            <i class="fa-solid fa-user-circle"></i>
+            <span>بازیکن گرامی</span>
+        </div>
+        
+        <div class="user-stats">
+            <div class="stat-pill">
+                <i class="fa-solid fa-wallet" style="color: #facc15; font-size: 11px;"></i>
+                <span class="stat-val" id="userBalance">1,500,000</span>
+                <span style="font-size: 9px; color: #94a3b8;">تومان</span>
+            </div>
+            <button class="casino-deposit-btn" onclick="openDepositModal()">
+                <i class="fa-solid fa-plus-circle"></i>
+                <span>شارژ</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="main-stage">
+        <div class="casino-felt-table">
+            
+            <!-- بخش دیلر و کفش کارت -->
+            <div class="dealer-tray-section">
+                <div>
+                    <i class="fa-solid fa-user-tie" style="color: #ca8a04; font-size: 16px;"></i>
+                    <span style="font-size: 10px; font-weight: 700; color: #cbd5e1; margin-right: 6px;">دیلر: الناز</span>
+                </div>
+                <div class="chip-rack">
+                    <span class="casino-chip chip-red"></span>
+                    <span class="casino-chip chip-green"></span>
+                    <span class="casino-chip chip-blue"></span>
+                    <span class="casino-chip chip-black"></span>
+                </div>
+                <div style="font-family:'Orbitron'; font-size:9px; color:#ca8a04; border:1px solid #ca8a04; padding:3px 8px; border-radius:4px;">
+                    TABLE #04
+                </div>
+            </div>
+
+            <!-- بنر وضعیت زنده -->
+            <div class="live-status-banner" id="statusBanner">
+                مرحله شرط‌بندی فعال است. لطفاً مبلغ و نوع شرط خود را انتخاب کنید.
+            </div>
+
+            <!-- میز بازی -->
+            <div class="arena-layout">
+                <div class="arena-box player-side">
+                    <div class="arena-title">
+                        <span>PLAYER</span>
+                        <span id="playerScore" style="color:#38bdf8;">0</span>
+                    </div>
+                    <div class="cards-row" id="playerCards">
+                        <div class="playing-card red">
+                            <div>10</div>
+                            <div class="card-symbol">♥</div>
+                            <div style="transform: rotate(180deg);">10</div>
+                        </div>
+                        <div class="playing-card">
+                            <div>8</div>
+                            <div class="card-symbol">♠</div>
+                            <div style="transform: rotate(180deg);">8</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arena-box banker-side">
+                    <div class="arena-title">
+                        <span>BANKER</span>
+                        <span id="bankerScore" style="color:#ef4444;">0</span>
+                    </div>
+                    <div class="cards-row" id="bankerCards">
+                        <div class="playing-card red">
+                            <div>9</div>
+                            <div class="card-symbol">♦</div>
+                            <div style="transform: rotate(180deg);">9</div>
+                        </div>
+                        <div class="playing-card">
+                            <div>J</div>
+                            <div class="card-symbol">♣</div>
+                            <div style="transform: rotate(180deg);">J</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- پنل کنترل -->
+        <div class="control-panel">
+            <div class="control-row">
+                <span style="font-size: 11px; color: #94a3b8;">مبلغ شرط (تومان):</span>
+                <div class="bet-input-box">
+                    <input type="number" class="bet-input" id="betAmount" value="50000" step="10000">
+                </div>
+            </div>
+
+            <div class="control-row">
+                <button class="btn-action btn-yes" onclick="placeBet('PLAYER')">شرط روی بازیکن (ضریب 1.95)</button>
+                <button class="btn-action btn-no" onclick="placeBet('BANKER')">شرط روی بانکر (ضریب 1.95)</button>
+            </div>
+            
+            <div class="control-row">
+                <button class="btn-action btn-deal" onclick="startDeal()">شروع بازی / توزیع کارت</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال شارژ حساب -->
+    <div class="modal" id="depositModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>افزایش موجودی کیف پول</span>
+                <button class="modal-close" onclick="closeDepositModal()">✕</button>
+            </div>
+            <div style="font-size: 10px; color: #94a3b8; margin-bottom: 6px;">مبلغ واریزی به تومان:</div>
+            <input type="number" class="form-input" id="depositAmountInput" placeholder="مثلا 500000">
+            <button class="btn-submit-deposit" onclick="submitDeposit()">پرداخت و شارژ آنی</button>
+        </div>
+    </div>
+
+    <script>
+        function openDepositModal() {
+            document.getElementById('depositModal').classList.add('show');
+        }
+        function closeDepositModal() {
+            document.getElementById('depositModal').classList.remove('show');
+        }
+        function submitDeposit() {
+            const amt = parseInt(document.getElementById('depositAmountInput').value);
+            if(amt > 0) {
+                let balanceEl = document.getElementById('userBalance');
+                let current = parseInt(balanceEl.innerText.replace(/,/g, ''));
+                let newBal = current + amt;
+                balanceEl.innerText = newBal.toLocaleString();
+                closeDepositModal();
+                alert('موجودی شما با موفقیت به روز شد.');
+            } else {
+                alert('لطفا مبلغ معتبری وارد کنید.');
+            }
+        }
+        function placeBet(type) {
+            const banner = document.getElementById('statusBanner');
+            const betVal = parseInt(document.getElementById('betAmount').value);
+            banner.innerText = `شرط شما به مبلغ ${betVal.toLocaleString()} تومان روی «${type === 'PLAYER' ? 'بازیکن' : 'بانکر'}» ثبت شد!`;
+        }
+        function startDeal() {
+            const banner = document.getElementById('statusBanner');
+            banner.innerText = "دیلر در حال توزیع کارت‌هاست... لطفاً صبر کنید.";
+            setTimeout(() => {
+                banner.innerText = "دست به پایان رسید. برنده: بازیکن!";
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
