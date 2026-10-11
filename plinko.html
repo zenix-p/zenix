@@ -11,34 +11,45 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --felt-green: #064e3b;
-            --felt-border: #022c22;
-            --gold-accent: #facc15;
-            --bg-dark: #030712;
-            --glass-border: rgba(255, 255, 255, 0.15);
+            --felt-green: #075b42;
+            --felt-border: #3a2414;
+            --gold-accent: #f8d66d;
+            --bg-dark: #07100e;
+            --glass-border: rgba(255, 239, 190, .25);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', 'Vazirmatn', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Plus Jakarta Sans', 'Vazirmatn', sans-serif; 
+            user-select: none; 
+            -webkit-tap-highlight-color: transparent; 
+        }
         
-        html { min-height: 100%; background: #07100e; }
-        
+        html { 
+            min-height: 100%; 
+            background: var(--bg-dark); 
+        }
+
         body {
-            background: var(--bg-dark);
-            min-height: 100vh;
-            min-height: 100svh;
-            color: #f8fafc;
-            display: flex;
-            flex-direction: column;
-            padding-bottom: 20px;
-            overflow-x: hidden;
             position: relative;
             isolation: isolate;
+            min-height: 100vh;
+            min-height: 100svh;
+            background: var(--bg-dark);
+            color: #fffdf4;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: env(safe-area-inset-bottom, 20px);
+            overflow-x: hidden;
+            width: 100%;
         }
 
         header {
             background: rgba(15, 23, 42, .95);
             border-bottom: 1px solid rgba(255,255,255,.1);
-            padding: 8px 12px;
+            padding: 10px 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -53,7 +64,7 @@
         .game-bar {
             background: rgba(15, 23, 42, 0.85);
             border-bottom: 1px solid var(--glass-border);
-            padding: 6px 12px;
+            padding: 8px 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -73,6 +84,7 @@
             display: flex;
             align-items: center;
             gap: 4px;
+            white-space: nowrap;
         }
 
         .user-stats { display: flex; align-items: center; gap: 6px; }
@@ -98,21 +110,22 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 8px;
+            padding: 10px;
             width: 100%;
-            max-width: 500px;
+            max-width: 480px;
             margin: 0 auto;
             gap: 10px;
             flex: 1;
+            box-sizing: border-box;
         }
 
-        /* طراحی میز هلالی و کازینویی واقعی - واکنش‌گرا برای موبایل */
+        /* طراحی میز هلالی و کازینویی واقعی با انطباق موبایلی */
         .casino-felt-table {
             width: 100%;
             background: radial-gradient(circle at 50% 20%, #065f46 0%, #064e3b 50%, #022c22 100%);
             border: 4px solid #1e293b;
-            border-top-left-radius: min(180px, 45vw);
-            border-top-right-radius: min(180px, 45vw);
+            border-top-left-radius: 160px;
+            border-top-right-radius: 160px;
             border-bottom-left-radius: 16px;
             border-bottom-right-radius: 16px;
             padding: 12px;
@@ -121,6 +134,7 @@
             gap: 10px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.9), inset 0 0 40px rgba(0,0,0,0.6);
             position: relative;
+            box-sizing: border-box;
         }
 
         /* جایگاه دیلر و کفش کارت در مرکز بالای میز */
@@ -133,6 +147,7 @@
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+            width: 100%;
         }
 
         .chip-rack {
@@ -144,8 +159,8 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
         .casino-chip {
-            width: 14px;
-            height: 14px;
+            width: 15px;
+            height: 15px;
             border-radius: 50%;
             border: 2px dashed #fff;
             display: inline-block;
@@ -162,7 +177,7 @@
             font-size: 9px;
             color: var(--gold-accent);
             background: rgba(0,0,0,0.6);
-            padding: 5px;
+            padding: 6px;
             border-radius: 6px;
             border: 1px solid var(--glass-border);
             width: 100%;
@@ -173,6 +188,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 8px;
+            width: 100%;
         }
 
         .arena-box {
@@ -184,6 +200,7 @@
             flex-direction: column;
             align-items: center;
             gap: 6px;
+            box-sizing: border-box;
         }
         .arena-box.player-side { border-color: rgba(56,189,248,0.5); }
         .arena-box.banker-side { border-color: rgba(239,68,68,0.5); }
@@ -201,12 +218,13 @@
         .cards-row {
             display: flex;
             gap: 4px;
-            min-height: 54px;
+            min-height: 55px;
             align-items: center;
             justify-content: center;
+            flex-wrap: wrap;
         }
 
-        /* کارت‌های استاندارد پاسور متناسب با موبایل */
+        /* کارت‌های واقعی و استاندارد پاسور */
         .playing-card {
             width: 35px;
             height: 52px;
@@ -223,6 +241,7 @@
             box-shadow: 0 3px 8px rgba(0,0,0,0.7);
             border: 1px solid #cbd5e1;
             animation: cardDeal 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            flex-shrink: 0;
         }
         .playing-card.red { color: #dc2626; }
         .card-symbol { font-size: 13px; align-self: center; line-height: 1; }
@@ -240,6 +259,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
+            box-sizing: border-box;
         }
 
         .control-row {
@@ -247,6 +267,7 @@
             justify-content: space-between;
             align-items: center;
             gap: 6px;
+            width: 100%;
         }
 
         .bet-input-box {
@@ -273,16 +294,16 @@
 
         .btn-action {
             flex: 1;
-            padding: 9px 4px;
+            padding: 9px;
             border-radius: 8px;
             font-family: 'Orbitron';
             font-weight: 900;
-            font-size: 9.5px;
+            font-size: 10px;
             cursor: pointer;
             border: none;
             color: #fff;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            white-space: nowrap;
+            text-align: center;
         }
         .btn-yes { background: linear-gradient(135deg, #22c55e, #16a34a); color: #030712; }
         .btn-no { background: linear-gradient(135deg, #ef4444, #dc2626); }
@@ -301,6 +322,7 @@
             justify-content: center;
             backdrop-filter: blur(10px);
             padding: 12px;
+            box-sizing: border-box;
         }
         .modal.show { display: flex; }
         .modal-content {
@@ -313,6 +335,7 @@
             flex-direction: column;
             padding: 14px;
             box-shadow: 0 15px 35px rgba(0,0,0,.9);
+            box-sizing: border-box;
         }
         .modal-header {
             display: flex;
@@ -343,158 +366,184 @@
             background: rgba(15,23,42,0.8);
             border: 1px solid rgba(255,255,255,0.15);
             border-radius: 6px;
-            padding: 8px;
+            padding: 6px;
             color: #fff;
             font-size: 10px;
             outline: none;
             margin-top: 4px;
             margin-bottom: 8px;
+            box-sizing: border-box;
         }
         .btn-submit-deposit {
             width: 100%;
             background: linear-gradient(135deg,#facc15,#f97316);
             color: #0f172a;
             border: none;
-            padding: 8px;
+            padding: 7px;
             border-radius: 6px;
             font-weight: 800;
             cursor: pointer;
             font-size: 10px;
         }
 
-        /* تنظیمات اضافی برای صفحه نمایش‌های بسیار کوچک موبایل */
+        /* مدیاکوئری برای صفحات بسیار کوچک موبایل */
         @media (max-width: 360px) {
-            .main-stage { padding: 4px; gap: 6px; }
-            .casino-felt-table { padding: 8px; }
-            .btn-action { font-size: 8.5px; padding: 7px 2px; }
-            .stat-pill { padding: 2px 5px; }
+            .casino-felt-table {
+                border-top-left-radius: 120px;
+                border-top-right-radius: 120px;
+                padding: 10px;
+            }
+            .playing-card {
+                width: 32px;
+                height: 48px;
+                font-size: 9px;
+            }
+            .card-symbol {
+                font-size: 11px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- ساختار فایل اصلی کاملاً حفظ شده است -->
+
     <header>
         <div class="game-header-title">
-            <i class="fas fa-gem"></i> Zenix Casino
+            <i class="fa-solid fa-dice"></i> Zenix Casino
         </div>
         <div class="live-badge">
-            <i class="fas fa-circle" style="font-size: 5px;"></i> زنده
+            <i class="fa-solid fa-circle" style="font-size: 6px;"></i> لایو
         </div>
     </header>
 
     <div class="game-bar">
         <div class="user-welcome-tag">
-            <i class="fas fa-user-circle"></i> کاربر گرامی
+            <i class="fa-solid fa-user-shield"></i> بازیکن
         </div>
         <div class="user-stats">
             <div class="stat-pill">
-                <i class="fas fa-wallet" style="font-size: 9px; color: var(--gold-accent);"></i>
-                <span class="stat-val" id="user-balance">1,000,000</span>
+                <span style="font-size: 8px; color: #94a3b8;">موجودی:</span>
+                <span class="stat-val" id="user-balance">1,500,000</span>
             </div>
             <button class="casino-deposit-btn" onclick="openDepositModal()">
-                <i class="fas fa-plus-circle"></i> شارژ
+                <i class="fa-solid fa-plus-circle"></i> شارژ
             </button>
         </div>
     </div>
 
     <div class="main-stage">
+        <!-- میز هلالی و کازینویی باکارات -->
         <div class="casino-felt-table">
-            <!-- جایگاه دیلر و کفش کارت -->
+            
             <div class="dealer-tray-section">
+                <div style="font-family: 'Orbitron'; font-size: 9px; color: #facc15; font-weight: 800;">
+                    <i class="fa-solid fa-shoe-prints"></i> SHOE / SHOELACE
+                </div>
                 <div class="chip-rack">
                     <span class="casino-chip chip-red"></span>
                     <span class="casino-chip chip-green"></span>
                     <span class="casino-chip chip-blue"></span>
                     <span class="casino-chip chip-black"></span>
                 </div>
-                <div style="font-family: 'Orbitron'; font-size: 9px; color: #94a3b8; font-weight: 700;">
-                    BACCARAT SHOE
-                </div>
             </div>
 
-            <div class="live-status-banner" id="game-status-text">
-                آماده برای ثبت شرط جدید
+            <div class="live-status-banner" id="game-status">
+                لطفاً مبلغ و نوع شرط خود را انتخاب کنید...
             </div>
 
-            <!-- ناحیه بازی بازیکن و دیلر -->
             <div class="arena-layout">
+                <!-- سمت بازیکن (Player) -->
                 <div class="arena-box player-side">
                     <div class="arena-title">
-                        <span>پلی‌یر (PLAYER)</span>
-                        <span id="player-score" style="color: #38bdf8;">0</span>
+                        <span>پاتک (PLAYER)</span>
+                        <span id="player-score" style="color:#38bdf8;">0</span>
                     </div>
                     <div class="cards-row" id="player-cards">
                         <!-- کارت‌ها اینجا قرار می‌گیرند -->
                     </div>
                 </div>
 
+                <!-- سمت بانکدار (Banker) -->
                 <div class="arena-box banker-side">
                     <div class="arena-title">
-                        <span>بنکر (BANKER)</span>
-                        <span id="banker-score" style="color: #ef4444;">0</span>
+                        <span>بانکدار (BANKER)</span>
+                        <span id="banker-score" style="color:#ef4444;">0</span>
                     </div>
                     <div class="cards-row" id="banker-cards">
                         <!-- کارت‌ها اینجا قرار می‌گیرند -->
                     </div>
                 </div>
             </div>
+
         </div>
 
-        <!-- پنل کنترل پایین صفحه -->
+        <!-- پنل کنترل و شرط‌بندی -->
         <div class="control-panel">
             <div class="control-row">
                 <div class="bet-input-box">
-                    <i class="fas fa-coins" style="font-size: 10px; color: var(--gold-accent);"></i>
-                    <input type="number" id="bet-amount" class="bet-input" value="10000" min="1000">
+                    <i class="fa-solid fa-coins" style="font-size: 10px; color: var(--gold-accent);"></i>
+                    <input type="number" id="bet-amount" class="bet-input" value="10000" min="1000" step="1000">
                 </div>
             </div>
+            
             <div class="control-row">
                 <button class="btn-action btn-yes" onclick="placeBet('player')">روی بازیکن</button>
-                <button class="btn-action btn-no" onclick="placeBet('banker')">روی بنکر</button>
-                <button class="btn-action" style="background: linear-gradient(135deg, #ca8a04, #eab308); color: #030712;" onclick="placeBet('tie')">مساوی (Tie)</button>
+                <button class="btn-action btn-no" onclick="placeBet('banker')">روی بانکدار</button>
             </div>
+
             <div class="control-row">
-                <button class="btn-action btn-deal" id="deal-btn" onclick="startDeal()" disabled>پخش کارت‌ها</button>
+                <button class="btn-action btn-deal" onclick="startDeal()">شروع دست / دیل کارت</button>
             </div>
         </div>
     </div>
 
     <!-- مودال شارژ حساب -->
-    <div class="modal" id="deposit-modal">
+    <div class="modal" id="depositModal">
         <div class="modal-content">
             <div class="modal-header">
-                <span>شارژ کیف پول حساب</span>
-                <button class="modal-close" onclick="closeDepositModal()"><i class="fas fa-times"></i></button>
+                <span>شارژ آنی کیف پول</span>
+                <button class="modal-close" onclick="closeDepositModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <p style="font-size: 9.5px; color: #94a3b8; margin-bottom: 8px;">مبلغ مورد نظر جهت واریز به حساب کازینو را وارد نمایید:</p>
-            <input type="number" class="form-input" id="deposit-input" placeholder="مبلغ به تومان..." value="500000">
-            <button class="btn-submit-deposit" onclick="submitDeposit()">تایید و افزایش موجودی</button>
+            <label style="font-size: 9.5px; color: #94a3b8; margin-bottom: 2px; display: block;">مبلغ به تومان:</label>
+            <input type="number" class="form-input" id="deposit-input" value="500000" step="50000">
+            <button class="btn-submit-deposit" onclick="confirmDeposit()">تایید و افزایش موجودی</button>
         </div>
     </div>
 
     <script>
-        // توابع و منطق بازی دست‌نخورده باقی مانده‌اند
         function openDepositModal() {
-            document.getElementById('deposit-modal').classList.add('show');
+            document.getElementById('depositModal').classList.add('show');
         }
+
         function closeDepositModal() {
-            document.getElementById('deposit-modal').classList.remove('show');
+            document.getElementById('depositModal').classList.remove('show');
         }
-        function submitDeposit() {
+
+        function confirmDeposit() {
             const amount = parseInt(document.getElementById('deposit-input').value) || 0;
-            if(amount > 0) {
-                let currentBal = parseInt(document.getElementById('user-balance').innerText.replace(/,/g, '')) || 0;
-                currentBal += amount;
-                document.getElementById('user-balance').innerText = currentBal.toLocaleString();
-                closeDepositModal();
-            }
+            const balanceEl = document.getElementById('user-balance');
+            let current = parseInt(balanceEl.innerText.replace(/,/g, '')) || 0;
+            current += amount;
+            balanceEl.innerText = current.toLocaleString();
+            closeDepositModal();
         }
-        function placeBet(type) {
-            document.getElementById('game-status-text').innerText = `شرط روی ${type} ثبت شد. آماده‌ی شروع!`;
-            document.getElementById('deal-btn').removeAttribute('disabled');
+
+        function placeBet(target) {
+            const betVal = document.getElementById('bet-amount').value;
+            document.getElementById('game-status').innerText = `شرط ${target === 'player' ? 'بازیکن' : 'بانکدار'} به مبلغ ${parseInt(betVal).toLocaleString()} ثبت شد!`;
         }
+
         function startDeal() {
-            document.getElementById('game-status-text').innerText = 'در حال پخش کارت‌ها...';
+            document.getElementById('game-status').innerText = 'کارت‌ها در حال پخش هستند...';
+            // نمونه رندر کارت نمونه برای تست واکنش‌گرایی
+            document.getElementById('player-cards').innerHTML = `
+                <div class="playing-card red"><span>9♥</span><span class="card-symbol">♥</span><span>9♥</span></div>
+                <div class="playing-card"><span>K♠</span><span class="card-symbol">♠</span><span>K♠</span></div>
+            `;
+            document.getElementById('banker-cards').innerHTML = `
+                <div class="playing-card red"><span>8♦</span><span class="card-symbol">♦</span><span>8♦</span></div>
+            `;
+            document.getElementById('player-score').innerText = '9';
+            document.getElementById('banker-score').innerText = '8';
         }
     </script>
 </body>
