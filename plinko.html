@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>باکارات زنده (کارت‌های واقعی) - Zenix Casino</title>
+    <title>میز کازینویی باکارات - Zenix Casino</title>
     <link rel="icon" href="data:image/x-icon;base64,=">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,13 +11,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-glow: #22c55e;
-            --accent-blue: #38bdf8;
-            --gold-accent: #facc15;
-            --bg-dark: #030712;
             --felt-green: #064e3b;
             --felt-border: #022c22;
-            --glass-border: rgba(255, 255, 255, 0.1);
+            --gold-accent: #facc15;
+            --bg-dark: #030712;
+            --glass-border: rgba(255, 255, 255, 0.15);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', 'Vazirmatn', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -44,22 +42,7 @@
             flex-shrink: 0;
         }
         .game-header-title { font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 800; color: #facc15; display: flex; align-items: center; gap: 5px; }
-        .live-badge { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; padding: 2px 6px; border-radius: 6px; font-size: 8px; font-weight: 800; display: flex; align-items: center; gap: 3px; animation: pulseLive 1.5s infinite; }
-        @keyframes pulseLive { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-
-        .guide-btn {
-            background: rgba(56, 189, 248, 0.15);
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            color: #38bdf8;
-            padding: 4px 9px;
-            border-radius: 6px;
-            font-size: 9px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
+        .live-badge { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; padding: 2px 6px; border-radius: 6px; font-size: 8px; font-weight: 800; display: flex; align-items: center; gap: 3px; }
 
         .game-bar {
             background: rgba(15, 23, 42, 0.85);
@@ -109,78 +92,83 @@
             align-items: center;
             padding: 8px;
             width: 100%;
-            max-width: 480px;
+            max-width: 500px;
             margin: 0 auto;
             gap: 10px;
             flex: 1;
         }
 
-        .table-board {
+        /* طراحی میز هلالی و کازینویی واقعی */
+        .casino-felt-table {
             width: 100%;
-            background: radial-gradient(circle at center, #064e3b 0%, #022c22 100%);
-            border: 3px solid var(--felt-border);
-            border-radius: 14px;
-            padding: 12px;
+            background: radial-gradient(circle at 50% 20%, #065f46 0%, #064e3b 50%, #022c22 100%);
+            border: 5px solid #1e293b;
+            border-top-left-radius: 200px;
+            border-top-right-radius: 200px;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            padding: 15px;
             display: flex;
             flex-direction: column;
             gap: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.9), inset 0 0 40px rgba(0,0,0,0.6);
             position: relative;
         }
 
-        /* استودیوی سه بعدی دیلر همراه با شمارنده کفش کارت‌ها */
-        .dealer-3d-studio {
-            background: linear-gradient(180deg, rgba(15,23,42,0.95) 0%, rgba(3,7,18,0.9) 100%);
-            border: 1px solid rgba(250,204,21,0.4);
-            border-radius: 12px;
-            padding: 10px 14px;
+        /* جایگاه دیلر و کفش کارت (Shoe & Chip Tray) در مرکز بالای میز */
+        .dealer-tray-section {
+            background: rgba(15, 23, 42, 0.85);
+            border: 2px solid #ca8a04;
+            border-radius: 10px;
+            padding: 8px 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
         }
 
-        .dealer-info-left {
+        .chip-rack {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            gap: 3px;
+            background: rgba(0,0,0,0.5);
+            padding: 4px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
-
-        .dealer-avatar-3d {
-            width: 45px;
-            height: 45px;
+        .casino-chip {
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #facc15, #f97316);
-            color: #0f172a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 20px;
-            box-shadow: 0 0 15px rgba(250,204,21,0.5);
-            position: relative;
+            border: 2px dashed #fff;
+            display: inline-block;
         }
+        .chip-red { background: #dc2626; }
+        .chip-green { background: #16a34a; }
+        .chip-blue { background: #2563eb; }
+        .chip-black { background: #111827; }
 
-        /* شمارنده تعداد کارت‌های باقی‌مانده در میز */
-        .shoe-counter-badge {
-            background: rgba(0,0,0,0.6);
-            border: 1px solid rgba(250,204,21,0.4);
-            border-radius: 8px;
-            padding: 4px 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .live-status-banner {
+            text-align: center;
             font-family: 'Orbitron';
-        }
-
-        .arena-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            font-weight: 800;
+            font-size: 9.5px;
+            color: var(--gold-accent);
+            background: rgba(0,0,0,0.6);
+            padding: 6px;
+            border-radius: 6px;
+            border: 1px solid var(--glass-border);
             width: 100%;
         }
 
+        /* ناحیه بازی بازیکن و دیلر روی نمد میز */
+        .arena-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
         .arena-box {
-            background: rgba(0,0,0,0.45);
+            background: rgba(0, 0, 0, 0.35);
             border: 1px solid var(--glass-border);
             border-radius: 10px;
             padding: 10px;
@@ -189,8 +177,8 @@
             align-items: center;
             gap: 6px;
         }
-        .arena-box.player-side { border-color: rgba(56,189,248,0.4); }
-        .arena-box.banker-side { border-color: rgba(239,68,68,0.4); }
+        .arena-box.player-side { border-color: rgba(56,189,248,0.5); }
+        .arena-box.banker-side { border-color: rgba(239,68,68,0.5); }
 
         .arena-title {
             font-family: 'Orbitron';
@@ -210,7 +198,7 @@
             justify-content: center;
         }
 
-        /* استایل واقعی و استاندارد کارت پاسور */
+        /* کارت‌های واقعی و استاندارد پاسور */
         .playing-card {
             width: 38px;
             height: 56px;
@@ -227,26 +215,12 @@
             box-shadow: 0 3px 8px rgba(0,0,0,0.7);
             border: 1px solid #cbd5e1;
             animation: cardDeal 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform-origin: center;
         }
         .playing-card.red { color: #dc2626; }
         .card-symbol { font-size: 14px; align-self: center; line-height: 1; }
         @keyframes cardDeal { 
-            0% { transform: translateY(-70px) scale(0.3) rotate(-20deg); opacity: 0; } 
+            0% { transform: translateY(-60px) scale(0.3) rotate(-15deg); opacity: 0; } 
             100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; } 
-        }
-
-        .live-status-banner {
-            text-align: center;
-            font-family: 'Orbitron';
-            font-weight: 800;
-            font-size: 10px;
-            color: var(--gold-accent);
-            background: rgba(0,0,0,0.6);
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid var(--glass-border);
-            width: 100%;
         }
 
         .control-panel {
@@ -317,10 +291,9 @@
 <body>
 
     <header>
-        <div class="game-header-title"><i class="fas fa-dice" style="color:#38bdf8;"></i> باکارات زنده (کارت‌های واقعی)</div>
+        <div class="game-header-title"><i class="fas fa-dice" style="color:#38bdf8;"></i> میز کازینویی باکارات</div>
         <div style="display:flex; align-items:center; gap:8px;">
             <div class="live-badge"><i class="fas fa-circle" style="font-size:6px;"></i> زنده</div>
-            <button class="guide-btn" onclick="openHelpModal()"><i class="fas fa-question-circle"></i> راهنما</button>
         </div>
     </header>
 
@@ -340,25 +313,30 @@
     </div>
 
     <div class="main-stage">
-        <div class="table-board">
-            <!-- استودیوی سه بعدی دیلر + شمارنده کفش کارت‌های میز -->
-            <div class="dealer-3d-studio">
-                <div class="dealer-info-left">
-                    <div class="dealer-avatar-3d">
-                        <i class="fas fa-user-tie"></i>
-                    </div>
+        <!-- طراحی دقیق میز هلالی شکل کازینو مطابق عکس -->
+        <div class="casino-felt-table">
+            <!-- جایگاه دیلر و جعبه چیپ و کفش کارت در مرکز بالای میز -->
+            <div class="dealer-tray-section">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <div style="width:36px; height:36px; border-radius:50%; background:#facc15; color:#0f172a; display:flex; justify-content:center; align-items:center; font-weight:900;"><i class="fas fa-user-tie"></i></div>
                     <div>
-                        <div style="font-size:8px; color:#94a3b8; font-weight:700;">دیلر میز</div>
-                        <div style="font-family:'Orbitron'; font-size:10px; font-weight:800; color:#facc15;">لِوَن (Live Dealer)</div>
+                        <div style="font-size:8px; color:#94a3b8; font-weight:700;">دیلر کازینو</div>
+                        <div style="font-family:'Orbitron'; font-size:9.5px; font-weight:800; color:#facc15;">Live Dealer Studio</div>
                     </div>
                 </div>
-                <div class="shoe-counter-badge">
-                    <span style="font-size:7px; color:#94a3b8;">کارت‌های میز:</span>
-                    <span style="font-size:12px; font-weight:900; color:#22c55e;" id="shoe-count">52</span>
+                <div class="chip-rack">
+                    <span class="casino-chip chip-red"></span>
+                    <span class="casino-chip chip-green"></span>
+                    <span class="casino-chip chip-blue"></span>
+                    <span class="casino-chip chip-black"></span>
+                </div>
+                <div style="background:rgba(0,0,0,0.5); border:1px solid rgba(250,204,21,0.4); border-radius:6px; padding:3px 6px; text-align:center;">
+                    <span style="font-size:7px; color:#94a3b8; display:block;">کارت میز:</span>
+                    <span style="font-family:'Orbitron'; font-size:11px; font-weight:900; color:#22c55e;" id="shoe-count">52</span>
                 </div>
             </div>
 
-            <div class="arena-row">
+            <div class="arena-layout">
                 <!-- دست شما (Player) -->
                 <div class="arena-box player-side">
                     <div class="arena-title">
@@ -368,7 +346,7 @@
                     <div class="cards-row" id="player-cards"></div>
                 </div>
 
-                <!-- دست دیلر / بانکر (Banker) -->
+                <!-- دست دیلر (Banker) -->
                 <div class="arena-box banker-side">
                     <div class="arena-title">
                         <span>دیلر (Banker)</span>
@@ -378,7 +356,7 @@
                 </div>
             </div>
 
-            <div class="live-status-banner" id="game-status-msg">مبلغ شرط را تعیین کرده و بازی را شروع کنید</div>
+            <div class="live-status-banner" id="game-status-msg">مبلغ شرط را تعیین کرده و روی شروع بازی کلیک کنید</div>
         </div>
 
         <div class="control-panel" id="bet-control-panel">
@@ -400,7 +378,7 @@
         </div>
     </div>
 
-    <!-- مودال‌ها -->
+    <!-- مودال شارژ -->
     <div class="modal" id="m-casino-deposit">
         <div class="modal-content">
             <div class="modal-header">
@@ -413,22 +391,7 @@
         </div>
     </div>
 
-    <div class="modal" id="m-help">
-        <div class="modal-content" style="max-width: 320px;">
-            <div class="modal-header">
-                <span><i class="fas fa-graduation-cap" style="color:#facc15;"></i> راهنمای بازی باکارات زنده</span>
-                <button class="modal-close" onclick="closeHelpModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <div style="overflow-y:auto; max-height: 60vh; font-size:9.5px; color:#cbd5e1; line-height:1.6;">
-                <p style="margin-bottom:8px;"><strong style="color:#facc15;">کارت‌های واقعی:</strong> کارت‌ها دارای نمادهای استاندارد (شاه، بی‌بی، سرباز و آس) با طراحی واقعی پاسور هستند.</p>
-                <p style="margin-bottom:8px;"><strong style="color:#38bdf8;">شمارنده میز:</strong> تعداد کل کارت‌های باقی‌مانده در کفش میز به صورت زنده نمایش داده می‌شود.</p>
-            </div>
-        </div>
-    </div>
-
     <script>
-        window.openHelpModal = () => document.getElementById('m-help')?.classList.add('show');
-        window.closeHelpModal = () => document.getElementById('m-help')?.classList.remove('show');
         window.openCasinoDepositModal = () => document.getElementById('m-casino-deposit')?.classList.add('show');
         window.closeCasinoDepositModal = () => document.getElementById('m-casino-deposit')?.classList.remove('show');
     </script>
@@ -508,7 +471,7 @@
         function drawCard() {
             const suit = suits[Math.floor(Math.random() * suits.length)];
             const val = values[Math.floor(Math.random() * values.length)];
-            shoeCardsCount = Math.max(30, shoeCardsCount - 1);
+            shoeCardsCount = Math.max(20, shoeCardsCount - 1);
             updateStats();
             return { suit, val, isRed: suit === '♥' || suit === '♦' };
         }
@@ -550,7 +513,7 @@
             bankerHand = [];
             renderHands(false);
 
-            document.getElementById('game-status-msg').textContent = 'دیلر در حال بر زدن کارت‌ها... 🃏';
+            document.getElementById('game-status-msg').textContent = 'دیلر در حال آماده‌سازی کارت‌ها روی میز... 🃏';
             await new Promise(r => setTimeout(r, 600));
 
             document.getElementById('game-status-msg').textContent = 'دیلر کارت اول را به شما می‌دهد...';
