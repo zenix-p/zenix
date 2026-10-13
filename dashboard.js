@@ -48,14 +48,25 @@ if (langBtn && langMenu) {
   });
 }
 
-// تغییر زبان از منو
+// تغییر زبان از منو و اعمال کلاس فعال (رنگ آبی)
 const langItems = document.querySelectorAll('#lang-menu .mi');
+const currentLang = localStorage.getItem('zenix_lang') || 'fa';
+
 langItems.forEach(item => {
+  if (item.getAttribute('data-lang') === currentLang) {
+    item.classList.add('active');
+  }
+  
   item.addEventListener('click', (e) => {
+    langItems.forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+    
     const lang = item.getAttribute('data-lang');
     if (lang) {
       localStorage.setItem('zenix_lang', lang);
-      location.reload();
+      setTimeout(() => {
+        location.reload();
+      }, 100);
     }
   });
 });
