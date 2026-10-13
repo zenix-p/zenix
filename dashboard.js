@@ -1,17 +1,20 @@
 // ==========================================
-// 1. اتصال به سوبابیس و دریافت موجودی و تیم
+// 1. تنظیمات اولیه و اتصال به سوبابیس (مشابه فایل تیم)
 // ==========================================
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
 
+function safeGetItem(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
+function safeSetItem(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
+
 const customStorage = {
-    getItem: (key) => { try { return localStorage.getItem(key); } catch(e) { return null; } },
-    setItem: (key, value) => { try { localStorage.setItem(key, value); } catch(e) {} },
+    getItem: (key) => safeGetItem(key),
+    setItem: (key, value) => safeSetItem(key, value),
     removeItem: (key) => { try { localStorage.removeItem(key); } catch(e) {} }
 };
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
         persistSession: true,
         storage: customStorage,
@@ -35,7 +38,7 @@ function generateUIDDigits(userId) {
 }
 
 // ==========================================
-// 2. سیستم اعلان‌ها و زنگوله (دقیقاً مشابه فایل تیم)
+// 2. سیستم اعلان‌ها و زنگوله (دقیقاً مشابه فایل تیم)[cite: 9]
 // ==========================================
 function getNotifCategory(m) {
     let t = (m.type || '').toLowerCase();
@@ -47,7 +50,7 @@ function getNotifCategory(m) {
 
 async function fetchUserMessages(uid) {
     try {
-        const { data } = await supabase.from('notifications').select('*').eq('user_id', uid).order('created_at', { ascending: false });
+        const { data } = await supabaseClient.from('notifications').select('*').eq('user_id', uid).order('created_at', { ascending: false });
         return (data || []).map(dt => ({
             id: dt.id,
             subject: dt.title || dt.subject || 'اطلاعیه',
@@ -98,12 +101,12 @@ window.openMessageModal = async () => {
 function renderMessageList() {
     let c = document.getElementById('modal-msg-container');
     if (!c) return;
+    let t = ld[currLang] || ld.fa;
     let list = allMessages;
     if (currentNotifFilter !== 'all') {
         list = allMessages.filter(m => getNotifCategory(m) === currentNotifFilter);
     }
 
-    let t = ld[currLang] || ld.fa;
     if (!list || list.length === 0) {
         c.innerHTML = `<div style="text-align:center;padding:20px;color:#94a3b8">${t.noMsg || 'هیچ پیام جدیدی وجود ندارد.'}</div>`;
         return;
@@ -139,7 +142,7 @@ window.readAdminMessage = async idx => {
     allMessages[idx].read = true;
     if (currentUserId && m.id) {
         try {
-            await supabase.from('notifications').update({ read: true, is_read: true }).eq('id', m.id);
+            await supabaseClient.from('notifications').update({ read: true, is_read: true }).eq('id', m.id);
         } catch(e) {}
     }
     updateNotifBadges();
@@ -169,9 +172,9 @@ document.getElementById('bell-btn')?.addEventListener('click', e => {
 
 
 // ==========================================
-// 3. سیستم زبان و ترجمه کامل (دقیقاً مشابه فایل تیم با رنگ آبی فعال)
+// 3. سیستم ترجمه کامل ۸ زبانه با رنگ آبی فعال
 // ==========================================
-let currLang = localStorage.getItem('zenix_lang') || 'fa';
+let currLang = safeGetItem('zenix_lang') || 'fa';
 
 const ld = {
     fa: {
@@ -231,7 +234,7 @@ const ld = {
         c6: 'Profil', d6: 'Güvenlik Ayarları',
         tmkt: 'Kripto Para Piyasası (Takip edilen 30 coinden en iyi 3ü)', tlive: 'Canlı',
         floatingCasino: 'Casino',
-        modalTitle: 'Bildirimler ve Mesajлар', noMsg: 'Yeni mesaj yok.', newBadge: 'YENİ',
+        modalTitle: 'Bildirimler ve Mesajlar', noMsg: 'Yeni mesaj yok.', newBadge: 'YENİ',
         tabAll: 'Tümü', tabApproved: 'Onaylanan', tabRejected: 'Reddedilen', tabAdmin: 'Yönetici'
     },
     ru: {
@@ -247,7 +250,7 @@ const ld = {
         tmkt: 'Криптовалютный рынок (топ-3 из 30 монет)', tlive: 'Онлайн',
         floatingCasino: 'Казино',
         modalTitle: 'Уведомления', noMsg: 'Нет новых сообщений.', newBadge: 'НОВОЕ',
-        tabAll: 'Все', tabApproved: 'Одобрено', tabRejected: 'Отклонено', tabAdmin: 'Админ'
+        tabAll: 'Все', tabApproved: 'Одобрено', tabRejected: 'Отклонено', tabАдмин: 'Админ'
     },
     es: {
         m1: 'Inicio', m2: 'Cuantificación', m3: 'Depósito', m4: 'Retiro', m5: 'Transacciones', m6: 'Perfil', m7: 'Soporte', m_about: 'Sobre la plataforma', m8: 'Cerrar sesión',
@@ -298,7 +301,7 @@ const ld = {
 
 function setLang(l) {
     currLang = l;
-    localStorage.setItem('zenix_lang', l);
+    safeSetItem('zenix_lang', l);
     let t = ld[l] || ld.fa;
     let r = l === 'fa' || l === 'ar';
     
@@ -365,12 +368,12 @@ setLang(currLang);
 // ==========================================
 // 4. دریافت اطلاعات کاربر و محاسبه زیرمجموعه‌ها
 // ==========================================
-async function loadDashboardUserData(user) {
+async function loadDashboardUserData(uid, sessionUser) {
     try {
-        currentUserId = user.id;
-        const { data: dbUser } = await supabase.from('users').select('*').eq('id', user.id).maybeSingle();
-        const { data: dbProfile } = await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle();
-        const meta = user.user_metadata || {};
+        currentUserId = uid;
+        const { data: dbUser } = await supabaseClient.from('users').select('*').eq('id', uid).maybeSingle();
+        const { data: dbProfile } = await supabaseClient.from('profiles').select('*').eq('id', uid).maybeSingle();
+        const meta = sessionUser.user_metadata || {};
 
         const balance = parseFloat(dbUser?.balance ?? dbProfile?.balance ?? meta.balance ?? 0);
         const valBalance = document.getElementById('val-balance');
@@ -378,12 +381,12 @@ async function loadDashboardUserData(user) {
             valBalance.textContent = `$${balance.toFixed(2)}`;
         }
 
-        let codeDigits = generateUIDDigits(user.id);
+        let codeDigits = generateUIDDigits(uid);
         let myRefCode = dbProfile?.referral_code || ('MS-' + codeDigits);
 
         let rawList = [];
         try {
-            const { data: dbProfiles } = await supabase.from('profiles').select('*');
+            const { data: dbProfiles } = await supabaseClient.from('profiles').select('*');
             if (dbProfiles && Array.isArray(dbProfiles)) {
                 rawList.push(...dbProfiles);
             }
@@ -394,9 +397,9 @@ async function loadDashboardUserData(user) {
             if (Array.isArray(metaTeam)) rawList.push(...metaTeam);
         }
 
-        ['zenix_registered_users', 'zenix_users', 'zenix_referrals', 'zenix_team_' + user.id, 'zenix_all_users'].forEach(k => {
+        ['zenix_registered_users', 'zenix_users', 'zenix_referrals', 'zenix_team_' + uid, 'zenix_all_users'].forEach(k => {
             try {
-                let item = localStorage.getItem(k);
+                let item = safeGetItem(k);
                 if (item) {
                     let parsed = JSON.parse(item);
                     if (Array.isArray(parsed)) rawList.push(...parsed);
@@ -439,12 +442,12 @@ async function loadDashboardUserData(user) {
             return refs.some(r => r && targetCodes.includes(r));
         }
 
-        let lvl1Users = allProfiles.filter(u => isReferredBy(u, user.id, myRefCode));
+        let lvl1Users = allProfiles.filter(u => isReferredBy(u, uid, myRefCode));
         let lvl2Users = [];
         if (lvl1Users.length > 0) {
             lvl2Users = allProfiles.filter(u => {
                 let uUid = u.user_id || u.id;
-                if (uUid === user.id || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid)) return false;
+                if (uUid === uid || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid)) return false;
                 return lvl1Users.some(l1 => isReferredBy(u, l1.user_id || l1.id, l1.referral_code));
             });
         }
@@ -453,7 +456,7 @@ async function loadDashboardUserData(user) {
         if (lvl2Users.length > 0) {
             lvl3Users = allProfiles.filter(u => {
                 let uUid = u.user_id || u.id;
-                if (uUid === user.id || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid) || lvl2Users.some(l2 => (l2.user_id || l2.id) === uUid)) return false;
+                if (uUid === uid || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid) || lvl2Users.some(l2 => (l2.user_id || l2.id) === uUid)) return false;
                 return lvl2Users.some(l2 => isReferredBy(u, l2.user_id || l2.id, l2.referral_code));
             });
         }
@@ -472,7 +475,7 @@ async function loadDashboardUserData(user) {
             valRef.textContent = totalTeamCount;
         }
 
-        allMessages = await fetchUserMessages(user.id);
+        allMessages = await fetchUserMessages(uid);
         updateNotifBadges();
 
     } catch (err) {
@@ -480,9 +483,15 @@ async function loadDashboardUserData(user) {
     }
 }
 
-supabase.auth.onAuthStateChange(async (event, session) => {
+supabaseClient.auth.onAuthStateChange(async (event, session) => {
     if (session && session.user) {
-        loadDashboardUserData(session.user);
+        currentUserId = session.user.id;
+        loadDashboardUserData(session.user.id, session.user);
+
+        fetchUserMessages(session.user.id).then(msgs => {
+            allMessages = msgs;
+            updateNotifBadges();
+        });
     } else {
         window.location.href = 'index.html';
     }
@@ -490,7 +499,7 @@ supabase.auth.onAuthStateChange(async (event, session) => {
 
 
 // ==========================================
-// 5. مدیریت منوی شناور کازینو و منوهای هدر
+// 5. مدیریت منوهای هدر و منوی شناور کازینو
 // ==========================================
 const floatingCasinoBtn = document.getElementById('floating-casino-btn');
 const casinoPopupMenu = document.getElementById('casino-popup-menu');
@@ -541,13 +550,17 @@ if (helpBtn) {
     helpBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         closeAllMenus();
-        const helpModal = document.getElementById('help-modal');
-        if (helpModal) helpModal.classList.add('show');
-        else alert('راهنمای داشبورد: از این پنل می‌توانید به بخش‌های مختلف دسترسی داشته باشید.');
+        alert('راهنمای داشبورد: از این پنل می‌توانید به بخش‌های مختلف دسترسی داشته باشید.');
     });
 }
 
 document.addEventListener('click', (e) => {
     if (navMenu && !navMenu.contains(e.target) && e.target !== menuBtn) navMenu.classList.remove('show');
     if (langMenu && !langMenu.contains(e.target) && e.target !== langBtn) langMenu.classList.remove('show');
+});
+
+document.getElementById('logout-btn')?.addEventListener('click', async e => {
+    e.preventDefault();
+    try { await supabaseClient.auth.signOut(); } catch(e) {}
+    window.location.href = 'index.html';
 });
