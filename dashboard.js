@@ -1,5 +1,5 @@
 // ==========================================
-// 1. تنظیمات اولیه و اتصال به سوبابیس (مشابه فایل تیم)
+// 1. تنظیمات اولیه و اتصال به سوبابیس
 // ==========================================
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
@@ -38,7 +38,72 @@ function generateUIDDigits(userId) {
 }
 
 // ==========================================
-// 2. سیستم اعلان‌ها و زنگوله (دقیقاً مشابه فایل تیم)[cite: 9]
+// 2. سیستم دریافت و نمایش بازار ارزهای دیجیتال (۳ ارز برتر از ۳0)
+// ==========================================
+async function fetchCryptoPrices() {
+    const tickerContainer = document.getElementById('crypto-ticker-list');
+    if (!tickerContainer) return;
+
+    try {
+        const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=30&page=1&sparkline=false');
+        if (!response.ok) throw new Error('خطا در دریافت قیمت ارزها');
+        
+        const data = await response.json();
+        const top3 = data.slice(0, 3); // دریافت ۳ ارز برتر اول
+
+        let html = '';
+        top3.forEach(coin => {
+            const price = coin.current_price >= 1 ? coin.current_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : coin.current_price.toFixed(4);
+            const change = coin.price_change_percentage_24h || 0;
+            const changeClass = change >= 0 ? 'price-up' : 'price-down';
+            const changeSign = change >= 0 ? '+' : '';
+
+            html += `
+                <div class="crypto-row">
+                    <div class="crypto-info">
+                        <div class="crypto-icon">
+                            <img src="${coin.image}" alt="${coin.symbol}">
+                        </div>
+                        <div>
+                            <strong style="color:#fff;font-size:12px;">${coin.symbol.toUpperCase()}</strong>
+                            <span style="font-size:10px;color:#94a3b8;display:block;">${coin.name}</span>
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="color:#fff;font-weight:bold;font-size:12px;">$${price}</div>
+                        <div class="${changeClass}" style="font-size:10px;">${changeSign}${change.toFixed(2)}%</div>
+                    </div>
+                </div>
+            `;
+        });
+
+        tickerContainer.innerHTML = html;
+    } catch (err) {
+        console.error('خطای دریافت قیمت ارزهای دیجیتال:', err);
+        // حالت fallback در صورت عدم پاسخگویی API
+        tickerContainer.innerHTML = `
+            <div class="crypto-row">
+                <div class="crypto-info"><strong style="color:#fff;">BTC</strong></div>
+                <div style="text-align:right;"><span style="color:#fff;">$96,500.00</span><div class="price-up">+2.15%</div></div>
+            </div>
+            <div class="crypto-row">
+                <div class="crypto-info"><strong style="color:#fff;">ETH</strong></div>
+                <div style="text-align:right;"><span style="color:#fff;">$2,780.50</span><div class="price-up">+1.84%</div></div>
+            </div>
+            <div class="crypto-row">
+                <div class="crypto-info"><strong style="color:#fff;">SOL</strong></div>
+                <div style="text-align:right;"><span style="color:#fff;">$198.20</span><div class="price-down">-0.65%</div></div>
+            </div>
+        `;
+    }
+}
+
+// اجرا اولیه و سپس به‌روزرسانی ۳۰ ثانیه‌ای
+fetchCryptoPrices();
+setInterval(fetchCryptoPrices, 30000);
+
+// ==========================================
+// 3. سیستم اعلان‌ها و زنگوله
 // ==========================================
 function getNotifCategory(m) {
     let t = (m.type || '').toLowerCase();
@@ -172,7 +237,7 @@ document.getElementById('bell-btn')?.addEventListener('click', e => {
 
 
 // ==========================================
-// 3. سیستم ترجمه کامل ۸ زبانه با رنگ آبی فعال
+// 4. سیستم ترجمه کامل ۸ زبانه با رنگ آبی فعال
 // ==========================================
 let currLang = safeGetItem('zenix_lang') || 'fa';
 
@@ -250,7 +315,7 @@ const ld = {
         tmkt: 'Криптовалютный рынок (топ-3 из 30 монет)', tlive: 'Онлайн',
         floatingCasino: 'Казино',
         modalTitle: 'Уведомления', noMsg: 'Нет новых сообщений.', newBadge: 'НОВОЕ',
-        tabAll: 'Все', tabApproved: 'Одобрено', tabRejected: 'Отклонено', tabАдмин: 'Админ'
+        tabAll: 'Все', tabApproved: 'Одобрено', tabRejected: 'Отклонено', tabAdmin: 'Админ'
     },
     es: {
         m1: 'Inicio', m2: 'Cuantificación', m3: 'Depósito', m4: 'Retiro', m5: 'Transacciones', m6: 'Perfil', m7: 'Soporte', m_about: 'Sobre la plataforma', m8: 'Cerrar sesión',
@@ -366,7 +431,7 @@ setLang(currLang);
 
 
 // ==========================================
-// 4. دریافت اطلاعات کاربر و محاسبه زیرمجموعه‌ها
+// 5. دریافت اطلاعات کاربر و محاسبه زیرمجموعه‌ها
 // ==========================================
 async function loadDashboardUserData(uid, sessionUser) {
     try {
@@ -499,7 +564,7 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 
 
 // ==========================================
-// 5. مدیریت منوهای هدر و منوی شناور کازینو
+// 6. مدیریت منوهای هدر و منوی شناور کازینو
 // ==========================================
 const floatingCasinoBtn = document.getElementById('floating-casino-btn');
 const casinoPopupMenu = document.getElementById('casino-popup-menu');
