@@ -1,4 +1,51 @@
-// مدیریت منوی شناور کازینو
+// ==========================================
+// 1. اتصال به سوبابیس و دریافت موجودی و اطلاعات کاربر
+// ==========================================
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const SUPABASE_URL = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+async function loadDashboardUserData() {
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (error || !user) {
+      // اگر کاربر لاگین نبود، هدایت به صفحه ورود
+      window.location.href = 'index.html';
+      return;
+    }
+
+    // دریافت اطلاعات از جدول users یا متادیتای کاربر
+    const { data: dbUser } = await supabase.from('users').select('*').eq('id', user.id).single();
+    const meta = user.user_metadata || {};
+
+    // استخراج موجودی
+    const balance = parseFloat(dbUser?.balance ?? meta.balance ?? 0);
+    const valBalance = document.getElementById('val-balance');
+    if (valBalance) {
+      valBalance.textContent = `$${balance.toFixed(2)}`;
+    }
+
+    // استخراج تعداد زیرمجموعه‌ها
+    const referralCount = dbUser?.referral_count ?? dbUser?.referrals ?? meta.referral_count ?? 0;
+    const valRef = document.getElementById('val-ref');
+    if (valRef) {
+      valRef.textContent = referralCount;
+    }
+
+  } catch (err) {
+    console.error("خطا در دریافت اطلاعات کاربر:", err);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadDashboardUserData();
+});
+
+
+// ==========================================
+// 2. مدیریت منوی شناور کازینو
+// ==========================================
 const floatingCasinoBtn = document.getElementById('floating-casino-btn');
 const casinoPopupMenu = document.getElementById('casino-popup-menu');
 
@@ -16,7 +63,9 @@ if (floatingCasinoBtn && casinoPopupMenu) {
   });
 }
 
-// مدیریت دکمه‌های هدر (منوی سه خط، زبان، راهنما، زنگوله اعلانات)
+// ==========================================
+// 3. مدیریت دکمه‌های هدر
+// ==========================================
 const menuBtn = document.getElementById('menu-btn');
 const navMenu = document.getElementById('nav-menu');
 const langBtn = document.getElementById('lang-btn');
@@ -30,7 +79,6 @@ function closeAllMenus(except = '') {
   if (except !== 'casino' && casinoPopupMenu) casinoPopupMenu.classList.remove('show');
 }
 
-// منوی سه خط (همبرگری)
 if (menuBtn && navMenu) {
   menuBtn.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -39,7 +87,6 @@ if (menuBtn && navMenu) {
   });
 }
 
-// منوی انتخاب زبان
 if (langBtn && langMenu) {
   langBtn.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -48,7 +95,9 @@ if (langBtn && langMenu) {
   });
 }
 
-// دیکشنری ترجمه 8 زبان
+// ==========================================
+// 4. سیستم ترجمه 8 زبانه
+// ==========================================
 const translations = {
   fa: {
     m1: "صفحه اصلی", m2: "کوانتیفیکیشن", m3: "واریز", m4: "برداشت", m5: "تراکنش", m6: "پروفایل", m7: "پشتیبانی", m_about: "درباره پلتفرم", m8: "خروج",
@@ -156,125 +205,68 @@ const translations = {
   }
 };
 
-// اعمال ترجمه بر اساس زبان ذخیره شده
 const currentLang = localStorage.getItem('zenix_lang') || 'fa';
 document.documentElement.lang = currentLang;
-if (currentLang === 'fa' || currentLang === 'ar') {
-  document.documentElement.dir = 'rtl';
-} else {
-  document.documentElement.dir = 'ltr';
-}
+document.documentElement.dir = (currentLang === 'fa' || currentLang === 'ar') ? 'rtl' : 'ltr';
 
 function applyTranslations(lang) {
   const t = translations[lang] || translations['fa'];
-  
   const setTxt = (id, text) => {
     const el = document.getElementById(id);
     if (el) el.textContent = text;
   };
 
-  setTxt('m1', t.m1);
-  setTxt('m2', t.m2);
-  setTxt('m3', t.m3);
-  setTxt('m4', t.m4);
-  setTxt('m5', t.m5);
-  setTxt('m6', t.m6);
-  setTxt('m7', t.m7);
-  setTxt('m_about', t.m_about);
-  setTxt('m8', t.m8);
-
-  setTxt('t-wel', t.wel);
-  setTxt('t-sub', t.sub);
-  setTxt('t-st', t.st);
-
-  setTxt('ts1', t.ts1);
-  setTxt('ts2', t.ts2);
-
-  setTxt('c1', t.c1);
-  setTxt('d1', t.d1);
-  setTxt('c2', t.c2);
-  setTxt('d2', t.d2);
-  setTxt('c3', t.c3);
-  setTxt('d3', t.d3);
-  setTxt('c4', t.c4);
-  setTxt('d4', t.d4);
-  setTxt('c5', t.c5);
-  setTxt('d5', t.d5);
-  setTxt('c6', t.c6);
-  setTxt('d6', t.d6);
-
-  setTxt('t-mkt', t.tmkt);
-  setTxt('t-live', t.tlive);
-  setTxt('t-floating-casino', t.floatingCasino);
+  setTxt('m1', t.m1); setTxt('m2', t.m2); setTxt('m3', t.m3);
+  setTxt('m4', t.m4); setTxt('m5', t.m5); setTxt('m6', t.m6);
+  setTxt('m7', t.m7); setTxt('m_about', t.m_about); setTxt('m8', t.m8);
+  setTxt('t-wel', t.wel); setTxt('t-sub', t.sub); setTxt('t-st', t.st);
+  setTxt('ts1', t.ts1); setTxt('ts2', t.ts2);
+  setTxt('c1', t.c1); setTxt('d1', t.d1); setTxt('c2', t.c2); setTxt('d2', t.d2);
+  setTxt('c3', t.c3); setTxt('d3', t.d3); setTxt('c4', t.c4); setTxt('d4', t.d4);
+  setTxt('c5', t.c5); setTxt('d5', t.d5); setTxt('c6', t.c6); setTxt('d6', t.d6);
+  setTxt('t-mkt', t.tmkt); setTxt('t-live', t.tlive); setTxt('t-floating-casino', t.floatingCasino);
 }
 
 applyTranslations(currentLang);
 
-// تغییر زبان از منو و اعمال کلاس فعال (رنگ آبی) و ترجمه زنده
 const langItems = document.querySelectorAll('#lang-menu .mi');
-
 langItems.forEach(item => {
-  if (item.getAttribute('data-lang') === currentLang) {
-    item.classList.add('active');
-  }
-  
-  item.addEventListener('click', (e) => {
+  if (item.getAttribute('data-lang') === currentLang) item.classList.add('active');
+  item.addEventListener('click', () => {
     langItems.forEach(i => i.classList.remove('active'));
     item.classList.add('active');
-    
     const lang = item.getAttribute('data-lang');
     if (lang) {
       localStorage.setItem('zenix_lang', lang);
       document.documentElement.lang = lang;
-      if (lang === 'fa' || lang === 'ar') {
-        document.documentElement.dir = 'rtl';
-      } else {
-        document.documentElement.dir = 'ltr';
-      }
+      document.documentElement.dir = (lang === 'fa' || lang === 'ar') ? 'rtl' : 'ltr';
       applyTranslations(lang);
       if (langMenu) langMenu.classList.remove('show');
     }
   });
 });
 
-// دکمه راهنما
 if (helpBtn) {
   helpBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     closeAllMenus();
     const helpModal = document.getElementById('help-modal');
-    if (helpModal) {
-      helpModal.classList.add('show');
-    } else {
-      alert('راهنمای داشبورد: از این پنل می‌توانید به بخش‌های کوانتیفیکیشن، واریز، برداشت، تراکنش‌ها و تنظیمات حساب خود دسترسی داشته باشید.');
-    }
+    if (helpModal) helpModal.classList.add('show');
+    else alert('راهنمای داشبورد: از این پنل می‌توانید به بخش‌های مختلف دسترسی داشته باشید.');
   });
 }
 
-// دکمه زنگوله اعلانات
 if (bellBtn) {
   bellBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     closeAllMenus();
     const notifModal = document.getElementById('notif-modal') || document.getElementById('notification-modal');
-    if (notifModal) {
-      notifModal.classList.add('show');
-    } else {
-      if (typeof window.openNotifModal === 'function') {
-        window.openNotifModal();
-      } else {
-        alert('اعلانی برای نمایش وجود ندارد.');
-      }
-    }
+    if (notifModal) notifModal.classList.add('show');
+    else alert('اعلانی برای نمایش وجود ندارد.');
   });
 }
 
-// بستن تمامی منوها با کلیک در خارج از آن‌ها
 document.addEventListener('click', (e) => {
-  if (navMenu && !navMenu.contains(e.target) && e.target !== menuBtn) {
-    navMenu.classList.remove('show');
-  }
-  if (langMenu && !langMenu.contains(e.target) && e.target !== langBtn) {
-    langMenu.classList.remove('show');
-  }
+  if (navMenu && !navMenu.contains(e.target) && e.target !== menuBtn) navMenu.classList.remove('show');
+  if (langMenu && !langMenu.contains(e.target) && e.target !== langBtn) langMenu.classList.remove('show');
 });
