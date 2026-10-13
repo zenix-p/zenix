@@ -38,7 +38,7 @@ function generateUIDDigits(userId) {
 }
 
 // ==========================================
-// 2. مدیریت مدال درباره پلتفرم و راهنما
+// 2. مدیریت مدال‌های پلتفرم (درباره، راهنما، کازینو)
 // ==========================================
 window.openAboutModal = function() {
     document.getElementById('m-about-modal')?.classList.add('show');
@@ -56,6 +56,15 @@ window.openHelpModal = function() {
 
 window.closeHelpModal = function() {
     document.getElementById('m-help-modal')?.classList.remove('show');
+};
+
+window.openCasinoModal = function() {
+    document.getElementById('m-casino-modal')?.classList.add('show');
+    closeAllMenus();
+};
+
+window.closeCasinoModal = function() {
+    document.getElementById('m-casino-modal')?.classList.remove('show');
 };
 
 // ==========================================
@@ -289,7 +298,10 @@ const ld = {
         helpS2List: '<li><strong>کوانتیفیکیشن:</strong> ورود به بخش معاملات هوشمند و رباتیک و دریافت سود روزانه.</li><li><strong>واریز:</strong> شارژ حساب کاربری از طریق ولت‌های دیجیتال با تأیید شبکه.</li><li><strong>برداشت:</strong> ثبت درخواست برداشت درآمدها و دارایی‌ها به کیف پول شخصی.</li><li><strong>تیم:</strong> مشاهده آمار کامل اعضا و لینک اختصاصی دعوت زیرمجموعه‌ها (سطوح ۱ تا ۳).</li><li><strong>تراکنش‌ها:</strong> بررسی تاریخچه کامل وضیعت ریز تراکنش‌های مالی، واریزی‌ها و برداشت‌ها.</li><li><strong>پروفایل:</strong> مدیریت امنیت حساب، رمز عبور و تنظیمات کاربری.</li>',
         helpS3Title: '<i class="fas fa-chart-line" style="margin-left:5px;"></i> ۳. بازار ارزهای دیجیتال و اعلان‌ها',
         helpS3Desc: 'قیمت ۳ ارز برتر بازار به صورت زنده به‌روزرسانی می‌شود. همچنین با کلیک روی آیکون زنگوله هدر می‌توانید پیام‌ها و اطلاعیه‌های سیستم را مشاهده کنید.',
-        helpFooter: '<i class="fas fa-headset" style="color:#a855f7;margin-left:4px;"></i> در صورت نیاز به راهنمایی بیشتر می‌توانید با پشتیبانی زِنیکس در ارتباط باشید.'
+        helpFooter: '<i class="fas fa-headset" style="color:#a855f7;margin-left:4px;"></i> در صورت نیاز به راهنمایی بیشتر می‌توانید با پشتیبانی زِنیکس در ارتباط باشید.',
+        casinoModalTitle: 'انتخاب بازی‌های کازینو',
+        casinoPoker: 'رولت آنلاین', casinoPokerDesc: 'بازی هیجان‌انگیز و شانس',
+        casinoPlinko: 'پلینکو (پاپالان)', casinoPlinkoDesc: 'بازی محبوب ریزش مهره‌ها'
     },
     en: {
         m1: 'Home', m2: 'Quantification', m3: 'Deposit', m4: 'Withdraw', m5: 'Transactions', m6: 'Profile', m7: 'Support', m_about: 'About Platform', m8: 'Logout',
@@ -319,7 +331,10 @@ const ld = {
         helpS2List: '<li><strong>Quantification:</strong> Enter automated robotic trading to earn daily profit.</li><li><strong>Deposit:</strong> Top up your account via digital wallets.</li><li><strong>Withdraw:</strong> Request asset withdrawals to your crypto wallet.</li><li><strong>Team:</strong> View member stats and get your referral link (Levels 1-3).</li><li><strong>Transactions:</strong> Review full history of financial deposits and withdrawals.</li><li><strong>Profile:</strong> Manage account security, password, and settings.</li>',
         helpS3Title: '<i class="fas fa-chart-line" style="margin-right:5px;"></i> 3. Crypto Market & Notifications',
         helpS3Desc: 'Top 3 crypto prices are updated live. Click the bell icon on the header to view notifications and admin messages.',
-        helpFooter: '<i class="fas fa-headset" style="color:#a855f7;margin-right:4px;"></i> If you need further assistance, feel free to contact Zenix Support.'
+        helpFooter: '<i class="fas fa-headset" style="color:#a855f7;margin-right:4px;"></i> If you need further assistance, feel free to contact Zenix Support.',
+        casinoModalTitle: 'Select Casino Games',
+        casinoPoker: 'Online Roulette', casinoPokerDesc: 'Exciting game of chance',
+        casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Popular dropping ball game'
     },
     ar: {
         m1: 'الرئيسية', m2: 'التكميم', m3: 'إيداع', m4: 'سحب', m5: 'المعاملات', m6: 'الملف الشخصي', m7: 'الدعم', m_about: 'حول المنصة', m8: 'تسجيل الخروج',
@@ -349,7 +364,10 @@ const ld = {
         helpS2List: '<li><strong>التكميم:</strong> الدخول إلى التداول الآلي لكسب الأرباح اليومية.</li><li><strong>إيداع:</strong> شحن حسابك عبر المحافظ الرقمية.</li><li><strong>سحب:</strong> طلب سحب الأصول إلى محفظتك الخاصة.</li><li><strong>الفريق:</strong> عرض إحصائيات الأعضاء ورابط الإحالة الخاص بك.</li><li><strong>المعاملات:</strong> مراجعة السجل الكامل لعمليات الإيداع والسحب.</li><li><strong>الملف الشخصي:</strong> إدارة أمان الحساب والإعدادات.</li>',
         helpS3Title: '<i class="fas fa-chart-line" style="margin-left:5px;"></i> ٣. سوق العملات والإشعارات',
         helpS3Desc: 'يتم تحديث أسعار العملات بشكل مباشر. انقر فوق أيقونة الجرس لعرض الإشعارات.',
-        helpFooter: '<i class="fas fa-headset" style="color:#a855f7;margin-left:4px;"></i> إذا كنت بحاجة إلى مساعدة إضافية، تواصل مع دعم Zenix.'
+        helpFooter: '<i class="fas fa-headset" style="color:#a855f7;margin-left:4px;"></i> إذا كنت بحاجة إلى مساعدة إضافية، تواصل مع دعم Zenix.',
+        casinoModalTitle: 'اختر ألعاب الكازينو',
+        casinoPoker: 'رولت مباشر', casinoPokerDesc: 'لعبة حظ مثيرة',
+        casinoPlinko: 'بلينكو', casinoPlinkoDesc: 'لعبة سقوط الكرات الشهيرة'
     },
     tr: {
         m1: 'Ana Sayfa', m2: 'Kuantifikasyon', m3: 'Yatırım', m4: 'Çekim', m5: 'İşlemler', m6: 'Profil', m7: 'Destek', m_about: 'Platform Hakkında', m8: 'Çıkış',
@@ -372,14 +390,17 @@ const ld = {
         modalTitle: 'Bildirimler و Mesajlar', noMsg: 'Yeni mesaj yok.', newBadge: 'YENİ',
         tabAll: 'Tümü', tabApproved: 'Onaylanan', tabRejected: 'Reddedilen', tabAdmin: 'Yönetici',
         helpTitle: 'Zenix Kontrol Paneli Kapsamlı Rehberi',
-        helpIntro: 'Zenix kullanıcı yönetim paneline hoş geldiniz. Burada finansal performansınızın bir özetini ve çekirdek bölümlere hızlı erişimi bulabilirsiniz.',
+        helpIntro: 'Zenix kullanıcı yönetim paneline hoş geldiniz. Burada finansal performansınızın bir özetini bulabilirsiniz.',
         helpS1Title: '<i class="fas fa-wallet" style="margin-right:5px;"></i> 1. İstatistikler ve Bakiye',
-        helpS1Desc: 'Sayfanın üst kısmında toplam bakiyeniz (USDT) ve ağ referans sayınız canlı olarak görüntülenir.',
+        helpS1Desc: 'Sayfanın üst kısmında toplam bakiyeniz (USDT) canlı olarak görüntülenir.',
         helpS2Title: '<i class="fas fa-th-large" style="margin-right:5px;"></i> 2. Hızlı Kısayollar',
-        helpS2List: '<li><strong>Kuantifikasyon:</strong> Günlük kar elde etmek için otomatik işlemlere girin.</li><li><strong>Yatırım:</strong> Dijital cüzdanlar aracılığıyla hesabınıza para yükleyin.</li><li><strong>Çekim:</strong> Kripto cüzdanınıza varlık çekme talebinde bulunun.</li><li><strong>Ekip:</strong> Üye istatistiklerini görüntüleyin ve referans bağlantınızı alın.</li><li><strong>İşlemler:</strong> Finansal geçmişi inceleyin.</li><li><strong>Profil:</strong> Hesap güvenliğini yönetin.</li>',
+        helpS2List: '<li><strong>Kuantifikasyon:</strong> Otomatik işlemler.</li><li><strong>Yatırım:</strong> Bakiye yükleme.</li><li><strong>Çekim:</strong> Varlık çekme.</li><li><strong>Ekip:</strong> Üye istatistikleri.</li><li><strong>İşlemler:</strong> Geçmiş.</li><li><strong>Profil:</strong> Güvenlik.</li>',
         helpS3Title: '<i class="fas fa-chart-line" style="margin-right:5px;"></i> 3. Kripto Piyasası ve Bildirimler',
-        helpS3Desc: 'En iyi 3 kripto fiyatı canlı güncellenir. Bildirimler için başlıkçtaki zil simgesine tıklayın.',
-        helpFooter: '<i class="fas fa-headset" style="color:#a855f7;margin-right:4px;"></i> Daha fazla yardıma ihtiyacınız olursa Zenix Desteği ile iletişime geçin.'
+        helpS3Desc: 'Canlı fiyatlar ve bildirimler.',
+        helpFooter: '<i class="fas fa-headset" style="color:#a855f7;margin-right:4px;"></i> Zenix Desteği ile iletişime geçin.',
+        casinoModalTitle: 'Casino Oyunları Seçimi',
+        casinoPoker: 'Canlı Rulet', casinoPokerDesc: 'Heyecan verici şans oyunu',
+        casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Popüler top bırakma oyunu'
     },
     ru: {
         m1: 'Главная', m2: 'Квантификация', m3: 'Депозит', m4: 'Вывод', m5: 'Транзакции', m6: 'Профиль', m7: 'Поддержка', m_about: 'О платформе', m8: 'Выход',
@@ -393,23 +414,26 @@ const ld = {
         c6: 'Профиль', d6: 'Настройки безопасности',
         tmkt: 'Криптовалютный рынок (топ-3 из 30 монет)', tlive: 'Онлайн',
         aboutTitle: 'О смарт-платформе Zenix',
-        aboutIntro: 'Добро пожаловать в Zenix — ведущую платформу с современным взглядом на цифровую экономику.',
-        aboutDesc: 'В современном мире доступ к надежным и умным инструментам управления активами имеет жизненно важное значение.',
-        aboutGoal: '<strong style="color:#38bdf8;">Наша цель:</strong> демократизировать доступ к передовым финансовым инструментам.',
-        aboutStrategy: '<strong style="color:#38bdf8;">Наша стратегия:</strong> фокус на максимальной безопасности и конфиденциальности.',
-        aboutConclusion: 'Zenix — ваш надежный партнер на пути к успеху в цифровых финансах.',
+        aboutIntro: 'Добро пожаловать в Zenix.',
+        aboutDesc: 'Современные инструменты управления активами.',
+        aboutGoal: '<strong style="color:#38bdf8;">Наша цель:</strong> демократизировать доступ.',
+        aboutStrategy: '<strong style="color:#38bdf8;">Наша стратегия:</strong> безопасность.',
+        aboutConclusion: 'Zenix — ваш надежный партнер.',
         floatingCasino: 'Казино',
         modalTitle: 'Уведомления', noMsg: 'Нет новых сообщений.', newBadge: 'НОВОЕ',
         tabAll: 'Все', tabApproved: 'Одобрено', tabRejected: 'Отклонено', tabAdmin: 'Админ',
-        helpTitle: 'Подробное руководство по панели управления Zenix',
-        helpIntro: 'Добро пожаловать в панель управления Zenix. Здесь вы найдете сводку по финансовым результатам.',
-        helpS1Title: '<i class="fas fa-wallet" style="margin-right:5px;"></i> 1. Статистика и Баланс',
-        helpS1Desc: 'В верхней части страницы отображаются ваш общий баланс (USDT) и количество рефералов.',
+        helpTitle: 'Руководство панели управления Zenix',
+        helpIntro: 'Добро пожаловать в панель управления.',
+        helpS1Title: '<i class="fas fa-wallet" style="margin-right:5px;"></i> 1. Баланс',
+        helpS1Desc: 'Общий баланс.',
         helpS2Title: '<i class="fas fa-th-large" style="margin-right:5px;"></i> 2. Быстрый доступ',
-        helpS2List: '<li><strong>Квантификация:</strong> Торговые роботы для получения прибыли.</li><li><strong>Депозит:</strong> Пополнение счета.</li><li><strong>Вывод:</strong> Вывод средств на кошелек.</li><li><strong>Команда:</strong> Статистика сети.</li><li><strong>Транзакции:</strong> История операций.</li><li><strong>Профиль:</strong> Безопасность аккаунта.</li>',
-        helpS3Title: '<i class="fas fa-chart-line" style="margin-right:5px;"></i> 3. Крипторынок и Уведомления',
-        helpS3Desc: 'Цены обновляются в реальном времени. Нажмите на иконку колокольчика для уведомлений.',
-        helpFooter: '<i class="fas fa-headset" style="color:#a855f7;margin-right:4px;"></i> Обратитесь в поддержку Zenix при возникновении вопросов.'
+        helpS2List: '<li>Квантификация</li><li>Депозит</li><li>Вывод</li>',
+        helpS3Title: '<i class="fas fa-chart-line" style="margin-right:5px;"></i> 3. Рынок',
+        helpS3Desc: 'Цены в реальном времени.',
+        helpFooter: 'Поддержка Zenix.',
+        casinoModalTitle: 'Выбор игр казино',
+        casinoPoker: 'Онлайн Рулетка', casinoPokerDesc: 'Захватывающая игра',
+        casinoPlinko: 'Плинко', casinoPlinkoDesc: 'Популярная игра с шариками'
     },
     es: {
         m1: 'Inicio', m2: 'Cuantificación', m3: 'Depósito', m4: 'Retiro', m5: 'Transacciones', m6: 'Perfil', m7: 'Soporte', m_about: 'Sobre la plataforma', m8: 'Cerrar sesión',
@@ -423,23 +447,26 @@ const ld = {
         c6: 'Perfil', d6: 'Configuración de seguridad',
         tmkt: 'Mercado de criptomonedas (Top 3 de 30 monedas)', tlive: 'En vivo',
         aboutTitle: 'Sobre la plataforma inteligente Zenix',
-        aboutIntro: 'Bienvenido al panel de gestión de Zenix. Aquí encontrará un resumen de su rendimiento financiero.',
-        aboutDesc: 'Acceso seguro a herramientas inteligentes.',
-        aboutGoal: '<strong style="color:#38bdf8;">Nuestro objetivo:</strong> Democratizar el acceso financiero.',
-        aboutStrategy: '<strong style="color:#38bdf8;">Nuestra estrategia:</strong> Enfoque en seguridad.',
-        aboutConclusion: 'Zenix es su socio de confianza.',
+        aboutIntro: 'Bienvenido a Zenix.',
+        aboutDesc: 'Herramientas seguras.',
+        aboutGoal: '<strong style="color:#38bdf8;">Objetivo:</strong> Democratizar el acceso.',
+        aboutStrategy: '<strong style="color:#38bdf8;">Estrategia:</strong> Seguridad.',
+        aboutConclusion: 'Zenix es su socio.',
         floatingCasino: 'Casino',
         modalTitle: 'Notificaciones', noMsg: 'No hay mensajes nuevos.', newBadge: 'NUEVO',
         tabAll: 'Todo', tabApproved: 'Aprobado', tabRejected: 'Rechazado', tabAdmin: 'Admin',
-        helpTitle: 'Guía completa del panel de Zenix',
-        helpIntro: 'Bienvenido al panel de usuario de Zenix. Aquí puede ver el resumen financiero y accesos directos.',
-        helpS1Title: '<i class="fas fa-wallet" style="margin-right:5px;"></i> 1. Estadísticas y Saldo',
-        helpS1Desc: 'En la parte superior se muestra su saldo total (USDT) y referidos.',
-        helpS2Title: '<i class="fas fa-th-large" style="margin-right:5px;"></i> 2. Accesos directos',
-        helpS2List: '<li><strong>Cuantificación:</strong> Comercio automatizado.</li><li><strong>Depósito:</strong> Recargar cuenta.</li><li><strong>Retiro:</strong> Retirar fondos.</li><li><strong>Equipo:</strong> Ver red.</li><li><strong>Transacciones:</strong> Historial.</li><li><strong>Perfil:</strong> Seguridad.</li>',
-        helpS3Title: '<i class="fas fa-chart-line" style="margin-right:5px;"></i> 3. Mercado y Notificaciones',
-        helpS3Desc: 'Precios en vivo. Haga clic en la campana para ver notificaciones.',
-        helpFooter: '<i class="fas fa-headset" style="color:#a855f7;margin-right:4px;"></i> Contacte a soporte si necesita ayuda.'
+        helpTitle: 'Guía de Zenix',
+        helpIntro: 'Bienvenido.',
+        helpS1Title: '1. Saldo',
+        helpS1Desc: 'Saldo total.',
+        helpS2Title: '2. Accesos',
+        helpS2List: '<li>Cuantificación</li><li>Depósito</li>',
+        helpS3Title: '3. Mercado',
+        helpS3Desc: 'Precios en vivo.',
+        helpFooter: 'Soporte Zenix.',
+        casinoModalTitle: 'Selección de Juegos de Casino',
+        casinoPoker: 'Ruleta Online', casinoPokerDesc: 'Emocionante juego de azar',
+        casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Popular juego de caída'
     },
     fr: {
         m1: 'Accueil', m2: 'Quantification', m3: 'Dépôt', m4: 'Retrait', m5: 'Transactions', m6: 'Profil', m7: 'Support', m_about: 'À propos', m8: 'Déconnexion',
@@ -453,23 +480,26 @@ const ld = {
         c6: 'Profil', d6: 'Paramètres de sécurité',
         tmkt: 'Marché des crypto-monnaies (Top 3 sur 30)', tlive: 'En direct',
         aboutTitle: 'À propos de la plateforme intelligente Zenix',
-        aboutIntro: 'Bienvenue sur Zenix. Accédez à vos performances financières et outils.',
-        aboutDesc: 'Outils sécurisés et intelligents.',
-        aboutGoal: '<strong style="color:#38bdf8;">Notre objectif:</strong> Démocratiser l\'accès.',
-        aboutStrategy: '<strong style="color:#38bdf8;">Notre stratégie:</strong> Sécurité maximale.',
-        aboutConclusion: 'Zenix est votre partenaire de confiance.',
+        aboutIntro: 'Bienvenue sur Zenix.',
+        aboutDesc: 'Outils sécurisés.',
+        aboutGoal: 'Objectif.',
+        aboutStrategy: 'Stratégie.',
+        aboutConclusion: 'Zenix partenaire.',
         floatingCasino: 'Casino',
         modalTitle: 'Notifications', noMsg: 'Aucun nouveau message.', newBadge: 'NOUVEAU',
         tabAll: 'Tout', tabApproved: 'Approuvé', tabRejected: 'Rejeté', tabAdmin: 'Admin',
-        helpTitle: 'Guide complet du tableau de bord Zenix',
-        helpIntro: 'Bienvenue sur le tableau de bord de Zenix. Retrouvez ici un résumé de vos performances.',
-        helpS1Title: '<i class="fas fa-wallet" style="margin-right:5px;"></i> 1. Statistiques et Solde',
-        helpS1Desc: 'En haut de la page, votre solde total (USDT) et vos parrainages s\'affichent en direct.',
-        helpS2Title: '<i class="fas fa-th-large" style="margin-right:5px;"></i> 2. Raccourcis rapides',
-        helpS2List: '<li><strong>Quantification:</strong> Trading automatisé.</li><li><strong>Dépôt:</strong> Recharger le compte.</li><li><strong>Retrait:</strong> Retirer des actifs.</li><li><strong>Équipe:</strong> Voir le réseau.</li><li><strong>Transactions:</strong> Historique.</li><li><strong>Profil:</strong> Sécurité.</li>',
-        helpS3Title: '<i class="fas fa-chart-line" style="margin-right:5px;"></i> 3. Marché crypto et Notifications',
-        helpS3Desc: 'Prix mis à jour en direct. Cliquez sur la cloche pour voir les notifications.',
-        helpFooter: '<i class="fas fa-headset" style="color:#a855f7;margin-left:4px;"></i> Contactez le support Zenix pour toute assistance.'
+        helpTitle: 'Guide Zenix',
+        helpIntro: 'Bienvenue.',
+        helpS1Title: '1. Solde',
+        helpS1Desc: 'Solde total.',
+        helpS2Title: '2. Raccourcis',
+        helpS2List: '<li>Quantification</li><li>Dépôt</li>',
+        helpS3Title: '3. Marché',
+        helpS3Desc: 'Prix en direct.',
+        helpFooter: 'Support Zenix.',
+        casinoModalTitle: 'Sélection des Jeux de Casino',
+        casinoPoker: 'Roulette en ligne', casinoPokerDesc: 'Jeu de hasard excitant',
+        casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Jeu populaire de balles'
     },
     de: {
         m1: 'Startseite', m2: 'Quantifizierung', m3: 'Einzahlung', m4: 'Auszahlung', m5: 'Transaktionen', m6: 'Profil', m7: 'Unterstützung', m_about: 'Über die Plattform', m8: 'Abmelden',
@@ -483,23 +513,26 @@ const ld = {
         c6: 'Profil', d6: 'Sicherheitseinstellungen',
         tmkt: 'Kryptowährungsmarkt (Top 3 von 30 Münzen)', tlive: 'Live',
         aboutTitle: 'Über die intelligente Zenix-Plattform',
-        aboutIntro: 'Willkommen bei Zenix. Verwalten Sie Ihr Vermögen und nutzen Sie smarte Tools.',
-        aboutDesc: 'Sicherer Zugang zu Finanztools.',
-        aboutGoal: '<strong style="color:#38bdf8;">Unser Ziel:</strong> Finanztools demokratisieren.',
-        aboutStrategy: '<strong style="color:#38bdf8;">Unsere Strategie:</strong> Maximale Sicherheit.',
-        aboutConclusion: 'Zenix ist Ihr zuverlässiger Partner.',
+        aboutIntro: 'Willkommen bei Zenix.',
+        aboutDesc: 'Sichere Tools.',
+        aboutGoal: 'Ziel.',
+        aboutStrategy: 'Strategie.',
+        aboutConclusion: 'Zenix Partner.',
         floatingCasino: 'Casino',
         modalTitle: 'Benachrichtigungen', noMsg: 'Keine neuen Nachrichten.', newBadge: 'NEU',
         tabAll: 'Alle', tabApproved: 'Genehmigt', tabRejected: 'Abgelehnt', tabAdmin: 'Admin',
-        helpTitle: 'Umfassender Zenix Dashboard-Leitfaden',
-        helpIntro: 'Willkommen im Zenix-Dashboard. Hier finden Sie eine Zusammenfassung Ihrer Finanzdaten.',
-        helpS1Title: '<i class="fas fa-wallet" style="margin-right:5px;"></i> 1. Statistik & Guthaben',
-        helpS1Desc: 'Oben sehen Sie Ihr Gesamtguthaben (USDT) und Ihre Empfehlungen.',
-        helpS2Title: '<i class="fas fa-th-large" style="margin-right:5px;"></i> 2. Schnellzugriffe',
-        helpS2List: '<li><strong>Quantifizierung:</strong> Automatisierter Handel.</li><li><strong>Einzahlung:</strong> Konto aufladen.</li><li><strong>Auszahlung:</strong> Guthaben abheben.</li><li><strong>Team:</strong> Netzwerk anzeigen.</li><li><strong>Transaktionen:</strong> Historie.</li><li><strong>Profil:</strong> Sicherheit.</li>',
-        helpS3Title: '<i class="fas fa-chart-line" style="margin-right:5px;"></i> 3. Kryptomarkt & Benachrichtigungen',
-        helpS3Desc: 'Live-Preise. Klicken Sie auf das Glockensymbol für Benachrichtigungen.',
-        helpFooter: '<i class="fas fa-headset" style="color:#a855f7;margin-left:4px;"></i> Kontaktieren Sie den Zenix-Support bei Fragen.'
+        helpTitle: 'Zenix Leitfaden',
+        helpIntro: 'Willkommen.',
+        helpS1Title: '1. Guthaben',
+        helpS1Desc: 'Gesamtguthaben.',
+        helpS2Title: '2. Schnellzugriff',
+        helpS2List: '<li>Quantifizierung</li>',
+        helpS3Title: '3. Markt',
+        helpS3Desc: 'Live-Preise.',
+        helpFooter: 'Zenix Support.',
+        casinoModalTitle: 'Casino-Spiele Auswahl',
+        casinoPoker: 'Online Roulette', casinoPokerDesc: 'Spannendes Glücksspiel',
+        casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Beliebtes Ballspiel'
     }
 };
 
@@ -575,6 +608,12 @@ function setLang(l) {
     setHtml('t-help-s3-title', t.helpS3Title);
     setTxt('t-help-s3-desc', t.helpS3Desc);
     setHtml('t-help-footer', t.helpFooter);
+
+    setHtml('t-casino-modal-title', `<i class="fas fa-dice" style="color:#f43f5e;"></i> ${t.casinoModalTitle}`);
+    setTxt('t-casino-poker', t.casinoPoker);
+    setTxt('t-casino-poker-desc', t.casinoPokerDesc);
+    setTxt('t-casino-plinko', t.casinoPlinko);
+    setTxt('t-casino-plinko-desc', t.casinoPlinkoDesc);
 
     setTxt('t-floating-casino', t.floatingCasino);
 
@@ -732,25 +771,8 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 
 
 // ==========================================
-// 7. مدیریت منوهای هدر و منوی شناور کازینو
+// 7. مدیریت منوهای هدر
 // ==========================================
-const floatingCasinoBtn = document.getElementById('floating-casino-btn');
-const casinoPopupMenu = document.getElementById('casino-popup-menu');
-
-if (floatingCasinoBtn && casinoPopupMenu) {
-    floatingCasinoBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        casinoPopupMenu.classList.toggle('show');
-        closeAllMenus('casino');
-    });
-
-    document.addEventListener('click', (e) => {
-        if (!casinoPopupMenu.contains(e.target) && e.target !== floatingCasinoBtn) {
-            casinoPopupMenu.classList.remove('show');
-        }
-    });
-}
-
 const menuBtn = document.getElementById('menu-btn');
 const navMenu = document.getElementById('nav-menu');
 const langBtn = document.getElementById('lang-btn');
@@ -760,7 +782,6 @@ const helpBtn = document.getElementById('help-btn');
 function closeAllMenus(except = '') {
     if (except !== 'nav' && navMenu) navMenu.classList.remove('show');
     if (except !== 'lang' && langMenu) langMenu.classList.remove('show');
-    if (except !== 'casino' && casinoPopupMenu) casinoPopupMenu.classList.remove('show');
 }
 
 if (menuBtn && navMenu) {
