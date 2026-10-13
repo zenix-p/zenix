@@ -38,7 +38,7 @@ function generateUIDDigits(userId) {
 }
 
 // ==========================================
-// 2. مدیریت مدال درباره پلتفرم
+// 2. مدیریت مدال درباره پلتفرم (منوی همبرگری)
 // ==========================================
 window.openAboutModal = function() {
     document.getElementById('m-about-modal')?.classList.add('show');
@@ -263,7 +263,7 @@ const ld = {
         c5: 'تراکنش‌ها', d5: 'تاریخچه مالی',
         c6: 'پروفایل', d6: 'تنظیمات امنیت',
         tmkt: 'بازار ارزهای دیجیتال (۳ ارز برتر از ۳۰ ارز رصد شده)', tlive: 'زنده',
-        aboutModalTitle: 'درباره پلتفرم هوشمند زِنیکس',
+        aboutTitle: 'درباره پلتفرم هوشمند زِنیکس (Zenix)',
         aboutIntro: 'به زِنیکس (Zenix) خوش آمدید؛ پلتفرمی پیشرو که با نگاهی نوین به دنیای اقتصاد دیجیتال و فناوری‌های مالی متولد شده است.',
         aboutDesc: 'در دنیای پرسرعت امروز، دسترسی به ابزارهای امن و هوشمند برای مدیریت و رشد سرمایه اهمیت حیاتی دارد. زِنیکس با بهره‌گیری از زیرساخت‌های مدرن ابری و پروتکل‌های امنیتی پیشرفته، بستری یکپارچه برای معاملات هوشمند، کوانتیفیکیشن و توسعه شبکه مالی شما فراهم کرده است.',
         aboutGoal: '<strong style="color:#38bdf8;">هدف ما:</strong> دموکراتیزه کردن دسترسی به ابزارهای مالی پیشرفته، ایجاد شفافیت کامل در تراکنش‌ها و فراهم کردن محیطی امن، پویا و سودآور برای تمامی کاربران، از مبتدی تا حرفه‌ای است.',
@@ -284,7 +284,7 @@ const ld = {
         c5: 'Transactions', d5: 'Financial History',
         c6: 'Profile', d6: 'Security Settings',
         tmkt: 'Cryptocurrency Market (Top 3 of 30 tracked coins)', tlive: 'Live',
-        aboutModalTitle: 'About Zenix Smart Platform',
+        aboutTitle: 'About Zenix Smart Platform',
         aboutIntro: 'Welcome to Zenix, a leading platform born with a modern vision for the digital economy and financial technologies.',
         aboutDesc: 'In today\'s fast-paced world, access to secure and smart tools for asset management and growth is vital. Zenix provides an integrated environment for smart trading, quantification, and digital asset management.',
         aboutGoal: '<strong style="color:#38bdf8;">Our Goal:</strong> To democratize access to advanced financial tools, ensure complete transparency, and provide a secure, dynamic, and profitable environment for all users worldwide.',
@@ -305,11 +305,11 @@ const ld = {
         c5: 'المعاملات', d5: 'السجل المالي',
         c6: 'الملف الشخصي', d6: 'إعدادات الأمان',
         tmkt: 'سوق العملات الرقمية (أفضل 3 من 30 عملة مراقبة)', tlive: 'مباشر',
-        aboutModalTitle: 'حول منصة Zenix الذكية',
+        aboutTitle: 'حول منصة Zenix الذكية',
         aboutIntro: 'مرحباً بك في Zenix، المنصة الرائدة التي ولدت برؤية حديثة للاقتصاد الرقمي والتقنيات المالية.',
         aboutDesc: 'في عالم اليوم سريع الخطى، يعد الوصول إلى أدوات آمنة وذكية لإدارة الأصول ونموها أمراً بالغ الأهمية.',
-        aboutGoal: '<strong style="color:#38bdf8;">هدفنا:</strong> إضفاء الطابع الديمقراطي على الوصول إلى الأدوات المالية المتقدمة، وضمان الشفافية الكاملة، وتوفير بيئة آمنة.',
-        aboutStrategy: '<strong style="color:#38bdf8;">استراتيجيتنا:</strong> التركيز على أقصى درجات الأمان والخصوصية ومعالجة المعاملات.',
+        aboutGoal: '<strong style="color:#38bdf8;">هدفنا:</strong> إضفاء الطابع الديمقراطي على الوصول إلى الأدوات المالية المتقدمة، وضمان الشفافية الكاملة، وتوفير بيئة آمنة ومربحة.',
+        aboutStrategy: '<strong style="color:#38bdf8;">استراتيجيتنا:</strong> التركيز على أقصى درجات الأمان والخصوصية والمعالجة الفورية للمعاملات.',
         aboutConclusion: 'Zenix هي أكثر من مجرد منصة؛ إنها شريكك الموثوق لبناء مستقبل مشرق.',
         floatingCasino: 'كازينو',
         modalTitle: 'صندوق الرسائل والإشعارات', noMsg: 'لا توجد رسائل جديدة.', newBadge: 'جديد',
@@ -326,14 +326,14 @@ const ld = {
         c5: 'İşlemler', d5: 'Finansal Geçmiş',
         c6: 'Profil', d6: 'Güvenlik Ayarları',
         tmkt: 'Kripto Para Piyasası (Takip edilen 30 coinden en iyi 3ü)', tlive: 'Canlı',
-        aboutModalTitle: 'Zenix Akıllı Platform Hakkında',
+        aboutTitle: 'Zenix Akıllı Platform Hakkında',
         aboutIntro: 'Dijital ekonomi ve finansal teknolojilere modern bir vizyonla doğan öncü platform Zenix\'e hoş geldiniz.',
         aboutDesc: 'Günümüzün hızlı dünyasında varlık yönetimi için güvenli araçlara erişim hayati önem taşır.',
         aboutGoal: '<strong style="color:#38bdf8;">Hedefimiz:</strong> Gelişmiş finansal araçlara erişimi demokratikleştirerek güvenli ortam sağlamak.',
         aboutStrategy: '<strong style="color:#38bdf8;">Stratejimiz:</strong> Maksimum güvenlik ve gizlilik odaklı modern algoritmalar.',
         aboutConclusion: 'Zenix sadece bir platform değil; geleceğinizi inşa eden güvenilir ortağınızdır.',
         floatingCasino: 'Casino',
-        modalTitle: 'Bildirimler ve Mesajlar', noMsg: 'Yeni mesaj yok.', newBadge: 'YENİ',
+        modalTitle: 'Bildirimler و Mesajlar', noMsg: 'Yeni mesaj yok.', newBadge: 'YENİ',
         tabAll: 'Tümü', tabApproved: 'Onaylanan', tabRejected: 'Reddedilen', tabAdmin: 'Yönetici'
     },
     ru: {
@@ -347,7 +347,7 @@ const ld = {
         c5: 'Транзакции', d5: 'История финансов',
         c6: 'Профиль', d6: 'Настройки безопасности',
         tmkt: 'Криптовалютный рынок (топ-3 из 30 монет)', tlive: 'Онлайн',
-        aboutModalTitle: 'О смарт-платформе Zenix',
+        aboutTitle: 'О смарт-платформе Zenix',
         aboutIntro: 'Добро пожаловать в Zenix — ведущую платформу с современным взглядом на цифровую экономику.',
         aboutDesc: 'В современном мире доступ к надежным и умным инструментам управления активами имеет жизненно важное значение.',
         aboutGoal: '<strong style="color:#38bdf8;">Наша цель:</strong> демократизировать доступ к передовым финансовым инструментам.',
@@ -368,7 +368,7 @@ const ld = {
         c5: 'Transacciones', d5: 'Historial financiero',
         c6: 'Perfil', d6: 'Configuración de seguridad',
         tmkt: 'Mercado de criptomonedas (Top 3 de 30 monedas)', tlive: 'En vivo',
-        aboutModalTitle: 'Sobre la plataforma inteligente Zenix',
+        aboutTitle: 'Sobre la plataforma inteligente Zenix',
         aboutIntro: 'Bienvenido a Zenix, una plataforma líder con una visión moderna de la economía digital.',
         aboutDesc: 'En el acelerado mundo actual, el acceso a herramientas seguras e inteligentes es vital.',
         aboutGoal: '<strong style="color:#38bdf8;">Nuestro objetivo:</strong> Democratizar el acceso a herramientas financieras avanzadas.',
@@ -389,7 +389,7 @@ const ld = {
         c5: 'Transactions', d5: 'Historique financier',
         c6: 'Profil', d6: 'Paramètres de sécurité',
         tmkt: 'Marché des crypto-monnaies (Top 3 sur 30)', tlive: 'En direct',
-        aboutModalTitle: 'À propos de la plateforme intelligente Zenix',
+        aboutTitle: 'À propos de la plateforme intelligente Zenix',
         aboutIntro: 'Bienvenue sur Zenix, une plateforme de premier plan dotée d\'une vision moderne.',
         aboutDesc: 'Dans le monde en évolution rapide d\'aujourd\'hui, l\'accès à des outils sécurisés est essentiel.',
         aboutGoal: '<strong style="color:#38bdf8;">Notre objectif:</strong> Démocratiser l\'accès aux outils financiers.',
@@ -410,7 +410,7 @@ const ld = {
         c5: 'Transaktionen', d5: 'Finanzhistorie',
         c6: 'Profil', d6: 'Sicherheitseinstellungen',
         tmkt: 'Kryptowährungsmarkt (Top 3 von 30 Münzen)', tlive: 'Live',
-        aboutModalTitle: 'Über die intelligente Zenix-Plattform',
+        aboutTitle: 'Über die intelligente Zenix-Plattform',
         aboutIntro: 'Willkommen bei Zenix, einer führenden Plattform mit einer modernen Vision für die digitale Wirtschaft.',
         aboutDesc: 'In der heutigen schnelllebigen Welt ist der Zugang zu sicheren und intelligenten Tools von entscheidender Bedeutung.',
         aboutGoal: '<strong style="color:#38bdf8;">Unser Ziel:</strong> Den Zugang zu fortschrittlichen Finanzinstrumenten zu demokratisieren.',
@@ -471,15 +471,20 @@ function setLang(l) {
     setTxt('t-mkt', t.tmkt);
     setTxt('t-live', t.tlive);
     
-    // ترجمه متن‌های مدال درباره پلتفرم
-    let elAboutTitle = document.getElementById('t-about-modal-title');
-    if (elAboutTitle) elAboutTitle.innerHTML = `<i class="fas fa-info-circle"></i> ${t.aboutModalTitle}`;
+    // به‌روزرسانی متن‌ها در دو جا (باکس داخل داشبورد و مدال پاپ‌آپ منو)
+    setTxt('t-about-box-title', t.aboutTitle);
+    setTxt('t-about-box-intro', t.aboutIntro);
+    setTxt('t-about-box-desc', t.aboutDesc);
+    setHtml('t-about-box-goal', t.aboutGoal);
+    setHtml('t-about-box-strategy', t.aboutStrategy);
+    setHtml('t-about-box-conclusion', t.aboutConclusion);
 
-    setTxt('t-about-intro', t.aboutIntro);
-    setTxt('t-about-desc', t.aboutDesc);
-    setHtml('t-about-goal', t.aboutGoal);
-    setHtml('t-about-strategy', t.aboutStrategy);
-    setHtml('t-about-conclusion', t.aboutConclusion);
+    setTxt('t-about-modal-title', t.aboutTitle);
+    setTxt('t-about-modal-intro', t.aboutIntro);
+    setTxt('t-about-modal-desc', t.aboutDesc);
+    setHtml('t-about-modal-goal', t.aboutGoal);
+    setHtml('t-about-modal-strategy', t.aboutStrategy);
+    setHtml('t-about-modal-conclusion', t.aboutConclusion);
 
     setTxt('t-floating-casino', t.floatingCasino);
 
