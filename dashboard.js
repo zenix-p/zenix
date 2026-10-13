@@ -252,7 +252,11 @@ const ld = {
         c6: 'پروفایل', d6: 'تنظیمات امنیت',
         tmkt: 'بازار ارزهای دیجیتال (۳ ارز برتر از ۳۰ ارز رصد شده)', tlive: 'زنده',
         aboutTitle: 'درباره پلتفرم هوشمند زِنیکس (Zenix)',
-        aboutDesc: 'پلتفرم Zenix با هدف ارائه راهکارهای نوین مالی، معاملات هوشمند (کوانتیفیکیشن) و مدیریت بهینه دارایی‌ها طراحی شده است. استراتژی ما تمرکز بر امنیت حداکثری، پردازش آنی تراکنش‌ها و خلق تجربه‌ای مطمئن و پویا برای کاربران در بازار دیجیتال است. با Zenix، آینده سرمایه‌گذاری خود را هوشمندانه‌تر بسازید.',
+        aboutIntro: 'به زِنیکس (Zenix) خوش آمدید؛ پلتفرمی پیشرو که با نگاهی نوین به دنیای اقتصاد دیجیتال و فناوری‌های مالی متولد شده است.',
+        aboutDesc: 'در دنیای پرسرعت امروز، دسترسی به ابزارهای امن و هوشمند برای مدیریت و رشد سرمایه اهمیت حیاتی دارد. زِنیکس با بهره‌گیری از زیرساخت‌های مدرن ابری و پروتکل‌های امنیتی پیشرفته، بستری یکپارچه برای معاملات هوشمند، کوانتیفیکیشن و توسعه شبکه مالی شما فراهم کرده است.',
+        aboutGoal: '<strong style="color:#38bdf8;">هدف ما:</strong> دموکراتیزه کردن دسترسی به ابزارهای مالی پیشرفته، ایجاد شفافیت کامل در تراکنش‌ها و فراهم کردن محیطی امن، پویا و سودآور برای تمامی کاربران، از مبتدی تا حرفه‌ای است.',
+        aboutStrategy: '<strong style="color:#38bdf8;">استراتژی ما:</strong> تمرکز بر امنیت حداکثری و حریم خصوصی، پردازش آنی تراکنش‌ها با الگوریتم‌های مدرن، و خلق ارزش پایدار از طریق سیستم‌های پیشرفته پاداش‌دهی و توسعه تیمی.',
+        aboutConclusion: '<i class="fas fa-quote-right" style="color:#38bdf8;margin-left:4px;"></i> زِنیکس تنها یک پلتفرم نیست؛ بلکه همراه مطمئن شما در مسیر هوشمندسازی و ساخت آینده‌ای روشن‌تر در دنیای مالی دیجیتال است. با ما همراه شوید تا مرزهای جدیدی از موفقیت را فتح کنید.',
         floatingCasino: 'کازینو',
         modalTitle: 'صندوق پیام‌ها و اعلان‌ها', noMsg: 'هیچ پیام جدیدی وجود ندارد.', newBadge: 'جدید',
         tabAll: 'همه', tabApproved: 'تایید درخواست', tabRejected: 'لغو درخواست', tabAdmin: 'پیام مدیریت'
@@ -269,7 +273,11 @@ const ld = {
         c6: 'Profile', d6: 'Security Settings',
         tmkt: 'Cryptocurrency Market (Top 3 of 30 tracked coins)', tlive: 'Live',
         aboutTitle: 'About Zenix Smart Platform',
-        aboutDesc: 'Zenix is designed to provide modern financial solutions, smart quantification trading, and optimal asset management. Our strategy focuses on maximum security, instant transaction processing, and a secure user experience in the digital market. Build your investment future smarter with Zenix.',
+        aboutIntro: 'Welcome to Zenix, a leading platform born with a modern vision for the digital economy and financial technologies.',
+        aboutDesc: 'In today\'s fast-paced world, access to secure and smart tools for asset management and growth is vital. Zenix provides an integrated environment for smart trading, quantification, and digital asset management.',
+        aboutGoal: '<strong style="color:#38bdf8;">Our Goal:</strong> To democratize access to advanced financial tools, ensure complete transparency, and provide a secure, dynamic, and profitable environment for all users worldwide.',
+        aboutStrategy: '<strong style="color:#38bdf8;">Our Strategy:</strong> Focusing on maximum security and privacy, instant transaction processing using modern algorithms, and creating sustainable value through advanced reward systems and team development.',
+        aboutConclusion: '<i class="fas fa-quote-right" style="color:#38bdf8;margin-left:4px;"></i> Zenix is more than just a platform; it is your reliable partner on the path to smarter investing and building a brighter future in digital finance. Join us to conquer new heights of success.',
         floatingCasino: 'Casino',
         modalTitle: 'Notifications & Messages', noMsg: 'No new messages.', newBadge: 'NEW',
         tabAll: 'All', tabApproved: 'Approved', tabRejected: 'Rejected', tabAdmin: 'Admin Msg'
@@ -286,7 +294,11 @@ const ld = {
         c6: 'الملف الشخصي', d6: 'إعدادات الأمان',
         tmkt: 'سوق العملات الرقمية (أفضل 3 من 30 عملة مراقبة)', tlive: 'مباشر',
         aboutTitle: 'حول منصة Zenix الذكية',
-        aboutDesc: 'تم تصميم منصة Zenix لتقديم حلول مالية حديثة وتداول ذكي وإدارة مثلى للأصول. تركز استراتيجيتنا على الأقصى من الأمان والمعالجة الفورية للمعاملات لضمان تجربة موثوقة.',
+        aboutIntro: 'مرحباً بك في Zenix، المنصة الرائدة التي ولدت برؤية حديثة للاقتصاد الرقمي والتقنيات المالية.',
+        aboutDesc: 'في عالم اليوم سريع الخطى، يعد الوصول إلى أدوات آمنة وذكية لإدارة الأصول ونموها أمراً بالغ الأهمية.',
+        aboutGoal: '<strong style="color:#38bdf8;">هدفنا:</strong> إضفاء الطابع الديمقراطي على الوصول إلى الأدوات المالية المتقدمة، وضمان الشفافية الكاملة، وتوفير بيئة آمنة ומربحة.',
+        aboutStrategy: '<strong style="color:#38bdf8;">استراتيجيتنا:</strong> التركيز على أقصى درجات الأمان والخصوصية والمعالجة الفورية للمعاملات.',
+        aboutConclusion: 'Zenix هي أكثر من مجرد منصة؛ إنها شريكك الموثوق لبناء مستقبل مشرق.',
         floatingCasino: 'كازينو',
         modalTitle: 'صندوق الرسائل والإشعارات', noMsg: 'لا توجد رسائل جديدة.', newBadge: 'جديد',
         tabAll: 'الكل', tabApproved: 'طلبات مقبولة', tabRejected: 'طلبات مرفوضة', tabAdmin: 'رسائل الإدارة'
@@ -303,7 +315,11 @@ const ld = {
         c6: 'Profil', d6: 'Güvenlik Ayarları',
         tmkt: 'Kripto Para Piyasası (Takip edilen 30 coinden en iyi 3ü)', tlive: 'Canlı',
         aboutTitle: 'Zenix Akıllı Platform Hakkında',
-        aboutDesc: 'Zenix, modern finansal çözümler, akıllı niceliksel ticaret ve optimum varlık yönetimi sunmak için tasarlanmıştır. Stratejimiz maksimum güvenlik ve anında işlem işlemine odaklanır.',
+        aboutIntro: 'Dijital ekonomi ve finansal teknolojilere modern bir vizyonla doğan öncü platform Zenix\'e hoş geldiniz.',
+        aboutDesc: 'Günümüzün hızlı dünyasında varlık yönetimi için güvenli araçlara erişim hayati önem taşır.',
+        aboutGoal: '<strong style="color:#38bdf8;">Hedefimiz:</strong> Gelişmiş finansal araçlara erişimi demokratikleştirerek tüm kullanıcılar için güvenli bir ortam sağlamak.',
+        aboutStrategy: '<strong style="color:#38bdf8;">Stratejimiz:</strong> Maksimum güvenlik ve gizlilik odaklı modern algoritmalar.',
+        aboutConclusion: 'Zenix sadece bir platform değil; geleceğinizi inşa eden güvenilir ortağınızdır.',
         floatingCasino: 'Casino',
         modalTitle: 'Bildirimler ve Mesajlar', noMsg: 'Yeni mesaj yok.', newBadge: 'YENİ',
         tabAll: 'Tümü', tabApproved: 'Onaylanan', tabRejected: 'Reddedilen', tabAdmin: 'Yönetici'
@@ -320,7 +336,11 @@ const ld = {
         c6: 'Профиль', d6: 'Настройки безопасности',
         tmkt: 'Криптовалютный рынок (топ-3 из 30 монет)', tlive: 'Онлайн',
         aboutTitle: 'О смарт-платформе Zenix',
-        aboutDesc: 'Zenix создана для предоставления современных финансовых решений, умной квантификационной торговли и оптимального управления активами.',
+        aboutIntro: 'Добро пожаловать в Zenix — ведущую платформу с современным взглядом на цифровую экономику.',
+        aboutDesc: 'В современном мире доступ к надежным и умным инструментам управления активами имеет жизненно важное значение.',
+        aboutGoal: '<strong style="color:#38bdf8;">Наша цель:</strong> демократизировать доступ к передовым финансовым инструментам.',
+        aboutStrategy: '<strong style="color:#38bdf8;">Наша стратегия:</strong> фокус на максимальной безопасности, конфиденциальности и мгновенной обработке.',
+        aboutConclusion: 'Zenix — ваш надежный партнер на пути к успеху в цифровых финансах.',
         floatingCasino: 'Казино',
         modalTitle: 'Уведомления', noMsg: 'Нет новых сообщений.', newBadge: 'НОВОЕ',
         tabAll: 'Все', tabApproved: 'Одобрено', tabRejected: 'Отклонено', tabAdmin: 'Админ'
@@ -337,7 +357,11 @@ const ld = {
         c6: 'Perfil', d6: 'Configuración de seguridad',
         tmkt: 'Mercado de criptomonedas (Top 3 de 30 monedas)', tlive: 'En vivo',
         aboutTitle: 'Sobre la plataforma inteligente Zenix',
-        aboutDesc: 'Zenix está diseñada para ofrecer soluciones financieras modernas, comercio de cuantificación inteligente y gestión óptima de activos.',
+        aboutIntro: 'Bienvenido a Zenix, una plataforma líder con una visión moderna de la economía digital.',
+        aboutDesc: 'En el acelerado mundo actual, el acceso a herramientas seguras e inteligentes para la gestión de activos es vital.',
+        aboutGoal: '<strong style="color:#38bdf8;">Nuestro objetivo:</strong> Democratizar el acceso a herramientas financieras avanzadas.',
+        aboutStrategy: '<strong style="color:#38bdf8;">Nuestra estrategia:</strong> Enfoque en la máxima seguridad, privacidad y procesamiento instantáneo.',
+        aboutConclusion: 'Zenix es tu socio confiable en el camino hacia un futuro financiero más brillante.',
         floatingCasino: 'Casino',
         modalTitle: 'Notificaciones', noMsg: 'No hay mensajes nuevos.', newBadge: 'NUEVO',
         tabAll: 'Todo', tabApproved: 'Aprobado', tabRejected: 'Rechazado', tabAdmin: 'Admin'
@@ -354,7 +378,11 @@ const ld = {
         c6: 'Profil', d6: 'Paramètres de sécurité',
         tmkt: 'Marché des crypto-monnaies (Top 3 sur 30)', tlive: 'En direct',
         aboutTitle: 'À propos de la plateforme intelligente Zenix',
-        aboutDesc: 'Zenix est conçue pour fournir des solutions financières modernes, du trading de quantification intelligent et une gestion optimale des actifs.',
+        aboutIntro: 'Bienvenue sur Zenix, une plateforme de premier plan dotée d\'une vision moderne de l\'économie numérique.',
+        aboutDesc: 'Dans le monde en évolution rapide d\'aujourd\'hui, l\'accès à des outils sécurisés est essentiel.',
+        aboutGoal: '<strong style="color:#38bdf8;">Notre objectif:</strong> Démocratiser l\'accès aux outils financiers avancés.',
+        aboutStrategy: '<strong style="color:#38bdf8;">Notre stratégie:</strong> Se concentrer sur une sécurité maximale et un traitement instantané.',
+        aboutConclusion: 'Zenix est votre partenaire de confiance vers le succès financier.',
         floatingCasino: 'Casino',
         modalTitle: 'Notifications', noMsg: 'Aucun nouveau message.', newBadge: 'NOUVEAU',
         tabAll: 'Tout', tabApproved: 'Approuvé', tabRejected: 'Rejeté', tabAdmin: 'Admin'
@@ -371,7 +399,11 @@ const ld = {
         c6: 'Profil', d6: 'Sicherheitseinstellungen',
         tmkt: 'Kryptowährungsmarkt (Top 3 von 30 Münzen)', tlive: 'Live',
         aboutTitle: 'Über die intelligente Zenix-Plattform',
-        aboutDesc: 'Zenix wurde entwickelt, um moderne Finanzلösungen, smarten Quantifizierungs-handel und ein optimales Asset-Management anzubieten.',
+        aboutIntro: 'Willkommen bei Zenix, einer führenden Plattform mit einer modernen Vision für die digitale Wirtschaft.',
+        aboutDesc: 'In der heutigen schnelllebigen Welt ist der Zugang zu sicheren und intelligenten Tools von entscheidender Bedeutung.',
+        aboutGoal: '<strong style="color:#38bdf8;">Unser Ziel:</strong> Den Zugang zu fortschrittlichen Finanzinstrumenten zu demokratisieren.',
+        aboutStrategy: '<strong style="color:#38bdf8;">Unsere Strategie:</strong> Fokus auf maximale Sicherheit, Privatsphäre und sofortige Transaktionsverarbeitung.',
+        aboutConclusion: 'Zenix ist Ihr zuverlässiger Partner auf dem Weg zu einer besseren finanziellen Zukunft.',
         floatingCasino: 'Casino',
         modalTitle: 'Benachrichtigungen', noMsg: 'Keine neuen Nachrichten.', newBadge: 'NEU',
         tabAll: 'Alle', tabApproved: 'Genehmigt', tabRejected: 'Abgelehnt', tabAdmin: 'Admin'
@@ -408,6 +440,11 @@ function setLang(l) {
         if (el && text) el.textContent = text;
     };
 
+    const setHtml = (id, html) => {
+        const el = document.getElementById(id);
+        if (el && html) el.innerHTML = html;
+    };
+
     setTxt('t-wel', t.wel);
     setTxt('t-sub', t.sub);
     setTxt('t-st', t.st);
@@ -422,7 +459,11 @@ function setLang(l) {
     setTxt('t-mkt', t.tmkt);
     setTxt('t-live', t.tlive);
     setTxt('t-about-title', t.aboutTitle);
+    setTxt('t-about-intro', t.aboutIntro);
     setTxt('t-about-desc', t.aboutDesc);
+    setHtml('t-about-goal', t.aboutGoal);
+    setHtml('t-about-strategy', t.aboutStrategy);
+    setHtml('t-about-conclusion', t.aboutConclusion);
     setTxt('t-floating-casino', t.floatingCasino);
 
     let elModalTitle = document.getElementById('t-modal-title');
