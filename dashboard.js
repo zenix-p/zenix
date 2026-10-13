@@ -10,23 +10,19 @@ async function loadDashboardUserData() {
   try {
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error || !user) {
-      // اگر کاربر لاگین نبود، هدایت به صفحه ورود
       window.location.href = 'index.html';
       return;
     }
 
-    // دریافت اطلاعات از جدول users یا متادیتای کاربر
     const { data: dbUser } = await supabase.from('users').select('*').eq('id', user.id).single();
     const meta = user.user_metadata || {};
 
-    // استخراج موجودی
     const balance = parseFloat(dbUser?.balance ?? meta.balance ?? 0);
     const valBalance = document.getElementById('val-balance');
     if (valBalance) {
       valBalance.textContent = `$${balance.toFixed(2)}`;
     }
 
-    // استخراج تعداد زیرمجموعه‌ها
     const referralCount = dbUser?.referral_count ?? dbUser?.referrals ?? meta.referral_count ?? 0;
     const valRef = document.getElementById('val-ref');
     if (valRef) {
@@ -41,7 +37,6 @@ async function loadDashboardUserData() {
 document.addEventListener('DOMContentLoaded', () => {
   loadDashboardUserData();
 });
-
 
 // ==========================================
 // 2. مدیریت منوی شناور کازینو
