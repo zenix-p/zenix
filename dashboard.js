@@ -80,7 +80,6 @@ async function fetchCryptoPrices() {
         tickerContainer.innerHTML = html;
     } catch (err) {
         console.error('خطای دریافت قیمت ارزهای دیجیتال:', err);
-        // حالت fallback در صورت عدم پاسخگویی API
         tickerContainer.innerHTML = `
             <div class="crypto-row">
                 <div class="crypto-info"><strong style="color:#fff;">BTC</strong></div>
@@ -98,7 +97,6 @@ async function fetchCryptoPrices() {
     }
 }
 
-// اجرا اولیه و سپس به‌روزرسانی ۳۰ ثانیه‌ای
 fetchCryptoPrices();
 setInterval(fetchCryptoPrices, 30000);
 
@@ -253,6 +251,8 @@ const ld = {
         c5: 'تراکنش‌ها', d5: 'تاریخچه مالی',
         c6: 'پروفایل', d6: 'تنظیمات امنیت',
         tmkt: 'بازار ارزهای دیجیتال (۳ ارز برتر از ۳۰ ارز رصد شده)', tlive: 'زنده',
+        aboutTitle: 'درباره پلتفرم هوشمند زِنیکس (Zenix)',
+        aboutDesc: 'پلتفرم Zenix با هدف ارائه راهکارهای نوین مالی، معاملات هوشمند (کوانتیفیکیشن) و مدیریت بهینه دارایی‌ها طراحی شده است. استراتژی ما تمرکز بر امنیت حداکثری، پردازش آنی تراکنش‌ها و خلق تجربه‌ای مطمئن و پویا برای کاربران در بازار دیجیتال است. با Zenix، آینده سرمایه‌گذاری خود را هوشمندانه‌تر بسازید.',
         floatingCasino: 'کازینو',
         modalTitle: 'صندوق پیام‌ها و اعلان‌ها', noMsg: 'هیچ پیام جدیدی وجود ندارد.', newBadge: 'جدید',
         tabAll: 'همه', tabApproved: 'تایید درخواست', tabRejected: 'لغو درخواست', tabAdmin: 'پیام مدیریت'
@@ -268,6 +268,8 @@ const ld = {
         c5: 'Transactions', d5: 'Financial History',
         c6: 'Profile', d6: 'Security Settings',
         tmkt: 'Cryptocurrency Market (Top 3 of 30 tracked coins)', tlive: 'Live',
+        aboutTitle: 'About Zenix Smart Platform',
+        aboutDesc: 'Zenix is designed to provide modern financial solutions, smart quantification trading, and optimal asset management. Our strategy focuses on maximum security, instant transaction processing, and a secure user experience in the digital market. Build your investment future smarter with Zenix.',
         floatingCasino: 'Casino',
         modalTitle: 'Notifications & Messages', noMsg: 'No new messages.', newBadge: 'NEW',
         tabAll: 'All', tabApproved: 'Approved', tabRejected: 'Rejected', tabAdmin: 'Admin Msg'
@@ -283,6 +285,8 @@ const ld = {
         c5: 'المعاملات', d5: 'السجل المالي',
         c6: 'الملف الشخصي', d6: 'إعدادات الأمان',
         tmkt: 'سوق العملات الرقمية (أفضل 3 من 30 عملة مراقبة)', tlive: 'مباشر',
+        aboutTitle: 'حول منصة Zenix الذكية',
+        aboutDesc: 'تم تصميم منصة Zenix لتقديم حلول مالية حديثة وتداول ذكي وإدارة مثلى للأصول. تركز استراتيجيتنا على الأقصى من الأمان والمعالجة الفورية للمعاملات لضمان تجربة موثوقة.',
         floatingCasino: 'كازينو',
         modalTitle: 'صندوق الرسائل والإشعارات', noMsg: 'لا توجد رسائل جديدة.', newBadge: 'جديد',
         tabAll: 'الكل', tabApproved: 'طلبات مقبولة', tabRejected: 'طلبات مرفوضة', tabAdmin: 'رسائل الإدارة'
@@ -298,6 +302,8 @@ const ld = {
         c5: 'İşlemler', d5: 'Finansal Geçmiş',
         c6: 'Profil', d6: 'Güvenlik Ayarları',
         tmkt: 'Kripto Para Piyasası (Takip edilen 30 coinden en iyi 3ü)', tlive: 'Canlı',
+        aboutTitle: 'Zenix Akıllı Platform Hakkında',
+        aboutDesc: 'Zenix, modern finansal çözümler, akıllı niceliksel ticaret ve optimum varlık yönetimi sunmak için tasarlanmıştır. Stratejimiz maksimum güvenlik ve anında işlem işlemine odaklanır.',
         floatingCasino: 'Casino',
         modalTitle: 'Bildirimler ve Mesajlar', noMsg: 'Yeni mesaj yok.', newBadge: 'YENİ',
         tabAll: 'Tümü', tabApproved: 'Onaylanan', tabRejected: 'Reddedilen', tabAdmin: 'Yönetici'
@@ -313,6 +319,8 @@ const ld = {
         c5: 'Транзакции', d5: 'История финансов',
         c6: 'Профиль', d6: 'Настройки безопасности',
         tmkt: 'Криптовалютный рынок (топ-3 из 30 монет)', tlive: 'Онлайн',
+        aboutTitle: 'О смарт-платформе Zenix',
+        aboutDesc: 'Zenix создана для предоставления современных финансовых решений, умной квантификационной торговли и оптимального управления активами.',
         floatingCasino: 'Казино',
         modalTitle: 'Уведомления', noMsg: 'Нет новых сообщений.', newBadge: 'НОВОЕ',
         tabAll: 'Все', tabApproved: 'Одобрено', tabRejected: 'Отклонено', tabAdmin: 'Админ'
@@ -328,6 +336,8 @@ const ld = {
         c5: 'Transacciones', d5: 'Historial financiero',
         c6: 'Perfil', d6: 'Configuración de seguridad',
         tmkt: 'Mercado de criptomonedas (Top 3 de 30 monedas)', tlive: 'En vivo',
+        aboutTitle: 'Sobre la plataforma inteligente Zenix',
+        aboutDesc: 'Zenix está diseñada para ofrecer soluciones financieras modernas, comercio de cuantificación inteligente y gestión óptima de activos.',
         floatingCasino: 'Casino',
         modalTitle: 'Notificaciones', noMsg: 'No hay mensajes nuevos.', newBadge: 'NUEVO',
         tabAll: 'Todo', tabApproved: 'Aprobado', tabRejected: 'Rechazado', tabAdmin: 'Admin'
@@ -343,6 +353,8 @@ const ld = {
         c5: 'Transactions', d5: 'Historique financier',
         c6: 'Profil', d6: 'Paramètres de sécurité',
         tmkt: 'Marché des crypto-monnaies (Top 3 sur 30)', tlive: 'En direct',
+        aboutTitle: 'À propos de la plateforme intelligente Zenix',
+        aboutDesc: 'Zenix est conçue pour fournir des solutions financières modernes, du trading de quantification intelligent et une gestion optimale des actifs.',
         floatingCasino: 'Casino',
         modalTitle: 'Notifications', noMsg: 'Aucun nouveau message.', newBadge: 'NOUVEAU',
         tabAll: 'Tout', tabApproved: 'Approuvé', tabRejected: 'Rejeté', tabAdmin: 'Admin'
@@ -358,6 +370,8 @@ const ld = {
         c5: 'Transaktionen', d5: 'Finanzhistorie',
         c6: 'Profil', d6: 'Sicherheitseinstellungen',
         tmkt: 'Kryptowährungsmarkt (Top 3 von 30 Münzen)', tlive: 'Live',
+        aboutTitle: 'Über die intelligente Zenix-Plattform',
+        aboutDesc: 'Zenix wurde entwickelt, um moderne Finanzلösungen, smarten Quantifizierungs-handel und ein optimales Asset-Management anzubieten.',
         floatingCasino: 'Casino',
         modalTitle: 'Benachrichtigungen', noMsg: 'Keine neuen Nachrichten.', newBadge: 'NEU',
         tabAll: 'Alle', tabApproved: 'Genehmigt', tabRejected: 'Abgelehnt', tabAdmin: 'Admin'
@@ -373,7 +387,6 @@ function setLang(l) {
     document.documentElement.setAttribute('dir', r ? 'rtl' : 'ltr');
     document.documentElement.setAttribute('lang', l);
 
-    // رنگی شدن زبان انتخاب‌شده به رنگ آبی (class active)
     document.querySelectorAll('#lang-menu .mi').forEach(item => {
         if (item.dataset.lang === l) {
             item.classList.add('active');
@@ -408,6 +421,8 @@ function setLang(l) {
     setTxt('c6', t.c6); setTxt('d6', t.d6);
     setTxt('t-mkt', t.tmkt);
     setTxt('t-live', t.tlive);
+    setTxt('t-about-title', t.aboutTitle);
+    setTxt('t-about-desc', t.aboutDesc);
     setTxt('t-floating-casino', t.floatingCasino);
 
     let elModalTitle = document.getElementById('t-modal-title');
