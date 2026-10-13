@@ -63,9 +63,6 @@
         .price-up{color:#22c55e!important;font-weight:bold}
         .price-down{color:#ef4444!important;font-weight:bold}
         
-        /* باکس جامع معرفی و استراتژی پلتفرم */
-        .platform-info-box{background:rgba(15,23,42,.85);border:1px solid rgba(56,189,248,.25);border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
-        
         /* مودال‌ها و صندوق پیام‌ها */
         .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
         .modal.show{display:flex}
@@ -81,12 +78,11 @@
         .tab-badge{background:rgba(255,255,255,.15);color:inherit;padding:1px 6px;border-radius:10px;font-size:10px;font-weight:700;line-height:1.2;min-width:16px;text-align:center;display:inline-block}
         .notif-tab.active .tab-badge{background:rgba(15,23,42,.3);color:#0f172a}
         
-        #modal-msg-container{overflow-y:auto;padding-right:6px;flex:1;min-height:0}
+        #modal-msg-container, .modal-content div[style*="overflow-y:auto"]{overflow-y:auto;padding-right:6px}
         #modal-msg-container::-webkit-scrollbar, .modal-content div::-webkit-scrollbar{width:5px}
         #modal-msg-container::-webkit-scrollbar-track, .modal-content div::-webkit-scrollbar-track{background:rgba(15,23,42,.6);border-radius:10px}
         #modal-msg-container::-webkit-scrollbar-thumb, .modal-content div::-webkit-scrollbar-thumb{background:rgba(56,189,248,.35);border-radius:10px}
         #modal-msg-container::-webkit-scrollbar-thumb:hover, .modal-content div::-webkit-scrollbar-thumb:hover{background:rgba(56,189,248,.7)}
-        #modal-msg-container, .modal-content div{scrollbar-width:thin;scrollbar-color:rgba(56,189,248,.35) rgba(15,23,42,.6)}
         
         .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px;transition:0.2s}
         .msg-body-box:hover{border-color:rgba(56,189,248,.5)!important;opacity:1!important;}
@@ -172,23 +168,6 @@
             </div>
             <div id="crypto-ticker-list"></div>
         </div>
-
-        <!-- باکس جامع معرفی، هدف و استراتژی زِنیکس -->
-        <div class="platform-info-box">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;">
-                <div style="width:34px;height:34px;background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#38bdf8;font-size:15px;">
-                    <i class="fas fa-shield-alt"></i>
-                </div>
-                <h3 style="font-size:13px;color:#38bdf8;font-weight:800;" id="t-about-title">درباره پلتفرم هوشمند زِنیکس (Zenix)</h3>
-            </div>
-            <div style="font-size:11px;color:#cbd5e1;line-height:1.7;display:flex;flex-direction:column;gap:10px;">
-                <p id="t-about-intro">به زِنیکس (Zenix) خوش آمدید؛ پلتفرمی پیشرو که با نگاهی نوین به دنیای اقتصاد دیجیتال و فناوری‌های مالی متولد شده است.</p>
-                <p id="t-about-desc">در دنیای پرسرعت امروز، دسترسی به ابزارهای امن و هوشمند برای مدیریت و رشد سرمایه اهمیت حیاتی دارد. زِنیکس با بهره‌گیری از زیرساخت‌های مدرن ابری و پروتکل‌های امنیتی پیشرفته، بستری یکپارچه برای معاملات هوشمند، کوانتیفیکیشن و توسعه شبکه مالی شما فراهم کرده است.</p>
-                <p id="t-about-goal"><strong style="color:#38bdf8;">هدف ما:</strong> دموکراتیزه کردن دسترسی به ابزارهای مالی پیشرفته، ایجاد شفافیت کامل در تراکنش‌ها و فراهم کردن محیطی امن، پویا و سودآور برای تمامی کاربران، از مبتدی تا حرفه‌ای است.</p>
-                <p id="t-about-strategy"><strong style="color:#38bdf8;">استراتژی ما:</strong> تمرکز بر امنیت حداکثری و حریم خصوصی، پردازش آنی تراکنش‌ها با الگوریتم‌های مدرن، و خلق ارزش پایدار از طریق سیستم‌های پیشرفته پاداش‌دهی و توسعه تیمی.</p>
-                <p id="t-about-conclusion" style="color:#94a3b8;border-top:1px dashed rgba(255,255,255,.08);padding-top:8px;margin-top:2px;"><i class="fas fa-quote-right" style="color:#38bdf8;margin-left:4px;"></i> زِنیکس تنها یک پلتفرم نیست؛ بلکه همراه مطمئن شما در مسیر هوشمندسازی و ساخت آینده‌ای روشن‌تر در دنیای مالی دیجیتال است. با ما همراه شوید تا مرزهای جدیدی از موفقیت را فتح کنید.</p>
-            </div>
-        </div>
     </div>
 
     <!-- مدال صندوق پیام‌ها و اعلان‌ها -->
@@ -223,12 +202,29 @@
         </div>
     </div>
 
+    <!-- مدال درباره پلتفرم (بازشونده از منوی همبرگری) -->
+    <div class="modal" id="m-about-modal" style="z-index:1050;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="t-about-modal-title"><i class="fas fa-info-circle"></i> درباره پلتفرم هوشمند زِنیکس</span>
+                <button class="modal-close" onclick="window.closeAboutModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div style="overflow-y:auto;padding-right:6px;font-size:12px;color:#cbd5e1;line-height:1.8;display:flex;flex-direction:column;gap:12px;">
+                <p id="t-about-intro">به زِنیکس (Zenix) خوش آمدید؛ پلتفرمی پیشرو که با نگاهی نوین به دنیای اقتصاد دیجیتال و فناوری‌های مالی متولد شده است.</p>
+                <p id="t-about-desc">در دنیای پرسرعت امروز، دسترسی به ابزارهای امن و هوشمند برای مدیریت و رشد سرمایه اهمیت حیاتی دارد. زِنیکس با بهره‌گیری از زیرساخت‌های مدرن ابری و پروتکل‌های امنیتی پیشرفته، بستری یکپارچه برای معاملات هوشمند، کوانتیفیکیشن و توسعه شبکه مالی شما فراهم کرده است.</p>
+                <p id="t-about-goal"><strong style="color:#38bdf8;">هدف ما:</strong> دموکراتیزه کردن دسترسی به ابزارهای مالی پیشرفته، ایجاد شفافیت کامل در تراکنش‌ها و فراهم کردن محیطی امن، پویا و سودآور برای تمامی کاربران، از مبتدی تا حرفه‌ای است.</p>
+                <p id="t-about-strategy"><strong style="color:#38bdf8;">استراتژی ما:</strong> تمرکز بر امنیت حداکثری و حریم خصوصی، پردازش آنی تراکنش‌ها با الگوریتم‌های مدرن، و خلق ارزش پایدار از طریق سیستم‌های پیشرفته پاداش‌دهی و توسعه تیمی.</p>
+                <p id="t-about-conclusion" style="color:#94a3b8;border-top:1px dashed rgba(255,255,255,.08);padding-top:10px;margin-top:2px;"><i class="fas fa-quote-right" style="color:#38bdf8;margin-left:4px;"></i> زِنیکس تنها یک پلتفرم نیست؛ بلکه همراه مطمئن شما در مسیر هوشمندسازی و ساخت آینده‌ای روشن‌تر در دنیای مالی دیجیتال است. با ما همراه شوید تا مرزهای جدیدی از موفقیت را فتح کنید.</p>
+            </div>
+        </div>
+    </div>
+
     <footer>
         <p>&copy; 2026 Zenix. All rights reserved.</p>
     </footer>
 
-    <!-- Supabase و اسکریپت اصلی داشبورد (نسخه ۱۶ برای رفع کش) -->
+    <!-- Supabase و اسکریپت اصلی داشبورد (نسخه ۱۷) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script type="module" src="dashboard.js?v=16"></script>
+    <script type="module" src="dashboard.js?v=17"></script>
 </body>
 </html>
