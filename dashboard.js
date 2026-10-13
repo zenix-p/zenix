@@ -1,10 +1,27 @@
 // ==========================================
-// 1. اتصال به سوبابیس و دریافت موجودی و اطلاعات کاربر
+// 1. اتصال به سوبابیس و دریافت موجودی و آمار تیم (زیرمجموعه‌ها)
 // ==========================================
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 const SUPABASE_URL = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
+});
+
+// تابع کمکی برای تولید رقم‌های یکتا بر اساس شناسه کاربر (مشابه فایل تیم)
+function generateUIDDigits(userId) {
+  if (!userId) return '000000';
+  let hash = 5381;
+  let str = String(userId);
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) + hash) + str.charCodeAt(i);
+  }
+  return (Math.abs(hash % 900000) + 100000).toString();
+}
 
 async function loadDashboardUserData() {
   try {
@@ -14,19 +31,112 @@ async function loadDashboardUserData() {
       return;
     }
 
-    const { data: dbUser } = await supabase.from('users').select('*').eq('id', user.id).single();
+    const userId = user.id;
+
+    // ۱. دریافت موجودی و اطلاعات کاربر از جدول profiles یا users
+    const { data: dbUser } = await supabase.from('users').select('*').eq('id', userId).maybeSingle();
+    const { data: dbProfile } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
     const meta = user.user_metadata || {};
 
-    const balance = parseFloat(dbUser?.balance ?? meta.balance ?? 0);
+    const balance = parseFloat(dbUser?.balance ?? dbProfile?.balance ?? meta.balance ?? 0);
     const valBalance = document.getElementById('val-balance');
     if (valBalance) {
       valBalance.textContent = `$${balance.toFixed(2)}`;
     }
 
-    const referralCount = dbUser?.referral_count ?? dbUser?.referrals ?? meta.referral_count ?? 0;
+    // ۲. محاسبه دقیق تعداد زیرمجموعه‌ها (مشابه منطق صفحه تیم)[cite: 6]
+    let codeDigits = generateUIDDigits(userId);
+    let myRefCode = dbProfile?.referral_code || ('MS-' + codeDigits);
+
+    let rawList = [];
+    try {
+      const { data: dbProfiles } = await supabase.from('profiles').select('*');
+      if (dbProfiles && Array.isArray(dbProfiles)) {
+        rawList.push(...dbProfiles);
+      }
+    } catch(e) {}
+
+    if (meta.team_members || meta.referrals || meta.invited_users) {
+      let metaTeam = meta.team_members || meta.referrals || meta.invited_users;
+      if (Array.isArray(metaTeam)) rawList.push(...metaTeam);
+    }
+
+    ['zenix_registered_users', 'zenix_users', 'zenix_referrals', 'zenix_team_' + userId, 'zenix_all_users'].forEach(k => {
+      try {
+        let item = localStorage.getItem(k);
+        if (item) {
+          let parsed = JSON.parse(item);
+          if (Array.isArray(parsed)) rawList.push(...parsed);
+          else if (parsed && typeof parsed === 'object') rawList.push(parsed);
+        }
+      } catch(e) {}
+    });
+
+    let uniqueMap = new Map();
+    rawList.forEach(u => {
+      if (u) {
+        let key = u.user_id || u.id || u.email || u.username || JSON.stringify(u);
+        uniqueMap.set(key, u);
+      }
+    });
+    let allProfiles = Array.from(uniqueMap.values());
+
+    function isReferredBy(u, refUid, refCodeVal) {
+      if (!u) return false;
+      let uUid = u.user_id || u.id;
+      if (uUid === refUid) return false;
+
+      let digits = generateUIDDigits(refUid);
+      let defaultCode = 'MS-' + digits;
+      let legacyCode = 'SM-' + digits;
+
+      let refs = [
+        u.referred_by, u.referrer_id, u.invitation_code,
+        u.ref_code, u.inviter, u.referral_code, u.ref
+      ].map(x => x ? String(x).trim().toUpperCase() : '');
+
+      const targetCodes = [
+        String(refUid).toUpperCase(),
+        defaultCode.toUpperCase(),
+        legacyCode.toUpperCase(),
+        digits.toUpperCase()
+      ];
+      if (refCodeVal) targetCodes.push(String(refCodeVal).toUpperCase());
+
+      return refs.some(r => r && targetCodes.includes(r));
+    }
+
+    let lvl1Users = allProfiles.filter(u => isReferredBy(u, userId, myRefCode));
+    let lvl2Users = [];
+    if (lvl1Users.length > 0) {
+      lvl2Users = allProfiles.filter(u => {
+        let uUid = u.user_id || u.id;
+        if (uUid === userId || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid)) return false;
+        return lvl1Users.some(l1 => isReferredBy(u, l1.user_id || l1.id, l1.referral_code));
+      });
+    }
+
+    let lvl3Users = [];
+    if (lvl2Users.length > 0) {
+      lvl3Users = allProfiles.filter(u => {
+        let uUid = u.user_id || u.id;
+        if (uUid === userId || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid) || lvl2Users.some(l2 => (l2.user_id || l2.id) === uUid)) return false;
+        return lvl2Users.some(l2 => isReferredBy(u, l2.user_id || l2.id, l2.referral_code));
+      });
+    }
+
+    let l1Count = lvl1Users.length;
+    let l2Count = lvl2Users.length;
+    let l3Count = lvl3Users.length;
+
+    if (l1Count === 0 && (meta.referral_count || meta.invited_count)) {
+      l1Count = Number(meta.referral_count || meta.invited_count || 0);
+    }
+
+    let totalTeamCount = l1Count + l2Count + l3Count;
     const valRef = document.getElementById('val-ref');
     if (valRef) {
-      valRef.textContent = referralCount;
+      valRef.textContent = totalTeamCount;
     }
 
   } catch (err) {
