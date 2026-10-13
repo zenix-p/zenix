@@ -63,7 +63,7 @@
         .price-up{color:#22c55e!important;font-weight:bold}
         .price-down{color:#ef4444!important;font-weight:bold}
         
-        /* باکس معرفی و استراتژی پلتفرم در داشبورد */
+        /* باکس جامع معرفی و استراتژی در داشبورد */
         .platform-info-box{background:rgba(15,23,42,.85);border:1px solid rgba(56,189,248,.25);border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
         
         /* مودال‌ها و صندوق پیام‌ها */
@@ -172,7 +172,7 @@
             <div id="crypto-ticker-list"></div>
         </div>
 
-        <!-- باکس جامع معرفی، هدف و استراتژی زِنیکس -->
+        <!-- باکس جامع معرفی، هدف و استراتژی زِنیکس (در زیر بازار ارزهای دیجیتال) -->
         <div class="platform-info-box">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;">
                 <div style="width:34px;height:34px;background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#38bdf8;font-size:15px;">
@@ -222,7 +222,7 @@
         </div>
     </div>
 
-    <!-- مدال درباره پلتفرم -->
+    <!-- مدال درباره پلتفرم (بازشونده از منوی همبرگری) -->
     <div class="modal" id="m-about-modal" style="z-index:1050;">
         <div class="modal-content">
             <div class="modal-header">
@@ -239,19 +239,43 @@
         </div>
     </div>
 
-    <!-- مدال راهنمای داشبورد (با کلیک روی آیکون سوال در هدر) -->
+    <!-- مدال راهنمای جامع بخش داشبورد -->
     <div class="modal" id="m-help-modal" style="z-index:1050;">
         <div class="modal-content">
             <div class="modal-header">
-                <span id="t-help-modal-title"><i class="fas fa-circle-question"></i> راهنمای جامع بخش داشبورد</span>
+                <span id="t-help-modal-title"><i class="fas fa-circle-question" style="color:#38bdf8;"></i> راهنمای جامع داشبورد زِنیکس</span>
                 <button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button>
             </div>
             <div style="overflow-y:auto;padding-right:6px;font-size:12px;color:#cbd5e1;line-height:1.8;display:flex;flex-direction:column;gap:12px;">
-                <p id="t-help-p1"><strong style="color:#38bdf8;">موجودی و آمار حساب:</strong> در بالای صفحه، موجودی حساب دلاری و مجموع تعداد زیرمجموعه‌های تیمی شما به صورت زنده نمایش داده می‌شود.</p>
-                <p id="t-help-p2"><strong style="color:#38bdf8;">دسترسی سریع به بخش‌ها:</strong> از طریق کارت‌های میانبر می‌توانید مستقیماً به بخش‌های کوانتیفیکیشن (معاملات هوشمند)، واریز، برداشت، تیم، تاریخچه تراکنش‌ها و تنظیمات پروفایل منتقل شوید.</p>
-                <p id="t-help-p3"><strong style="color:#38bdf8;">بازار ارزهای دیجیتال:</strong> این بخش لحظه‌ای ۳ ارز برتر بازار را به همراه قیمت و درصد تغییرات ۲۴ ساعته برای بررسی سریع روند بازار نمایش می‌دهد.</p>
-                <p id="t-help-p4"><strong style="color:#38bdf8;">صندوق پیام‌ها و اعلان‌ها:</strong> با کلیک روی آیکون زنگوله در هدر، می‌توانید آخرین اطلاعیه‌ها، پیام‌های مدیریت و وضعیت تایید یا لغو درخواست‌های مالی خود را مشاهده کنید.</p>
-                <p id="t-help-p5"><strong style="color:#38bdf8;">منوی همبرگری و زبان‌ها:</strong> از منوی بالایی می‌توانید بین زبان‌های مختلف جابجا شوید، به بخش «درباره پلتفرم» دسترسی داشته باشید یا از حساب خود خارج شوید.</p>
+                <div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);border-radius:10px;padding:10px;margin-bottom:4px;">
+                    <p id="t-help-intro" style="color:#f8fafc;font-weight:600;">به بخش مدیریت و داشبورد کاربری پلتفرم زِنیکس خوش آمدید. در این بخش می‌توانید خلاصه‌ای از عملکرد مالی و دسترسی سریع به بخش‌های اصلی داشته باشید.</p>
+                </div>
+                
+                <div>
+                    <h4 style="color:#38bdf8;font-size:13px;margin-bottom:4px;" id="t-help-s1-title"><i class="fas fa-wallet" style="margin-left:5px;"></i> ۱. آمار و موجودی</h4>
+                    <p id="t-help-s1-desc">در بالای صفحه، کل موجودی حساب (USDT) و تعداد کاربران زیرمجموعه شبکه شما به صورت زنده نمایش داده می‌شود.</p>
+                </div>
+
+                <div>
+                    <h4 style="color:#38bdf8;font-size:13px;margin-bottom:4px;" id="t-help-s2-title"><i class="fas fa-th-large" style="margin-left:5px;"></i> ۲. دسترسی سریع (میانبرها)</h4>
+                    <ul style="padding-right:18px;display:flex;flex-direction:column;gap:4px;" id="t-help-s2-list">
+                        <li><strong>کوانتیفیکیشن:</strong> ورود به بخش معاملات هوشمند و رباتیک و دریافت سود روزانه.</li>
+                        <li><strong>واریز:</strong> شارژ حساب کاربری از طریق ولت‌های دیجیتال با تأیید شبکه.</li>
+                        <li><strong>برداشت:</strong> ثبت درخواست برداشت درآمدها و دارایی‌ها به کیف پول شخصی.</li>
+                        <li><strong>تیم:</strong> مشاهده آمار کامل اعضا و لینک اختصاصی دعوت زیرمجموعه‌ها (سطوح ۱ تا ۳).</li>
+                        <li><strong>تراکنش‌ها:</strong> بررسی تاریخچه کامل وضیعت ریز تراکنش‌های مالی، واریزی‌ها و برداشت‌ها.</li>
+                        <li><strong>پروفایل:</strong> مدیریت امنیت حساب، رمز عبور و تنظیمات کاربری.</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 style="color:#38bdf8;font-size:13px;margin-bottom:4px;" id="t-help-s3-title"><i class="fas fa-chart-line" style="margin-left:5px;"></i> ۳. بازار ارزهای دیجیتال و اعلان‌ها</h4>
+                    <p id="t-help-s3-desc">قیمت ۳ ارز برتر بازار به صورت زنده به‌روزرسانی می‌شود. همچنین با کلیک روی آیکون زنگوله هدر می‌توانید پیام‌ها و اطلاعیه‌های سیستم را مشاهده کنید.</p>
+                </div>
+
+                <div style="border-top:1px dashed rgba(255,255,255,.1);padding-top:8px;color:#94a3b8;font-size:11px;" id="t-help-footer">
+                    <i class="fas fa-headset" style="color:#a855f7;margin-left:4px;"></i> در صورت نیاز به راهنمایی بیشتر می‌توانید با پشتیبانی زِنیکس در ارتباط باشید.
+                </div>
             </div>
         </div>
     </div>
@@ -260,8 +284,8 @@
         <p>&copy; 2026 Zenix. All rights reserved.</p>
     </footer>
 
-    <!-- Supabase و اسکریپت اصلی داشبورد (نسخه ۱۹ برای رفع کامل کش) -->
+    <!-- Supabase و اسکریپت اصلی داشبورد (نسخه ۱۸ برای رفع کش) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script type="module" src="dashboard.js?v=19"></script>
+    <script type="module" src="dashboard.js?v=18"></script>
 </body>
 </html>
