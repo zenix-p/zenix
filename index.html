@@ -218,7 +218,18 @@
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (capIn.value.toUpperCase() !== code) return showError('errCap', true);
+            
+            // اعتبارسنجی امن سمت سرور با Supabase RPC
+            const userInput = capIn.value.trim().toUpperCase();
+            const { data: isCaptchaValid, error: captchaErr } = await supabaseClient.rpc('verify_captcha', {
+                p_session_id: window.currentCaptchaSessionId || '',
+                p_user_input: userInput
+            });
+
+            if (captchaErr || !isCaptchaValid) {
+                return showError('errCap', true);
+            }
+
             submitBtn.disabled = true;
 
             const emailVal = userIn.value.trim().toLowerCase();
