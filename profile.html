@@ -1,8 +1,26 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Apply the saved interface language before the page renders. -->
+    <script>
+    (function () {
+        const supportedLanguages = ['en', 'fa', 'ar', 'tr', 'ru', 'es', 'fr', 'de'];
+        let selectedLang = 'en';
+        try {
+            const savedLang = window.localStorage.getItem('zenix_lang');
+            if (supportedLanguages.includes(savedLang)) selectedLang = savedLang;
+        } catch (_) {
+            // Storage may be blocked; keep the English default for this page view.
+        }
+        document.documentElement.setAttribute('lang', selectedLang);
+        document.documentElement.setAttribute(
+            'dir',
+            selectedLang === 'fa' || selectedLang === 'ar' ? 'rtl' : 'ltr'
+        );
+    })();
+    </script>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -504,20 +522,46 @@
                 }
             }
 
-            // مدیریت انتخاب زبان و هایلایت آبی روی گزینه فعال
+            // مدیریت انتخاب زبان، جهت صفحه و هایلایت گزینه فعال
             const langMenu = document.getElementById('lang-menu');
             if (langMenu) {
-                const savedLang = localStorage.getItem('zenix_lang') || 'fa';
-                const initialItem = langMenu.querySelector(`[data-lang="${savedLang}"]`) || langMenu.querySelector('[data-lang="fa"]');
-                if (initialItem) initialItem.classList.add('active');
+                const supportedLanguages = ['en', 'fa', 'ar', 'tr', 'ru', 'es', 'fr', 'de'];
+                let savedLang = 'en';
+                try {
+                    const storedLang = localStorage.getItem('zenix_lang');
+                    if (supportedLanguages.includes(storedLang)) savedLang = storedLang;
+                    else localStorage.setItem('zenix_lang', 'en');
+                } catch (_) {
+                    // The page still updates its language and direction if storage is unavailable.
+                }
 
-                langMenu.querySelectorAll('.mi').forEach(item => {
+                const applyLanguageDirection = (lang) => {
+                    document.documentElement.setAttribute('lang', lang);
+                    document.documentElement.setAttribute(
+                        'dir',
+                        lang === 'fa' || lang === 'ar' ? 'rtl' : 'ltr'
+                    );
+                };
+
+                applyLanguageDirection(savedLang);
+                const initialItem = langMenu.querySelector(`[data-lang="${savedLang}"]`) || langMenu.querySelector('[data-lang="en"]');
+                langMenu.querySelectorAll('.mi').forEach(el => el.classList.toggle('active', el === initialItem));
+
+                langMenu.querySelectorAll('[data-lang]').forEach(item => {
                     item.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        langMenu.querySelectorAll('.mi').forEach(el => el.classList.remove('active'));
-                        item.classList.add('active');
                         const selectedLang = item.getAttribute('data-lang');
-                        localStorage.setItem('zenix_lang', selectedLang);
+                        if (!supportedLanguages.includes(selectedLang)) return;
+
+                        applyLanguageDirection(selectedLang);
+                        langMenu.querySelectorAll('.mi').forEach(el => {
+                            el.classList.toggle('active', el === item);
+                        });
+                        try {
+                            localStorage.setItem('zenix_lang', selectedLang);
+                        } catch (_) {
+                            // Keep the current page's selected language even if storage is blocked.
+                        }
                         langMenu.classList.remove('show');
                     });
                 });
