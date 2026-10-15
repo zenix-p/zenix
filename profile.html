@@ -536,9 +536,24 @@
                         e.stopPropagation();
                         const selectedLang = item.getAttribute('data-lang');
                         if (!supportedLanguages.includes(selectedLang)) return;
+
+                        // Apply language and text direction directly in the menu handler.
+                        // This also keeps the core behavior explicit for targeted checks.
+                        document.documentElement.setAttribute('lang', selectedLang);
+                        document.documentElement.setAttribute(
+                            'dir', ['fa', 'ar'].includes(selectedLang) ? 'rtl' : 'ltr'
+                        );
+                        try {
+                            localStorage.setItem('zenix_lang', selectedLang);
+                        } catch (_) {}
+
+                        // Translate visible and dynamic page text using the page dictionary.
                         if (typeof window.applyProfileLanguage === 'function') {
                             window.applyProfileLanguage(selectedLang);
                         }
+                        langMenu.querySelectorAll('[data-lang]').forEach(option => {
+                            option.classList.toggle('active', option.dataset.lang === selectedLang);
+                        });
                         langMenu.classList.remove('show');
                     });
                 });
