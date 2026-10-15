@@ -46,12 +46,33 @@
         [dir="ltr"] input{padding-left:36px;padding-right:36px}
         input:focus{border-color:#38bdf8}
 
-        /* High-contrast placeholder text: explicitly override browser defaults at every viewport. */
-        input::placeholder,
-        input::-webkit-input-placeholder,
-        input::-moz-placeholder,
-        input:-ms-input-placeholder,
+        /* High-contrast placeholders. Keep each vendor selector separate:
+           one unsupported pseudo-selector in a grouped rule can invalidate the whole rule. */
+        input::placeholder {
+            color: #e2e8f0 !important;
+            opacity: 1 !important;
+        }
+        input::-webkit-input-placeholder {
+            color: #e2e8f0 !important;
+            opacity: 1 !important;
+        }
+        input::-moz-placeholder {
+            color: #e2e8f0 !important;
+            opacity: 1 !important;
+        }
+        input:-ms-input-placeholder {
+            color: #e2e8f0 !important;
+            opacity: 1 !important;
+        }
         input::-ms-input-placeholder {
+            color: #e2e8f0 !important;
+            opacity: 1 !important;
+        }
+        /* Extra specificity for the four fields highlighted by the auditor. */
+        #email::placeholder,
+        #fullname::placeholder,
+        #pass::placeholder,
+        #confirm-pass::placeholder {
             color: #e2e8f0 !important;
             opacity: 1 !important;
         }
