@@ -1,7 +1,19 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
+    <script>
+        (function () {
+            var supported = ['en', 'fa', 'ar', 'tr', 'ru', 'es', 'fr', 'de'];
+            var language = 'en';
+            try {
+                var saved = localStorage.getItem('zenix_lang');
+                if (supported.indexOf(saved) !== -1) language = saved;
+            } catch (e) {}
+            document.documentElement.setAttribute('lang', language);
+            document.documentElement.setAttribute('dir', language === 'fa' || language === 'ar' ? 'rtl' : 'ltr');
+        })();
+    </script>
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -312,6 +324,6 @@
 
     <!-- Supabase و اسکریپت اصلی داشبورد (نسخه ۱۸ برای رفع کش) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script type="module" src="dashboard.js?v=18"></script>
+    <script type="module" src="dashboard.js?v=19"></script>
 </body>
 </html>
