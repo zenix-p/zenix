@@ -93,50 +93,50 @@
 
         <form id="form">
             <div class="group">
-                <label id="l-email"><i class="fas fa-envelope"></i> Email <span class="req">*</span></label>
+                <label id="l-email" for="email"><i class="fas fa-envelope"></i> Email <span class="req">*</span></label>
                 <div class="wrap-input">
                     <i class="fas fa-at"></i>
-                    <input type="email" id="email" placeholder="Email" required>
+                    <input type="email" id="email" placeholder="Email" aria-label="Email" required>
                 </div>
             </div>
             <div class="group">
-                <label id="l-name"><i class="fas fa-id-card"></i> Full Name <span class="req">*</span></label>
+                <label id="l-name" for="fullname"><i class="fas fa-id-card"></i> Full Name <span class="req">*</span></label>
                 <div class="wrap-input">
                     <i class="fas fa-user"></i>
-                    <input type="text" id="fullname" placeholder="Full Name" required>
+                    <input type="text" id="fullname" placeholder="Full Name" aria-label="Full Name" required>
                 </div>
             </div>
             <div class="group">
-                <label id="l-pass"><i class="fas fa-lock"></i> Password <span class="req">*</span></label>
+                <label id="l-pass" for="pass"><i class="fas fa-lock"></i> Password <span class="req">*</span></label>
                 <div class="wrap-input">
                     <i class="fas fa-key"></i>
-                    <input type="password" id="pass" placeholder="Password" required>
+                    <input type="password" id="pass" placeholder="Password" aria-label="Password" required>
                     <button type="button" class="eye-btn" onclick="togglePassword('pass',this)"><i class="fas fa-eye eye-icon"></i></button>
                 </div>
             </div>
             <div class="group">
-                <label id="l-confirm-pass"><i class="fas fa-lock"></i> Confirm Password <span class="req">*</span></label>
+                <label id="l-confirm-pass" for="confirm-pass"><i class="fas fa-lock"></i> Confirm Password <span class="req">*</span></label>
                 <div class="wrap-input">
                     <i class="fas fa-key"></i>
-                    <input type="password" id="confirm-pass" placeholder="Confirm Password" required>
+                    <input type="password" id="confirm-pass" placeholder="Confirm Password" aria-label="Confirm Password" required>
                     <button type="button" class="eye-btn" onclick="togglePassword('confirm-pass',this)"><i class="fas fa-eye eye-icon"></i></button>
                 </div>
             </div>
             <div class="group">
-                <label id="l-ref"><i class="fas fa-ticket"></i> Referral Code <span class="req">*</span></label>
+                <label id="l-ref" for="ref-in"><i class="fas fa-ticket"></i> Referral Code <span class="req">*</span></label>
                 <div class="wrap-input">
                     <i class="fas fa-lock" id="ref-icon"></i>
-                    <input type="text" id="ref-in" placeholder="Referral Code" readonly required tabindex="-1">
+                    <input type="text" id="ref-in" placeholder="Referral Code" aria-label="Referral Code" readonly required tabindex="-1">
                 </div>
             </div>
             <div class="group">
-                <label id="l-cap"><i class="fas fa-shield-alt"></i> Security Code <span class="req">*</span></label>
+                <label id="l-cap" for="cap-in"><i class="fas fa-shield-alt"></i> Security Code <span class="req">*</span></label>
                 <div class="cap-box">
                     <div class="cap-row">
                         <canvas id="c-canvas" width="165" height="44"></canvas>
                         <button type="button" class="ref-btn" id="ref-btn"><i class="fas fa-sync-alt"></i></button>
                     </div>
-                    <input type="text" id="cap-in" class="cap-input" placeholder="Enter code" maxlength="5" autocomplete="off" required>
+                    <input type="text" id="cap-in" class="cap-input" placeholder="Enter code" aria-label="Security code" maxlength="5" autocomplete="off" required>
                 </div>
             </div>
             <button type="submit" id="t-btn" class="btn" disabled>Sign Up</button>
@@ -190,16 +190,22 @@
             document.getElementById('t-wel').textContent = t.wel;
             document.getElementById('l-email').innerHTML = `<i class="fas fa-envelope"></i> ${t.email} <span class="req">*</span>`;
             document.getElementById('email').placeholder = t.emailP;
+            document.getElementById('email').setAttribute('aria-label', t.email);
             document.getElementById('l-name').innerHTML = `<i class="fas fa-id-card"></i> ${t.name} <span class="req">*</span>`;
             document.getElementById('fullname').placeholder = t.nameP;
+            document.getElementById('fullname').setAttribute('aria-label', t.name);
             document.getElementById('l-pass').innerHTML = `<i class="fas fa-lock"></i> ${t.pass} <span class="req">*</span>`;
             document.getElementById('pass').placeholder = t.passP;
+            document.getElementById('pass').setAttribute('aria-label', t.pass);
             document.getElementById('l-confirm-pass').innerHTML = `<i class="fas fa-lock"></i> ${t.confirmPass} <span class="req">*</span>`;
             document.getElementById('confirm-pass').placeholder = t.confirmPassP;
+            document.getElementById('confirm-pass').setAttribute('aria-label', t.confirmPass);
             document.getElementById('l-ref').innerHTML = `<i class="fas fa-ticket"></i> ${t.ref} <span class="req">*</span>`;
             document.getElementById('ref-in').placeholder = t.refP;
+            document.getElementById('ref-in').setAttribute('aria-label', t.ref);
             document.getElementById('l-cap').innerHTML = `<i class="fas fa-shield-alt"></i> ${t.cap} <span class="req">*</span>`;
             document.getElementById('cap-in').placeholder = t.capP;
+            document.getElementById('cap-in').setAttribute('aria-label', t.cap);
             document.getElementById('t-btn').textContent = t.btn;
             const arrowIcon = t.dir === 'rtl' ? 'fa-arrow-right' : 'fa-arrow-left';
             document.getElementById('t-back').innerHTML = `<i class="fas ${arrowIcon}"></i> ${t.back}`;
