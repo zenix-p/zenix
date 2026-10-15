@@ -267,7 +267,9 @@ document.getElementById('bell-btn')?.addEventListener('click', e => {
 // ==========================================
 // 5. سیستم ترجمه کامل ۸ زبانه با رنگ آبی فعال
 // ==========================================
-let currLang = safeGetItem('zenix_lang') || 'fa';
+const SUPPORTED_LANGUAGES = ['en', 'fa', 'ar', 'tr', 'ru', 'es', 'fr', 'de'];
+const savedLang = safeGetItem('zenix_lang');
+let currLang = SUPPORTED_LANGUAGES.includes(savedLang) ? savedLang : 'en';
 
 const ld = {
     fa: {
@@ -537,9 +539,10 @@ const ld = {
 };
 
 function setLang(l) {
+    if (!SUPPORTED_LANGUAGES.includes(l)) l = 'en';
     currLang = l;
     safeSetItem('zenix_lang', l);
-    let t = ld[l] || ld.fa;
+    let t = ld[l] || ld.en;
     let r = l === 'fa' || l === 'ar';
     
     document.documentElement.setAttribute('dir', r ? 'rtl' : 'ltr');
