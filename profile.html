@@ -11,7 +11,7 @@
         try {
             const savedLang = localStorage.getItem('zenix_lang');
             if (supportedLanguages.includes(savedLang)) selectedLang = savedLang;
-        } catch (_) {}
+        } catch (_) { /* localStorage may be unavailable in private browsing; default to English */ }
         document.documentElement.setAttribute('lang', selectedLang);
         document.documentElement.setAttribute('dir', ['fa', 'ar'].includes(selectedLang) ? 'rtl' : 'ltr');
     })();
@@ -414,6 +414,19 @@
     </footer>
 
     <script>
+        // HTML escape helper: neutralises any HTML tag or attribute-breaking
+        // character coming from user-controlled data (notification titles,
+        // message bodies, emails, phone numbers, error messages) before it
+        // is placed into innerHTML.
+        function escapeHtml(value) {
+            return String(value == null ? '' : value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         window.showToast = function(message, type = 'success', duration = 8000) {
             const container = document.getElementById('toast-container');
             if (!container) return;
@@ -425,7 +438,9 @@
             if (type === 'error') iconClass = 'fa-exclamation-circle';
             if (type === 'info') iconClass = 'fa-info-circle';
 
-            toast.innerHTML = `<i class="fas ${iconClass}"></i><div style="flex:1;">${message}</div>`;
+            // message may contain data derived from user input or DB records;
+            // escape before inserting into innerHTML. iconClass is a literal.
+            toast.innerHTML = `<i class="fas ${iconClass}"></i><div style="flex:1;">${escapeHtml(message)}</div>`;
             container.appendChild(toast);
 
             setTimeout(() => {
@@ -526,7 +541,7 @@
                     const storedLang = localStorage.getItem('zenix_lang');
                     if (supportedLanguages.includes(storedLang)) savedLang = storedLang;
                     else localStorage.setItem('zenix_lang', 'en');
-                } catch (_) {}
+                } catch (_) { /* localStorage may be unavailable; default stays 'en' */ }
 
                 if (typeof window.applyProfileLanguage === 'function') {
                     window.applyProfileLanguage(savedLang);
@@ -545,7 +560,7 @@
                         );
                         try {
                             localStorage.setItem('zenix_lang', selectedLang);
-                        } catch (_) {}
+                        } catch (_) { /* quota or privacy mode: language preference is best-effort */ }
 
                         // Translate visible and dynamic page text using the page dictionary.
                         if (typeof window.applyProfileLanguage === 'function') {
@@ -556,7 +571,7 @@
                         });
                         langMenu.classList.remove('show');
                     });
-                });
+                }
             }
         });
     </script>
@@ -720,13 +735,15 @@
               `;
             }
 
+            // title and msg come from the notifications table (user/admin controlled).
+            // Escape before inserting into innerHTML.
             html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle}">
               <div class="msg-title-text" style="display:flex;align-items:center;gap:8px;">
                 ${icon}
-                <span>${title}</span>
+                <span>${escapeHtml(title)}</span>
                 ${tagHtml}
               </div>
-              <div class="msg-desc-text" style="margin-top:6px;">${msg}</div>
+              <div class="msg-desc-text" style="margin-top:6px;">${escapeHtml(msg)}</div>
               ${supportBtn}
             </div>`;
           });
@@ -918,7 +935,9 @@
                   if (payload.eventType === 'INSERT') {
                     const title = newRec.title || newRec.subject || 'اعلان جدید';
                     const msg = newRec.message || newRec.text || newRec.body || '';
-                    window.showToast(`<strong>${title}</strong><br>${msg}`, 'info', 7000);
+                    // showToast escapes its message argument before inserting
+                    // into innerHTML, so passing raw title/msg here is safe.
+                    window.showToast(`<strong>${escapeHtml(title)}</strong><br>${escapeHtml(msg)}`, 'info', 7000);
                   }
                 }
               })
@@ -1214,7 +1233,7 @@
             activeLang = normalizeLanguage(lang);
             document.documentElement.setAttribute('lang', activeLang);
             document.documentElement.setAttribute('dir', ['fa', 'ar'].includes(activeLang) ? 'rtl' : 'ltr');
-            try { localStorage.setItem('zenix_lang', activeLang); } catch (_) {}
+            try { localStorage.setItem('zenix_lang', activeLang); } catch (_) { /* quota or privacy mode: language preference is best-effort */ }
             if (!document.__zenixOriginalTitle) document.__zenixOriginalTitle = document.title;
             document.title = translatePhrase(document.__zenixOriginalTitle, activeLang);
 
@@ -1247,7 +1266,7 @@
         observer.observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: attrNames });
 
         let saved = 'en';
-        try { saved = normalizeLanguage(localStorage.getItem('zenix_lang')); } catch (_) {}
+        try { saved = normalizeLanguage(localStorage.getItem('zenix_lang')); } catch (_) { /* localStorage may be unavailable; default to English */ }
         localizePage(saved);
     })();
     </script>
