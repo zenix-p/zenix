@@ -9,7 +9,9 @@
             try {
                 var saved = localStorage.getItem('zenix_lang');
                 if (supported.indexOf(saved) !== -1) language = saved;
-            } catch (e) {}
+            } catch (e) {
+                /* localStorage may be unavailable (private browsing or disabled storage); default to English. */
+            }
             document.documentElement.setAttribute('lang', language);
             document.documentElement.setAttribute('dir', language === 'fa' || language === 'ar' ? 'rtl' : 'ltr');
         })();
