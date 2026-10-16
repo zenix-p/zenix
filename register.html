@@ -276,18 +276,16 @@
             refIn.value = refParam;
         }
 
-        // [FIX] Referral code logic:
-        // - If a referral code is provided in the URL, keep it.
-        // - Otherwise:
-        //     - If NO user exists in profiles, this is the first signup -> ADMIN.
-        //     - If users exist, the referral field stays READ-ONLY and EMPTY.
-        //       A clear message is shown telling the visitor an invitation link is required.
-        //       The submit button remains disabled.
+        // منطق کد معرف:
+        // - اگر در URL پارامتر ref باشد، همان را نگه دار.
+        // - در غیر این صورت:
+        //     - اگر هیچ کاربری در profiles نباشد، این اولین ثبت‌نام است → ADMIN.
+        //     - اگر کاربر وجود دارد، فیلد کد معرف readonly و خالی می‌ماند و پیام
+        //       «نیاز به لینک دعوت» نمایش داده می‌شود.
         async function checkFirstUserInit() {
             const inviteBox = document.getElementById('invite-required');
 
             if (refIn.value) {
-                // Came with an invitation link -> keep it as-is
                 chk();
                 return;
             }
@@ -301,26 +299,24 @@
                 if (error) throw error;
 
                 if (!data || data.length === 0) {
-                    // First ever user -> becomes ADMIN
                     refIn.value = 'ADMIN';
                     chk();
                     return;
                 }
 
-                // Users already exist and no referral link was provided.
-                // Keep the field read-only and empty, and show a clear message.
+                // کاربران وجود دارند و لینک دعوت نیامده → کد معرف اجباری است
                 refIn.value = '';
                 if (inviteBox) inviteBox.classList.add('show');
                 chk();
             } catch (e) {
-                // On error, stay safe: keep the field read-only, empty, and show the message.
+                // در صورت خطا، به‌عنوان احتیاط اجباری کن
                 refIn.value = '';
                 if (inviteBox) inviteBox.classList.add('show');
                 chk();
             }
         }
 
-        // [FIX] Email format validation, plus stricter rules for all fields.
+        // اعتبارسنجی کامل فرم
         function isValidEmailFormat(email) {
             if (!email) return false;
             const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -331,4 +327,176 @@
             const emailOk = isValidEmailFormat(emailIn.value.trim());
             const nameOk = nameIn.value.trim().length >= 2;
             const passOk = passIn.value.length >= 6;
-            const confirmOk = confirmPassIn.value.length
+            const confirmOk = confirmPassIn.value.length >= 6 && passIn.value === confirmPassIn.value;
+            const refOk = refIn.value.trim().length > 0;
+            const capOk = capIn.value.length === 5;
+            btn.disabled = !(emailOk && nameOk && passOk && confirmOk && refOk && capOk);
+        }
+        [emailIn, nameIn, passIn, confirmPassIn, refIn, capIn].forEach(i => i.oninput = chk);
+        
+        // تابع رسم کپچا
+        function drawCap() {
+            if (!cv) return;
+            const ctx = cv.getContext('2d'), w = cv.width, h = cv.height;
+            code = '';
+            const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+            for (let i = 0; i < 5; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+
+            // [USER-SIM] برای تست خودکار
+            window.__zenix_captcha_code = code;
+
+            ctx.clearRect(0, 0, w, h);
+            const bgGrad = ctx.createLinearGradient(0, 0, w, h);
+            bgGrad.addColorStop(0, '#030712'); bgGrad.addColorStop(0.5, '#0b1329'); bgGrad.addColorStop(1, '#02050e');
+            ctx.fillStyle = bgGrad; ctx.fillRect(0, 0, w, h);
+
+            ctx.strokeStyle = 'rgba(56,189,248,0.12)'; ctx.lineWidth = 1;
+            for (let i = 0; i < 2; i++) {
+                ctx.beginPath(); ctx.moveTo(Math.random() * w, Math.random() * h);
+                ctx.lineTo(Math.random() * w, Math.random() * h); ctx.stroke();
+            }
+
+            const neonColors = ['#38bdf8', '#c084fc', '#34d399', '#f43f5e', '#fbbf24'];
+            const cw = w / 5;
+
+            for (let i = 0; i < 5; i++) {
+                const x = i * cw + cw / 2, y = h / 2 + (Math.random() - 0.5) * 4, color = neonColors[i % neonColors.length];
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate((Math.random() - 0.5) * 0.2);
+
+                ctx.font = '700 24px "Vazirmatn", system-ui, sans-serif';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.shadowColor = color; ctx.shadowBlur = 4;
+                ctx.strokeStyle = '#020617'; ctx.lineWidth = 2;
+                ctx.strokeText(code[i], 0, 0);
+                ctx.fillStyle = color;
+                ctx.fillText(code[i], 0, 0);
+                ctx.restore();
+            }
+        }
+        
+        document.getElementById('ref-btn').onclick = () => { capIn.value = ''; drawCap(); chk(); };
+        cv.onclick = () => { drawCap(); chk(); };
+        
+        async function generateUniqueReferralCode() {
+            for (let attempt = 0; attempt < 5; attempt += 1) {
+                const randomBytes = new Uint32Array(1);
+                crypto.getRandomValues(randomBytes);
+                const candidate = 'ZX-' + ((randomBytes[0] % 900000) + 100000).toString();
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('profiles')
+                        .select('id')
+                        .eq('referral_code', candidate)
+                        .maybeSingle();
+                    if (error) throw error;
+                    if (!data) return candidate;
+                } catch (_) {
+                    return candidate;
+                }
+            }
+            const fallbackBytes = new Uint32Array(1);
+            crypto.getRandomValues(fallbackBytes);
+            return 'ZX-' + Date.now().toString().slice(-6) + (fallbackBytes[0] % 1000).toString().padStart(3, '0');
+        }
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const t = langData[currentLang] || langData.en;
+            if (passIn.value.length < 6) { msg.textContent = t.lenErr; msg.className = 'err'; return; }
+            if (passIn.value !== confirmPassIn.value) { msg.textContent = t.passErr; msg.className = 'err'; return; }
+            if (capIn.value.toUpperCase() !== code) { msg.textContent = t.err; msg.className = 'err'; capIn.value = ''; drawCap(); chk(); return; }
+            if (!refIn.value.trim()) { msg.textContent = t.refErr; msg.className = 'err'; return; }
+
+            btn.disabled = true;
+            const emailValue = emailIn.value.trim().toLowerCase();
+            const fullNameValue = nameIn.value.trim();
+            const refCodeValue = refIn.value.trim().toUpperCase();
+
+            try {
+                const referrerFinalValue = refCodeValue || 'SYSTEM';
+
+                const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+                    email: emailValue,
+                    password: passIn.value,
+                    options: {
+                        data: {
+                            fullname: fullNameValue,
+                            full_name: fullNameValue,
+                            referred_by: referrerFinalValue
+                        }
+                    }
+                });
+
+                if (authError) throw authError;
+
+                if (authData?.user) {
+                    const userId = authData.user.id;
+                    const myNewReferralCode = await generateUniqueReferralCode();
+
+                    const { error: profileErr } = await supabaseClient
+                        .from('profiles')
+                        .insert([
+                            {
+                                id: userId,
+                                email: emailValue,
+                                referral_code: myNewReferralCode,
+                                referred_by: referrerFinalValue
+                            }
+                        ]);
+
+                    if (profileErr) {
+                        console.error('خطا در ثبت پروفایل:', profileErr);
+                    }
+
+                    const userPayload = {
+                        id: userId,
+                        email: emailValue,
+                        fullname: fullNameValue,
+                        balance: 2
+                    };
+
+                    const { error: updateErr } = await supabaseClient
+                        .from('users')
+                        .update({
+                            email: emailValue,
+                            fullname: fullNameValue,
+                            balance: 2
+                        })
+                        .eq('id', userId);
+
+                    if (updateErr) {
+                        await supabaseClient
+                            .from('users')
+                            .insert([userPayload]);
+                    }
+                }
+
+                await supabaseClient.auth.signOut();
+
+                msg.textContent = t.succ;
+                msg.className = 'succ';
+                setTimeout(() => window.location.href = 'index.html', 1500);
+
+            } catch (error) {
+                btn.disabled = false;
+                if (error.message?.toLowerCase().includes('already registered') || error.status === 400) {
+                    msg.textContent = t.existErr;
+                } else {
+                    msg.textContent = error.message || 'خطایی رخ داده است';
+                }
+                msg.className = 'err';
+                capIn.value = '';
+                drawCap();
+                chk();
+            }
+        };
+        
+        setLang(currentLang);
+        drawCap();
+        checkFirstUserInit();
+        chk();
+    </script>
+</body>
+</html>
