@@ -381,4 +381,125 @@
         }
         
         document.getElementById('ref-btn').onclick = () => { capIn.value = ''; drawCap(); chk(); };
-        cv.onclick = () => { drawCap(); chk();
+        cv.onclick = () => { drawCap(); chk(); };
+        
+        async function generateUniqueReferralCode() {
+            for (let attempt = 0; attempt < 5; attempt += 1) {
+                const randomBytes = new Uint32Array(1);
+                crypto.getRandomValues(randomBytes);
+                const candidate = 'ZX-' + ((randomBytes[0] % 900000) + 100000).toString();
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('profiles')
+                        .select('id')
+                        .eq('referral_code', candidate)
+                        .maybeSingle();
+                    if (error) throw error;
+                    if (!data) return candidate;
+                } catch (_) {
+                    return candidate;
+                }
+            }
+            const fallbackBytes = new Uint32Array(1);
+            crypto.getRandomValues(fallbackBytes);
+            return 'ZX-' + Date.now().toString().slice(-6) + (fallbackBytes[0] % 1000).toString().padStart(3, '0');
+        }
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const t = langData[currentLang] || langData.en;
+            if (passIn.value.length < 6) { msg.textContent = t.lenErr; msg.className = 'err'; return; }
+            if (passIn.value !== confirmPassIn.value) { msg.textContent = t.passErr; msg.className = 'err'; return; }
+            if (capIn.value.toUpperCase() !== code) { msg.textContent = t.err; msg.className = 'err'; capIn.value = ''; drawCap(); chk(); return; }
+
+            btn.disabled = true;
+            const emailValue = emailIn.value.trim().toLowerCase();
+            const fullNameValue = nameIn.value.trim();
+            const refCodeValue = refIn.value.trim().toUpperCase();
+
+            try {
+                const referrerFinalValue = refCodeValue || 'SYSTEM';
+
+                const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+                    email: emailValue,
+                    password: passIn.value,
+                    options: {
+                        data: {
+                            fullname: fullNameValue,
+                            full_name: fullNameValue,
+                            referred_by: referrerFinalValue
+                        }
+                    }
+                });
+
+                if (authError) throw authError;
+
+                if (authData?.user) {
+                    const userId = authData.user.id;
+                    const myNewReferralCode = await generateUniqueReferralCode();
+
+                    const { error: profileErr } = await supabaseClient
+                        .from('profiles')
+                        .insert([
+                            {
+                                id: userId,
+                                email: emailValue,
+                                referral_code: myNewReferralCode,
+                                referred_by: referrerFinalValue
+                            }
+                        ]);
+
+                    if (profileErr) {
+                        console.error('خطا در ثبت پروفایل:', profileErr);
+                    }
+
+                    const userPayload = {
+                        id: userId,
+                        email: emailValue,
+                        fullname: fullNameValue,
+                        balance: 2
+                    };
+
+                    const { error: updateErr } = await supabaseClient
+                        .from('users')
+                        .update({
+                            email: emailValue,
+                            fullname: fullNameValue,
+                            balance: 2
+                        })
+                        .eq('id', userId);
+
+                    if (updateErr) {
+                        await supabaseClient
+                            .from('users')
+                            .insert([userPayload]);
+                    }
+                }
+
+                await supabaseClient.auth.signOut();
+
+                msg.textContent = t.succ;
+                msg.className = 'succ';
+                setTimeout(() => window.location.href = 'index.html', 1500);
+
+            } catch (error) {
+                btn.disabled = false;
+                if (error.message?.toLowerCase().includes('already registered') || error.status === 400) {
+                    msg.textContent = t.existErr;
+                } else {
+                    msg.textContent = error.message || 'خطایی رخ داده است';
+                }
+                msg.className = 'err';
+                capIn.value = '';
+                drawCap();
+                chk();
+            }
+        };
+        
+        setLang(currentLang);
+        drawCap();
+        checkFirstUserInit();
+        chk();
+    </script>
+</body>
+</html>
