@@ -60,8 +60,6 @@
         .footer{text-align:center;margin-top:14px;font-size:12px;color:#94a3b8}
         .footer a{color:#38bdf8;text-decoration:none}
         #msg{margin-top:8px;font-size:12px;text-align:center;font-weight:bold;padding:6px;border-radius:6px}
-        /* .err contrast fixed: #ef4444 on rgba(239,68,68,.1) was 4.43:1 (below WCAG AA).
-           Changed to #f87171 with slightly stronger background, giving ~6.2:1. */
         .err{color:#f87171;background:rgba(239,68,68,.15)}
         .succ{color:#22c55e;background:rgba(34,197,94,.1)}
     </style>
@@ -168,7 +166,6 @@
         // depend on variables that live inside the <script type="module">
         // block, because those are scoped to that module and not visible
         // here. This previously caused "langData is not defined" errors.
-        // The aria-label text is looked up from a local table instead.
         const ZENIX_TOGGLE_LABELS = {
             en: { show: 'Show password', hide: 'Hide password' },
             fa: { show: 'نمایش رمز عبور', hide: 'مخفی کردن رمز عبور' },
@@ -323,8 +320,45 @@
         document.getElementById('ref-btn').onclick = () => { capIn.value = ''; drawCap(); chk(); };
         cv.onclick = () => { drawCap(); chk(); };
         
-        function generateUserReferralCode() {
-            return 'ZX-' + Math.floor(100000 + Math.random() * 900000);
+        // ============================================================
+        // Unique referral-code generator
+        // ============================================================
+        // The previous implementation used Math.random(), which:
+        //   * is not cryptographically strong,
+        //   * is not guaranteed to be unique across users,
+        //   * can collide more often than expected under load.
+        //
+        // This version uses the Web Crypto API (crypto.getRandomValues) for
+        // strong randomness and additionally queries the profiles table to
+        // confirm the candidate code is not already in use. The database
+        // should also enforce a UNIQUE constraint on profiles.referral_code,
+        // so a concurrent insert can never produce a duplicate.
+        async function generateUniqueReferralCode() {
+            for (let attempt = 0; attempt < 5; attempt += 1) {
+                const randomBytes = new Uint32Array(1);
+                crypto.getRandomValues(randomBytes);
+                const candidate = 'ZX-' + ((randomBytes[0] % 900000) + 100000).toString();
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('profiles')
+                        .select('id')
+                        .eq('referral_code', candidate)
+                        .maybeSingle();
+                    if (error) throw error;
+                    if (!data) return candidate;
+                } catch (_) {
+                    // If the uniqueness lookup itself fails (offline, transient
+                    // network error), return the candidate anyway. The UNIQUE
+                    // constraint on the database will reject the row on insert
+                    // if it happens to collide, and the user can retry.
+                    return candidate;
+                }
+            }
+            // Fallback for the extremely unlikely case that all five attempts
+            // collided with existing codes: append the current timestamp.
+            const fallbackBytes = new Uint32Array(1);
+            crypto.getRandomValues(fallbackBytes);
+            return 'ZX-' + Date.now().toString().slice(-6) + (fallbackBytes[0] % 1000).toString().padStart(3, '0');
         }
 
         form.onsubmit = async (e) => {
@@ -358,7 +392,7 @@
 
                 if (authData?.user) {
                     const userId = authData.user.id;
-                    const myNewReferralCode = generateUserReferralCode();
+                    const myNewReferralCode = await generateUniqueReferralCode();
 
                     const { error: profileErr } = await supabaseClient
                         .from('profiles')
