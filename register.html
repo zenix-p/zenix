@@ -64,7 +64,6 @@
         .succ{color:#22c55e;background:rgba(34,197,94,.1)}
     </style>
     <style id="zenix-placeholder-contrast-fix">
-        /* Strong, independent override for input placeholder colors in all supported browsers. */
         input::placeholder { color: #f8fafc !important; opacity: 1 !important; -webkit-text-fill-color: #f8fafc !important; }
         input::-webkit-input-placeholder { color: #f8fafc !important; opacity: 1 !important; -webkit-text-fill-color: #f8fafc !important; }
         input::-moz-placeholder { color: #f8fafc !important; opacity: 1 !important; }
@@ -162,17 +161,36 @@
     </div>
 
     <script>
-        function togglePassword(id,btn){
-            const input=document.getElementById(id);
-            const lang=(typeof currentLang!=='undefined'&&langData[currentLang])?langData[currentLang]:langData.en;
-            if(input.type==='password'){
-                input.type='text';
-                btn.innerHTML='<i class="fas fa-eye-slash eye-icon"></i>';
-                btn.setAttribute('aria-label', lang.hidePass || 'Hide password');
+        // togglePassword runs in a plain (non-module) script so it can be
+        // referenced directly from inline onclick handlers. It must NOT
+        // depend on variables that live inside the <script type="module">
+        // block, because those are scoped to that module and not visible
+        // here. This previously caused "langData is not defined" errors.
+        // The aria-label text is looked up from a local table instead.
+        const ZENIX_TOGGLE_LABELS = {
+            en: { show: 'Show password', hide: 'Hide password' },
+            fa: { show: 'نمایش رمز عبور', hide: 'مخفی کردن رمز عبور' },
+            ar: { show: 'إظهار كلمة المرور', hide: 'إخفاء كلمة المرور' },
+            tr: { show: 'Şifreyi göster', hide: 'Şifreyi gizle' },
+            ru: { show: 'Показать пароль', hide: 'Скрыть пароль' },
+            es: { show: 'Mostrar contraseña', hide: 'Ocultar contraseña' },
+            fr: { show: 'Afficher le mot de passe', hide: 'Masquer le mot de passe' },
+            de: { show: 'Passwort anzeigen', hide: 'Passwort verbergen' }
+        };
+        function togglePassword(id, btn) {
+            const input = document.getElementById(id);
+            if (!input) return;
+            let lang = 'en';
+            try { lang = (localStorage.getItem('zenix_lang') || 'en'); } catch (_) {}
+            const label = ZENIX_TOGGLE_LABELS[lang] || ZENIX_TOGGLE_LABELS.en;
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.innerHTML = '<i class="fas fa-eye-slash eye-icon"></i>';
+                btn.setAttribute('aria-label', label.hide);
             } else {
-                input.type='password';
-                btn.innerHTML='<i class="fas fa-eye eye-icon"></i>';
-                btn.setAttribute('aria-label', lang.showPass || 'Show password');
+                input.type = 'password';
+                btn.innerHTML = '<i class="fas fa-eye eye-icon"></i>';
+                btn.setAttribute('aria-label', label.show);
             }
         }
     </script>
@@ -232,10 +250,8 @@
             document.getElementById('t-back').innerHTML = `<i class="fas ${arrowIcon}"></i> ${t.back}`;
             document.getElementById('btn-support')?.setAttribute('title', t.supTitle);
             langBtn?.setAttribute('title', t.langTitle);
-            // Update aria-label of the refresh captcha button
             const refBtn = document.getElementById('ref-btn');
             if (refBtn) refBtn.setAttribute('aria-label', t.refreshCap || 'Refresh security code');
-            // Update aria-label of the two eye buttons based on their current state
             document.querySelectorAll('.eye-btn').forEach(btn => {
                 const input = btn.parentElement.querySelector('input');
                 const isShowing = input && input.type === 'text';
@@ -305,7 +321,6 @@
         document.getElementById('ref-btn').onclick = () => { capIn.value = ''; drawCap(); chk(); };
         cv.onclick = () => { drawCap(); chk(); };
         
-        // تابع تولید کد دعوت اختصاصی برای کاربر جدید
         function generateUserReferralCode() {
             return 'ZX-' + Math.floor(100000 + Math.random() * 900000);
         }
@@ -325,7 +340,6 @@
             try {
                 const referrerFinalValue = refCodeValue || 'SYSTEM';
 
-                // ۱. ثبت‌نام در Supabase Auth
                 const { data: authData, error: authError } = await supabaseClient.auth.signUp({
                     email: emailValue,
                     password: passIn.value,
@@ -344,7 +358,6 @@
                     const userId = authData.user.id;
                     const myNewReferralCode = generateUserReferralCode();
 
-                    // ۲. ذخیره مستقیم اطلاعات شبکه و کد دعوت در جدول profiles
                     const { error: profileErr } = await supabaseClient
                         .from('profiles')
                         .insert([
@@ -360,7 +373,6 @@
                         console.error('خطا در ثبت پروفایل:', profileErr);
                     }
 
-                    // ۳. به‌روزرسانی یا ذخیره اطلاعات کاربر در دیتابیس (جدول users)
                     const userPayload = {
                         id: userId,
                         email: emailValue,
@@ -384,7 +396,6 @@
                     }
                 }
 
-                // ۴. خروج از حساب جهت بستن نشست فعال و هدایت به صفحه ورود اصلی (index.html)
                 await supabaseClient.auth.signOut();
 
                 msg.textContent = t.succ;
