@@ -16,7 +16,39 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Zenix Admin">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/906/906343.png">
-    
+
+    <style>
+        /* ============================================================
+           AUTH GUARD GATE
+           The admin UI must never paint before the server-side guard
+           has confirmed the visitor is an admin. Otherwise a regular
+           user briefly sees the dashboard before the redirect fires.
+           Body stays hidden until the JS guard adds .zenix-authed.
+           ============================================================ */
+        body { visibility: hidden; }
+        body.zenix-authed { visibility: visible; }
+        #zenix-auth-gate {
+            position: fixed; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(1100px 620px at 88% -8%, rgba(56,189,248,.16), transparent 60%),
+                        radial-gradient(950px 560px at 4% 4%, rgba(129,140,248,.16), transparent 58%),
+                        #05060d;
+            color: #38bdf8;
+            font-family: 'Vazirmatn', system-ui, sans-serif;
+            z-index: 10000;
+            visibility: visible;
+            transition: opacity .25s ease;
+        }
+        body.zenix-authed #zenix-auth-gate { opacity: 0; pointer-events: none; }
+        #zenix-auth-gate .gate-inner { text-align: center; }
+        #zenix-auth-gate .gate-inner i { font-size: 34px; margin-bottom: 12px; display: block; animation: zenixGatePulse 1.4s ease-in-out infinite; }
+        #zenix-auth-gate .gate-inner span { font-size: 13px; color: #cbd5e1; letter-spacing: .3px; }
+        @keyframes zenixGatePulse {
+            0%, 100% { opacity: .55; transform: scale(1); }
+            50%      { opacity: 1;   transform: scale(1.08); }
+        }
+    </style>
+
     <style>
         :root {
             --bg-0: #05060d;
@@ -307,6 +339,16 @@
     </style>
 </head>
 <body>
+    <!-- Auth gate: keeps the admin UI hidden until the server-side
+         guard confirms the visitor is an admin. Prevents a regular
+         user from briefly seeing the dashboard before redirect. -->
+    <div id="zenix-auth-gate" aria-live="polite">
+        <div class="gate-inner">
+            <i class="fas fa-shield-halved" aria-hidden="true"></i>
+            <span>در حال بررسی دسترسی...</span>
+        </div>
+    </div>
+
     <div class="app-shell">
       <aside class="sidebar">
         <div class="brand">
@@ -1495,11 +1537,15 @@
         document.getElementById('mobile-logout-btn')?.addEventListener('click', async () => { await supabaseClient.auth.signOut(); window.location.href = 'login.html'; });
 
         // ============================================================
-        // BOOTSTRAP: guard first, then load data
+        // BOOTSTRAP: guard first, then reveal admin UI, then load data.
+        // The body stays hidden (see the first <style> block) until the
+        // guard confirms admin access. This prevents the brief flash of
+        // the admin dashboard for unauthorized visitors.
         // ============================================================
         (async () => {
             const ok = await guardAdminAccess();
             if (!ok) return;
+            document.body.classList.add('zenix-authed');
             await loadNtfyTopic();
             loadData();
             loadCasinoData();
