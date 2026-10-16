@@ -6,12 +6,12 @@ const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
 
 function safeGetItem(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
-function safeSetItem(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
+function safeSetItem(key, val) { try { localStorage.setItem(key, val); } catch(e) { /* quota or privacy mode: writing is best-effort */ } }
 
 const customStorage = {
     getItem: (key) => safeGetItem(key),
     setItem: (key, value) => safeSetItem(key, value),
-    removeItem: (key) => { try { localStorage.removeItem(key); } catch(e) {} }
+    removeItem: (key) => { try { localStorage.removeItem(key); } catch(e) { /* removal is best-effort */ } }
 };
 
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -68,7 +68,7 @@ window.closeCasinoModal = function() {
 };
 
 // ==========================================
-// 3. سیستم دریافت و نمایش بازار ارزهای دیجیتال (۳ ارز برتر از ۳0)
+// 3. سیستم دریافت و نمایش بازار ارزهای دیجیتال (۳ ارز برتر از ۳۰)
 // ==========================================
 async function fetchCryptoPrices() {
     const tickerContainer = document.getElementById('crypto-ticker-list');
@@ -236,7 +236,7 @@ window.readAdminMessage = async idx => {
     if (currentUserId && m.id) {
         try {
             await supabaseClient.from('notifications').update({ read: true, is_read: true }).eq('id', m.id);
-        } catch(e) {}
+        } catch(e) { /* mark-as-read is best-effort; the local UI already shows it as read */ }
     }
     updateNotifBadges();
     renderMessageList();
@@ -665,7 +665,7 @@ async function loadDashboardUserData(uid, sessionUser) {
             if (dbProfiles && Array.isArray(dbProfiles)) {
                 rawList.push(...dbProfiles);
             }
-        } catch(e) {}
+        } catch(e) { /* profiles fetch is best-effort; the users table already provides the main data */ }
 
         if (meta.team_members || meta.referrals || meta.invited_users) {
             let metaTeam = meta.team_members || meta.referrals || meta.invited_users;
@@ -680,7 +680,7 @@ async function loadDashboardUserData(uid, sessionUser) {
                     if (Array.isArray(parsed)) rawList.push(...parsed);
                     else if (parsed && typeof parsed === 'object') rawList.push(parsed);
                 }
-            } catch(e) {}
+            } catch(e) { /* legacy localStorage keys may be missing or malformed; skip only this key */ }
         });
 
         let uniqueMap = new Map();
@@ -818,6 +818,6 @@ document.addEventListener('click', (e) => {
 
 document.getElementById('logout-btn')?.addEventListener('click', async e => {
     e.preventDefault();
-    try { await supabaseClient.auth.signOut(); } catch(e) {}
+    try { await supabaseClient.auth.signOut(); } catch(e) { /* signOut is best-effort; the redirect below always runs */ }
     window.location.href = 'index.html';
 });
