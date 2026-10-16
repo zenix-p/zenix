@@ -6,7 +6,7 @@
 (function(){
   var supported=['en','fa','ar','tr','ru','es','fr','de'];
   var lang='en';
-  try { var saved=localStorage.getItem('zenix_lang'); if(supported.indexOf(saved)!==-1) lang=saved; } catch(e) {}
+  try { var saved=localStorage.getItem('zenix_lang'); if(supported.indexOf(saved)!==-1) lang=saved; } catch(e) { /* localStorage may be unavailable in private browsing; default to English */ }
   document.documentElement.lang=lang;
   document.documentElement.dir=(lang==='fa'||lang==='ar')?'rtl':'ltr';
 })();
@@ -335,7 +335,7 @@ function setLang(l){
   const direction = (l === 'fa' || l === 'ar') ? 'rtl' : 'ltr';
   document.documentElement.setAttribute('dir', direction);
   document.documentElement.setAttribute('lang', l);
-  try { localStorage.setItem('zenix_lang', l); } catch (e) {}
+  try { localStorage.setItem('zenix_lang', l); } catch (e) { /* quota or privacy mode: language preference is best-effort */ }
   document.title = t.pageTitle || 'Zenix - Deposit';
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
@@ -522,9 +522,6 @@ function showMsg(text, isErr, showTimer = false) {
   box.style.border = isErr ? '1px solid #ef4444' : '1px solid #22c55e';
   box.style.color = isErr ? '#ef4444' : '#22c55e';
   
-  // text may contain error messages that embed user input; escape it.
-  // The elapsedTime label comes from LD (static) but is escaped for
-  // consistency with the rest of the codebase.
   const safeText = escapeHtml(text);
   const elapsedLabel = escapeHtml((window.currentLangData || LD.en).elapsedTime);
   
@@ -755,7 +752,6 @@ window.openMsgDetail = async function(idx) {
   const detailBody = document.getElementById('detail-msg-body');
   const detailSupport = document.getElementById('detail-msg-support');
 
-  // title comes from the notifications table (user/DB) so it must be escaped.
   if (detailTitle) detailTitle.innerHTML = `<i class="fas fa-bell" style="color:#38bdf8"></i> ${escapeHtml(title)}`;
   
   if (detailDate) {
@@ -842,7 +838,6 @@ window.renderNotifications = function() {
 
     const dateDisplay = dateStr ? `<div style="font-size:11px;color:${isUnread ? '#cbd5e1' : '#64748b'};margin-top:6px;direction:ltr;text-align:left;"><i class="far fa-clock" style="margin-right:4px;"></i>${escapeHtml(dateStr)}</div>` : '';
 
-    // title comes from the notifications table (user/DB) so it is escaped.
     html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle} ${opacityStyle} cursor:pointer; position:relative; transition:all 0.2s;" onclick="window.openMsgDetail(${idx})">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
         <div class="msg-title-text" style="display:flex;align-items:center;gap:8px;font-weight:${isUnread ? '800' : '500'};color:${isUnread ? '#f8fafc' : '#cbd5e1'};">
