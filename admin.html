@@ -18,13 +18,6 @@
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/906/906343.png">
 
     <style>
-        /* ============================================================
-           AUTH GUARD GATE
-           The admin UI must never paint before the server-side guard
-           has confirmed the visitor is an admin. Otherwise a regular
-           user briefly sees the dashboard before the redirect fires.
-           Body stays hidden until the JS guard adds .zenix-authed.
-           ============================================================ */
         body { visibility: hidden; }
         body.zenix-authed { visibility: visible; }
         #zenix-auth-gate {
@@ -51,48 +44,30 @@
 
     <style>
         :root {
-            --bg-0: #05060d;
-            --bg-1: #0a0f1e;
-            --panel: rgba(17,24,42,.72);
-            --line: rgba(255,255,255,.07);
-            --line-2: rgba(255,255,255,.12);
-            --accent: #38bdf8;
-            --accent-2: #818cf8;
-            --accent-3: #22d3ee;
-            --txt: #eef2ff;
-            --muted: #94a3b8;
-            --radius: 16px;
-            --shadow: 0 18px 50px -12px rgba(0,0,0,.75);
+            --bg-0: #05060d; --bg-1: #0a0f1e; --panel: rgba(17,24,42,.72);
+            --line: rgba(255,255,255,.07); --line-2: rgba(255,255,255,.12);
+            --accent: #38bdf8; --accent-2: #818cf8; --accent-3: #22d3ee;
+            --txt: #eef2ff; --muted: #94a3b8;
+            --radius: 16px; --shadow: 0 18px 50px -12px rgba(0,0,0,.75);
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', system-ui, sans-serif; }
         html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
-        
         body {
             background:
                 radial-gradient(1100px 620px at 88% -8%, rgba(56,189,248,.16), transparent 60%),
                 radial-gradient(950px 560px at 4% 4%, rgba(129,140,248,.16), transparent 58%),
                 radial-gradient(800px 700px at 50% 120%, rgba(34,211,238,.10), transparent 60%),
                 linear-gradient(180deg, var(--bg-0), var(--bg-1) 55%, var(--bg-0));
-            background-attachment: fixed;
-            color: var(--txt);
-            min-height: 100vh;
-            font-size: 12px;
-            -webkit-font-smoothing: antialiased;
-            letter-spacing: .1px;
-            display: block;
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
+            background-attachment: fixed; color: var(--txt); min-height: 100vh;
+            font-size: 12px; -webkit-font-smoothing: antialiased; letter-spacing: .1px;
+            display: block; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
         }
-
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #334155, #1e293b); border-radius: 20px; }
         ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, var(--accent), var(--accent-2)); }
         ::selection { background: rgba(56,189,248,.35); color: #fff; }
-
         .app-shell { display: flex; align-items: stretch; min-height: 100vh; }
-        
         .sidebar {
             position: sticky; top: 0; align-self: flex-start; height: 100vh;
             width: 270px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px;
@@ -100,19 +75,15 @@
             background: linear-gradient(180deg, rgba(13,19,36,.94), rgba(7,11,22,.9));
             border-left: 1px solid var(--line-2);
             backdrop-filter: blur(20px) saturate(140%);
-            box-shadow: -12px 0 44px -22px rgba(0,0,0,.85);
-            z-index: 50;
+            box-shadow: -12px 0 44px -22px rgba(0,0,0,.85); z-index: 50;
         }
-
         .brand { display: flex; flex-direction: column; gap: 12px; padding: 6px 8px 20px; border-bottom: 1px solid var(--line); margin-bottom: 10px; }
         .logo { display: flex; align-items: center; gap: 10px; }
         .logo h2 {
-            font-family: 'Orbitron', 'Vazirmatn', sans-serif;
-            font-size: 20px; letter-spacing: 2px;
+            font-family: 'Orbitron', 'Vazirmatn', sans-serif; font-size: 20px; letter-spacing: 2px;
             background: linear-gradient(90deg, #7dd3fc, #818cf8 55%, #22d3ee);
             -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 2px 14px rgba(56,189,248,.35));
-            font-weight: 800;
+            filter: drop-shadow(0 2px 14px rgba(56,189,248,.35)); font-weight: 800;
         }
         .logo::before {
             content: "\f3ed"; font-family: "Font Awesome 6 Free"; font-weight: 900;
@@ -121,13 +92,11 @@
             border: 1px solid rgba(56,189,248,.35); color: #7dd3fc; font-size: 17px;
             box-shadow: 0 8px 22px -8px rgba(56,189,248,.6);
         }
-
         .admin-badge {
             background: linear-gradient(135deg, rgba(56,189,248,.16), rgba(129,140,248,.16));
             border: 1px solid rgba(56,189,248,.32); font-size: 11px; padding: 5px 12px; border-radius: 9px;
             backdrop-filter: blur(6px); color: #38bdf8; font-weight: 600; white-space: nowrap;
         }
-
         .sidebar .admin-tabs { display: flex; flex-direction: column; gap: 7px; border: 0; padding: 0; margin: 0; flex: 1; overflow-y: auto; }
         .tab-btn {
             background: rgba(255,255,255,.035); border: 1px solid var(--line-2); color: #94a3b8;
@@ -144,14 +113,12 @@
         }
         .tab-badge { background: #ef4444; color: #fff; font-size: 10px; padding: 2px 7px; border-radius: 10px; font-weight: 700; margin-inline-start: auto; box-shadow: 0 4px 12px -4px rgba(239,68,68,.7); }
         .tab-badge.zero { background: rgba(255,255,255,.08); color: #94a3b8; box-shadow: none; }
-
         .btn-logout {
             background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.25); color: #ef4444;
             padding: 12px; border-radius: 12px; font-size: 12px; cursor: pointer; display: flex;
             align-items: center; justify-content: center; gap: 8px; font-weight: 600; transition: all .25s; margin-top: 10px; white-space: nowrap;
         }
         .btn-logout:hover { background: rgba(239,68,68,.28); transform: translateY(-1px); box-shadow: 0 10px 24px -10px rgba(239,68,68,.7); }
-
         .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
         .main header {
             position: sticky; top: 0; z-index: 40; padding: 18px 34px;
@@ -172,12 +139,9 @@
             border: 1px solid rgba(56,189,248,.4); color: #7dd3fc; font-size: 16px;
             box-shadow: 0 8px 22px -8px rgba(56,189,248,.6); flex-shrink: 0;
         }
-
         .main .c { max-width: none; margin: 0; padding: 24px 28px 12px; flex: 1; }
-
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-bottom: 20px; }
         .stat-card {
             position: relative; overflow: hidden;
@@ -189,7 +153,6 @@
         .stat-icon { width: 46px; height: 46px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 19px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); flex-shrink: 0; }
         .stat-info span { font-size: 11.5px; color: var(--muted); display: block; margin-bottom: 2px; }
         .stat-info h3 { font-size: 20px; font-weight: 800; background: linear-gradient(90deg,#fff,#cbd5e1); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-
         .panel-box {
             position: relative; background: linear-gradient(160deg, rgba(19,27,48,.82), rgba(11,17,33,.7));
             border: 1px solid var(--line-2); border-radius: 20px; padding: 20px;
@@ -197,14 +160,12 @@
             margin-bottom: 20px; animation: riseIn .4s ease both;
         }
         @keyframes riseIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-        
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
         .panel-title {
             font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 10px;
             background: linear-gradient(90deg, #7dd3fc, #a5b4fc); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
         }
         .panel-title i { -webkit-text-fill-color: #38bdf8; }
-
         .search-box { position: relative; flex: 1; max-width: 300px; min-width: 180px; }
         .search-box input {
             width: 100%; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.12);
@@ -212,7 +173,6 @@
         }
         .search-box input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(56,189,248,.15); }
         .search-box i { position: absolute; top: 11px; left: 12px; color: #94a3b8; font-size: 12px; }
-
         .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; }
         table { width: 100%; border-collapse: collapse; text-align: right; font-size: 12px; min-width: 600px; }
         th, td { padding: 12px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
@@ -223,20 +183,17 @@
         td { color: #d5deec; }
         tbody tr { transition: background .2s; }
         tbody tr:hover { background: linear-gradient(90deg, rgba(56,189,248,.08), transparent); }
-
         .badge-id {
             color: #38bdf8; font-weight: 700; font-family: 'Vazirmatn', monospace; cursor: pointer;
             padding: 4px 10px; background: rgba(56,189,248,.1); border-radius: 8px; border: 1px solid rgba(56,189,248,.25); font-size: 11px; transition: all .2s; display: inline-block;
         }
         .badge-id:hover { background: rgba(56,189,248,.22); box-shadow: 0 4px 14px -4px rgba(56,189,248,.6); }
-
         .btn-action { padding: 6px 12px; border-radius: 9px; cursor: pointer; font-size: 11px; font-weight: 700; border: none; display: inline-flex; align-items: center; gap: 5px; transition: all .22s cubic-bezier(.4,0,.2,1); }
         .btn-action:hover { transform: translateY(-1px); opacity: 1; }
         .btn-edit { background: rgba(56,189,248,.15); border: 1px solid rgba(56,189,248,.3); color: #38bdf8; }
         .btn-approve { background: rgba(34,197,94,.15); border: 1px solid rgba(34,197,94,.3); color: #22c55e; }
         .btn-reject { background: rgba(239,68,68,.15); border: 1px solid rgba(239,68,68,.3); color: #ef4444; }
         .btn-ban { background: rgba(220,38,38,.2); border: 1px solid rgba(220,38,38,.4); color: #f87171; }
-
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(3,6,14,.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(12px); padding: 16px; }
         .modal.show { display: flex; }
         .modal-content {
@@ -246,11 +203,9 @@
             animation: pop .32s cubic-bezier(.34,1.56,.64,1) both;
         }
         @keyframes pop { from { opacity: 0; transform: scale(.92) translateY(10px); } to { opacity: 1; transform: none; } }
-        
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; color: #38bdf8; font-weight: 700; font-size: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
         .modal-close { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 18px; transition: color .2s, transform .2s; padding: 4px; }
         .modal-close:hover { color: #fff; transform: rotate(90deg); }
-
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-size: 11px; color: #94a3b8; margin-bottom: 6px; }
         .form-group input, .form-group textarea, .form-group select {
@@ -259,40 +214,31 @@
         }
         .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(56,189,248,.14); }
         .form-group select option { background: #0f172a; color: #f8fafc; padding: 6px; }
-
         .btn-save { width: 100%; background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; border: none; padding: 12px; border-radius: 11px; font-weight: 700; cursor: pointer; margin-top: 10px; font-size: 12px; transition: all .25s; box-shadow: 0 10px 26px -10px rgba(2,132,199,.8); }
         .btn-save:hover { transform: translateY(-2px); filter: brightness(1.08); }
-
         .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.06); font-size: 11px; flex-wrap: wrap; gap: 6px; }
         .detail-row span:first-child { color: #94a3b8; }
         .detail-row span:last-child { color: #f8fafc; font-weight: 600; }
-
         #toast-notification {
             position: fixed; bottom: 20px; left: 20px; right: 20px; max-width: 400px; margin: 0 auto;
             background: #0f172a; border: 1px solid rgba(56,189,248,.4);
             color: #f8fafc; padding: 14px 20px; border-radius: 14px; box-shadow: 0 20px 50px -12px rgba(0,0,0,.9);
             z-index: 9999; display: flex; align-items: center; gap: 10px; transform: translateY(100px); opacity: 0; transition: all .3s ease; backdrop-filter: blur(10px);
         }
-
         .chat-container-layout { display: flex; gap: 16px; min-height: 520px; flex-wrap: wrap; }
         .chat-list-panel { width: 280px; background: rgba(10, 15, 30, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0; }
         .chat-main-panel { flex: 1; min-width: 280px; background: rgba(10, 15, 30, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; min-height: 380px; }
-
         .chat-item { padding: 10px; border-radius: 10px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); cursor: pointer; transition: all .2s; display: flex; flex-direction: column; gap: 4px; }
         .chat-item:hover, .chat-item.active { background: rgba(56,189,248,.15); border-color: rgba(56,189,248,.4); }
         .chat-item-header { display: flex; justify-content: space-between; align-items: center; }
         .chat-item-title { font-weight: 700; color: #f8fafc; font-size: 12px; }
         .chat-item-time { font-size: 10px; color: #64748b; }
         .chat-item-sub { font-size: 11px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
         .chat-msg-box { max-width: 85%; padding: 10px 14px; border-radius: 12px; font-size: 12px; line-height: 1.6; margin-bottom: 8px; word-break: break-word; }
         .chat-msg-box.admin { align-self: flex-start; background: rgba(56,189,248,.2); border: 1px solid rgba(56,189,248,.4); color: #f8fafc; border-top-right-radius: 2px; }
         .chat-msg-box.user { align-self: flex-end; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); color: #cbd5e1; border-top-left-radius: 2px; }
-
         .messaging-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-
         footer { text-align: center; padding: 20px; font-size: 11px; color: #64748b; border-top: 1px solid var(--line); margin-top: auto; }
-
         @media (max-width: 960px) {
             .app-shell { flex-direction: column; }
             .sidebar {
@@ -302,18 +248,8 @@
             }
             .sidebar .brand { flex-direction: row; justify-content: space-between; align-items: center; border-bottom: none; padding: 0 4px; margin-bottom: 0; }
             .sidebar .brand .admin-badge { display: none; }
-            .sidebar .admin-tabs {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 6px;
-                padding-bottom: 4px;
-                overflow: visible;
-            }
-            .sidebar .tab-btn {
-                width: 100%; font-size: 10.5px; padding: 8px 4px;
-                border-radius: 10px; justify-content: center; text-align: center;
-                gap: 5px; flex-direction: row; flex-wrap: wrap;
-            }
+            .sidebar .admin-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding-bottom: 4px; overflow: visible; }
+            .sidebar .tab-btn { width: 100%; font-size: 10.5px; padding: 8px 4px; border-radius: 10px; justify-content: center; text-align: center; gap: 5px; flex-direction: row; flex-wrap: wrap; }
             .sidebar .tab-btn i { width: auto; font-size: 13px; }
             .sidebar .btn-logout { display: none; }
             .mobile-logout-tab { display: flex !important; }
@@ -339,9 +275,6 @@
     </style>
 </head>
 <body>
-    <!-- Auth gate: keeps the admin UI hidden until the server-side
-         guard confirms the visitor is an admin. Prevents a regular
-         user from briefly seeing the dashboard before redirect. -->
     <div id="zenix-auth-gate" aria-live="polite">
         <div class="gate-inner">
             <i class="fas fa-shield-halved" aria-hidden="true"></i>
@@ -389,112 +322,49 @@
         </header>
 
         <div class="c">
-            <!-- Tab 0: Overview -->
             <div id="t-overview" class="tab-content active">
                 <div class="panel-box">
                     <div class="panel-title"><i class="fas fa-chart-pie"></i> خلاصه آمار و عملکرد پلتفرم Zenix</div>
                 </div>
                 <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background:rgba(56,189,248,.15);color:#38bdf8"><i class="fas fa-users"></i></div>
-                        <div class="stat-info"><span>کل کاربران</span><h3 id="st-users">0</h3></div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background:rgba(34,197,94,.15);color:#22c55e"><i class="fas fa-wallet"></i></div>
-                        <div class="stat-info"><span>موجودی کل کاربران</span><h3 id="st-bal">$0.00</h3></div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background:rgba(168,85,247,.15);color:#a855f7"><i class="fas fa-chart-line"></i></div>
-                        <div class="stat-info"><span>سود کل ادمین</span><h3 id="st-admin-profit">$0.00</h3></div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background:rgba(245,158,11,.15);color:#f59e0b"><i class="fas fa-clock"></i></div>
-                        <div class="stat-info"><span>درخواست‌های معلق</span><h3 id="st-req">0</h3></div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background:rgba(34,197,94,.15);color:#22c55e"><i class="fas fa-arrow-down"></i></div>
-                        <div class="stat-info"><span>واریزهای معلق</span><h3 id="st-d-req">0</h3></div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background:rgba(239,68,68,.15);color:#ef4444"><i class="fas fa-money-bill-transfer"></i></div>
-                        <div class="stat-info"><span>برداشت‌های معلق</span><h3 id="st-w-req">0</h3></div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background:rgba(16,185,129,.15);color:#10b981"><i class="fas fa-arrow-down-to-bracket"></i></div>
-                        <div class="stat-info"><span>واریزی کاربران</span><h3 id="st-user-deposits">$0.00</h3></div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background:rgba(99,102,241,.15);color:#6366f1"><i class="fas fa-coins"></i></div>
-                        <div class="stat-info"><span>سود کاربران</span><h3 id="st-user-profit">$0.00</h3></div>
-                    </div>
+                    <div class="stat-card"><div class="stat-icon" style="background:rgba(56,189,248,.15);color:#38bdf8"><i class="fas fa-users"></i></div><div class="stat-info"><span>کل کاربران</span><h3 id="st-users">0</h3></div></div>
+                    <div class="stat-card"><div class="stat-icon" style="background:rgba(34,197,94,.15);color:#22c55e"><i class="fas fa-wallet"></i></div><div class="stat-info"><span>موجودی کل کاربران</span><h3 id="st-bal">$0.00</h3></div></div>
+                    <div class="stat-card"><div class="stat-icon" style="background:rgba(168,85,247,.15);color:#a855f7"><i class="fas fa-chart-line"></i></div><div class="stat-info"><span>سود کل ادمین</span><h3 id="st-admin-profit">$0.00</h3></div></div>
+                    <div class="stat-card"><div class="stat-icon" style="background:rgba(245,158,11,.15);color:#f59e0b"><i class="fas fa-clock"></i></div><div class="stat-info"><span>درخواست‌های معلق</span><h3 id="st-req">0</h3></div></div>
+                    <div class="stat-card"><div class="stat-icon" style="background:rgba(34,197,94,.15);color:#22c55e"><i class="fas fa-arrow-down"></i></div><div class="stat-info"><span>واریزهای معلق</span><h3 id="st-d-req">0</h3></div></div>
+                    <div class="stat-card"><div class="stat-icon" style="background:rgba(239,68,68,.15);color:#ef4444"><i class="fas fa-money-bill-transfer"></i></div><div class="stat-info"><span>برداشت‌های معلق</span><h3 id="st-w-req">0</h3></div></div>
+                    <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,.15);color:#10b981"><i class="fas fa-arrow-down-to-bracket"></i></div><div class="stat-info"><span>واریزی کاربران</span><h3 id="st-user-deposits">$0.00</h3></div></div>
+                    <div class="stat-card"><div class="stat-icon" style="background:rgba(99,102,241,.15);color:#6366f1"><i class="fas fa-coins"></i></div><div class="stat-info"><span>سود کاربران</span><h3 id="st-user-profit">$0.00</h3></div></div>
                 </div>
             </div>
 
-            <!-- Tab Casino -->
             <div id="t-casino" class="tab-content">
-                <div class="panel-box">
-                    <div class="panel-title"><i class="fas fa-dice-roulette"></i> مدیریت و آمار کازینو آنلاین (رولت)</div>
-                </div>
+                <div class="panel-box"><div class="panel-title"><i class="fas fa-dice-roulette"></i> مدیریت و آمار کازینو آنلاین (رولت)</div></div>
                 <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background:rgba(56,189,248,.15);color:#38bdf8"><i class="fas fa-dice"></i></div>
-                        <div class="stat-info"><span>کل گردش شرط‌بندی‌ها</span><h3 id="st-casino-turnover">$0.00</h3></div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background:rgba(34,197,94,.15);color:#22c55e"><i class="fas fa-trophy"></i></div>
-                        <div class="stat-info"><span>کل جوایز پرداختی</span><h3 id="st-casino-payouts">$0.00</h3></div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background:rgba(245,158,11,.15);color:#f59e0b"><i class="fas fa-wallet"></i></div>
-                        <div class="stat-info"><span>مجموع موجودی بازی کاربران</span><h3 id="st-casino-balances">$0.00</h3></div>
-                    </div>
+                    <div class="stat-card"><div class="stat-icon" style="background:rgba(56,189,248,.15);color:#38bdf8"><i class="fas fa-dice"></i></div><div class="stat-info"><span>کل گردش شرط‌بندی‌ها</span><h3 id="st-casino-turnover">$0.00</h3></div></div>
+                    <div class="stat-card"><div class="stat-icon" style="background:rgba(34,197,94,.15);color:#22c55e"><i class="fas fa-trophy"></i></div><div class="stat-info"><span>کل جوایز پرداختی</span><h3 id="st-casino-payouts">$0.00</h3></div></div>
+                    <div class="stat-card"><div class="stat-icon" style="background:rgba(245,158,11,.15);color:#f59e0b"><i class="fas fa-wallet"></i></div><div class="stat-info"><span>مجموع موجودی بازی کاربران</span><h3 id="st-casino-balances">$0.00</h3></div></div>
                 </div>
-
                 <div class="panel-box">
-                    <div class="panel-header">
-                        <div class="panel-title"><i class="fas fa-list-check"></i> واریزی‌ها و شرط‌بندی‌های انجام شده در رولت</div>
-                    </div>
+                    <div class="panel-header"><div class="panel-title"><i class="fas fa-list-check"></i> واریزی‌ها و شرط‌بندی‌های انجام شده در رولت</div></div>
                     <div class="table-responsive">
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>شناسه کاربر</th>
-                                    <th>هدف شرط (خانه/رنگ/عدد)</th>
-                                    <th>مبلغ ژتون ($)</th>
-                                    <th>وضعیت</th>
-                                    <th>تاریخ و ساعت</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tb-casino-bets">
-                                <tr><td colspan="5" style="text-align:center; color:#94a3b8;">در حال بارگذاری...</td></tr>
-                            </tbody>
+                            <thead><tr><th>شناسه کاربر</th><th>هدف شرط (خانه/رنگ/عدد)</th><th>مبلغ ژتون ($)</th><th>وضعیت</th><th>تاریخ و ساعت</th></tr></thead>
+                            <tbody id="tb-casino-bets"><tr><td colspan="5" style="text-align:center; color:#94a3b8;">در حال بارگذاری...</td></tr></tbody>
                         </table>
                     </div>
                 </div>
-
                 <div class="panel-box">
-                    <div class="panel-header">
-                        <div class="panel-title"><i class="fas fa-users"></i> کاربران و موجودی بازی کازینو</div>
-                    </div>
+                    <div class="panel-header"><div class="panel-title"><i class="fas fa-users"></i> کاربران و موجودی بازی کازینو</div></div>
                     <div class="table-responsive">
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>شناسه کاربر</th>
-                                    <th>نام و نام خانوادگی</th>
-                                    <th>ایمیل</th>
-                                    <th>موجودی بازی کازینو ($)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tb-casino-users">
-                                <tr><td colspan="4" style="text-align:center; color:#94a3b8;">در حال بارگذاری...</td></tr>
-                            </tbody>
+                            <thead><tr><th>شناسه کاربر</th><th>نام و نام خانوادگی</th><th>ایمیل</th><th>موجودی بازی کازینو ($)</th></tr></thead>
+                            <tbody id="tb-casino-users"><tr><td colspan="4" style="text-align:center; color:#94a3b8;">در حال بارگذاری...</td></tr></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab 1: Active Users -->
             <div id="t-active" class="tab-content">
                 <div class="panel-box">
                     <div class="panel-header">
@@ -503,25 +373,13 @@
                     </div>
                     <div class="table-responsive">
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>شناسه</th>
-                                    <th>نام و نام خانوادگی</th>
-                                    <th>ایمیل</th>
-                                    <th>تلفن</th>
-                                    <th>موجودی</th>
-                                    <th>سود از پلتفرم</th>
-                                    <th>تاریخ ثبت‌نام</th>
-                                    <th>عملیات</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>شناسه</th><th>نام و نام خانوادگی</th><th>ایمیل</th><th>تلفن</th><th>موجودی</th><th>سود از پلتفرم</th><th>تاریخ ثبت‌نام</th><th>عملیات</th></tr></thead>
                             <tbody id="tb-act"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab 2: Pending Users -->
             <div id="t-pending" class="tab-content">
                 <div class="panel-box">
                     <div class="panel-header">
@@ -530,24 +388,13 @@
                     </div>
                     <div class="table-responsive">
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>شناسه</th>
-                                    <th>نام و نام خانوادگی</th>
-                                    <th>ایمیل فعلی</th>
-                                    <th>ایمیل جدید درخواستی</th>
-                                    <th>تلفن</th>
-                                    <th>موجودی</th>
-                                    <th>عملیات</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>شناسه</th><th>نام و نام خانوادگی</th><th>ایمیل فعلی</th><th>ایمیل جدید درخواستی</th><th>تلفن</th><th>موجودی</th><th>عملیات</th></tr></thead>
                             <tbody id="tb-pend"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab 3: Banned Users -->
             <div id="t-banned" class="tab-content">
                 <div class="panel-box">
                     <div class="panel-header">
@@ -556,60 +403,31 @@
                     </div>
                     <div class="table-responsive">
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>شناسه</th>
-                                    <th>نام و نام خانوادگی</th>
-                                    <th>ایمیل</th>
-                                    <th>تلفن</th>
-                                    <th>موجودی</th>
-                                    <th>سود از پلتفرم</th>
-                                    <th>عملیات</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>شناسه</th><th>نام و نام خانوادگی</th><th>ایمیل</th><th>تلفن</th><th>موجودی</th><th>سود از پلتفرم</th><th>عملیات</th></tr></thead>
                             <tbody id="tb-ban"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab 4: Deposits Requests -->
             <div id="t-deposit" class="tab-content">
                 <div class="panel-box">
                     <div class="panel-header"><div class="panel-title"><i class="fas fa-arrow-down"></i> مدیریت درخواست‌های واریز وجه</div></div>
                     <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>شناسه کاربر</th>
-                                    <th>تاریخ و ساعت</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tb-deposit"></tbody>
-                        </table>
+                        <table><thead><tr><th>شناسه کاربر</th><th>تاریخ و ساعت</th></tr></thead><tbody id="tb-deposit"></tbody></table>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab 5: Withdrawals Requests -->
             <div id="t-withdraw" class="tab-content">
                 <div class="panel-box">
                     <div class="panel-header"><div class="panel-title"><i class="fas fa-wallet"></i> مدیریت درخواست‌های برداشت وجه</div></div>
                     <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>شناسه کاربر</th>
-                                    <th>تاریخ و ساعت</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tb-withdraw"></tbody>
-                        </table>
+                        <table><thead><tr><th>شناسه کاربر</th><th>تاریخ و ساعت</th></tr></thead><tbody id="tb-withdraw"></tbody></table>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab 6: Requests Box -->
             <div id="t-reqs" class="tab-content">
                 <div class="panel-box">
                     <div class="panel-header"><div class="panel-title"><i class="fas fa-inbox"></i> صندوق درخواست‌ها</div></div>
@@ -617,29 +435,17 @@
                 </div>
             </div>
 
-            <!-- Tab 7: Support Chat -->
             <div id="t-chat" class="tab-content">
                 <div class="panel-box" style="padding: 16px;">
-                    <div class="panel-header" style="margin-bottom: 12px;">
-                        <div class="panel-title"><i class="fas fa-comments"></i> چت مستقیم با کاربران (پشتیبانی مدیریت)</div>
-                    </div>
+                    <div class="panel-header" style="margin-bottom: 12px;"><div class="panel-title"><i class="fas fa-comments"></i> چت مستقیم با کاربران (پشتیبانی مدیریت)</div></div>
                     <div class="chat-container-layout">
                         <div class="chat-list-panel">
-                            <div style="padding: 12px; background: rgba(30,41,59,0.5); border-bottom: 1px solid rgba(255,255,255,0.08); font-weight: bold; color: #38bdf8; font-size: 12px;">
-                                <i class="fas fa-list"></i> لیست چت‌های فعال
-                            </div>
-                            <div id="admin-chat-list" style="flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
-                                <div style="text-align:center; color:#64748b; margin-top:20px;">هیچ چتی ثبت نشده است.</div>
-                            </div>
+                            <div style="padding: 12px; background: rgba(30,41,59,0.5); border-bottom: 1px solid rgba(255,255,255,0.08); font-weight: bold; color: #38bdf8; font-size: 12px;"><i class="fas fa-list"></i> لیست چت‌های فعال</div>
+                            <div id="admin-chat-list" style="flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 6px;"><div style="text-align:center; color:#64748b; margin-top:20px;">هیچ چتی ثبت نشده است.</div></div>
                         </div>
-
                         <div class="chat-main-panel">
-                            <div id="admin-chat-header" style="padding: 12px 16px; background: rgba(30,41,59,0.5); border-bottom: 1px solid rgba(255,255,255,0.08); font-weight: bold; color: #f8fafc; font-size: 13px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-                                <span>یک کاربر را برای شروع گفتگو انتخاب کنید...</span>
-                            </div>
-                            <div id="admin-chat-messages" style="flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
-                                <div style="text-align: center; color: #64748b; margin-top: 80px;">لطفاً از لیست یک کاربر را انتخاب کنید.</div>
-                            </div>
+                            <div id="admin-chat-header" style="padding: 12px 16px; background: rgba(30,41,59,0.5); border-bottom: 1px solid rgba(255,255,255,0.08); font-weight: bold; color: #f8fafc; font-size: 13px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;"><span>یک کاربر را برای شروع گفتگو انتخاب کنید...</span></div>
+                            <div id="admin-chat-messages" style="flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px;"><div style="text-align: center; color: #64748b; margin-top: 80px;">لطفاً از لیست یک کاربر را انتخاب کنید.</div></div>
                             <form id="admin-chat-form" style="padding: 12px; border-top: 1px solid rgba(255,255,255,0.08); background: rgba(15,23,42,0.8); display: none; gap: 8px;">
                                 <input type="text" id="admin-chat-input" placeholder="پاسخ خود به کاربر را بنویسید..." style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 12px; outline: none;" required>
                                 <button type="submit" style="background: #38bdf8; color: #030712; border: none; border-radius: 8px; padding: 0 16px; font-weight: 700; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 6px;"><i class="fas fa-paper-plane"></i> ارسال</button>
@@ -649,7 +455,6 @@
                 </div>
             </div>
 
-            <!-- Tab 8: Messaging Center -->
             <div id="t-messages" class="tab-content">
                 <div class="messaging-grid">
                     <div class="panel-box" style="margin-bottom:0;">
@@ -660,7 +465,6 @@
                             <button type="submit" class="btn-save" style="background:linear-gradient(135deg,#0284c7,#0369a1)"><i class="fas fa-paper-plane"></i> ارسال به تمام کاربران</button>
                         </form>
                     </div>
-
                     <div class="panel-box" style="margin-bottom:0;">
                         <div class="panel-header"><div class="panel-title"><i class="fas fa-user-pen"></i> ارسال پیام تکی به یک کاربر</div></div>
                         <form id="f-single-msg">
@@ -672,15 +476,11 @@
                                 </div>
                                 <button type="button" onclick="clearSelectedUser()" style="background:rgba(239,68,68,.2); border:1px solid rgba(239,68,68,.4); color:#ef4444; border-radius:6px; padding:4px 8px; font-size:10px; cursor:pointer;"><i class="fas fa-times"></i> تغییر کاربر</button>
                             </div>
-
                             <div class="form-group" id="sm-uid-container">
                                 <label>جستجو و انتخاب کاربر</label>
                                 <input type="text" id="sm-search" placeholder="جستجو بر اساس نام، ایمیل یا شناسه..." style="margin-bottom:6px;">
-                                <select id="sm-uid" style="background:#0f172a; height: 100px;" size="4">
-                                    <option value="">ابتدا یک کاربر را از لیست جستجو انتخاب کنید...</option>
-                                </select>
+                                <select id="sm-uid" style="background:#0f172a; height: 100px;" size="4"><option value="">ابتدا یک کاربر را از لیست جستجو انتخاب کنید...</option></select>
                             </div>
-
                             <div class="form-group"><label>موضوع پیام</label><input type="text" id="sm-title" placeholder="موضوع..." required></div>
                             <div class="form-group"><label>متن پیام</label><textarea id="sm-msg" style="height:70px;resize:vertical;" placeholder="متن پیام..." required></textarea></div>
                             <button type="submit" class="btn-save" style="background:linear-gradient(135deg,#059669,#047857)"><i class="fas fa-paper-plane"></i> ارسال پیام به کاربر</button>
@@ -692,23 +492,8 @@
       </div>
     </div>
 
-    <!-- Modals -->
-    <div class="modal" id="m-details">
-        <div class="modal-content">
-            <div class="modal-header"><span>اطلاعات کامل کاربر</span><button class="modal-close" onclick="closeModal('m-details')"><i class="fas fa-times"></i></button></div>
-            <div id="user-details-body"></div>
-            <div id="modal-action-btn" style="margin-top:12px"></div>
-        </div>
-    </div>
-
-    <div class="modal" id="m-item-details">
-        <div class="modal-content">
-            <div class="modal-header"><span id="item-modal-title">جزئیات درخواست</span><button class="modal-close" onclick="closeModal('m-item-details')"><i class="fas fa-times"></i></button></div>
-            <div id="item-details-body"></div>
-            <div id="item-modal-actions" style="margin-top:16px; display:flex; gap:10px;"></div>
-        </div>
-    </div>
-
+    <div class="modal" id="m-details"><div class="modal-content"><div class="modal-header"><span>اطلاعات کامل کاربر</span><button class="modal-close" onclick="closeModal('m-details')"><i class="fas fa-times"></i></button></div><div id="user-details-body"></div><div id="modal-action-btn" style="margin-top:12px"></div></div></div>
+    <div class="modal" id="m-item-details"><div class="modal-content"><div class="modal-header"><span id="item-modal-title">جزئیات درخواست</span><button class="modal-close" onclick="closeModal('m-item-details')"><i class="fas fa-times"></i></button></div><div id="item-details-body"></div><div id="item-modal-actions" style="margin-top:16px; display:flex; gap:10px;"></div></div></div>
     <div class="modal" id="m-edit">
         <div class="modal-content">
             <div class="modal-header"><span>ویرایش مشخصات کاربر</span><button class="modal-close" onclick="closeModal('m-edit')"><i class="fas fa-times"></i></button></div>
@@ -739,25 +524,25 @@
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // ============================================================
-        // ADMIN AUTHENTICATION GUARD
+        // HTML ESCAPE HELPER — used to neutralise any HTML tag or
+        // attribute-breaking character that comes from user-controlled
+        // data (user names, emails, chat messages, request fields, etc.)
+        // before that data is placed into innerHTML.
         // ============================================================
-        // admin.html is published publicly on GitHub Pages. Without a check
-        // here, anyone could open this URL and read every user, change balances,
-        // read chats, or ban accounts. This guard runs before any other code
-        // so the admin UI never renders for an unauthorized visitor.
-        //
-        // The list of admins is NOT stored in this file. It lives in the
-        // Supabase `admins` table, protected by RLS. The `is_current_user_admin()`
-        // RPC returns a boolean. If it returns false, we redirect to index.html.
-        // This means no email address appears in this public source file.
+        function escapeHtml(value) {
+            return String(value == null ? '' : value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         async function guardAdminAccess() {
             try {
                 const { data: userData, error: userError } = await supabaseClient.auth.getUser();
                 const user = userData && userData.user;
-                if (userError || !user) {
-                    window.location.replace('index.html');
-                    return false;
-                }
+                if (userError || !user) { window.location.replace('index.html'); return false; }
                 const { data: isAdmin, error: rpcError } = await supabaseClient.rpc('is_current_user_admin');
                 if (rpcError || isAdmin !== true) {
                     try { await supabaseClient.auth.signOut(); } catch (_) {}
@@ -765,34 +550,15 @@
                     return false;
                 }
                 return true;
-            } catch (_) {
-                window.location.replace('index.html');
-                return false;
-            }
+            } catch (_) { window.location.replace('index.html'); return false; }
         }
 
-        // ============================================================
-        // NTFY TOPIC (loaded from Supabase, not hardcoded)
-        // ============================================================
-        // The public ntfy topic used to be a string in this file. Because
-        // this file is served publicly on GitHub Pages, that made the topic
-        // discoverable by anyone reading the source. The value now lives in
-        // the Supabase `app_settings` table with row-level security so only
-        // an authenticated admin can read it.
         let NTFY_TOPIC = null;
         async function loadNtfyTopic() {
             try {
-                const { data, error } = await supabaseClient
-                    .from('app_settings')
-                    .select('value')
-                    .eq('key', 'ntfy_topic')
-                    .maybeSingle();
-                if (!error && data && data.value) {
-                    NTFY_TOPIC = String(data.value).trim();
-                }
-            } catch (_) {
-                NTFY_TOPIC = null;
-            }
+                const { data, error } = await supabaseClient.from('app_settings').select('value').eq('key', 'ntfy_topic').maybeSingle();
+                if (!error && data && data.value) NTFY_TOPIC = String(data.value).trim();
+            } catch (_) { NTFY_TOPIC = null; }
         }
 
         let uMap = {};
@@ -808,39 +574,25 @@
             if (!userId) return '000000';
             let hash = 5381;
             let str = String(userId);
-            for (let i = 0; i < str.length; i++) {
-                hash = ((hash << 5) + hash) + str.charCodeAt(i);
-            }
+            for (let i = 0; i < str.length; i++) hash = ((hash << 5) + hash) + str.charCodeAt(i);
             return (Math.abs(hash % 900000) + 100000).toString();
         }
-
-        function getUserIdCode(uid) {
-            return 'SM-' + generateUIDDigits(uid);
-        }
+        function getUserIdCode(uid) { return 'SM-' + generateUIDDigits(uid); }
 
         let isMuted = localStorage.getItem('zenix_admin_muted') === 'true';
-
         function updateSoundUI() {
             const soundBtn = document.getElementById('toggle-sound-btn');
             const soundIcon = document.getElementById('sound-icon');
             const soundText = document.getElementById('sound-text');
             if(!soundBtn || !soundIcon || !soundText) return;
-
             if (isMuted) {
-                soundIcon.className = 'fas fa-volume-xmark';
-                soundIcon.style.color = '#ef4444';
-                soundText.innerText = 'بی‌صدا';
-                soundBtn.style.borderColor = 'rgba(239,68,68,.3)';
-                soundBtn.style.background = 'rgba(239,68,68,.1)';
+                soundIcon.className = 'fas fa-volume-xmark'; soundIcon.style.color = '#ef4444'; soundText.innerText = 'بی‌صدا';
+                soundBtn.style.borderColor = 'rgba(239,68,68,.3)'; soundBtn.style.background = 'rgba(239,68,68,.1)';
             } else {
-                soundIcon.className = 'fas fa-volume-high';
-                soundIcon.style.color = '#22c55e';
-                soundText.innerText = 'صدا فعال';
-                soundBtn.style.borderColor = 'rgba(34,197,94,.3)';
-                soundBtn.style.background = 'rgba(34,197,94,.1)';
+                soundIcon.className = 'fas fa-volume-high'; soundIcon.style.color = '#22c55e'; soundText.innerText = 'صدا فعال';
+                soundBtn.style.borderColor = 'rgba(34,197,94,.3)'; soundBtn.style.background = 'rgba(34,197,94,.1)';
             }
         }
-
         document.getElementById('toggle-sound-btn')?.addEventListener('click', () => {
             isMuted = !isMuted;
             localStorage.setItem('zenix_admin_muted', isMuted);
@@ -855,23 +607,16 @@
         }
         document.addEventListener('click', unlockAudio);
         document.addEventListener('touchstart', unlockAudio);
-
         function playAlertSound() {
             if (isMuted) return;
             try {
                 if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 if (audioCtx.state === 'suspended') audioCtx.resume();
                 const now = audioCtx.currentTime;
-                const osc1 = audioCtx.createOscillator();
-                const gain1 = audioCtx.createGain();
-                osc1.type = 'sine';
-                osc1.frequency.setValueAtTime(880, now);
-                gain1.gain.setValueAtTime(0.3, now);
-                gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-                osc1.connect(gain1);
-                gain1.connect(audioCtx.destination);
-                osc1.start(now);
-                osc1.stop(now + 0.25);
+                const osc1 = audioCtx.createOscillator(); const gain1 = audioCtx.createGain();
+                osc1.type = 'sine'; osc1.frequency.setValueAtTime(880, now);
+                gain1.gain.setValueAtTime(0.3, now); gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                osc1.connect(gain1); gain1.connect(audioCtx.destination); osc1.start(now); osc1.stop(now + 0.25);
             } catch (e) {}
         }
 
@@ -881,20 +626,15 @@
             if (!NTFY_TOPIC) return;
             try {
                 await fetch('https://ntfy.sh', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ topic: NTFY_TOPIC, title: titleText, message: messageText, priority: 5, tags: ['bell', 'warning'] })
                 });
             } catch (e) {}
         }
 
         document.getElementById('test-ntfy-btn')?.addEventListener('click', async () => {
-            unlockAudio();
-            playAlertSound();
-            if (!NTFY_TOPIC) {
-                showToast('تاپیک ntfy تنظیم نشده است (جدول app_settings را بررسی کنید).', 'error');
-                return;
-            }
+            unlockAudio(); playAlertSound();
+            if (!NTFY_TOPIC) { showToast('تاپیک ntfy تنظیم نشده است.', 'error'); return; }
             await sendNtfyAlert("🧪 تست آلارم Zenix", "این یک پیام تست برای بررسی زنگ خوردن گوشی است.");
             showToast("پیام تست به ntfy ارسال شد.");
         });
@@ -908,11 +648,8 @@
         };
 
         window.closeModal = id => document.getElementById(id).classList.remove('show');
+        document.querySelectorAll('.modal').forEach(m => { m.addEventListener('click', (e) => { if (e.target === m) closeModal(m.id); }); });
 
-        document.querySelectorAll('.modal').forEach(m => {
-            m.addEventListener('click', (e) => { if (e.target === m) closeModal(m.id); });
-        });
-        
         function showToast(text, type='success'){
             let t = document.getElementById('toast-notification');
             let icon = document.getElementById('toast-icon');
@@ -921,32 +658,24 @@
             icon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
             icon.style.color = type === 'success' ? '#22c55e' : '#ef4444';
             t.style.borderColor = type === 'success' ? 'rgba(34,197,94,.4)' : 'rgba(239,68,68,.4)';
-            t.style.transform = 'translateY(0)';
-            t.style.opacity = '1';
-            setTimeout(() => {
-                t.style.transform = 'translateY(100px)';
-                t.style.opacity = '0';
-            }, 3500);
+            t.style.transform = 'translateY(0)'; t.style.opacity = '1';
+            setTimeout(() => { t.style.transform = 'translateY(100px)'; t.style.opacity = '0'; }, 3500);
         }
 
         const getName = u => u.fullname || u.fullName || u.full_name || u.name || (u.firstName ? `${u.firstName} ${u.lastName||''}` : null) || (u.raw_user_meta_data?.fullname) || (u.user_metadata?.fullname) || u.email?.split('@')[0] || 'کاربر بدون نام';
-        
+
         const formatDate = ts => {
             if(!ts) return 'نامشخص';
             let d;
             if(typeof ts.toDate === 'function') d = ts.toDate();
-            else if(typeof ts === 'string') {
-                d = new Date(ts.replace(/at\s.*UTC.*/i, '').trim());
-                if(isNaN(d.getTime())) d = new Date(ts);
-            } else d = new Date(ts);
+            else if(typeof ts === 'string') { d = new Date(ts.replace(/at\s.*UTC.*/i, '').trim()); if(isNaN(d.getTime())) d = new Date(ts); }
+            else d = new Date(ts);
             return isNaN(d.getTime()) ? 'نامشخص' : `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} | ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
         };
 
         async function sendNotificationToUser(uid, title, message) {
             try {
-                await supabaseClient.from('notifications').insert([{
-                    user_id: uid, title: title, message: message, created_at: new Date().toISOString(), read: false
-                }]);
+                await supabaseClient.from('notifications').insert([{ user_id: uid, title: title, message: message, created_at: new Date().toISOString(), read: false }]);
             } catch (err) {}
         }
 
@@ -960,34 +689,17 @@
 
         async function initRealtimeDataListeners() {
             cleanupRealtimeChannels();
-
-            realtimeTxChannel = supabaseClient.channel('realtime_transactions_changes')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, () => loadData())
-                .subscribe();
-
-            realtimeUsersChannel = supabaseClient.channel('realtime_users_changes')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, () => { loadData(); loadCasinoData(); })
-                .subscribe();
-
-            realtimeBetsChannel = supabaseClient.channel('realtime_bets_changes')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'casino_bets' }, () => loadCasinoData())
-                .subscribe();
+            realtimeTxChannel = supabaseClient.channel('realtime_transactions_changes').on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, () => loadData()).subscribe();
+            realtimeUsersChannel = supabaseClient.channel('realtime_users_changes').on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, () => { loadData(); loadCasinoData(); }).subscribe();
+            realtimeBetsChannel = supabaseClient.channel('realtime_bets_changes').on('postgres_changes', { event: '*', schema: 'public', table: 'casino_bets' }, () => loadCasinoData()).subscribe();
         }
 
         async function loadCasinoData() {
             try {
                 let tbBets = document.getElementById('tb-casino-bets');
                 let tbUsers = document.getElementById('tb-casino-users');
-                
-                const { data: betsData, error: betsErr } = await supabaseClient
-                    .from('casino_bets')
-                    .select('*')
-                    .order('created_at', { ascending: false })
-                    .limit(50);
-
-                let totalTurnover = 0;
-                let totalPayouts = 0;
-
+                const { data: betsData, error: betsErr } = await supabaseClient.from('casino_bets').select('*').order('created_at', { ascending: false }).limit(50);
+                let totalTurnover = 0, totalPayouts = 0;
                 if (!betsErr && betsData) {
                     if (betsData.length === 0) {
                         tbBets.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#94a3b8;">هیچ شرط‌بندی در کازینو ثبت نشده است.</td></tr>`;
@@ -996,74 +708,51 @@
                         betsData.forEach(bet => {
                             let amt = Number(bet.amount || 0);
                             totalTurnover += amt;
-                            
-                            let stColor = '#f59e0b';
-                            let stText = 'در انتظار';
-                            if (bet.status === 'WON') {
-                                stColor = '#22c55e';
-                                stText = 'برنده';
-                                totalPayouts += amt * (bet.target.length <= 2 || !isNaN(bet.target) ? 36 : 2);
-                            } else if (bet.status === 'LOST') {
-                                stColor = '#ef4444';
-                                stText = 'بازنده';
-                            }
-
+                            let stColor = '#f59e0b', stText = 'در انتظار';
+                            if (bet.status === 'WON') { stColor = '#22c55e'; stText = 'برنده'; totalPayouts += amt * (bet.target.length <= 2 || !isNaN(bet.target) ? 36 : 2); }
+                            else if (bet.status === 'LOST') { stColor = '#ef4444'; stText = 'بازنده'; }
                             let idCode = getUserIdCode(bet.user_id);
                             betsHtml += `<tr>
-                                <td><span class="badge-id">${idCode}</span></td>
-                                <td><b>${bet.target}</b></td>
+                                <td><span class="badge-id">${escapeHtml(idCode)}</span></td>
+                                <td><b>${escapeHtml(bet.target)}</b></td>
                                 <td style="color:#38bdf8; font-weight:bold;">$${amt.toFixed(2)}</td>
                                 <td><span style="color:${stColor}; font-weight:bold;">${stText}</span></td>
-                                <td>${formatDate(bet.created_at)}</td>
+                                <td>${escapeHtml(formatDate(bet.created_at))}</td>
                             </tr>`;
                         });
                         tbBets.innerHTML = betsHtml;
                     }
                 }
-
-                let totalCasinoBal = 0;
-                let usersHtml = '';
-                let uKeys = Object.keys(uMap);
-
+                let totalCasinoBal = 0, usersHtml = '', uKeys = Object.keys(uMap);
                 if (uKeys.length === 0) {
                     const { data: supaUsers } = await supabaseClient.from('users').select('*');
                     if (supaUsers) {
                         supaUsers.forEach(u => {
-                            let uid = u.id || u.uid;
-                            let cBal = Number(u.casino_balance || 0);
-                            totalCasinoBal += cBal;
-                            let nameStr = getName(u);
+                            let uid = u.id || u.uid; let cBal = Number(u.casino_balance || 0); totalCasinoBal += cBal;
                             usersHtml += `<tr>
-                                <td><span class="badge-id">${getUserIdCode(uid)}</span></td>
-                                <td><b>${nameStr}</b></td>
-                                <td>${u.email || '-'}</td>
+                                <td><span class="badge-id">${escapeHtml(getUserIdCode(uid))}</span></td>
+                                <td><b>${escapeHtml(getName(u))}</b></td>
+                                <td>${escapeHtml(u.email || '-')}</td>
                                 <td style="color:#22c55e; font-weight:bold;">$${cBal.toFixed(2)}</td>
                             </tr>`;
                         });
                     }
                 } else {
                     uKeys.forEach(uid => {
-                        let u = uMap[uid];
-                        let cBal = Number(u.casino_balance || 0);
-                        totalCasinoBal += cBal;
+                        let u = uMap[uid]; let cBal = Number(u.casino_balance || 0); totalCasinoBal += cBal;
                         usersHtml += `<tr>
-                            <td><span class="badge-id">${getUserIdCode(uid)}</span></td>
-                            <td><b>${getName(u)}</b></td>
-                            <td>${u.email || '-'}</td>
+                            <td><span class="badge-id">${escapeHtml(getUserIdCode(uid))}</span></td>
+                            <td><b>${escapeHtml(getName(u))}</b></td>
+                            <td>${escapeHtml(u.email || '-')}</td>
                             <td style="color:#22c55e; font-weight:bold;">$${cBal.toFixed(2)}</td>
                         </tr>`;
                     });
                 }
-
                 if (tbUsers) tbUsers.innerHTML = usersHtml || `<tr><td colspan="4" style="text-align:center; color:#94a3b8;">کاربری یافت نشد.</td></tr>`;
-
                 document.getElementById('st-casino-turnover').innerText = '$' + totalTurnover.toLocaleString('en-US', {minimumFractionDigits:2});
                 document.getElementById('st-casino-payouts').innerText = '$' + totalPayouts.toLocaleString('en-US', {minimumFractionDigits:2});
                 document.getElementById('st-casino-balances').innerText = '$' + totalCasinoBal.toLocaleString('en-US', {minimumFractionDigits:2});
-
-            } catch (err) {
-                console.error("Error loading casino data:", err);
-            }
+            } catch (err) { console.error("Error loading casino data:", err); }
         }
 
         async function initSupportChatListener() {
@@ -1072,17 +761,13 @@
                     const { data: chats, error } = await supabaseClient.from('support_chats').select('*').order('updated_at', { ascending: false });
                     let listContainer = document.getElementById('admin-chat-list');
                     if(!listContainer) return;
-
                     if (error || !chats || chats.length === 0) {
                         listContainer.innerHTML = `<div style="text-align:center; color:#64748b; margin-top:20px;">هیچ چتی ثبت نشده است.</div>`;
                         let badge = document.getElementById('chat-badge');
                         if (badge) { badge.innerText = '0'; badge.className = 'tab-badge zero'; }
-                        prevChat = 0;
-                        return;
+                        prevChat = 0; return;
                     }
-
-                    let unreadCount = 0;
-                    let html = '';
+                    let unreadCount = 0, html = '';
                     chats.forEach(chat => {
                         let chatId = chat.id;
                         let userName = chat.user_name || chat.userName || chat.fullname || chat.user_email || 'کاربر';
@@ -1090,48 +775,53 @@
                         let isUnread = chat.unread_by_admin === true || chat.unreadByAdmin === true;
                         if (isUnread) unreadCount++;
                         let isActive = currentActiveChatId === chatId;
-
+                        // User-controlled fields are escaped; click uses data-attributes
+                        // instead of an inline onclick so nothing can break out of a
+                        // JS string context.
                         html += `
-                            <div class="chat-item ${isActive ? 'active' : ''}" onclick="openAdminChat('${chatId}', '${userName}', '${chat.user_email || ''}')">
+                            <div class="chat-item ${isActive ? 'active' : ''}"
+                                 data-chat-id="${escapeHtml(chatId)}"
+                                 data-user-name="${escapeHtml(userName)}"
+                                 data-user-email="${escapeHtml(chat.user_email || '')}">
                                 <div class="chat-item-header">
-                                    <span class="chat-item-title">${userName} ${isUnread ? '<span style="color:#ef4444; font-size:14px;">●</span>' : ''}</span>
-                                    <span class="chat-item-time">${formatDate(chat.updated_at || chat.created_at)}</span>
+                                    <span class="chat-item-title">${escapeHtml(userName)} ${isUnread ? '<span style="color:#ef4444; font-size:14px;">●</span>' : ''}</span>
+                                    <span class="chat-item-time">${escapeHtml(formatDate(chat.updated_at || chat.created_at))}</span>
                                 </div>
-                                <div class="chat-item-sub">${lastMsg}</div>
+                                <div class="chat-item-sub">${escapeHtml(lastMsg)}</div>
                             </div>
                         `;
                     });
-
                     listContainer.innerHTML = html;
+                    listContainer.querySelectorAll('.chat-item[data-chat-id]').forEach(el => {
+                        el.addEventListener('click', () => {
+                            window.openAdminChat(el.getAttribute('data-chat-id'), el.getAttribute('data-user-name'), el.getAttribute('data-user-email'));
+                        });
+                    });
                     let badge = document.getElementById('chat-badge');
                     if (badge) { badge.innerText = unreadCount; badge.className = unreadCount > 0 ? 'tab-badge' : 'tab-badge zero'; }
-
-                    if (prevChat !== -1 && unreadCount > prevChat) {
-                        playAlertSound();
-                        sendNtfyAlert("💬 پیام پشتیبانی جدید", "کاربری در بخش پشتیبانی پیام ارسال کرده است.");
-                    }
+                    if (prevChat !== -1 && unreadCount > prevChat) { playAlertSound(); sendNtfyAlert("💬 پیام پشتیبانی جدید", "کاربری در بخش پشتیبانی پیام ارسال کرده است."); }
                     prevChat = unreadCount;
                 } catch(err) {}
             }
-
             await fetchChats();
             if (chatChannel) supabaseClient.removeChannel(chatChannel);
-            chatChannel = supabaseClient.channel('realtime_support_chats')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'support_chats' }, () => fetchChats())
-                .subscribe();
+            chatChannel = supabaseClient.channel('realtime_support_chats').on('postgres_changes', { event: '*', schema: 'public', table: 'support_chats' }, () => fetchChats()).subscribe();
         }
 
         window.openAdminChat = async (chatId, userName, userEmail) => {
             currentActiveChatId = chatId;
-            document.getElementById('admin-chat-header').innerHTML = `
+            // Header uses escaped values. Delete button uses data attribute + listener.
+            const headerEl = document.getElementById('admin-chat-header');
+            headerEl.innerHTML = `
                 <div>
-                    <span><i class="fas fa-user-circle"></i> گفتگو با <strong>${userName}</strong></span>
-                    <span style="font-size:10px; color:#94a3b8; display:block;">${userEmail}</span>
+                    <span><i class="fas fa-user-circle"></i> گفتگو با <strong>${escapeHtml(userName)}</strong></span>
+                    <span style="font-size:10px; color:#94a3b8; display:block;">${escapeHtml(userEmail)}</span>
                 </div>
-                <button onclick="deleteAdminChat('${chatId}')" style="background:rgba(239,68,68,.15); border:1px solid rgba(239,68,68,.3); color:#ef4444; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:11px; font-weight:600; display:flex; align-items:center; gap:4px;">
+                <button type="button" class="chat-delete-btn" style="background:rgba(239,68,68,.15); border:1px solid rgba(239,68,68,.3); color:#ef4444; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:11px; font-weight:600; display:flex; align-items:center; gap:4px;">
                     <i class="fas fa-trash-alt"></i> بستن گفتگو
                 </button>
             `;
+            headerEl.querySelector('.chat-delete-btn')?.addEventListener('click', () => window.deleteAdminChat(chatId));
             document.getElementById('admin-chat-form').style.display = 'flex';
             await supabaseClient.from('support_chats').update({ unread_by_admin: false }).eq('id', chatId);
 
@@ -1146,10 +836,12 @@
                 let msgHtml = '';
                 messages.forEach(msg => {
                     let isAdmin = msg.sender === 'admin';
+                    // Both the label and the message text come from user or DB
+                    // storage and are escaped before being placed in innerHTML.
                     msgHtml += `
                         <div class="chat-msg-box ${isAdmin ? 'admin' : 'user'}">
-                            <div style="font-size:10px; opacity:0.7; margin-bottom:2px;">${isAdmin ? 'پشتیبان (شما)' : userName}</div>
-                            <div>${msg.text}</div>
+                            <div style="font-size:10px; opacity:0.7; margin-bottom:2px;">${isAdmin ? 'پشتیبان (شما)' : escapeHtml(userName)}</div>
+                            <div>${escapeHtml(msg.text)}</div>
                         </div>
                     `;
                 });
@@ -1158,9 +850,7 @@
             }
             await fetchMessages();
             if (messageChannel) supabaseClient.removeChannel(messageChannel);
-            messageChannel = supabaseClient.channel(`realtime_messages_${chatId}`)
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'support_messages', filter: `chat_id=eq.${chatId}` }, () => fetchMessages())
-                .subscribe();
+            messageChannel = supabaseClient.channel(`realtime_messages_${chatId}`).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'support_messages', filter: `chat_id=eq.${chatId}` }, () => fetchMessages()).subscribe();
         };
 
         window.deleteAdminChat = async (chatId) => {
@@ -1191,12 +881,12 @@
             let currentVal = smSelect.value;
             let html = '<option value="">انتخاب کاربر...</option>';
             let q = filter.toLowerCase();
-            
             for(let uid in uMap){
                 let u = uMap[uid];
                 let searchStr = `${getUserIdCode(uid)} ${getName(u)} ${u.email||''} ${u.phone||''}`.toLowerCase();
                 if(!q || searchStr.includes(q)){
-                    html += `<option value="${uid}">${getName(u)} (${getUserIdCode(uid)} - ${u.email||'-'})</option>`;
+                    // escapeHtml applied to every user-controlled label.
+                    html += `<option value="${escapeHtml(uid)}">${escapeHtml(getName(u))} (${escapeHtml(getUserIdCode(uid))} - ${escapeHtml(u.email || '-')})</option>`;
                 }
             }
             smSelect.innerHTML = html;
@@ -1206,62 +896,41 @@
         window.appEm = async (uid, newEmail) => {
             if (!confirm(`آیا از تایید تغییر ایمیل به ${newEmail} اطمینان دارید؟`)) return;
             try {
-                const { error } = await supabaseClient.from('users').update({
-                    email: newEmail,
-                    pending_email: null,
-                    pendingEmail: null,
-                    admin_approval_status: 'approved',
-                    adminApprovalStatus: 'approved'
-                }).eq('id', uid);
-
+                const { error } = await supabaseClient.from('users').update({ email: newEmail, pending_email: null, pendingEmail: null, admin_approval_status: 'approved', adminApprovalStatus: 'approved' }).eq('id', uid);
                 if (error) throw error;
                 await sendNotificationToUser(uid, 'تایید تغییر ایمیل', `درخواست تغییر ایمیل شما به ${newEmail} با موفقیت توسط ادمین تایید شد.`);
                 showToast('درخواست تغییر ایمیل تایید و اعمال شد.');
                 loadData();
-            } catch (e) {
-                showToast('خطا در تایید درخواست: ' + e.message, 'error');
-            }
+            } catch (e) { showToast('خطا در تایید درخواست: ' + e.message, 'error'); }
         };
 
         window.rejEm = async (uid) => {
             if (!confirm('آیا از رد درخواست تغییر ایمیل اطمینان دارید؟')) return;
             try {
-                const { error } = await supabaseClient.from('users').update({
-                    pending_email: null,
-                    pendingEmail: null,
-                    admin_approval_status: 'rejected',
-                    adminApprovalStatus: 'rejected'
-                }).eq('id', uid);
-
+                const { error } = await supabaseClient.from('users').update({ pending_email: null, pendingEmail: null, admin_approval_status: 'rejected', adminApprovalStatus: 'rejected' }).eq('id', uid);
                 if (error) throw error;
                 await sendNotificationToUser(uid, 'لغو درخواست تغییر ایمیل', 'درخواست تغییر ایمیل شما توسط ادمین رد شد.');
                 showToast('درخواست تغییر ایمیل رد شد.');
                 loadData();
-            } catch (e) {
-                showToast('خطا در رد درخواست: ' + e.message, 'error');
-            }
+            } catch (e) { showToast('خطا در رد درخواست: ' + e.message, 'error'); }
         };
 
         window.toggleBan = async (uid, banState) => {
             let actionText = banState ? 'لغو و مسدودسازی' : 'فعال‌سازی مجدد';
             if (!confirm(`آیا از ${actionText} این کاربر اطمینان دارید؟`)) return;
             try {
-                const { error } = await supabaseClient.from('users').update({
-                    status: banState ? 'cancelled' : 'active'
-                }).eq('id', uid);
-
+                const { error } = await supabaseClient.from('users').update({ status: banState ? 'cancelled' : 'active' }).eq('id', uid);
                 if (error) throw error;
                 showToast(`وضعیت کاربر به ${actionText} تغییر یافت.`);
                 loadData();
-            } catch (e) {
-                showToast('خطا در تغییر وضعیت کاربر: ' + e.message, 'error');
-            }
+            } catch (e) { showToast('خطا در تغییر وضعیت کاربر: ' + e.message, 'error'); }
         };
 
         window.selectUserForMessage = uid => {
             let u = uMap[uid];
             if(!u) return;
-            document.getElementById('sel-user-name').innerText = `${getName(u)} (${getUserIdCode(uid)} - ${u.email || '-'})`;
+            // Uses textContent (not innerHTML) so this line was already safe.
+            document.getElementById('sel-user-name').textContent = `${getName(u)} (${getUserIdCode(uid)} - ${u.email || '-'})`;
             document.getElementById('selected-user-card').style.display = 'flex';
             document.getElementById('sm-uid-container').style.display = 'none';
             document.getElementById('target-uid-hidden').value = uid;
@@ -1276,10 +945,7 @@
 
         async function loadData(){
             try {
-                let adminProfitTotal = 0;
-                let totUserDeposits = 0;
-                let totUserProfit = 0;
-
+                let adminProfitTotal = 0, totUserDeposits = 0, totUserProfit = 0;
                 const { data: statsData } = await supabaseClient.from('system_stats').select('total_admin_profit').maybeSingle();
                 if (statsData) adminProfitTotal = Number(statsData.total_admin_profit || 0);
 
@@ -1290,8 +956,7 @@
                         let uid = u.id || u.uid;
                         let meta = u.raw_user_meta_data || u.user_metadata || {};
                         uMap[uid] = {
-                            ...u,
-                            id: uid,
+                            ...u, id: uid,
                             fullname: u.fullname || meta.fullname || u.email?.split('@')[0] || 'کاربر',
                             email: u.email || meta.email || '',
                             phone: u.phone || meta.phone || '-',
@@ -1304,33 +969,19 @@
                     });
                 }
 
-                let depositList = [];
-                let seenDepositKeys = new Set();
+                let depositList = [], seenDepositKeys = new Set();
                 const { data: txData } = await supabaseClient.from('transactions').select('*');
-
                 if (txData) {
                     txData.forEach(tx => {
                         let st = String(tx.status || '').toLowerCase();
                         let typeStr = String(tx.type || tx.title || '').toLowerCase();
                         let isDeposit = typeStr.includes('deposit') || typeStr.includes('واریز') || typeStr.includes('charge');
-
                         if (st === 'success' && isDeposit) totUserDeposits += Number(tx.amount || 0);
-
                         if (st === 'pending' && isDeposit) {
                             let uid = tx.user_id || 'unknown';
-                            if (!uMap[uid]) {
-                                uMap[uid] = { id: uid, fullname: `کاربر`, email: '-', phone: '-', balance: 0, platformProfit: 0, casino_balance: 0, createdAt: new Date().toISOString() };
-                            }
+                            if (!uMap[uid]) uMap[uid] = { id: uid, fullname: `کاربر`, email: '-', phone: '-', balance: 0, platformProfit: 0, casino_balance: 0, createdAt: new Date().toISOString() };
                             let rawAmt = tx.amount ? (Number(tx.amount) / 1.025) : 0;
-                            let txObj = {
-                                txId: tx.id,
-                                rawAmount: rawAmt,
-                                amount: Number(tx.amount || 0),
-                                network: tx.network || 'TRC20',
-                                txHash: tx.tx_hash || '-',
-                                status: 'pending',
-                                createdAt: tx.created_at
-                            };
+                            let txObj = { txId: tx.id, rawAmount: rawAmt, amount: Number(tx.amount || 0), network: tx.network || 'TRC20', txHash: tx.tx_hash || '-', status: 'pending', createdAt: tx.created_at };
                             let key = tx.id ? `tx_${tx.id}` : `hash_${txObj.txHash}`;
                             if (!seenDepositKeys.has(key)) {
                                 seenDepositKeys.add(key);
@@ -1341,81 +992,72 @@
                 }
 
                 let tbAct = document.getElementById('tb-act'), tbPend = document.getElementById('tb-pend'), tbBan = document.getElementById('tb-ban'), tbW = document.getElementById('tb-withdraw');
-                if(tbAct) tbAct.innerHTML = ""; 
-                if(tbPend) tbPend.innerHTML = ""; 
-                if(tbBan) tbBan.innerHTML = ""; 
-                if(tbW) tbW.innerHTML = "";
+                if(tbAct) tbAct.innerHTML = ""; if(tbPend) tbPend.innerHTML = ""; if(tbBan) tbBan.innerHTML = ""; if(tbW) tbW.innerHTML = "";
 
                 let totU = 0, totB = 0, totR = 0, totW = 0, totD = depositList.length, reqList = [], withdrawList = [];
                 let cAct = 0, cPend = 0, cBan = 0;
 
                 Object.keys(uMap).forEach(uid => {
                     let u = uMap[uid];
-                    totU++; 
-                    totB += Number(u.balance || 0);
-                    totUserProfit += Number(u.platformProfit || 0);
-
+                    totU++; totB += Number(u.balance || 0); totUserProfit += Number(u.platformProfit || 0);
                     let idCode = getUserIdCode(uid);
                     let nameStr = getName(u);
                     let emailStr = u.email || '-';
                     let phoneStr = u.phone || '-';
                     let regStr = formatDate(u.createdAt);
                     let search = `${idCode} ${nameStr} ${emailStr} ${phoneStr} ${regStr}`.toLowerCase();
-
                     let isBanned = (u.status === 'cancelled' || u.status === 'banned' || u.isBanned === true);
                     let hasPend = (u.pending_email || u.pendingEmail || u.admin_approval_status === 'pending' || u.adminApprovalStatus === 'pending');
                     let requestedEmail = u.pending_email || u.pendingEmail || u.newEmail || '-';
 
                     if (u.pendingWithdrawal && String(u.pendingWithdrawal.status || 'pending').toLowerCase() === 'pending') {
-                        totW++;
-                        withdrawList.push({ uid, u, idCode, nameStr, data: u.pendingWithdrawal });
+                        totW++; withdrawList.push({ uid, u, idCode, nameStr, data: u.pendingWithdrawal });
                     }
-
                     let balStr = `$${Number(u.balance||0).toLocaleString()}`;
                     let profitStr = `$${Number(u.platformProfit||0).toLocaleString()}`;
 
+                    // Every user-controlled value below is escaped. The id-based
+                    // buttons also use escaped uid so the inline onclick cannot
+                    // be broken out of by a malicious uid.
                     if(isBanned){
                         cBan++;
-                        let rowHtml = `<tr data-s="${search}">
-                            <td><span class="badge-id" onclick="openDetails('${uid}')">${idCode}</span></td>
-                            <td><b>${nameStr}</b></td>
-                            <td>${emailStr}</td>
-                            <td dir="ltr" style="text-align:right">${phoneStr}</td>
-                            <td style="color:#22c55e;font-weight:bold">${balStr}</td>
-                            <td style="color:#38bdf8;font-weight:bold">${profitStr}</td>
-                            <td><button class="btn-action btn-approve" onclick="toggleBan('${uid}',false)"><i class="fas fa-undo"></i> فعال‌‌سازی</button></td></tr>`;
-                        if(tbBan) tbBan.innerHTML += rowHtml;
+                        if(tbBan) tbBan.innerHTML += `<tr data-s="${escapeHtml(search)}">
+                            <td><span class="badge-id" data-open-details="${escapeHtml(uid)}">${escapeHtml(idCode)}</span></td>
+                            <td><b>${escapeHtml(nameStr)}</b></td>
+                            <td>${escapeHtml(emailStr)}</td>
+                            <td dir="ltr" style="text-align:right">${escapeHtml(phoneStr)}</td>
+                            <td style="color:#22c55e;font-weight:bold">${escapeHtml(balStr)}</td>
+                            <td style="color:#38bdf8;font-weight:bold">${escapeHtml(profitStr)}</td>
+                            <td><button class="btn-action btn-approve" data-toggle-ban="${escapeHtml(uid)}" data-ban-state="false"><i class="fas fa-undo"></i> فعال‌‌سازی</button></td></tr>`;
                     }else if(hasPend){
                         cPend++; totR++;
                         reqList.push({uid, u, requestedEmail, time: u.request_timestamp||u.requestTimestamp||u.createdAt});
-                        let rowHtml = `<tr data-s="${search}">
-                            <td><span class="badge-id" onclick="openDetails('${uid}')">${idCode}</span></td>
-                            <td><b>${nameStr}</b></td>
-                            <td>${emailStr}</td>
-                            <td style="color:#fbbf24;font-weight:bold">${requestedEmail}</td>
-                            <td dir="ltr" style="text-align:right">${phoneStr}</td>
-                            <td style="color:#22c55e;font-weight:bold">${balStr}</td>
+                        if(tbPend) tbPend.innerHTML += `<tr data-s="${escapeHtml(search)}">
+                            <td><span class="badge-id" data-open-details="${escapeHtml(uid)}">${escapeHtml(idCode)}</span></td>
+                            <td><b>${escapeHtml(nameStr)}</b></td>
+                            <td>${escapeHtml(emailStr)}</td>
+                            <td style="color:#fbbf24;font-weight:bold">${escapeHtml(requestedEmail)}</td>
+                            <td dir="ltr" style="text-align:right">${escapeHtml(phoneStr)}</td>
+                            <td style="color:#22c55e;font-weight:bold">${escapeHtml(balStr)}</td>
                             <td>
-                                <button class="btn-action btn-approve" onclick="appEm('${uid}','${requestedEmail}')">تایید</button>
-                                <button class="btn-action btn-reject" onclick="rejEm('${uid}')">رد</button>
+                                <button class="btn-action btn-approve" data-approve-email="${escapeHtml(uid)}" data-new-email="${escapeHtml(requestedEmail)}">تایید</button>
+                                <button class="btn-action btn-reject" data-reject-email="${escapeHtml(uid)}">رد</button>
                             </td></tr>`;
-                        if(tbPend) tbPend.innerHTML += rowHtml;
                     }else{
                         cAct++;
-                        let rowHtml = `<tr data-s="${search}">
-                            <td><span class="badge-id" onclick="openDetails('${uid}')">${idCode}</span></td>
-                            <td><b>${nameStr}</b></td>
-                            <td>${emailStr}</td>
-                            <td dir="ltr" style="text-align:right">${phoneStr}</td>
-                            <td style="color:#22c55e;font-weight:bold">${balStr}</td>
-                            <td style="color:#38bdf8;font-weight:bold">${profitStr}</td>
-                            <td>${regStr}</td>
-                            <td><button class="btn-action btn-ban" onclick="toggleBan('${uid}',true)">لغو کاربر</button></td></tr>`;
-                        if(tbAct) tbAct.innerHTML += rowHtml;
+                        if(tbAct) tbAct.innerHTML += `<tr data-s="${escapeHtml(search)}">
+                            <td><span class="badge-id" data-open-details="${escapeHtml(uid)}">${escapeHtml(idCode)}</span></td>
+                            <td><b>${escapeHtml(nameStr)}</b></td>
+                            <td>${escapeHtml(emailStr)}</td>
+                            <td dir="ltr" style="text-align:right">${escapeHtml(phoneStr)}</td>
+                            <td style="color:#22c55e;font-weight:bold">${escapeHtml(balStr)}</td>
+                            <td style="color:#38bdf8;font-weight:bold">${escapeHtml(profitStr)}</td>
+                            <td>${escapeHtml(regStr)}</td>
+                            <td><button class="btn-action btn-ban" data-toggle-ban="${escapeHtml(uid)}" data-ban-state="true">لغو کاربر</button></td></tr>`;
                     }
                 });
 
-                // رندر کردن باکس درخواست‌ها
+                // Request cards (email change). Every user value escaped.
                 let reqContainer = document.getElementById('req-container');
                 if (reqContainer) {
                     if (reqList.length === 0) {
@@ -1427,18 +1069,18 @@
                                 <div style="background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                                     <div>
                                         <div style="font-weight:bold; color:#38bdf8; font-size:13px; margin-bottom:4px;">
-                                            <i class="fas fa-envelope"></i> درخواست تغییر ایمیل (${getUserIdCode(item.uid)})
+                                            <i class="fas fa-envelope"></i> درخواست تغییر ایمیل (${escapeHtml(getUserIdCode(item.uid))})
                                         </div>
                                         <div style="color:#cbd5e1; font-size:12px;">
-                                            نام: <b>${getName(item.u)}</b> | ایمیل جدید: <b style="color:#fbbf24">${item.requestedEmail}</b>
+                                            نام: <b>${escapeHtml(getName(item.u))}</b> | ایمیل جدید: <b style="color:#fbbf24">${escapeHtml(item.requestedEmail)}</b>
                                         </div>
                                         <div style="color:#64748b; font-size:10px; margin-top:4px;">
-                                            زمان ثبت: ${formatDate(item.time)}
+                                            زمان ثبت: ${escapeHtml(formatDate(item.time))}
                                         </div>
                                     </div>
                                     <div style="display:flex; gap:8px;">
-                                        <button class="btn-action btn-approve" onclick="appEm('${item.uid}','${item.requestedEmail}')"><i class="fas fa-check"></i> تایید درخواست</button>
-                                        <button class="btn-action btn-reject" onclick="rejEm('${item.uid}')"><i class="fas fa-times"></i> رد درخواست</button>
+                                        <button class="btn-action btn-approve" data-approve-email="${escapeHtml(item.uid)}" data-new-email="${escapeHtml(item.requestedEmail)}"><i class="fas fa-check"></i> تایید درخواست</button>
+                                        <button class="btn-action btn-reject" data-reject-email="${escapeHtml(item.uid)}"><i class="fas fa-times"></i> رد درخواست</button>
                                     </div>
                                 </div>
                             `;
@@ -1446,6 +1088,22 @@
                         reqContainer.innerHTML = reqHtml;
                     }
                 }
+
+                // Event delegation for all data-driven buttons in the panels we
+                // just rebuilt. This keeps user data out of inline onclick
+                // attributes entirely.
+                document.querySelectorAll('[data-open-details]').forEach(el => {
+                    el.addEventListener('click', () => window.openDetails(el.getAttribute('data-open-details')));
+                });
+                document.querySelectorAll('[data-toggle-ban]').forEach(el => {
+                    el.addEventListener('click', () => window.toggleBan(el.getAttribute('data-toggle-ban'), el.getAttribute('data-ban-state') === 'true'));
+                });
+                document.querySelectorAll('[data-approve-email]').forEach(el => {
+                    el.addEventListener('click', () => window.appEm(el.getAttribute('data-approve-email'), el.getAttribute('data-new-email')));
+                });
+                document.querySelectorAll('[data-reject-email]').forEach(el => {
+                    el.addEventListener('click', () => window.rejEm(el.getAttribute('data-reject-email')));
+                });
 
                 updateSelectOptions(document.getElementById('sm-search')?.value || '');
 
@@ -1463,10 +1121,7 @@
                     if (totD > prevD) alertsList.push("واریز وجه");
                     if (totW > prevW) alertsList.push("برداشت وجه");
                     if (totR > prevR) alertsList.push("احراز هویت / تغییر ایمیل");
-                    if (alertsList.length > 0) {
-                        playAlertSound();
-                        sendNtfyAlert("🔔 درخواست جدید در پنل Zenix", `نوع درخواست: ${alertsList.join("، ")}`);
-                    }
+                    if (alertsList.length > 0) { playAlertSound(); sendNtfyAlert("🔔 درخواست جدید در پنل Zenix", `نوع درخواست: ${alertsList.join("، ")}`); }
                 }
                 prevD = totD; prevW = totW; prevR = totR;
 
@@ -1480,14 +1135,26 @@
                 window.currentDepositList = depositList;
                 let tbDep = document.getElementById('tb-deposit');
                 if(tbDep) {
-                    tbDep.innerHTML = depositList.length === 0 ? `<tr><td colspan="2" style="text-align:center;padding:20px;color:#94a3b8">هیچ درخواست واریزی وجود ندارد.</td></tr>` : 
-                    depositList.map((i, idx) => `<tr><td><span class="badge-id" onclick="openDepositDetails('${i.uid}', '${i.txId}', ${idx})">${i.idCode}</span></td><td>${formatDate(i.data.createdAt)}</td></tr>`).join('');
+                    tbDep.innerHTML = depositList.length === 0
+                        ? `<tr><td colspan="2" style="text-align:center;padding:20px;color:#94a3b8">هیچ درخواست واریزی وجود ندارد.</td></tr>`
+                        : depositList.map((i, idx) => `<tr><td><span class="badge-id" data-open-deposit="${escapeHtml(i.txId)}" data-deposit-index="${idx}">${escapeHtml(i.idCode)}</span></td><td>${escapeHtml(formatDate(i.data.createdAt))}</td></tr>`).join('');
+                    tbDep.querySelectorAll('[data-open-deposit]').forEach(el => {
+                        el.addEventListener('click', () => {
+                            const idx = Number(el.getAttribute('data-deposit-index'));
+                            const uid = depositList[idx]?.uid || '';
+                            window.openDepositDetails(uid, el.getAttribute('data-open-deposit'), idx);
+                        });
+                    });
                 }
 
                 let tbWd = document.getElementById('tb-withdraw');
                 if(tbWd) {
-                    tbWd.innerHTML = withdrawList.length === 0 ? `<tr><td colspan="2" style="text-align:center;padding:20px;color:#94a3b8">هیچ درخواست برداشتی وجود ندارد.</td></tr>` : 
-                    withdrawList.map(i => `<tr><td><span class="badge-id" onclick="openWithdrawDetails('${i.uid}')">${i.idCode}</span></td><td>${formatDate(i.data.createdAt)}</td></tr>`).join('');
+                    tbWd.innerHTML = withdrawList.length === 0
+                        ? `<tr><td colspan="2" style="text-align:center;padding:20px;color:#94a3b8">هیچ درخواست برداشتی وجود ندارد.</td></tr>`
+                        : withdrawList.map((i, idx) => `<tr><td><span class="badge-id" data-open-withdraw="${escapeHtml(i.uid)}">${escapeHtml(i.idCode)}</span></td><td>${escapeHtml(formatDate(i.data.createdAt))}</td></tr>`).join('');
+                    tbWd.querySelectorAll('[data-open-withdraw]').forEach(el => {
+                        el.addEventListener('click', () => window.openWithdrawDetails(el.getAttribute('data-open-withdraw')));
+                    });
                 }
             } catch(err) {}
         }
@@ -1495,14 +1162,17 @@
         window.openDetails = uid => {
             let u = uMap[uid];
             if (!u) return;
+            // All values here come from the users table and are escaped.
             document.getElementById('user-details-body').innerHTML = `
-                <div class="detail-row"><span>شناسه:</span><span>${getUserIdCode(uid)}</span></div>
-                <div class="detail-row"><span>نام:</span><span>${getName(u)}</span></div>
-                <div class="detail-row"><span>ایمیل:</span><span>${u.email||'-'}</span></div>
+                <div class="detail-row"><span>شناسه:</span><span>${escapeHtml(getUserIdCode(uid))}</span></div>
+                <div class="detail-row"><span>نام:</span><span>${escapeHtml(getName(u))}</span></div>
+                <div class="detail-row"><span>ایمیل:</span><span>${escapeHtml(u.email||'-')}</span></div>
                 <div class="detail-row"><span>موجودی اصلی:</span><span>$${Number(u.balance||0).toLocaleString()}</span></div>
                 <div class="detail-row"><span>موجودی کازینو:</span><span>$${Number(u.casino_balance||0).toLocaleString()}</span></div>
             `;
-            document.getElementById('modal-action-btn').innerHTML = `<button class="btn-action btn-edit" style="width:100%;justify-content:center;padding:8px" onclick="closeModal('m-details');openE('${uid}')"><i class="fas fa-edit"></i> ویرایش مشخصات</button>`;
+            const btnWrap = document.getElementById('modal-action-btn');
+            btnWrap.innerHTML = `<button class="btn-action btn-edit" style="width:100%;justify-content:center;padding:8px"><i class="fas fa-edit"></i> ویرایش مشخصات</button>`;
+            btnWrap.querySelector('button').addEventListener('click', () => { closeModal('m-details'); window.openE(uid); });
             document.getElementById('m-details').classList.add('show');
         };
 
@@ -1536,12 +1206,6 @@
         document.getElementById('logout-btn')?.addEventListener('click', async () => { await supabaseClient.auth.signOut(); window.location.href = 'login.html'; });
         document.getElementById('mobile-logout-btn')?.addEventListener('click', async () => { await supabaseClient.auth.signOut(); window.location.href = 'login.html'; });
 
-        // ============================================================
-        // BOOTSTRAP: guard first, then reveal admin UI, then load data.
-        // The body stays hidden (see the first <style> block) until the
-        // guard confirms admin access. This prevents the brief flash of
-        // the admin dashboard for unauthorized visitors.
-        // ============================================================
         (async () => {
             const ok = await guardAdminAccess();
             if (!ok) return;
