@@ -158,13 +158,13 @@
 
     <script>
         function safeGetItem(key) {
-            try { return localStorage.getItem(key); } catch(e) { return null; }
+            try { return localStorage.getItem(key); } catch(e) { console.warn('safeGetItem failed:', key, e); return null; }
         }
         function safeSetItem(key, val) {
-            try { localStorage.setItem(key, val); } catch(e) {}
+            try { localStorage.setItem(key, val); } catch(e) { console.warn('safeSetItem failed:', key, e); }
         }
         function safeRemoveItem(key) {
-            try { localStorage.removeItem(key); } catch(e) {}
+            try { localStorage.removeItem(key); } catch(e) { console.warn('safeRemoveItem failed:', key, e); }
         }
 
         const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
@@ -257,6 +257,7 @@
                     read: dt.read === true || dt.is_read === true
                 }));
             } catch (e) {
+                console.warn('fetchUserMessages failed:', e);
                 return [];
             }
         }
@@ -296,7 +297,7 @@
             if (currentUserId && m.id) {
                 try {
                     await supabaseClient.from('notifications').update({ read: true, is_read: true }).eq('id', m.id);
-                } catch(e) {}
+                } catch(e) { console.warn('mark message read failed:', e); }
             }
             let unread = allMessages.filter(i => !i.read).length, b = document.getElementById('bell-badge');
             if (b) { b.textContent = unread; b.classList.toggle('show', unread > 0); }
@@ -319,285 +320,4 @@
         window.openAboutModal = () => document.getElementById('m-about')?.classList.add('show');
 
         window.showUserModal = function(username, email) {
-            document.getElementById('modal-username').textContent = username || '-';
-            document.getElementById('modal-email').textContent = email || '-';
-            document.getElementById('m-user-detail')?.classList.add('show');
-        };
-
-        document.getElementById('bell-btn')?.addEventListener('click', e => { e.stopPropagation(); window.openMessageModal(); });
-
-        const mBtn = document.getElementById('menu-btn'), nMenu = document.getElementById('nav-menu'), lBtn = document.getElementById('lang-btn'), lMenu = document.getElementById('lang-menu');
-        function toggleM(m, e) { e?.stopPropagation(); [nMenu, lMenu].forEach(x => { if (x && x !== m) x.classList.remove('show'); }); m?.classList.toggle('show'); }
-        mBtn?.addEventListener('click', e => toggleM(nMenu, e));
-        lBtn?.addEventListener('click', e => toggleM(lMenu, e));
-        document.addEventListener('click', e => {
-            if (!e.target.closest('.menu') && !e.target.closest('#menu-btn') && !e.target.closest('#lang-btn')) {
-                [nMenu, lMenu].forEach(x => x?.classList.remove('show'));
-            }
-        });
-
-        function formatDate(dateStr) {
-            if (!dateStr) return '-';
-            try {
-                let d = new Date(dateStr);
-                if (isNaN(d.getTime())) return dateStr;
-                return d.toLocaleDateString(currLang === 'fa' ? 'fa-IR' : 'en-US');
-            } catch(e) {
-                return dateStr;
-            }
-        }
-
-        async function loadTeamMembers(uid, sessionUser) {
-            const listElem = document.getElementById('team-members-list');
-            const t = ld[currLang] || ld.fa;
-
-            try {
-                let codeDigits = generateUIDDigits(uid);
-                let myRefCode = 'MS-' + codeDigits;
-
-                try {
-                    const { data: myProfile } = await supabaseClient
-                        .from('profiles')
-                        .select('referral_code')
-                        .eq('id', uid)
-                        .maybeSingle();
-
-                    if (myProfile && myProfile.referral_code) {
-                        myRefCode = myProfile.referral_code;
-                    }
-                } catch(e) {}
-
-                let rawList = [];
-
-                try {
-                    const { data: dbProfiles } = await supabaseClient.from('profiles').select('*');
-                    if (dbProfiles && Array.isArray(dbProfiles)) {
-                        rawList.push(...dbProfiles);
-                    }
-                } catch(e) {}
-
-                if (sessionUser && sessionUser.user_metadata) {
-                    let metaTeam = sessionUser.user_metadata.team_members || sessionUser.user_metadata.referrals || sessionUser.user_metadata.invited_users;
-                    if (Array.isArray(metaTeam)) rawList.push(...metaTeam);
-                }
-
-                ['zenix_registered_users', 'zenix_users', 'zenix_referrals', 'zenix_team_' + uid, 'zenix_all_users'].forEach(k => {
-                    let item = safeGetItem(k);
-                    if (item) {
-                        try {
-                            let parsed = JSON.parse(item);
-                            if (Array.isArray(parsed)) rawList.push(...parsed);
-                            else if (parsed && typeof parsed === 'object') rawList.push(parsed);
-                        } catch(e) {}
-                    }
-                });
-
-                let uniqueMap = new Map();
-                rawList.forEach(u => {
-                    if (u) {
-                        let key = u.user_id || u.id || u.email || u.username || JSON.stringify(u);
-                        uniqueMap.set(key, u);
-                    }
-                });
-                let allProfiles = Array.from(uniqueMap.values());
-
-                function isReferredBy(u, refUid, refCodeVal) {
-                    if (!u) return false;
-                    let uUid = u.user_id || u.id;
-                    if (uUid === refUid) return false;
-
-                    let digits = generateUIDDigits(refUid);
-                    let defaultCode = 'MS-' + digits;
-                    let legacyCode = 'SM-' + digits;
-
-                    let refs = [
-                        u.referred_by,
-                        u.referrer_id,
-                        u.invitation_code,
-                        u.ref_code,
-                        u.inviter,
-                        u.referral_code,
-                        u.ref
-                    ].map(x => x ? String(x).trim().toUpperCase() : '');
-
-                    const targetCodes = [
-                        String(refUid).toUpperCase(),
-                        defaultCode.toUpperCase(),
-                        legacyCode.toUpperCase(),
-                        digits.toUpperCase()
-                    ];
-                    if (refCodeVal) targetCodes.push(String(refCodeVal).toUpperCase());
-
-                    return refs.some(r => r && targetCodes.includes(r));
-                }
-
-                let lvl1Users = allProfiles.filter(u => isReferredBy(u, uid, myRefCode));
-
-                let lvl2Users = [];
-                if (lvl1Users.length > 0) {
-                    lvl2Users = allProfiles.filter(u => {
-                        let uUid = u.user_id || u.id;
-                        if (uUid === uid || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid)) return false;
-                        return lvl1Users.some(l1 => isReferredBy(u, l1.user_id || l1.id, l1.referral_code));
-                    });
-                }
-
-                let lvl3Users = [];
-                if (lvl2Users.length > 0) {
-                    lvl3Users = allProfiles.filter(u => {
-                        let uUid = u.user_id || u.id;
-                        if (uUid === uid || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid) || lvl2Users.some(l2 => (l2.user_id || l2.id) === uUid)) return false;
-                        return lvl2Users.some(l2 => isReferredBy(u, l2.user_id || l2.id, l2.referral_code));
-                    });
-                }
-
-                let targetUsers = [];
-                if (targetLevel === 1) targetUsers = lvl1Users;
-                else if (targetLevel === 2) targetUsers = lvl2Users;
-                else if (targetLevel === 3) targetUsers = lvl3Users;
-
-                if (!listElem) return;
-
-                if (targetUsers.length === 0) {
-                    listElem.innerHTML = `<div style="text-align:center;color:#94a3b8;padding:20px;font-size:12px;">${t.nf}</div>`;
-                    return;
-                }
-
-                let html = '';
-                targetUsers.forEach((u, idx) => {
-                    let uName = u.username || u.name || (u.email ? u.email.split('@')[0] : `کاربر ${idx + 1}`);
-                    let uEmail = u.email || u.gmail || '-';
-                    let depVal = Number(u.total_deposit || u.deposit || u.deposits || 0).toFixed(2);
-                    let witVal = Number(u.total_withdraw || u.withdraw || u.withdrawals || 0).toFixed(2);
-                    let regDate = formatDate(u.created_at || u.registered_at || u.date);
-
-                    html += `
-                    <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:10px;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;">
-                            <div style="display:flex;align-items:center;gap:10px;">
-                                <div style="width:38px;height:38px;border-radius:50%;background:rgba(56,189,248,0.15);color:#38bdf8;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:15px;"><i class="fas fa-user"></i></div>
-                                <div>
-                                    <div style="font-weight:bold;font-size:13px;color:#f8fafc;">${uName}</div>
-                                    <div style="font-size:10px;color:#94a3b8;margin-top:2px;">${t.reg} ${regDate}</div>
-                                </div>
-                            </div>
-                            <button type="button" onclick="showUserModal('${uName.replace(/'/g, "\\'")}', '${uEmail.replace(/'/g, "\\'")}')" style="background:rgba(56,189,248,0.15);border:1px solid #38bdf8;color:#38bdf8;padding:5px 12px;border-radius:6px;font-size:11px;cursor:pointer;font-weight:bold;display:flex;align-items:center;gap:4px;">
-                                <i class="fas fa-eye"></i> ${t.viewBtn}
-                            </button>
-                        </div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;background:rgba(30,41,59,0.5);padding:10px 12px;border-radius:8px;font-size:11px;">
-                            <div><span style="color:#94a3b8;">${t.dep}</span> <strong style="color:#22c55e;">${depVal}$</strong></div>
-                            <div><span style="color:#94a3b8;">${t.wit}</span> <strong style="color:#ef4444;">${witVal}$</strong></div>
-                        </div>
-                    </div>`;
-                });
-
-                listElem.innerHTML = html;
-
-            } catch (err) {
-                console.error("Error loading team members:", err);
-                if (listElem) {
-                    listElem.innerHTML = `<div style="text-align:center;color:#ef4444;padding:20px;font-size:12px;">خطا در بارگیری داده‌ها. لطفا مجددا تلاش کنید.</div>`;
-                }
-            }
-        }
-
-        supabaseClient.auth.onAuthStateChange(async (event, session) => {
-            if (session && session.user) {
-                currentUserId = session.user.id;
-                loadTeamMembers(session.user.id, session.user);
-
-                fetchUserMessages(session.user.id).then(msgs => {
-                    allMessages = msgs;
-                    let unread = allMessages.filter(m => !m.read).length, b = document.getElementById('bell-badge');
-                    if (b && unread > 0) { b.textContent = unread; b.classList.add('show'); }
-                });
-            } else {
-                window.location.href = "index.html";
-            }
-        });
-
-        function setLang(l) {
-            currLang = l;
-            safeSetItem('zenix_lang', l);
-            let t = ld[l] || ld.fa;
-            let r = l === 'fa' || l === 'ar';
-            
-            document.documentElement.setAttribute('dir', r ? 'rtl' : 'ltr');
-            document.documentElement.setAttribute('lang', l);
-
-            for (let i = 1; i <= 8; i++) {
-                let m = document.getElementById('m' + i);
-                if (m) m.textContent = t['m' + i] || '';
-            }
-
-            let mTeam = document.getElementById('m_team');
-            if (mTeam) mTeam.textContent = t.m_team;
-
-            let elModalTitle = document.getElementById('t-modal-title');
-            if (elModalTitle) elModalTitle.textContent = t.modalTitle;
-
-            let elAbout = document.getElementById('m_about');
-            if (elAbout) elAbout.textContent = t.m_about;
-
-            let helpBtn = document.getElementById('help-btn');
-            if (helpBtn) helpBtn.setAttribute('title', t.helpTitle || '');
-
-            let elHelpTitle = document.getElementById('t-help-title');
-            if (elHelpTitle) elHelpTitle.textContent = t.helpTitle;
-
-            let elPageTitle = document.getElementById('page-title');
-            if (elPageTitle) elPageTitle.textContent = t.tTpl;
-
-            let elPageDesc = document.getElementById('page-desc');
-            if (elPageDesc) elPageDesc.textContent = t.desc;
-
-            let elBackBtn = document.getElementById('t-back-btn');
-            if (elBackBtn) elBackBtn.textContent = t.backToTeam;
-
-            let elUserModalTitle = document.getElementById('t-user-modal-title');
-            if (elUserModalTitle) elUserModalTitle.textContent = t.userModalTitle;
-
-            let elLblUsername = document.getElementById('t-lbl-username');
-            if (elLblUsername) elLblUsername.textContent = t.lblUsername;
-
-            let elLblEmail = document.getElementById('t-lbl-email');
-            if (elLblEmail) elLblEmail.textContent = t.lblEmail;
-
-            let elHelpDesc = document.getElementById('t-help-desc');
-            if (elHelpDesc) elHelpDesc.textContent = t.helpDesc;
-
-            for (let i = 1; i <= 3; i++) {
-                let ht = document.getElementById('t-help-l' + i + 't');
-                let hd = document.getElementById('t-help-l' + i + 'd');
-                if (ht && t['helpL' + i + 'T']) ht.textContent = t['helpL' + i + 'T'];
-                if (hd && t['helpL' + i + 'D']) hd.textContent = t['helpL' + i + 'D'];
-            }
-
-            ['t-about-title'].forEach(id => { let el = document.getElementById(id); if (el) el.textContent = t.abTitle; });
-            ['t-ab-m-desc'].forEach(id => { let el = document.getElementById(id); if (el) el.textContent = t.abDesc; });
-
-            for (let i = 1; i <= 4; i++) {
-                let elT = document.getElementById('t-ab-m-l' + i + 't');
-                let elD = document.getElementById('t-ab-m-l' + i + 'd');
-                if (elT) elT.textContent = t['abL' + i + 'T'];
-                if (elD) elD.textContent = t['abL' + i + 'D'];
-            }
-
-            if (currentUserId) {
-                loadTeamMembers(currentUserId, supabaseClient.auth.getSession());
-            }
-        }
-
-        document.querySelectorAll('#lang-menu .mi').forEach(i => i.addEventListener('click', () => setLang(i.dataset.lang)));
-
-        document.getElementById('logout-btn')?.addEventListener('click', async e => {
-            e.preventDefault();
-            try { await supabaseClient.auth.signOut(); } catch(e) {}
-            window.location.href = 'index.html';
-        });
-
-        setLang(currLang);
-    </script>
-</body>
-</html>
+           
