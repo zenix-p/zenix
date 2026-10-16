@@ -155,8 +155,8 @@
             <button type="submit" id="t-btn" class="btn" disabled>Sign Up</button>
             <div id="msg"></div>
             <div id="invite-required">
-                <strong>Invitation required.</strong><br>
-                A referral code is required for every new account. Please open the registration page through an invitation link. If you already have one, ask the person who invited you to resend it.
+                <strong id="t-invite-title">Invitation required.</strong><br>
+                <span id="t-invite-desc">A referral code is required for every new account. Please open the registration page through an invitation link. If you already have one, ask the person who invited you to resend it.</span>
             </div>
         </form>
 
@@ -211,14 +211,14 @@
         }
 
         const langData = {
-            fa:{dir:'rtl',wel:'ثبت‌نام حساب کاربری جدید',email:'ایمیل',emailP:'ایمیل',name:'نام و نام خانوادگی',nameP:'نام و نام خانوادگی',pass:'رمز عبور',passP:'رمز عبور',confirmPass:'تکرار رمز عبور',confirmPassP:'تکرار رمز عبور',ref:'کد معرف',refP:'کد معرف',cap:'کد امنیتی',capP:'کد را وارد کنید',btn:'ثبت‌نام در زنیکس',back:'بازگشت به صفحه اصلی',succ:'ثبت‌نام با موفقیت انجام شد!',err:'کد امنیتی اشتباه است!',refErr:'کد معرف معتبر نیست یا وجود ندارد!',passErr:'رمز عبور و تکرار آن مطابقت ندارند!',lenErr:'رمز عبور باید حداقل ۶ کاراکتر باشد!',existErr:'این ایمیل قبلاً ثبت شده است!',emailErr:'لطفاً یک آدرس ایمیل معتبر وارد کنید!',supTitle:'پشتیبانی',langTitle:'تغییر زبان',showPass:'نمایش رمز عبور',hidePass:'مخفی کردن رمز عبور',refreshCap:'تازه‌سازی کد امنیتی'},
-            en:{dir:'ltr',wel:'Register New Account',email:'Email',emailP:'Email',name:'Full Name',nameP:'Full Name',pass:'Password',passP:'Password',confirmPass:'Confirm Password',confirmPassP:'Confirm Password',ref:'Referral Code',refP:'Referral Code',cap:'Security Code',capP:'Enter code',btn:'Sign Up',back:'Back to Main Page',succ:'Successfully registered!',err:'Invalid security code!',refErr:'Invalid or non-existent referral code!',passErr:'Passwords do not match!',lenErr:'Password must be at least 6 characters!',existErr:'Email already registered!',emailErr:'Please enter a valid email address!',supTitle:'Support',langTitle:'Change Language',showPass:'Show password',hidePass:'Hide password',refreshCap:'Refresh security code'},
-            ar:{dir:'rtl',wel:'تسجيل حساب جديد',email:'البريد الإلكتروني',emailP:'البريد الإلكتروني',name:'الاسم الكامل',nameP:'الاسم الكامل',pass:'كلمة المرور',passP:'كلمة المرور',confirmPass:'تأكيد كلمة المرور',confirmPassP:'تأكيد كلمة المرور',ref:'رمز الإحالة',refP:'رمز الإحالة',cap:'رمز التحقق',capP:'أدخل الرمز',btn:'التسجيل في Zenix',back:'العودة للصفحة الرئيسية',succ:'تم التسجيل بنجاح!',err:'رمز التحقق غير صحيح!',refErr:'رمز الإحالة غير صالح أو غير موجود!',passErr:'كلمتا المرور غير متطابقتين!',lenErr:'يجب أن تكون كلمة المرور 6 أحرف على الأقل!',existErr:'هذا البريد الإلكتروني مسجل بالفعل!',emailErr:'يرجى إدخال بريد إلكتروني صالح!',supTitle:'الدعم الفني',langTitle:'تغيير اللغة',showPass:'إظهار كلمة المرور',hidePass:'إخفاء كلمة المرور',refreshCap:'تحديث رمز الأمان'},
-            tr:{dir:'ltr',wel:'Yeni Hesap Oluştur',email:'E-posta',emailP:'E-posta',name:'Ad Soyad',nameP:'Ad Soyad',pass:'Şifre',passP:'Şifre',confirmPass:'Şifreyi Tekrarla',confirmPassP:'Şifreyi Tekrarla',ref:'Referans Kodu',refP:'Referans Kodu',cap:'Güvenlik Kodu',capP:'Kodu girin',btn:'Zenix\'e Kayıt Ol',back:'Ana Sayfaya Dön',succ:'Kayıt başarılı!',err:'Geçersiz güvenlik kodu!',refErr:'Geçersiz veya bulunmayan referans kodu!',passErr:'Şifreler eşleşmiyor!',lenErr:'Şifre en az 6 karakter olmalıdır!',existErr:'Bu e-posta zaten kayıtlı!',emailErr:'Lütfen geçerli bir e-posta adresi girin!',supTitle:'Destek',langTitle:'Dil Değiştir',showPass:'Şifreyi göster',hidePass:'Şifreyi gizle',refreshCap:'Güvenlik kodunu yenile'},
-            ru:{dir:'ltr',wel:'Регистрация аккаунта',email:'Эл. почта',emailP:'Эл. почта',name:'ФИО',nameP:'Введите ФИО',pass:'Пароль',passP:'Пароль',confirmPass:'Повторите пароль',confirmPassP:'Повторите пароль',ref:'Реферальный код',refP:'Реферальный код',cap:'Защитный код',capP:'Введите код',btn:'Зарегистрироваться',back:'На главную',succ:'Успешная регистрация!',err:'Неверный защитный код!',refErr:'Неверный реферальный код!',passErr:'Пароли не совпадают!',lenErr:'Пароль должен быть не менее 6 символов!',existErr:'Этот email уже зарегистрирован!',emailErr:'Пожалуйста, введите корректный адрес электронной почты!',supTitle:'Поддержка',langTitle:'Сменить язык',showPass:'Показать пароль',hidePass:'Скрыть пароль',refreshCap:'Обновить код безопасности'},
-            es:{dir:'ltr',wel:'Registrar nueva cuenta',email:'Correo electrónico',emailP:'Correo electrónico',name:'Nombre completo',nameP:'Nombre completo',pass:'Contraseña',passP:'Contraseña',confirmPass:'Confirmar contraseña',confirmPassP:'Confirmar contraseña',ref:'Código de referencia',refP:'Código de referencia',cap:'Código de seguridad',capP:'Ingrese el código',btn:'Registrarse en Zenix',back:'Volver al inicio',succ:'¡Registro exitoso!',err:'¡Código inválido!',refErr:'¡Código de referencia inválido!',passErr:'¡Las contraseñas no coinciden!',lenErr:'¡La contraseña debe tener al menos 6 caracteres!',existErr:'¡Este correo ya está registrado!',emailErr:'¡Por favor ingrese un correo electrónico válido!',supTitle:'Soporte',langTitle:'Cambiar idioma',showPass:'Mostrar contraseña',hidePass:'Ocultar contraseña',refreshCap:'Actualizar código de seguridad'},
-            fr:{dir:'ltr',wel:'Créer un compte',email:'E-mail',emailP:'E-mail',name:'Nom complet',nameP:'Nom complet',pass:'Mot de passe',passP:'Mot de passe',confirmPass:'Confirmer',confirmPassP:'Confirmer',ref:'Code de parrainage',refP:'Code',cap:'Code de sécurité',capP:'Entrez le code',btn:'S\'inscrire',back:'Retour',succ:'Inscription réussie !',err:'Code invalide !',refErr:'Code de parrainage invalide !',passErr:'Les mots de passe ne correspondent pas !',lenErr:'Le mot de passe doit contenir au moins 6 caractères !',existErr:'E-mail déjà enregistré !',emailErr:'Veuillez saisir une adresse e-mail valide !',supTitle:'Support',langTitle:'Changer de langue',showPass:'Afficher le mot de passe',hidePass:'Masquer le mot de passe',refreshCap:'Actualiser le code de sécurité'},
-            de:{dir:'ltr',wel:'Konto erstellen',email:'E-Mail',emailP:'E-Mail',name:'Vollständiger Name',nameP:'Vollständiger Name',pass:'Passwort',passP:'Passwort',confirmPass:'Passwort bestätigen',confirmPassP:'Passwort bestätigen',ref:'Empfehlungscode',refP:'Empfehlungscode',cap:'Sicherheitscode',capP:'Code eingeben',btn:'Registrieren',back:'Zurück',succ:'Erfolgreich!',err:'Ungültiger Code!',refErr:'Ungültiger Empfehlungscode!',passErr:'Passwörter stimmen nicht überein!',lenErr:'Das Passwort muss mindestens 6 Zeichen lang sein!',existErr:'E-Mail bereits registriert!',emailErr:'Bitte geben Sie eine gültige E-Mail-Adresse ein!',supTitle:'Support',langTitle:'Sprache ändern',showPass:'Passwort anzeigen',hidePass:'Passwort verbergen',refreshCap:'Sicherheitscode aktualisieren'}
+            fa:{dir:'rtl',wel:'ثبت‌نام حساب کاربری جدید',inviteTitle:'لینک دعوت لازم است.',inviteDesc:'برای ساخت هر حساب جدید، یک کد معرف لازم است. لطفاً صفحه ثبت‌نام را از طریق لینک دعوت باز کنید. اگر قبلاً لینک را دریافت کرده‌اید، از شخصی که شما را دعوت کرده بخواهید آن را دوباره ارسال کند.',email:'ایمیل',emailP:'ایمیل',name:'نام و نام خانوادگی',nameP:'نام و نام خانوادگی',pass:'رمز عبور',passP:'رمز عبور',confirmPass:'تکرار رمز عبور',confirmPassP:'تکرار رمز عبور',ref:'کد معرف',refP:'کد معرف',cap:'کد امنیتی',capP:'کد را وارد کنید',btn:'ثبت‌نام در زنیکس',back:'بازگشت به صفحه اصلی',succ:'ثبت‌نام با موفقیت انجام شد!',err:'کد امنیتی اشتباه است!',refErr:'کد معرف معتبر نیست یا وجود ندارد!',passErr:'رمز عبور و تکرار آن مطابقت ندارند!',lenErr:'رمز عبور باید حداقل ۶ کاراکتر باشد!',existErr:'این ایمیل قبلاً ثبت شده است!',emailErr:'لطفاً یک آدرس ایمیل معتبر وارد کنید!',supTitle:'پشتیبانی',langTitle:'تغییر زبان',showPass:'نمایش رمز عبور',hidePass:'مخفی کردن رمز عبور',refreshCap:'تازه‌سازی کد امنیتی'},
+            en:{dir:'ltr',wel:'Register New Account',inviteTitle:'Invitation required.',inviteDesc:'A referral code is required for every new account. Please open the registration page through an invitation link. If you already have one, ask the person who invited you to resend it.',email:'Email',emailP:'Email',name:'Full Name',nameP:'Full Name',pass:'Password',passP:'Password',confirmPass:'Confirm Password',confirmPassP:'Confirm Password',ref:'Referral Code',refP:'Referral Code',cap:'Security Code',capP:'Enter code',btn:'Sign Up',back:'Back to Main Page',succ:'Successfully registered!',err:'Invalid security code!',refErr:'Invalid or non-existent referral code!',passErr:'Passwords do not match!',lenErr:'Password must be at least 6 characters!',existErr:'Email already registered!',emailErr:'Please enter a valid email address!',supTitle:'Support',langTitle:'Change Language',showPass:'Show password',hidePass:'Hide password',refreshCap:'Refresh security code'},
+            ar:{dir:'rtl',wel:'تسجيل حساب جديد',inviteTitle:'مطلوب رمز الإحالة.',inviteDesc:'رمز الإحالة مطلوب لإنشاء كل حساب جديد. يرجى فتح صفحة التسجيل من خلال رابط دعوة. إذا كان لديك واحد بالفعل، اطلب من الشخص الذي دعاك إعادة إرساله.',email:'البريد الإلكتروني',emailP:'البريد الإلكتروني',name:'الاسم الكامل',nameP:'الاسم الكامل',pass:'كلمة المرور',passP:'كلمة المرور',confirmPass:'تأكيد كلمة المرور',confirmPassP:'تأكيد كلمة المرور',ref:'رمز الإحالة',refP:'رمز الإحالة',cap:'رمز التحقق',capP:'أدخل الرمز',btn:'التسجيل في Zenix',back:'العودة للصفحة الرئيسية',succ:'تم التسجيل بنجاح!',err:'رمز التحقق غير صحيح!',refErr:'رمز الإحالة غير صالح أو غير موجود!',passErr:'كلمتا المرور غير متطابقتين!',lenErr:'يجب أن تكون كلمة المرور 6 أحرف على الأقل!',existErr:'هذا البريد الإلكتروني مسجل بالفعل!',emailErr:'يرجى إدخال بريد إلكتروني صالح!',supTitle:'الدعم الفني',langTitle:'تغيير اللغة',showPass:'إظهار كلمة المرور',hidePass:'إخفاء كلمة المرور',refreshCap:'تحديث رمز الأمان'},
+            tr:{dir:'ltr',wel:'Yeni Hesap Oluştur',inviteTitle:'Davet gerekli.',inviteDesc:'Her yeni hesap için bir referans kodu gereklidir. Lütfen kayıt sayfasını bir davet bağlantısı üzerinden açın. Zaten varsa, sizi davet eden kişiden yeniden göndermesini isteyin.',email:'E-posta',emailP:'E-posta',name:'Ad Soyad',nameP:'Ad Soyad',pass:'Şifre',passP:'Şifre',confirmPass:'Şifreyi Tekrarla',confirmPassP:'Şifreyi Tekrarla',ref:'Referans Kodu',refP:'Referans Kodu',cap:'Güvenlik Kodu',capP:'Kodu girin',btn:'Zenix\'e Kayıt Ol',back:'Ana Sayfaya Dön',succ:'Kayıt başarılı!',err:'Geçersiz güvenlik kodu!',refErr:'Geçersiz veya bulunmayan referans kodu!',passErr:'Şifreler eşleşmiyor!',lenErr:'Şifre en az 6 karakter olmalıdır!',existErr:'Bu e-posta zaten kayıtlı!',emailErr:'Lütfen geçerli bir e-posta adresi girin!',supTitle:'Destek',langTitle:'Dil Değiştir',showPass:'Şifreyi göster',hidePass:'Şifreyi gizle',refreshCap:'Güvenlik kodunu yenile'},
+            ru:{dir:'ltr',wel:'Регистрация аккаунта',inviteTitle:'Требуется приглашение.',inviteDesc:'Для создания нового аккаунта требуется реферальный код. Пожалуйста, откройте страницу регистрации по ссылке-приглашению. Если у вас уже есть код, попросите пригласившего отправить его снова.',email:'Эл. почта',emailP:'Эл. почта',name:'ФИО',nameP:'Введите ФИО',pass:'Пароль',passP:'Пароль',confirmPass:'Повторите пароль',confirmPassP:'Повторите пароль',ref:'Реферальный код',refP:'Реферальный код',cap:'Защитный код',capP:'Введите код',btn:'Зарегистрироваться',back:'На главную',succ:'Успешная регистрация!',err:'Неверный защитный код!',refErr:'Неверный реферальный код!',passErr:'Пароли не совпадают!',lenErr:'Пароль должен быть не менее 6 символов!',existErr:'Этот email уже зарегистрирован!',emailErr:'Пожалуйста, введите корректный адрес электронной почты!',supTitle:'Поддержка',langTitle:'Сменить язык',showPass:'Показать пароль',hidePass:'Скрыть пароль',refreshCap:'Обновить код безопасности'},
+            es:{dir:'ltr',wel:'Registrar nueva cuenta',inviteTitle:'Se requiere invitación.',inviteDesc:'Se requiere un código de referencia para cada cuenta nueva. Abra la página de registro a través de un enlace de invitación. Si ya tiene uno, pida a la persona que lo invitó que lo reenvíe.',email:'Correo electrónico',emailP:'Correo electrónico',name:'Nombre completo',nameP:'Nombre completo',pass:'Contraseña',passP:'Contraseña',confirmPass:'Confirmar contraseña',confirmPassP:'Confirmar contraseña',ref:'Código de referencia',refP:'Código de referencia',cap:'Código de seguridad',capP:'Ingrese el código',btn:'Registrarse en Zenix',back:'Volver al inicio',succ:'¡Registro exitoso!',err:'¡Código inválido!',refErr:'¡Código de referencia inválido!',passErr:'¡Las contraseñas no coinciden!',lenErr:'¡La contraseña debe tener al menos 6 caracteres!',existErr:'¡Este correo ya está registrado!',emailErr:'¡Por favor ingrese un correo electrónico válido!',supTitle:'Soporte',langTitle:'Cambiar idioma',showPass:'Mostrar contraseña',hidePass:'Ocultar contraseña',refreshCap:'Actualizar código de seguridad'},
+            fr:{dir:'ltr',wel:'Créer un compte',inviteTitle:'Invitation requise.',inviteDesc:'Un code de parrainage est requis pour chaque nouveau compte. Veuillez ouvrir la page d\'inscription via un lien d\'invitation. Si vous en avez déjà un, demandez à la personne qui vous a invité de le renvoyer.',email:'E-mail',emailP:'E-mail',name:'Nom complet',nameP:'Nom complet',pass:'Mot de passe',passP:'Mot de passe',confirmPass:'Confirmer',confirmPassP:'Confirmer',ref:'Code de parrainage',refP:'Code',cap:'Code de sécurité',capP:'Entrez le code',btn:'S\'inscrire',back:'Retour',succ:'Inscription réussie !',err:'Code invalide !',refErr:'Code de parrainage invalide !',passErr:'Les mots de passe ne correspondent pas !',lenErr:'Le mot de passe doit contenir au moins 6 caractères !',existErr:'E-mail déjà enregistré !',emailErr:'Veuillez saisir une adresse e-mail valide !',supTitle:'Support',langTitle:'Changer de langue',showPass:'Afficher le mot de passe',hidePass:'Masquer le mot de passe',refreshCap:'Actualiser le code de sécurité'},
+            de:{dir:'ltr',wel:'Konto erstellen',inviteTitle:'Einladung erforderlich.',inviteDesc:'Für jedes neue Konto ist ein Empfehlungscode erforderlich. Bitte öffnen Sie die Registrierungsseite über einen Einladungslink. Wenn Sie bereits einen haben, bitten Sie die Person, die Sie eingeladen hat, ihn erneut zu senden.',email:'E-Mail',emailP:'E-Mail',name:'Vollständiger Name',nameP:'Vollständiger Name',pass:'Passwort',passP:'Passwort',confirmPass:'Passwort bestätigen',confirmPassP:'Passwort bestätigen',ref:'Empfehlungscode',refP:'Empfehlungscode',cap:'Sicherheitscode',capP:'Code eingeben',btn:'Registrieren',back:'Zurück',succ:'Erfolgreich!',err:'Ungültiger Code!',refErr:'Ungültiger Empfehlungscode!',passErr:'Passwörter stimmen nicht überein!',lenErr:'Das Passwort muss mindestens 6 Zeichen lang sein!',existErr:'E-Mail bereits registriert!',emailErr:'Bitte geben Sie eine gültige E-Mail-Adresse ein!',supTitle:'Support',langTitle:'Sprache ändern',showPass:'Passwort anzeigen',hidePass:'Passwort verbergen',refreshCap:'Sicherheitscode aktualisieren'}
         };
         
         let currentLang = localStorage.getItem('zenix_lang') || 'en', code = '';
@@ -235,6 +235,8 @@
             document.documentElement.setAttribute('dir', t.dir);
             document.documentElement.setAttribute('lang', l);
             document.getElementById('t-wel').textContent = t.wel;
+            document.getElementById('t-invite-title').textContent = t.inviteTitle || '';
+            document.getElementById('t-invite-desc').textContent = t.inviteDesc || '';
             document.getElementById('l-email').innerHTML = `<i class="fas fa-envelope"></i> ${escapeHtml(t.email)} <span class="req">*</span>`;
             document.getElementById('email').placeholder = t.emailP;
             document.getElementById('email').setAttribute('aria-label', t.email);
@@ -276,12 +278,6 @@
             refIn.value = refParam;
         }
 
-        // منطق کد معرف:
-        // - اگر در URL پارامتر ref باشد، همان را نگه دار.
-        // - در غیر این صورت:
-        //     - اگر هیچ کاربری در profiles نباشد، این اولین ثبت‌نام است → ADMIN.
-        //     - اگر کاربر وجود دارد، فیلد کد معرف readonly و خالی می‌ماند و پیام
-        //       «نیاز به لینک دعوت» نمایش داده می‌شود.
         async function checkFirstUserInit() {
             const inviteBox = document.getElementById('invite-required');
 
@@ -304,19 +300,16 @@
                     return;
                 }
 
-                // کاربران وجود دارند و لینک دعوت نیامده → کد معرف اجباری است
                 refIn.value = '';
                 if (inviteBox) inviteBox.classList.add('show');
                 chk();
             } catch (e) {
-                // در صورت خطا، به‌عنوان احتیاط اجباری کن
                 refIn.value = '';
                 if (inviteBox) inviteBox.classList.add('show');
                 chk();
             }
         }
 
-        // اعتبارسنجی کامل فرم
         function isValidEmailFormat(email) {
             if (!email) return false;
             const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -334,7 +327,6 @@
         }
         [emailIn, nameIn, passIn, confirmPassIn, refIn, capIn].forEach(i => i.oninput = chk);
         
-        // تابع رسم کپچا
         function drawCap() {
             if (!cv) return;
             const ctx = cv.getContext('2d'), w = cv.width, h = cv.height;
@@ -342,7 +334,6 @@
             const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
             for (let i = 0; i < 5; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
 
-            // [USER-SIM] برای تست خودکار
             window.__zenix_captcha_code = code;
 
             ctx.clearRect(0, 0, w, h);
