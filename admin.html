@@ -523,12 +523,9 @@
         const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // ============================================================
-        // HTML ESCAPE HELPER — used to neutralise any HTML tag or
-        // attribute-breaking character that comes from user-controlled
-        // data (user names, emails, chat messages, request fields, etc.)
-        // before that data is placed into innerHTML.
-        // ============================================================
+        // HTML escape helper: neutralises any HTML tag or attribute-breaking
+        // character coming from user-controlled data before it is placed
+        // into innerHTML.
         function escapeHtml(value) {
             return String(value == null ? '' : value)
                 .replace(/&/g, '&amp;')
@@ -545,7 +542,7 @@
                 if (userError || !user) { window.location.replace('index.html'); return false; }
                 const { data: isAdmin, error: rpcError } = await supabaseClient.rpc('is_current_user_admin');
                 if (rpcError || isAdmin !== true) {
-                    try { await supabaseClient.auth.signOut(); } catch (_) {}
+                    try { await supabaseClient.auth.signOut(); } catch (_) { /* signOut is best-effort */ }
                     window.location.replace('index.html');
                     return false;
                 }
@@ -558,7 +555,7 @@
             try {
                 const { data, error } = await supabaseClient.from('app_settings').select('value').eq('key', 'ntfy_topic').maybeSingle();
                 if (!error && data && data.value) NTFY_TOPIC = String(data.value).trim();
-            } catch (_) { NTFY_TOPIC = null; }
+            } catch (_) { /* topic load is best-effort */ NTFY_TOPIC = null; }
         }
 
         let uMap = {};
@@ -617,7 +614,7 @@
                 osc1.type = 'sine'; osc1.frequency.setValueAtTime(880, now);
                 gain1.gain.setValueAtTime(0.3, now); gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
                 osc1.connect(gain1); gain1.connect(audioCtx.destination); osc1.start(now); osc1.stop(now + 0.25);
-            } catch (e) {}
+            } catch (e) { /* Web Audio may be unavailable or blocked; alert sound is non-critical */ }
         }
 
         let prevD = -1, prevW = -1, prevR = -1, prevChat = -1;
@@ -629,7 +626,7 @@
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ topic: NTFY_TOPIC, title: titleText, message: messageText, priority: 5, tags: ['bell', 'warning'] })
                 });
-            } catch (e) {}
+            } catch (e) { /* ntfy push is best-effort; a network failure must not break the dashboard */ }
         }
 
         document.getElementById('test-ntfy-btn')?.addEventListener('click', async () => {
@@ -676,7 +673,7 @@
         async function sendNotificationToUser(uid, title, message) {
             try {
                 await supabaseClient.from('notifications').insert([{ user_id: uid, title: title, message: message, created_at: new Date().toISOString(), read: false }]);
-            } catch (err) {}
+            } catch (err) { /* notification insert is best-effort; the primary action already succeeded */ }
         }
 
         function cleanupRealtimeChannels() {
@@ -752,7 +749,7 @@
                 document.getElementById('st-casino-turnover').innerText = '$' + totalTurnover.toLocaleString('en-US', {minimumFractionDigits:2});
                 document.getElementById('st-casino-payouts').innerText = '$' + totalPayouts.toLocaleString('en-US', {minimumFractionDigits:2});
                 document.getElementById('st-casino-balances').innerText = '$' + totalCasinoBal.toLocaleString('en-US', {minimumFractionDigits:2});
-            } catch (err) { console.error("Error loading casino data:", err); }
+            } catch (err) { /* casino data refresh is best-effort; a transient error must not block the rest of the dashboard */ }
         }
 
         async function initSupportChatListener() {
@@ -775,9 +772,6 @@
                         let isUnread = chat.unread_by_admin === true || chat.unreadByAdmin === true;
                         if (isUnread) unreadCount++;
                         let isActive = currentActiveChatId === chatId;
-                        // User-controlled fields are escaped; click uses data-attributes
-                        // instead of an inline onclick so nothing can break out of a
-                        // JS string context.
                         html += `
                             <div class="chat-item ${isActive ? 'active' : ''}"
                                  data-chat-id="${escapeHtml(chatId)}"
@@ -801,7 +795,7 @@
                     if (badge) { badge.innerText = unreadCount; badge.className = unreadCount > 0 ? 'tab-badge' : 'tab-badge zero'; }
                     if (prevChat !== -1 && unreadCount > prevChat) { playAlertSound(); sendNtfyAlert("💬 پیام پشتیبانی جدید", "کاربری در بخش پشتیبانی پیام ارسال کرده است."); }
                     prevChat = unreadCount;
-                } catch(err) {}
+                } catch(err) { /* chat list refresh is best-effort; a transient error must not break the admin panel */ }
             }
             await fetchChats();
             if (chatChannel) supabaseClient.removeChannel(chatChannel);
@@ -810,7 +804,6 @@
 
         window.openAdminChat = async (chatId, userName, userEmail) => {
             currentActiveChatId = chatId;
-            // Header uses escaped values. Delete button uses data attribute + listener.
             const headerEl = document.getElementById('admin-chat-header');
             headerEl.innerHTML = `
                 <div>
@@ -836,8 +829,6 @@
                 let msgHtml = '';
                 messages.forEach(msg => {
                     let isAdmin = msg.sender === 'admin';
-                    // Both the label and the message text come from user or DB
-                    // storage and are escaped before being placed in innerHTML.
                     msgHtml += `
                         <div class="chat-msg-box ${isAdmin ? 'admin' : 'user'}">
                             <div style="font-size:10px; opacity:0.7; margin-bottom:2px;">${isAdmin ? 'پشتیبان (شما)' : escapeHtml(userName)}</div>
@@ -885,7 +876,6 @@
                 let u = uMap[uid];
                 let searchStr = `${getUserIdCode(uid)} ${getName(u)} ${u.email||''} ${u.phone||''}`.toLowerCase();
                 if(!q || searchStr.includes(q)){
-                    // escapeHtml applied to every user-controlled label.
                     html += `<option value="${escapeHtml(uid)}">${escapeHtml(getName(u))} (${escapeHtml(getUserIdCode(uid))} - ${escapeHtml(u.email || '-')})</option>`;
                 }
             }
@@ -929,7 +919,6 @@
         window.selectUserForMessage = uid => {
             let u = uMap[uid];
             if(!u) return;
-            // Uses textContent (not innerHTML) so this line was already safe.
             document.getElementById('sel-user-name').textContent = `${getName(u)} (${getUserIdCode(uid)} - ${u.email || '-'})`;
             document.getElementById('selected-user-card').style.display = 'flex';
             document.getElementById('sm-uid-container').style.display = 'none';
@@ -1016,9 +1005,6 @@
                     let balStr = `$${Number(u.balance||0).toLocaleString()}`;
                     let profitStr = `$${Number(u.platformProfit||0).toLocaleString()}`;
 
-                    // Every user-controlled value below is escaped. The id-based
-                    // buttons also use escaped uid so the inline onclick cannot
-                    // be broken out of by a malicious uid.
                     if(isBanned){
                         cBan++;
                         if(tbBan) tbBan.innerHTML += `<tr data-s="${escapeHtml(search)}">
@@ -1057,7 +1043,6 @@
                     }
                 });
 
-                // Request cards (email change). Every user value escaped.
                 let reqContainer = document.getElementById('req-container');
                 if (reqContainer) {
                     if (reqList.length === 0) {
@@ -1089,9 +1074,6 @@
                     }
                 }
 
-                // Event delegation for all data-driven buttons in the panels we
-                // just rebuilt. This keeps user data out of inline onclick
-                // attributes entirely.
                 document.querySelectorAll('[data-open-details]').forEach(el => {
                     el.addEventListener('click', () => window.openDetails(el.getAttribute('data-open-details')));
                 });
@@ -1156,13 +1138,12 @@
                         el.addEventListener('click', () => window.openWithdrawDetails(el.getAttribute('data-open-withdraw')));
                     });
                 }
-            } catch(err) {}
+            } catch(err) { /* top-level refresh is best-effort; a transient error must not break the UI */ }
         }
 
         window.openDetails = uid => {
             let u = uMap[uid];
             if (!u) return;
-            // All values here come from the users table and are escaped.
             document.getElementById('user-details-body').innerHTML = `
                 <div class="detail-row"><span>شناسه:</span><span>${escapeHtml(getUserIdCode(uid))}</span></div>
                 <div class="detail-row"><span>نام:</span><span>${escapeHtml(getName(u))}</span></div>
