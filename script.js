@@ -86,6 +86,17 @@ checkNYDailyReset();
 return parseInt(localStorage.getItem('zenix_q_count')||'0'); 
 }
 
+/* [FIX-XSS] ساخت امن محتوای دکمه بدون innerHTML */
+function setButtonContent(iconClass, textValue){
+qBtn.textContent='';
+const icon=document.createElement('i');
+icon.className=iconClass;
+const span=document.createElement('span');
+span.textContent=' '+textValue;
+qBtn.appendChild(icon);
+qBtn.appendChild(span);
+}
+
 function updateButtonState(){
 let count=getCount();
 const lang=localStorage.getItem('zenix_lang')||'fa';
@@ -93,13 +104,13 @@ const t=translations[lang];
 if(count>=max){
 qBtn.disabled=true;
 qBtn.style.opacity='0.6';
-qBtn.innerHTML=`<i class="fas fa-check-circle"></i> <span>${t.completed}</span>`;
+setButtonContent('fas fa-check-circle', t.completed);
 if(tradeBox)tradeBox.style.display='none';
 }else{
 qBtn.disabled=false;
 qBtn.style.opacity='1';
 qBtn.style.cursor='pointer';
-qBtn.innerHTML=`<i class="fas fa-robot"></i> <span>${t.stepText} ${count+1} ${t.of} ${max}</span>`;
+setButtonContent('fas fa-robot', `${t.stepText} ${count+1} ${t.of} ${max}`);
 }
 }
 
@@ -123,7 +134,7 @@ let timeLeft=10;
 const timerInterval=setInterval(()=>{
 timeLeft--;
 if(timeLeft>0){
-qBtn.innerHTML=`<i class="fas fa-clock"></i> <span>مرحله ${count+1} (${timeLeft}s)...</span>`;
+setButtonContent('fas fa-clock', `مرحله ${count+1} (${timeLeft}s)...`);
 }else{
 clearInterval(timerInterval);
 
