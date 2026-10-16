@@ -274,7 +274,6 @@
         </div>
     </div>
 
-    <!-- مودال اصلاح‌شده صندوق پیام‌ها و اعلان‌ها به همراه بج شمارنده برای هر تب -->
     <div class="modal" id="m-msg">
         <div class="modal-content">
             <div class="modal-header">
@@ -291,7 +290,6 @@
         </div>
     </div>
 
-    <!-- مودال مشاهده جزئیات پیام -->
     <div class="modal" id="m-msg-detail" style="z-index:1050;">
         <div class="modal-content">
             <div class="modal-header">
@@ -331,6 +329,18 @@
     </footer>
 
     <script>
+        // HTML escape helper: neutralises any HTML tag or attribute-breaking
+        // character coming from user-controlled data (notification titles,
+        // message bodies, error messages) before inserting into innerHTML.
+        function escapeHtml(value) {
+            return String(value == null ? '' : value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
         var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -339,14 +349,10 @@
         let currentUserId = null;
         let userData = null;
 
-        // ==========================================
-        // تابع تغییر و هایلایت زبان فعال به رنگ آبی
-        // ==========================================
         function setLang(l) {
             const activeLang = l || localStorage.getItem('zenix_lang') || 'fa';
             localStorage.setItem('zenix_lang', activeLang);
 
-            // اعمال هایلایت آبی رنگ روی گزینه زبان انتخابی در منو
             document.querySelectorAll('#lang-menu .mi').forEach(item => {
                 if (item.getAttribute('data-lang') === activeLang) {
                     item.classList.add('active');
@@ -360,10 +366,8 @@
             document.documentElement.lang = activeLang;
         }
 
-        // تنظیم اولیه زبان بر اساس تنظیمات ذخیره‌شده
         setLang(localStorage.getItem('zenix_lang') || 'fa');
 
-        // اتصال رویداد کلیک به گزینه‌های زبان منوی هدر
         document.querySelectorAll('#lang-menu .mi').forEach(el => {
             el.onclick = (e) => {
                 e.stopPropagation();
@@ -372,9 +376,6 @@
             };
         });
 
-        // ==========================================
-        // متغیرها و توابع مدیریت اعلان‌ها
-        // ==========================================
         window.openMessageModal = () => document.getElementById('m-msg')?.classList.add('show');
         window.closeMessageModal = () => document.getElementById('m-msg')?.classList.remove('show');
 
@@ -511,11 +512,12 @@
           const detailBody = document.getElementById('detail-msg-body');
           const detailSupport = document.getElementById('detail-msg-support');
 
-          if (detailTitle) detailTitle.innerHTML = `<i class="fas fa-bell" style="color:#38bdf8"></i> ${title}`;
+          // title comes from the notifications table (user/DB) so it must be escaped.
+          if (detailTitle) detailTitle.innerHTML = `<i class="fas fa-bell" style="color:#38bdf8"></i> ${escapeHtml(title)}`;
           
           if (detailDate) {
             if (dateStr) {
-              detailDate.innerHTML = `<i class="far fa-clock" style="color:#38bdf8;margin-right:4px;"></i>${dateStr}`;
+              detailDate.innerHTML = `<i class="far fa-clock" style="color:#38bdf8;margin-right:4px;"></i>${escapeHtml(dateStr)}`;
               detailDate.style.display = 'block';
             } else {
               detailDate.style.display = 'none';
@@ -592,14 +594,15 @@
               ? '<span style="font-size:10px;background:#ef4444;color:#fff;padding:2px 7px;border-radius:10px;font-weight:800;box-shadow:0 0 8px rgba(239,68,68,0.5);">جدید</span>' 
               : '<span style="font-size:10px;background:rgba(255,255,255,0.06);color:#94a3b8;padding:2px 6px;border-radius:10px;"><i class="fas fa-check" style="font-size:9px;color:#64748b;"></i> خوانده‌شده</span>';
 
-            const dateDisplay = dateStr ? `<div style="font-size:11px;color:${isUnread ? '#cbd5e1' : '#64748b'};margin-top:6px;direction:ltr;text-align:left;"><i class="far fa-clock" style="margin-right:4px;"></i>${dateStr}</div>` : '';
+            const dateDisplay = dateStr ? `<div style="font-size:11px;color:${isUnread ? '#cbd5e1' : '#64748b'};margin-top:6px;direction:ltr;text-align:left;"><i class="far fa-clock" style="margin-right:4px;"></i>${escapeHtml(dateStr)}</div>` : '';
 
+            // title comes from the notifications table (user/DB) so it is escaped.
             html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle} ${opacityStyle} cursor:pointer; position:relative; transition:all 0.2s;" onclick="window.openMsgDetail(${idx})">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
                 <div class="msg-title-text" style="display:flex;align-items:center;gap:8px;font-weight:${isUnread ? '800' : '500'};color:${isUnread ? '#f8fafc' : '#cbd5e1'};">
                   ${unreadDot}
                   ${icon}
-                  <span>${title}</span>
+                  <span>${escapeHtml(title)}</span>
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;">
                   ${tagHtml}
@@ -624,7 +627,9 @@
             if (type === 'error') iconClass = 'fa-exclamation-circle';
             if (type === 'info') iconClass = 'fa-info-circle';
 
-            toast.innerHTML = `<i class="fas ${iconClass}"></i><div style="flex:1;">${message}</div>`;
+            // message may contain data derived from user input or DB records;
+            // escape before inserting into innerHTML. iconClass is a literal.
+            toast.innerHTML = `<i class="fas ${iconClass}"></i><div style="flex:1;">${escapeHtml(message)}</div>`;
             container.appendChild(toast);
 
             setTimeout(() => { toast.classList.add('show'); }, 10);
