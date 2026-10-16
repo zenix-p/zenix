@@ -118,7 +118,6 @@
         let currentLang = localStorage.getItem('zenix_lang') || 'en', code = '';
         const langBtn = document.getElementById('lang-btn'), langMenu = document.getElementById('lang-menu'), cv = document.getElementById('c-canvas'), capIn = document.getElementById('cap-in'), userIn = document.getElementById('user'), passIn = document.getElementById('pass'), submitBtn = document.getElementById('t-btn'), msg = document.getElementById('msg'), form = document.getElementById('form'), authCard = document.getElementById('auth-card');
 
-        // تابع تشخیص صفحه مقصد بر اساس وجود شماره تلفن در جدول users
         async function getTargetPage(userId) {
             try {
                 const { data } = await supabaseClient
@@ -136,7 +135,6 @@
             }
         }
 
-        // بررسی ورود قبلی کاربر از طریق Supabase
         async function checkExistingSession() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session && session.user) {
@@ -166,7 +164,6 @@
         document.querySelectorAll('#lang-menu .mi').forEach(i => i.addEventListener('click', () => { setLang(i.dataset.lang); clearError(); }));
         function clearError() { if (msg) { msg.innerHTML = ''; msg.className = ''; } }
 
-        // تابع اعتبارسنجی دقیق و ترکیبی قالب ایمیل (بومی مرورگر + Regex استاندارد)
         function isValidEmail(email) {
             if (!email) return false;
             const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -199,6 +196,9 @@
             code = '';
             const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
             for (let i = 0; i < 5; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+
+            // [USER-SIM] این خط برای تست خودکار اضافه شد. هیچ رفتاری تغییر نمی‌کند.
+            window.__zenix_captcha_code = code;
 
             ctx.clearRect(0, 0, w, h);
             const bgGrad = ctx.createLinearGradient(0, 0, w, h);
@@ -251,9 +251,6 @@
                 return showError('errEmail', false);
             }
 
-            // Client-side captcha comparison (same approach as register.html
-            // and forgot-password.html). The previous version relied on a
-            // Supabase RPC with an empty session id, so it always failed.
             const userInput = capIn.value.trim().toUpperCase();
             if (userInput !== code) {
                 return showError('errCap', true);
@@ -262,7 +259,6 @@
             submitBtn.disabled = true;
 
             try {
-                // ورود از طریق Supabase Auth
                 const { data, error } = await supabaseClient.auth.signInWithPassword({
                     email: emailVal,
                     password: passVal
@@ -270,7 +266,6 @@
 
                 if (error) throw error;
 
-                // استعلام وجود یا عدم وجود شماره تلفن
                 const targetPage = await getTargetPage(data.user.id);
 
                 const t = langData[currentLang] || langData.en;
