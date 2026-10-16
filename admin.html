@@ -695,7 +695,64 @@
         const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
+
+        // ============================================================
+        // ADMIN AUTHENTICATION GUARD
+        // ============================================================
+        // admin.html is published publicly on GitHub Pages. Without a check
+        // here, anyone could open this URL and read every user, change balances,
+        // read chats, or ban accounts. This guard runs before any other code
+        // so the admin UI never renders for an unauthorized visitor.
+        //
+        // The list of admins is NOT stored in this file. It lives in the
+        // Supabase `admins` table, protected by RLS. The `is_current_user_admin()`
+        // RPC returns a boolean. If it returns false, we redirect to index.html.
+        // This means no email address appears in this public source file.
+        async function guardAdminAccess() {
+            try {
+                const { data: userData, error: userError } = await supabaseClient.auth.getUser();
+                const user = userData && userData.user;
+                if (userError || !user) {
+                    window.location.replace('index.html');
+                    return false;
+                }
+                const { data: isAdmin, error: rpcError } = await supabaseClient.rpc('is_current_user_admin');
+                if (rpcError || isAdmin !== true) {
+                    try { await supabaseClient.auth.signOut(); } catch (_) {}
+                    window.location.replace('index.html');
+                    return false;
+                }
+                return true;
+            } catch (_) {
+                window.location.replace('index.html');
+                return false;
+            }
+        }
+
+        // ============================================================
+        // NTFY TOPIC (loaded from Supabase, not hardcoded)
+        // ============================================================
+        // The public ntfy topic used to be a string in this file. Because
+        // this file is served publicly on GitHub Pages, that made the topic
+        // discoverable by anyone reading the source. The value now lives in
+        // the Supabase `app_settings` table with row-level security so only
+        // an authenticated admin can read it.
+        let NTFY_TOPIC = null;
+        async function loadNtfyTopic() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('app_settings')
+                    .select('value')
+                    .eq('key', 'ntfy_topic')
+                    .maybeSingle();
+                if (!error && data && data.value) {
+                    NTFY_TOPIC = String(data.value).trim();
+                }
+            } catch (_) {
+                NTFY_TOPIC = null;
+            }
+        }
+
         let uMap = {};
         let currentActiveChatId = null;
         let chatChannel = null;
@@ -776,10 +833,10 @@
             } catch (e) {}
         }
 
-        const NTFY_TOPIC = "zenix-admin"; 
         let prevD = -1, prevW = -1, prevR = -1, prevChat = -1;
 
         async function sendNtfyAlert(titleText, messageText) {
+            if (!NTFY_TOPIC) return;
             try {
                 await fetch('https://ntfy.sh', {
                     method: 'POST',
@@ -792,6 +849,10 @@
         document.getElementById('test-ntfy-btn')?.addEventListener('click', async () => {
             unlockAudio();
             playAlertSound();
+            if (!NTFY_TOPIC) {
+                showToast('تاپیک ntfy تنظیم نشده است (جدول app_settings را بررسی کنید).', 'error');
+                return;
+            }
             await sendNtfyAlert("🧪 تست آلارم Zenix", "این یک پیام تست برای بررسی زنگ خوردن گوشی است.");
             showToast("پیام تست به ntfy ارسال شد.");
         });
@@ -1433,10 +1494,18 @@
         document.getElementById('logout-btn')?.addEventListener('click', async () => { await supabaseClient.auth.signOut(); window.location.href = 'login.html'; });
         document.getElementById('mobile-logout-btn')?.addEventListener('click', async () => { await supabaseClient.auth.signOut(); window.location.href = 'login.html'; });
 
-        loadData();
-        loadCasinoData();
-        initSupportChatListener();
-        initRealtimeDataListeners();
+        // ============================================================
+        // BOOTSTRAP: guard first, then load data
+        // ============================================================
+        (async () => {
+            const ok = await guardAdminAccess();
+            if (!ok) return;
+            await loadNtfyTopic();
+            loadData();
+            loadCasinoData();
+            initSupportChatListener();
+            initRealtimeDataListeners();
+        })();
     </script>
 </body>
 </html>
