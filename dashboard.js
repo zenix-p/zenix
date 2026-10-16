@@ -5,6 +5,18 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
 
+// HTML escape helper: neutralises any HTML tag or attribute-breaking
+// character coming from user-controlled data (notification subjects,
+// bodies, admin messages, etc.) before it is placed into innerHTML.
+function escapeHtml(value) {
+    return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 function safeGetItem(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
 function safeSetItem(key, val) { try { localStorage.setItem(key, val); } catch(e) { /* quota or privacy mode: writing is best-effort */ } }
 
@@ -87,16 +99,22 @@ async function fetchCryptoPrices() {
             const change = coin.price_change_percentage_24h || 0;
             const changeClass = change >= 0 ? 'price-up' : 'price-down';
             const changeSign = change >= 0 ? '+' : '';
+            // Even though CoinGecko is a trusted source, escape its string
+            // fields before inserting them, so a compromised or spoofed API
+            // response cannot inject markup either.
+            const safeSymbol = escapeHtml(coin.symbol.toUpperCase());
+            const safeName = escapeHtml(coin.name);
+            const safeImage = escapeHtml(coin.image);
 
             html += `
                 <div class="crypto-row">
                     <div class="crypto-info">
                         <div class="crypto-icon">
-                            <img src="${coin.image}" alt="${coin.symbol}">
+                            <img src="${safeImage}" alt="${safeSymbol}">
                         </div>
                         <div>
-                            <strong style="color:#fff;font-size:12px;">${coin.symbol.toUpperCase()}</strong>
-                            <span style="font-size:10px;color:#94a3b8;display:block;">${coin.name}</span>
+                            <strong style="color:#fff;font-size:12px;">${safeSymbol}</strong>
+                            <span style="font-size:10px;color:#94a3b8;display:block;">${safeName}</span>
                         </div>
                     </div>
                     <div style="text-align:right;">
@@ -218,13 +236,21 @@ function renderMessageList() {
         else if (cat === 'rejected') { iconClass = 'fa-times-circle'; iconColor = '#ef4444'; }
         else { iconClass = 'fa-bullhorn'; iconColor = '#38bdf8'; }
 
+        // Escape the subject, body and time — these come from the
+        // notifications table and could contain HTML if any writer was not
+        // careful. The icon class / colour above are always literals we set,
+        // so they do not need escaping.
+        const safeSubject = escapeHtml(m.subject);
+        const safeBody = escapeHtml(m.body);
+        const safeTime = escapeHtml(dTime);
+
         html += `<div class="msg-body-box" style="cursor:pointer;border-right:${unread ? '3px solid #38bdf8' : '1px solid rgba(255,255,255,.08)'};" onclick="window.readAdminMessage(${realIdx})">
             <div style="display:flex;justify-content:space-between;align-items:center;">
-                <div class="msg-title-text" style="${unread ? 'color:#fff;font-weight:800;' : ''}"><i class="fas ${iconClass}" style="color:${iconColor};margin-left:5px;"></i> ${m.subject}</div>
+                <div class="msg-title-text" style="${unread ? 'color:#fff;font-weight:800;' : ''}"><i class="fas ${iconClass}" style="color:${iconColor};margin-left:5px;"></i> ${safeSubject}</div>
                 ${unread ? `<span style="font-size:9px;background:#38bdf8;color:#0f172a;padding:2px 6px;border-radius:4px;font-weight:700;">${t.newBadge || 'جدید'}</span>` : ''}
             </div>
-            <div class="msg-desc-text" style="margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${m.body}</div>
-            <div style="font-size:10px;color:#64748b;margin-top:6px;text-align:left" dir="ltr">${dTime}</div>
+            <div class="msg-desc-text" style="margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${safeBody}</div>
+            <div style="font-size:10px;color:#64748b;margin-top:6px;text-align:left" dir="ltr">${safeTime}</div>
         </div>`;
     });
     c.innerHTML = html + '</div>';
@@ -245,7 +271,9 @@ window.readAdminMessage = async idx => {
     let dateEl = document.getElementById('detail-msg-date');
     let bodyEl = document.getElementById('detail-msg-body');
 
-    if (titleEl) titleEl.innerHTML = `<i class="fas fa-envelope-open"></i> ${m.subject}`;
+    // The subject is user/DB-controlled so it is escaped before the innerHTML
+    // assignment. The body uses textContent which is safe by construction.
+    if (titleEl) titleEl.innerHTML = `<i class="fas fa-envelope-open"></i> ${escapeHtml(m.subject)}`;
     if (dateEl) {
         dateEl.textContent = m.time || '';
         dateEl.style.display = m.time ? 'block' : 'none';
