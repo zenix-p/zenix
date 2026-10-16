@@ -165,7 +165,7 @@
         // referenced directly from inline onclick handlers. It must NOT
         // depend on variables that live inside the <script type="module">
         // block, because those are scoped to that module and not visible
-        // here. This previously caused "langData is not defined" errors.
+        // here.
         const ZENIX_TOGGLE_LABELS = {
             en: { show: 'Show password', hide: 'Hide password' },
             fa: { show: 'نمایش رمز عبور', hide: 'مخفی کردن رمز عبور' },
@@ -201,6 +201,21 @@
         const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // HTML escape helper: neutralises any HTML tag or attribute-breaking
+        // character coming from translation strings or dynamic content before
+        // it is placed into innerHTML. Even though langData is written by the
+        // developers (not end users), the scanner flags innerHTML that mixes
+        // variables with markup, so we escape every variable for defence in
+        // depth.
+        function escapeHtml(value) {
+            return String(value == null ? '' : value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         const langData = {
             fa:{dir:'rtl',wel:'ثبت‌نام حساب کاربری جدید',email:'ایمیل',emailP:'ایمیل',name:'نام و نام خانوادگی',nameP:'نام و نام خانوادگی',pass:'رمز عبور',passP:'رمز عبور',confirmPass:'تکرار رمز عبور',confirmPassP:'تکرار رمز عبور',ref:'کد معرف',refP:'کد معرف',cap:'کد امنیتی',capP:'کد را وارد کنید',btn:'ثبت‌نام در زنیکس',back:'بازگشت به صفحه اصلی',succ:'ثبت‌نام با موفقیت انجام شد!',err:'کد امنیتی اشتباه است!',refErr:'کد معرف معتبر نیست یا وجود ندارد!',passErr:'رمز عبور و تکرار آن مطابقت ندارند!',lenErr:'رمز عبور باید حداقل ۶ کاراکتر باشد!',existErr:'این ایمیل قبلاً ثبت شده است!',supTitle:'پشتیبانی',langTitle:'تغییر زبان',showPass:'نمایش رمز عبور',hidePass:'مخفی کردن رمز عبور',refreshCap:'تازه‌سازی کد امنیتی'},
             en:{dir:'ltr',wel:'Register New Account',email:'Email',emailP:'Email',name:'Full Name',nameP:'Full Name',pass:'Password',passP:'Password',confirmPass:'Confirm Password',confirmPassP:'Confirm Password',ref:'Referral Code',refP:'Referral Code',cap:'Security Code',capP:'Enter code',btn:'Sign Up',back:'Back to Main Page',succ:'Successfully registered!',err:'Invalid security code!',refErr:'Invalid or non-existent referral code!',passErr:'Passwords do not match!',lenErr:'Password must be at least 6 characters!',existErr:'Email already registered!',supTitle:'Support',langTitle:'Change Language',showPass:'Show password',hidePass:'Hide password',refreshCap:'Refresh security code'},
@@ -226,27 +241,29 @@
             document.documentElement.setAttribute('dir', t.dir);
             document.documentElement.setAttribute('lang', l);
             document.getElementById('t-wel').textContent = t.wel;
-            document.getElementById('l-email').innerHTML = `<i class="fas fa-envelope"></i> ${t.email} <span class="req">*</span>`;
+            // Every variable inserted into an innerHTML template is escaped.
+            // The icons and <span class="req">*</span> remain literal markup.
+            document.getElementById('l-email').innerHTML = `<i class="fas fa-envelope"></i> ${escapeHtml(t.email)} <span class="req">*</span>`;
             document.getElementById('email').placeholder = t.emailP;
             document.getElementById('email').setAttribute('aria-label', t.email);
-            document.getElementById('l-name').innerHTML = `<i class="fas fa-id-card"></i> ${t.name} <span class="req">*</span>`;
+            document.getElementById('l-name').innerHTML = `<i class="fas fa-id-card"></i> ${escapeHtml(t.name)} <span class="req">*</span>`;
             document.getElementById('fullname').placeholder = t.nameP;
             document.getElementById('fullname').setAttribute('aria-label', t.name);
-            document.getElementById('l-pass').innerHTML = `<i class="fas fa-lock"></i> ${t.pass} <span class="req">*</span>`;
+            document.getElementById('l-pass').innerHTML = `<i class="fas fa-lock"></i> ${escapeHtml(t.pass)} <span class="req">*</span>`;
             document.getElementById('pass').placeholder = t.passP;
             document.getElementById('pass').setAttribute('aria-label', t.pass);
-            document.getElementById('l-confirm-pass').innerHTML = `<i class="fas fa-lock"></i> ${t.confirmPass} <span class="req">*</span>`;
+            document.getElementById('l-confirm-pass').innerHTML = `<i class="fas fa-lock"></i> ${escapeHtml(t.confirmPass)} <span class="req">*</span>`;
             document.getElementById('confirm-pass').placeholder = t.confirmPassP;
             document.getElementById('confirm-pass').setAttribute('aria-label', t.confirmPass);
-            document.getElementById('l-ref').innerHTML = `<i class="fas fa-ticket"></i> ${t.ref} <span class="req">*</span>`;
+            document.getElementById('l-ref').innerHTML = `<i class="fas fa-ticket"></i> ${escapeHtml(t.ref)} <span class="req">*</span>`;
             document.getElementById('ref-in').placeholder = t.refP;
             document.getElementById('ref-in').setAttribute('aria-label', t.ref);
-            document.getElementById('l-cap').innerHTML = `<i class="fas fa-shield-alt"></i> ${t.cap} <span class="req">*</span>`;
+            document.getElementById('l-cap').innerHTML = `<i class="fas fa-shield-alt"></i> ${escapeHtml(t.cap)} <span class="req">*</span>`;
             document.getElementById('cap-in').placeholder = t.capP;
             document.getElementById('cap-in').setAttribute('aria-label', t.cap);
             document.getElementById('t-btn').textContent = t.btn;
             const arrowIcon = t.dir === 'rtl' ? 'fa-arrow-right' : 'fa-arrow-left';
-            document.getElementById('t-back').innerHTML = `<i class="fas ${arrowIcon}"></i> ${t.back}`;
+            document.getElementById('t-back').innerHTML = `<i class="fas ${arrowIcon}"></i> ${escapeHtml(t.back)}`;
             document.getElementById('btn-support')?.setAttribute('title', t.supTitle);
             langBtn?.setAttribute('title', t.langTitle);
             const refBtn = document.getElementById('ref-btn');
@@ -320,19 +337,10 @@
         document.getElementById('ref-btn').onclick = () => { capIn.value = ''; drawCap(); chk(); };
         cv.onclick = () => { drawCap(); chk(); };
         
-        // ============================================================
-        // Unique referral-code generator
-        // ============================================================
-        // The previous implementation used Math.random(), which:
-        //   * is not cryptographically strong,
-        //   * is not guaranteed to be unique across users,
-        //   * can collide more often than expected under load.
-        //
-        // This version uses the Web Crypto API (crypto.getRandomValues) for
-        // strong randomness and additionally queries the profiles table to
-        // confirm the candidate code is not already in use. The database
-        // should also enforce a UNIQUE constraint on profiles.referral_code,
-        // so a concurrent insert can never produce a duplicate.
+        // Unique referral-code generator using the Web Crypto API. It also
+        // verifies the candidate code is not already in use in the profiles
+        // table. The database should additionally enforce a UNIQUE constraint
+        // on profiles.referral_code so a concurrent insert cannot collide.
         async function generateUniqueReferralCode() {
             for (let attempt = 0; attempt < 5; attempt += 1) {
                 const randomBytes = new Uint32Array(1);
@@ -347,15 +355,12 @@
                     if (error) throw error;
                     if (!data) return candidate;
                 } catch (_) {
-                    // If the uniqueness lookup itself fails (offline, transient
-                    // network error), return the candidate anyway. The UNIQUE
-                    // constraint on the database will reject the row on insert
-                    // if it happens to collide, and the user can retry.
+                    // Uniqueness lookup failed (offline, transient network error).
+                    // Return the candidate anyway; the UNIQUE constraint on the
+                    // database will reject the row if it collides.
                     return candidate;
                 }
             }
-            // Fallback for the extremely unlikely case that all five attempts
-            // collided with existing codes: append the current timestamp.
             const fallbackBytes = new Uint32Array(1);
             crypto.getRandomValues(fallbackBytes);
             return 'ZX-' + Date.now().toString().slice(-6) + (fallbackBytes[0] % 1000).toString().padStart(3, '0');
