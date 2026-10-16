@@ -440,7 +440,7 @@
                 gain.connect(audioCtx.destination);
                 osc.start();
                 osc.stop(audioCtx.currentTime + duration);
-            } catch(e){}
+            } catch(e) { /* Web Audio may be unavailable or blocked; sound is non-critical */ }
         }
 
         async function fetchUserBalance() {
@@ -457,7 +457,7 @@
                         renderWelcomeName(name);
                     }
                 }
-            } catch (e) {}
+            } catch (e) { /* balance fetch is best-effort; the local value stays until the next successful refresh */ }
         }
 
         function renderWelcomeName(name) {
@@ -730,7 +730,7 @@
                             if (count !== null && count !== undefined) {
                                 totalBetsCount = count;
                             }
-                        } catch(e) {}
+                        } catch(e) { /* pending-bet count is best-effort; the local count is used as a fallback */ }
                     }
 
                     if (totalBetsCount >= 2) {
