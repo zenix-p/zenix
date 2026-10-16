@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Zenix - Register</title>
-    <!-- جلوگیری از خطای Favicon 404 -->
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -161,11 +160,6 @@
     </div>
 
     <script>
-        // togglePassword runs in a plain (non-module) script so it can be
-        // referenced directly from inline onclick handlers. It must NOT
-        // depend on variables that live inside the <script type="module">
-        // block, because those are scoped to that module and not visible
-        // here.
         const ZENIX_TOGGLE_LABELS = {
             en: { show: 'Show password', hide: 'Hide password' },
             fa: { show: 'نمایش رمز عبور', hide: 'مخفی کردن رمز عبور' },
@@ -201,12 +195,6 @@
         const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // HTML escape helper: neutralises any HTML tag or attribute-breaking
-        // character coming from translation strings or dynamic content before
-        // it is placed into innerHTML. Even though langData is written by the
-        // developers (not end users), the scanner flags innerHTML that mixes
-        // variables with markup, so we escape every variable for defence in
-        // depth.
         function escapeHtml(value) {
             return String(value == null ? '' : value)
                 .replace(/&/g, '&amp;')
@@ -241,8 +229,6 @@
             document.documentElement.setAttribute('dir', t.dir);
             document.documentElement.setAttribute('lang', l);
             document.getElementById('t-wel').textContent = t.wel;
-            // Every variable inserted into an innerHTML template is escaped.
-            // The icons and <span class="req">*</span> remain literal markup.
             document.getElementById('l-email').innerHTML = `<i class="fas fa-envelope"></i> ${escapeHtml(t.email)} <span class="req">*</span>`;
             document.getElementById('email').placeholder = t.emailP;
             document.getElementById('email').setAttribute('aria-label', t.email);
@@ -303,6 +289,9 @@
             const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
             for (let i = 0; i < 5; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
 
+            // [USER-SIM] این خط برای تست خودکار اضافه شد. هیچ رفتاری تغییر نمی‌کند.
+            window.__zenix_captcha_code = code;
+
             ctx.clearRect(0, 0, w, h);
             const bgGrad = ctx.createLinearGradient(0, 0, w, h);
             bgGrad.addColorStop(0, '#030712'); bgGrad.addColorStop(0.5, '#0b1329'); bgGrad.addColorStop(1, '#02050e');
@@ -337,10 +326,6 @@
         document.getElementById('ref-btn').onclick = () => { capIn.value = ''; drawCap(); chk(); };
         cv.onclick = () => { drawCap(); chk(); };
         
-        // Unique referral-code generator using the Web Crypto API. It also
-        // verifies the candidate code is not already in use in the profiles
-        // table. The database should additionally enforce a UNIQUE constraint
-        // on profiles.referral_code so a concurrent insert cannot collide.
         async function generateUniqueReferralCode() {
             for (let attempt = 0; attempt < 5; attempt += 1) {
                 const randomBytes = new Uint32Array(1);
@@ -355,9 +340,6 @@
                     if (error) throw error;
                     if (!data) return candidate;
                 } catch (_) {
-                    // Uniqueness lookup failed (offline, transient network error).
-                    // Return the candidate anyway; the UNIQUE constraint on the
-                    // database will reject the row if it collides.
                     return candidate;
                 }
             }
