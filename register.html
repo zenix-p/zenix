@@ -298,14 +298,10 @@
             }
 
             try {
-                const { data, error } = await supabaseClient
-                    .from('profiles')
-                    .select('id')
-                    .limit(1);
-
+                const { data: isAllowed, error } = await supabaseClient.rpc('can_register_with_admin');
                 if (error) throw error;
 
-                if (!data || data.length === 0) {
+                if (isAllowed === true) {
                     refIn.value = 'ADMIN';
                     chk();
                     return;
@@ -428,7 +424,7 @@
             const refCodeValue = refIn.value.trim().toUpperCase();
 
             try {
-                // ★ مرحله ۲ امنیتی: بررسی صحت کد معرف قبل از ثبت‌نام
+                // بررسی صحت کد معرف قبل از ثبت‌نام
                 if (refCodeValue !== 'ADMIN') {
                     const { data: refData, error: refError } = await supabaseClient
                         .from('profiles')
@@ -437,7 +433,16 @@
                         .maybeSingle();
 
                     if (refError || !refData) {
-                        msg.textContent = t.refErr; // پیام "کد معرف معتبر نیست"
+                        msg.textContent = t.refErr;
+                        msg.className = 'err';
+                        btn.disabled = false;
+                        return;
+                    }
+                } else {
+                    // بررسی مجدد اینکه آیا واقعاً اولین کاربر است
+                    const { data: isAllowed, error: rpcError } = await supabaseClient.rpc('can_register_with_admin');
+                    if (rpcError || isAllowed !== true) {
+                        msg.textContent = t.refErr;
                         msg.className = 'err';
                         btn.disabled = false;
                         return;
@@ -479,7 +484,6 @@
                         console.error('خطا در ثبت پروفایل:', profileErr);
                     }
 
-                    // موجودی توسط تریگر دیتابیس تنظیم می‌شود
                     const { error: updateErr } = await supabaseClient
                         .from('users')
                         .update({
@@ -508,11 +512,16 @@
 
             } catch (error) {
                 btn.disabled = false;
-                if (error.message?.toLowerCase().includes('already registered') || error.status === 400) {
+                
+                // ★ اصلاح شد: مدیریت خطای امنیتی که از دیتابیس (تریگر) برمی‌گردد
+                if (error.message && error.message.includes('Security Error')) {
+                    msg.textContent = t.refErr; // نمایش پیام "کد معرف نامعتبر است" به جای ارور انگلیسی
+                } else if (error.message?.toLowerCase().includes('already registered') || error.status === 400) {
                     msg.textContent = t.existErr;
                 } else {
                     msg.textContent = error.message || t.errGeneral;
                 }
+                
                 msg.className = 'err';
                 capIn.value = '';
                 drawCap();
