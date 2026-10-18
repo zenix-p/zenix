@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Zenix - Register</title>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.cn">
+    <link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin>
+    <link href="https://fonts.googleapis.cn/css2?family=Orbitron:wght@700;900&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Vazirmatn',system-ui,sans-serif}
         body{background:#030712;min-height:100vh;display:flex;justify-content:center;align-items:center;color:#f8fafc;padding:15px}
@@ -18,8 +18,7 @@
         .lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none;transition:.2s}
         .lb:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.3)}
         .menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;width:max-content;padding:5px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8)}
-        [dir="rtl"] .wrap .menu{left:0}
-        [dir="ltr"] .wrap .menu{right:0}
+        [dir="rtl"] .wrap .menu{left:0}[dir="ltr"] .wrap .menu{right:0}
         .menu.show{display:block!important}
         .mi{padding:6px 12px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap;transition:.2s}
         .mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}
@@ -63,6 +62,11 @@
         .succ{color:#22c55e;background:rgba(34,197,94,.1)}
         #invite-required{display:none;margin-top:10px;padding:10px 12px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);border-radius:10px;color:#fca5a5;font-size:12px;line-height:1.6;}
         #invite-required.show{display:block}
+
+        /* ★ جلوگیری از زوم شدن صفحه در موبایل */
+        @media (max-width: 768px) {
+            input, select, textarea { font-size: 16px !important; }
+        }
     </style>
     <style id="zenix-placeholder-contrast-fix">
         input::placeholder { color: #f8fafc !important; opacity: 1 !important; -webkit-text-fill-color: #f8fafc !important; }
@@ -195,7 +199,7 @@
     </script>
 
     <script type="module">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+        import { createClient } from 'https://cdn.jsdmirror.com/npm/@supabase/supabase-js@2/+esm';
 
         const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
@@ -329,12 +333,26 @@
         
         function drawCap() {
             if (!cv) return;
-            const ctx = cv.getContext('2d'), w = cv.width, h = cv.height;
+            
+            // ★ اصلاح وضوح برای صفحه‌های رتینا (موبایل)
+            const dpr = window.devicePixelRatio || 1;
+            const rect = cv.getBoundingClientRect();
+            const width = rect.width || 165;
+            const height = rect.height || 44;
+
+            cv.width = width * dpr;
+            cv.height = height * dpr;
+            
+            const ctx = cv.getContext('2d');
+            ctx.scale(dpr, dpr);
+            
+            const w = width, h = height;
+            
             code = '';
             const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
             for (let i = 0; i < 5; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
 
-            window.__zenix_captcha_code = code;
+            // ★ خط window.__zenix_captcha_code برای امنیت حذف شد.
 
             ctx.clearRect(0, 0, w, h);
             const bgGrad = ctx.createLinearGradient(0, 0, w, h);
