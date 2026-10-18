@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Zenix - Next-Gen Admin Dashboard</title>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.cn">
+    <link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin>
+    <link href="https://fonts.googleapis.cn/css2?family=Orbitron:wght@700;800;900&family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="manifest" href="manifest-admin.json">
     <meta name="theme-color" content="#0a0f1e">
     <meta name="mobile-web-app-capable" content="yes">
@@ -239,6 +239,7 @@
         .chat-msg-box.user { align-self: flex-end; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); color: #cbd5e1; border-top-left-radius: 2px; }
         .messaging-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         footer { text-align: center; padding: 20px; font-size: 11px; color: #64748b; border-top: 1px solid var(--line); margin-top: auto; }
+        
         @media (max-width: 960px) {
             .app-shell { flex-direction: column; }
             .sidebar {
@@ -260,7 +261,9 @@
             .topbar-badge span { display: none; }
             .topbar-badge i { font-size: 12px; margin: 0; }
             .main .c { padding: 16px 12px 8px; }
-            .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+            
+            /* ★ اصلاح چیدمان کارت‌های آماری در موبایل (۲ ستونه شد) */
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
             .stat-card { padding: 14px 10px; gap: 8px; }
             .stat-icon { width: 34px; height: 34px; font-size: 15px; border-radius: 10px; }
             .stat-info span { font-size: 10px; }
@@ -271,6 +274,9 @@
             .chat-container-layout { flex-direction: column; height: auto; min-height: 0; }
             .chat-list-panel { width: 100%; max-height: 220px; }
             .chat-main-panel { width: 100%; min-height: 350px; }
+            
+            /* ★ جلوگیری از زوم در فیلدهای ادمین */
+            input, select, textarea { font-size: 16px !important; }
         }
     </style>
 </head>
@@ -517,15 +523,12 @@
     <footer><p>&copy; 2026 Zenix Platform - Enterprise Admin Dashboard</p></footer>
 
     <script type="module">
-        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+        import { createClient } from "https://cdn.jsdmirror.com/npm/@supabase/supabase-js@2/+esm";
 
         const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // HTML escape helper: neutralises any HTML tag or attribute-breaking
-        // character coming from user-controlled data before it is placed
-        // into innerHTML.
         function escapeHtml(value) {
             return String(value == null ? '' : value)
                 .replace(/&/g, '&amp;')
