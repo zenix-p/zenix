@@ -1,7 +1,6 @@
 // ==========================================
 // 1. تنظیمات اولیه و اتصال به سوبابیس
 // ==========================================
-// ★ اصلاح CDN سوپابیس
 import { createClient } from 'https://cdn.jsdmirror.com/npm/@supabase/supabase-js@2/+esm';
 const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
@@ -48,7 +47,7 @@ function generateUIDDigits(userId) {
 }
 
 // ==========================================
-// 2. مدیریت مدال‌های پلتفرم (درباره، راهنما، کازینو)
+// 2. مدیریت مدال‌های پلتفرم
 // ==========================================
 window.openAboutModal = function() {
     document.getElementById('m-about-modal')?.classList.add('show');
@@ -78,7 +77,7 @@ window.closeCasinoModal = function() {
 };
 
 // ==========================================
-// 3. سیستم دریافت و نمایش بازار ارزهای دیجیتال (۳ ارز برتر از ۳۰)
+// 3. سیستم دریافت و نمایش بازار ارزهای دیجیتال
 // ==========================================
 async function fetchCryptoPrices() {
     const tickerContainer = document.getElementById('crypto-ticker-list');
@@ -144,7 +143,7 @@ fetchCryptoPrices();
 setInterval(fetchCryptoPrices, 30000);
 
 // ==========================================
-// 4. سیستم اعلان‌ها و زنگوله
+// 4. سیستم اعلان‌ها
 // ==========================================
 function getNotifCategory(m) {
     let t = (m.type || '').toLowerCase();
@@ -282,7 +281,7 @@ document.getElementById('bell-btn')?.addEventListener('click', e => {
 
 
 // ==========================================
-// 5. سیستم ترجمه کامل ۸ زبانه
+// 5. سیستم ترجمه کامل ۸ زبانه (با اصلاح باگ‌های جدید)
 // ==========================================
 const SUPPORTED_LANGUAGES = ['en', 'fa', 'ar', 'tr', 'ru', 'es', 'fr', 'de'];
 const savedLang = safeGetItem('zenix_lang');
@@ -290,7 +289,7 @@ let currLang = SUPPORTED_LANGUAGES.includes(savedLang) ? savedLang : 'en';
 
 const ld = {
     fa: {
-        m1: 'صفحه اصلی', m2: 'کوانتیفیکیشن', m3: 'واریز', m4: 'برداشت', m5: 'تراکنش', m6: 'پروفایل', m7: 'پشتیبانی', m_about: 'درباره پلتفرم', m8: 'خروج',
+        m1: 'صفحه اصلی', m2: 'کوانتیفیکیشن', m3: 'واریز', m4: 'برداشت', m_team: 'تیم من', m5: 'تراکنش', m6: 'پروفایل', m7: 'پشتیبانی', m_about: 'درباره پلتفرم', m8: 'خروج',
         wel: 'خوش آمدید', sub: 'پنل مدیریت کاربری', st: 'تایید شده',
         ts1: 'موجودی', ts2: 'زیرمجموعه',
         c1: 'کوانتیفیکیشن', d1: 'معاملات هوشمند',
@@ -306,7 +305,10 @@ const ld = {
         aboutGoal: '<strong style="color:#38bdf8;">هدف ما:</strong> دموکراتیزه کردن دسترسی به ابزارهای مالی پیشرفته، ایجاد شفافیت کامل در تراکنش‌ها و فراهم کردن محیطی امن، پویا و سودآور برای تمامی کاربران، از مبتدی تا حرفه‌ای است.',
         aboutStrategy: '<strong style="color:#38bdf8;">استراتژی ما:</strong> تمرکز بر امنیت حداکثری و حریم خصوصی، پردازش آنی تراکنش‌ها با الگوریتم‌های مدرن، و خلق ارزش پایدار از طریق سیستم‌های پیشرفته پاداش‌دهی و توسعه تیمی.',
         aboutConclusion: '<i class="fas fa-quote-right" style="color:#38bdf8;margin-left:4px;"></i> زِنیکس تنها یک پلتفرم نیست؛ بلکه همراه مطمئن شما در مسیر هوشمندسازی و ساخت آینده‌ای روشن‌تر در دنیای مالی دیجیتال است. با ما همراه شوید تا مرزهای جدیدی از موفقیت را فتح کنید.',
-        floatingCasino: 'کازینو',
+        floatingCasino: 'کازینو', floatingCasinoTitle: 'بازی‌های کازینو',
+        helpBtnTitle: 'راهنمای صفحه داشبورد',
+        detailMsgTitle: 'مشاهده پیام',
+        aboutModalTitle: '<i class="fas fa-info-circle"></i> درباره پلتفرم هوشمند زِنیکس',
         modalTitle: 'صندوق پیام‌ها و اعلان‌ها', noMsg: 'هیچ پیام جدیدی وجود ندارد.', newBadge: 'جدید',
         tabAll: 'همه', tabApproved: 'تایید درخواست', tabRejected: 'لغو درخواست', tabAdmin: 'پیام مدیریت',
         helpTitle: 'راهنمای جامع داشبورد زِنیکس',
@@ -323,7 +325,7 @@ const ld = {
         casinoPlinko: 'پلینکو (پاپالان)', casinoPlinkoDesc: 'بازی محبوب ریزش مهره‌ها'
     },
     en: {
-        m1: 'Home', m2: 'Quantification', m3: 'Deposit', m4: 'Withdraw', m5: 'Transactions', m6: 'Profile', m7: 'Support', m_about: 'About Platform', m8: 'Logout',
+        m1: 'Home', m2: 'Quantification', m3: 'Deposit', m4: 'Withdraw', m_team: 'My Team', m5: 'Transactions', m6: 'Profile', m7: 'Support', m_about: 'About Platform', m8: 'Logout',
         wel: 'Welcome', sub: 'User Management Panel', st: 'Verified',
         ts1: 'Balance', ts2: 'Referrals',
         c1: 'Quantification', d1: 'Smart Trading',
@@ -339,7 +341,10 @@ const ld = {
         aboutGoal: '<strong style="color:#38bdf8;">Our Goal:</strong> To democratize access to advanced financial tools, ensure complete transparency, and provide a secure, dynamic, and profitable environment for all users worldwide.',
         aboutStrategy: '<strong style="color:#38bdf8;">Our Strategy:</strong> Focusing on maximum security and privacy, instant transaction processing using modern algorithms, and creating sustainable value through advanced reward systems and team development.',
         aboutConclusion: '<i class="fas fa-quote-right" style="color:#38bdf8;margin-left:4px;"></i> Zenix is more than just a platform; it is your reliable partner on the path to smarter investing and building a brighter future in digital finance. Join us to conquer new heights of success.',
-        floatingCasino: 'Casino',
+        floatingCasino: 'Casino', floatingCasinoTitle: 'Casino Games',
+        helpBtnTitle: 'Dashboard Help',
+        detailMsgTitle: 'View Message',
+        aboutModalTitle: '<i class="fas fa-info-circle"></i> About Zenix Smart Platform',
         modalTitle: 'Notifications & Messages', noMsg: 'No new messages.', newBadge: 'NEW',
         tabAll: 'All', tabApproved: 'Approved', tabRejected: 'Rejected', tabAdmin: 'Admin Msg',
         helpTitle: 'Zenix Dashboard Comprehensive Guide',
@@ -356,7 +361,7 @@ const ld = {
         casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Popular dropping ball game'
     },
     ar: {
-        m1: 'الرئيسية', m2: 'التكميم', m3: 'إيداع', m4: 'سحب', m5: 'المعاملات', m6: 'الملف الشخصي', m7: 'الدعم', m_about: 'حول المنصة', m8: 'تسجيل الخروج',
+        m1: 'الرئيسية', m2: 'التكميم', m3: 'إيداع', m4: 'سحب', m_team: 'فريقي', m5: 'المعاملات', m6: 'الملف الشخصي', m7: 'الدعم', m_about: 'حول المنصة', m8: 'تسجيل الخروج',
         wel: 'أهلاً بك', sub: 'لوحة إدارة المستخدم', st: 'موثق',
         ts1: 'الرصيد', ts2: 'الإحالات',
         c1: 'التكميم', d1: 'التداول الذكي',
@@ -372,7 +377,10 @@ const ld = {
         aboutGoal: '<strong style="color:#38bdf8;">هدفنا:</strong> إضفاء الطابع الديمقراطي على الوصول إلى الأدوات المالية المتقدمة، وضمان الشفافية الكاملة، وتوفير بيئة آمنة ومربحة.',
         aboutStrategy: '<strong style="color:#38bdf8;">استراتيجيتنا:</strong> التركيز على أقصى درجات الأمان والخصوصية والمعالجة الفورية للمعاملات.',
         aboutConclusion: 'Zenix هي أكثر من مجرد منصة؛ إنها شريكك الموثوق لبناء مستقبل مشرق.',
-        floatingCasino: 'كازينو',
+        floatingCasino: 'كازينو', floatingCasinoTitle: 'ألعاب الكازينو',
+        helpBtnTitle: 'مساعدة لوحة التحكم',
+        detailMsgTitle: 'عرض الرسالة',
+        aboutModalTitle: '<i class="fas fa-info-circle"></i> حول منصة Zenix الذكية',
         modalTitle: 'صندوق الرسائل والإشعارات', noMsg: 'لا توجد رسائل جديدة.', newBadge: 'جديد',
         tabAll: 'الكل', tabApproved: 'طلبات مقبولة', tabRejected: 'طلبات مرفوضة', tabAdmin: 'رسائل الإدارة',
         helpTitle: 'دليل لوحة تحكم Zenix الشامل',
@@ -389,7 +397,7 @@ const ld = {
         casinoPlinko: 'بلينكو', casinoPlinkoDesc: 'لعبة سقوط الكرات الشهيرة'
     },
     tr: {
-        m1: 'Ana Sayfa', m2: 'Kuantifikasyon', m3: 'Yatırım', m4: 'Çekim', m5: 'İşlemler', m6: 'Profil', m7: 'Destek', m_about: 'Platform Hakkında', m8: 'Çıkış',
+        m1: 'Ana Sayfa', m2: 'Kuantifikasyon', m3: 'Yatırım', m4: 'Çekim', m_team: 'Ekibim', m5: 'İşlemler', m6: 'Profil', m7: 'Destek', m_about: 'Platform Hakkında', m8: 'Çıkış',
         wel: 'Hoş Geldiniz', sub: 'Kullanıcı Yönetim Paneli', st: 'Onaylandı',
         ts1: 'Bakiye', ts2: 'Referanslar',
         c1: 'Kuantifikasyon', d1: 'Akıllı İşlem',
@@ -405,7 +413,10 @@ const ld = {
         aboutGoal: '<strong style="color:#38bdf8;">Hedefimiz:</strong> Gelişmiş finansal araçlara erişimi demokratikleştirerek güvenli ortam sağlamak.',
         aboutStrategy: '<strong style="color:#38bdf8;">Stratejimiz:</strong> Maksimum güvenlik ve gizlilik odaklı modern algoritmalar.',
         aboutConclusion: 'Zenix sadece bir platform değil; geleceğinizi inşa eden güvenilir ortağınızdır.',
-        floatingCasino: 'Casino',
+        floatingCasino: 'Casino', floatingCasinoTitle: 'Casino Oyunları',
+        helpBtnTitle: 'Panel Yardımı',
+        detailMsgTitle: 'Mesajı Görüntüle',
+        aboutModalTitle: '<i class="fas fa-info-circle"></i> Zenix Akıllı Platform Hakkında',
         modalTitle: 'Bildirimler ve Mesajlar', noMsg: 'Yeni mesaj yok.', newBadge: 'YENİ',
         tabAll: 'Tümü', tabApproved: 'Onaylanan', tabRejected: 'Reddedilen', tabAdmin: 'Yönetici',
         helpTitle: 'Zenix Kontrol Paneli Kapsamlı Rehberi',
@@ -422,7 +433,7 @@ const ld = {
         casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Popüler top bırakma oyunu'
     },
     ru: {
-        m1: 'Главная', m2: 'Квантификация', m3: 'Депозит', m4: 'Вывод', m5: 'Транзакции', m6: 'Профиль', m7: 'Поддержка', m_about: 'О платформе', m8: 'Выход',
+        m1: 'Главная', m2: 'Квантификация', m3: 'Депозит', m4: 'Вывод', m_team: 'Команда', m5: 'Транзакции', m6: 'Профиль', m7: 'Поддержка', m_about: 'О платформе', m8: 'Выход',
         wel: 'Добро пожаловать', sub: 'Панель управления', st: 'Подтверждено',
         ts1: 'Баланс', ts2: 'Рефералы',
         c1: 'Квантификация', d1: 'Умная торговля',
@@ -438,7 +449,10 @@ const ld = {
         aboutGoal: '<strong style="color:#38bdf8;">Наша цель:</strong> демократизировать доступ.',
         aboutStrategy: '<strong style="color:#38bdf8;">Наша стратегия:</strong> безопасность.',
         aboutConclusion: 'Zenix — ваш надежный партнер.',
-        floatingCasino: 'Казино',
+        floatingCasino: 'Казино', floatingCasinoTitle: 'Игры казино',
+        helpBtnTitle: 'Помощь',
+        detailMsgTitle: 'Просмотр сообщения',
+        aboutModalTitle: '<i class="fas fa-info-circle"></i> О смарт-платформе Zenix',
         modalTitle: 'Уведомления', noMsg: 'Нет новых сообщений.', newBadge: 'НОВОЕ',
         tabAll: 'Все', tabApproved: 'Одобрено', tabRejected: 'Отклонено', tabAdmin: 'Админ',
         helpTitle: 'Руководство панели управления Zenix',
@@ -455,7 +469,7 @@ const ld = {
         casinoPlinko: 'Плинко', casinoPlinkoDesc: 'Популярная игра с шариками'
     },
     es: {
-        m1: 'Inicio', m2: 'Cuantificación', m3: 'Depósito', m4: 'Retiro', m5: 'Transacciones', m6: 'Perfil', m7: 'Soporte', m_about: 'Sobre la plataforma', m8: 'Cerrar sesión',
+        m1: 'Inicio', m2: 'Cuantificación', m3: 'Depósito', m4: 'Retiro', m_team: 'Equipo', m5: 'Transacciones', m6: 'Perfil', m7: 'Soporte', m_about: 'Sobre la plataforma', m8: 'Cerrar sesión',
         wel: 'Bienvenido', sub: 'Panel de gestión de usuario', st: 'Verificado',
         ts1: 'Saldo', ts2: 'Referidos',
         c1: 'Cuantificación', d1: 'Comercio inteligente',
@@ -471,7 +485,10 @@ const ld = {
         aboutGoal: '<strong style="color:#38bdf8;">Objetivo:</strong> Democratizar el acceso.',
         aboutStrategy: '<strong style="color:#38bdf8;">Estrategia:</strong> Seguridad.',
         aboutConclusion: 'Zenix es su socio.',
-        floatingCasino: 'Casino',
+        floatingCasino: 'Casino', floatingCasinoTitle: 'Juegos de Casino',
+        helpBtnTitle: 'Ayuda',
+        detailMsgTitle: 'Ver mensaje',
+        aboutModalTitle: '<i class="fas fa-info-circle"></i> Sobre la plataforma inteligente Zenix',
         modalTitle: 'Notificaciones', noMsg: 'No hay mensajes nuevos.', newBadge: 'NUEVO',
         tabAll: 'Todo', tabApproved: 'Aprobado', tabRejected: 'Rechazado', tabAdmin: 'Admin',
         helpTitle: 'Guía de Zenix',
@@ -488,7 +505,7 @@ const ld = {
         casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Popular juego de caída'
     },
     fr: {
-        m1: 'Accueil', m2: 'Quantification', m3: 'Dépôt', m4: 'Retrait', m5: 'Transactions', m6: 'Profil', m7: 'Support', m_about: 'À propos', m8: 'Déconnexion',
+        m1: 'Accueil', m2: 'Quantification', m3: 'Dépôt', m4: 'Retrait', m_team: 'Équipe', m5: 'Transactions', m6: 'Profil', m7: 'Support', m_about: 'À propos', m8: 'Déconnexion',
         wel: 'Bienvenue', sub: 'Panneau de gestion', st: 'Vérifié',
         ts1: 'Solde', ts2: 'Parrainages',
         c1: 'Quantification', d1: 'Trading intelligent',
@@ -504,7 +521,10 @@ const ld = {
         aboutGoal: 'Objectif.',
         aboutStrategy: 'Stratégie.',
         aboutConclusion: 'Zenix partenaire.',
-        floatingCasino: 'Casino',
+        floatingCasino: 'Casino', floatingCasinoTitle: 'Jeux de casino',
+        helpBtnTitle: 'Aide',
+        detailMsgTitle: 'Voir le message',
+        aboutModalTitle: '<i class="fas fa-info-circle"></i> À propos de la plateforme intelligente Zenix',
         modalTitle: 'Notifications', noMsg: 'Aucun nouveau message.', newBadge: 'NOUVEAU',
         tabAll: 'Tout', tabApproved: 'Approuvé', tabRejected: 'Rejeté', tabAdmin: 'Admin',
         helpTitle: 'Guide Zenix',
@@ -521,7 +541,7 @@ const ld = {
         casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Jeu populaire de balles'
     },
     de: {
-        m1: 'Startseite', m2: 'Quantifizierung', m3: 'Einzahlung', m4: 'Auszahlung', m5: 'Transaktionen', m6: 'Profil', m7: 'Unterstützung', m_about: 'Über die Plattform', m8: 'Abmelden',
+        m1: 'Startseite', m2: 'Quantifizierung', m3: 'Einzahlung', m4: 'Auszahlung', m_team: 'Team', m5: 'Transaktionen', m6: 'Profil', m7: 'Unterstützung', m_about: 'Über die Plattform', m8: 'Abmelden',
         wel: 'Willkommen', sub: 'Benutzer-Management-Panel', st: 'Verifiziert',
         ts1: 'Guthaben', ts2: 'Empfehlungen',
         c1: 'Quantifizierung', d1: 'Smart Trading',
@@ -537,7 +557,10 @@ const ld = {
         aboutGoal: 'Ziel.',
         aboutStrategy: 'Strategie.',
         aboutConclusion: 'Zenix Partner.',
-        floatingCasino: 'Casino',
+        floatingCasino: 'Casino', floatingCasinoTitle: 'Casino-Spiele',
+        helpBtnTitle: 'Hilfe',
+        detailMsgTitle: 'Nachricht anzeigen',
+        aboutModalTitle: '<i class="fas fa-info-circle"></i> Über die intelligente Zenix-Plattform',
         modalTitle: 'Benachrichtigungen', noMsg: 'Keine neuen Nachrichten.', newBadge: 'NEU',
         tabAll: 'Alle', tabApproved: 'Genehmigt', tabRejected: 'Abgelehnt', tabAdmin: 'Admin',
         helpTitle: 'Zenix Leitfaden',
@@ -578,8 +601,20 @@ function setLang(l) {
         if (m) m.textContent = t['m' + i] || '';
     }
 
+    // ★ اصلاح شد: ترجمه منوی تیم و سایر متن‌های هاردکد شده
+    let mTeam = document.getElementById('m_team');
+    if (mTeam) mTeam.textContent = t.m_team;
+
     let mAbout = document.getElementById('m_about');
     if (mAbout) mAbout.textContent = t.m_about;
+
+    // ★ اصلاح شد: ترجمه Tooltipهای دکمه‌ها
+    document.getElementById('help-btn')?.setAttribute('title', t.helpBtnTitle);
+    document.getElementById('floating-casino-btn')?.setAttribute('title', t.floatingCasinoTitle);
+
+    // ★ اصلاح شد: ترجمه عنوان مودال مشاهده پیام
+    let detailMsgTitle = document.getElementById('detail-msg-title');
+    if (detailMsgTitle) detailMsgTitle.innerHTML = `<i class="fas fa-envelope-open"></i> ${t.detailMsgTitle}`;
 
     const setTxt = (id, text) => {
         const el = document.getElementById(id);
@@ -612,7 +647,8 @@ function setLang(l) {
     setHtml('t-about-box-strategy', t.aboutStrategy);
     setHtml('t-about-box-conclusion', t.aboutConclusion);
 
-    setTxt('t-about-modal-title', t.aboutTitle);
+    // ★ اصلاح شد: حفظ آیکون در مودال درباره ما
+    setHtml('t-about-modal-title', t.aboutModalTitle);
     setTxt('t-about-modal-intro', t.aboutIntro);
     setTxt('t-about-modal-desc', t.aboutDesc);
     setHtml('t-about-modal-goal', t.aboutGoal);
