@@ -9,6 +9,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin>
     <link href="https://fonts.googleapis.cn/css2?family=Orbitron:wght@700;900&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- ★ اصلاح شد: اعمال فوری زبان و جهت قبل از رندر شدن صفحه (جلوگیری از فلش زدن) -->
+    <script>(function(){
+        var s = localStorage.getItem('zenix_lang') || 'en';
+        var r = ['fa','ar'];
+        document.documentElement.setAttribute('dir', r.includes(s) ? 'rtl' : 'ltr');
+        document.documentElement.setAttribute('lang', s);
+    })();</script>
+
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Vazirmatn',system-ui,sans-serif}
         body{background:#030712;min-height:100vh;display:flex;justify-content:center;align-items:center;color:#f8fafc;padding:15px}
@@ -489,7 +498,6 @@
                 if (error.message?.toLowerCase().includes('already registered') || error.status === 400) {
                     msg.textContent = t.existErr;
                 } else {
-                    // ★ اصلاح شد: استفاده از کلید ترجمه به جای متن ثابت فارسی
                     msg.textContent = error.message || t.errGeneral;
                 }
                 msg.className = 'err';
