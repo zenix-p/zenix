@@ -196,7 +196,22 @@
 
         function drawCap() {
             if (!cv) return;
-            const ctx = cv.getContext('2d'), w = cv.width, h = cv.height;
+            
+            // اصلاح وضوح برای صفحه‌های رتینا (موبایل و مک)
+            const dpr = window.devicePixelRatio || 1;
+            const rect = cv.getBoundingClientRect();
+            
+            const width = rect.width || 165;
+            const height = rect.height || 44;
+
+            cv.width = width * dpr;
+            cv.height = height * dpr;
+            
+            const ctx = cv.getContext('2d');
+            ctx.scale(dpr, dpr);
+            
+            const w = width, h = height;
+            
             code = '';
             const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
             for (let i = 0; i < 5; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
