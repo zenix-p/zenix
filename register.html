@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    
+    <!-- ★ اصلاح شد: اضافه کردن CSP برای اجازه دادن به کلادفلر -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://cdn.jsdmirror.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.cn https://cdnjs.loli.net; font-src 'self' data: https://fonts.gstatic.cn; img-src 'self' data:; connect-src 'self' https://ujyenmqdgivuxvxptwyl.supabase.co wss://ujyenmqdgivuxvxptwyl.supabase.co https://challenges.cloudflare.com; frame-src 'self' https://challenges.cloudflare.com;">
+    
     <title>Zenix - Register</title>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <link rel="preconnect" href="https://fonts.googleapis.cn">
@@ -149,7 +153,7 @@
                 </div>
             </div>
 
-            <!-- ویجت کپچا با کلید واقعی شما -->
+            <!-- ویجت کپچا -->
             <div class="group" style="display:flex; justify-content:center; margin-bottom:14px;">
                 <div class="cf-turnstile" data-sitekey="0x4AAAAAAFaU1RVZfnTURKOc" data-theme="dark" data-callback="onloadTurnstileCallback"></div>
             </div>
@@ -282,11 +286,7 @@
                 return;
             }
             try {
-                // ★ لاگ برای دیباگ
-                console.log("Checking if database is empty to allow ADMIN registration...");
                 const { data: isAllowed, error } = await supabaseClient.rpc('can_register_with_admin');
-                console.log("RPC Result:", isAllowed, "Error:", error);
-                
                 if (error) throw error;
                 if (isAllowed === true) {
                     refIn.value = 'ADMIN';
@@ -297,7 +297,6 @@
                 if (inviteBox) inviteBox.classList.add('show');
                 chk();
             } catch (e) {
-                console.error("RPC Error:", e);
                 refIn.value = '';
                 if (inviteBox) inviteBox.classList.add('show');
                 chk();
@@ -405,7 +404,6 @@
                     const userId = authData.user.id;
                     const myNewReferralCode = await generateUniqueReferralCode();
 
-                    // ★ فقط پروفایل را ثبت می‌کنیم. جدول users توسط تریگر دیتابیس ساخته می‌شود.
                     const { error: profileErr } = await supabaseClient.from('profiles').insert([{ 
                         id: userId, 
                         email: emailValue, 
