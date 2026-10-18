@@ -9,9 +9,7 @@
             try {
                 var saved = localStorage.getItem('zenix_lang');
                 if (supported.indexOf(saved) !== -1) language = saved;
-            } catch (e) {
-                /* localStorage may be unavailable (private browsing or disabled storage); default to English. */
-            }
+            } catch (e) {}
             document.documentElement.setAttribute('lang', language);
             document.documentElement.setAttribute('dir', language === 'fa' || language === 'ar' ? 'rtl' : 'ltr');
         })();
@@ -21,12 +19,15 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Zenix - Dashboard</title>
-    <!-- جلوگیری از خطای 404 Favicon -->
     <link rel="icon" href="data:image/x-icon;base64,=">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    
+    <!-- ★ اصلاح CDN فونت‌ها -->
+    <link rel="preconnect" href="https://fonts.googleapis.cn">
+    <link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin>
+    <link href="https://fonts.googleapis.cn/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- ★ اصلاح CDN آیکون‌ها -->
+    <link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
         body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
@@ -77,10 +78,8 @@
         .price-up{color:#22c55e!important;font-weight:bold}
         .price-down{color:#ef4444!important;font-weight:bold}
         
-        /* باکس جامع معرفی و استراتژی در داشبورد */
         .platform-info-box{background:rgba(15,23,42,.85);border:1px solid rgba(56,189,248,.25);border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
         
-        /* مودال‌ها و صندوق پیام‌ها */
         .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
         .modal.show{display:flex}
         .modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(56,189,248,.3);border-radius:20px;width:100%;max-width:460px;max-height:85vh;display:flex;flex-direction:column;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.9);overflow:hidden}
@@ -108,17 +107,25 @@
         
         footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
         
-        /* دکمه شناور کازینو */
         .floating-casino-wrap{position:fixed;right:18px;bottom:25px;z-index:999}
         .floating-casino{display:flex;flex-direction:column;align-items:center;justify-content:center;width:60px;height:60px;background:linear-gradient(135deg,#f43f5e,#a855f7,#0ea5e9);border:2px solid rgba(255,255,255,.4);border-radius:50%;color:#fff;cursor:pointer;box-shadow:0 0 20px rgba(244,63,94,.6),0 0 10px rgba(168,85,247,.5);transition:all .3s ease;animation:floatingCasinoPulse 2.5s infinite ease-in-out}
         .floating-casino:hover{transform:scale(1.12);box-shadow:0 0 30px rgba(244,63,94,.9),0 0 15px rgba(56,189,248,.8);color:#fff}
         .floating-casino i{font-size:22px}
         .floating-casino span{font-size:9px;font-weight:800;margin-top:2px;letter-spacing:.5px;text-shadow:0 1px 2px rgba(0,0,0,.8)}
         @keyframes floatingCasinoPulse{0%,100%{transform:scale(1);box-shadow:0 0 15px rgba(244,63,94,.5),0 0 10px rgba(168,85,247,.4)}50%{transform:translateY(-6px) scale(1.06);box-shadow:0 0 25px rgba(244,63,94,.85),0 0 20px rgba(56,189,248,.7)}}
+
+        /* ★ اصلاحات ریسپانسیو برای موبایل */
+        @media (max-width: 480px) {
+            .stats { grid-template-columns: 1fr; }
+            .grid { grid-template-columns: 1fr; }
+            .hr { gap: 5px; }
+            .lb { width: 32px; height: 32px; font-size: 12px; }
+            .logo-text { font-size: 16px; }
+            .wel { flex-direction: column; align-items: flex-start; }
+        }
     </style>
 </head>
 <body>
-    <!-- دکمه شناور کازینو -->
     <div class="floating-casino-wrap">
         <button type="button" class="floating-casino" id="floating-casino-btn" title="کازینو" onclick="window.openCasinoModal(); return false;">
             <i class="fas fa-dice"></i>
@@ -126,7 +133,6 @@
         </button>
     </div>
 
-    <!-- مدال انتخاب بازی‌های کازینو -->
     <div class="modal" id="m-casino-modal" style="z-index:1050;">
         <div class="modal-content">
             <div class="modal-header">
@@ -212,7 +218,6 @@
             <div id="crypto-ticker-list"></div>
         </div>
 
-        <!-- باکس جامع معرفی، هدف و استراتژی زِنیکس (در زیر بازار ارزهای دیجیتال) -->
         <div class="platform-info-box">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;">
                 <div style="width:34px;height:34px;background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#38bdf8;font-size:15px;">
@@ -230,7 +235,6 @@
         </div>
     </div>
 
-    <!-- مدال صندوق پیام‌ها و اعلان‌ها -->
     <div class="modal" id="m-msg">
         <div class="modal-content">
             <div class="modal-header">
@@ -247,7 +251,6 @@
         </div>
     </div>
 
-    <!-- مدال مشاهده جزئیات پیام -->
     <div class="modal" id="m-msg-detail" style="z-index:1050;">
         <div class="modal-content">
             <div class="modal-header">
@@ -262,7 +265,6 @@
         </div>
     </div>
 
-    <!-- مدال درباره پلتفرم (بازشونده از منوی همبرگری) -->
     <div class="modal" id="m-about-modal" style="z-index:1050;">
         <div class="modal-content">
             <div class="modal-header">
@@ -279,7 +281,6 @@
         </div>
     </div>
 
-    <!-- مدال راهنمای جامع بخش داشبورد -->
     <div class="modal" id="m-help-modal" style="z-index:1050;">
         <div class="modal-content">
             <div class="modal-header">
@@ -324,8 +325,8 @@
         <p>&copy; 2026 Zenix. All rights reserved.</p>
     </footer>
 
-    <!-- Supabase و اسکریپت اصلی داشبورد (نسخه ۱۸ برای رفع کش) -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script type="module" src="dashboard.js?v=19"></script>
+    <!-- ★ اصلاح CDN سوپابیس -->
+    <script src="https://cdn.jsdmirror.com/npm/@supabase/supabase-js@2" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="module" src="dashboard.js?v=20"></script>
 </body>
 </html>
