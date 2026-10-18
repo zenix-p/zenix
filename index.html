@@ -116,7 +116,7 @@
         };
 
         let currentLang = localStorage.getItem('zenix_lang') || 'en', code = '';
-        let submitCounter = 0; // برای جلوگیری از تداخل پاسخ‌های دیررس شبکه
+        let submitCounter = 0;
 
         const langBtn = document.getElementById('lang-btn'), langMenu = document.getElementById('lang-menu'), cv = document.getElementById('c-canvas'), capIn = document.getElementById('cap-in'), userIn = document.getElementById('user'), passIn = document.getElementById('pass'), submitBtn = document.getElementById('t-btn'), msg = document.getElementById('msg'), form = document.getElementById('form'), authCard = document.getElementById('auth-card');
 
@@ -150,7 +150,7 @@
         document.addEventListener('click', e => { if (!e.target.closest('.menu') && !e.target.closest('#lang-btn')) langMenu?.classList.remove('show'); });
 
         function setLang(l) {
-            submitCounter++; // لغو درخواست‌های در حال انتظار
+            submitCounter++;
             currentLang = l; localStorage.setItem('zenix_lang', l); langMenu?.classList.remove('show');
             const t = langData[l] || langData.en;
             document.documentElement.setAttribute('dir', t.dir); document.documentElement.setAttribute('lang', l);
@@ -197,7 +197,6 @@
         function drawCap() {
             if (!cv) return;
             
-            // اصلاح وضوح برای صفحه‌های رتینا (موبایل و مک)
             const dpr = window.devicePixelRatio || 1;
             const rect = cv.getBoundingClientRect();
             
@@ -216,7 +215,7 @@
             const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
             for (let i = 0; i < 5; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
 
-            window.__zenix_captcha_code = code;
+            // ⚠️ لایه ۱ امنیتی: خط window.__zenix_captcha_code حذف شد تا هکرها نتوانند از کنسول آن را بخوانند.
 
             ctx.clearRect(0, 0, w, h);
             const bgGrad = ctx.createLinearGradient(0, 0, w, h);
@@ -276,7 +275,7 @@
 
             const currentSubmit = ++submitCounter;
             submitBtn.disabled = true;
-            clearError(); // پاک کردن پیام‌های قبلی هنگام ارسال درخواست جدید
+            clearError();
 
             try {
                 const { data, error } = await supabaseClient.auth.signInWithPassword({
@@ -284,7 +283,6 @@
                     password: passVal
                 });
 
-                // اگر کاربر زبان را عوض کرده باشد یا درخواست جدیدی فرستاده باشد، این نتیجه را نادیده بگیر
                 if (currentSubmit !== submitCounter) return;
 
                 if (error) throw error;
@@ -297,7 +295,7 @@
                 msg.innerHTML = `<div>${t.succ}</div>`; msg.className = 'succ show';
                 setTimeout(() => { window.location.href = targetPage; }, 1000);
             } catch (error) {
-                if (currentSubmit !== submitCounter) return; // نادیده گرفتن خطای درخواست‌های قدیمی
+                if (currentSubmit !== submitCounter) return;
                 
                 console.error('Login Error:', error);
                 submitBtn.disabled = false;
