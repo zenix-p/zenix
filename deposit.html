@@ -13,10 +13,14 @@
 </script>
 <title>Zenix - Deposit</title>
 <link rel="icon" href="data:image/x-icon;base64,=">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- ★ اصلاح CDN فونت‌ها -->
+<link rel="preconnect" href="https://fonts.googleapis.cn">
+<link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin>
+<link href="https://fonts.googleapis.cn/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+
+<!-- ★ اصلاح CDN آیکون‌ها -->
+<link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
 body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
@@ -126,6 +130,16 @@ input[readonly] {
 }
 
 footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:800px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
+
+/* ★ اصلاحات ریسپانسیو برای موبایل */
+@media (max-width: 480px) {
+    .hr { gap: 4px; flex-wrap: wrap; justify-content: center; }
+    .lb { width: 32px; height: 32px; font-size: 12px; }
+    .logo-text { font-size: 16px; }
+    .wel { flex-direction: column; align-items: flex-start; }
+    input, select, textarea { font-size: 16px !important; } /* جلوگیری از زوم در Safari */
+    #net-trc20, #net-bep20 { padding: 8px 4px; font-size: 11px; }
+}
 </style>
 </head>
 <body>
@@ -163,9 +177,9 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
 <div id="status-box" style="display:none;padding:12px;border-radius:8px;font-size:12px;margin-bottom:12px;text-align:center;font-weight:600;"></div>
 
 <div style="font-size:13px;color:#38bdf8;font-weight:bold;margin-bottom:12px;"><i class="fas fa-network-wired"></i> <span data-i18n="selectNetwork">انتخاب شبکه و آدرس</span></div>
-<div style="display:flex;gap:10px;margin-bottom:14px;">
-<div id="net-trc20" onclick="setNetwork('TRC20')" style="flex:1;background:rgba(56,189,248,0.15);border:1px solid #38bdf8;padding:10px;border-radius:8px;text-align:center;font-size:12px;color:#f8fafc;font-weight:bold;cursor:pointer;">USDT (TRC20)</div>
-<div id="net-bep20" onclick="setNetwork('BEP20')" style="flex:1;background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.1);padding:10px;border-radius:8px;text-align:center;font-size:12px;color:#94a3b8;cursor:pointer;">USDT (BEP20)</div>
+<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+<div id="net-trc20" onclick="setNetwork('TRC20')" style="flex:1;min-width:120px;background:rgba(56,189,248,0.15);border:1px solid #38bdf8;padding:10px;border-radius:8px;text-align:center;font-size:12px;color:#f8fafc;font-weight:bold;cursor:pointer;">USDT (TRC20)</div>
+<div id="net-bep20" onclick="setNetwork('BEP20')" style="flex:1;min-width:120px;background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.1);padding:10px;border-radius:8px;text-align:center;font-size:12px;color:#94a3b8;cursor:pointer;">USDT (BEP20)</div>
 </div>
 <div style="text-align:center;margin:16px 0;">
 <div style="background:#fff;display:inline-block;padding:10px;border-radius:8px;margin-bottom:8px;">
@@ -486,7 +500,7 @@ document.onclick=()=>{[nM,lMenu].forEach(m=>m.classList.remove('show'));};docume
 </script>
 
 <script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+import { createClient } from 'https://cdn.jsdmirror.com/npm/@supabase/supabase-js@2/+esm';
 
 const SUPABASE_URL = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
