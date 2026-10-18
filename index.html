@@ -215,8 +215,6 @@
             const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
             for (let i = 0; i < 5; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
 
-            // ⚠️ لایه ۱ امنیتی: خط window.__zenix_captcha_code حذف شد تا هکرها نتوانند از کنسول آن را بخوانند.
-
             ctx.clearRect(0, 0, w, h);
             const bgGrad = ctx.createLinearGradient(0, 0, w, h);
             bgGrad.addColorStop(0, '#030712'); bgGrad.addColorStop(0.5, '#0b1329'); bgGrad.addColorStop(1, '#02050e');
@@ -299,7 +297,18 @@
                 
                 console.error('Login Error:', error);
                 submitBtn.disabled = false;
-                showError('errNoUser', true);
+
+                // لایه ۲ امنیتی: بررسی خطای محدودیت نرخ درخواست (Rate Limit - 429)
+                if (error.status === 429 || (error.message && error.message.toLowerCase().includes('too many requests'))) {
+                    const t = langData[currentLang] || langData.en;
+                    msg.innerHTML = `<div>${t.errTooMany}</div>`; 
+                    msg.className = 'err show';
+                    capIn.value = ''; 
+                    drawCap(); 
+                    checkInputs();
+                } else {
+                    showError('errNoUser', true);
+                }
             }
         });
 
