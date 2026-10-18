@@ -428,6 +428,22 @@
             const refCodeValue = refIn.value.trim().toUpperCase();
 
             try {
+                // ★ مرحله ۲ امنیتی: بررسی صحت کد معرف قبل از ثبت‌نام
+                if (refCodeValue !== 'ADMIN') {
+                    const { data: refData, error: refError } = await supabaseClient
+                        .from('profiles')
+                        .select('id')
+                        .eq('referral_code', refCodeValue)
+                        .maybeSingle();
+
+                    if (refError || !refData) {
+                        msg.textContent = t.refErr; // پیام "کد معرف معتبر نیست"
+                        msg.className = 'err';
+                        btn.disabled = false;
+                        return;
+                    }
+                }
+
                 const referrerFinalValue = refCodeValue || 'SYSTEM';
 
                 const { data: authData, error: authError } = await supabaseClient.auth.signUp({
@@ -448,7 +464,6 @@
                     const userId = authData.user.id;
                     const myNewReferralCode = await generateUniqueReferralCode();
 
-                    // ثبت پروفایل (کد معرف و معرف)
                     const { error: profileErr } = await supabaseClient
                         .from('profiles')
                         .insert([
@@ -464,9 +479,7 @@
                         console.error('خطا در ثبت پروفایل:', profileErr);
                     }
 
-                    // ★ اصلاح امنیتی: موجودی دیگر از سمت مرورگر ارسال نمی‌شود.
-                    // تریگر دیتابیس به صورت خودکار موجودی ۲ دلار را تنظیم می‌کند.
-                    // ما فقط اطلاعات متنی را آپدیت می‌کنیم.
+                    // موجودی توسط تریگر دیتابیس تنظیم می‌شود
                     const { error: updateErr } = await supabaseClient
                         .from('users')
                         .update({
@@ -476,7 +489,6 @@
                         .eq('id', userId);
 
                     if (updateErr) {
-                        // اگر رکورد وجود نداشت، آن را بدون فیلد balance می‌سازیم
                         const userPayload = {
                             id: userId,
                             email: emailValue,
