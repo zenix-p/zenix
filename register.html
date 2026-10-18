@@ -149,8 +149,9 @@
                 </div>
             </div>
 
+            <!-- ویجت کپچا با کلید واقعی شما -->
             <div class="group" style="display:flex; justify-content:center; margin-bottom:14px;">
-                <div class="cf-turnstile" data-sitekey="YOUR_SITE_KEY" data-theme="dark" data-callback="onloadTurnstileCallback"></div>
+                <div class="cf-turnstile" data-sitekey="0x4AAAAAAFaU1RVZfnTURKOc" data-theme="dark" data-callback="onloadTurnstileCallback"></div>
             </div>
 
             <button type="submit" id="t-btn" class="btn" disabled>Sign Up</button>
@@ -281,7 +282,11 @@
                 return;
             }
             try {
+                // ★ لاگ برای دیباگ
+                console.log("Checking if database is empty to allow ADMIN registration...");
                 const { data: isAllowed, error } = await supabaseClient.rpc('can_register_with_admin');
+                console.log("RPC Result:", isAllowed, "Error:", error);
+                
                 if (error) throw error;
                 if (isAllowed === true) {
                     refIn.value = 'ADMIN';
@@ -292,6 +297,7 @@
                 if (inviteBox) inviteBox.classList.add('show');
                 chk();
             } catch (e) {
+                console.error("RPC Error:", e);
                 refIn.value = '';
                 if (inviteBox) inviteBox.classList.add('show');
                 chk();
