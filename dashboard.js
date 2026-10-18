@@ -1,13 +1,11 @@
 // ==========================================
 // 1. تنظیمات اولیه و اتصال به سوبابیس
 // ==========================================
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+// ★ اصلاح CDN سوپابیس
+import { createClient } from 'https://cdn.jsdmirror.com/npm/@supabase/supabase-js@2/+esm';
 const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
 
-// HTML escape helper: neutralises any HTML tag or attribute-breaking
-// character coming from user-controlled data (notification subjects,
-// bodies, admin messages, etc.) before it is placed into innerHTML.
 function escapeHtml(value) {
     return String(value == null ? '' : value)
         .replace(/&/g, '&amp;')
@@ -18,12 +16,12 @@ function escapeHtml(value) {
 }
 
 function safeGetItem(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
-function safeSetItem(key, val) { try { localStorage.setItem(key, val); } catch(e) { /* quota or privacy mode: writing is best-effort */ } }
+function safeSetItem(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
 
 const customStorage = {
     getItem: (key) => safeGetItem(key),
     setItem: (key, value) => safeSetItem(key, value),
-    removeItem: (key) => { try { localStorage.removeItem(key); } catch(e) { /* removal is best-effort */ } }
+    removeItem: (key) => { try { localStorage.removeItem(key); } catch(e) {} }
 };
 
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -99,9 +97,6 @@ async function fetchCryptoPrices() {
             const change = coin.price_change_percentage_24h || 0;
             const changeClass = change >= 0 ? 'price-up' : 'price-down';
             const changeSign = change >= 0 ? '+' : '';
-            // Even though CoinGecko is a trusted source, escape its string
-            // fields before inserting them, so a compromised or spoofed API
-            // response cannot inject markup either.
             const safeSymbol = escapeHtml(coin.symbol.toUpperCase());
             const safeName = escapeHtml(coin.name);
             const safeImage = escapeHtml(coin.image);
@@ -236,10 +231,6 @@ function renderMessageList() {
         else if (cat === 'rejected') { iconClass = 'fa-times-circle'; iconColor = '#ef4444'; }
         else { iconClass = 'fa-bullhorn'; iconColor = '#38bdf8'; }
 
-        // Escape the subject, body and time — these come from the
-        // notifications table and could contain HTML if any writer was not
-        // careful. The icon class / colour above are always literals we set,
-        // so they do not need escaping.
         const safeSubject = escapeHtml(m.subject);
         const safeBody = escapeHtml(m.body);
         const safeTime = escapeHtml(dTime);
@@ -262,7 +253,7 @@ window.readAdminMessage = async idx => {
     if (currentUserId && m.id) {
         try {
             await supabaseClient.from('notifications').update({ read: true, is_read: true }).eq('id', m.id);
-        } catch(e) { /* mark-as-read is best-effort; the local UI already shows it as read */ }
+        } catch(e) {}
     }
     updateNotifBadges();
     renderMessageList();
@@ -271,8 +262,6 @@ window.readAdminMessage = async idx => {
     let dateEl = document.getElementById('detail-msg-date');
     let bodyEl = document.getElementById('detail-msg-body');
 
-    // The subject is user/DB-controlled so it is escaped before the innerHTML
-    // assignment. The body uses textContent which is safe by construction.
     if (titleEl) titleEl.innerHTML = `<i class="fas fa-envelope-open"></i> ${escapeHtml(m.subject)}`;
     if (dateEl) {
         dateEl.textContent = m.time || '';
@@ -293,7 +282,7 @@ document.getElementById('bell-btn')?.addEventListener('click', e => {
 
 
 // ==========================================
-// 5. سیستم ترجمه کامل ۸ زبانه با رنگ آبی فعال
+// 5. سیستم ترجمه کامل ۸ زبانه
 // ==========================================
 const SUPPORTED_LANGUAGES = ['en', 'fa', 'ar', 'tr', 'ru', 'es', 'fr', 'de'];
 const savedLang = safeGetItem('zenix_lang');
@@ -417,7 +406,7 @@ const ld = {
         aboutStrategy: '<strong style="color:#38bdf8;">Stratejimiz:</strong> Maksimum güvenlik ve gizlilik odaklı modern algoritmalar.',
         aboutConclusion: 'Zenix sadece bir platform değil; geleceğinizi inşa eden güvenilir ortağınızdır.',
         floatingCasino: 'Casino',
-        modalTitle: 'Bildirimler و Mesajlar', noMsg: 'Yeni mesaj yok.', newBadge: 'YENİ',
+        modalTitle: 'Bildirimler ve Mesajlar', noMsg: 'Yeni mesaj yok.', newBadge: 'YENİ',
         tabAll: 'Tümü', tabApproved: 'Onaylanan', tabRejected: 'Reddedilen', tabAdmin: 'Yönetici',
         helpTitle: 'Zenix Kontrol Paneli Kapsamlı Rehberi',
         helpIntro: 'Zenix kullanıcı yönetim paneline hoş geldiniz. Burada finansal performansınızın bir özetini bulabilirsiniz.',
@@ -693,7 +682,7 @@ async function loadDashboardUserData(uid, sessionUser) {
             if (dbProfiles && Array.isArray(dbProfiles)) {
                 rawList.push(...dbProfiles);
             }
-        } catch(e) { /* profiles fetch is best-effort; the users table already provides the main data */ }
+        } catch(e) {}
 
         if (meta.team_members || meta.referrals || meta.invited_users) {
             let metaTeam = meta.team_members || meta.referrals || meta.invited_users;
@@ -708,7 +697,7 @@ async function loadDashboardUserData(uid, sessionUser) {
                     if (Array.isArray(parsed)) rawList.push(...parsed);
                     else if (parsed && typeof parsed === 'object') rawList.push(parsed);
                 }
-            } catch(e) { /* legacy localStorage keys may be missing or malformed; skip only this key */ }
+            } catch(e) {}
         });
 
         let uniqueMap = new Map();
@@ -846,6 +835,6 @@ document.addEventListener('click', (e) => {
 
 document.getElementById('logout-btn')?.addEventListener('click', async e => {
     e.preventDefault();
-    try { await supabaseClient.auth.signOut(); } catch(e) { /* signOut is best-effort; the redirect below always runs */ }
+    try { await supabaseClient.auth.signOut(); } catch(e) {}
     window.location.href = 'index.html';
 });
