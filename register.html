@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.cn/css2?family=Orbitron:wght@700;900&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
     <script>(function(){
         var s = localStorage.getItem('zenix_lang') || 'en';
         var r = ['fa','ar'];
@@ -53,13 +55,6 @@
         input:focus{border-color:#38bdf8}
 
         input[readonly]{background:rgba(15,23,42,.6)!important;color:#94a3b8!important;border-color:rgba(255,255,255,.08)!important;cursor:not-allowed!important;user-select:none;pointer-events:none}
-
-        .cap-box{background:rgba(10,15,30,.5);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;margin-bottom:14px}
-        .cap-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px}
-        #c-canvas{border-radius:12px;background:#050811;border:1px solid rgba(56,189,248,.3);cursor:pointer;box-shadow:0 6px 25px rgba(0,0,0,.7),inset 0 0 15px rgba(56,189,248,.05)}
-        .ref-btn{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.4);border-radius:10px;color:#38bdf8;width:42px;height:42px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
-        .ref-btn:hover{background:rgba(56,189,248,.25);transform:rotate(180deg)}
-        .cap-input{text-align:center;letter-spacing:6px;font-weight:700;padding:8px!important;font-family:'Orbitron',sans-serif!important}
 
         .btn{width:100%;padding:12px;background:linear-gradient(135deg,#0284c7,#9333ea);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:bold;cursor:pointer}
         .btn:disabled{background:rgba(255,255,255,.1);color:#64748b;cursor:not-allowed}
@@ -153,16 +148,11 @@
                     <input type="text" id="ref-in" placeholder="Referral Code" aria-label="Referral Code" readonly required tabindex="-1">
                 </div>
             </div>
-            <div class="group">
-                <label id="l-cap" for="cap-in"><i class="fas fa-shield-alt"></i> Security Code <span class="req">*</span></label>
-                <div class="cap-box">
-                    <div class="cap-row">
-                        <canvas id="c-canvas" width="165" height="44"></canvas>
-                        <button type="button" class="ref-btn" id="ref-btn" aria-label="Refresh security code"><i class="fas fa-sync-alt"></i></button>
-                    </div>
-                    <input type="text" id="cap-in" class="cap-input" placeholder="Enter code" aria-label="Security code" maxlength="5" autocomplete="off" required>
-                </div>
+
+            <div class="group" style="display:flex; justify-content:center; margin-bottom:14px;">
+                <div class="cf-turnstile" data-sitekey="YOUR_SITE_KEY" data-theme="dark" data-callback="onloadTurnstileCallback"></div>
             </div>
+
             <button type="submit" id="t-btn" class="btn" disabled>Sign Up</button>
             <div id="msg"></div>
             <div id="invite-required">
@@ -222,17 +212,17 @@
         }
 
         const langData = {
-            fa:{dir:'rtl',wel:'ثبت‌نام حساب کاربری جدید',inviteTitle:'لینک دعوت لازم است.',inviteDesc:'برای ساخت هر حساب جدید، یک کد معرف لازم است. لطفاً صفحه ثبت‌نام را از طریق لینک دعوت باز کنید. اگر قبلاً لینک را دریافت کرده‌اید، از شخصی که شما را دعوت کرده بخواهید آن را دوباره ارسال کند.',email:'ایمیل',emailP:'ایمیل',name:'نام و نام خانوادگی',nameP:'نام و نام خانوادگی',pass:'رمز عبور',passP:'رمز عبور',confirmPass:'تکرار رمز عبور',confirmPassP:'تکرار رمز عبور',ref:'کد معرف',refP:'کد معرف',cap:'کد امنیتی',capP:'کد را وارد کنید',btn:'ثبت‌نام در زنیکس',back:'بازگشت به صفحه اصلی',succ:'ثبت‌نام با موفقیت انجام شد!',err:'کد امنیتی اشتباه است!',refErr:'کد معرف معتبر نیست یا وجود ندارد!',passErr:'رمز عبور و تکرار آن مطابقت ندارند!',lenErr:'رمز عبور باید حداقل ۶ کاراکتر باشد!',existErr:'این ایمیل قبلاً ثبت شده است!',emailErr:'لطفاً یک آدرس ایمیل معتبر وارد کنید!',errGeneral:'خطایی رخ داده است!',supTitle:'پشتیبانی',langTitle:'تغییر زبان',showPass:'نمایش رمز عبور',hidePass:'مخفی کردن رمز عبور',refreshCap:'تازه‌سازی کد امنیتی'},
-            en:{dir:'ltr',wel:'Register New Account',inviteTitle:'Invitation required.',inviteDesc:'A referral code is required for every new account. Please open the registration page through an invitation link. If you already have one, ask the person who invited you to resend it.',email:'Email',emailP:'Email',name:'Full Name',nameP:'Full Name',pass:'Password',passP:'Password',confirmPass:'Confirm Password',confirmPassP:'Confirm Password',ref:'Referral Code',refP:'Referral Code',cap:'Security Code',capP:'Enter code',btn:'Sign Up',back:'Back to Main Page',succ:'Successfully registered!',err:'Invalid security code!',refErr:'Invalid or non-existent referral code!',passErr:'Passwords do not match!',lenErr:'Password must be at least 6 characters!',existErr:'Email already registered!',emailErr:'Please enter a valid email address!',errGeneral:'An error occurred!',supTitle:'Support',langTitle:'Change Language',showPass:'Show password',hidePass:'Hide password',refreshCap:'Refresh security code'},
-            ar:{dir:'rtl',wel:'تسجيل حساب جديد',inviteTitle:'مطلوب رمز الإحالة.',inviteDesc:'رمز الإحالة مطلوب لإنشاء كل حساب جديد. يرجى فتح صفحة التسجيل من خلال رابط دعوة. إذا كان لديك واحد بالفعل، اطلب من الشخص الذي دعاك إعادة إرساله.',email:'البريد الإلكتروني',emailP:'البريد الإلكتروني',name:'الاسم الكامل',nameP:'الاسم الكامل',pass:'كلمة المرور',passP:'كلمة المرور',confirmPass:'تأكيد كلمة المرور',confirmPassP:'تأكيد كلمة المرور',ref:'رمز الإحالة',refP:'رمز الإحالة',cap:'رمز التحقق',capP:'أدخل الرمز',btn:'التسجيل في Zenix',back:'العودة للصفحة الرئيسية',succ:'تم التسجيل بنجاح!',err:'رمز التحقق غير صحيح!',refErr:'رمز الإحالة غير صالح أو غير موجود!',passErr:'كلمتا المرور غير متطابقتين!',lenErr:'يجب أن تكون كلمة المرور 6 أحرف على الأقل!',existErr:'هذا البريد الإلكتروني مسجل بالفعل!',emailErr:'يرجى إدخال بريد إلكتروني صالح!',errGeneral:'حدث خطأ!',supTitle:'الدعم الفني',langTitle:'تغيير اللغة',showPass:'إظهار كلمة المرور',hidePass:'إخفاء كلمة المرور',refreshCap:'تحديث رمز الأمان'},
-            tr:{dir:'ltr',wel:'Yeni Hesap Oluştur',inviteTitle:'Davet gerekli.',inviteDesc:'Her yeni hesap için bir referans kodu gereklidir. Lütfen kayıt sayfasını bir davet bağlantısı üzerinden açın. Zaten varsa, sizi davet eden kişiden yeniden göndermesini isteyin.',email:'E-posta',emailP:'E-posta',name:'Ad Soyad',nameP:'Ad Soyad',pass:'Şifre',passP:'Şifre',confirmPass:'Şifreyi Tekrarla',confirmPassP:'Şifreyi Tekrarla',ref:'Referans Kodu',refP:'Referans Kodu',cap:'Güvenlik Kodu',capP:'Kodu girin',btn:'Zenix\'e Kayıt Ol',back:'Ana Sayfaya Dön',succ:'Kayıt başarılı!',err:'Geçersiz güvenlik kodu!',refErr:'Geçersiz veya bulunmayan referans kodu!',passErr:'Şifreler eşleşmiyor!',lenErr:'Şifre en az 6 karakter olmalıdır!',existErr:'Bu e-posta zaten kayıtlı!',emailErr:'Lütfen geçerli bir e-posta adresi girin!',errGeneral:'Bir hata oluştu!',supTitle:'Destek',langTitle:'Dil Değiştir',showPass:'Şifreyi göster',hidePass:'Şifreyi gizle',refreshCap:'Güvenlik kodunu yenile'},
-            ru:{dir:'ltr',wel:'Регистрация аккаунта',inviteTitle:'Требуется приглашение.',inviteDesc:'Для создания нового аккаунта требуется реферальный код. Пожалуйста, откройте страницу регистрации по ссылке-приглашению. Если у вас уже есть код, попросите пригласившего отправить его снова.',email:'Эл. почта',emailP:'Эл. почта',name:'ФИО',nameP:'Введите ФИО',pass:'Пароль',passP:'Пароль',confirmPass:'Повторите пароль',confirmPassP:'Повторите пароль',ref:'Реферальный код',refP:'Реферальный код',cap:'Защитный код',capP:'Введите код',btn:'Зарегистрироваться',back:'На главную',succ:'Успешная регистрация!',err:'Неверный защитный код!',refErr:'Неверный реферальный код!',passErr:'Пароли не совпадают!',lenErr:'Пароль должен быть не менее 6 символов!',existErr:'Этот email уже зарегистрирован!',emailErr:'Пожалуйста, введите корректный адрес электронной почты!',errGeneral:'Произошла ошибка!',supTitle:'Поддержка',langTitle:'Сменить язык',showPass:'Показать пароль',hidePass:'Скрыть пароль',refreshCap:'Обновить код безопасности'},
-            es:{dir:'ltr',wel:'Registrar nueva cuenta',inviteTitle:'Se requiere invitación.',inviteDesc:'Se requiere un código de referencia para cada cuenta nueva. Abra la página de registro a través de un enlace de invitación. Si ya tiene uno, pida a la persona que lo invitó que lo reenvíe.',email:'Correo electrónico',emailP:'Correo electrónico',name:'Nombre completo',nameP:'Nombre completo',pass:'Contraseña',passP:'Contraseña',confirmPass:'Confirmar contraseña',confirmPassP:'Confirmar contraseña',ref:'Código de referencia',refP:'Código de referencia',cap:'Código de seguridad',capP:'Ingrese el código',btn:'Registrarse en Zenix',back:'Volver al inicio',succ:'¡Registro exitoso!',err:'¡Código inválido!',refErr:'¡Código de referencia inválido!',passErr:'¡Las contraseñas no coinciden!',lenErr:'¡La contraseña debe tener al menos 6 caracteres!',existErr:'¡Este correo ya está registrado!',emailErr:'¡Por favor ingrese un correo electrónico válido!',errGeneral:'¡Ocurrió un error!',supTitle:'Soporte',langTitle:'Cambiar idioma',showPass:'Mostrar contraseña',hidePass:'Ocultar contraseña',refreshCap:'Actualizar código de seguridad'},
-            fr:{dir:'ltr',wel:'Créer un compte',inviteTitle:'Invitation requise.',inviteDesc:'Un code de parrainage est requis pour chaque nouveau compte. Veuillez ouvrir la page d\'inscription via un lien d\'invitation. Si vous en avez déjà un, demandez à la personne qui vous a invité de le renvoyer.',email:'E-mail',emailP:'E-mail',name:'Nom complet',nameP:'Nom complet',pass:'Mot de passe',passP:'Mot de passe',confirmPass:'Confirmer',confirmPassP:'Confirmer',ref:'Code de parrainage',refP:'Code',cap:'Code de sécurité',capP:'Entrez le code',btn:'S\'inscrire',back:'Retour',succ:'Inscription réussie !',err:'Code invalide !',refErr:'Code de parrainage invalide !',passErr:'Les mots de passe ne correspondent pas !',lenErr:'Le mot de passe doit contenir au moins 6 caractères !',existErr:'E-mail déjà enregistré !',emailErr:'Veuillez saisir une adresse e-mail valide !',errGeneral:'Une erreur est survenue !',supTitle:'Support',langTitle:'Changer de langue',showPass:'Afficher le mot de passe',hidePass:'Masquer le mot de passe',refreshCap:'Actualiser le code de sécurité'},
-            de:{dir:'ltr',wel:'Konto erstellen',inviteTitle:'Einladung erforderlich.',inviteDesc:'Für jedes neue Konto ist ein Empfehlungscode erforderlich. Bitte öffnen Sie die Registrierungsseite über einen Einladungslink. Wenn Sie bereits einen haben, bitten Sie die Person, die Sie eingeladen hat, ihn erneut zu senden.',email:'E-Mail',emailP:'E-Mail',name:'Vollständiger Name',nameP:'Vollständiger Name',pass:'Passwort',passP:'Passwort',confirmPass:'Passwort bestätigen',confirmPassP:'Passwort bestätigen',ref:'Empfehlungscode',refP:'Empfehlungscode',cap:'Sicherheitscode',capP:'Code eingeben',btn:'Registrieren',back:'Zurück',succ:'Erfolgreich!',err:'Ungültiger Code!',refErr:'Ungültiger Empfehlungscode!',passErr:'Passwörter stimmen nicht überein!',lenErr:'Das Passwort muss mindestens 6 Zeichen lang sein!',existErr:'E-Mail bereits registriert!',emailErr:'Bitte geben Sie eine gültige E-Mail-Adresse ein!',errGeneral:'Ein Fehler ist aufgetreten!',supTitle:'Support',langTitle:'Sprache ändern',showPass:'Passwort anzeigen',hidePass:'Passwort verbergen',refreshCap:'Sicherheitscode aktualisieren'}
+            fa:{dir:'rtl',wel:'ثبت‌نام حساب کاربری جدید',inviteTitle:'لینک دعوت لازم است.',inviteDesc:'برای ساخت هر حساب جدید، یک کد معرف لازم است. لطفاً صفحه ثبت‌نام را از طریق لینک دعوت باز کنید. اگر قبلاً لینک را دریافت کرده‌اید، از شخصی که شما را دعوت کرده بخواهید آن را دوباره ارسال کند.',email:'ایمیل',emailP:'ایمیل',name:'نام و نام خانوادگی',nameP:'نام و نام خانوادگی',pass:'رمز عبور',passP:'رمز عبور',confirmPass:'تکرار رمز عبور',confirmPassP:'تکرار رمز عبور',ref:'کد معرف',refP:'کد معرف',btn:'ثبت‌نام در زنیکس',back:'بازگشت به صفحه اصلی',succ:'ثبت‌نام با موفقیت انجام شد!',refErr:'کد معرف معتبر نیست یا وجود ندارد!',passErr:'رمز عبور و تکرار آن مطابقت ندارند!',lenErr:'رمز عبور باید حداقل ۶ کاراکتر باشد!',existErr:'این ایمیل قبلاً ثبت شده است!',emailErr:'لطفاً یک آدرس ایمیل معتبر وارد کنید!',errGeneral:'خطایی رخ داده است!',errCaptcha:'لطفاً بررسی امنیتی را کامل کنید.',supTitle:'پشتیبانی',langTitle:'تغییر زبان',showPass:'نمایش رمز عبور',hidePass:'مخفی کردن رمز عبور'},
+            en:{dir:'ltr',wel:'Register New Account',inviteTitle:'Invitation required.',inviteDesc:'A referral code is required for every new account. Please open the registration page through an invitation link. If you already have one, ask the person who invited you to resend it.',email:'Email',emailP:'Email',name:'Full Name',nameP:'Full Name',pass:'Password',passP:'Password',confirmPass:'Confirm Password',confirmPassP:'Confirm Password',ref:'Referral Code',refP:'Referral Code',btn:'Sign Up',back:'Back to Main Page',succ:'Successfully registered!',refErr:'Invalid or non-existent referral code!',passErr:'Passwords do not match!',lenErr:'Password must be at least 6 characters!',existErr:'Email already registered!',emailErr:'Please enter a valid email address!',errGeneral:'An error occurred!',errCaptcha:'Please complete the security check.',supTitle:'Support',langTitle:'Change Language',showPass:'Show password',hidePass:'Hide password'},
+            ar:{dir:'rtl',wel:'تسجيل حساب جديد',inviteTitle:'مطلوب رمز الإحالة.',inviteDesc:'رمز الإحالة مطلوب لإنشاء كل حساب جديد. يرجى فتح صفحة التسجيل من خلال رابط دعوة. إذا كان لديك واحد بالفعل، اطلب من الشخص الذي دعاك إعادة إرساله.',email:'البريد الإلكتروني',emailP:'البريد الإلكتروني',name:'الاسم الكامل',nameP:'الاسم الكامل',pass:'كلمة المرور',passP:'كلمة المرور',confirmPass:'تأكيد كلمة المرور',confirmPassP:'تأكيد كلمة المرور',ref:'رمز الإحالة',refP:'رمز الإحالة',btn:'التسجيل في Zenix',back:'العودة للصفحة الرئيسية',succ:'تم التسجيل بنجاح!',refErr:'رمز الإحالة غير صالح أو غير موجود!',passErr:'كلمتا المرور غير متطابقتين!',lenErr:'يجب أن تكون كلمة المرور 6 أحرف على الأقل!',existErr:'هذا البريد الإلكتروني مسجل بالفعل!',emailErr:'يرجى إدخال بريد إلكتروني صالح!',errGeneral:'حدث خطأ!',errCaptcha:'يرجى إكمال التحقق الأمني.',supTitle:'الدعم الفني',langTitle:'تغيير اللغة',showPass:'إظهار كلمة المرور',hidePass:'إخفاء كلمة المرور'},
+            tr:{dir:'ltr',wel:'Yeni Hesap Oluştur',inviteTitle:'Davet gerekli.',inviteDesc:'Her yeni hesap için bir referans kodu gereklidir. Lütfen kayıt sayfasını bir davet bağlantısı üzerinden açın. Zaten varsa, sizi davet eden kişiden yeniden göndermesini isteyin.',email:'E-posta',emailP:'E-posta',name:'Ad Soyad',nameP:'Ad Soyad',pass:'Şifre',passP:'Şifre',confirmPass:'Şifreyi Tekrarla',confirmPassP:'Şifreyi Tekrarla',ref:'Referans Kodu',refP:'Referans Kodu',btn:'Zenix\'e Kayıt Ol',back:'Ana Sayfaya Dön',succ:'Kayıt başarılı!',refErr:'Geçersiz veya bulunmayan referans kodu!',passErr:'Şifreler eşleşmiyor!',lenErr:'Şifre en az 6 karakter olmalıdır!',existErr:'Bu e-posta zaten kayıtlı!',emailErr:'Lütfen geçerli bir e-posta adresi girin!',errGeneral:'Bir hata oluştu!',errCaptcha:'Lütfen güvenlik kontrolünü tamamlayın.',supTitle:'Destek',langTitle:'Dil Değiştir',showPass:'Şifreyi göster',hidePass:'Şifreyi gizle'},
+            ru:{dir:'ltr',wel:'Регистрация аккаунта',inviteTitle:'Требуется приглашение.',inviteDesc:'Для создания нового аккаунта требуется реферальный код. Пожалуйста, откройте страницу регистрации по ссылке-приглашению. Если у вас уже есть код, попросите пригласившего отправить его снова.',email:'Эл. почта',emailP:'Эл. почта',name:'ФИО',nameP:'Введите ФИО',pass:'Пароль',passP:'Пароль',confirmPass:'Повторите пароль',confirmPassP:'Повторите пароль',ref:'Реферальный код',refP:'Реферальный код',btn:'Зарегистрироваться',back:'На главную',succ:'Успешная регистрация!',refErr:'Неверный реферальный код!',passErr:'Пароли не совпадают!',lenErr:'Пароль должен быть не менее 6 символов!',existErr:'Этот email уже зарегистрирован!',emailErr:'Пожалуйста, введите корректный адрес электронной почты!',errGeneral:'Произошла ошибка!',errCaptcha:'Пожалуйста, пройдите проверку безопасности.',supTitle:'Поддержка',langTitle:'Сменить язык',showPass:'Показать пароль',hidePass:'Скрыть пароль'},
+            es:{dir:'ltr',wel:'Registrar nueva cuenta',inviteTitle:'Se requiere invitación.',inviteDesc:'Se requiere un código de referencia para cada cuenta nueva. Abra la página de registro a través de un enlace de invitación. Si ya tiene uno, pida a la persona que lo invitó que lo reenvíe.',email:'Correo electrónico',emailP:'Correo electrónico',name:'Nombre completo',nameP:'Nombre completo',pass:'Contraseña',passP:'Contraseña',confirmPass:'Confirmar contraseña',confirmPassP:'Confirmar contraseña',ref:'Código de referencia',refP:'Código de referencia',btn:'Registrarse en Zenix',back:'Volver al inicio',succ:'¡Registro exitoso!',refErr:'¡Código de referencia inválido!',passErr:'¡Las contraseñas no coinciden!',lenErr:'¡La contraseña debe tener al menos 6 caracteres!',existErr:'¡Este correo ya está registrado!',emailErr:'¡Por favor ingrese un correo electrónico válido!',errGeneral:'¡Ocurrió un error!',errCaptcha:'Por favor complete la verificación de seguridad.',supTitle:'Soporte',langTitle:'Cambiar idioma',showPass:'Mostrar contraseña',hidePass:'Ocultar contraseña'},
+            fr:{dir:'ltr',wel:'Créer un compte',inviteTitle:'Invitation requise.',inviteDesc:'Un code de parrainage est requis pour chaque nouveau compte. Veuillez ouvrir la page d\'inscription via un lien d\'invitation. Si vous en avez déjà un, demandez à la personne qui vous a invité de le renvoyer.',email:'E-mail',emailP:'E-mail',name:'Nom complet',nameP:'Nom complet',pass:'Mot de passe',passP:'Mot de passe',confirmPass:'Confirmer',confirmPassP:'Confirmer',ref:'Code de parrainage',refP:'Code',btn:'S\'inscrire',back:'Retour',succ:'Inscription réussie !',refErr:'Code de parrainage invalide !',passErr:'Les mots de passe ne correspondent pas !',lenErr:'Le mot de passe doit contenir au moins 6 caractères !',existErr:'E-mail déjà enregistré !',emailErr:'Veuillez saisir une adresse e-mail valide !',errGeneral:'Une erreur est survenue !',errCaptcha:'Veuillez compléter la vérification de sécurité.',supTitle:'Support',langTitle:'Changer de langue',showPass:'Afficher le mot de passe',hidePass:'Masquer le mot de passe'},
+            de:{dir:'ltr',wel:'Konto erstellen',inviteTitle:'Einladung erforderlich.',inviteDesc:'Für jedes neue Konto ist ein Empfehlungscode erforderlich. Bitte öffnen Sie die Registrierungsseite über einen Einladungslink. Wenn Sie bereits einen haben, bitten Sie die Person, die Sie eingeladen hat, ihn erneut zu senden.',email:'E-Mail',emailP:'E-Mail',name:'Vollständiger Name',nameP:'Vollständiger Name',pass:'Passwort',passP:'Passwort',confirmPass:'Passwort bestätigen',confirmPassP:'Passwort bestätigen',ref:'Empfehlungscode',refP:'Empfehlungscode',btn:'Registrieren',back:'Zurück',succ:'Erfolgreich!',refErr:'Ungültiger Empfehlungscode!',passErr:'Passwörter stimmen nicht überein!',lenErr:'Das Passwort muss mindestens 6 Zeichen lang sein!',existErr:'E-Mail bereits registriert!',emailErr:'Bitte geben Sie eine gültige E-Mail-Adresse ein!',errGeneral:'Ein Fehler ist aufgetreten!',errCaptcha:'Bitte schließen Sie die Sicherheitsüberprüfung ab.',supTitle:'Support',langTitle:'Sprache ändern',showPass:'Passwort anzeigen',hidePass:'Passwort verbergen'}
         };
         
-        let currentLang = localStorage.getItem('zenix_lang') || 'en', code = '';
+        let currentLang = localStorage.getItem('zenix_lang') || 'en';
         const langBtn = document.getElementById('lang-btn'), langMenu = document.getElementById('lang-menu');
         
         langBtn.onclick = e => { e.stopPropagation(); langMenu.classList.toggle('show'); };
@@ -263,16 +253,11 @@
             document.getElementById('l-ref').innerHTML = `<i class="fas fa-ticket"></i> ${escapeHtml(t.ref)} <span class="req">*</span>`;
             document.getElementById('ref-in').placeholder = t.refP;
             document.getElementById('ref-in').setAttribute('aria-label', t.ref);
-            document.getElementById('l-cap').innerHTML = `<i class="fas fa-shield-alt"></i> ${escapeHtml(t.cap)} <span class="req">*</span>`;
-            document.getElementById('cap-in').placeholder = t.capP;
-            document.getElementById('cap-in').setAttribute('aria-label', t.cap);
             document.getElementById('t-btn').textContent = t.btn;
             const arrowIcon = t.dir === 'rtl' ? 'fa-arrow-right' : 'fa-arrow-left';
             document.getElementById('t-back').innerHTML = `<i class="fas ${arrowIcon}"></i> ${escapeHtml(t.back)}`;
             document.getElementById('btn-support')?.setAttribute('title', t.supTitle);
             langBtn?.setAttribute('title', t.langTitle);
-            const refBtn = document.getElementById('ref-btn');
-            if (refBtn) refBtn.setAttribute('aria-label', t.refreshCap || 'Refresh security code');
             document.querySelectorAll('.eye-btn').forEach(btn => {
                 const input = btn.parentElement.querySelector('input');
                 const isShowing = input && input.type === 'text';
@@ -283,7 +268,7 @@
         
         document.querySelectorAll('#lang-menu .mi').forEach(i => i.onclick = () => setLang(i.dataset.lang));
         
-        const cv = document.getElementById('c-canvas'), emailIn = document.getElementById('email'), nameIn = document.getElementById('fullname'), passIn = document.getElementById('pass'), confirmPassIn = document.getElementById('confirm-pass'), refIn = document.getElementById('ref-in'), capIn = document.getElementById('cap-in'), btn = document.getElementById('t-btn'), msg = document.getElementById('msg'), form = document.getElementById('form'), urlParams = new URLSearchParams(window.location.search), refParam = urlParams.get('ref');
+        const emailIn = document.getElementById('email'), nameIn = document.getElementById('fullname'), passIn = document.getElementById('pass'), confirmPassIn = document.getElementById('confirm-pass'), refIn = document.getElementById('ref-in'), btn = document.getElementById('t-btn'), msg = document.getElementById('msg'), form = document.getElementById('form'), urlParams = new URLSearchParams(window.location.search), refParam = urlParams.get('ref');
         
         if (refParam) {
             refIn.value = refParam;
@@ -291,22 +276,18 @@
 
         async function checkFirstUserInit() {
             const inviteBox = document.getElementById('invite-required');
-
             if (refIn.value) {
                 chk();
                 return;
             }
-
             try {
                 const { data: isAllowed, error } = await supabaseClient.rpc('can_register_with_admin');
                 if (error) throw error;
-
                 if (isAllowed === true) {
                     refIn.value = 'ADMIN';
                     chk();
                     return;
                 }
-
                 refIn.value = '';
                 if (inviteBox) inviteBox.classList.add('show');
                 chk();
@@ -329,64 +310,18 @@
             const passOk = passIn.value.length >= 6;
             const confirmOk = confirmPassIn.value.length >= 6 && passIn.value === confirmPassIn.value;
             const refOk = refIn.value.trim().length > 0;
-            const capOk = capIn.value.length === 5;
+            
+            const turnstileToken = document.querySelector('[name="cf-turnstile-response"]')?.value;
+            const capOk = !!turnstileToken;
+
             btn.disabled = !(emailOk && nameOk && passOk && confirmOk && refOk && capOk);
         }
-        [emailIn, nameIn, passIn, confirmPassIn, refIn, capIn].forEach(i => i.oninput = chk);
         
-        function drawCap() {
-            if (!cv) return;
-            
-            const dpr = window.devicePixelRatio || 1;
-            const rect = cv.getBoundingClientRect();
-            const width = rect.width || 165;
-            const height = rect.height || 44;
+        [emailIn, nameIn, passIn, confirmPassIn, refIn].forEach(i => i.oninput = chk);
 
-            cv.width = width * dpr;
-            cv.height = height * dpr;
-            
-            const ctx = cv.getContext('2d');
-            ctx.scale(dpr, dpr);
-            
-            const w = width, h = height;
-            
-            code = '';
-            const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-            for (let i = 0; i < 5; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-
-            ctx.clearRect(0, 0, w, h);
-            const bgGrad = ctx.createLinearGradient(0, 0, w, h);
-            bgGrad.addColorStop(0, '#030712'); bgGrad.addColorStop(0.5, '#0b1329'); bgGrad.addColorStop(1, '#02050e');
-            ctx.fillStyle = bgGrad; ctx.fillRect(0, 0, w, h);
-
-            ctx.strokeStyle = 'rgba(56,189,248,0.12)'; ctx.lineWidth = 1;
-            for (let i = 0; i < 2; i++) {
-                ctx.beginPath(); ctx.moveTo(Math.random() * w, Math.random() * h);
-                ctx.lineTo(Math.random() * w, Math.random() * h); ctx.stroke();
-            }
-
-            const neonColors = ['#38bdf8', '#c084fc', '#34d399', '#f43f5e', '#fbbf24'];
-            const cw = w / 5;
-
-            for (let i = 0; i < 5; i++) {
-                const x = i * cw + cw / 2, y = h / 2 + (Math.random() - 0.5) * 4, color = neonColors[i % neonColors.length];
-                ctx.save();
-                ctx.translate(x, y);
-                ctx.rotate((Math.random() - 0.5) * 0.2);
-
-                ctx.font = '700 24px "Vazirmatn", system-ui, sans-serif';
-                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                ctx.shadowColor = color; ctx.shadowBlur = 4;
-                ctx.strokeStyle = '#020617'; ctx.lineWidth = 2;
-                ctx.strokeText(code[i], 0, 0);
-                ctx.fillStyle = color;
-                ctx.fillText(code[i], 0, 0);
-                ctx.restore();
-            }
-        }
-        
-        document.getElementById('ref-btn').onclick = () => { capIn.value = ''; drawCap(); chk(); };
-        cv.onclick = () => { drawCap(); chk(); };
+        window.onloadTurnstileCallback = function() {
+            chk();
+        };
         
         async function generateUniqueReferralCode() {
             for (let attempt = 0; attempt < 5; attempt += 1) {
@@ -394,16 +329,10 @@
                 crypto.getRandomValues(randomBytes);
                 const candidate = 'MS-' + ((randomBytes[0] % 900000) + 100000).toString();
                 try {
-                    const { data, error } = await supabaseClient
-                        .from('profiles')
-                        .select('id')
-                        .eq('referral_code', candidate)
-                        .maybeSingle();
+                    const { data, error } = await supabaseClient.from('profiles').select('id').eq('referral_code', candidate).maybeSingle();
                     if (error) throw error;
                     if (!data) return candidate;
-                } catch (_) {
-                    return candidate;
-                }
+                } catch (_) { return candidate; }
             }
             const fallbackBytes = new Uint32Array(1);
             crypto.getRandomValues(fallbackBytes);
@@ -415,36 +344,36 @@
             const t = langData[currentLang] || langData.en;
             if (passIn.value.length < 6) { msg.textContent = t.lenErr; msg.className = 'err'; return; }
             if (passIn.value !== confirmPassIn.value) { msg.textContent = t.passErr; msg.className = 'err'; return; }
-            if (capIn.value.toUpperCase() !== code) { msg.textContent = t.err; msg.className = 'err'; capIn.value = ''; drawCap(); chk(); return; }
-            if (!refIn.value.trim()) { msg.textContent = t.refErr; msg.className = 'err'; return; }
+            
+            const refCodeValue = refIn.value.trim().toUpperCase();
+            if (!refCodeValue) { msg.textContent = t.refErr; msg.className = 'err'; return; }
+
+            const turnstileToken = document.querySelector('[name="cf-turnstile-response"]')?.value;
+            if (!turnstileToken) { msg.textContent = t.errCaptcha; msg.className = 'err'; return; }
 
             btn.disabled = true;
             const emailValue = emailIn.value.trim().toLowerCase();
             const fullNameValue = nameIn.value.trim();
-            const refCodeValue = refIn.value.trim().toUpperCase();
 
             try {
-                // بررسی صحت کد معرف قبل از ثبت‌نام
                 if (refCodeValue !== 'ADMIN') {
-                    const { data: refData, error: refError } = await supabaseClient
-                        .from('profiles')
-                        .select('id')
-                        .eq('referral_code', refCodeValue)
-                        .maybeSingle();
-
+                    const { data: refData, error: refError } = await supabaseClient.from('profiles').select('id').eq('referral_code', refCodeValue).maybeSingle();
                     if (refError || !refData) {
                         msg.textContent = t.refErr;
                         msg.className = 'err';
                         btn.disabled = false;
+                        if (window.turnstile) window.turnstile.reset();
+                        chk();
                         return;
                     }
                 } else {
-                    // بررسی مجدد اینکه آیا واقعاً اولین کاربر است
                     const { data: isAllowed, error: rpcError } = await supabaseClient.rpc('can_register_with_admin');
                     if (rpcError || isAllowed !== true) {
                         msg.textContent = t.refErr;
                         msg.className = 'err';
                         btn.disabled = false;
+                        if (window.turnstile) window.turnstile.reset();
+                        chk();
                         return;
                     }
                 }
@@ -455,6 +384,7 @@
                     email: emailValue,
                     password: passIn.value,
                     options: {
+                        captchaToken: turnstileToken,
                         data: {
                             fullname: fullNameValue,
                             full_name: fullNameValue,
@@ -469,39 +399,15 @@
                     const userId = authData.user.id;
                     const myNewReferralCode = await generateUniqueReferralCode();
 
-                    const { error: profileErr } = await supabaseClient
-                        .from('profiles')
-                        .insert([
-                            {
-                                id: userId,
-                                email: emailValue,
-                                referral_code: myNewReferralCode,
-                                referred_by: referrerFinalValue
-                            }
-                        ]);
-
-                    if (profileErr) {
-                        console.error('خطا در ثبت پروفایل:', profileErr);
-                    }
-
-                    const { error: updateErr } = await supabaseClient
-                        .from('users')
-                        .update({
-                            email: emailValue,
-                            fullname: fullNameValue
-                        })
-                        .eq('id', userId);
-
-                    if (updateErr) {
-                        const userPayload = {
-                            id: userId,
-                            email: emailValue,
-                            fullname: fullNameValue
-                        };
-                        await supabaseClient
-                            .from('users')
-                            .insert([userPayload]);
-                    }
+                    // ★ فقط پروفایل را ثبت می‌کنیم. جدول users توسط تریگر دیتابیس ساخته می‌شود.
+                    const { error: profileErr } = await supabaseClient.from('profiles').insert([{ 
+                        id: userId, 
+                        email: emailValue, 
+                        referral_code: myNewReferralCode, 
+                        referred_by: referrerFinalValue 
+                    }]);
+                    
+                    if (profileErr) console.error('خطا در ثبت پروفایل:', profileErr);
                 }
 
                 await supabaseClient.auth.signOut();
@@ -512,25 +418,23 @@
 
             } catch (error) {
                 btn.disabled = false;
+                if (window.turnstile) window.turnstile.reset(); 
                 
-                // ★ اصلاح شد: مدیریت خطای امنیتی که از دیتابیس (تریگر) برمی‌گردد
                 if (error.message && error.message.includes('Security Error')) {
-                    msg.textContent = t.refErr; // نمایش پیام "کد معرف نامعتبر است" به جای ارور انگلیسی
+                    msg.textContent = t.refErr; 
                 } else if (error.message?.toLowerCase().includes('already registered') || error.status === 400) {
                     msg.textContent = t.existErr;
+                } else if (error.message?.toLowerCase().includes('captcha')) {
+                    msg.textContent = t.errCaptcha;
                 } else {
                     msg.textContent = error.message || t.errGeneral;
                 }
-                
                 msg.className = 'err';
-                capIn.value = '';
-                drawCap();
                 chk();
             }
         };
         
         setLang(currentLang);
-        drawCap();
         checkFirstUserInit();
         chk();
     </script>
