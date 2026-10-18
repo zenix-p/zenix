@@ -105,13 +105,92 @@
         
         footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
         
-        .floating-casino-wrap{position:fixed;right:18px;bottom:25px;z-index:999}
-        .floating-casino{display:flex;flex-direction:column;align-items:center;justify-content:center;width:60px;height:60px;background:linear-gradient(135deg,#f43f5e,#a855f7,#0ea5e9);border:2px solid rgba(255,255,255,.4);border-radius:50%;color:#fff;cursor:pointer;box-shadow:0 0 20px rgba(244,63,94,.6),0 0 10px rgba(168,85,247,.5);transition:all .3s ease;animation:floatingCasinoPulse 2.5s infinite ease-in-out}
-        .floating-casino:hover{transform:scale(1.12);box-shadow:0 0 30px rgba(244,63,94,.9),0 0 15px rgba(56,189,248,.8);color:#fff}
-        .floating-casino i{font-size:22px}
-        .floating-casino span{font-size:9px;font-weight:800;margin-top:2px;letter-spacing:.5px;text-shadow:0 1px 2px rgba(0,0,0,.8)}
-        @keyframes floatingCasinoPulse{0%,100%{transform:scale(1);box-shadow:0 0 15px rgba(244,63,94,.5),0 0 10px rgba(168,85,247,.4)}50%{transform:translateY(-6px) scale(1.06);box-shadow:0 0 25px rgba(244,63,94,.85),0 0 20px rgba(56,189,248,.7)}}
+        /* ★ دکمه شناور کازینو (طراحی جدید و مدرن) */
+        .floating-casino-wrap {
+            position: fixed; 
+            right: 24px; 
+            bottom: 28px; 
+            z-index: 9999;
+        }
+        [dir="rtl"] .floating-casino-wrap {
+            right: auto;
+            left: 24px;
+        }
+        
+        .floating-casino {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
 
+        /* حاشیه نئونی چرخان */
+        .floating-casino::before {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            background: conic-gradient(from 0deg, #f43f5e, #a855f7, #38bdf8, #f43f5e);
+            z-index: -1;
+            border-radius: 50%;
+            animation: spinCasinoBorder 3s linear infinite;
+            opacity: 0.8;
+        }
+
+        /* پوشش داخلی برای ایجاد عمق */
+        .floating-casino::after {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            background: #0f172a;
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .floating-casino:hover {
+            transform: translateY(-5px) scale(1.08);
+            box-shadow: 0 15px 45px rgba(244, 63, 94, 0.5), inset 0 0 20px rgba(168, 85, 247, 0.3);
+        }
+
+        .floating-casino i {
+            font-size: 24px;
+            background: linear-gradient(135deg, #38bdf8, #c084fc, #f43f5e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 3px;
+            transition: transform 0.4s ease;
+        }
+
+        .floating-casino:hover i {
+            transform: rotate(25deg) scale(1.1);
+        }
+
+        .floating-casino span {
+            font-size: 9px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 0.5px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            z-index: 1;
+        }
+
+        @keyframes spinCasinoBorder {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ★ اصلاحات ریسپانسیو برای موبایل */
         @media (max-width: 480px) {
             .stats { grid-template-columns: 1fr; }
             .grid { grid-template-columns: 1fr; }
@@ -215,7 +294,7 @@
             <div id="crypto-ticker-list"></div>
         </div>
 
-        <!-- ★ متن معرفی جدید و عمیق‌تر -->
+        <!-- متن معرفی جدید و عمیق‌تر -->
         <div class="platform-info-box">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;">
                 <div style="width:34px;height:34px;background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#38bdf8;font-size:15px;">
@@ -324,6 +403,6 @@
     </footer>
 
     <script src="https://cdn.jsdmirror.com/npm/@supabase/supabase-js@2" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script type="module" src="dashboard.js?v=21"></script>
+    <script type="module" src="dashboard.js?v=22"></script>
 </body>
 </html>
