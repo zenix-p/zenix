@@ -19,40 +19,13 @@
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
         body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column;overflow-x:hidden}
         
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 99999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            pointer-events: none;
-            width: 90%;
-            max-width: 420px;
-        }
-        .toast {
-            padding: 14px 18px;
-            border-radius: 14px;
-            font-size: 13px;
-            font-weight: 600;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(14px);
-            opacity: 0;
-            transform: translateY(-20px);
-            transition: all 0.35s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            pointer-events: auto;
-            line-height: 1.5;
-        }
-        .toast.show { opacity: 1; transform: translateY(0); }
-        .toast-success { background: rgba(16, 185, 129, 0.22); border: 1px solid rgba(16, 185, 129, 0.6); color: #34d399; }
-        .toast-error { background: rgba(239, 68, 68, 0.22); border: 1px solid rgba(239, 68, 68, 0.6); color: #f87171; }
-        .toast-info { background: rgba(15, 23, 42, 0.92); border: 1px solid rgba(56, 189, 248, 0.5); color: #38bdf8; box-shadow: 0 0 25px rgba(56, 189, 248, 0.25); }
-        .toast i { font-size: 18px; margin-top: 2px; }
+        .toast-container{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column;gap:10px;pointer-events:none;width:90%;max-width:420px}
+        .toast{padding:14px 18px;border-radius:14px;font-size:13px;font-weight:600;display:flex;align-items:flex-start;gap:12px;box-shadow:0 12px 35px rgba(0,0,0,0.7);backdrop-filter:blur(14px);opacity:0;transform:translateY(-20px);transition:all 0.35s cubic-bezier(0.68,-0.55,0.27,1.55);pointer-events:auto;line-height:1.5}
+        .toast.show{opacity:1;transform:translateY(0)}
+        .toast-success{background:rgba(16,185,129,0.22);border:1px solid rgba(16,185,129,0.6);color:#34d399}
+        .toast-error{background:rgba(239,68,68,0.22);border:1px solid rgba(239,68,68,0.6);color:#f87171}
+        .toast-info{background:rgba(15,23,42,0.92);border:1px solid rgba(56,189,248,0.5);color:#38bdf8;box-shadow:0 0 25px rgba(56,189,248,0.25)}
+        .toast i{font-size:18px;margin-top:2px}
 
         header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1);padding:10px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
         .logo{display:flex;align-items:center;gap:10px}
@@ -78,12 +51,34 @@
         .wel{background:linear-gradient(135deg,rgba(2,132,199,.15),rgba(147,51,234,.15));border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
         .wel h1{font-size:16px;margin-bottom:3px}
         .wel p{color:#94a3b8;font-size:11px}
-        
+
+        /* === Level Info Box === */
+        .level-info-box{
+            background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(239,68,68,.08));
+            border:1px solid rgba(251,191,36,.4);
+            border-radius:12px;
+            padding:12px 15px;
+            margin-bottom:12px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:10px;
+            flex-wrap:wrap;
+        }
+        .level-info-box .lvl-block{display:flex;align-items:center;gap:10px}
+        .level-info-box .lvl-icon{width:34px;height:34px;border-radius:10px;background:rgba(251,191,36,.2);display:grid;place-items:center;color:#fbbf24;font-size:16px;flex-shrink:0}
+        .level-info-box .lvl-label{font-size:11px;color:#94a3b8;display:block;margin-bottom:2px}
+        .level-info-box .lvl-value{font-size:15px;font-weight:800;color:#fbbf24}
+        .level-info-box .amt-block{display:flex;align-items:center;gap:10px}
+        .level-info-box .amt-icon{width:34px;height:34px;border-radius:10px;background:rgba(34,197,94,.2);display:grid;place-items:center;color:#22c55e;font-size:16px;flex-shrink:0}
+        .level-info-box .amt-value{font-size:15px;font-weight:800;color:#22c55e}
+
         .card{background:rgba(30,41,59,0.8);border:1px solid rgba(56,189,248,0.3);border-radius:12px;padding:20px;margin-top:12px}
         .fg{margin-bottom:15px}
         .fl{display:block;font-size:13px;color:#94a3b8;margin-bottom:6px}
         .fi{width:100%;padding:10px 14px;background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#f8fafc;font-size:13px;outline:none;transition:border-color 0.2s}
         .fi:focus{border-color:#38bdf8}
+        .fi[readonly]{background:rgba(15,23,42,0.5);color:#38bdf8;cursor:not-allowed;font-weight:700;font-size:15px}
         .bs{display:block;width:100%;background:#38bdf8;color:#0f172a;border:none;padding:12px;font-weight:bold;border-radius:8px;cursor:pointer;font-size:14px;text-align:center;transition:0.2s;font-family:inherit}
         .bs:hover:not(:disabled){background:#0ea5e9}
         .bs:disabled{opacity:0.55;cursor:not-allowed;background:#475569}
@@ -121,7 +116,6 @@
 
         footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
 
-        /* ========== RESPONSIVE ========== */
         @media (max-width: 640px) {
             input, select, textarea, .fi { font-size: 16px !important; }
             header { padding: 8px 12px; }
@@ -141,6 +135,8 @@
             .msg-desc-text { font-size: 13px; }
             .notif-tab { font-size: 12px; }
             .fl { font-size: 14px; }
+            .level-info-box { flex-direction: column; align-items: stretch; gap: 8px; }
+            .level-info-box .lvl-block, .level-info-box .amt-block { justify-content: flex-start; }
         }
         @media (max-width: 480px) {
             .hr { gap: 4px; flex-wrap: nowrap; }
@@ -218,6 +214,23 @@
             </div>
         </div>
 
+        <div class="level-info-box" id="level-info-box">
+            <div class="lvl-block">
+                <div class="lvl-icon"><i class="fas fa-crown"></i></div>
+                <div>
+                    <span class="lvl-label" data-i18n="yourLevel">سطح شما</span>
+                    <span class="lvl-value" id="user-level-display">—</span>
+                </div>
+            </div>
+            <div class="amt-block">
+                <div class="amt-icon"><i class="fas fa-coins"></i></div>
+                <div>
+                    <span class="lvl-label" data-i18n="requiredAmountLabel">مبلغ برداشت الزامی</span>
+                    <span class="amt-value" id="required-amount-display">— USDT</span>
+                </div>
+            </div>
+        </div>
+
         <div class="card">
             <div class="fg">
                 <label class="fl" data-i18n="networkLabel">انتخاب شبکه (Network)</label>
@@ -234,9 +247,9 @@
 
             <div class="fg">
                 <label class="fl" data-i18n="amountLabel">مبلغ برداشت (USDT)</label>
-                <input type="number" id="withdraw-amount" class="fi" data-i18n-placeholder="amountPlaceholder" placeholder="حداقل ۱۰ تتر" oninput="window.calcFee()" inputmode="decimal" min="0" step="any" autocomplete="off">
+                <input type="number" id="withdraw-amount" class="fi" readonly data-i18n-placeholder="amountPlaceholder" placeholder="حداقل ۱۰ تتر" inputmode="decimal" min="0" step="any" autocomplete="off">
                 <div style="display:flex;justify-content:space-between;font-size:11px;color:#94a3b8;margin-top:6px;gap:8px;flex-wrap:wrap;">
-                    <span><span data-i18n="feeLabel">کارمزد شبکه:</span> <strong id="withdraw-fee" style="color:#fbbf24;">1 USDT</strong></span>
+                    <span><span data-i18n="feeLabel">کارمزد شبکه:</span> <strong id="withdraw-fee" style="color:#fbbf24;">0.9 USDT</strong></span>
                     <span><span data-i18n="netLabel">مبلغ دریافتی نهایی:</span> <strong id="withdraw-net" style="color:#22c55e;">0 USDT</strong></span>
                 </div>
             </div>
@@ -299,7 +312,11 @@
                 </div>
                 <div class="msg-body-box">
                     <div class="msg-title-text"><i class="fas fa-key" style="color:#a855f7"></i> <span data-i18n="helpStep2Title">رمز تراکنش</span></div>
-                    <div class="msg-desc-text" data-i18n="helpStep2Desc">جهت تایید نهایی نیاز به وارد کردن رمز تراکنش ۶ رقمی دارید. در صورت فراموشی می‌توانید از لینک فراموشی رمز استفاده نمایید.</div>
+                    <div class="msg-desc-text" data-i18n="helpStep2Desc">جهت تایید نهایی نیاز به وارد کردن رمز تراکنش ۶ رقمی دارید.</div>
+                </div>
+                <div class="msg-body-box">
+                    <div class="msg-title-text"><i class="fas fa-crown" style="color:#fbbf24"></i> <span data-i18n="helpStep3Title">سطح و مبلغ برداشت</span></div>
+                    <div class="msg-desc-text" data-i18n="helpStep3Desc">مبلغ برداشت شما بر اساس سطح حساب تعیین می‌شود و به‌صورت خودکار در فیلد مربوطه نمایش داده می‌شود.</div>
                 </div>
             </div>
         </div>
@@ -313,16 +330,45 @@
     <script>
         function escapeHtml(value) {
             return String(value == null ? '' : value)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
 
         const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
         var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // ============================================================
+        // LEVEL CONFIG
+        // ============================================================
+        // مبلغ دقیق برداشت برای هر سطح (فقط همین عدد مجاز است)
+        const LEVEL_AMOUNTS = { 1: 10, 2: 50, 3: 100, 4: 200, 5: 300, 6: 500 };
+        // کارمزد شبکه (از مبلغ برداشت کم می‌شود)
+        const NETWORK_FEE = 0.9;
+        // اسم‌های احتمالی ستون سطح در جدول users
+        const LEVEL_COLUMN_NAMES = ['level', 'user_level', 'tier', 'user_tier', 'vip_level'];
+
+        let userLevel = 1;
+
+        function getUserLevel(data) {
+            if (!data) return 1;
+            for (const col of LEVEL_COLUMN_NAMES) {
+                if (data[col] !== undefined && data[col] !== null && data[col] !== '') {
+                    const n = parseInt(data[col]);
+                    if (Number.isFinite(n)) {
+                        if (n < 1) return 1;
+                        if (n > 6) return 6;
+                        return n;
+                    }
+                }
+            }
+            return 1;
+        }
+
+        function getRequiredAmount(level) {
+            return LEVEL_AMOUNTS[level] || LEVEL_AMOUNTS[1];
+        }
+        window.getRequiredAmount = getRequiredAmount;
 
         // ============================================================
         // DICTIONARY: 8 LANGUAGES
@@ -335,11 +381,13 @@
                 pageHeading: "برداشت ارز دیجیتال",
                 pageSub: "درخواست برداشت سریع و امن USDT به کیف پول مقصد",
                 balanceLabel: "موجودی قابل برداشت:",
+                yourLevel: "سطح شما",
+                requiredAmountLabel: "مبلغ برداشت الزامی",
                 networkLabel: "انتخاب شبکه (Network)",
                 addressLabel: "آدرس کیف پول مقصد",
                 addressPlaceholder: "آدرس کیف پول برداشت خود را وارد کنید",
                 amountLabel: "مبلغ برداشت (USDT)",
-                amountPlaceholder: "حداقل ۱۰ تتر",
+                amountPlaceholder: "مبلغ تعیین‌شده بر اساس سطح",
                 feeLabel: "کارمزد شبکه:",
                 netLabel: "مبلغ دریافتی نهایی:",
                 passLabel: "رمز تراکنش",
@@ -351,7 +399,9 @@
                 helpStep1Title: "نحوه ثبت درخواست برداشت",
                 helpStep1Desc: "شبکه موردنظر (TRC20 یا BEP20) را انتخاب کرده و آدرس دقیق کیف پول مقصد و مبلغ برداشت را وارد نمایید.",
                 helpStep2Title: "رمز تراکنش",
-                helpStep2Desc: "جهت تایید نهایی نیاز به وارد کردن رمز تراکنش ۶ رقمی دارید. در صورت فراموشی می‌توانید از لینک فراموشی رمز استفاده نمایید.",
+                helpStep2Desc: "جهت تایید نهایی نیاز به وارد کردن رمز تراکنش ۶ رقمی دارید.",
+                helpStep3Title: "سطح و مبلغ برداشت",
+                helpStep3Desc: "مبلغ برداشت شما بر اساس سطح حساب تعیین می‌شود و به‌صورت خودکار در فیلد مربوطه نمایش داده می‌شود.",
                 notifTitle: "صندوق پیام‌ها و اعلان‌ها",
                 tabAll: "همه", tabApproved: "تایید درخواست", tabRejected: "لغو درخواست", tabAdmin: "پیام مدیریت",
                 noMsg: "هیچ پیام جدیدی وجود ندارد.",
@@ -361,7 +411,8 @@
                 systemMessage: "پیام سیستم",
                 supportFollowup: "پیگیری از طریق پشتیبانی",
                 errAddressRequired: "لطفاً آدرس کیف پول مقصد را وارد کنید.",
-                errMinAmount: "حداقل مبلغ برداشت ۱۰ تتر می‌باشد.",
+                errAmountMismatch: "برای سطح شما فقط مبلغ {x} USDT قابل برداشت است.",
+                errInsufficientBalance: "موجودی کافی نیست. حداقل موجودی مورد نیاز: {x} USDT",
                 errPassRequired: "لطفاً رمز تراکنش را وارد کنید.",
                 errSuccess: "درخواست برداشت شما با موفقیت ثبت شد و در صف بررسی قرار گرفت.",
                 errFailed: "خطا در ثبت درخواست",
@@ -381,11 +432,13 @@
                 pageHeading: "Withdraw Crypto",
                 pageSub: "Fast and secure USDT withdrawal to your destination wallet",
                 balanceLabel: "Available balance:",
+                yourLevel: "Your Level",
+                requiredAmountLabel: "Required withdrawal amount",
                 networkLabel: "Select Network",
                 addressLabel: "Destination wallet address",
                 addressPlaceholder: "Enter your withdrawal wallet address",
                 amountLabel: "Withdrawal amount (USDT)",
-                amountPlaceholder: "Minimum 10 USDT",
+                amountPlaceholder: "Amount set based on your level",
                 feeLabel: "Network fee:",
                 netLabel: "Net amount:",
                 passLabel: "Transaction password",
@@ -397,7 +450,9 @@
                 helpStep1Title: "How to submit a withdrawal request",
                 helpStep1Desc: "Select your preferred network (TRC20 or BEP20) and enter the exact destination wallet address and withdrawal amount.",
                 helpStep2Title: "Transaction password",
-                helpStep2Desc: "You need to enter your 6-digit transaction password for final confirmation. If you forgot it, use the forgot password link.",
+                helpStep2Desc: "You need to enter your 6-digit transaction password for final confirmation.",
+                helpStep3Title: "Level and amount",
+                helpStep3Desc: "Your withdrawal amount is determined by your account level and is shown automatically in the field.",
                 notifTitle: "Messages and notifications",
                 tabAll: "All", tabApproved: "Approved", tabRejected: "Rejected", tabAdmin: "Admin message",
                 noMsg: "No new messages.",
@@ -407,7 +462,8 @@
                 systemMessage: "System message",
                 supportFollowup: "Contact support",
                 errAddressRequired: "Please enter the destination wallet address.",
-                errMinAmount: "Minimum withdrawal amount is 10 USDT.",
+                errAmountMismatch: "For your level, only {x} USDT can be withdrawn.",
+                errInsufficientBalance: "Insufficient balance. Minimum required: {x} USDT",
                 errPassRequired: "Please enter the transaction password.",
                 errSuccess: "Your withdrawal request has been submitted for review.",
                 errFailed: "Error submitting request",
@@ -427,11 +483,13 @@
                 pageHeading: "سحب العملات الرقمية",
                 pageSub: "طلب سحب سريع وآمن لعملة USDT إلى محفظتك",
                 balanceLabel: "الرصيد المتاح:",
+                yourLevel: "مستواك",
+                requiredAmountLabel: "مبلغ السحب المطلوب",
                 networkLabel: "اختر الشبكة",
                 addressLabel: "عنوان محفظة الوجهة",
                 addressPlaceholder: "أدخل عنوان محفظة السحب",
                 amountLabel: "مبلغ السحب (USDT)",
-                amountPlaceholder: "الحد الأدنى 10 USDT",
+                amountPlaceholder: "المبلغ المحدد حسب مستواك",
                 feeLabel: "رسوم الشبكة:",
                 netLabel: "المبلغ الصافي:",
                 passLabel: "كلمة مرور المعاملة",
@@ -443,7 +501,9 @@
                 helpStep1Title: "كيفية إرسال طلب السحب",
                 helpStep1Desc: "اختر الشبكة المفضلة (TRC20 أو BEP20) وأدخل عنوان محفظة الوجهة بدقة ومبلغ السحب.",
                 helpStep2Title: "كلمة مرور المعاملة",
-                helpStep2Desc: "تحتاج إلى إدخال كلمة مرور المعاملة المكونة من 6 أرقام للتأكيد النهائي. إذا نسيتها، استخدم رابط نسيت كلمة المرور.",
+                helpStep2Desc: "تحتاج إلى إدخال كلمة مرور المعاملة المكونة من 6 أرقام للتأكيد النهائي.",
+                helpStep3Title: "المستوى والمبلغ",
+                helpStep3Desc: "يتم تحديد مبلغ السحب بناءً على مستوى حسابك ويظهر تلقائياً في الحقل.",
                 notifTitle: "الرسائل والإشعارات",
                 tabAll: "الكل", tabApproved: "تمت الموافقة", tabRejected: "مرفوض", tabAdmin: "رسالة الإدارة",
                 noMsg: "لا توجد رسائل جديدة.",
@@ -453,7 +513,8 @@
                 systemMessage: "رسالة النظام",
                 supportFollowup: "التواصل مع الدعم",
                 errAddressRequired: "الرجاء إدخال عنوان محفظة الوجهة.",
-                errMinAmount: "الحد الأدنى لمبلغ السحب هو 10 USDT.",
+                errAmountMismatch: "لمستواك، يمكن فقط سحب {x} USDT.",
+                errInsufficientBalance: "الرصيد غير كافٍ. الحد الأدنى المطلوب: {x} USDT",
                 errPassRequired: "الرجاء إدخال كلمة مرور المعاملة.",
                 errSuccess: "تم إرسال طلب السحب الخاص بك للمراجعة.",
                 errFailed: "خطأ في إرسال الطلب",
@@ -473,11 +534,13 @@
                 pageHeading: "Kripto Para Çekme",
                 pageSub: "Hedef cüzdanınıza hızlı ve güvenli USDT çekme talebi",
                 balanceLabel: "Kullanılabilir bakiye:",
+                yourLevel: "Seviyeniz",
+                requiredAmountLabel: "Gerekli çekim tutarı",
                 networkLabel: "Ağ Seçin",
                 addressLabel: "Hedef cüzdan adresi",
                 addressPlaceholder: "Para çekme cüzdan adresinizi girin",
                 amountLabel: "Çekim tutarı (USDT)",
-                amountPlaceholder: "Minimum 10 USDT",
+                amountPlaceholder: "Seviyenize göre belirlenen tutar",
                 feeLabel: "Ağ ücreti:",
                 netLabel: "Net tutar:",
                 passLabel: "İşlem şifresi",
@@ -489,7 +552,9 @@
                 helpStep1Title: "Para çekme talebi nasıl gönderilir",
                 helpStep1Desc: "Tercih ettiğiniz ağı (TRC20 veya BEP20) seçin ve hedef cüzdan adresini ve çekim tutarını doğru girin.",
                 helpStep2Title: "İşlem şifresi",
-                helpStep2Desc: "Son onay için 6 haneli işlem şifrenizi girmeniz gerekir. Unuttuysanız, şifremi unuttum bağlantısını kullanın.",
+                helpStep2Desc: "Son onay için 6 haneli işlem şifrenizi girmeniz gerekir.",
+                helpStep3Title: "Seviye ve tutar",
+                helpStep3Desc: "Çekim tutarınız hesap seviyenize göre belirlenir ve alanda otomatik olarak gösterilir.",
                 notifTitle: "Mesajlar ve bildirimler",
                 tabAll: "Tümü", tabApproved: "Onaylandı", tabRejected: "Reddedildi", tabAdmin: "Yönetici mesajı",
                 noMsg: "Yeni mesaj yok.",
@@ -499,7 +564,8 @@
                 systemMessage: "Sistem mesajı",
                 supportFollowup: "Destekle iletişime geç",
                 errAddressRequired: "Lütfen hedef cüzdan adresini girin.",
-                errMinAmount: "Minimum çekim tutarı 10 USDT'dir.",
+                errAmountMismatch: "Seviyeniz için yalnızca {x} USDT çekilebilir.",
+                errInsufficientBalance: "Yetersiz bakiye. Gerekli minimum: {x} USDT",
                 errPassRequired: "Lütfen işlem şifresini girin.",
                 errSuccess: "Para çekme talebiniz inceleme için gönderildi.",
                 errFailed: "Talep gönderilirken hata oluştu",
@@ -519,11 +585,13 @@
                 pageHeading: "Вывод криптовалюты",
                 pageSub: "Быстрый и безопасный вывод USDT на ваш кошелёк",
                 balanceLabel: "Доступный баланс:",
+                yourLevel: "Ваш уровень",
+                requiredAmountLabel: "Требуемая сумма вывода",
                 networkLabel: "Выберите сеть",
                 addressLabel: "Адрес кошелька получателя",
                 addressPlaceholder: "Введите адрес кошелька для вывода",
                 amountLabel: "Сумма вывода (USDT)",
-                amountPlaceholder: "Минимум 10 USDT",
+                amountPlaceholder: "Сумма определяется вашим уровнем",
                 feeLabel: "Комиссия сети:",
                 netLabel: "Итоговая сумма:",
                 passLabel: "Пароль транзакции",
@@ -535,7 +603,9 @@
                 helpStep1Title: "Как отправить запрос на вывод",
                 helpStep1Desc: "Выберите предпочтительную сеть (TRC20 или BEP20) и точно введите адрес кошелька получателя и сумму вывода.",
                 helpStep2Title: "Пароль транзакции",
-                helpStep2Desc: "Для окончательного подтверждения необходимо ввести 6-значный пароль транзакции. Если вы его забыли, воспользуйтесь ссылкой восстановления пароля.",
+                helpStep2Desc: "Для окончательного подтверждения необходимо ввести 6-значный пароль транзакции.",
+                helpStep3Title: "Уровень и сумма",
+                helpStep3Desc: "Сумма вывода определяется вашим уровнем аккаунта и автоматически отображается в поле.",
                 notifTitle: "Сообщения и уведомления",
                 tabAll: "Все", tabApproved: "Одобрено", tabRejected: "Отклонено", tabAdmin: "Сообщение администратора",
                 noMsg: "Нет новых сообщений.",
@@ -545,7 +615,8 @@
                 systemMessage: "Системное сообщение",
                 supportFollowup: "Обратиться в поддержку",
                 errAddressRequired: "Пожалуйста, введите адрес кошелька получателя.",
-                errMinAmount: "Минимальная сумма вывода — 10 USDT.",
+                errAmountMismatch: "Для вашего уровня можно вывести только {x} USDT.",
+                errInsufficientBalance: "Недостаточно средств. Минимум: {x} USDT",
                 errPassRequired: "Пожалуйста, введите пароль транзакции.",
                 errSuccess: "Ваш запрос на вывод отправлен на рассмотрение.",
                 errFailed: "Ошибка при отправке запроса",
@@ -565,11 +636,13 @@
                 pageHeading: "Retirar criptomonedas",
                 pageSub: "Solicitud rápida y segura de retiro de USDT a tu billetera",
                 balanceLabel: "Saldo disponible:",
+                yourLevel: "Tu nivel",
+                requiredAmountLabel: "Cantidad requerida de retiro",
                 networkLabel: "Seleccionar red",
                 addressLabel: "Dirección de billetera de destino",
                 addressPlaceholder: "Ingresa tu dirección de billetera para retiro",
                 amountLabel: "Cantidad a retirar (USDT)",
-                amountPlaceholder: "Mínimo 10 USDT",
+                amountPlaceholder: "Cantidad según tu nivel",
                 feeLabel: "Comisión de red:",
                 netLabel: "Cantidad neta:",
                 passLabel: "Contraseña de transacción",
@@ -581,7 +654,9 @@
                 helpStep1Title: "Cómo enviar una solicitud de retiro",
                 helpStep1Desc: "Selecciona tu red preferida (TRC20 o BEP20) e ingresa la dirección exacta de la billetera de destino y la cantidad de retiro.",
                 helpStep2Title: "Contraseña de transacción",
-                helpStep2Desc: "Necesitas ingresar tu contraseña de transacción de 6 dígitos para la confirmación final. Si la olvidaste, usa el enlace de contraseña olvidada.",
+                helpStep2Desc: "Necesitas ingresar tu contraseña de transacción de 6 dígitos para la confirmación final.",
+                helpStep3Title: "Nivel y cantidad",
+                helpStep3Desc: "Tu cantidad de retiro está determinada por el nivel de tu cuenta y se muestra automáticamente en el campo.",
                 notifTitle: "Mensajes y notificaciones",
                 tabAll: "Todos", tabApproved: "Aprobado", tabRejected: "Rechazado", tabAdmin: "Mensaje del admin",
                 noMsg: "No hay mensajes nuevos.",
@@ -591,7 +666,8 @@
                 systemMessage: "Mensaje del sistema",
                 supportFollowup: "Contactar soporte",
                 errAddressRequired: "Por favor ingresa la dirección de billetera de destino.",
-                errMinAmount: "La cantidad mínima de retiro es 10 USDT.",
+                errAmountMismatch: "Para tu nivel, solo se pueden retirar {x} USDT.",
+                errInsufficientBalance: "Saldo insuficiente. Mínimo requerido: {x} USDT",
                 errPassRequired: "Por favor ingresa la contraseña de transacción.",
                 errSuccess: "Tu solicitud de retiro ha sido enviada para revisión.",
                 errFailed: "Error al enviar la solicitud",
@@ -611,11 +687,13 @@
                 pageHeading: "Retirer des cryptomonnaies",
                 pageSub: "Demande rapide et sécurisée de retrait USDT vers votre portefeuille",
                 balanceLabel: "Solde disponible :",
+                yourLevel: "Votre niveau",
+                requiredAmountLabel: "Montant de retrait requis",
                 networkLabel: "Sélectionner le réseau",
                 addressLabel: "Adresse du portefeuille de destination",
                 addressPlaceholder: "Saisissez votre adresse de portefeuille de retrait",
                 amountLabel: "Montant du retrait (USDT)",
-                amountPlaceholder: "Minimum 10 USDT",
+                amountPlaceholder: "Montant selon votre niveau",
                 feeLabel: "Frais de réseau :",
                 netLabel: "Montant net :",
                 passLabel: "Mot de passe de transaction",
@@ -627,7 +705,9 @@
                 helpStep1Title: "Comment envoyer une demande de retrait",
                 helpStep1Desc: "Sélectionnez votre réseau préféré (TRC20 ou BEP20) et saisissez l'adresse exacte du portefeuille de destination et le montant du retrait.",
                 helpStep2Title: "Mot de passe de transaction",
-                helpStep2Desc: "Vous devez saisir votre mot de passe de transaction à 6 chiffres pour la confirmation finale. Si vous l'avez oublié, utilisez le lien de récupération.",
+                helpStep2Desc: "Vous devez saisir votre mot de passe de transaction à 6 chiffres pour la confirmation finale.",
+                helpStep3Title: "Niveau et montant",
+                helpStep3Desc: "Votre montant de retrait est déterminé par le niveau de votre compte et s'affiche automatiquement dans le champ.",
                 notifTitle: "Messages et notifications",
                 tabAll: "Tous", tabApproved: "Approuvé", tabRejected: "Rejeté", tabAdmin: "Message admin",
                 noMsg: "Aucun nouveau message.",
@@ -637,7 +717,8 @@
                 systemMessage: "Message système",
                 supportFollowup: "Contacter le support",
                 errAddressRequired: "Veuillez saisir l'adresse du portefeuille de destination.",
-                errMinAmount: "Le montant minimum de retrait est de 10 USDT.",
+                errAmountMismatch: "Pour votre niveau, seuls {x} USDT peuvent être retirés.",
+                errInsufficientBalance: "Solde insuffisant. Minimum requis : {x} USDT",
                 errPassRequired: "Veuillez saisir le mot de passe de transaction.",
                 errSuccess: "Votre demande de retrait a été soumise pour examen.",
                 errFailed: "Erreur lors de l'envoi de la demande",
@@ -657,11 +738,13 @@
                 pageHeading: "Krypto abheben",
                 pageSub: "Schnelle und sichere USDT-Auszahlung an Ihre Ziel-Wallet",
                 balanceLabel: "Verfügbares Guthaben:",
+                yourLevel: "Ihre Stufe",
+                requiredAmountLabel: "Erforderlicher Auszahlungsbetrag",
                 networkLabel: "Netzwerk auswählen",
                 addressLabel: "Ziel-Wallet-Adresse",
                 addressPlaceholder: "Geben Sie Ihre Auszahlungs-Wallet-Adresse ein",
                 amountLabel: "Auszahlungsbetrag (USDT)",
-                amountPlaceholder: "Mindestens 10 USDT",
+                amountPlaceholder: "Betrag je nach Stufe",
                 feeLabel: "Netzwerkgebühr:",
                 netLabel: "Nettobetrag:",
                 passLabel: "Transaktionspasswort",
@@ -673,7 +756,9 @@
                 helpStep1Title: "So senden Sie eine Auszahlungsanfrage",
                 helpStep1Desc: "Wählen Sie Ihr bevorzugtes Netzwerk (TRC20 oder BEP20) und geben Sie die genaue Ziel-Wallet-Adresse und den Auszahlungsbetrag ein.",
                 helpStep2Title: "Transaktionspasswort",
-                helpStep2Desc: "Zur endgültigen Bestätigung müssen Sie Ihr 6-stelliges Transaktionspasswort eingeben. Falls Sie es vergessen haben, verwenden Sie den Link zum Zurücksetzen.",
+                helpStep2Desc: "Zur endgültigen Bestätigung müssen Sie Ihr 6-stelliges Transaktionspasswort eingeben.",
+                helpStep3Title: "Stufe und Betrag",
+                helpStep3Desc: "Ihr Auszahlungsbetrag wird durch Ihre Konto-Stufe bestimmt und automatisch im Feld angezeigt.",
                 notifTitle: "Nachrichten und Benachrichtigungen",
                 tabAll: "Alle", tabApproved: "Genehmigt", tabRejected: "Abgelehnt", tabAdmin: "Admin-Nachricht",
                 noMsg: "Keine neuen Nachrichten.",
@@ -683,7 +768,8 @@
                 systemMessage: "Systemnachricht",
                 supportFollowup: "Support kontaktieren",
                 errAddressRequired: "Bitte geben Sie die Ziel-Wallet-Adresse ein.",
-                errMinAmount: "Der Mindestauszahlungsbetrag beträgt 10 USDT.",
+                errAmountMismatch: "Für Ihre Stufe können nur {x} USDT abgehoben werden.",
+                errInsufficientBalance: "Unzureichendes Guthaben. Mindestens erforderlich: {x} USDT",
                 errPassRequired: "Bitte geben Sie das Transaktionspasswort ein.",
                 errSuccess: "Ihre Auszahlungsanfrage wurde zur Überprüfung gesendet.",
                 errFailed: "Fehler beim Senden der Anfrage",
@@ -707,9 +793,6 @@
         })();
         window.currentLangData = LD[currentLang];
 
-        // ============================================================
-        // i18n ENGINE
-        // ============================================================
         function setLang(l) {
             if (!SUPPORTED_LANGUAGES.includes(l)) l = 'fa';
             currentLang = l;
@@ -720,50 +803,37 @@
 
             document.documentElement.lang = l;
             document.documentElement.dir = t.dir || (['fa','ar'].includes(l) ? 'rtl' : 'ltr');
-
-            // Title
             document.title = t.pageTitle;
 
-            // Text nodes
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (Object.prototype.hasOwnProperty.call(t, key)) el.textContent = t[key];
             });
-
-            // Placeholders
             document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
                 const key = el.getAttribute('data-i18n-placeholder');
                 if (Object.prototype.hasOwnProperty.call(t, key)) el.setAttribute('placeholder', t[key]);
             });
-
-            // Title attributes
             document.querySelectorAll('[data-i18n-title]').forEach(el => {
                 const key = el.getAttribute('data-i18n-title');
                 if (Object.prototype.hasOwnProperty.call(t, key)) el.setAttribute('title', t[key]);
             });
-
-            // Active menu item
             document.querySelectorAll('#lang-menu .mi').forEach(item => {
                 item.classList.toggle('active', item.getAttribute('data-lang') === l);
             });
 
-            // Re-render dynamic content (notifications, fee label, etc.)
             try {
                 if (typeof window.renderNotifications === 'function') window.renderNotifications();
                 if (typeof window.calcFee === 'function') window.calcFee();
-            } catch(e) { /* ignore if not ready */ }
+                if (typeof window.refreshLevelUI === 'function') window.refreshLevelUI();
+            } catch(e) {}
         }
         window.setLang = setLang;
 
-        // ============================================================
-        // SUPABASE ERROR MAPPER (option A+B)
-        // ============================================================
         function mapSupabaseError(error) {
             const t = window.currentLangData || LD.fa;
             if (!error) return t.errGeneric;
             console.error('[Supabase Error →]', error);
             const msg = String(error.message || error.error_description || error).toLowerCase();
-
             if (msg.includes('duplicate key') || msg.includes('unique constraint')) return t.errDuplicate;
             if (msg.includes('row-level security') || msg.includes('rls')) return t.errRLS;
             if (msg.includes('check constraint') || msg.includes('violates check')) return t.errConstraint;
@@ -773,9 +843,6 @@
         }
         window.mapSupabaseError = mapSupabaseError;
 
-        // ============================================================
-        // REST OF LOGIC
-        // ============================================================
         let currentUser = null;
         let currentUserId = null;
         let userData = null;
@@ -980,12 +1047,44 @@
             }, duration);
         };
 
-        window.calcFee = function() {
+        // ============================================================
+        // LEVEL UI + CALC FEE
+        // ============================================================
+        window.refreshLevelUI = function() {
             const t = window.currentLangData || LD.fa;
+            const required = getRequiredAmount(userLevel);
+
+            const lvlEl = document.getElementById('user-level-display');
+            const amtEl = document.getElementById('required-amount-display');
+            const amtInput = document.getElementById('withdraw-amount');
+            const balEl = document.getElementById('user-balance');
+
+            if (lvlEl) lvlEl.textContent = String(userLevel);
+            if (amtEl) amtEl.textContent = required.toFixed(2) + ' USDT';
+
+            if (amtInput) {
+                amtInput.value = required.toFixed(2);
+            }
+
+            // Balance check
+            const balance = userData ? parseFloat(userData.balance || 0) : 0;
+            const submitBtn = document.getElementById('submit-withdraw-btn');
+            if (submitBtn && !submitBtn.dataset.busy) {
+                if (balance < required) {
+                    submitBtn.disabled = true;
+                } else {
+                    submitBtn.disabled = false;
+                }
+            }
+
+            if (balEl) balEl.textContent = balance.toFixed(2) + ' USDT';
+            window.calcFee();
+        };
+
+        window.calcFee = function() {
             const amt = parseFloat(document.getElementById('withdraw-amount').value) || 0;
-            const fee = 1;
-            const net = Math.max(0, amt - fee);
-            document.getElementById('withdraw-fee').innerText = fee + ' USDT';
+            const net = Math.max(0, amt - NETWORK_FEE);
+            document.getElementById('withdraw-fee').innerText = NETWORK_FEE.toFixed(2) + ' USDT';
             document.getElementById('withdraw-net').innerText = net.toFixed(2) + ' USDT';
         };
 
@@ -1003,13 +1102,28 @@
             const addr = document.getElementById('withdraw-address').value.trim();
             const amt = parseFloat(document.getElementById('withdraw-amount').value);
             const pass = document.getElementById('withdraw-pass').value.trim();
+            const required = getRequiredAmount(userLevel);
 
             if (!addr) { window.showToast(t.errAddressRequired, 'error', 4000); return; }
-            if (isNaN(amt) || amt < 10) { window.showToast(t.errMinAmount, 'error', 4000); return; }
+
+            // مبلغ باید دقیقاً برابر مبلغ سطح باشد
+            if (!Number.isFinite(amt) || Math.abs(amt - required) > 0.001) {
+                window.showToast(t.errAmountMismatch.replace('{x}', required.toFixed(2)), 'error', 5000);
+                return;
+            }
+
+            // چک موجودی
+            const balance = userData ? parseFloat(userData.balance || 0) : 0;
+            if (balance < required) {
+                window.showToast(t.errInsufficientBalance.replace('{x}', required.toFixed(2)), 'error', 5000);
+                return;
+            }
+
             if (!pass) { window.showToast(t.errPassRequired, 'error', 4000); return; }
 
             const btn = document.getElementById('submit-withdraw-btn');
             const origText = btn.innerText;
+            btn.dataset.busy = '1';
             btn.disabled = true;
             btn.innerText = t.submitting;
 
@@ -1023,23 +1137,24 @@
                     created_at: new Date().toISOString()
                 }]);
 
-                btn.disabled = false;
+                delete btn.dataset.busy;
                 btn.innerText = origText;
 
                 if (!error) {
                     window.showToast(t.errSuccess, 'success', 5000);
-                    document.getElementById('withdraw-amount').value = '';
                     document.getElementById('withdraw-pass').value = '';
-                    window.calcFee();
+                    window.refreshLevelUI();
                 } else {
                     const friendlyMsg = mapSupabaseError(error);
                     window.showToast(`${t.errFailed}: ${friendlyMsg}`, 'error', 5000);
+                    window.refreshLevelUI();
                 }
             } catch (e) {
-                btn.disabled = false;
+                delete btn.dataset.busy;
                 btn.innerText = origText;
                 const friendlyMsg = mapSupabaseError(e);
                 window.showToast(`${t.errFailed}: ${friendlyMsg}`, 'error', 5000);
+                window.refreshLevelUI();
             }
         };
 
@@ -1047,8 +1162,8 @@
             const { data } = await supabaseClient.from('users').select('*').eq('id', user.id).single();
             if (data) {
                 userData = data;
-                const bal = parseFloat(data.balance || 0);
-                document.getElementById('user-balance').innerText = bal.toFixed(2) + ' USDT';
+                userLevel = getUserLevel(data);
+                window.refreshLevelUI();
                 window.onNetworkChange();
             }
 
@@ -1097,7 +1212,6 @@
             window.location.href = "index.html";
         };
 
-        // Initialize language on load
         setLang(currentLang);
     </script>
 </body>
