@@ -255,8 +255,8 @@
             font-weight: 700; font-size: 12px; display: flex; align-items: center;
             justify-content: center; gap: 6px; transition: all .2s; font-family: inherit;
         }
-        .confirm-btn-approve:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 8px 20px -8px rgba(34,197,94,.6); }
-        .confirm-btn-approve:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+        .confirm-btn-approve:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 8px 20px -8px rgba(34,197,94,.6); }
+        .confirm-btn-approve:disabled { opacity: .5; cursor: not-allowed; }
         .confirm-btn-reject {
             flex: 1; padding: 11px; background: linear-gradient(135deg, #ef4444, #dc2626);
             border: none; color: #fff; border-radius: 10px; cursor: pointer;
@@ -277,6 +277,20 @@
             font-size: 11px; color: #94a3b8;
         }
         .wallet-preview strong { color: #38bdf8; }
+
+        .approve-checkbox-item {
+            display: flex; align-items: flex-start; gap: 8px;
+            padding: 10px 0; cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,.04);
+        }
+        .approve-checkbox-item:last-child { border-bottom: none; }
+        .approve-checkbox-item input[type="checkbox"] {
+            margin-top: 2px; cursor: pointer; width: 16px; height: 16px;
+            flex-shrink: 0; accent-color: #22c55e;
+        }
+        .approve-checkbox-item span {
+            color: #cbd5e1; font-size: 11px; line-height: 1.6;
+        }
 
         @media (max-width: 960px) {
             .app-shell { flex-direction: column; }
@@ -630,27 +644,17 @@
     </div>
 
     <div class="modal" id="m-confirm-approve" style="z-index:1050;">
-        <div class="modal-content" style="max-width:420px;">
+        <div class="modal-content" style="max-width:500px;">
             <div class="modal-header" style="color:#22c55e; border-bottom-color:rgba(34,197,94,.25);">
                 <span><i class="fas fa-check-circle"></i> تایید واریزی</span>
                 <button class="modal-close" onclick="closeModal('m-confirm-approve')"><i class="fas fa-times"></i></button>
             </div>
-            <div style="padding:8px 0 16px; color:#cbd5e1; font-size:13px; line-height:1.9;">
-                آیا از تایید این واریزی اطمینان دارید؟
-                <div style="margin-top:14px; padding:14px; background:rgba(34,197,94,.1); border:1px solid rgba(34,197,94,.3); border-radius:10px; text-align:center;">
-                    <div style="color:#22c55e; font-weight:800; font-size:20px;" id="confirm-approve-amount">$0.00</div>
-                    <div style="color:#94a3b8; font-size:11px; margin-top:4px;">به موجودی کاربر اضافه خواهد شد</div>
-                </div>
-                <div style="margin-top:14px; padding:10px; background:rgba(251,191,36,.08); border:1px solid rgba(251,191,36,.25); border-radius:8px; color:#fbbf24; font-size:11px; display:flex; align-items:flex-start; gap:8px;">
-                    <i class="fas fa-exclamation-triangle" style="margin-top:2px; flex-shrink:0;"></i>
-                    <span>این عمل قابل بازگشت نیست. لطفاً قبل از تایید، TxID را در بلاکچین بررسی کرده باشید.</span>
-                </div>
-            </div>
-            <div style="display:flex; gap:10px;">
+            <div id="confirm-approve-body" style="padding:0; max-height:60vh; overflow-y:auto;"></div>
+            <div style="display:flex; gap:10px; margin-top:14px;">
                 <button type="button" class="confirm-btn-cancel" onclick="closeModal('m-confirm-approve')">
                     <i class="fas fa-times"></i> لغو
                 </button>
-                <button type="button" class="confirm-btn-approve" id="confirm-approve-btn">
+                <button type="button" class="confirm-btn-approve" id="confirm-approve-btn" disabled>
                     <i class="fas fa-check"></i> تایید واریزی
                 </button>
             </div>
@@ -715,8 +719,6 @@
         const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // ★★★ توابع اعتبارسنجی کیف پول — Base58Check + EIP-55 format ★★★
 
         function base58Decode(str) {
             const alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
@@ -1535,27 +1537,103 @@
 
         window.approveDeposit = function(txId) {
             const dep = (window.currentDepositList || []).find(x => x.txId === txId);
-            const amountText = dep ? `$${dep.creditedAmount.toFixed(2)} USDT` : '$0.00';
-            const amountEl = document.getElementById('confirm-approve-amount');
-            if (amountEl) amountEl.textContent = amountText;
+            if (!dep) { showToast('واریزی یافت نشد', 'error'); return; }
 
-            document.getElementById('m-confirm-approve').classList.add('show');
+            const creditedAmount = dep.creditedAmount || 0;
+            const sentAmount = dep.sentAmount || 0;
+            const network = dep.network || 'TRC20';
+            const txHash = dep.txHash || '-';
+            const explorerName = network === 'TRC20' ? 'TronScan' : 'BscScan';
 
-            const confirmBtn = document.getElementById('confirm-approve-btn');
-            const newBtn = confirmBtn.cloneNode(true);
-            confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+            let explorerUrl = '';
+            if (txHash && txHash !== '-') {
+                if (network === 'TRC20') explorerUrl = `https://tronscan.org/#/transaction/${txHash}`;
+                else if (network === 'BEP20') explorerUrl = `https://bscscan.com/tx/${txHash}`;
+            }
+
+            const bodyHtml = `
+                <div style="background:rgba(34,197,94,.08); border:1px solid rgba(34,197,94,.25); border-radius:10px; padding:12px; margin-bottom:14px; text-align:center;">
+                    <div style="color:#22c55e; font-weight:800; font-size:20px;">$${creditedAmount.toFixed(2)} USDT</div>
+                    <div style="color:#94a3b8; font-size:11px; margin-top:2px;">مبلغ شارژ به موجودی کاربر</div>
+                </div>
+
+                <div style="background:rgba(15,23,42,.6); border:1px solid rgba(255,255,255,.08); border-radius:8px; padding:10px; margin-bottom:12px;">
+                    <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,.04);">
+                        <span style="color:#94a3b8; font-size:11px;">شبکه:</span>
+                        <span style="color:#38bdf8; font-weight:700; font-size:11px;">${escapeHtml(network)}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,.04);">
+                        <span style="color:#94a3b8; font-size:11px;">مبلغ ارسالی ادعایی:</span>
+                        <span style="color:#22c55e; font-weight:700; font-size:11px;">$${sentAmount.toFixed(2)}</span>
+                    </div>
+                    <div style="padding:5px 0;">
+                        <div style="color:#94a3b8; font-size:11px; margin-bottom:3px;">هش تراکنش (TxID):</div>
+                        <div style="font-family:monospace; font-size:10px; color:#cbd5e1; word-break:break-all; direction:ltr; text-align:left; background:rgba(0,0,0,.3); padding:6px; border-radius:4px;">${escapeHtml(txHash)}</div>
+                    </div>
+                    ${explorerUrl ? `<div style="padding:5px 0 0; text-align:center;"><a href="${escapeHtml(explorerUrl)}" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:6px; background:rgba(56,189,248,.15); border:1px solid rgba(56,189,248,.4); color:#38bdf8; padding:8px 16px; border-radius:6px; text-decoration:none; font-size:11px; font-weight:600;"><i class="fas fa-external-link-alt"></i> باز کردن در ${explorerName}</a></div>` : ''}
+                </div>
+
+                <div style="background:rgba(251,191,36,.08); border:1px solid rgba(251,191,36,.25); border-radius:8px; padding:12px; margin-bottom:14px;">
+                    <div style="color:#fbbf24; font-weight:700; font-size:12px; margin-bottom:8px;"><i class="fas fa-list-check"></i> چک‌لیست اجباری تایید (هر ۳ باید تیک بخورد):</div>
+
+                    <label class="approve-checkbox-item">
+                        <input type="checkbox" id="chk-txid">
+                        <span>TxID را در ${explorerName} بررسی کردم و تراکنش وجود دارد</span>
+                    </label>
+
+                    <label class="approve-checkbox-item">
+                        <input type="checkbox" id="chk-amount">
+                        <span>مبلغ on-chain با مبلغ ارسالی ادعایی ($${sentAmount.toFixed(2)}) مطابقت دارد</span>
+                    </label>
+
+                    <label class="approve-checkbox-item">
+                        <input type="checkbox" id="chk-address">
+                        <span>آدرس مقصد در بلاکچین با آدرس کیف پول پلتفرم یکسان است</span>
+                    </label>
+                </div>
+
+                <div style="background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.25); border-radius:8px; padding:10px; color:#fbbf24; font-size:10px; line-height:1.6; display:flex; align-items:flex-start; gap:8px;">
+                    <i class="fas fa-exclamation-triangle" style="color:#ef4444; margin-top:2px; flex-shrink:0;"></i>
+                    <span>این عمل قابل بازگشت نیست. بعد از تایید، مبلغ به موجودی کاربر اضافه می‌شود و قابل لغو نیست.</span>
+                </div>
+            `;
+
+            document.getElementById('confirm-approve-body').innerHTML = bodyHtml;
+
+            const oldBtn = document.getElementById('confirm-approve-btn');
+            const newBtn = oldBtn.cloneNode(true);
+            oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+
+            newBtn.disabled = true;
+
+            const updateBtnState = () => {
+                const c1 = document.getElementById('chk-txid')?.checked;
+                const c2 = document.getElementById('chk-amount')?.checked;
+                const c3 = document.getElementById('chk-address')?.checked;
+                newBtn.disabled = !(c1 && c2 && c3);
+            };
+
+            ['chk-txid', 'chk-amount', 'chk-address'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('change', updateBtnState);
+            });
 
             newBtn.addEventListener('click', async () => {
-                closeModal('m-confirm-approve');
+                if (newBtn.disabled) return;
+
+                newBtn.disabled = true;
+                newBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال تایید...';
+
                 try {
                     const { data, error } = await supabaseClient.rpc('approve_deposit', {
                         p_transaction_id: txId,
-                        p_admin_note: 'تایید توسط ادمین'
+                        p_admin_note: 'تایید توسط ادمین (چک‌لیست کامل)'
                     });
 
                     if (error) throw error;
 
                     if (data && data.success) {
+                        closeModal('m-confirm-approve');
                         showToast(`✅ واریزی تایید شد. مبلغ $${Number(data.amount).toFixed(2)} به کاربر اضافه شد.`);
                         loadData();
                     } else if (data && data.error) {
@@ -1571,8 +1649,12 @@
                 } catch (err) {
                     console.error('Approve error:', err);
                     showToast('خطا در تایید: ' + (err.message || 'خطای نامشخص'), 'error');
+                    newBtn.disabled = false;
+                    newBtn.innerHTML = '<i class="fas fa-check"></i> تایید واریزی';
                 }
             });
+
+            document.getElementById('m-confirm-approve').classList.add('show');
         };
 
         window.rejectDeposit = function(txId) {
