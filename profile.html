@@ -127,13 +127,22 @@
         .bs:disabled{opacity:0.6;cursor:not-allowed;background:#64748b;color:#cbd5e1}
         .ibox{display:flex;justify-content:space-between;align-items:center;background:rgba(15,23,42,0.6);padding:12px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);margin-bottom:12px}
         
-        .c-dropdown{position:relative;width:95px}
-        .c-select-btn{background:#0f172a;color:#f8fafc;border:1px solid rgba(255,255,255,0.2);padding:6px;border-radius:6px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;width:100%}
-        .c-list{display:none;position:absolute;top:100%;left:0;background:#0f172a;border:1px solid rgba(255,255,255,0.2);border-radius:6px;width:190px;max-height:180px;overflow-y:auto;z-index:9999;box-shadow:0 10px 25px rgba(0,0,0,.9);margin-top:4px}
-        .c-list.show{display:block}
-        .c-search{width:100%;padding:6px;background:#1e293b;border:none;border-bottom:1px solid rgba(255,255,255,0.1);color:#fff;font-size:11px;outline:none}
-        .c-option{padding:6px 8px;font-size:11px;color:#cbd5e1;cursor:pointer;display:flex;align-items:center;gap:6px}
+        /* ★★ تغییر: dropdown با کادر جستجوی sticky و اسکرول داخلی ★★ */
+        .c-dropdown{position:relative;width:110px}
+        .c-select-btn{background:#0f172a;color:#f8fafc;border:1px solid rgba(255,255,255,0.2);padding:8px;border-radius:6px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .c-select-btn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80px;display:inline-block;text-align:left}
+        .c-list{display:none;position:fixed;background:#0f172a;border:1px solid rgba(255,255,255,0.2);border-radius:8px;overflow:hidden;z-index:99999;box-shadow:0 10px 25px rgba(0,0,0,.9);flex-direction:column}
+        .c-list.show{display:flex}
+        .c-search-wrap{padding:6px;border-bottom:1px solid rgba(255,255,255,0.08);background:#0f172a;flex-shrink:0}
+        .c-search{width:100%;padding:8px 10px;background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#fff;font-size:12px;outline:none;font-family:inherit}
+        .c-search:focus{border-color:#38bdf8}
+        #c-options-container{overflow-y:auto;max-height:160px}
+        #c-options-container::-webkit-scrollbar{width:5px}
+        #c-options-container::-webkit-scrollbar-track{background:rgba(15,23,42,0.6);border-radius:10px}
+        #c-options-container::-webkit-scrollbar-thumb{background:rgba(56,189,248,0.35);border-radius:10px}
+        .c-option{padding:8px 10px;font-size:12px;color:#cbd5e1;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background 0.15s}
         .c-option:hover{background:rgba(56,189,248,.2);color:#38bdf8}
+        .c-option-empty{padding:12px;text-align:center;font-size:11px;color:#64748b}
 
         .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
         .modal.show{display:flex}
@@ -231,13 +240,15 @@
                             <span style="color:#94a3b8;font-size:10px;">کد کشور</span> <i class="fas fa-chevron-down" style="font-size:8px;"></i>
                         </div>
                         <div class="c-list" id="c-list">
-                            <input type="text" class="c-search" placeholder="Search..." oninput="window.filterCountries(this)">
+                            <div class="c-search-wrap">
+                                <input type="text" class="c-search" id="c-search-input" placeholder="جستجو (مثلاً 98 یا Iran)..." oninput="window.filterCountries(this)">
+                            </div>
                             <div id="c-options-container"></div>
                         </div>
                     </div>
                     <input type="hidden" id="country-code" value="">
                     <div style="display:flex;flex-direction:column;flex:1;">
-                        <input type="text" id="user-phone-input" placeholder="9123456789" maxlength="10" style="background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#fff;padding:6px 10px;font-size:13px;width:100%;outline:none;">
+                        <input type="text" id="user-phone-input" placeholder="9123456789" maxlength="10" oninput="window.clearPhoneError()" style="background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#fff;padding:6px 10px;font-size:13px;width:100%;outline:none;">
                         <div class="err-msg" id="phone-err-msg" style="font-size:10px;margin-top:2px;">شماره باید ۱۰ رقم و بدون صفر باشد</div>
                     </div>
                 </div>
@@ -420,17 +431,40 @@
 
         function renderCountries(l){
             const c=document.getElementById('c-options-container');
-            if(c) c.innerHTML=l.map(o=>`<div class="c-option" onclick="window.selectCountry('${o.f}','${o.c}')"><span>${o.f}</span> <span>${o.c}</span> <span style="color:#94a3b8;font-size:10px;">(${o.n})</span></div>`).join('');
+            if(!c) return;
+            if (l.length === 0) {
+                c.innerHTML = '<div class="c-option-empty">نتیجه‌ای یافت نشد</div>';
+                return;
+            }
+            c.innerHTML = l.map(o => `<div class="c-option" onclick="window.selectCountry('${o.f}','${o.c}','${o.n}')"><span>${o.f}</span><span>${o.c}</span><span style="color:#94a3b8;font-size:10px;margin-left:auto;">${o.n}</span></div>`).join('');
         }
+        window.renderCountries = renderCountries;
 
         window.filterCountries = function(i){
-            renderCountries(countries.filter(x=>x.n.toLowerCase().includes(i.value.toLowerCase())||x.c.includes(i.value)));
+            const v = i.value.trim().toLowerCase();
+            if (!v) {
+                renderCountries(countries);
+                return;
+            }
+            const cleaned = v.replace(/^\+/, '');
+            const filtered = countries.filter(x =>
+                x.n.toLowerCase().includes(v) ||
+                x.c.replace('+','').includes(cleaned)
+            );
+            renderCountries(filtered);
         };
 
-        window.selectCountry = function(f,c){
+        window.selectCountry = function(f,c,n){
             document.getElementById('country-code').value=c;
-            document.getElementById('c-select-btn').querySelector('span').innerText=`${f} ${c}`;
+            const btn = document.getElementById('c-select-btn');
+            if (btn) btn.querySelector('span').innerText=`${f} ${c}`;
             document.getElementById('c-list').classList.remove('show');
+            window.clearPhoneError();
+        };
+
+        window.clearPhoneError = function() {
+            const errEl = document.getElementById('phone-err-msg');
+            if (errEl) errEl.style.display = 'none';
         };
 
         window.tc = function(e){
@@ -450,9 +484,56 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             renderCountries(countries);
-            const sBtn=document.getElementById('c-select-btn'), sList=document.getElementById('c-list');
-            if(sBtn) sBtn.onclick=e=>{ e.stopPropagation(); sList.classList.toggle('show'); };
-            window.addEventListener('click',e=>{ if(sList && !e.target.closest('#c-dropdown')) sList.classList.remove('show'); },true);
+            
+            const sBtn = document.getElementById('c-select-btn');
+            const sList = document.getElementById('c-list');
+            
+            if (sBtn) {
+                sBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    
+                    if (sList.classList.contains('show')) {
+                        sList.classList.remove('show');
+                        return;
+                    }
+                    
+                    // محاسبه موقعیت نسبت به viewport
+                    const rect = sBtn.getBoundingClientRect();
+                    const ddW = Math.min(240, window.innerWidth - 20);
+                    let left = rect.left;
+                    if (left + ddW > window.innerWidth - 10) left = window.innerWidth - ddW - 10;
+                    if (left < 10) left = 10;
+                    
+                    const ddH = 210;
+                    let top = rect.bottom + 4;
+                    
+                    if (top + ddH > window.innerHeight - 10) {
+                        top = Math.max(10, rect.top - ddH - 4);
+                    }
+                    
+                    sList.style.left = left + 'px';
+                    sList.style.top = top + 'px';
+                    sList.style.width = ddW + 'px';
+                    sList.classList.add('show');
+                    
+                    // ریست جستجو + فوکوس
+                    setTimeout(() => {
+                        const searchInput = document.getElementById('c-search-input');
+                        if (searchInput) {
+                            searchInput.value = '';
+                            renderCountries(countries);
+                            searchInput.focus();
+                        }
+                    }, 30);
+                };
+            }
+            
+            // بستن با کلیک بیرون
+            window.addEventListener('click', (e) => {
+                if (sList && !e.target.closest('#c-dropdown') && !e.target.closest('#c-list')) {
+                    sList.classList.remove('show');
+                }
+            }, true);
         });
     </script>
 
@@ -850,7 +931,6 @@
             return true;
         }
 
-        // ★★★ جدید: اول getSession()، بعد onAuthStateChange ★★★
         (async () => {
             try {
                 const { data: { session }, error } = await supabaseClient.auth.getSession();
@@ -862,18 +942,15 @@
                 if (session && session.user) {
                     await initializeUserSession(session);
                 } else {
-                    // Try refresh
-                    const { data: { session: refreshed }, error: refreshErr } = await supabaseClient.auth.refreshSession();
+                    const { data: { session: refreshed } } = await supabaseClient.auth.refreshSession();
                     if (refreshed && refreshed.user) {
                         await initializeUserSession(refreshed);
                     } else {
-                        console.log('No valid session, redirecting to login');
                         window.location.href = "index.html";
                         return;
                     }
                 }
                 
-                // ★ فقط حالا listener را نصب می‌کنیم
                 supabaseClient.auth.onAuthStateChange(async (event, session) => {
                     if (event === 'SIGNED_OUT') {
                         window.location.href = "index.html";
@@ -883,7 +960,6 @@
                         currentUser = session.user;
                         currentUserId = session.user.id;
                     }
-                    // INITIAL_SESSION را نادیده بگیر — چون قبلاً getSession() کار خود را کرد
                 });
             } catch (err) {
                 console.error('Auth init error:', err);
