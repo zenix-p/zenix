@@ -261,8 +261,6 @@
             .topbar-badge span { display: none; }
             .topbar-badge i { font-size: 12px; margin: 0; }
             .main .c { padding: 16px 12px 8px; }
-            
-            /* ★ اصلاح چیدمان کارت‌های آماری در موبایل (۲ ستونه شد) */
             .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
             .stat-card { padding: 14px 10px; gap: 8px; }
             .stat-icon { width: 34px; height: 34px; font-size: 15px; border-radius: 10px; }
@@ -274,8 +272,6 @@
             .chat-container-layout { flex-direction: column; height: auto; min-height: 0; }
             .chat-list-panel { width: 100%; max-height: 220px; }
             .chat-main-panel { width: 100%; min-height: 350px; }
-            
-            /* ★ جلوگیری از زوم در فیلدهای ادمین */
             input, select, textarea { font-size: 16px !important; }
         }
     </style>
@@ -418,9 +414,39 @@
 
             <div id="t-deposit" class="tab-content">
                 <div class="panel-box">
-                    <div class="panel-header"><div class="panel-title"><i class="fas fa-arrow-down"></i> مدیریت درخواست‌های واریز وجه</div></div>
+                    <div class="panel-header">
+                        <div class="panel-title"><i class="fas fa-arrow-down"></i> مدیریت درخواست‌های واریز وجه</div>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <button type="button" class="dep-filter-btn active" data-filter="pending" style="background:rgba(56,189,248,.15); border:1px solid rgba(56,189,248,.3); color:#38bdf8; padding:6px 10px; border-radius:8px; cursor:pointer; font-size:11px; font-weight:600;">
+                                <i class="fas fa-clock"></i> معلق <span class="tab-badge" id="dep-cnt-pending" style="margin-inline-start:4px;">0</span>
+                            </button>
+                            <button type="button" class="dep-filter-btn" data-filter="approved" style="background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); color:#94a3b8; padding:6px 10px; border-radius:8px; cursor:pointer; font-size:11px; font-weight:600;">
+                                <i class="fas fa-check-circle" style="color:#22c55e;"></i> تایید شده <span class="tab-badge" id="dep-cnt-approved" style="margin-inline-start:4px;">0</span>
+                            </button>
+                            <button type="button" class="dep-filter-btn" data-filter="rejected" style="background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); color:#94a3b8; padding:6px 10px; border-radius:8px; cursor:pointer; font-size:11px; font-weight:600;">
+                                <i class="fas fa-times-circle" style="color:#ef4444;"></i> رد شده <span class="tab-badge" id="dep-cnt-rejected" style="margin-inline-start:4px;">0</span>
+                            </button>
+                            <button type="button" class="dep-filter-btn" data-filter="all" style="background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); color:#94a3b8; padding:6px 10px; border-radius:8px; cursor:pointer; font-size:11px; font-weight:600;">
+                                <i class="fas fa-list"></i> همه <span class="tab-badge" id="dep-cnt-all" style="margin-inline-start:4px;">0</span>
+                            </button>
+                        </div>
+                    </div>
                     <div class="table-responsive">
-                        <table><thead><tr><th>شناسه کاربر</th><th>تاریخ و ساعت</th></tr></thead><tbody id="tb-deposit"></tbody></table>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>کاربر</th>
+                                    <th>مبلغ شارژ</th>
+                                    <th>مبلغ ارسالی</th>
+                                    <th>شبکه</th>
+                                    <th>TxID</th>
+                                    <th>تاریخ</th>
+                                    <th>وضعیت</th>
+                                    <th>عملیات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tb-deposit"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -545,7 +571,7 @@
                 if (userError || !user) { window.location.replace('index.html'); return false; }
                 const { data: isAdmin, error: rpcError } = await supabaseClient.rpc('is_current_user_admin');
                 if (rpcError || isAdmin !== true) {
-                    try { await supabaseClient.auth.signOut(); } catch (_) { /* signOut is best-effort */ }
+                    try { await supabaseClient.auth.signOut(); } catch (_) {}
                     window.location.replace('index.html');
                     return false;
                 }
@@ -558,7 +584,7 @@
             try {
                 const { data, error } = await supabaseClient.from('app_settings').select('value').eq('key', 'ntfy_topic').maybeSingle();
                 if (!error && data && data.value) NTFY_TOPIC = String(data.value).trim();
-            } catch (_) { /* topic load is best-effort */ NTFY_TOPIC = null; }
+            } catch (_) { NTFY_TOPIC = null; }
         }
 
         let uMap = {};
@@ -569,6 +595,7 @@
         let realtimeUsersChannel = null;
         let realtimeBetsChannel = null;
         window.currentDepositList = [];
+        window.currentDepFilter = 'pending';
 
         function generateUIDDigits(userId) {
             if (!userId) return '000000';
@@ -617,7 +644,7 @@
                 osc1.type = 'sine'; osc1.frequency.setValueAtTime(880, now);
                 gain1.gain.setValueAtTime(0.3, now); gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
                 osc1.connect(gain1); gain1.connect(audioCtx.destination); osc1.start(now); osc1.stop(now + 0.25);
-            } catch (e) { /* Web Audio may be unavailable or blocked; alert sound is non-critical */ }
+            } catch (e) {}
         }
 
         let prevD = -1, prevW = -1, prevR = -1, prevChat = -1;
@@ -629,7 +656,7 @@
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ topic: NTFY_TOPIC, title: titleText, message: messageText, priority: 5, tags: ['bell', 'warning'] })
                 });
-            } catch (e) { /* ntfy push is best-effort; a network failure must not break the dashboard */ }
+            } catch (e) {}
         }
 
         document.getElementById('test-ntfy-btn')?.addEventListener('click', async () => {
@@ -645,6 +672,7 @@
             document.getElementById(id).classList.add('active');
             if(btn) btn.classList.add('active');
             if(id === 't-casino') loadCasinoData();
+            if(id === 't-deposit') window.renderDepositTable();
         };
 
         window.closeModal = id => document.getElementById(id).classList.remove('show');
@@ -676,7 +704,7 @@
         async function sendNotificationToUser(uid, title, message) {
             try {
                 await supabaseClient.from('notifications').insert([{ user_id: uid, title: title, message: message, created_at: new Date().toISOString(), read: false }]);
-            } catch (err) { /* notification insert is best-effort; the primary action already succeeded */ }
+            } catch (err) {}
         }
 
         function cleanupRealtimeChannels() {
@@ -752,7 +780,7 @@
                 document.getElementById('st-casino-turnover').innerText = '$' + totalTurnover.toLocaleString('en-US', {minimumFractionDigits:2});
                 document.getElementById('st-casino-payouts').innerText = '$' + totalPayouts.toLocaleString('en-US', {minimumFractionDigits:2});
                 document.getElementById('st-casino-balances').innerText = '$' + totalCasinoBal.toLocaleString('en-US', {minimumFractionDigits:2});
-            } catch (err) { /* casino data refresh is best-effort; a transient error must not block the rest of the dashboard */ }
+            } catch (err) {}
         }
 
         async function initSupportChatListener() {
@@ -798,7 +826,7 @@
                     if (badge) { badge.innerText = unreadCount; badge.className = unreadCount > 0 ? 'tab-badge' : 'tab-badge zero'; }
                     if (prevChat !== -1 && unreadCount > prevChat) { playAlertSound(); sendNtfyAlert("💬 پیام پشتیبانی جدید", "کاربری در بخش پشتیبانی پیام ارسال کرده است."); }
                     prevChat = unreadCount;
-                } catch(err) { /* chat list refresh is best-effort; a transient error must not break the admin panel */ }
+                } catch(err) {}
             }
             await fetchChats();
             if (chatChannel) supabaseClient.removeChannel(chatChannel);
@@ -935,6 +963,242 @@
             document.getElementById('target-uid-hidden').value = '';
         };
 
+        // ============================================================
+        // ★★★ توابع جدید برای مدیریت واریزی‌ها ★★★
+        // ============================================================
+        window.renderDepositTable = function() {
+            const allDeposits = window.currentDepositList || [];
+            const filter = window.currentDepFilter || 'pending';
+            const filtered = filter === 'all' ? allDeposits : allDeposits.filter(d => d.status === filter);
+
+            const cntPending = document.getElementById('dep-cnt-pending');
+            const cntApproved = document.getElementById('dep-cnt-approved');
+            const cntRejected = document.getElementById('dep-cnt-rejected');
+            const cntAll = document.getElementById('dep-cnt-all');
+            if (cntPending) cntPending.innerText = allDeposits.filter(d => d.status === 'pending').length;
+            if (cntApproved) cntApproved.innerText = allDeposits.filter(d => d.status === 'approved' || d.status === 'success').length;
+            if (cntRejected) cntRejected.innerText = allDeposits.filter(d => d.status === 'rejected').length;
+            if (cntAll) cntAll.innerText = allDeposits.length;
+
+            let tbDep = document.getElementById('tb-deposit');
+            if (!tbDep) return;
+
+            if (filtered.length === 0) {
+                tbDep.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:25px;color:#94a3b8;">هیچ درخواست واریزی با این فیلتر وجود ندارد.</td></tr>`;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(d => {
+                let statusHtml = '';
+                if (d.status === 'pending') statusHtml = '<span style="color:#fbbf24; font-weight:bold; font-size:11px;"><i class="fas fa-clock"></i> معلق</span>';
+                else if (d.status === 'approved' || d.status === 'success') statusHtml = '<span style="color:#22c55e; font-weight:bold; font-size:11px;"><i class="fas fa-check-circle"></i> تایید شده</span>';
+                else if (d.status === 'rejected') statusHtml = '<span style="color:#ef4444; font-weight:bold; font-size:11px;"><i class="fas fa-times-circle"></i> رد شده</span>';
+                else statusHtml = `<span style="color:#94a3b8; font-size:11px;">${escapeHtml(d.status)}</span>`;
+
+                let networkBadge = d.network === 'TRC20'
+                    ? '<span style="background:rgba(56,189,248,.15); color:#38bdf8; padding:2px 8px; border-radius:6px; font-size:10px; font-weight:700;">TRC20</span>'
+                    : '<span style="background:rgba(245,158,11,.15); color:#f59e0b; padding:2px 8px; border-radius:6px; font-size:10px; font-weight:700;">BEP20</span>';
+
+                let txHashShort = d.txHash && d.txHash.length > 12
+                    ? d.txHash.substring(0, 6) + '...' + d.txHash.substring(d.txHash.length - 6)
+                    : (d.txHash || '-');
+
+                let actionsHtml = '';
+                if (d.status === 'pending') {
+                    actionsHtml = `
+                        <button type="button" class="btn-action btn-approve" data-dep-approve="${escapeHtml(d.txId)}" style="padding:5px 8px; font-size:10px;">
+                            <i class="fas fa-check"></i> تایید
+                        </button>
+                        <button type="button" class="btn-action btn-reject" data-dep-reject="${escapeHtml(d.txId)}" style="padding:5px 8px; font-size:10px;">
+                            <i class="fas fa-times"></i> رد
+                        </button>
+                    `;
+                } else {
+                    actionsHtml = `
+                        <button type="button" class="btn-action btn-edit" data-dep-view="${escapeHtml(d.txId)}" style="padding:5px 8px; font-size:10px;">
+                            <i class="fas fa-eye"></i> جزئیات
+                        </button>
+                    `;
+                }
+
+                html += `
+                    <tr>
+                        <td>
+                            <span class="badge-id" data-dep-view="${escapeHtml(d.txId)}" style="cursor:pointer;">${escapeHtml(d.idCode)}</span>
+                            <div style="font-size:10px; color:#94a3b8; margin-top:2px; max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(d.nameStr)}</div>
+                        </td>
+                        <td style="color:#22c55e; font-weight:bold;">$${d.creditedAmount.toFixed(2)}</td>
+                        <td style="color:#38bdf8; font-weight:bold;">$${d.sentAmount.toFixed(2)}</td>
+                        <td>${networkBadge}</td>
+                        <td>
+                            <span style="font-family:monospace; font-size:10px; color:#cbd5e1; cursor:pointer;"
+                                  data-txid="${escapeHtml(d.txHash)}" title="کلیک برای کپی: ${escapeHtml(d.txHash)}">
+                                ${escapeHtml(txHashShort)}
+                            </span>
+                        </td>
+                        <td style="font-size:10px;">${escapeHtml(formatDate(d.createdAt))}</td>
+                        <td>${statusHtml}</td>
+                        <td style="white-space:nowrap;">${actionsHtml}</td>
+                    </tr>
+                `;
+            });
+            tbDep.innerHTML = html;
+
+            tbDep.querySelectorAll('[data-dep-approve]').forEach(el => {
+                el.addEventListener('click', () => window.approveDeposit(el.getAttribute('data-dep-approve')));
+            });
+            tbDep.querySelectorAll('[data-dep-reject]').forEach(el => {
+                el.addEventListener('click', () => window.rejectDeposit(el.getAttribute('data-dep-reject')));
+            });
+            tbDep.querySelectorAll('[data-dep-view]').forEach(el => {
+                el.addEventListener('click', () => window.openDepositDetails(el.getAttribute('data-dep-view')));
+            });
+            tbDep.querySelectorAll('[data-txid]').forEach(el => {
+                el.addEventListener('click', () => {
+                    const hash = el.getAttribute('data-txid');
+                    if (hash && hash !== '-') {
+                        navigator.clipboard.writeText(hash);
+                        showToast('TxID در کلیپ‌بورد کپی شد.');
+                    }
+                });
+            });
+        };
+
+        window.approveDeposit = async function(txId) {
+            if (!confirm('آیا از تایید این واریزی اطمینان دارید؟\n\n⚠️ این عمل موجودی کاربر را افزایش می‌دهد و قابل بازگشت نیست.')) return;
+
+            try {
+                const { data, error } = await supabaseClient.rpc('approve_deposit', {
+                    p_transaction_id: txId,
+                    p_admin_note: 'تایید توسط ادمین'
+                });
+
+                if (error) throw error;
+
+                if (data && data.success) {
+                    showToast(`✅ واریزی تایید شد. مبلغ $${Number(data.amount).toFixed(2)} به کاربر اضافه شد.`);
+                    loadData();
+                } else if (data && data.error) {
+                    const errMsg = {
+                        'not_admin': 'شما دسترسی ادمین ندارید',
+                        'not_found': 'واریزی یافت نشد',
+                        'not_pending': 'این واریزی قبلاً بررسی شده است',
+                        'not_deposit': 'این رکورد از نوع واریزی نیست'
+                    }[data.error] || data.error;
+                    showToast('خطا: ' + errMsg, 'error');
+                    loadData();
+                }
+            } catch (err) {
+                console.error('Approve error:', err);
+                showToast('خطا در تایید: ' + (err.message || 'خطای نامشخص'), 'error');
+            }
+        };
+
+        window.rejectDeposit = async function(txId) {
+            const reason = prompt('دلیل رد واریزی را وارد کنید:\n(در صورت خالی گذاشتن، دلیل پیش‌فرض ثبت می‌شود)', 'واریزی توسط مدیریت تایید نشد');
+            if (reason === null) return;
+
+            try {
+                const { data, error } = await supabaseClient.rpc('reject_deposit', {
+                    p_transaction_id: txId,
+                    p_reason: reason || 'واریزی توسط مدیریت تایید نشد'
+                });
+
+                if (error) throw error;
+
+                if (data && data.success) {
+                    showToast('واریزی رد شد و به کاربر اطلاع داده شد.');
+                    loadData();
+                } else if (data && data.error) {
+                    const errMsg = {
+                        'not_admin': 'شما دسترسی ادمین ندارید',
+                        'not_found': 'واریزی یافت نشد',
+                        'not_pending': 'این واریزی قبلاً بررسی شده است'
+                    }[data.error] || data.error;
+                    showToast('خطا: ' + errMsg, 'error');
+                    loadData();
+                }
+            } catch (err) {
+                console.error('Reject error:', err);
+                showToast('خطا در رد: ' + (err.message || 'خطای نامشخص'), 'error');
+            }
+        };
+
+        window.openDepositDetails = function(txId) {
+            const d = (window.currentDepositList || []).find(x => x.txId === txId);
+            if (!d) { showToast('واریزی یافت نشد', 'error'); return; }
+
+            let explorerUrl = '';
+            if (d.txHash && d.txHash !== '-') {
+                if (d.network === 'TRC20') explorerUrl = `https://tronscan.org/#/transaction/${d.txHash}`;
+                else if (d.network === 'BEP20') explorerUrl = `https://bscscan.com/tx/${d.txHash}`;
+            }
+
+            let statusHtml = '';
+            if (d.status === 'pending') statusHtml = '<span style="color:#fbbf24; font-weight:bold;">⏳ معلق</span>';
+            else if (d.status === 'approved' || d.status === 'success') statusHtml = '<span style="color:#22c55e; font-weight:bold;">✅ تایید شده</span>';
+            else if (d.status === 'rejected') statusHtml = '<span style="color:#ef4444; font-weight:bold;">❌ رد شده</span>';
+
+            const html = `
+                <div class="detail-row"><span>شناسه کاربر:</span><span>${escapeHtml(d.idCode)}</span></div>
+                <div class="detail-row"><span>نام:</span><span>${escapeHtml(d.nameStr)}</span></div>
+                <div class="detail-row"><span>ایمیل:</span><span>${escapeHtml(d.user.email || '-')}</span></div>
+                <div class="detail-row" style="background:rgba(34,197,94,.08); padding:12px; border-radius:8px; margin-top:10px;">
+                    <span style="color:#22c55e; font-weight:bold;">💰 مبلغ شارژ:</span>
+                    <span style="color:#22c55e; font-weight:bold; font-size:16px;">$${d.creditedAmount.toFixed(2)}</span>
+                </div>
+                <div class="detail-row" style="background:rgba(56,189,248,.08); padding:12px; border-radius:8px; margin-top:8px;">
+                    <span style="color:#38bdf8; font-weight:bold;">📤 مبلغ ارسالی:</span>
+                    <span style="color:#38bdf8; font-weight:bold; font-size:16px;">$${d.sentAmount.toFixed(2)}</span>
+                </div>
+                <div class="detail-row"><span>شبکه:</span><span>${escapeHtml(d.network)}</span></div>
+                <div class="detail-row"><span>هش تراکنش:</span><span style="font-family:monospace; font-size:10px; word-break:break-all; direction:ltr; text-align:left;">${escapeHtml(d.txHash)}</span></div>
+                ${explorerUrl ? `<div style="text-align:center; margin:12px 0;"><a href="${escapeHtml(explorerUrl)}" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:6px; background:rgba(56,189,248,.15); border:1px solid rgba(56,189,248,.4); color:#38bdf8; padding:9px 18px; border-radius:8px; text-decoration:none; font-size:12px; font-weight:600;"><i class="fas fa-external-link-alt"></i> مشاهده در ${d.network === 'TRC20' ? 'TronScan' : 'BscScan'}</a></div>` : ''}
+                <div class="detail-row"><span>زمان ثبت:</span><span>${escapeHtml(formatDate(d.createdAt))}</span></div>
+                <div class="detail-row"><span>وضعیت:</span><span>${statusHtml}</span></div>
+                ${d.adminNote ? `<div class="detail-row"><span>یادداشت ادمین:</span><span>${escapeHtml(d.adminNote)}</span></div>` : ''}
+                ${d.reviewedAt ? `<div class="detail-row"><span>زمان بررسی:</span><span>${escapeHtml(formatDate(d.reviewedAt))}</span></div>` : ''}
+            `;
+
+            document.getElementById('item-modal-title').innerHTML = '<i class="fas fa-arrow-down"></i> جزئیات واریزی';
+            document.getElementById('item-details-body').innerHTML = html;
+
+            const actionsEl = document.getElementById('item-modal-actions');
+            if (d.status === 'pending') {
+                actionsEl.innerHTML = `
+                    <button type="button" class="btn-action btn-approve" style="flex:1; justify-content:center; padding:11px;" onclick="window.approveDeposit('${d.txId}'); closeModal('m-item-details');">
+                        <i class="fas fa-check"></i> تایید واریزی
+                    </button>
+                    <button type="button" class="btn-action btn-reject" style="flex:1; justify-content:center; padding:11px;" onclick="window.rejectDeposit('${d.txId}'); closeModal('m-item-details');">
+                        <i class="fas fa-times"></i> رد واریزی
+                    </button>
+                `;
+            } else {
+                actionsEl.innerHTML = `<button type="button" class="btn-action" style="width:100%; justify-content:center; padding:11px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); color:#cbd5e1;" onclick="closeModal('m-item-details')">بستن</button>`;
+            }
+
+            document.getElementById('m-item-details').classList.add('show');
+        };
+
+        // اتصال دکمه‌های فیلتر (یک بار)
+        document.querySelectorAll('.dep-filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                window.currentDepFilter = btn.getAttribute('data-filter');
+                document.querySelectorAll('.dep-filter-btn').forEach(b => {
+                    b.classList.remove('active');
+                    b.style.background = 'rgba(255,255,255,.05)';
+                    b.style.borderColor = 'rgba(255,255,255,.1)';
+                    b.style.color = '#94a3b8';
+                });
+                btn.classList.add('active');
+                btn.style.background = 'rgba(56,189,248,.15)';
+                btn.style.borderColor = 'rgba(56,189,248,.5)';
+                btn.style.color = '#38bdf8';
+                window.renderDepositTable();
+            });
+        });
+
         async function loadData(){
             try {
                 let adminProfitTotal = 0, totUserDeposits = 0, totUserProfit = 0;
@@ -961,27 +1225,61 @@
                     });
                 }
 
-                let depositList = [], seenDepositKeys = new Set();
+                // ★★★ خواندن همه‌ی واریزی‌ها با ستون‌های جدید ★★★
+                let allDeposits = [];
                 const { data: txData } = await supabaseClient.from('transactions').select('*');
                 if (txData) {
                     txData.forEach(tx => {
                         let st = String(tx.status || '').toLowerCase();
                         let typeStr = String(tx.type || tx.title || '').toLowerCase();
                         let isDeposit = typeStr.includes('deposit') || typeStr.includes('واریز') || typeStr.includes('charge');
-                        if (st === 'success' && isDeposit) totUserDeposits += Number(tx.amount || 0);
-                        if (st === 'pending' && isDeposit) {
-                            let uid = tx.user_id || 'unknown';
-                            if (!uMap[uid]) uMap[uid] = { id: uid, fullname: `کاربر`, email: '-', phone: '-', balance: 0, platformProfit: 0, casino_balance: 0, createdAt: new Date().toISOString() };
-                            let rawAmt = tx.amount ? (Number(tx.amount) / 1.025) : 0;
-                            let txObj = { txId: tx.id, rawAmount: rawAmt, amount: Number(tx.amount || 0), network: tx.network || 'TRC20', txHash: tx.tx_hash || '-', status: 'pending', createdAt: tx.created_at };
-                            let key = tx.id ? `tx_${tx.id}` : `hash_${txObj.txHash}`;
-                            if (!seenDepositKeys.has(key)) {
-                                seenDepositKeys.add(key);
-                                depositList.push({ uid, u: uMap[uid], idCode: getUserIdCode(uid), nameStr: getName(uMap[uid]), data: txObj, txId: tx.id });
-                            }
+                        if (!isDeposit) return;
+
+                        if (st === 'approved' || st === 'success') totUserDeposits += Number(tx.amount || 0);
+
+                        let uid = tx.user_id || 'unknown';
+                        if (!uMap[uid]) uMap[uid] = { id: uid, fullname: `کاربر`, email: '-', phone: '-', balance: 0, platformProfit: 0, casino_balance: 0, createdAt: new Date().toISOString() };
+
+                        let networkVal = tx.network;
+                        if (!networkVal) {
+                            let combined = `${tx.title || ''} ${tx.description || ''}`;
+                            if (combined.includes('BEP20')) networkVal = 'BEP20';
+                            else if (combined.includes('TRC20')) networkVal = 'TRC20';
+                            else networkVal = 'TRC20';
                         }
+
+                        let sentVal = Number(tx.sent_amount || 0);
+                        if (!sentVal && tx.description) {
+                            let m = tx.description.match(/Sent:\s*([\d.]+)/i);
+                            if (m) sentVal = parseFloat(m[1]);
+                            else sentVal = Number(tx.amount || 0) * 1.025;
+                        }
+
+                        let hashVal = tx.tx_hash;
+                        if (!hashVal && tx.description) {
+                            let m = tx.description.match(/TxID:\s*([a-fA-F0-9x]+)/i);
+                            if (m) hashVal = m[1];
+                        }
+
+                        allDeposits.push({
+                            txId: tx.id,
+                            uid: uid,
+                            user: uMap[uid],
+                            idCode: getUserIdCode(uid),
+                            nameStr: getName(uMap[uid]),
+                            creditedAmount: Number(tx.amount || 0),
+                            sentAmount: sentVal,
+                            network: networkVal,
+                            txHash: hashVal || '-',
+                            status: st,
+                            createdAt: tx.created_at,
+                            adminNote: tx.admin_note || null,
+                            reviewedAt: tx.reviewed_at || null
+                        });
                     });
                 }
+
+                let depositList = allDeposits.filter(d => d.status === 'pending');
 
                 let tbAct = document.getElementById('tb-act'), tbPend = document.getElementById('tb-pend'), tbBan = document.getElementById('tb-ban'), tbW = document.getElementById('tb-withdraw');
                 if(tbAct) tbAct.innerHTML = ""; if(tbPend) tbPend.innerHTML = ""; if(tbBan) tbBan.innerHTML = ""; if(tbW) tbW.innerHTML = "";
@@ -1117,20 +1415,9 @@
                 let wBadge = document.getElementById('w-badge');
                 if(wBadge){ wBadge.innerText = totW; wBadge.className = totW > 0 ? 'tab-badge' : 'tab-badge zero'; }
 
-                window.currentDepositList = depositList;
-                let tbDep = document.getElementById('tb-deposit');
-                if(tbDep) {
-                    tbDep.innerHTML = depositList.length === 0
-                        ? `<tr><td colspan="2" style="text-align:center;padding:20px;color:#94a3b8">هیچ درخواست واریزی وجود ندارد.</td></tr>`
-                        : depositList.map((i, idx) => `<tr><td><span class="badge-id" data-open-deposit="${escapeHtml(i.txId)}" data-deposit-index="${idx}">${escapeHtml(i.idCode)}</span></td><td>${escapeHtml(formatDate(i.data.createdAt))}</td></tr>`).join('');
-                    tbDep.querySelectorAll('[data-open-deposit]').forEach(el => {
-                        el.addEventListener('click', () => {
-                            const idx = Number(el.getAttribute('data-deposit-index'));
-                            const uid = depositList[idx]?.uid || '';
-                            window.openDepositDetails(uid, el.getAttribute('data-open-deposit'), idx);
-                        });
-                    });
-                }
+                // ★★★ رندر جدول واریزی با تابع جدید ★★★
+                window.currentDepositList = allDeposits;
+                window.renderDepositTable();
 
                 let tbWd = document.getElementById('tb-withdraw');
                 if(tbWd) {
@@ -1141,7 +1428,7 @@
                         el.addEventListener('click', () => window.openWithdrawDetails(el.getAttribute('data-open-withdraw')));
                     });
                 }
-            } catch(err) { /* top-level refresh is best-effort; a transient error must not break the UI */ }
+            } catch(err) { console.error('loadData error:', err); }
         }
 
         window.openDetails = uid => {
@@ -1187,8 +1474,8 @@
             loadData();
         });
 
-        document.getElementById('logout-btn')?.addEventListener('click', async () => { await supabaseClient.auth.signOut(); window.location.href = 'login.html'; });
-        document.getElementById('mobile-logout-btn')?.addEventListener('click', async () => { await supabaseClient.auth.signOut(); window.location.href = 'login.html'; });
+        document.getElementById('logout-btn')?.addEventListener('click', async () => { await supabaseClient.auth.signOut(); window.location.href = 'index.html'; });
+        document.getElementById('mobile-logout-btn')?.addEventListener('click', async () => { await supabaseClient.auth.signOut(); window.location.href = 'index.html'; });
 
         (async () => {
             const ok = await guardAdminAccess();
