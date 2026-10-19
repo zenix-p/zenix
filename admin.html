@@ -706,6 +706,54 @@
         </div>
     </div>
 
+    <!-- ★★★ 2FA Setup Modal ★★★ -->
+    <div class="modal" id="mfa-setup-modal" style="z-index:11000;">
+      <div class="modal-content" style="max-width:460px;">
+        <div class="modal-header" style="color:#38bdf8; border-bottom-color:rgba(56,189,248,.25);">
+          <span><i class="fas fa-shield-halved"></i> تنظیم احراز هویت دو مرحله‌ای (2FA)</span>
+        </div>
+        <div style="padding:8px 0 16px; text-align:center;">
+          <div style="background:rgba(56,189,248,.08); border:1px solid rgba(56,189,248,.25); border-radius:10px; padding:10px; margin-bottom:14px; font-size:11px; color:#38bdf8; text-align:right; line-height:1.7;">
+            <i class="fas fa-info-circle"></i> برای امنیت بیشتر، اپلیکیشن <strong>Google Authenticator</strong> یا <strong>Authy</strong> را روی گوشی نصب کن، سپس QR زیر را اسکن کن.
+          </div>
+          <div style="background:#fff; display:inline-block; padding:12px; border-radius:10px; margin-bottom:12px;">
+            <img id="mfa-qr" src="" alt="QR Code" style="width:180px; height:180px; display:block;">
+          </div>
+          <div style="font-size:10px; color:#94a3b8; margin-bottom:4px;">یا این کد را دستی وارد کنید:</div>
+          <div id="mfa-secret" style="font-family:monospace; font-size:12px; color:#38bdf8; background:rgba(56,189,248,.1); padding:8px; border-radius:6px; word-break:break-all; margin-bottom:14px; user-select:all;"></div>
+          <div style="font-size:11px; color:#cbd5e1; margin-bottom:6px;">کد ۶ رقمی که اپ نشان می‌دهد را وارد کنید:</div>
+          <input type="text" id="mfa-setup-code" maxlength="6" inputmode="numeric" placeholder="------" autocomplete="one-time-code"
+            style="width:100%; text-align:center; font-size:22px; letter-spacing:10px; font-family:monospace; background:rgba(15,23,42,.9); border:1px solid rgba(56,189,248,.3); border-radius:10px; padding:14px; color:#38bdf8; outline:none;">
+        </div>
+        <button type="button" onclick="window.verifySetupCode()" style="width:100%; padding:12px; background:linear-gradient(135deg,#0284c7,#0369a1); color:#fff; border:none; border-radius:10px; font-weight:700; cursor:pointer; font-size:13px;">
+          <i class="fas fa-check"></i> تایید و فعال‌سازی 2FA
+        </button>
+        <div style="margin-top:12px; padding:10px; background:rgba(251,191,36,.08); border:1px solid rgba(251,191,36,.25); border-radius:8px; color:#fbbf24; font-size:10px; line-height:1.6;">
+          <i class="fas fa-exclamation-triangle"></i> <strong>مهم:</strong> اگر گوشی خود را گم کردید، باید از Supabase Dashboard فاکتور 2FA را حذف کنید تا دوباره وارد شوید.
+        </div>
+      </div>
+    </div>
+
+    <!-- ★★★ 2FA Verify Modal ★★★ -->
+    <div class="modal" id="mfa-verify-modal" style="z-index:11000;">
+      <div class="modal-content" style="max-width:380px;">
+        <div class="modal-header" style="color:#38bdf8; border-bottom-color:rgba(56,189,248,.25);">
+          <span><i class="fas fa-lock"></i> احراز هویت دو مرحله‌ای</span>
+        </div>
+        <div style="padding:8px 0 16px; text-align:center;">
+          <div style="font-size:44px; margin-bottom:10px;">🔐</div>
+          <p style="color:#cbd5e1; font-size:12px; margin-bottom:14px; line-height:1.7;">
+            کد ۶ رقمی از <strong>Google Authenticator</strong> خود را وارد کنید.
+          </p>
+          <input type="text" id="mfa-verify-code" maxlength="6" inputmode="numeric" placeholder="------" autocomplete="one-time-code"
+            style="width:100%; text-align:center; font-size:26px; letter-spacing:12px; font-family:monospace; background:rgba(15,23,42,.9); border:1px solid rgba(56,189,248,.4); border-radius:10px; padding:16px; color:#38bdf8; outline:none; box-shadow:0 0 20px rgba(56,189,248,.15);">
+        </div>
+        <button type="button" onclick="window.verifyLoginCode()" style="width:100%; padding:12px; background:linear-gradient(135deg,#0284c7,#0369a1); color:#fff; border:none; border-radius:10px; font-weight:700; cursor:pointer; font-size:13px;">
+          <i class="fas fa-unlock"></i> ورود به پنل
+        </button>
+      </div>
+    </div>
+
     <div id="toast-notification">
         <i id="toast-icon" class="fas fa-check-circle" style="color:#22c55e; font-size:16px;"></i>
         <span id="toast-text" style="font-size:12px; font-weight:600;">عملیات با موفقیت انجام شد.</span>
@@ -797,6 +845,103 @@
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#39;');
+        }
+
+        // ★★★ توابع 2FA ★★★
+        let mfaFactorId = null;
+
+        async function showMFASetupModal() {
+            document.getElementById('mfa-setup-modal').classList.add('show');
+            try {
+                const { data, error } = await supabaseClient.auth.mfa.enroll({ factorType: 'totp' });
+                if (error) throw error;
+                mfaFactorId = data.id;
+                const qrEl = document.getElementById('mfa-qr');
+                const secretEl = document.getElementById('mfa-secret');
+                if (qrEl) qrEl.src = data.totp.qr_code;
+                if (secretEl) secretEl.textContent = data.totp.secret;
+                setTimeout(() => document.getElementById('mfa-setup-code')?.focus(), 200);
+            } catch (e) {
+                console.error('MFA enroll error:', e);
+                showToast('خطا در راه‌اندازی 2FA: ' + (e.message || 'نامشخص'), 'error');
+            }
+        }
+
+        window.verifySetupCode = async function() {
+            const input = document.getElementById('mfa-setup-code');
+            const code = (input?.value || '').trim();
+            if (code.length !== 6) { showToast('کد باید ۶ رقم باشد', 'error'); input?.focus(); return; }
+            if (!mfaFactorId) { showToast('خطا: فاکتور 2FA یافت نشد', 'error'); return; }
+            try {
+                const { data: challenge, error: chErr } = await supabaseClient.auth.mfa.challenge({ factorId: mfaFactorId });
+                if (chErr) throw chErr;
+                const { error: vErr } = await supabaseClient.auth.mfa.verify({
+                    factorId: mfaFactorId,
+                    challengeId: challenge.id,
+                    code: code
+                });
+                if (vErr) throw vErr;
+                document.getElementById('mfa-setup-modal').classList.remove('show');
+                showToast('✅ 2FA با موفقیت فعال شد');
+                await startAdminPanel();
+            } catch (e) {
+                console.error('MFA verify error:', e);
+                showToast('کد اشتباه است: ' + (e.message || 'دوباره تلاش کنید'), 'error');
+                if (input) { input.value = ''; input.focus(); }
+            }
+        };
+
+        async function showMFAVerifyModal() {
+            document.getElementById('mfa-verify-modal').classList.add('show');
+            try {
+                const { data, error } = await supabaseClient.auth.mfa.listFactors();
+                if (error) throw error;
+                const factor = data.totp && data.totp[0];
+                if (!factor) {
+                    showToast('فاکتور 2FA یافت نشد. لطفاً دوباره تنظیم کنید.', 'error');
+                    document.getElementById('mfa-verify-modal').classList.remove('show');
+                    await showMFASetupModal();
+                    return;
+                }
+                mfaFactorId = factor.id;
+                setTimeout(() => document.getElementById('mfa-verify-code')?.focus(), 200);
+            } catch (e) {
+                console.error('MFA listFactors error:', e);
+                showToast('خطا: ' + (e.message || 'نامشخص'), 'error');
+            }
+        }
+
+        window.verifyLoginCode = async function() {
+            const input = document.getElementById('mfa-verify-code');
+            const code = (input?.value || '').trim();
+            if (code.length !== 6) { showToast('کد باید ۶ رقم باشد', 'error'); input?.focus(); return; }
+            if (!mfaFactorId) { showToast('خطا: فاکتور 2FA یافت نشد', 'error'); return; }
+            try {
+                const { data: challenge, error: chErr } = await supabaseClient.auth.mfa.challenge({ factorId: mfaFactorId });
+                if (chErr) throw chErr;
+                const { error: vErr } = await supabaseClient.auth.mfa.verify({
+                    factorId: mfaFactorId,
+                    challengeId: challenge.id,
+                    code: code
+                });
+                if (vErr) throw vErr;
+                document.getElementById('mfa-verify-modal').classList.remove('show');
+                showToast('✅ ورود موفق');
+                await startAdminPanel();
+            } catch (e) {
+                console.error('MFA login verify error:', e);
+                showToast('کد اشتباه است: ' + (e.message || 'دوباره تلاش کنید'), 'error');
+                if (input) { input.value = ''; input.focus(); }
+            }
+        };
+
+        async function startAdminPanel() {
+            document.body.classList.add('zenix-authed');
+            await loadNtfyTopic();
+            loadData();
+            loadCasinoData();
+            initSupportChatListener();
+            initRealtimeDataListeners();
         }
 
         async function guardAdminAccess() {
@@ -1712,366 +1857,4 @@
             let statusHtml = '';
             if (d.status === 'pending') statusHtml = '<span style="color:#fbbf24; font-weight:bold;">⏳ معلق</span>';
             else if (d.status === 'approved' || d.status === 'success') statusHtml = '<span style="color:#22c55e; font-weight:bold;">✅ تایید شده</span>';
-            else if (d.status === 'rejected') statusHtml = '<span style="color:#ef4444; font-weight:bold;">❌ رد شده</span>';
-
-            const html = `
-                <div class="detail-row"><span>شناسه کاربر:</span><span>${escapeHtml(d.idCode)}</span></div>
-                <div class="detail-row"><span>نام:</span><span>${escapeHtml(d.nameStr)}</span></div>
-                <div class="detail-row"><span>ایمیل:</span><span>${escapeHtml(d.user.email || '-')}</span></div>
-                <div class="detail-row" style="background:rgba(34,197,94,.08); padding:12px; border-radius:8px; margin-top:10px;">
-                    <span style="color:#22c55e; font-weight:bold;">💰 مبلغ شارژ:</span>
-                    <span style="color:#22c55e; font-weight:bold; font-size:16px;">$${d.creditedAmount.toFixed(2)}</span>
-                </div>
-                <div class="detail-row" style="background:rgba(56,189,248,.08); padding:12px; border-radius:8px; margin-top:8px;">
-                    <span style="color:#38bdf8; font-weight:bold;">📤 مبلغ ارسالی:</span>
-                    <span style="color:#38bdf8; font-weight:bold; font-size:16px;">$${d.sentAmount.toFixed(2)}</span>
-                </div>
-                <div class="detail-row"><span>شبکه:</span><span>${escapeHtml(d.network)}</span></div>
-                <div class="detail-row"><span>هش تراکنش:</span><span style="font-family:monospace; font-size:10px; word-break:break-all; direction:ltr; text-align:left;">${escapeHtml(d.txHash)}</span></div>
-                ${explorerUrl ? `<div style="text-align:center; margin:12px 0;"><a href="${escapeHtml(explorerUrl)}" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:6px; background:rgba(56,189,248,.15); border:1px solid rgba(56,189,248,.4); color:#38bdf8; padding:9px 18px; border-radius:8px; text-decoration:none; font-size:12px; font-weight:600;"><i class="fas fa-external-link-alt"></i> مشاهده در ${d.network === 'TRC20' ? 'TronScan' : 'BscScan'}</a></div>` : ''}
-                <div class="detail-row"><span>زمان ثبت:</span><span>${escapeHtml(formatDate(d.createdAt))}</span></div>
-                <div class="detail-row"><span>وضعیت:</span><span>${statusHtml}</span></div>
-                ${d.adminNote ? `<div class="detail-row"><span>یادداشت ادمین:</span><span>${escapeHtml(d.adminNote)}</span></div>` : ''}
-                ${d.reviewedAt ? `<div class="detail-row"><span>زمان بررسی:</span><span>${escapeHtml(formatDate(d.reviewedAt))}</span></div>` : ''}
-            `;
-
-            document.getElementById('item-modal-title').innerHTML = '<i class="fas fa-arrow-down"></i> جزئیات واریزی';
-            document.getElementById('item-details-body').innerHTML = html;
-
-            const actionsEl = document.getElementById('item-modal-actions');
-            if (d.status === 'pending') {
-                actionsEl.innerHTML = `
-                    <button type="button" class="btn-action btn-approve" style="flex:1; justify-content:center; padding:11px;" data-dep-approve-modal="${escapeHtml(d.txId)}">
-                        <i class="fas fa-check"></i> تایید واریزی
-                    </button>
-                    <button type="button" class="btn-action btn-reject" style="flex:1; justify-content:center; padding:11px;" data-dep-reject-modal="${escapeHtml(d.txId)}">
-                        <i class="fas fa-times"></i> رد واریزی
-                    </button>
-                `;
-                actionsEl.querySelector('[data-dep-approve-modal]').addEventListener('click', () => {
-                    closeModal('m-item-details');
-                    window.approveDeposit(d.txId);
-                });
-                actionsEl.querySelector('[data-dep-reject-modal]').addEventListener('click', () => {
-                    closeModal('m-item-details');
-                    window.rejectDeposit(d.txId);
-                });
-            } else {
-                actionsEl.innerHTML = `<button type="button" class="btn-action" style="width:100%; justify-content:center; padding:11px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); color:#cbd5e1;" onclick="closeModal('m-item-details')">بستن</button>`;
-            }
-
-            document.getElementById('m-item-details').classList.add('show');
-        };
-
-        document.querySelectorAll('.dep-filter-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                window.currentDepFilter = btn.getAttribute('data-filter');
-                document.querySelectorAll('.dep-filter-btn').forEach(b => {
-                    b.classList.remove('active');
-                    b.style.background = 'rgba(255,255,255,.05)';
-                    b.style.borderColor = 'rgba(255,255,255,.1)';
-                    b.style.color = '#94a3b8';
-                });
-                btn.classList.add('active');
-                btn.style.background = 'rgba(56,189,248,.15)';
-                btn.style.borderColor = 'rgba(56,189,248,.5)';
-                btn.style.color = '#38bdf8';
-                window.renderDepositTable();
-            });
-        });
-
-        async function loadData(){
-            try {
-                let adminProfitTotal = 0, totUserDeposits = 0, totUserProfit = 0;
-                const { data: statsData } = await supabaseClient.from('system_stats').select('total_admin_profit').maybeSingle();
-                if (statsData) adminProfitTotal = Number(statsData.total_admin_profit || 0);
-
-                uMap = {};
-                const { data: supaUsers } = await supabaseClient.from('users').select('*');
-                if (supaUsers) {
-                    supaUsers.forEach(u => {
-                        let uid = u.id || u.uid;
-                        let meta = u.raw_user_meta_data || u.user_metadata || {};
-                        uMap[uid] = {
-                            ...u, id: uid,
-                            fullname: u.fullname || meta.fullname || u.email?.split('@')[0] || 'کاربر',
-                            email: u.email || meta.email || '',
-                            phone: u.phone || meta.phone || '-',
-                            balance: u.balance !== undefined ? Number(u.balance) : 0,
-                            platform_profit: Number(u.platform_profit || 0),
-                            casino_balance: Number(u.casino_balance || 0),
-                            status: u.status || 'active',
-                            createdAt: u.created_at || new Date().toISOString()
-                        };
-                    });
-                }
-
-                let allDeposits = [];
-                const { data: txData } = await supabaseClient.from('transactions').select('*');
-                if (txData) {
-                    txData.forEach(tx => {
-                        let st = String(tx.status || '').toLowerCase();
-                        let typeStr = String(tx.type || tx.title || '').toLowerCase();
-                        let isDeposit = typeStr.includes('deposit') || typeStr.includes('واریز') || typeStr.includes('charge');
-                        if (!isDeposit) return;
-
-                        if (st === 'approved' || st === 'success') totUserDeposits += Number(tx.amount || 0);
-
-                        let uid = tx.user_id || 'unknown';
-                        if (!uMap[uid]) uMap[uid] = { id: uid, fullname: `کاربر`, email: '-', phone: '-', balance: 0, platform_profit: 0, casino_balance: 0, createdAt: new Date().toISOString() };
-
-                        let networkVal = tx.network;
-                        if (!networkVal) {
-                            let combined = `${tx.title || ''} ${tx.description || ''}`;
-                            if (combined.includes('BEP20')) networkVal = 'BEP20';
-                            else if (combined.includes('TRC20')) networkVal = 'TRC20';
-                            else networkVal = 'TRC20';
-                        }
-
-                        let sentVal = Number(tx.sent_amount || 0);
-                        if (!sentVal && tx.description) {
-                            let m = tx.description.match(/Sent:\s*([\d.]+)/i);
-                            if (m) sentVal = parseFloat(m[1]);
-                            else sentVal = Number(tx.amount || 0) * 1.025;
-                        }
-
-                        let hashVal = tx.tx_hash;
-                        if (!hashVal && tx.description) {
-                            let m = tx.description.match(/TxID:\s*([a-fA-F0-9x]+)/i);
-                            if (m) hashVal = m[1];
-                        }
-
-                        allDeposits.push({
-                            txId: tx.id,
-                            uid: uid,
-                            user: uMap[uid],
-                            idCode: getUserIdCode(uid),
-                            nameStr: getName(uMap[uid]),
-                            creditedAmount: Number(tx.amount || 0),
-                            sentAmount: sentVal,
-                            network: networkVal,
-                            txHash: hashVal || '-',
-                            status: st,
-                            createdAt: tx.created_at,
-                            adminNote: tx.admin_note || null,
-                            reviewedAt: tx.reviewed_at || null
-                        });
-                    });
-                }
-
-                let depositList = allDeposits.filter(d => d.status === 'pending');
-
-                let tbAct = document.getElementById('tb-act'), tbPend = document.getElementById('tb-pend'), tbBan = document.getElementById('tb-ban'), tbW = document.getElementById('tb-withdraw');
-                if(tbAct) tbAct.innerHTML = ""; if(tbPend) tbPend.innerHTML = ""; if(tbBan) tbBan.innerHTML = ""; if(tbW) tbW.innerHTML = "";
-
-                let totU = 0, totB = 0, totR = 0, totW = 0, totD = depositList.length, reqList = [], withdrawList = [];
-                let cAct = 0, cPend = 0, cBan = 0;
-
-                Object.keys(uMap).forEach(uid => {
-                    let u = uMap[uid];
-                    totU++; totB += Number(u.balance || 0); totUserProfit += Number(u.platform_profit || 0);
-                    let idCode = getUserIdCode(uid);
-                    let nameStr = getName(u);
-                    let emailStr = u.email || '-';
-                    let phoneStr = u.phone || '-';
-                    let regStr = formatDate(u.createdAt);
-                    let search = `${idCode} ${nameStr} ${emailStr} ${phoneStr} ${regStr}`.toLowerCase();
-                    let isBanned = (u.status === 'cancelled' || u.status === 'banned' || u.isBanned === true);
-                    let hasPend = (u.pending_email || u.pendingEmail || u.admin_approval_status === 'pending' || u.adminApprovalStatus === 'pending');
-                    let requestedEmail = u.pending_email || u.pendingEmail || u.newEmail || '-';
-
-                    if (u.pendingWithdrawal && String(u.pendingWithdrawal.status || 'pending').toLowerCase() === 'pending') {
-                        totW++; withdrawList.push({ uid, u, idCode, nameStr, data: u.pendingWithdrawal });
-                    }
-                    let balStr = `$${Number(u.balance||0).toLocaleString()}`;
-                    let profitStr = `$${Number(u.platform_profit||0).toLocaleString()}`;
-
-                    if(isBanned){
-                        cBan++;
-                        if(tbBan) tbBan.innerHTML += `<tr data-s="${escapeHtml(search)}">
-                            <td><span class="badge-id" data-open-details="${escapeHtml(uid)}">${escapeHtml(idCode)}</span></td>
-                            <td><b>${escapeHtml(nameStr)}</b></td>
-                            <td>${escapeHtml(emailStr)}</td>
-                            <td dir="ltr" style="text-align:right">${escapeHtml(phoneStr)}</td>
-                            <td style="color:#22c55e;font-weight:bold">${escapeHtml(balStr)}</td>
-                            <td style="color:#38bdf8;font-weight:bold">${escapeHtml(profitStr)}</td>
-                            <td><button class="btn-action btn-approve" data-toggle-ban="${escapeHtml(uid)}" data-ban-state="false"><i class="fas fa-undo"></i> فعال‌‌سازی</button></td></tr>`;
-                    }else if(hasPend){
-                        cPend++; totR++;
-                        reqList.push({uid, u, requestedEmail, time: u.request_timestamp||u.requestTimestamp||u.createdAt});
-                        if(tbPend) tbPend.innerHTML += `<tr data-s="${escapeHtml(search)}">
-                            <td><span class="badge-id" data-open-details="${escapeHtml(uid)}">${escapeHtml(idCode)}</span></td>
-                            <td><b>${escapeHtml(nameStr)}</b></td>
-                            <td>${escapeHtml(emailStr)}</td>
-                            <td style="color:#fbbf24;font-weight:bold">${escapeHtml(requestedEmail)}</td>
-                            <td dir="ltr" style="text-align:right">${escapeHtml(phoneStr)}</td>
-                            <td style="color:#22c55e;font-weight:bold">${escapeHtml(balStr)}</td>
-                            <td>
-                                <button class="btn-action btn-approve" data-approve-email="${escapeHtml(uid)}" data-new-email="${escapeHtml(requestedEmail)}">تایید</button>
-                                <button class="btn-action btn-reject" data-reject-email="${escapeHtml(uid)}">رد</button>
-                            </td></tr>`;
-                    }else{
-                        cAct++;
-                        if(tbAct) tbAct.innerHTML += `<tr data-s="${escapeHtml(search)}">
-                            <td><span class="badge-id" data-open-details="${escapeHtml(uid)}">${escapeHtml(idCode)}</span></td>
-                            <td><b>${escapeHtml(nameStr)}</b></td>
-                            <td>${escapeHtml(emailStr)}</td>
-                            <td dir="ltr" style="text-align:right">${escapeHtml(phoneStr)}</td>
-                            <td style="color:#22c55e;font-weight:bold">${escapeHtml(balStr)}</td>
-                            <td style="color:#38bdf8;font-weight:bold">${escapeHtml(profitStr)}</td>
-                            <td>${escapeHtml(regStr)}</td>
-                            <td><button class="btn-action btn-ban" data-toggle-ban="${escapeHtml(uid)}" data-ban-state="true">لغو کاربر</button></td></tr>`;
-                    }
-                });
-
-                let reqContainer = document.getElementById('req-container');
-                if (reqContainer) {
-                    if (reqList.length === 0) {
-                        reqContainer.innerHTML = `<div style="text-align:center;padding:25px;color:#94a3b8">هیچ درخواستی در انتظار بررسی نیست.</div>`;
-                    } else {
-                        let reqHtml = '';
-                        reqList.forEach(item => {
-                            reqHtml += `
-                                <div style="background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                                    <div>
-                                        <div style="font-weight:bold; color:#38bdf8; font-size:13px; margin-bottom:4px;">
-                                            <i class="fas fa-envelope"></i> درخواست تغییر ایمیل (${escapeHtml(getUserIdCode(item.uid))})
-                                        </div>
-                                        <div style="color:#cbd5e1; font-size:12px;">
-                                            نام: <b>${escapeHtml(getName(item.u))}</b> | ایمیل جدید: <b style="color:#fbbf24">${escapeHtml(item.requestedEmail)}</b>
-                                        </div>
-                                        <div style="color:#64748b; font-size:10px; margin-top:4px;">
-                                            زمان ثبت: ${escapeHtml(formatDate(item.time))}
-                                        </div>
-                                    </div>
-                                    <div style="display:flex; gap:8px;">
-                                        <button class="btn-action btn-approve" data-approve-email="${escapeHtml(item.uid)}" data-new-email="${escapeHtml(item.requestedEmail)}"><i class="fas fa-check"></i> تایید درخواست</button>
-                                        <button class="btn-action btn-reject" data-reject-email="${escapeHtml(item.uid)}"><i class="fas fa-times"></i> رد درخواست</button>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                        reqContainer.innerHTML = reqHtml;
-                    }
-                }
-
-                document.querySelectorAll('[data-open-details]').forEach(el => {
-                    el.addEventListener('click', () => window.openDetails(el.getAttribute('data-open-details')));
-                });
-                document.querySelectorAll('[data-toggle-ban]').forEach(el => {
-                    el.addEventListener('click', () => window.toggleBan(el.getAttribute('data-toggle-ban'), el.getAttribute('data-ban-state') === 'true'));
-                });
-                document.querySelectorAll('[data-approve-email]').forEach(el => {
-                    el.addEventListener('click', () => window.appEm(el.getAttribute('data-approve-email'), el.getAttribute('data-new-email')));
-                });
-                document.querySelectorAll('[data-reject-email]').forEach(el => {
-                    el.addEventListener('click', () => window.rejEm(el.getAttribute('data-reject-email')));
-                });
-
-                updateSelectOptions(document.getElementById('sm-search')?.value || '');
-
-                document.getElementById('st-users').innerText = totU;
-                document.getElementById('st-bal').innerText = '$' + totB.toLocaleString('en-US',{minimumFractionDigits:2});
-                document.getElementById('st-admin-profit').innerText = '$' + adminProfitTotal.toLocaleString('en-US',{minimumFractionDigits:2});
-                document.getElementById('st-req').innerText = totR;
-                document.getElementById('st-d-req').innerText = totD;
-                document.getElementById('st-w-req').innerText = totW;
-                document.getElementById('st-user-deposits').innerText = '$' + totUserDeposits.toLocaleString('en-US',{minimumFractionDigits:2});
-                document.getElementById('st-user-profit').innerText = '$' + totUserProfit.toLocaleString('en-US',{minimumFractionDigits:2});
-
-                if (prevD !== -1) {
-                    let alertsList = [];
-                    if (totD > prevD) alertsList.push("واریز وجه");
-                    if (totW > prevW) alertsList.push("برداشت وجه");
-                    if (totR > prevR) alertsList.push("احراز هویت / تغییر ایمیل");
-                    if (alertsList.length > 0) { playAlertSound(); sendNtfyAlert("🔔 درخواست جدید در پنل Zenix", `نوع درخواست: ${alertsList.join("، ")}`); }
-                }
-                prevD = totD; prevW = totW; prevR = totR;
-
-                let badge = document.getElementById('req-badge');
-                if(badge){ badge.innerText = totR; badge.className = totR > 0 ? 'tab-badge' : 'tab-badge zero'; }
-                let dBadge = document.getElementById('d-badge');
-                if(dBadge){ dBadge.innerText = totD; dBadge.className = totD > 0 ? 'tab-badge' : 'tab-badge zero'; }
-                let wBadge = document.getElementById('w-badge');
-                if(wBadge){ wBadge.innerText = totW; wBadge.className = totW > 0 ? 'tab-badge' : 'tab-badge zero'; }
-
-                window.currentDepositList = allDeposits;
-                window.renderDepositTable();
-
-                let tbWd = document.getElementById('tb-withdraw');
-                if(tbWd) {
-                    tbWd.innerHTML = withdrawList.length === 0
-                        ? `<tr><td colspan="2" style="text-align:center;padding:20px;color:#94a3b8">هیچ درخواست برداشتی وجود ندارد.</td></tr>`
-                        : withdrawList.map((i, idx) => `<tr><td><span class="badge-id" data-open-withdraw="${escapeHtml(i.uid)}">${escapeHtml(i.idCode)}</span></td><td>${escapeHtml(formatDate(i.data.createdAt))}</td></tr>`).join('');
-                    tbWd.querySelectorAll('[data-open-withdraw]').forEach(el => {
-                        el.addEventListener('click', () => window.openWithdrawDetails(el.getAttribute('data-open-withdraw')));
-                    });
-                }
-            } catch(err) { console.error('loadData error:', err); }
-        }
-
-        window.openDetails = uid => {
-            let u = uMap[uid];
-            if (!u) return;
-            document.getElementById('user-details-body').innerHTML = `
-                <div class="detail-row"><span>شناسه:</span><span>${escapeHtml(getUserIdCode(uid))}</span></div>
-                <div class="detail-row"><span>نام:</span><span>${escapeHtml(getName(u))}</span></div>
-                <div class="detail-row"><span>ایمیل:</span><span>${escapeHtml(u.email||'-')}</span></div>
-                <div class="detail-row"><span>موجودی اصلی:</span><span>$${Number(u.balance||0).toLocaleString()}</span></div>
-                <div class="detail-row"><span>موجودی کازینو:</span><span>$${Number(u.casino_balance||0).toLocaleString()}</span></div>
-            `;
-            const btnWrap = document.getElementById('modal-action-btn');
-            btnWrap.innerHTML = `<button class="btn-action btn-edit" style="width:100%;justify-content:center;padding:8px"><i class="fas fa-edit"></i> ویرایش مشخصات</button>`;
-            btnWrap.querySelector('button').addEventListener('click', () => { closeModal('m-details'); window.openE(uid); });
-            document.getElementById('m-details').classList.add('show');
-        };
-
-        window.openE = uid => {
-            let u = uMap[uid];
-            if (!u) return;
-            document.getElementById('e-uid').value = uid;
-            document.getElementById('e-name').value = getName(u);
-            document.getElementById('e-email').value = u.email || '';
-            document.getElementById('e-phone').value = u.phone || '';
-            document.getElementById('e-bal').value = u.balance || 0;
-            document.getElementById('e-profit').value = u.platform_profit || 0;
-            document.getElementById('m-edit').classList.add('show');
-        };
-
-        document.getElementById('f-edit')?.addEventListener('submit', async e => {
-            e.preventDefault();
-            let uid = document.getElementById('e-uid').value;
-            try {
-                const { error } = await supabaseClient.from('users').update({
-                    fullname: document.getElementById('e-name').value,
-                    email: document.getElementById('e-email').value,
-                    phone: document.getElementById('e-phone').value,
-                    balance: parseFloat(document.getElementById('e-bal').value) || 0,
-                    platform_profit: parseFloat(document.getElementById('e-profit').value) || 0
-                }).eq('id', uid);
-                if (error) throw error;
-                showToast('مشخصات ویرایش شد.');
-                closeModal('m-edit');
-                loadData();
-            } catch (err) {
-                console.error('Edit error:', err);
-                showToast('خطا در ویرایش: ' + (err.message || 'خطای نامشخص'), 'error');
-            }
-        });
-
-        document.getElementById('logout-btn')?.addEventListener('click', async () => { await supabaseClient.auth.signOut(); window.location.href = 'index.html'; });
-        document.getElementById('mobile-logout-btn')?.addEventListener('click', async () => { await supabaseClient.auth.signOut(); window.location.href = 'index.html'; });
-
-        (async () => {
-            const ok = await guardAdminAccess();
-            if (!ok) return;
-            document.body.classList.add('zenix-authed');
-            await loadNtfyTopic();
-            loadData();
-            loadCasinoData();
-            initSupportChatListener();
-            initRealtimeDataListeners();
-        })();
-    </script>
-</body>
-</html>
+            else if (d.status === '
