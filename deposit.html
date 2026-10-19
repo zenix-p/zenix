@@ -132,13 +132,17 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
 </div>
 <div style="text-align:center;margin:16px 0;">
 <div style="background:#fff;display:inline-block;padding:10px;border-radius:8px;margin-bottom:8px;">
-<img id="qr-code-img" src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=TMkUAe5kzL3PdfkwV2vKot3dL3kkDD9z4Y" alt="QR Code" style="display:block;">
+<img id="qr-code-img" src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=" alt="QR Code" style="display:block;">
 </div>
 <div style="font-size:11px;color:#94a3b8;" data-i18n="scanQr">اسکن جهت واریز مستقیم</div>
 <div id="qr-amount-label" style="display:none;font-size:13px;color:#22c55e;font-weight:800;margin-top:8px;padding:6px 12px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:6px;direction:ltr;text-align:center;"></div>
 </div>
 
 <div style="margin-bottom:16px;">
+<div id="wallet-warning" style="display:none;font-size:10px;color:#fbbf24;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);padding:8px 10px;border-radius:6px;margin-bottom:8px;">
+<i class="fas fa-shield-alt" style="color:#fbbf24;"></i>
+<strong>توجه:</strong> آدرس را با دقت بررسی کنید. فقط USDT در شبکه انتخاب‌شده بفرستید.
+</div>
 <label id="wallet-label" style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;">آدرس کیف پول (TRC20):</label>
 <div style="display:flex;background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:8px;overflow:hidden;">
 <input type="text" id="wallet-address" value="" placeholder="Enter the deposit amount first to display the address…" data-i18n-placeholder="walletPlaceholder" readonly style="width:100%;background:transparent;border:none;color:#f8fafc;padding:10px;font-size:12px;outline:none;direction:ltr;text-align:left;user-select:none;-webkit-user-select:none;">
@@ -263,11 +267,14 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
 </footer>
 
 <script>
-const wallets = {
-  TRC20: "TMkUAe5kzL3PdfkwV2vKot3dL3kkDD9z4Y",
-  BEP20: "0x9eA4B9aCa9B7505E63BA436d3240718A21574dc4"
-};
+/* ★★★ ثابت‌های Supabase در scope عادی (برای دسترسی از loadWallets) ★★★ */
+const SUPABASE_URL = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
+
+/* ★★★ آدرس‌های کیف پول از دیتابیس خوانده می‌شوند، نه hardcoded ★★★ */
+window.wallets = { TRC20: '', BEP20: '' };
 window.currentNetwork = 'TRC20';
+
 const MIN_DEPOSIT = 10;
 const MAX_DEPOSIT = 100000;
 const FEE_RATE = 1.025;
@@ -275,6 +282,32 @@ const TXID_REGEX = /^(?:0x)?[a-fA-F0-9]{64}$/;
 
 window.__statusState = null;
 window.__statusTimerStart = null;
+
+/* ★★★ بارگذاری آدرس‌ها از دیتابیس ★★★ */
+window.loadWallets = async function() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/app_settings?key=in.(wallet_trc20,wallet_bep20)&select=key,value`, {
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      data.forEach(row => {
+        if (row.key === 'wallet_trc20') window.wallets.TRC20 = row.value || '';
+        if (row.key === 'wallet_bep20') window.wallets.BEP20 = row.value || '';
+      });
+    }
+    const ok = !!(window.wallets.TRC20 && window.wallets.BEP20);
+    if (!ok) console.warn('⚠ کیف پول‌ها ناقص بارگذاری شدند:', window.wallets);
+    return ok;
+  } catch (e) {
+    console.error('loadWallets error:', e);
+    return false;
+  }
+};
 
 function escapeHtml(value) {
   return String(value == null ? '' : value)
@@ -538,8 +571,16 @@ window.updateQR = function() {
   const lbl = document.getElementById('qr-amount-label');
   if (!qr) return;
   const net = window.currentNetwork || 'TRC20';
-  const addr = wallets[net];
+  const addr = window.wallets[net];
+
+  if (!addr) {
+    qr.style.display = 'none';
+    if (lbl) lbl.style.display = 'none';
+    return;
+  }
+  qr.style.display = 'block';
   qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=${encodeURIComponent(addr)}`;
+
   if (lbl) {
     const t = window.currentLangData || LD.en;
     if (calcVal > 0) {
@@ -618,9 +659,32 @@ function checkInputs(){
   const walletInput = document.getElementById('wallet-address');
   const copyWarning = document.getElementById('copy-warning');
   const inquiryBtn = document.getElementById('inquiry-btn');
+  const warningEl = document.getElementById('wallet-warning');
+
+  // ★★★ بررسی وجود آدرس کیف پول ★★★
+  const walletsReady = window.wallets.TRC20 && window.wallets.BEP20;
+  if (!walletsReady) {
+    if (warningEl) {
+      warningEl.style.display = 'block';
+      warningEl.style.background = 'rgba(239,68,68,.1)';
+      warningEl.style.borderColor = 'rgba(239,68,68,.35)';
+      warningEl.style.color = '#ef4444';
+      warningEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> خطا در بارگذاری آدرس کیف پول. لطفاً صفحه را رفرش کنید.';
+    }
+    walletInput.value = '';
+    copyBtn.disabled = true;
+    copyBtn.style.background = '#475569';
+    copyBtn.style.color = '#94a3b8';
+    copyBtn.style.cursor = 'not-allowed';
+    inquiryBtn.disabled = true;
+    inquiryBtn.style.background = '#475569';
+    inquiryBtn.style.color = '#94a3b8';
+    inquiryBtn.style.cursor = 'not-allowed';
+    return;
+  }
 
   if(calcVal > 0){
-    walletInput.value = wallets[window.currentNetwork];
+    walletInput.value = window.wallets[window.currentNetwork];
     copyBtn.disabled = false;
     copyBtn.style.background = '#38bdf8';
     copyBtn.style.color = '#0f172a';
@@ -628,6 +692,13 @@ function checkInputs(){
     walletInput.style.userSelect = 'text';
     walletInput.style.webkitUserSelect = 'text';
     copyWarning.style.display = 'none';
+    if (warningEl) {
+      warningEl.style.display = 'block';
+      warningEl.style.background = 'rgba(251,191,36,.08)';
+      warningEl.style.borderColor = 'rgba(251,191,36,.25)';
+      warningEl.style.color = '#fbbf24';
+      warningEl.innerHTML = '<i class="fas fa-shield-alt"></i> <strong>توجه:</strong> آدرس را با دقت بررسی کنید. فقط USDT در شبکه انتخاب‌شده بفرستید.';
+    }
   } else {
     walletInput.value = "";
     copyBtn.disabled = true;
@@ -637,6 +708,7 @@ function checkInputs(){
     walletInput.style.userSelect = 'none';
     walletInput.style.webkitUserSelect = 'none';
     copyWarning.style.display = 'block';
+    if (warningEl) warningEl.style.display = 'none';
   }
 
   if(calcVal > 0 && txVal.length > 0){
@@ -668,7 +740,8 @@ window.setNetwork=function(net){
   lbl.textContent=`${t.netLbl} (${net}):`;
   window.updateQR();
   const calcVal = parseFloat(document.getElementById('calc-input').value) || 0;
-  if(calcVal > 0){ addr.value = wallets[net]; }
+  const newAddr = window.wallets[net];
+  if(calcVal > 0 && newAddr){ addr.value = newAddr; }
 }
 
 window.lockNetworks = function(lock) {
@@ -684,6 +757,7 @@ window.copyAddress = async function(){
   const calcVal = parseFloat(document.getElementById('calc-input').value) || 0;
   if(calcVal <= 0) return;
   const c = document.getElementById("wallet-address");
+  if (!c.value) return;
   const t = window.currentLangData || LD.en;
   try {
     await navigator.clipboard.writeText(c.value);
@@ -732,16 +806,20 @@ function tM(o,e){e.stopPropagation();[nM,lMenu].forEach(m=>{if(m!==o)m.classList
 if(mB)mB.onclick=(e)=>tM(nM,e);if(lB)lB.onclick=(e)=>tM(lMenu,e);
 document.onclick=()=>{[nM,lMenu].forEach(m=>m.classList.remove('show'));};document.querySelectorAll('.menu').forEach(m=>m.onclick=(e)=>e.stopPropagation());
 
-try { setLang(currLang); } catch (e) {}
-if (document.body) document.body.classList.add('lang-ready');
+/* ★★★ راه‌اندازی: اول کیف پول‌ها را لود کن، بعد زبان را اعمال کن ★★★ */
+(async () => {
+  await window.loadWallets();
+  try { setLang(currLang); } catch (e) { console.error('Initial setLang failed:', e); }
+  if (document.body) document.body.classList.add('lang-ready');
+})();
 </script>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdmirror.com/npm/@supabase/supabase-js@2/+esm';
 
-const SUPABASE_URL = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const SUPABASE_URL_M = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
+const SUPABASE_ANON_KEY_M = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
+const supabase = createClient(SUPABASE_URL_M, SUPABASE_ANON_KEY_M);
 
 let timerInterval = null;
 let currentUser = null;
@@ -830,6 +908,12 @@ window.checkAutoDeposit = async function(){
     return;
   }
 
+  // بررسی وجود آدرس کیف پول
+  if (!window.wallets.TRC20 || !window.wallets.BEP20) {
+    showMsg('⚠ خطا در بارگذاری آدرس کیف پول. لطفاً صفحه را رفرش کنید.', true, false);
+    return;
+  }
+
   const inquiryBtn = document.getElementById('inquiry-btn');
   inquiryBtn.disabled = true;
   inquiryBtn.style.background = '#475569';
@@ -873,7 +957,6 @@ window.checkAutoDeposit = async function(){
     try { localStorage.setItem('zenix_pending_deposit_' + currentUser.id, JSON.stringify(pendingDepositObj)); } catch(e) {}
 
     try {
-      // ★★★ INSERT با ستون‌های جدید ★★★
       await supabase.from('transactions').insert([{
         user_id: currentUser.id,
         amount: calcVal,
@@ -1087,7 +1170,7 @@ async function loadUserData(user) {
         const copyBtn = document.getElementById('copy-btn');
         const copyWarning = document.getElementById('copy-warning');
         if (walletInput && copyBtn) {
-          walletInput.value = wallets[window.currentNetwork];
+          walletInput.value = window.wallets[window.currentNetwork] || '';
           copyBtn.disabled = false;
           copyBtn.style.background = '#38bdf8';
           copyBtn.style.color = '#0f172a';
