@@ -57,17 +57,47 @@
         #user::placeholder,#pass::placeholder{color:#9ca3af;opacity:1}
         .group input:focus{border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.2)}
 
-        /* ★ حذف خط زیر حروف (اسپل‌چک مرورگر) در فیلد ایمیل و رمز */
-        .group input,
-        #user,
-        #pass{
+        /* ============================================================
+           ★★★ حذف کامل زیرخط اسپل‌چک / گرامر / اتوفیل ★★★
+           ============================================================ */
+
+        /* حذف خط قرمز مواج اسپل‌چک (شبه‌المان استاندارد جدید) */
+        ::spelling-error {
+            text-decoration: none !important;
             -webkit-text-decoration: none !important;
-            text-decoration: none !important;
             text-decoration-line: none !important;
+            -webkit-text-decoration-line: none !important;
+            text-decoration-style: none !important;
+            background: transparent !important;
         }
-        #user::selection,
-        #pass::selection{
+        ::grammar-error {
             text-decoration: none !important;
+            -webkit-text-decoration: none !important;
+            text-decoration-line: none !important;
+            -webkit-text-decoration-line: none !important;
+            background: transparent !important;
+        }
+
+        /* حذف هر نوع خط / دکوریشن روی فیلدها در همه‌ی حالت‌ها */
+        #user,
+        #pass,
+        .group input,
+        .group input:hover,
+        .group input:focus,
+        .group input:active,
+        .group input:valid,
+        .group input:invalid,
+        .group input:placeholder-shown,
+        .group input:-webkit-autofill {
+            text-decoration: none !important;
+            -webkit-text-decoration: none !important;
+            text-decoration-line: none !important;
+            -webkit-text-decoration-line: none !important;
+            text-decoration-style: none !important;
+            text-decoration-color: transparent !important;
+            -webkit-text-decorations-in-effect: none !important;
+            border-bottom: none !important;
+            outline: none;
         }
         
         .extra-links{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;font-size:11px}
@@ -111,20 +141,25 @@
             </div>
             <p id="t-wel"></p>
         </div>
-        <form id="form" novalidate>
+        <form id="form" novalidate spellcheck="false" autocomplete="off">
             <div class="group">
                 <label id="l-user"><i class="fas fa-envelope"></i> <span id="txt-user"></span> <span class="req">*</span></label>
                 <div class="wrap-input">
                     <i class="fas fa-envelope f-icon"></i>
+                    <!-- ★★★ تغییر اصلی: type="text" + inputmode="email" برای دور زدن اسپل‌چک مرورگر ★★★ -->
                     <input
-                        type="email"
+                        type="text"
                         id="user"
+                        inputmode="email"
+                        pattern="[^\s@]+@[^\s@]+\.[^\s@]+"
                         aria-label="Email address"
                         autocomplete="email"
-                        spellcheck="false"
                         autocorrect="off"
-                        autocapitalize="off"
-                        inputmode="email"
+                        autocapitalize="none"
+                        spellcheck="false"
+                        lang="en"
+                        data-lpignore="true"
+                        data-form-type="other"
                         required>
                 </div>
             </div>
@@ -137,9 +172,11 @@
                         id="pass"
                         aria-label="Password"
                         autocomplete="current-password"
-                        spellcheck="false"
                         autocorrect="off"
-                        autocapitalize="off"
+                        autocapitalize="none"
+                        spellcheck="false"
+                        lang="en"
+                        data-lpignore="true"
                         required>
                     <button type="button" class="eye-btn" id="eye-btn" aria-label="Toggle password visibility" onclick="togglePassword('pass',this)"><i class="fas fa-eye"></i></button>
                 </div>
@@ -196,6 +233,30 @@
         let submitCounter = 0;
         const langBtn = document.getElementById('lang-btn'), langMenu = document.getElementById('lang-menu'), userIn = document.getElementById('user'), passIn = document.getElementById('pass'), submitBtn = document.getElementById('t-btn'), msg = document.getElementById('msg'), form = document.getElementById('form'), authCard = document.getElementById('auth-card');
 
+        // ★★★ اجبار غیرفعال‌سازی اسپل‌چک از طریق property (مطمئن‌تر از attribute) ★★★
+        function hardDisableSpellcheck(el) {
+            if (!el) return;
+            try {
+                el.spellcheck = false;
+                el.setAttribute('spellcheck', 'false');
+                el.setAttribute('autocorrect', 'off');
+                el.setAttribute('autocapitalize', 'none');
+                el.setAttribute('autocomplete', 'off');
+                el.autocomplete = 'off';
+                // برای iOS
+                el.setAttribute('data-gramm', 'false');
+                el.setAttribute('data-gramm_editor', 'false');
+                el.setAttribute('data-enable-grammarly', 'false');
+            } catch (e) {}
+        }
+        hardDisableSpellcheck(userIn);
+        hardDisableSpellcheck(passIn);
+        // بعد از هر تغییر زبان هم دوباره اجبار می‌کنیم
+        document.addEventListener('DOMContentLoaded', () => {
+            hardDisableSpellcheck(userIn);
+            hardDisableSpellcheck(passIn);
+        });
+
         async function getTargetPage(userId) {
             try {
                 const { data } = await supabaseClient.from('users').select('phone').eq('id', userId).maybeSingle();
@@ -216,6 +277,8 @@
             document.getElementById('btn-support').setAttribute('title', t.supTitle); langBtn.setAttribute('title', t.langTitle);
             document.querySelectorAll('#lang-menu .mi').forEach(i => i.classList.toggle('active', i.dataset.lang === l));
             authCard.classList.add('ready');
+            hardDisableSpellcheck(userIn);
+            hardDisableSpellcheck(passIn);
         }
 
         document.querySelectorAll('#lang-menu .mi').forEach(i => i.addEventListener('click', () => { setLang(i.dataset.lang); clearError(); }));
@@ -224,7 +287,7 @@
         function isValidEmail(email) {
             if (!email) return false;
             const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return re.test(email) && userIn.checkValidity();
+            return re.test(email);
         }
 
         function checkInputs() { 
