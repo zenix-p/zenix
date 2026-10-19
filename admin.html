@@ -828,7 +828,6 @@
                     return false;
                 }
 
-                // بررسی سطح اطمینان احراز هویت (AAL)
                 try {
                     const { data: aal, error: aalErr } = await supabaseClient.auth.mfa.getAuthenticatorAssuranceLevel();
                     if (aalErr) {
@@ -915,7 +914,6 @@
                     });
                     if (vErr) throw vErr;
 
-                    // ورود موفق — بارگذاری مجدد
                     window.location.reload();
                 } catch (e) {
                     console.error('MFA verify error:', e);
@@ -1938,14 +1936,21 @@
                             'not_admin': 'شما دسترسی ادمین ندارید',
                             'not_found': 'واریزی یافت نشد',
                             'not_pending': 'این واریزی قبلاً بررسی شده است',
-                            'not_deposit': 'این رکورد از نوع واریزی نیست'
+                            'not_deposit': 'این رکورد از نوع واریزی نیست',
+                            'mfa_required': 'تایید دو مرحله‌ای لازم است — صفحه را رفرش کنید'
                         }[data.error] || data.error;
                         showToast('خطا: ' + errMsg, 'error');
                         loadData();
                     }
                 } catch (err) {
                     console.error('Approve error:', err);
-                    showToast('خطا در تایید: ' + (err.message || 'خطای نامشخص'), 'error');
+                    const errMsg = err.message || '';
+                    if (errMsg.includes('mfa_required')) {
+                        showToast('⚠️ جلسه 2FA شما منقضی شده — صفحه رفرش می‌شود...', 'error');
+                        setTimeout(() => window.location.reload(), 1800);
+                    } else {
+                        showToast('خطا در تایید: ' + (errMsg || 'خطای نامشخص'), 'error');
+                    }
                     newBtn.disabled = false;
                     newBtn.innerHTML = '<i class="fas fa-check"></i> تایید واریزی';
                 }
@@ -1984,14 +1989,21 @@
                         const errMsg = {
                             'not_admin': 'شما دسترسی ادمین ندارید',
                             'not_found': 'واریزی یافت نشد',
-                            'not_pending': 'این واریزی قبلاً بررسی شده است'
+                            'not_pending': 'این واریزی قبلاً بررسی شده است',
+                            'mfa_required': 'تایید دو مرحله‌ای لازم است — صفحه را رفرش کنید'
                         }[data.error] || data.error;
                         showToast('خطا: ' + errMsg, 'error');
                         loadData();
                     }
                 } catch (err) {
                     console.error('Reject error:', err);
-                    showToast('خطا در رد: ' + (err.message || 'خطای نامشخص'), 'error');
+                    const errMsg = err.message || '';
+                    if (errMsg.includes('mfa_required')) {
+                        showToast('⚠️ جلسه 2FA شما منقضی شده — صفحه رفرش می‌شود...', 'error');
+                        setTimeout(() => window.location.reload(), 1800);
+                    } else {
+                        showToast('خطا در رد: ' + (errMsg || 'خطای نامشخص'), 'error');
+                    }
                 }
             });
         };
