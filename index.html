@@ -10,7 +10,29 @@
     <link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin>
     <link href="https://fonts.googleapis.cn/css2?family=Orbitron:wght@700;900&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
+    <!-- ★★★ مرحله ۱: تعریف callbacks قبل از لود Turnstile ★★★ -->
+    <script>
+        window.__cfToken = null;
+
+        window.onCaptchaSuccess = function (token) {
+            window.__cfToken = token ||
+                (document.querySelector('[name="cf-turnstile-response"]') || {}).value ||
+                null;
+            try { document.dispatchEvent(new CustomEvent('cf-token-ready')); } catch (e) {}
+        };
+
+        window.onCaptchaExpired = function () {
+            window.__cfToken = null;
+            try { document.dispatchEvent(new CustomEvent('cf-token-ready')); } catch (e) {}
+        };
+
+        window.onCaptchaError = function () {
+            window.__cfToken = null;
+            try { document.dispatchEvent(new CustomEvent('cf-token-ready')); } catch (e) {}
+        };
+    </script>
+
     <!-- اسکریپت کلادفلر -->
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
@@ -57,17 +79,11 @@
         #user::placeholder,#pass::placeholder{color:#9ca3af;opacity:1}
         .group input:focus{border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.2)}
 
-        /* ============================================================
-           ★★★ حذف کامل زیرخط اسپل‌چک / گرامر / اتوفیل ★★★
-           ============================================================ */
-
-        /* حذف خط قرمز مواج اسپل‌چک (شبه‌المان استاندارد جدید) */
         ::spelling-error {
             text-decoration: none !important;
             -webkit-text-decoration: none !important;
             text-decoration-line: none !important;
             -webkit-text-decoration-line: none !important;
-            text-decoration-style: none !important;
             background: transparent !important;
         }
         ::grammar-error {
@@ -77,8 +93,6 @@
             -webkit-text-decoration-line: none !important;
             background: transparent !important;
         }
-
-        /* حذف هر نوع خط / دکوریشن روی فیلدها در همه‌ی حالت‌ها */
         #user,
         #pass,
         .group input,
@@ -146,7 +160,6 @@
                 <label id="l-user"><i class="fas fa-envelope"></i> <span id="txt-user"></span> <span class="req">*</span></label>
                 <div class="wrap-input">
                     <i class="fas fa-envelope f-icon"></i>
-                    <!-- ★★★ تغییر اصلی: type="text" + inputmode="email" برای دور زدن اسپل‌چک مرورگر ★★★ -->
                     <input
                         type="text"
                         id="user"
@@ -182,9 +195,14 @@
                 </div>
             </div>
             
-            <!-- ویجت کلادفلر -->
+            <!-- ★★★ ویجت کلادفلر با کال‌بک‌های کامل ★★★ -->
             <div class="group" style="display:flex; justify-content:center; margin-bottom:14px;">
-                <div class="cf-turnstile" data-sitekey="0x4AAAAAAFaU1RVZfnTURKOc" data-theme="dark" data-callback="onCaptchaSuccess"></div>
+                <div class="cf-turnstile"
+                     data-sitekey="0x4AAAAAAFaU1RVZfnTURKOc"
+                     data-theme="dark"
+                     data-callback="onCaptchaSuccess"
+                     data-expired-callback="onCaptchaExpired"
+                     data-error-callback="onCaptchaError"></div>
             </div>
 
             <div class="extra-links">
@@ -231,9 +249,18 @@
 
         let currentLang = localStorage.getItem('zenix_lang') || 'en';
         let submitCounter = 0;
-        const langBtn = document.getElementById('lang-btn'), langMenu = document.getElementById('lang-menu'), userIn = document.getElementById('user'), passIn = document.getElementById('pass'), submitBtn = document.getElementById('t-btn'), msg = document.getElementById('msg'), form = document.getElementById('form'), authCard = document.getElementById('auth-card');
+        let isSubmitting = false;
 
-        // ★★★ اجبار غیرفعال‌سازی اسپل‌چک از طریق property (مطمئن‌تر از attribute) ★★★
+        const langBtn = document.getElementById('lang-btn'),
+              langMenu = document.getElementById('lang-menu'),
+              userIn = document.getElementById('user'),
+              passIn = document.getElementById('pass'),
+              submitBtn = document.getElementById('t-btn'),
+              msg = document.getElementById('msg'),
+              form = document.getElementById('form'),
+              authCard = document.getElementById('auth-card');
+
+        // ★★★ اجبار غیرفعال‌سازی اسپل‌چک ★★★
         function hardDisableSpellcheck(el) {
             if (!el) return;
             try {
@@ -241,9 +268,6 @@
                 el.setAttribute('spellcheck', 'false');
                 el.setAttribute('autocorrect', 'off');
                 el.setAttribute('autocapitalize', 'none');
-                el.setAttribute('autocomplete', 'off');
-                el.autocomplete = 'off';
-                // برای iOS
                 el.setAttribute('data-gramm', 'false');
                 el.setAttribute('data-gramm_editor', 'false');
                 el.setAttribute('data-enable-grammarly', 'false');
@@ -251,11 +275,12 @@
         }
         hardDisableSpellcheck(userIn);
         hardDisableSpellcheck(passIn);
-        // بعد از هر تغییر زبان هم دوباره اجبار می‌کنیم
-        document.addEventListener('DOMContentLoaded', () => {
-            hardDisableSpellcheck(userIn);
-            hardDisableSpellcheck(passIn);
-        });
+
+        // ★★★ گرفتن توکن کپچا (DOM اولویت دارد، سپس متغیر global) ★★★
+        function getCaptchaToken() {
+            const domToken = document.querySelector('[name="cf-turnstile-response"]')?.value;
+            return domToken || window.__cfToken || null;
+        }
 
         async function getTargetPage(userId) {
             try {
@@ -270,11 +295,23 @@
 
         function setLang(l) {
             submitCounter++;
-            currentLang = l; localStorage.setItem('zenix_lang', l); langMenu?.classList.remove('show');
+            currentLang = l;
+            localStorage.setItem('zenix_lang', l);
+            langMenu?.classList.remove('show');
             const t = langData[l] || langData.en;
-            document.documentElement.setAttribute('dir', t.dir); document.documentElement.setAttribute('lang', l);
-            document.getElementById('t-wel').textContent = t.wel; document.getElementById('txt-user').textContent = t.user; userIn.placeholder = t.userP; document.getElementById('txt-pass').textContent = t.pass; passIn.placeholder = t.passP; document.getElementById('t-remember').textContent = t.remember; document.getElementById('t-forgot').textContent = t.forgot; submitBtn.textContent = t.btn; document.getElementById('t-foot').innerHTML = `${t.noAcc} <a href="register.html">${t.reg}</a>`;
-            document.getElementById('btn-support').setAttribute('title', t.supTitle); langBtn.setAttribute('title', t.langTitle);
+            document.documentElement.setAttribute('dir', t.dir);
+            document.documentElement.setAttribute('lang', l);
+            document.getElementById('t-wel').textContent = t.wel;
+            document.getElementById('txt-user').textContent = t.user;
+            userIn.placeholder = t.userP;
+            document.getElementById('txt-pass').textContent = t.pass;
+            passIn.placeholder = t.passP;
+            document.getElementById('t-remember').textContent = t.remember;
+            document.getElementById('t-forgot').textContent = t.forgot;
+            submitBtn.textContent = t.btn;
+            document.getElementById('t-foot').innerHTML = `${t.noAcc} <a href="register.html">${t.reg}</a>`;
+            document.getElementById('btn-support').setAttribute('title', t.supTitle);
+            langBtn.setAttribute('title', t.langTitle);
             document.querySelectorAll('#lang-menu .mi').forEach(i => i.classList.toggle('active', i.dataset.lang === l));
             authCard.classList.add('ready');
             hardDisableSpellcheck(userIn);
@@ -290,27 +327,38 @@
             return re.test(email);
         }
 
-        function checkInputs() { 
+        // ★★★ اصلاح‌شده: از getCaptchaToken استفاده می‌کند ★★★
+        function checkInputs() {
+            if (isSubmitting) return;
             const emailOk = isValidEmail(userIn.value.trim());
             const passOk = passIn.value.length >= 6;
-            const captchaToken = document.querySelector('[name="cf-turnstile-response"]')?.value;
-            const capOk = !!captchaToken;
-
-            submitBtn.disabled = !(emailOk && passOk && capOk); 
+            const capOk = !!getCaptchaToken();
+            submitBtn.disabled = !(emailOk && passOk && capOk);
         }
 
-        userIn.addEventListener('focus', clearError); 
-        userIn.addEventListener('input', () => { clearError(); checkInputs(); });
-        passIn.addEventListener('focus', clearError); 
-        passIn.addEventListener('input', checkInputs);
+        // ★★★ لیسن به رویداد cf-token-ready (فایر شده از کال‌بک) ★★★
+        document.addEventListener('cf-token-ready', () => { checkInputs(); });
 
-        window.onCaptchaSuccess = function() {
-            checkInputs();
-        };
+        // ★★★ پولینگ بکاپ برای حالتی که کال‌بک به هر دلیلی فایر نشود ★★★
+        let lastKnownToken = null;
+        setInterval(() => {
+            if (isSubmitting) return;
+            const token = getCaptchaToken();
+            if (token !== lastKnownToken) {
+                lastKnownToken = token;
+                checkInputs();
+            }
+        }, 400);
+
+        userIn.addEventListener('focus', clearError);
+        userIn.addEventListener('input', () => { clearError(); checkInputs(); });
+        passIn.addEventListener('focus', clearError);
+        passIn.addEventListener('input', checkInputs);
 
         function showError(errKey) {
             const t = langData[currentLang] || langData.en;
-            msg.innerHTML = `<div>${t[errKey] || errKey}</div>`; msg.className = 'err show';
+            msg.innerHTML = `<div>${t[errKey] || errKey}</div>`;
+            msg.className = 'err show';
             checkInputs();
         }
 
@@ -321,10 +369,11 @@
             const passVal = passIn.value.trim();
 
             if (!isValidEmail(emailVal)) return showError('errEmail');
-            const captchaToken = document.querySelector('[name="cf-turnstile-response"]')?.value;
+            const captchaToken = getCaptchaToken();
             if (!captchaToken) return showError('errCaptcha');
 
             const currentSubmit = ++submitCounter;
+            isSubmitting = true;
             submitBtn.disabled = true;
             clearError();
 
@@ -332,29 +381,32 @@
                 const { data, error } = await supabaseClient.auth.signInWithPassword({
                     email: emailVal,
                     password: passVal,
-                    options: {
-                        captchaToken: captchaToken
-                    }
+                    options: { captchaToken: captchaToken }
                 });
 
-                if (currentSubmit !== submitCounter) return;
+                if (currentSubmit !== submitCounter) { isSubmitting = false; return; }
                 if (error) throw error;
 
                 const targetPage = await getTargetPage(data.user.id);
-                if (currentSubmit !== submitCounter) return;
+                if (currentSubmit !== submitCounter) { isSubmitting = false; return; }
 
                 const t = langData[currentLang] || langData.en;
-                msg.innerHTML = `<div>${t.succ}</div>`; msg.className = 'succ show';
+                msg.innerHTML = `<div>${t.succ}</div>`;
+                msg.className = 'succ show';
+                // isSubmitting عمداً true می‌ماند تا دکمه در حین ریدایرکت غیرفعال بماند
                 setTimeout(() => { window.location.href = targetPage; }, 1000);
             } catch (error) {
-                if (currentSubmit !== submitCounter) return;
+                if (currentSubmit !== submitCounter) { isSubmitting = false; return; }
                 console.error('Login Error:', error);
+                isSubmitting = false;
                 submitBtn.disabled = false;
-                if (window.turnstile) window.turnstile.reset();
+
+                // ریست کپچا (رویداد expired را فایر می‌کند و توکن را پاک می‌کند)
+                try { if (window.turnstile) window.turnstile.reset(); } catch(e) {}
 
                 if (error.status === 429 || (error.message && error.message.toLowerCase().includes('too many requests'))) {
                     const t = langData[currentLang] || langData.en;
-                    msg.innerHTML = `<div>${t.errTooMany}</div>`; 
+                    msg.innerHTML = `<div>${t.errTooMany}</div>`;
                     msg.className = 'err show';
                 } else {
                     showError('errNoUser');
