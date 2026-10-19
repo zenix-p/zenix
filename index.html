@@ -11,7 +11,6 @@
     <link href="https://fonts.googleapis.cn/css2?family=Orbitron:wght@700;900&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- ★★★ مرحله ۱: تعریف callbacks قبل از لود Turnstile ★★★ -->
     <script>
         window.__cfToken = null;
 
@@ -33,7 +32,6 @@
         };
     </script>
 
-    <!-- اسکریپت کلادفلر -->
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
     <script>(function(){var s=localStorage.getItem('zenix_lang')||'en',r=['fa','ar'];document.documentElement.setAttribute('dir',r.includes(s)?'rtl':'ltr');document.documentElement.setAttribute('lang',s);})();</script>
@@ -195,7 +193,6 @@
                 </div>
             </div>
             
-            <!-- ★★★ ویجت کلادفلر با کال‌بک‌های کامل ★★★ -->
             <div class="group" style="display:flex; justify-content:center; margin-bottom:14px;">
                 <div class="cf-turnstile"
                      data-sitekey="0x4AAAAAAFaU1RVZfnTURKOc"
@@ -260,7 +257,6 @@
               form = document.getElementById('form'),
               authCard = document.getElementById('auth-card');
 
-        // ★★★ اجبار غیرفعال‌سازی اسپل‌چک ★★★
         function hardDisableSpellcheck(el) {
             if (!el) return;
             try {
@@ -276,15 +272,25 @@
         hardDisableSpellcheck(userIn);
         hardDisableSpellcheck(passIn);
 
-        // ★★★ گرفتن توکن کپچا (DOM اولویت دارد، سپس متغیر global) ★★★
         function getCaptchaToken() {
             const domToken = document.querySelector('[name="cf-turnstile-response"]')?.value;
             return domToken || window.__cfToken || null;
         }
 
+        // ★★★ اصلاح شده: چک status + بازگشت 'BANNED' برای کاربران مسدود
         async function getTargetPage(userId) {
             try {
-                const { data } = await supabaseClient.from('users').select('phone').eq('id', userId).maybeSingle();
+                const { data } = await supabaseClient
+                    .from('users')
+                    .select('phone, status')
+                    .eq('id', userId)
+                    .maybeSingle();
+
+                // اگر کاربر مسدود است، علامت BANNED برگردان
+                if (data && (data.status === 'cancelled' || data.status === 'banned')) {
+                    return 'BANNED';
+                }
+
                 if (!data || !data.phone || data.phone.trim() === '') return 'profile.html';
                 return 'dashboard.html';
             } catch (e) { return 'dashboard.html'; }
@@ -327,7 +333,6 @@
             return re.test(email);
         }
 
-        // ★★★ اصلاح‌شده: از getCaptchaToken استفاده می‌کند ★★★
         function checkInputs() {
             if (isSubmitting) return;
             const emailOk = isValidEmail(userIn.value.trim());
@@ -336,10 +341,8 @@
             submitBtn.disabled = !(emailOk && passOk && capOk);
         }
 
-        // ★★★ لیسن به رویداد cf-token-ready (فایر شده از کال‌بک) ★★★
         document.addEventListener('cf-token-ready', () => { checkInputs(); });
 
-        // ★★★ پولینگ بکاپ برای حالتی که کال‌بک به هر دلیلی فایر نشود ★★★
         let lastKnownToken = null;
         setInterval(() => {
             if (isSubmitting) return;
@@ -360,6 +363,15 @@
             msg.innerHTML = `<div>${t[errKey] || errKey}</div>`;
             msg.className = 'err show';
             checkInputs();
+        }
+
+        // ★★★ نمایش پیام مسدود بودن با آیکون واضح
+        function showBanned() {
+            const t = langData[currentLang] || langData.en;
+            msg.innerHTML = `<div><i class="fas fa-ban" style="margin-inline-end:6px;"></i>${t.errDisabled}</div>`;
+            msg.className = 'err show';
+            submitBtn.disabled = false;
+            isSubmitting = false;
         }
 
         form.addEventListener('submit', async (e) => {
@@ -390,10 +402,17 @@
                 const targetPage = await getTargetPage(data.user.id);
                 if (currentSubmit !== submitCounter) { isSubmitting = false; return; }
 
+                // ★★★ چک مسدود بودن: اگر BANNED بود، خارج شو + پیام بده
+                if (targetPage === 'BANNED') {
+                    try { await supabaseClient.auth.signOut(); } catch (_) {}
+                    try { if (window.turnstile) window.turnstile.reset(); } catch(e) {}
+                    showBanned();
+                    return;
+                }
+
                 const t = langData[currentLang] || langData.en;
                 msg.innerHTML = `<div>${t.succ}</div>`;
                 msg.className = 'succ show';
-                // isSubmitting عمداً true می‌ماند تا دکمه در حین ریدایرکت غیرفعال بماند
                 setTimeout(() => { window.location.href = targetPage; }, 1000);
             } catch (error) {
                 if (currentSubmit !== submitCounter) { isSubmitting = false; return; }
@@ -401,7 +420,6 @@
                 isSubmitting = false;
                 submitBtn.disabled = false;
 
-                // ریست کپچا (رویداد expired را فایر می‌کند و توکن را پاک می‌کند)
                 try { if (window.turnstile) window.turnstile.reset(); } catch(e) {}
 
                 if (error.status === 429 || (error.message && error.message.toLowerCase().includes('too many requests'))) {
