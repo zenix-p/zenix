@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Apply saved Zenix language before rendering this protected page. -->
     <script>
     (function () {
         const supportedLanguages = ['en', 'fa', 'ar', 'tr', 'ru', 'es', 'fr', 'de'];
@@ -11,7 +10,7 @@
         try {
             const savedLang = localStorage.getItem('zenix_lang');
             if (supportedLanguages.includes(savedLang)) selectedLang = savedLang;
-        } catch (_) { /* localStorage may be unavailable in private browsing; default to English */ }
+        } catch (_) { }
         document.documentElement.setAttribute('lang', selectedLang);
         document.documentElement.setAttribute('dir', ['fa', 'ar'].includes(selectedLang) ? 'rtl' : 'ltr');
     })();
@@ -26,7 +25,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     
-    <!-- سرویس EmailJS برای ارسال کد ۶ رقمی -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="text/javascript">
         (function(){
@@ -34,14 +32,10 @@
         })();
     </script>
 
-    <!-- Supabase JS Library -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
         body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
         
-        /* سیستم توست نوتیفیکیشن اختصاصی Zenix */
         .toast-container {
             position: fixed;
             top: 20px;
@@ -157,29 +151,6 @@
         .notif-tab.active{background:#38bdf8;color:#0f172a;font-weight:bold;border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.3)}
 
         #modal-msg-container{overflow-y:auto;padding-right:6px;flex:1;min-height:0}
-
-        #modal-msg-container::-webkit-scrollbar,
-        .modal-content div::-webkit-scrollbar {
-          width: 5px;
-        }
-        #modal-msg-container::-webkit-scrollbar-track,
-        .modal-content div::-webkit-scrollbar-track {
-          background: rgba(15, 23, 42, 0.6);
-          border-radius: 10px;
-        }
-        #modal-msg-container::-webkit-scrollbar-thumb,
-        .modal-content div::-webkit-scrollbar-thumb {
-          background: rgba(56, 189, 248, 0.35);
-          border-radius: 10px;
-        }
-        #modal-msg-container::-webkit-scrollbar-thumb:hover,
-        .modal-content div::-webkit-scrollbar-thumb:hover {
-          background: rgba(56, 189, 248, 0.7);
-        }
-        #modal-msg-container, .modal-content div {
-          scrollbar-width: thin;
-          scrollbar-color: rgba(56, 189, 248, 0.35) rgba(15, 23, 42, 0.6);
-        }
         
         footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:800px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
     </style>
@@ -366,7 +337,6 @@
         </div>
     </div>
 
-    <!-- مودال صندوق پیام‌ها و اعلان‌ها -->
     <div class="modal" id="m-msg">
         <div class="modal-content">
             <div class="modal-header">
@@ -414,10 +384,6 @@
     </footer>
 
     <script>
-        // HTML escape helper: neutralises any HTML tag or attribute-breaking
-        // character coming from user-controlled data (notification titles,
-        // message bodies, emails, phone numbers, error messages) before it
-        // is placed into innerHTML.
         function escapeHtml(value) {
             return String(value == null ? '' : value)
                 .replace(/&/g, '&amp;')
@@ -426,6 +392,7 @@
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#39;');
         }
+        window.escapeHtml = escapeHtml;
 
         window.showToast = function(message, type = 'success', duration = 8000) {
             const container = document.getElementById('toast-container');
@@ -438,24 +405,18 @@
             if (type === 'error') iconClass = 'fa-exclamation-circle';
             if (type === 'info') iconClass = 'fa-info-circle';
 
-            // message may contain data derived from user input or DB records;
-            // escape before inserting into innerHTML. iconClass is a literal.
             toast.innerHTML = `<i class="fas ${iconClass}"></i><div style="flex:1;">${escapeHtml(message)}</div>`;
             container.appendChild(toast);
 
-            setTimeout(() => {
-                toast.classList.add('show');
-            }, 10);
-
+            setTimeout(() => { toast.classList.add('show'); }, 10);
             setTimeout(() => {
                 toast.classList.remove('show');
-                setTimeout(() => {
-                    toast.remove();
-                }, 350);
+                setTimeout(() => { toast.remove(); }, 350);
             }, duration);
         };
 
         const countries=[{n:"Afghanistan",c:"+93",f:"🇦🇫"},{n:"Albania",c:"+355",f:"🇦🇱"},{n:"Algeria",c:"+213",f:"🇩🇿"},{n:"Argentina",c:"+54",f:"🇦🇷"},{n:"Australia",c:"+61",f:"🇦🇺"},{n:"Austria",c:"+43",f:"🇦🇹"},{n:"Azerbaijan",c:"+994",f:"🇦🇿"},{n:"Bahrain",c:"+973",f:"🇧🇭"},{n:"Bangladesh",c:"+880",f:"🇧🇩"},{n:"Belarus",c:"+375",f:"🇧🇾"},{n:"Belgium",c:"+32",f:"🇧🇪"},{n:"Brazil",c:"+55",f:"🇧🇷"},{n:"Canada",c:"+1",f:"🇨🇦"},{n:"China",c:"+86",f:"🇨🇳"},{n:"Egypt",c:"+20",f:"🇪🇬"},{n:"France",c:"+33",f:"🇫🇷"},{n:"Germany",c:"+49",f:"🇩🇪"},{n:"India",c:"+91",f:"🇮🇳"},{n:"Indonesia",c:"+62",f:"🇮🇩"},{n:"Iran",c:"+98",f:"🇮🇷"},{n:"Iraq",c:"+964",f:"🇮🇶"},{n:"Italy",c:"+39",f:"🇮🇹"},{n:"Japan",c:"+81",f:"🇯🇵"},{n:"Jordan",c:"+962",f:"🇯🇴"},{n:"Kuwait",c:"+965",f:"🇰🇼"},{n:"Lebanon",c:"+961",f:"🇱🇧"},{n:"Malaysia",c:"+60",f:"🇲🇾"},{n:"Netherlands",c:"+31",f:"🇳🇱"},{n:"Oman",c:"+968",f:"🇴🇲"},{n:"Pakistan",c:"+92",f:"🇵🇰"},{n:"Qatar",c:"+974",f:"🇶🇦"},{n:"Russia",c:"+7",f:"🇷🇺"},{n:"Saudi Arabia",c:"+966",f:"🇸🇦"},{n:"Spain",c:"+34",f:"🇪🇸"},{n:"Sweden",c:"+46",f:"🇸🇪"},{n:"Switzerland",c:"+41",f:"🇨🇭"},{n:"Turkey",c:"+90",f:"🇹🇷"},{n:"United Arab Emirates",c:"+971",f:"🇦🇪"},{n:"United Kingdom",c:"+44",f:"🇬🇧"},{n:"United States",c:"+1",f:"🇺🇸"}];
+        window.countries = countries;
 
         function renderCountries(l){
             const c=document.getElementById('c-options-container');
@@ -492,101 +453,24 @@
             const sBtn=document.getElementById('c-select-btn'), sList=document.getElementById('c-list');
             if(sBtn) sBtn.onclick=e=>{ e.stopPropagation(); sList.classList.toggle('show'); };
             window.addEventListener('click',e=>{ if(sList && !e.target.closest('#c-dropdown')) sList.classList.remove('show'); },true);
-
-            // بررسی و بازیابی تایمرهای فعال ارسال کد پس از ریفرش صفحه
-            ['pwd-email', 'tr-email', 'wal-email'].forEach(id => {
-                const expireTime = parseInt(localStorage.getItem('otp_cooldown_' + id) || '0', 10);
-                if (expireTime > Date.now()) {
-                    const inputEl = document.getElementById(id);
-                    if (inputEl) {
-                        const btnEl = inputEl.closest('.fg')?.querySelector('button');
-                        if (btnEl) {
-                            runCountdown(btnEl, id);
-                        }
-                    }
-                } else {
-                    localStorage.removeItem('otp_cooldown_' + id);
-                }
-            });
-
-            /* باز کردن خودکار بخش تعویض رمز تراکنش یا ورود بر اساس URL */
-            const urlParams = new URLSearchParams(window.location.search);
-            const openSection = urlParams.get('open') || window.location.hash.replace('#', '');
-            if (openSection === 'tx_pass' || openSection === 'tr-pass' || openSection === 'card-tx-pass') {
-                const txCard = document.getElementById('card-tx-pass');
-                if (txCard) {
-                    const hd = txCard.querySelector('.hd');
-                    if (hd) window.tc(hd);
-                    setTimeout(() => {
-                        txCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 200);
-                }
-            } else if (openSection === 'pwd' || openSection === 'password' || openSection === 'card-pwd') {
-                const pwdCard = document.getElementById('card-pwd');
-                if (pwdCard) {
-                    const hd = pwdCard.querySelector('.hd');
-                    if (hd) window.tc(hd);
-                    setTimeout(() => {
-                        pwdCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 200);
-                }
-            }
-
-            // Language selection, direction, and complete profile UI localization.
-            const langMenu = document.getElementById('lang-menu');
-            if (langMenu) {
-                const supportedLanguages = ['en', 'fa', 'ar', 'tr', 'ru', 'es', 'fr', 'de'];
-                let savedLang = 'en';
-                try {
-                    const storedLang = localStorage.getItem('zenix_lang');
-                    if (supportedLanguages.includes(storedLang)) savedLang = storedLang;
-                    else localStorage.setItem('zenix_lang', 'en');
-                } catch (_) { /* localStorage may be unavailable; default stays 'en' */ }
-
-                if (typeof window.applyProfileLanguage === 'function') {
-                    window.applyProfileLanguage(savedLang);
-                }
-                langMenu.querySelectorAll('[data-lang]').forEach(item => {
-                    item.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const selectedLang = item.getAttribute('data-lang');
-                        if (!supportedLanguages.includes(selectedLang)) return;
-
-                        // Apply language and text direction directly in the menu handler.
-                        // This also keeps the core behavior explicit for targeted checks.
-                        document.documentElement.setAttribute('lang', selectedLang);
-                        document.documentElement.setAttribute(
-                            'dir', ['fa', 'ar'].includes(selectedLang) ? 'rtl' : 'ltr'
-                        );
-                        try {
-                            localStorage.setItem('zenix_lang', selectedLang);
-                        } catch (_) { /* quota or privacy mode: language preference is best-effort */ }
-
-                        // Translate visible and dynamic page text using the page dictionary.
-                        if (typeof window.applyProfileLanguage === 'function') {
-                            window.applyProfileLanguage(selectedLang);
-                        }
-                        langMenu.querySelectorAll('[data-lang]').forEach(option => {
-                            option.classList.toggle('active', option.dataset.lang === selectedLang);
-                        });
-                        langMenu.classList.remove('show');
-                    });
-                }
-            }
         });
     </script>
 
-    <script>
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdmirror.com/npm/@supabase/supabase-js@2/+esm';
+
         const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
         
-        var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        window.supabaseClient = supabaseClient;
 
         let currentUser = null;
         let currentUserId = null;
         let userRealtimeChannel = null;
         let notificationRealtimeChannel = null;
         let hasShownWelcomeToast = false;
+        let authInitialized = false;
 
         window.cachedNotifications = [];
         window.activeNotifFilter = 'all';
@@ -606,7 +490,7 @@
             const dropdownBtn = document.getElementById('c-select-btn');
 
             if (phoneNumber) {
-                let matchedCountry = countries.find(c => phoneNumber.startsWith(c.c));
+                let matchedCountry = window.countries.find(c => phoneNumber.startsWith(c.c));
                 if (matchedCountry) {
                     document.getElementById('country-code').value = matchedCountry.c;
                     dropdownBtn.querySelector('span').innerText = `${matchedCountry.f} ${matchedCountry.c}`;
@@ -630,11 +514,10 @@
             const { data, error } = await supabaseClient
               .from('notifications')
               .select('*')
-              .or(`user_id.eq.${uid},user_id.is.null`)
+              .eq('user_id', uid)
               .order('created_at', { ascending: false });
 
             if (error) throw error;
-
             return data || [];
           } catch (e) {
             console.error('خطا در دریافت اعلانات:', e);
@@ -735,8 +618,6 @@
               `;
             }
 
-            // title and msg come from the notifications table (user/admin controlled).
-            // Escape before inserting into innerHTML.
             html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle}">
               <div class="msg-title-text" style="display:flex;align-items:center;gap:8px;">
                 ${icon}
@@ -843,7 +724,7 @@
             hasShownWelcomeToast = true;
             
             const welcomeMsg = `
-                <strong style="color:#fbbf24; font-size:14px; font-weight:800; display:block; margin-bottom:4px; text-shadow:0 0 10px rgba(251,191,36,0.3);">
+                <strong style="color:#fbbf24; font-size:14px; font-weight:800; display:block; margin-bottom:4px;">
                     🎉 به Zenix خوش آمدید!
                 </strong>
                 <span style="color:#e2e8f0; font-size:12px; font-weight:500; line-height:1.6;">
@@ -935,8 +816,6 @@
                   if (payload.eventType === 'INSERT') {
                     const title = newRec.title || newRec.subject || 'اعلان جدید';
                     const msg = newRec.message || newRec.text || newRec.body || '';
-                    // showToast escapes its message argument before inserting
-                    // into innerHTML, so passing raw title/msg here is safe.
                     window.showToast(`<strong>${escapeHtml(title)}</strong><br>${escapeHtml(msg)}`, 'info', 7000);
                   }
                 }
@@ -944,8 +823,9 @@
               .subscribe();
         }
 
-        supabaseClient.auth.onAuthStateChange(async (event, session) => {
-          if (session && session.user) {
+        async function initializeUserSession(session) {
+            if (!session || !session.user || authInitialized) return false;
+            
             currentUser = session.user;
             currentUserId = session.user.id;
 
@@ -965,15 +845,51 @@
 
             await loadUserData(session.user);
             await setupRealtimeSubscriptions(session.user.id);
+            
+            authInitialized = true;
+            return true;
+        }
 
-          } else {
-            if (userRealtimeChannel) await supabaseClient.removeChannel(userRealtimeChannel);
-            if (notificationRealtimeChannel) await supabaseClient.removeChannel(notificationRealtimeChannel);
-            userRealtimeChannel = null;
-            notificationRealtimeChannel = null;
-            window.location.href = "index.html";
-          }
-        });
+        // ★★★ جدید: اول getSession()، بعد onAuthStateChange ★★★
+        (async () => {
+            try {
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                
+                if (error) {
+                    console.error('getSession error:', error);
+                }
+                
+                if (session && session.user) {
+                    await initializeUserSession(session);
+                } else {
+                    // Try refresh
+                    const { data: { session: refreshed }, error: refreshErr } = await supabaseClient.auth.refreshSession();
+                    if (refreshed && refreshed.user) {
+                        await initializeUserSession(refreshed);
+                    } else {
+                        console.log('No valid session, redirecting to login');
+                        window.location.href = "index.html";
+                        return;
+                    }
+                }
+                
+                // ★ فقط حالا listener را نصب می‌کنیم
+                supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                    if (event === 'SIGNED_OUT') {
+                        window.location.href = "index.html";
+                    } else if (event === 'SIGNED_IN' && session && session.user && !authInitialized) {
+                        await initializeUserSession(session);
+                    } else if (event === 'TOKEN_REFRESHED' && session && session.user) {
+                        currentUser = session.user;
+                        currentUserId = session.user.id;
+                    }
+                    // INITIAL_SESSION را نادیده بگیر — چون قبلاً getSession() کار خود را کرد
+                });
+            } catch (err) {
+                console.error('Auth init error:', err);
+                window.location.href = "index.html";
+            }
+        })();
 
         window.savePhone = async function() {
           const phoneInput = document.getElementById('user-phone-input');
@@ -1050,7 +966,7 @@
                   errEl.textContent = 'خطا: ' + errMsg;
                   errEl.style.display = 'block';
                 }
-                window.showToast('خطای ذخیره‌سازی سوپابیس: ' + errMsg, 'error', 5000);
+                window.showToast('خطای ذخیره‌سازی: ' + errMsg, 'error', 5000);
               }
             } catch (e) {
               if (saveBtn) {
@@ -1064,7 +980,7 @@
               errEl.textContent = 'شماره باید ۱۰ رقم و بدون صفر باشد (مثال: 9123456789)';
               errEl.style.display = 'block';
             }
-            window.showToast('لطفاً شماره را به‌‌صورت ۱۰ رقمی و بدون صفر وارد کنید.', 'error', 4000);
+            window.showToast('لطفاً شماره را به‌صورت ۱۰ رقمی و بدون صفر وارد کنید.', 'error', 4000);
           }
         };
 
@@ -1172,103 +1088,6 @@
             await supabaseClient.auth.signOut();
             window.location.href = "index.html";
         };
-    </script>
-
-    <script>
-    // Profile-page translations. Original Persian strings are retained per node so language changes are reversible.
-    (function () {
-        const supported = ['en', 'fa', 'ar', 'tr', 'ru', 'es', 'fr', 'de'];
-        const phrases = {"Zenix - پروفایل":["Zenix - Profile","Zenix - پروفایل","زينكس - الملف الشخصي","Zenix - Profil","Zenix — Профиль","Zenix - Perfil","Zenix - Profil","Zenix – Profil"],"صفحه اصلی":["Home","صفحه اصلی","الرئيسية","Ana sayfa","Главная","Inicio","Accueil","Startseite"],"کوانتیفیکیشن":["Quantification","کوانتیفیکیشن","القياس الكمي","Kuantifikasyon","Количественная оценка","Cuantificación","Quantification","Quantifizierung"],"واریز":["Deposit","واریز","إيداع","Yatırma","Пополнение","Depósito","Dépôt","Einzahlung"],"برداشت":["Withdraw","برداشت","سحب","Çekme","Вывод средств","Retirar","Retrait","Auszahlung"],"تیم من":["My Team","تیم من","فريقي","Ekibim","Моя команда","Mi equipo","Mon équipe","Mein Team"],"تراکنش":["Transactions","تراکنش","المعاملات","İşlemler","Транзакции","Transacciones","Transactions","Transaktionen"],"پروفایل":["Profile","پروفایل","الملف الشخصي","Profil","Профиль","Perfil","Profil","Profil"],"پشتیبانی":["Support","پشتیبانی","الدعم","Destek","Поддержка","Soporte","Assistance","Support"],"خروج":["Log out","خروج","تسجيل الخروج","Çıkış yap","Выйти","Cerrar sesión","Se déconnecter","Abmelden"],"پروفایل کاربر":["User Profile","پروفایل کاربر","الملف الشخصي للمستخدم","Kullanıcı Profili","Профиль пользователя","Perfil de usuario","Profil utilisateur","Benutzerprofil"],"مدیریت اطلاعات حساب کاربری و تنظیمات امنیتی":["Manage your account information and security settings","مدیریت اطلاعات حساب کاربری و تنظیمات امنیتی","إدارة معلومات حسابك وإعدادات الأمان","Hesap bilgilerinizi ve güvenlik ayarlarınızı yönetin","Управление данными учетной записи и настройками безопасности","Administra la información de tu cuenta y la configuración de seguridad","Gérez les informations de votre compte et les paramètres de sécurité","Verwalten Sie Ihre Kontoinformationen und Sicherheitseinstellungen"],"در حال بارگذاری...":["Loading...","در حال بارگذاری...","جارٍ التحميل...","Yükleniyor...","Загрузка...","Cargando...","Chargement...","Wird geladen..."],"وضعیت حساب:":["Account status:","وضعیت حساب:","حالة الحساب:","Hesap durumu:","Статус аккаунта:","Estado de la cuenta:","État du compte :","Kontostatus:"],"در حال بررسی...":["Checking...","در حال بررسی...","جارٍ التحقق...","Kontrol ediliyor...","Проверка...","Comprobando...","Vérification...","Wird geprüft..."],"شماره تماس:":["Phone number:","شماره تماس:","رقم الهاتف:","Telefon numarası:","Номер телефона:","Número de teléfono:","Numéro de téléphone :","Telefonnummer:"],"کد کشور":["Country code","کد کشور","رمز الدولة","Ülke kodu","Код страны","Código de país","Indicatif du pays","Ländercode"],"شماره باید ۱۰ رقم و بدون صفر باشد":["The number must contain 10 digits and must not start with zero","شماره باید ۱۰ رقم و بدون صفر باشد","يجب أن يتكون الرقم من 10 أرقام وألا يبدأ بصفر","Numara 10 haneli olmalı ve sıfırla başlamamalıdır","Номер должен содержать 10 цифр и не начинаться с нуля","El número debe tener 10 dígitos y no empezar por cero","Le numéro doit comporter 10 chiffres et ne pas commencer par zéro","Die Nummer muss 10 Ziffern haben und darf nicht mit Null beginnen"],"ذخیره":["Save","ذخیره","حفظ","Kaydet","Сохранить","Guardar","Enregistrer","Speichern"],"تغییر ایمیل":["Change Email","تغییر ایمیل","تغيير البريد الإلكتروني","E-postayı değiştir","Изменить электронную почту","Cambiar correo electrónico","Modifier l’adresse e-mail","E-Mail ändern"],"ایمیل فعلی":["Current email","ایمیل فعلی","البريد الإلكتروني الحالي","Mevcut e-posta","Текущая почта","Correo actual","E-mail actuel","Aktuelle E-Mail"],"ایمیل جدید":["New email","ایمیل جدید","البريد الإلكتروني الجديد","Yeni e-posta","Новая почта","Correo nuevo","Nouvel e-mail","Neue E-Mail"],"گرفتن عکس و ارسال به ادمین":["Take a photo and send it to the admin","گرفتن عکس و ارسال به ادمین","التقط صورة وأرسلها إلى المسؤول","Fotoğraf çek ve yöneticiye gönder","Сделать фото и отправить администратору","Tomar una foto y enviarla al administrador","Prendre une photo et l’envoyer à l’administrateur","Foto aufnehmen und an den Administrator senden"],"در انتظار تایید مدیریت (از ۱ تا ۷۲ ساعت)...":["Awaiting administrator approval (1–72 hours)...","در انتظار تایید مدیریت (از ۱ تا ۷۲ ساعت)...","بانتظار موافقة المسؤول (من ساعة إلى 72 ساعة)...","Yönetici onayı bekleniyor (1–72 saat)...","Ожидание одобрения администратора (от 1 до 72 часов)...","Esperando la aprobación del administrador (de 1 a 72 horas)...","En attente de l’approbation de l’administrateur (1 à 72 heures)...","Warten auf Administratorfreigabe (1–72 Stunden)..."],"تغییر رمز ورود":["Change Login Password","تغییر رمز ورود","تغيير كلمة مرور تسجيل الدخول","Giriş şifresini değiştir","Изменить пароль для входа","Cambiar contraseña de inicio de sesión","Modifier le mot de passe de connexion","Anmeldepasswort ändern"],"ایمیل":["Email","ایمیل","البريد الإلكتروني","E-posta","Электронная почта","Correo electrónico","E-mail","E-Mail"],"ارسال کد به ایمیل":["Send code to email","ارسال کد به ایمیل","إرسال الرمز إلى البريد الإلكتروني","E-postaya kod gönder","Отправить код на почту","Enviar código al correo","Envoyer le code par e-mail","Code per E-Mail senden"],"کد ۶ رقمی تأیید ایمیل":["6-digit email verification code","کد ۶ رقمی تأیید ایمیل","رمز التحقق المكوّن من 6 أرقام للبريد الإلكتروني","6 haneli e-posta doğrulama kodu","6-значный код подтверждения электронной почты","Código de verificación de correo de 6 dígitos","Code de vérification e-mail à 6 chiffres","6-stelliger E-Mail-Bestätigungscode"],"رمز فعلی":["Current password","رمز فعلی","كلمة المرور الحالية","Mevcut şifre","Текущий пароль","Contraseña actual","Mot de passe actuel","Aktuelles Passwort"],"رمز جدید":["New password","رمز جدید","كلمة المرور الجديدة","Yeni şifre","Новый пароль","Nueva contraseña","Nouveau mot de passe","Neues Passwort"],"تکرار رمز جدید":["Confirm new password","تکرار رمز جدید","تأكيد كلمة المرور الجديدة","Yeni şifreyi tekrar girin","Повторите новый пароль","Repetir la nueva contraseña","Confirmer le nouveau mot de passe","Neues Passwort bestätigen"],"ذخیره تغییرات":["Save changes","ذخیره تغییرات","حفظ التغييرات","Değişiklikleri kaydet","Сохранить изменения","Guardar cambios","Enregistrer les modifications","Änderungen speichern"],"تغییر رمز تراکنش":["Change Transaction Password","تغییر رمز تراکنش","تغيير كلمة مرور المعاملات","İşlem şifresini değiştir","Изменить пароль транзакций","Cambiar contraseña de transacciones","Modifier le mot de passe des transactions","Transaktionspasswort ändern"],"کد ۶ رقمی تأیید":["6-digit verification code","کد ۶ رقمی تأیید","رمز التحقق المكوّن من 6 أرقام","6 haneli doğrulama kodu","6-значный код подтверждения","Código de verificación de 6 dígitos","Code de vérification à 6 chiffres","6-stelliger Bestätigungscode"],"رمز جدید (۶ رقم)":["New password (6 digits)","رمز جدید (۶ رقم)","كلمة مرور جديدة (6 أرقام)","Yeni şifre (6 haneli)","Новый пароль (6 цифр)","Nueva contraseña (6 dígitos)","Nouveau mot de passe (6 chiffres)","Neues Passwort (6 Ziffern)"],"آدرس‌های کیف پول":["Wallet Addresses","آدرس‌های کیف پول","عناوين المحافظ","Cüzdan adresleri","Адреса кошельков","Direcciones de billetera","Adresses de portefeuille","Wallet-Adressen"],"آدرس TRX":["TRX address","آدرس TRX","عنوان TRX","TRX adresi","Адрес TRX","Dirección TRX","Adresse TRX","TRX-Adresse"],"آدرس BEP20":["BEP20 address","آدرس BEP20","عنوان BEP20","BEP20 adresi","Адрес BEP20","Dirección BEP20","Adresse BEP20","BEP20-Adresse"],"تایید کد":["Verify code","تایید کد","تحقق من الرمز","Kodu doğrula","Подтвердить код","Verificar código","Vérifier le code","Code bestätigen"],"صندوق پیام‌ها و اعلان‌ها":["Messages and Notifications","صندوق پیام‌ها و اعلان‌ها","صندوق الرسائل والإشعارات","Mesajlar ve bildirimler","Сообщения и уведомления","Mensajes y notificaciones","Messages et notifications","Nachrichten und Benachrichtigungen"],"همه":["All","همه","الكل","Tümü","Все","Todos","Tout","Alle"],"تایید درخواست":["Request approved","تایید درخواست","تمت الموافقة على الطلب","İstek onaylandı","Запрос одобрен","Solicitud aprobada","Demande approuvée","Anfrage genehmigt"],"لغو درخواست":["Request rejected","لغو درخواست","تم رفض الطلب","İstek reddedildi","Запрос отклонён","Solicitud rechazada","Demande refusée","Anfrage abgelehnt"],"پیام مدیریت":["Admin message","پیام مدیریت","رسالة الإدارة","Yönetici mesajı","Сообщение администратора","Mensaje del administrador","Message de l’administration","Administratornachricht"],"هیچ پیام جدیدی وجود ندارد.":["There are no new messages.","هیچ پیام جدیدی وجود ندارد.","لا توجد رسائل جديدة.","Yeni mesaj yok.","Новых сообщений нет.","No hay mensajes nuevos.","Aucun nouveau message.","Keine neuen Nachrichten."],"راهنمای صفحه پروفایل":["Profile Page Guide","راهنمای صفحه پروفایل","دليل صفحة الملف الشخصي","Profil sayfası rehberi","Справка по странице профиля","Guía de la página de perfil","Guide de la page de profil","Profilseitenhilfe"],"کاربرد این صفحه چیست؟":["What is this page for?","کاربرد این صفحه چیست؟","ما وظيفة هذه الصفحة؟","Bu sayfa ne işe yarar?","Для чего нужна эта страница?","¿Para qué sirve esta página?","À quoi sert cette page ?","Wozu dient diese Seite?"],"در این صفحه می‌توانید اطلاعات شخصی، شماره تماس، ایمیل و تنظیمات امنیتی مانند تغییر رمز عبور و رمز تراکنش حساب خود را مدیریت کنید.":["On this page, you can manage your personal information, phone number, email, and security settings such as your account password and transaction password.","در این صفحه می‌توانید اطلاعات شخصی، شماره تماس، ایمیل و تنظیمات امنیتی مانند تغییر رمز عبور و رمز تراکنش حساب خود را مدیریت کنید.","يمكنك في هذه الصفحة إدارة معلوماتك الشخصية ورقم الهاتف والبريد الإلكتروني وإعدادات الأمان، مثل كلمة مرور الحساب وكلمة مرور المعاملات.","Bu sayfada kişisel bilgilerinizi, telefon numaranızı, e-postanızı ve hesap/işlem şifresi gibi güvenlik ayarlarını yönetebilirsiniz.","На этой странице можно управлять личными данными, номером телефона, электронной почтой и настройками безопасности, включая пароль аккаунта и пароль транзакций.","En esta página puedes gestionar tus datos personales, teléfono, correo y ajustes de seguridad, como las contraseñas de la cuenta y de las transacciones.","Sur cette page, vous pouvez gérer vos informations personnelles, votre numéro de téléphone, votre e-mail et les paramètres de sécurité, notamment les mots de passe du compte et des transactions.","Auf dieser Seite können Sie Ihre persönlichen Daten, Telefonnummer, E-Mail und Sicherheitseinstellungen wie Konto- und Transaktionspasswort verwalten."],"وضعیت حساب و شماره تماس":["Account Status and Phone Number","وضعیت حساب و شماره تماس","حالة الحساب ورقم الهاتف","Hesap durumu ve telefon numarası","Статус аккаунта и номер телефона","Estado de la cuenta y número de teléfono","État du compte et numéro de téléphone","Kontostatus und Telefonnummer"],"وضعیت تایید حساب و ثبت شماره تماس برای امنیت بیشتر در این قسمت مدیریت می‌شود.":["Account verification status and phone number registration are managed here for added security.","وضعیت تایید حساب و ثبت شماره تماس برای امنیت بیشتر در این قسمت مدیریت می‌شود.","تتم هنا إدارة حالة التحقق من الحساب وتسجيل رقم الهاتف لتعزيز الأمان.","Ek güvenlik için hesap doğrulama durumu ve telefon numarası kaydı burada yönetilir.","Здесь управляются статус подтверждения аккаунта и регистрация номера телефона для повышения безопасности.","Aquí se gestionan el estado de verificación de la cuenta y el registro del teléfono para mayor seguridad.","L’état de vérification du compte et l’enregistrement du numéro de téléphone sont gérés ici pour renforcer la sécurité.","Hier werden der Kontoverifizierungsstatus und die Registrierung der Telefonnummer für zusätzliche Sicherheit verwaltet."],"کلمات عبور و کیف پول":["Passwords and Wallet","کلمات عبور و کیف پول","كلمات المرور والمحفظة","Parolalar ve cüzdan","Пароли и кошелёк","Contraseñas y billetera","Mots de passe et portefeuille","Passwörter und Wallet"],"جهت حفظ امنیت دارایی‌های خود می‌توانید کلمات عبور و آدرس‌های کیف پول مقصد برداشت را بروزرسانی نمایید.":["To help protect your assets, you can update your passwords and withdrawal destination wallet addresses.","جهت حفظ امنیت دارایی‌های خود می‌توانید کلمات عبور و آدرس‌های کیف پول مقصد برداشت را بروزرسانی نمایید.","لحماية أصولك، يمكنك تحديث كلمات المرور وعناوين المحافظ المستخدمة لاستقبال عمليات السحب.","Varlıklarınızı korumak için şifrelerinizi ve para çekme hedefi cüzdan adreslerini güncelleyebilirsiniz.","Для защиты активов вы можете обновить пароли и адреса кошельков для вывода средств.","Para proteger tus activos, puedes actualizar las contraseñas y las direcciones de las billeteras de destino para retiros.","Pour protéger vos actifs, vous pouvez mettre à jour vos mots de passe et les adresses des portefeuilles de retrait.","Zum Schutz Ihrer Vermögenswerte können Sie Passwörter und Wallet-Adressen für Auszahlungen aktualisieren."],"سرور فعال (US-East)":["Server online (US-East)","سرور فعال (US-East)","الخادم نشط (US-East)","Sunucu çevrimiçi (US-East)","Сервер активен (US-East)","Servidor activo (US-East)","Serveur actif (US-East)","Server aktiv (US-East)"],"کپی UID":["Copy UID","کپی UID","نسخ UID","UID kopyala","Скопировать UID","Copiar UID","Copier l’UID","UID kopieren"],"Search...":["Search...","Search...","بحث...","Ara...","Поиск...","Buscar...","Rechercher...","Suchen..."],"در حال دریافت ایمیل...":["Retrieving email...","در حال دریافت ایمیل...","جارٍ جلب البريد الإلكتروني...","E-posta alınıyor...","Получение электронной почты...","Obteniendo correo...","Récupération de l’e-mail...","E-Mail wird abgerufen..."],"ایمیل جدید را وارد کنید":["Enter the new email","ایمیل جدید را وارد کنید","أدخل البريد الإلكتروني الجديد","Yeni e-posta adresini girin","Введите новый адрес электронной почты","Introduce el nuevo correo electrónico","Saisissez le nouvel e-mail","Neue E-Mail eingeben"],"مثال: 849201":["Example: 849201","مثال: 849201","مثال: 849201","Örnek: 849201","Например: 849201","Ejemplo: 849201","Exemple : 849201","Beispiel: 849201"],"هیچ پیامی در این دسته‌بندی وجود ندارد.":["There are no messages in this category.","هیچ پیامی در این دسته‌بندی وجود ندارد.","لا توجد رسائل في هذه الفئة.","Bu kategoride mesaj yok.","В этой категории нет сообщений.","No hay mensajes en esta categoría.","Aucun message dans cette catégorie.","Keine Nachrichten in dieser Kategorie."],"پیام سیستم":["System message","پیام سیستم","رسالة النظام","Sistem mesajı","Системное сообщение","Mensaje del sistema","Message système","Systemnachricht"],"پیگیری از طریق پشتیبانی":["Follow up with Support","پیگیری از طریق پشتیبانی","المتابعة عبر الدعم","Destek üzerinden takip et","Обратиться в поддержку","Contactar con soporte","Contacter le support","Support kontaktieren"],"به Zenix خوش آمدید!":["Welcome to Zenix!","به Zenix خوش آمدید!","مرحبًا بك في Zenix!","Zenix’e hoş geldiniz!","Добро пожаловать в Zenix!","¡Te damos la bienvenida a Zenix!","Bienvenue sur Zenix !","Willkommen bei Zenix!"],"جهت دسترسی کامل و استفاده از تمام امکانات پلتفرم، لطفاً شماره موبایل خود را وارد و ذخیره کنید.":["To access all platform features, please enter and save your mobile number.","جهت دسترسی کامل و استفاده از تمام امکانات پلتفرم، لطفاً شماره موبایل خود را وارد و ذخیره کنید.","للوصول إلى جميع ميزات المنصة، يرجى إدخال رقم هاتفك المحمول وحفظه.","Platformun tüm özelliklerine erişmek için lütfen cep telefonu numaranızı girip kaydedin.","Чтобы получить доступ ко всем функциям платформы, введите и сохраните номер мобильного телефона.","Para acceder a todas las funciones de la plataforma, introduce y guarda tu número de móvil.","Pour accéder à toutes les fonctionnalités de la plateforme, veuillez saisir et enregistrer votre numéro de téléphone mobile.","Um alle Plattformfunktionen zu nutzen, geben Sie bitte Ihre Mobilnummer ein und speichern Sie sie."],"نشست کاری شما یافت نشد. لطفاً مجدداً وارد شوید.":["Your session could not be found. Please sign in again.","نشست کاری شما یافت نشد. لطفاً مجدداً وارد شوید.","تعذر العثور على جلستك. يرجى تسجيل الدخول مرة أخرى.","Oturumunuz bulunamadı. Lütfen tekrar giriş yapın.","Сеанс не найден. Пожалуйста, войдите снова.","No se encontró tu sesión. Inicia sesión de nuevo.","Session introuvable. Veuillez vous reconnecter.","Ihre Sitzung wurde nicht gefunden. Bitte melden Sie sich erneut an."],"در حال ذخیره‌سازی...":["Saving...","در حال ذخیره‌سازی...","جارٍ الحفظ...","Kaydediliyor...","Сохранение...","Guardando...","Enregistrement...","Wird gespeichert..."],"شماره تماس با موفقیت ثبت شد.":["Phone number saved successfully.","شماره تماس با موفقیت ثبت شد.","تم حفظ رقم الهاتف بنجاح.","Telefon numarası başarıyla kaydedildi.","Номер телефона успешно сохранён.","El número de teléfono se guardó correctamente.","Numéro de téléphone enregistré avec succès.","Telefonnummer erfolgreich gespeichert."],"عدم دسترسی ویرایش به دیتابیس":["Database update permission denied","عدم دسترسی ویرایش به دیتابیس","لا توجد صلاحية لتعديل قاعدة البيانات","Veritabanı düzenleme izni yok","Нет разрешения на изменение базы данных","Sin permiso para editar la base de datos","Autorisation de modification de la base de données refusée","Keine Berechtigung zum Ändern der Datenbank"],"شماره باید ۱۰ رقم و بدون صفر باشد (مثال: 9123456789)":["The number must be 10 digits and must not start with zero (e.g. 9123456789)","شماره باید ۱۰ رقم و بدون صفر باشد (مثال: 9123456789)","يجب أن يتكون الرقم من 10 أرقام وألا يبدأ بصفر (مثال: 9123456789)","Numara 10 haneli olmalı ve sıfırla başlamamalı (örn. 9123456789)","Номер должен состоять из 10 цифр и не начинаться с нуля (например, 9123456789)","El número debe tener 10 dígitos y no empezar por cero (p. ej., 9123456789)","Le numéro doit comporter 10 chiffres et ne pas commencer par zéro (ex. : 9123456789)","Die Nummer muss 10-stellig sein und darf nicht mit Null beginnen (z. B. 9123456789)"],"لطفاً شماره را به‌‌صورت ۱۰ رقمی و بدون صفر وارد کنید.":["Please enter a 10-digit number without a leading zero.","لطفاً شماره را به‌‌صورت ۱۰ رقمی و بدون صفر وارد کنید.","يرجى إدخال رقم مكوّن من 10 أرقام دون صفر في البداية.","Lütfen başında sıfır olmayan 10 haneli bir numara girin.","Введите 10-значный номер без нуля в начале.","Introduce un número de 10 dígitos sin cero inicial.","Veuillez saisir un numéro à 10 chiffres sans zéro initial.","Bitte geben Sie eine 10-stellige Nummer ohne führende Null ein."],"لطفاً ابتدا ایمیل جدید و معتبر را وارد کنید.":["Please enter a valid new email first.","لطفاً ابتدا ایمیل جدید و معتبر را وارد کنید.","يرجى إدخال بريد إلكتروني جديد وصحيح أولاً.","Lütfen önce geçerli bir yeni e-posta girin.","Сначала введите корректный новый адрес электронной почты.","Primero introduce un correo nuevo válido.","Veuillez d’abord saisir un nouvel e-mail valide.","Bitte geben Sie zuerst eine gültige neue E-Mail-Adresse ein."],"نشست کاربر یافت نشد. لطفاً مجدداً وارد شوید.":["User session not found. Please sign in again.","نشست کاربر یافت نشد. لطفاً مجدداً وارد شوید.","لم يتم العثور على جلسة المستخدم. يرجى تسجيل الدخول مجددًا.","Kullanıcı oturumu bulunamadı. Lütfen tekrar giriş yapın.","Сеанс пользователя не найден. Пожалуйста, войдите снова.","No se encontró la sesión del usuario. Inicia sesión de nuevo.","Session utilisateur introuvable. Veuillez vous reconnecter.","Benutzersitzung nicht gefunden. Bitte melden Sie sich erneut an."],"در حال ارسال درخواست به ادمین...":["Sending request to admin...","در حال ارسال درخواست به ادمین...","جارٍ إرسال الطلب إلى المسؤول...","Yöneticiye istek gönderiliyor...","Отправка запроса администратору...","Enviando solicitud al administrador...","Envoi de la demande à l’administrateur...","Anfrage wird an den Administrator gesendet..."],"درخواست تغییر ایمیل با موفقیت برای ادمین ارسال شد.":["Email change request sent to the admin successfully.","درخواست تغییر ایمیل با موفقیت برای ادمین ارسال شد.","تم إرسال طلب تغيير البريد الإلكتروني إلى المسؤول بنجاح.","E-posta değiştirme isteği yöneticiye başarıyla gönderildi.","Запрос на изменение электронной почты успешно отправлен администратору.","La solicitud de cambio de correo se envió correctamente al administrador.","La demande de changement d’e-mail a été envoyée à l’administrateur.","Die Anfrage zur E-Mail-Änderung wurde erfolgreich an den Administrator gesendet."],"رمز ورود با موفقیت به‌روزرسانی شد.":["Login password updated successfully.","رمز ورود با موفقیت به‌روزرسانی شد.","تم تحديث كلمة مرور تسجيل الدخول بنجاح.","Giriş şifresi başarıyla güncellendi.","Пароль для входа успешно обновлён.","La contraseña de inicio de sesión se actualizó correctamente.","Mot de passe de connexion mis à jour.","Anmeldepasswort erfolgreich aktualisiert."],"رمز تراکنش با موفقیت به‌روزرسانی شد.":["Transaction password updated successfully.","رمز تراکنش با موفقیت به‌روزرسانی شد.","تم تحديث كلمة مرور المعاملات بنجاح.","İşlem şifresi başarıyla güncellendi.","Пароль транзакций успешно обновлён.","La contraseña de transacciones se actualizó correctamente.","Mot de passe des transactions mis à jour.","Transaktionspasswort erfolgreich aktualisiert."],"کد تایید با موفقیت تایید شد.":["Code verified successfully.","کد تایید با موفقیت تایید شد.","تم التحقق من الرمز بنجاح.","Kod başarıyla doğrulandı.","Код успешно подтверждён.","Código verificado correctamente.","Code vérifié avec succès.","Code erfolgreich bestätigt."],"آدرس‌های کیف پول با موفقیت ثبت شدند.":["Wallet addresses saved successfully.","آدرس‌های کیف پول با موفقیت ثبت شدند.","تم حفظ عناوين المحافظ بنجاح.","Cüzdan adresleri başarıyla kaydedildi.","Адреса кошельков успешно сохранены.","Las direcciones de billetera se guardaron correctamente.","Adresses de portefeuille enregistrées avec succès.","Wallet-Adressen erfolgreich gespeichert."],"در حال ارسال...":["Sending...","در حال ارسال...","جارٍ الإرسال...","Gönderiliyor...","Отправка...","Enviando...","Envoi...","Wird gesendet..."],"فعال":["Active","فعال","نشط","Etkin","Активен","Activo","Actif","Aktiv"],"غیرفعال":["Inactive","غیرفعال","غير نشط","Devre dışı","Неактивен","Inactivo","Inactif","Inaktiv"],"اعلان جدید":["New notification","اعلان جدید","إشعار جديد","Yeni bildirim","Новое уведомление","Nueva notificación","Nouvelle notification","Neue Benachrichtigung"]};
-        let activeLang = 'en';
-        const attrNames = ['placeholder', 'title', 'aria-label'];
-
-        function normalizeLanguage(value) {
-            return supported.includes(value) ? value : 'en';
-        }
-        function translatePhrase(original, lang) {
-            const values = phrases[original];
-            if (!values) return original;
-            const index = supported.indexOf(lang);
-            return values[index >= 0 ? index : 0] || original;
-        }
-        function localizeTextNode(node, lang) {
-            if (!node || node.nodeType !== Node.TEXT_NODE) return;
-            const parent = node.parentElement;
-            if (!parent || parent.closest('script,style,noscript,#lang-menu')) return;
-            if (!Object.prototype.hasOwnProperty.call(node, '__zenixOriginalText')) {
-                node.__zenixOriginalText = node.nodeValue;
-            }
-            const sourceText = node.__zenixOriginalText;
-            const trimmed = sourceText.trim();
-            if (!trimmed) return;
-            const replacement = translatePhrase(trimmed, lang);
-            if (replacement === trimmed) {
-                if (node.nodeValue !== sourceText) node.nodeValue = sourceText;
-                return;
-            }
-            const leading = sourceText.match(/^\s*/)?.[0] || '';
-            const trailing = sourceText.match(/\s*$/)?.[0] || '';
-            const value = leading + replacement + trailing;
-            if (node.nodeValue !== value) node.nodeValue = value;
-        }
-        function localizeAttributes(root, lang) {
-            const nodes = [];
-            if (root.nodeType === Node.ELEMENT_NODE) nodes.push(root);
-            if (root.querySelectorAll) nodes.push(...root.querySelectorAll('*'));
-            for (const el of nodes) {
-                if (el.closest && el.closest('#lang-menu')) continue;
-                if (!el.__zenixOriginalAttrs) el.__zenixOriginalAttrs = {};
-                for (const attr of attrNames) {
-                    if (!el.hasAttribute(attr)) continue;
-                    if (!Object.prototype.hasOwnProperty.call(el.__zenixOriginalAttrs, attr)) {
-                        el.__zenixOriginalAttrs[attr] = el.getAttribute(attr);
-                    }
-                    const original = el.__zenixOriginalAttrs[attr];
-                    const translated = translatePhrase(original, lang);
-                    if (translated !== original && el.getAttribute(attr) !== translated) el.setAttribute(attr, translated);
-                }
-            }
-        }
-        function localizePage(lang) {
-            activeLang = normalizeLanguage(lang);
-            document.documentElement.setAttribute('lang', activeLang);
-            document.documentElement.setAttribute('dir', ['fa', 'ar'].includes(activeLang) ? 'rtl' : 'ltr');
-            try { localStorage.setItem('zenix_lang', activeLang); } catch (_) { /* quota or privacy mode: language preference is best-effort */ }
-            if (!document.__zenixOriginalTitle) document.__zenixOriginalTitle = document.title;
-            document.title = translatePhrase(document.__zenixOriginalTitle, activeLang);
-
-            const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-            let node;
-            while ((node = walker.nextNode())) localizeTextNode(node, activeLang);
-            localizeAttributes(document.body, activeLang);
-            const menu = document.getElementById('lang-menu');
-            if (menu) menu.querySelectorAll('[data-lang]').forEach(item => item.classList.toggle('active', item.dataset.lang === activeLang));
-        }
-        window.applyProfileLanguage = localizePage;
-
-        // Translate dynamic labels/toasts that are added after the initial page render as well.
-        const observer = new MutationObserver(mutations => {
-            for (const mutation of mutations) {
-                if (mutation.type === 'characterData') localizeTextNode(mutation.target, activeLang);
-                for (const added of mutation.addedNodes || []) {
-                    if (added.nodeType === Node.TEXT_NODE) localizeTextNode(added, activeLang);
-                    else if (added.nodeType === Node.ELEMENT_NODE) {
-                        if (!added.closest('#lang-menu')) {
-                            const walker = document.createTreeWalker(added, NodeFilter.SHOW_TEXT);
-                            let textNode;
-                            while ((textNode = walker.nextNode())) localizeTextNode(textNode, activeLang);
-                            localizeAttributes(added, activeLang);
-                        }
-                    }
-                }
-            }
-        });
-        observer.observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: attrNames });
-
-        let saved = 'en';
-        try { saved = normalizeLanguage(localStorage.getItem('zenix_lang')); } catch (_) { /* localStorage may be unavailable; default to English */ }
-        localizePage(saved);
-    })();
     </script>
 </body>
 </html>
