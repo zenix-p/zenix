@@ -22,7 +22,6 @@
         .glow-1{width:250px;height:250px;background:#0ea5e9;top:10%;left:10%}
         .glow-2{width:250px;height:250px;background:#a855f7;bottom:10%;right:10%}
         
-        /* ★ اصلاح شد: opacity از 0 به 1 تغییر کرد تا صفحه همیشه دیده شود */
         .auth-card{width:100%;max-width:400px;background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:24px 22px;box-shadow:0 20px 50px rgba(0,0,0,.7);position:relative;z-index:10;backdrop-filter:blur(10px);opacity:1;transition:opacity .2s ease-in-out}
         
         .header-actions{position:relative;z-index:20;display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-bottom:12px}
@@ -57,6 +56,19 @@
         .group input:-webkit-autofill,.group input:-webkit-autofill:hover,.group input:-webkit-autofill:focus,.group input:-webkit-autofill:active{-webkit-box-shadow:0 0 0 30px rgba(10,15,30,.95) inset!important;-webkit-text-fill-color:#fff!important;caret-color:#fff}
         #user::placeholder,#pass::placeholder{color:#9ca3af;opacity:1}
         .group input:focus{border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.2)}
+
+        /* ★ حذف خط زیر حروف (اسپل‌چک مرورگر) در فیلد ایمیل و رمز */
+        .group input,
+        #user,
+        #pass{
+            -webkit-text-decoration: none !important;
+            text-decoration: none !important;
+            text-decoration-line: none !important;
+        }
+        #user::selection,
+        #pass::selection{
+            text-decoration: none !important;
+        }
         
         .extra-links{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;font-size:11px}
         .extra-links a{color:#38bdf8;text-decoration:none}
@@ -104,14 +116,31 @@
                 <label id="l-user"><i class="fas fa-envelope"></i> <span id="txt-user"></span> <span class="req">*</span></label>
                 <div class="wrap-input">
                     <i class="fas fa-envelope f-icon"></i>
-                    <input type="email" id="user" aria-label="Email address" autocomplete="email" required>
+                    <input
+                        type="email"
+                        id="user"
+                        aria-label="Email address"
+                        autocomplete="email"
+                        spellcheck="false"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        inputmode="email"
+                        required>
                 </div>
             </div>
             <div class="group">
                 <label id="l-pass"><i class="fas fa-lock"></i> <span id="txt-pass"></span> <span class="req">*</span></label>
                 <div class="wrap-input">
                     <i class="fas fa-key f-icon"></i>
-                    <input type="password" id="pass" aria-label="Password" autocomplete="current-password" required>
+                    <input
+                        type="password"
+                        id="pass"
+                        aria-label="Password"
+                        autocomplete="current-password"
+                        spellcheck="false"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        required>
                     <button type="button" class="eye-btn" id="eye-btn" aria-label="Toggle password visibility" onclick="togglePassword('pass',this)"><i class="fas fa-eye"></i></button>
                 </div>
             </div>
@@ -174,18 +203,6 @@
                 return 'dashboard.html';
             } catch (e) { return 'dashboard.html'; }
         }
-
-        // ★ غیرفعال کردن موقت ریدایرکت خودکار برای تست
-        /*
-        async function checkExistingSession() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session && session.user) {
-                const targetPage = await getTargetPage(session.user.id);
-                window.location.replace(targetPage);
-            }
-        }
-        checkExistingSession();
-        */
 
         langBtn?.addEventListener('click', e => { e.stopPropagation(); langMenu?.classList.toggle('show'); });
         document.addEventListener('click', e => { if (!e.target.closest('.menu') && !e.target.closest('#lang-btn')) langMenu?.classList.remove('show'); });
