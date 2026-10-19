@@ -132,7 +132,7 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
 </div>
 <div style="text-align:center;margin:16px 0;">
 <div style="background:#fff;display:inline-block;padding:10px;border-radius:8px;margin-bottom:8px;">
-<img id="qr-code-img" src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=" alt="QR Code" style="display:block;">
+<img id="qr-code-img" src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=" alt="QR Code" style="display:none;">
 </div>
 <div style="font-size:11px;color:#94a3b8;" data-i18n="scanQr">اسکن جهت واریز مستقیم</div>
 <div id="qr-amount-label" style="display:none;font-size:13px;color:#22c55e;font-weight:800;margin-top:8px;padding:6px 12px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:6px;direction:ltr;text-align:center;"></div>
@@ -565,6 +565,7 @@ function readSavedLanguage(){
 }
 let currLang = readSavedLanguage();
 
+/* ★★★ QR فقط برای نمایش آدرس — بدون تغییر با مبلغ ★★★ */
 window.updateQR = function() {
   const calcVal = parseFloat(document.getElementById('calc-input')?.value) || 0;
   const qr = document.getElementById('qr-code-img');
@@ -573,23 +574,25 @@ window.updateQR = function() {
   const net = window.currentNetwork || 'TRC20';
   const addr = window.wallets[net];
 
-  if (!addr) {
+  // اگر مبلغ صفر است یا آدرس خالی است، QR را مخفی کن
+  if (calcVal <= 0 || !addr) {
     qr.style.display = 'none';
     if (lbl) lbl.style.display = 'none';
     return;
   }
+
+  // ★ QR را فقط اگر آدرس عوض شده بازسازی کن (نه با تغییر مبلغ)
+  if (qr.getAttribute('data-current-addr') !== addr) {
+    qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=${encodeURIComponent(addr)}`;
+    qr.setAttribute('data-current-addr', addr);
+  }
   qr.style.display = 'block';
-  qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=${encodeURIComponent(addr)}`;
 
   if (lbl) {
     const t = window.currentLangData || LD.en;
-    if (calcVal > 0) {
-      const sendAmt = (calcVal * FEE_RATE).toFixed(2);
-      lbl.style.display = 'block';
-      lbl.textContent = `⬇ ${t.sendExactlyLabel}: ${sendAmt} USDT (${net})`;
-    } else {
-      lbl.style.display = 'none';
-    }
+    const sendAmt = (calcVal * FEE_RATE).toFixed(2);
+    lbl.style.display = 'block';
+    lbl.textContent = `⬇ ${t.sendExactlyLabel}: ${sendAmt} USDT (${net})`;
   }
 };
 
@@ -661,7 +664,6 @@ function checkInputs(){
   const inquiryBtn = document.getElementById('inquiry-btn');
   const warningEl = document.getElementById('wallet-warning');
 
-  // ★★★ بررسی وجود آدرس کیف پول ★★★
   const walletsReady = window.wallets.TRC20 && window.wallets.BEP20;
   if (!walletsReady) {
     if (warningEl) {
@@ -908,7 +910,6 @@ window.checkAutoDeposit = async function(){
     return;
   }
 
-  // بررسی وجود آدرس کیف پول
   if (!window.wallets.TRC20 || !window.wallets.BEP20) {
     showMsg('⚠ خطا در بارگذاری آدرس کیف پول. لطفاً صفحه را رفرش کنید.', true, false);
     return;
