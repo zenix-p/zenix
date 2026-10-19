@@ -256,6 +256,7 @@
             justify-content: center; gap: 6px; transition: all .2s; font-family: inherit;
         }
         .confirm-btn-approve:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 8px 20px -8px rgba(34,197,94,.6); }
+        .confirm-btn-approve:disabled { opacity: .6; cursor: not-allowed; transform: none; }
         .confirm-btn-reject {
             flex: 1; padding: 11px; background: linear-gradient(135deg, #ef4444, #dc2626);
             border: none; color: #fff; border-radius: 10px; cursor: pointer;
@@ -508,7 +509,7 @@
                         <i class="fas fa-exclamation-triangle"></i>
                         <div>
                             <strong>هشدار امنیتی مهم:</strong>
-                            تغییر آدرس کیف پول بلافاصله بر واریزی‌های آینده کاربران تأثیر می‌گذارد. سیستم checksum ریاضی آدرس را قبل از ذخیره بررسی می‌کند.
+                            تغییر آدرس کیف پول بلافاصله بر واریزی‌های آینده کاربران تأثیر می‌گذارد. سیستم checksum ریاضی آدرس را قبل از ذخیره بررسی می‌کند و برای تایید نهایی، باید ۶ کاراکتر آخر آدرس جدید را تایپ کنید.
                         </div>
                     </div>
 
@@ -683,6 +684,24 @@
         </div>
     </div>
 
+    <div class="modal" id="m-confirm-wallet" style="z-index:1100;">
+        <div class="modal-content" style="max-width:480px;">
+            <div class="modal-header" style="color:#fbbf24; border-bottom-color:rgba(251,191,36,.25);">
+                <span><i class="fas fa-exclamation-triangle"></i> تایید تغییر آدرس کیف پول</span>
+                <button class="modal-close" onclick="closeModal('m-confirm-wallet')"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="wallet-confirm-body" style="padding:8px 0 16px; max-height:55vh; overflow-y:auto;"></div>
+            <div style="display:flex; gap:10px;">
+                <button type="button" class="confirm-btn-cancel" onclick="closeModal('m-confirm-wallet')">
+                    <i class="fas fa-times"></i> لغو
+                </button>
+                <button type="button" class="confirm-btn-approve" id="confirm-wallet-btn">
+                    <i class="fas fa-check"></i> تایید و ذخیره
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div id="toast-notification">
         <i id="toast-icon" class="fas fa-check-circle" style="color:#22c55e; font-size:16px;"></i>
         <span id="toast-text" style="font-size:12px; font-weight:600;">عملیات با موفقیت انجام شد.</span>
@@ -755,6 +774,16 @@
                 statusEl.style.color = '#ef4444';
                 statusEl.style.border = '1px solid rgba(239,68,68,.3)';
                 statusEl.innerHTML = '<i class="fas fa-times-circle"></i> ' + escapeHtml(msg);
+            }
+            showToast(msg, 'error');
+        }
+
+        function modalInputError(inputId, msg) {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.style.borderColor = '#ef4444';
+                input.focus();
+                setTimeout(() => { if (input) input.style.borderColor = 'rgba(255,255,255,.12)'; }, 2000);
             }
             showToast(msg, 'error');
         }
@@ -1031,25 +1060,143 @@
             }
         }
 
+        function showWalletConfirmModal(changes) {
+            const body = document.getElementById('wallet-confirm-body');
+            const confirmBtn = document.getElementById('confirm-wallet-btn');
+
+            let html = `
+                <div style="background:rgba(251,191,36,.08); border:1px solid rgba(251,191,36,.3); border-radius:10px; padding:12px; margin-bottom:14px; font-size:12px; color:#fbbf24; display:flex; gap:8px; align-items:flex-start;">
+                    <i class="fas fa-exclamation-triangle" style="font-size:16px; margin-top:2px; flex-shrink:0;"></i>
+                    <div>با این تغییر، آدرس واریزی‌های بعدی کاربران عوض می‌شود. حتماً آدرس جدید را از نظر صحت بررسی کنید.</div>
+                </div>
+            `;
+
+            if (changes.trcChanged) {
+                const last6Trc = changes.newTrc.slice(-6);
+                html += `
+                    <div style="margin-bottom:14px;">
+                        <div style="font-size:11px; color:#38bdf8; font-weight:700; margin-bottom:8px;">
+                            <i class="fas fa-coins"></i> تغییر آدرس TRC20
+                        </div>
+                        <div style="font-size:10px; color:#94a3b8; margin-bottom:4px;">آدرس قدیم:</div>
+                        <div style="font-family:monospace; direction:ltr; text-align:left; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.2); border-radius:6px; padding:6px 10px; font-size:10px; color:#f87171; word-break:break-all; margin-bottom:8px;">${escapeHtml(changes.oldTrc || '—')}</div>
+                        <div style="font-size:10px; color:#94a3b8; margin-bottom:4px;">آدرس جدید:</div>
+                        <div style="font-family:monospace; direction:ltr; text-align:left; background:rgba(34,197,94,.08); border:1px solid rgba(34,197,94,.3); border-radius:6px; padding:6px 10px; font-size:10px; color:#4ade80; word-break:break-all; margin-bottom:10px;">${escapeHtml(changes.newTrc)}</div>
+                        <label style="font-size:11px; color:#cbd5e1; display:block; margin-bottom:4px;">
+                            برای تایید، ۶ کاراکتر آخر آدرس جدید را تایپ کنید:
+                        </label>
+                        <input type="text" id="confirm-trc-input" maxlength="6" placeholder="${escapeHtml(last6Trc)}" autocomplete="off" style="width:100%; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.12); border-radius:8px; padding:10px 12px; color:#fff; font-size:12px; outline:none; font-family:monospace; direction:ltr; text-align:left; letter-spacing:2px;">
+                    </div>
+                `;
+            }
+
+            if (changes.bepChanged) {
+                const last6Bep = changes.newBep.slice(-6);
+                html += `
+                    <div style="margin-bottom:14px;">
+                        <div style="font-size:11px; color:#f59e0b; font-weight:700; margin-bottom:8px;">
+                            <i class="fas fa-coins"></i> تغییر آدرس BEP20
+                        </div>
+                        <div style="font-size:10px; color:#94a3b8; margin-bottom:4px;">آدرس قدیم:</div>
+                        <div style="font-family:monospace; direction:ltr; text-align:left; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.2); border-radius:6px; padding:6px 10px; font-size:10px; color:#f87171; word-break:break-all; margin-bottom:8px;">${escapeHtml(changes.oldBep || '—')}</div>
+                        <div style="font-size:10px; color:#94a3b8; margin-bottom:4px;">آدرس جدید:</div>
+                        <div style="font-family:monospace; direction:ltr; text-align:left; background:rgba(34,197,94,.08); border:1px solid rgba(34,197,94,.3); border-radius:6px; padding:6px 10px; font-size:10px; color:#4ade80; word-break:break-all; margin-bottom:10px;">${escapeHtml(changes.newBep)}</div>
+                        <label style="font-size:11px; color:#cbd5e1; display:block; margin-bottom:4px;">
+                            برای تایید، ۶ کاراکتر آخر آدرس جدید را تایپ کنید:
+                        </label>
+                        <input type="text" id="confirm-bep-input" maxlength="6" placeholder="${escapeHtml(last6Bep)}" autocomplete="off" style="width:100%; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.12); border-radius:8px; padding:10px 12px; color:#fff; font-size:12px; outline:none; font-family:monospace; direction:ltr; text-align:left; letter-spacing:2px;">
+                    </div>
+                `;
+            }
+
+            body.innerHTML = html;
+
+            const newBtn = confirmBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+
+            newBtn.addEventListener('click', async () => {
+                if (changes.trcChanged) {
+                    const input = document.getElementById('confirm-trc-input');
+                    const expected = changes.newTrc.slice(-6);
+                    if (!input || input.value.trim() !== expected) {
+                        modalInputError('confirm-trc-input', 'کد تایید TRC20 اشتباه است. دوباره بررسی کنید.');
+                        return;
+                    }
+                }
+                if (changes.bepChanged) {
+                    const input = document.getElementById('confirm-bep-input');
+                    const expected = changes.newBep.slice(-6);
+                    if (!input || input.value.trim() !== expected) {
+                        modalInputError('confirm-bep-input', 'کد تایید BEP20 اشتباه است. دوباره بررسی کنید.');
+                        return;
+                    }
+                }
+
+                newBtn.disabled = true;
+                newBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال ذخیره...';
+
+                try {
+                    const now = new Date().toISOString();
+
+                    const { error: e1 } = await supabaseClient.from('app_settings').upsert(
+                        { key: 'wallet_trc20', value: changes.newTrc, updated_at: now },
+                        { onConflict: 'key' }
+                    );
+                    if (e1) throw e1;
+
+                    const { error: e2 } = await supabaseClient.from('app_settings').upsert(
+                        { key: 'wallet_bep20', value: changes.newBep, updated_at: now },
+                        { onConflict: 'key' }
+                    );
+                    if (e2) throw e2;
+
+                    closeModal('m-confirm-wallet');
+
+                    const statusEl = document.getElementById('wallet-save-status');
+                    if (statusEl) {
+                        statusEl.style.display = 'block';
+                        statusEl.style.background = 'rgba(34,197,94,.15)';
+                        statusEl.style.color = '#22c55e';
+                        statusEl.style.border = '1px solid rgba(34,197,94,.3)';
+                        statusEl.innerHTML = '<i class="fas fa-check-circle"></i> آدرس‌ها با موفقیت ذخیره شدند (تایید دوگانه انجام شد).';
+                    }
+                    showToast('آدرس‌های کیف پول با موفقیت ذخیره شدند.');
+
+                    await loadWalletSettings();
+
+                } catch (e) {
+                    console.error('saveWalletSettings error:', e);
+                    showWalletError('خطا در ذخیره: ' + (e.message || 'نامشخص'));
+                    newBtn.disabled = false;
+                    newBtn.innerHTML = '<i class="fas fa-check"></i> تایید و ذخیره';
+                }
+            });
+
+            document.getElementById('m-confirm-wallet').classList.add('show');
+
+            setTimeout(() => {
+                const trcInput = document.getElementById('confirm-trc-input');
+                const bepInput = document.getElementById('confirm-bep-input');
+                if (trcInput) trcInput.focus();
+                else if (bepInput) bepInput.focus();
+            }, 250);
+        }
+
         window.saveWalletSettings = async function() {
             const trcVal = (document.getElementById('wallet-trc20-input')?.value || '').trim();
             const bepVal = (document.getElementById('wallet-bep20-input')?.value || '').trim();
-            const statusEl = document.getElementById('wallet-save-status');
             const saveBtn = document.querySelector('#t-wallets .btn-save');
 
-            // اعتبارسنجی پایه TRC20
             if (!trcVal || trcVal.length !== 34 || !trcVal.startsWith('T')) {
                 showWalletError('آدرس TRC20 باید ۳۴ کاراکتر باشد و با T شروع شود.');
                 return;
             }
 
-            // اعتبارسنجی فرمت BEP20
             if (!validateBep20Format(bepVal)) {
                 showWalletError('آدرس BEP20 باید با 0x شروع شود و ۴۰ کاراکتر hex باشد.');
                 return;
             }
 
-            // دکمه را غیرفعال کن
             let origHTML = '';
             if (saveBtn) {
                 saveBtn.disabled = true;
@@ -1058,7 +1205,6 @@
             }
 
             try {
-                // ★ اعتبارسنجی ریاضی TRC20 ★
                 const trcValid = await validateTrc20Checksum(trcVal);
                 if (!trcValid) {
                     showWalletError('آدرس TRC20 از نظر ریاضی نامعتبر است (checksum رد شد). لطفاً آدرس را دوباره بررسی کنید.');
@@ -1066,35 +1212,37 @@
                     return;
                 }
 
-                // ذخیره در دیتابیس
-                const now = new Date().toISOString();
+                const { data: currentData } = await supabaseClient
+                    .from('app_settings')
+                    .select('key, value')
+                    .in('key', ['wallet_trc20', 'wallet_bep20']);
 
-                const { error: e1 } = await supabaseClient.from('app_settings').upsert(
-                    { key: 'wallet_trc20', value: trcVal, updated_at: now },
-                    { onConflict: 'key' }
-                );
-                if (e1) throw e1;
-
-                const { error: e2 } = await supabaseClient.from('app_settings').upsert(
-                    { key: 'wallet_bep20', value: bepVal, updated_at: now },
-                    { onConflict: 'key' }
-                );
-                if (e2) throw e2;
-
-                if (statusEl) {
-                    statusEl.style.display = 'block';
-                    statusEl.style.background = 'rgba(34,197,94,.15)';
-                    statusEl.style.color = '#22c55e';
-                    statusEl.style.border = '1px solid rgba(34,197,94,.3)';
-                    statusEl.innerHTML = '<i class="fas fa-check-circle"></i> آدرس‌ها با موفقیت ذخیره شدند (checksum تایید شد).';
+                let oldTrc = '';
+                let oldBep = '';
+                if (currentData) {
+                    currentData.forEach(row => {
+                        if (row.key === 'wallet_trc20') oldTrc = row.value || '';
+                        if (row.key === 'wallet_bep20') oldBep = row.value || '';
+                    });
                 }
-                showToast('آدرس‌های کیف پول با موفقیت ذخیره شدند.');
 
-                await loadWalletSettings();
+                const trcChanged = trcVal !== oldTrc;
+                const bepChanged = bepVal !== oldBep;
+
+                if (!trcChanged && !bepChanged) {
+                    showToast('هیچ تغییری اعمال نشد — آدرس‌ها یکسان هستند.', 'error');
+                    if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = origHTML; }
+                    return;
+                }
+
+                showWalletConfirmModal({
+                    oldTrc, newTrc: trcVal, trcChanged,
+                    oldBep, newBep: bepVal, bepChanged
+                });
 
             } catch (e) {
                 console.error('saveWalletSettings error:', e);
-                showWalletError('خطا در ذخیره: ' + (e.message || 'نامشخص'));
+                showWalletError('خطا: ' + (e.message || 'نامشخص'));
             } finally {
                 if (saveBtn) {
                     saveBtn.disabled = false;
