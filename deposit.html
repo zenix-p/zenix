@@ -139,6 +139,7 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
 </div>
 
 <div style="margin-bottom:16px;">
+<div id="wallet-recent-warning" style="display:none;margin-bottom:8px;"></div>
 <div id="wallet-warning" style="display:none;font-size:10px;color:#fbbf24;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);padding:8px 10px;border-radius:6px;margin-bottom:8px;">
 <i class="fas fa-shield-alt" style="color:#fbbf24;"></i>
 <strong>توجه:</strong> آدرس را با دقت بررسی کنید. فقط USDT در شبکه انتخاب‌شده بفرستید.
@@ -988,7 +989,6 @@ window.checkAutoDeposit = async function(){
   inquiryBtn.style.cursor = 'not-allowed';
   inquiryBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + escapeHtml(t.requesting);
 
-  // Duplicate TxID check
   try {
     const { data: existing } = await supabase
       .from('transactions').select('id').eq('type', 'deposit')
@@ -1005,7 +1005,6 @@ window.checkAutoDeposit = async function(){
   const nowISO = new Date().toISOString();
   const amountWithFee = calcVal * FEE_RATE;
 
-  // ★★★ INSERT — چک دقیق خطا ★★★
   let insertErr = null;
   try {
     const res = await supabase.from('transactions').insert([{
@@ -1046,7 +1045,6 @@ window.checkAutoDeposit = async function(){
     return;
   }
 
-  // ★★★ فقط بعد از موفقیت insert ★★★
   const pendingDepositObj = {
     rawAmount: calcVal,
     sentAmount: amountWithFee,
