@@ -867,6 +867,8 @@
                     const { data: chats, error } = await supabaseClient.from('support_chats').select('*').order('updated_at', { ascending: false });
                     let listContainer = document.getElementById('admin-chat-list');
                     if(!listContainer) return;
+                    if (error) console.error('fetchChats error:', error);
+                    if (chats) console.log('fetchChats got', chats.length, 'chats');
                     if (error || !chats || chats.length === 0) {
                         listContainer.innerHTML = `<div style="text-align:center; color:#64748b; margin-top:20px;">هیچ چتی ثبت نشده است.</div>`;
                         let badge = document.getElementById('chat-badge');
@@ -904,7 +906,7 @@
                     if (badge) { badge.innerText = unreadCount; badge.className = unreadCount > 0 ? 'tab-badge' : 'tab-badge zero'; }
                     if (prevChat !== -1 && unreadCount > prevChat) { playAlertSound(); sendNtfyAlert("💬 پیام پشتیبانی جدید", "کاربری در بخش پشتیبانی پیام ارسال کرده است."); }
                     prevChat = unreadCount;
-                } catch(err) {}
+                } catch(err) { console.error('fetchChats outer error:', err); }
             }
             await fetchChats();
             if (chatChannel) supabaseClient.removeChannel(chatChannel);
@@ -928,7 +930,8 @@
             await supabaseClient.from('support_chats').update({ unread_by_admin: false }).eq('id', chatId);
 
             async function fetchMessages() {
-                const { data: messages } = await supabaseClient.from('support_messages').select('*').eq('chat_id', chatId).order('created_at', { ascending: true });
+                const { data: messages, error } = await supabaseClient.from('support_messages').select('*').eq('chat_id', chatId).order('created_at', { ascending: true });
+                if (error) console.error('fetchMessages error:', error);
                 let msgBox = document.getElementById('admin-chat-messages');
                 if(!msgBox) return;
                 if (!messages || messages.length === 0) {
