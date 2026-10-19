@@ -352,6 +352,58 @@ window.renderWalletLastChange = function() {
   } catch (e) { box.style.display = 'none'; }
 };
 
+/* ★★★ بنر هشدار «آدرس اخیراً تغییر کرده» ★★★ */
+window.renderRecentWarning = function() {
+  const box = document.getElementById('wallet-recent-warning');
+  if (!box) return;
+  const net = window.currentNetwork || 'TRC20';
+  const lastChange = window.walletLastChange[net];
+
+  if (!lastChange) { box.style.display = 'none'; box.innerHTML = ''; return; }
+
+  try {
+    const d = new Date(lastChange);
+    if (isNaN(d.getTime())) { box.style.display = 'none'; box.innerHTML = ''; return; }
+
+    const hoursAgo = (Date.now() - d.getTime()) / 3600000;
+    const t = window.currentLangData || LD.en;
+
+    /* اگر در ۷۲ ساعت گذشته تغییر کرده → بنر قرمز بزرگ */
+    if (hoursAgo < 72) {
+      box.style.cssText = 'display:block;background:rgba(239,68,68,.15);border:2px solid #ef4444;border-radius:10px;padding:14px;margin-bottom:10px;color:#fecaca;font-size:12px;line-height:1.7;box-shadow:0 0 20px rgba(239,68,68,.3);';
+      box.innerHTML = `
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <i class="fas fa-exclamation-triangle" style="color:#ef4444;font-size:20px;margin-top:2px;flex-shrink:0;"></i>
+          <div>
+            <strong style="color:#ef4444;display:block;margin-bottom:4px;font-size:13px;">${escapeHtml(t.recentWarnTitle72 || '⚠ آدرس کیف پول اخیراً تغییر کرده است')}</strong>
+            <div>${escapeHtml(t.recentWarnBody72 || 'آدرس کیف پول در ۷۲ ساعت گذشته تغییر کرده است. قبل از واریز، لطفاً با پشتیبانی تماس بگیرید تا از صحت آن مطمئن شوید.')}</div>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    /* اگر در ۷ روز گذشته تغییر کرده → بنر زرد کوچک‌تر */
+    if (hoursAgo < 168) {
+      box.style.cssText = 'display:block;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.3);border-radius:8px;padding:10px;margin-bottom:10px;color:#fbbf24;font-size:11px;line-height:1.6;';
+      box.innerHTML = `
+        <div style="display:flex;align-items:flex-start;gap:8px;">
+          <i class="fas fa-info-circle" style="color:#fbbf24;font-size:15px;margin-top:1px;flex-shrink:0;"></i>
+          <div>${escapeHtml(t.recentWarnBody7 || 'آدرس کیف پول در ۷ روز گذشته تغییر کرده است. لطفاً آدرس را با دقت بررسی کنید.')}</div>
+        </div>
+      `;
+      return;
+    }
+
+    /* بیش از ۷ روز → مخفی */
+    box.style.display = 'none';
+    box.innerHTML = '';
+  } catch (e) {
+    box.style.display = 'none';
+    box.innerHTML = '';
+  }
+};
+
 function escapeHtml(value) {
   return String(value == null ? '' : value)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -391,6 +443,9 @@ const LD = {
     lastChangeLabel:"⏱ آخرین تغییر آدرس:",lastChangeJustNow:"همین حالا",lastChangeMinAgo:"X دقیقه پیش",lastChangeHourAgo:"X ساعت پیش",lastChangeDayAgo:"X روز پیش",
     cooldownErr:"⏳ لطفاً X ثانیه صبر کنید و دوباره تلاش کنید (ضد اسپم).",
     rateLimitErr:"❌ حداکثر ۵ درخواست واریز در ۲۴ ساعت مجاز است.",
+    recentWarnTitle72:"⚠ آدرس کیف پول اخیراً تغییر کرده است",
+    recentWarnBody72:"آدرس کیف پول در ۷۲ ساعت گذشته تغییر کرده است. قبل از واریز، لطفاً با پشتیبانی تماس بگیرید تا از صحت آن مطمئن شوید.",
+    recentWarnBody7:"آدرس کیف پول در ۷ روز گذشته تغییر کرده است. لطفاً آدرس را با دقت بررسی کنید.",
     dir:"rtl"
   },
   en: {
@@ -425,6 +480,9 @@ const LD = {
     lastChangeLabel:"⏱ Last address change:",lastChangeJustNow:"just now",lastChangeMinAgo:"X minutes ago",lastChangeHourAgo:"X hours ago",lastChangeDayAgo:"X days ago",
     cooldownErr:"⏳ Please wait X seconds before trying again (anti-spam).",
     rateLimitErr:"❌ Maximum 5 deposit requests per 24 hours.",
+    recentWarnTitle72:"⚠ Wallet address recently changed",
+    recentWarnBody72:"The wallet address has changed within the last 72 hours. Please contact support to verify before depositing.",
+    recentWarnBody7:"The wallet address has changed within the last 7 days. Please verify the address carefully.",
     dir:"ltr"
   },
   ar: {
@@ -459,6 +517,9 @@ const LD = {
     lastChangeLabel:"⏱ آخر تغيير:",lastChangeJustNow:"الآن",lastChangeMinAgo:"منذ X دقيقة",lastChangeHourAgo:"منذ X ساعة",lastChangeDayAgo:"منذ X يوم",
     cooldownErr:"⏳ يرجى الانتظار X ثانية قبل المحاولة مجدداً.",
     rateLimitErr:"❌ الحد الأقصى 5 طلبات في 24 ساعة.",
+    recentWarnTitle72:"⚠ تم تغيير عنوان المحفظة مؤخراً",
+    recentWarnBody72:"تم تغيير عنوان المحفظة خلال الـ 72 ساعة الماضية. يرجى التواصل مع الدعم للتحقق قبل الإيداع.",
+    recentWarnBody7:"تم تغيير عنوان المحفظة خلال الـ 7 أيام الماضية. يرجى التحقق من العنوان بعناية.",
     dir:"rtl"
   },
   tr: {
@@ -493,6 +554,9 @@ const LD = {
     lastChangeLabel:"⏱ Son değişiklik:",lastChangeJustNow:"az önce",lastChangeMinAgo:"X dakika önce",lastChangeHourAgo:"X saat önce",lastChangeDayAgo:"X gün önce",
     cooldownErr:"⏳ Lütfen X saniye bekleyin.",
     rateLimitErr:"❌ 24 saatte en fazla 5 talep.",
+    recentWarnTitle72:"⚠ Cüzdan adresi yakın zamanda değişti",
+    recentWarnBody72:"Cüzdan adresi son 72 saat içinde değişti. Para yatırmadan önce lütfen doğrulamak için destekle iletişime geçin.",
+    recentWarnBody7:"Cüzdan adresi son 7 gün içinde değişti. Lütfen adresi dikkatlice kontrol edin.",
     dir:"ltr"
   },
   ru: {
@@ -527,6 +591,9 @@ const LD = {
     lastChangeLabel:"⏱ Последнее изменение:",lastChangeJustNow:"только что",lastChangeMinAgo:"X минут назад",lastChangeHourAgo:"X часов назад",lastChangeDayAgo:"X дней назад",
     cooldownErr:"⏳ Подождите X секунд.",
     rateLimitErr:"❌ Не более 5 заявок в 24 часа.",
+    recentWarnTitle72:"⚠ Адрес кошелька недавно изменился",
+    recentWarnBody72:"Адрес кошелька изменился в течение последних 72 часов. Пожалуйста, свяжитесь с поддержкой для проверки перед пополнением.",
+    recentWarnBody7:"Адрес кошелька изменился в течение последних 7 дней. Пожалуйста, внимательно проверьте адрес.",
     dir:"ltr"
   },
   es: {
@@ -561,6 +628,9 @@ const LD = {
     lastChangeLabel:"⏱ Último cambio:",lastChangeJustNow:"ahora",lastChangeMinAgo:"hace X min",lastChangeHourAgo:"hace X h",lastChangeDayAgo:"hace X días",
     cooldownErr:"⏳ Espera X segundos.",
     rateLimitErr:"❌ Máximo 5 por 24 horas.",
+    recentWarnTitle72:"⚠ La dirección de la cartera cambió recientemente",
+    recentWarnBody72:"La dirección de la cartera ha cambiado en las últimas 72 horas. Contacta con soporte para verificar antes de depositar.",
+    recentWarnBody7:"La dirección de la cartera ha cambiado en los últimos 7 días. Verifica la dirección cuidadosamente.",
     dir:"ltr"
   },
   fr: {
@@ -595,6 +665,9 @@ const LD = {
     lastChangeLabel:"⏱ Dernier changement :",lastChangeJustNow:"à l’instant",lastChangeMinAgo:"il y a X min",lastChangeHourAgo:"il y a X h",lastChangeDayAgo:"il y a X j",
     cooldownErr:"⏳ Patientez X secondes.",
     rateLimitErr:"❌ Maximum 5 par 24 heures.",
+    recentWarnTitle72:"⚠ L'adresse du portefeuille a récemment changé",
+    recentWarnBody72:"L'adresse du portefeuille a changé au cours des dernières 72 heures. Veuillez contacter l'assistance pour vérifier avant de déposer.",
+    recentWarnBody7:"L'adresse du portefeuille a changé au cours des 7 derniers jours. Veuillez vérifier l'adresse avec attention.",
     dir:"ltr"
   },
   de: {
@@ -629,6 +702,9 @@ const LD = {
     lastChangeLabel:"⏱ Letzte Änderung:",lastChangeJustNow:"gerade eben",lastChangeMinAgo:"vor X Min",lastChangeHourAgo:"vor X Std",lastChangeDayAgo:"vor X Tagen",
     cooldownErr:"⏳ Bitte X Sekunden warten.",
     rateLimitErr:"❌ Maximal 5 pro 24 Stunden.",
+    recentWarnTitle72:"⚠ Wallet-Adresse kürzlich geändert",
+    recentWarnBody72:"Die Wallet-Adresse wurde in den letzten 72 Stunden geändert. Bitte kontaktieren Sie den Support zur Überprüfung vor der Einzahlung.",
+    recentWarnBody7:"Die Wallet-Adresse wurde in den letzten 7 Tagen geändert. Bitte überprüfen Sie die Adresse sorgfältig.",
     dir:"ltr"
   }
 };
@@ -707,6 +783,7 @@ function setLang(l){
   }
   try { if (typeof window.updateQR === 'function') window.updateQR(); } catch(e) {}
   try { if (typeof window.renderWalletLastChange === 'function') window.renderWalletLastChange(); } catch(e) {}
+  try { if (typeof window.renderRecentWarning === 'function') window.renderRecentWarning(); } catch(e) {}
   if (document.body) document.body.classList.add('lang-ready');
 }
 
@@ -811,6 +888,7 @@ window.setNetwork=function(net){
   lbl.textContent=`${t.netLbl} (${net}):`;
   window.updateQR();
   window.renderWalletLastChange();
+  window.renderRecentWarning();
   const calcVal = parseFloat(document.getElementById('calc-input').value) || 0;
   const newAddr = window.wallets[net];
   if(calcVal > 0 && newAddr){ addr.value = newAddr; }
@@ -884,6 +962,7 @@ document.onclick=()=>{[nM,lMenu].forEach(m=>m.classList.remove('show'));};docume
   await window.loadWalletLastChange('wallet_bep20');
   try { setLang(currLang); } catch (e) { console.error('Initial setLang failed:', e); }
   window.renderWalletLastChange();
+  window.renderRecentWarning();
   if (document.body) document.body.classList.add('lang-ready');
 })();
 </script>
