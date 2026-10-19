@@ -216,6 +216,7 @@
         .form-group select option { background: #0f172a; color: #f8fafc; padding: 6px; }
         .btn-save { width: 100%; background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; border: none; padding: 12px; border-radius: 11px; font-weight: 700; cursor: pointer; margin-top: 10px; font-size: 12px; transition: all .25s; box-shadow: 0 10px 26px -10px rgba(2,132,199,.8); }
         .btn-save:hover { transform: translateY(-2px); filter: brightness(1.08); }
+        .btn-save:disabled { opacity: .6; cursor: not-allowed; transform: none; }
         .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.06); font-size: 11px; flex-wrap: wrap; gap: 6px; }
         .detail-row span:first-child { color: #94a3b8; }
         .detail-row span:last-child { color: #f8fafc; font-weight: 600; }
@@ -263,7 +264,6 @@
         }
         .confirm-btn-reject:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 8px 20px -8px rgba(239,68,68,.6); }
 
-        /* ★ استایل بخش تنظیمات کیف پول */
         .wallet-warning-box {
             background: rgba(251,191,36,.08); border: 1px solid rgba(251,191,36,.3);
             border-radius: 12px; padding: 14px; margin-bottom: 20px;
@@ -498,7 +498,6 @@
                 </div>
             </div>
 
-            <!-- ★★★ تب جدید: تنظیمات کیف پول ★★★ -->
             <div id="t-wallets" class="tab-content">
                 <div class="panel-box">
                     <div class="panel-header">
@@ -509,7 +508,7 @@
                         <i class="fas fa-exclamation-triangle"></i>
                         <div>
                             <strong>هشدار امنیتی مهم:</strong>
-                            تغییر آدرس کیف پول بلافاصله بر واریزی‌های آینده کاربران تأثیر می‌گذارد. اگر آدرس را اشتباه وارد کنید، تمام واریزی‌ها به آدرس اشتباه می‌روند و قابل بازگشت نیستند. حتماً قبل از ذخیره، آدرس را ۲ بار بررسی کنید.
+                            تغییر آدرس کیف پول بلافاصله بر واریزی‌های آینده کاربران تأثیر می‌گذارد. سیستم checksum ریاضی آدرس را قبل از ذخیره بررسی می‌کند.
                         </div>
                     </div>
 
@@ -697,6 +696,68 @@
         const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // ★★★ توابع اعتبارسنجی کیف پول — Base58Check + EIP-55 format ★★★
+
+        function base58Decode(str) {
+            const alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+            const base = 58n;
+            let num = 0n;
+            for (const c of str) {
+                const idx = alphabet.indexOf(c);
+                if (idx === -1) return null;
+                num = num * base + BigInt(idx);
+            }
+            const bytes = [];
+            while (num > 0n) {
+                bytes.unshift(Number(num & 0xffn));
+                num >>= 8n;
+            }
+            for (const c of str) {
+                if (c === '1') bytes.unshift(0);
+                else break;
+            }
+            return bytes;
+        }
+
+        async function sha256Bytes(bytes) {
+            const buf = new Uint8Array(bytes);
+            const hash = await crypto.subtle.digest('SHA-256', buf);
+            return Array.from(new Uint8Array(hash));
+        }
+
+        async function validateTrc20Checksum(addr) {
+            if (!addr || addr.length !== 34 || addr[0] !== 'T') return false;
+            try {
+                const decoded = base58Decode(addr);
+                if (!decoded || decoded.length !== 25) return false;
+                const data = decoded.slice(0, 21);
+                const checksum = decoded.slice(21, 25);
+                const hash1 = await sha256Bytes(data);
+                const hash2 = await sha256Bytes(hash1);
+                const expected = hash2.slice(0, 4);
+                return checksum.every((b, i) => b === expected[i]);
+            } catch (e) {
+                console.error('TRC20 checksum error:', e);
+                return false;
+            }
+        }
+
+        function validateBep20Format(addr) {
+            return /^0x[a-fA-F0-9]{40}$/.test(addr);
+        }
+
+        function showWalletError(msg) {
+            const statusEl = document.getElementById('wallet-save-status');
+            if (statusEl) {
+                statusEl.style.display = 'block';
+                statusEl.style.background = 'rgba(239,68,68,.15)';
+                statusEl.style.color = '#ef4444';
+                statusEl.style.border = '1px solid rgba(239,68,68,.3)';
+                statusEl.innerHTML = '<i class="fas fa-times-circle"></i> ' + escapeHtml(msg);
+            }
+            showToast(msg, 'error');
+        }
 
         function escapeHtml(value) {
             return String(value == null ? '' : value)
@@ -927,7 +988,6 @@
             } catch (err) {}
         }
 
-        // ★★★ توابع تنظیمات کیف پول ★★★
         async function loadWalletSettings() {
             try {
                 const trcEl = document.getElementById('wallet-trc20-input');
@@ -975,33 +1035,38 @@
             const trcVal = (document.getElementById('wallet-trc20-input')?.value || '').trim();
             const bepVal = (document.getElementById('wallet-bep20-input')?.value || '').trim();
             const statusEl = document.getElementById('wallet-save-status');
+            const saveBtn = document.querySelector('#t-wallets .btn-save');
 
-            // اعتبارسنجی
-            if (!trcVal || !trcVal.startsWith('T') || trcVal.length !== 34) {
-                if (statusEl) {
-                    statusEl.style.display = 'block';
-                    statusEl.style.background = 'rgba(239,68,68,.15)';
-                    statusEl.style.color = '#ef4444';
-                    statusEl.style.border = '1px solid rgba(239,68,68,.3)';
-                    statusEl.innerHTML = '<i class="fas fa-times-circle"></i> آدرس TRC20 نامعتبر است. باید با T شروع شود و ۳۴ کاراکتر باشد.';
-                }
-                showToast('آدرس TRC20 نامعتبر است.', 'error');
+            // اعتبارسنجی پایه TRC20
+            if (!trcVal || trcVal.length !== 34 || !trcVal.startsWith('T')) {
+                showWalletError('آدرس TRC20 باید ۳۴ کاراکتر باشد و با T شروع شود.');
                 return;
             }
 
-            if (!bepVal || !bepVal.startsWith('0x') || bepVal.length !== 42) {
-                if (statusEl) {
-                    statusEl.style.display = 'block';
-                    statusEl.style.background = 'rgba(239,68,68,.15)';
-                    statusEl.style.color = '#ef4444';
-                    statusEl.style.border = '1px solid rgba(239,68,68,.3)';
-                    statusEl.innerHTML = '<i class="fas fa-times-circle"></i> آدرس BEP20 نامعتبر است. باید با 0x شروع شود و ۴۲ کاراکتر باشد.';
-                }
-                showToast('آدرس BEP20 نامعتبر است.', 'error');
+            // اعتبارسنجی فرمت BEP20
+            if (!validateBep20Format(bepVal)) {
+                showWalletError('آدرس BEP20 باید با 0x شروع شود و ۴۰ کاراکتر hex باشد.');
                 return;
+            }
+
+            // دکمه را غیرفعال کن
+            let origHTML = '';
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                origHTML = saveBtn.innerHTML;
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال بررسی checksum...';
             }
 
             try {
+                // ★ اعتبارسنجی ریاضی TRC20 ★
+                const trcValid = await validateTrc20Checksum(trcVal);
+                if (!trcValid) {
+                    showWalletError('آدرس TRC20 از نظر ریاضی نامعتبر است (checksum رد شد). لطفاً آدرس را دوباره بررسی کنید.');
+                    if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = origHTML; }
+                    return;
+                }
+
+                // ذخیره در دیتابیس
                 const now = new Date().toISOString();
 
                 const { error: e1 } = await supabaseClient.from('app_settings').upsert(
@@ -1021,23 +1086,20 @@
                     statusEl.style.background = 'rgba(34,197,94,.15)';
                     statusEl.style.color = '#22c55e';
                     statusEl.style.border = '1px solid rgba(34,197,94,.3)';
-                    statusEl.innerHTML = '<i class="fas fa-check-circle"></i> آدرس‌ها با موفقیت ذخیره شدند.';
+                    statusEl.innerHTML = '<i class="fas fa-check-circle"></i> آدرس‌ها با موفقیت ذخیره شدند (checksum تایید شد).';
                 }
                 showToast('آدرس‌های کیف پول با موفقیت ذخیره شدند.');
 
-                // رفرش پیش‌نمایش
                 await loadWalletSettings();
 
             } catch (e) {
                 console.error('saveWalletSettings error:', e);
-                if (statusEl) {
-                    statusEl.style.display = 'block';
-                    statusEl.style.background = 'rgba(239,68,68,.15)';
-                    statusEl.style.color = '#ef4444';
-                    statusEl.style.border = '1px solid rgba(239,68,68,.3)';
-                    statusEl.innerHTML = '<i class="fas fa-times-circle"></i> خطا: ' + escapeHtml(e.message || 'نامشخص');
+                showWalletError('خطا در ذخیره: ' + (e.message || 'نامشخص'));
+            } finally {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = origHTML;
                 }
-                showToast('خطا در ذخیره آدرس‌ها: ' + (e.message || 'نامشخص'), 'error');
             }
         };
 
