@@ -149,6 +149,12 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
 <button type="button" id="copy-btn" onclick="copyAddress()" disabled style="background:#475569;border:none;color:#94a3b8;padding:0 14px;cursor:not-allowed;font-weight:bold;font-size:12px;transition:0.3s;"><i class="fas fa-copy"></i> <span data-i18n="copyBtn">کپی</span></button>
 </div>
 <div id="copy-warning" style="font-size:10px;color:#ef4444;margin-top:4px;" data-i18n="copyWarning">⚠ برای نمایش و کپی آدرس کیف پول، ابتدا مبلغ واریزی را وارد کنید.</div>
+
+<!-- ★★★ نمایش آخرین تغییر کیف پول ★★★ -->
+<div id="wallet-last-change" style="font-size:10px;color:#94a3b8;margin-top:6px;display:none;">
+    <i class="fas fa-clock" style="color:#38bdf8;"></i>
+    <span id="wallet-last-change-text"></span>
+</div>
 </div>
 
 <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;margin-bottom:16px;">
@@ -267,12 +273,13 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
 </footer>
 
 <script>
-/* ★★★ ثابت‌های Supabase در scope عادی (برای دسترسی از loadWallets) ★★★ */
+/* ★★★ ثابت‌های Supabase در scope عادی ★★★ */
 const SUPABASE_URL = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
 
-/* ★★★ آدرس‌های کیف پول از دیتابیس خوانده می‌شوند، نه hardcoded ★★★ */
+/* ★★★ آدرس‌های کیف پول از دیتابیس خوانده می‌شوند ★★★ */
 window.wallets = { TRC20: '', BEP20: '' };
+window.walletLastChange = { TRC20: null, BEP20: null };
 window.currentNetwork = 'TRC20';
 
 const MIN_DEPOSIT = 10;
@@ -306,6 +313,81 @@ window.loadWallets = async function() {
   } catch (e) {
     console.error('loadWallets error:', e);
     return false;
+  }
+};
+
+/* ★★★ بارگذاری تاریخ آخرین تغییر کیف پول ★★★ */
+window.loadWalletLastChange = async function(key) {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_last_wallet_change`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ p_key: key })
+    });
+    if (!res.ok) {
+      if (key === 'wallet_trc20') window.walletLastChange.TRC20 = null;
+      if (key === 'wallet_bep20') window.walletLastChange.BEP20 = null;
+      return null;
+    }
+    const data = await res.json();
+    const result = data === null ? null : (Array.isArray(data) ? data[0] : data);
+    if (key === 'wallet_trc20') window.walletLastChange.TRC20 = result;
+    if (key === 'wallet_bep20') window.walletLastChange.BEP20 = result;
+    return result;
+  } catch (e) {
+    console.error('loadWalletLastChange error:', e);
+    return null;
+  }
+};
+
+/* ★★★ نمایش آخرین تغییر ★★★ */
+window.renderWalletLastChange = function() {
+  const box = document.getElementById('wallet-last-change');
+  const txt = document.getElementById('wallet-last-change-text');
+  if (!box || !txt) return;
+
+  const net = window.currentNetwork || 'TRC20';
+  const lastChange = window.walletLastChange[net];
+
+  if (!lastChange) {
+    box.style.display = 'none';
+    return;
+  }
+
+  try {
+    const d = new Date(lastChange);
+    if (isNaN(d.getTime())) {
+      box.style.display = 'none';
+      return;
+    }
+
+    const pad = n => String(n).padStart(2, '0');
+    const dateStr = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+    const now = Date.now();
+    const diffMs = now - d.getTime();
+    const diffMin = Math.floor(diffMs / 60000);
+
+    let ago = '';
+    const t = window.currentLangData || LD.en;
+    if (diffMin < 1) {
+      ago = t.lastChangeJustNow || 'همین حالا';
+    } else if (diffMin < 60) {
+      ago = (t.lastChangeMinAgo || 'X دقیقه پیش').replace('X', diffMin);
+    } else if (diffMin < 1440) {
+      ago = (t.lastChangeHourAgo || 'X ساعت پیش').replace('X', Math.floor(diffMin/60));
+    } else {
+      ago = (t.lastChangeDayAgo || 'X روز پیش').replace('X', Math.floor(diffMin/1440));
+    }
+
+    txt.innerHTML = `${t.lastChangeLabel || 'آخرین تغییر آدرس:'} <strong style="color:#38bdf8;direction:ltr;display:inline-block;">${dateStr}</strong> <span style="color:#64748b;">(${ago})</span>`;
+    box.style.display = 'block';
+  } catch (e) {
+    box.style.display = 'none';
   }
 };
 
@@ -344,7 +426,9 @@ const LD = {
     noMsgCategory:"در این دسته‌بندی پیامی وجود ندارد.",systemMessage:"پیام سیستم",
     tagAdmin:"پیام مدیریت",tagApproved:"تأیید درخواست",tagRejected:"لغو درخواست",badgeNew:"جدید",badgeRead:"خوانده‌شده",
     supportFollowup:"پیگیری از پشتیبانی",unreadTitle:"خوانده‌نشده",elapsedTime:"زمان سپری‌شده:",requesting:"در حال ثبت درخواست…",requestPending:"درخواست در حال بررسی…",
-    depositError:"❌ خطا در ثبت درخواست واریز:",copyFinalTitle:"کپی مبلغ نهایی",dir:"rtl"
+    depositError:"❌ خطا در ثبت درخواست واریز:",copyFinalTitle:"کپی مبلغ نهایی",
+    lastChangeLabel:"⏱ آخرین تغییر آدرس:",lastChangeJustNow:"همین حالا",lastChangeMinAgo:"X دقیقه پیش",lastChangeHourAgo:"X ساعت پیش",lastChangeDayAgo:"X روز پیش",
+    dir:"rtl"
   },
   en: {
     pageTitle:"Deposit | Zenix",home:"Home",quantification:"Quantification",deposit:"Deposit",receive:"Withdraw",transactions:"Transactions",profile:"Profile",support:"Support",m_about:"About platform",logout:"Log out",
@@ -374,7 +458,9 @@ const LD = {
     noMsgCategory:"No messages in this category.",systemMessage:"System message",
     tagAdmin:"Admin message",tagApproved:"Request approved",tagRejected:"Request rejected",badgeNew:"New",badgeRead:"Read",
     supportFollowup:"Contact support",unreadTitle:"Unread",elapsedTime:"Elapsed time:",requesting:"Submitting request…",requestPending:"Request under review…",
-    depositError:"❌ Error submitting deposit request:",copyFinalTitle:"Copy final amount",dir:"ltr"
+    depositError:"❌ Error submitting deposit request:",copyFinalTitle:"Copy final amount",
+    lastChangeLabel:"⏱ Last address change:",lastChangeJustNow:"just now",lastChangeMinAgo:"X minutes ago",lastChangeHourAgo:"X hours ago",lastChangeDayAgo:"X days ago",
+    dir:"ltr"
   },
   ar: {
     pageTitle:"Zenix - إيداع",home:"الرئيسية",quantification:"التداول الكمي",deposit:"إيداع",receive:"سحب",transactions:"المعاملات",profile:"الملف الشخصي",support:"الدعم",m_about:"حول المنصة",logout:"تسجيل الخروج",
@@ -404,7 +490,9 @@ const LD = {
     noMsgCategory:"لا توجد رسائل في هذه الفئة.",systemMessage:"رسالة النظام",
     tagAdmin:"رسالة الإدارة",tagApproved:"تمت الموافقة",tagRejected:"تم الرفض",badgeNew:"جديد",badgeRead:"مقروء",
     supportFollowup:"التواصل مع الدعم",unreadTitle:"غير مقروء",elapsedTime:"الوقت المنقضي:",requesting:"جارٍ إرسال الطلب…",requestPending:"الطلب قيد المراجعة…",
-    depositError:"❌ حدث خطأ أثناء إرسال طلب الإيداع:",copyFinalTitle:"نسخ المبلغ النهائي",dir:"rtl"
+    depositError:"❌ حدث خطأ أثناء إرسال طلب الإيداع:",copyFinalTitle:"نسخ المبلغ النهائي",
+    lastChangeLabel:"⏱ آخر تغيير للعنوان:",lastChangeJustNow:"الآن",lastChangeMinAgo:"منذ X دقيقة",lastChangeHourAgo:"منذ X ساعة",lastChangeDayAgo:"منذ X يوم",
+    dir:"rtl"
   },
   tr: {
     pageTitle:"Zenix - Para Yatırma",home:"Ana sayfa",quantification:"Kantifikasyon",deposit:"Para yatır",receive:"Para çek",transactions:"İşlemler",profile:"Profil",support:"Destek",m_about:"Platform hakkında",logout:"Çıkış yap",
@@ -434,7 +522,9 @@ const LD = {
     noMsgCategory:"Bu kategoride mesaj yok.",systemMessage:"Sistem mesajı",
     tagAdmin:"Yönetici mesajı",tagApproved:"Talep onaylandı",tagRejected:"Talep reddedildi",badgeNew:"Yeni",badgeRead:"Okundu",
     supportFollowup:"Destekle iletişime geç",unreadTitle:"Okunmadı",elapsedTime:"Geçen süre:",requesting:"Talep gönderiliyor…",requestPending:"Talep inceleniyor…",
-    depositError:"❌ Para yatırma talebi gönderilirken hata oluştu:",copyFinalTitle:"Son tutarı kopyala",dir:"ltr"
+    depositError:"❌ Para yatırma talebi gönderilirken hata oluştu:",copyFinalTitle:"Son tutarı kopyala",
+    lastChangeLabel:"⏱ Son adres değişikliği:",lastChangeJustNow:"az önce",lastChangeMinAgo:"X dakika önce",lastChangeHourAgo:"X saat önce",lastChangeDayAgo:"X gün önce",
+    dir:"ltr"
   },
   ru: {
     pageTitle:"Zenix — Пополнение",home:"Главная",quantification:"Квантификация",deposit:"Пополнение",receive:"Вывод",transactions:"Транзакции",profile:"Профиль",support:"Поддержка",m_about:"О платформе",logout:"Выйти",
@@ -464,7 +554,9 @@ const LD = {
     noMsgCategory:"В этой категории нет сообщений.",systemMessage:"Системное сообщение",
     tagAdmin:"Сообщение администратора",tagApproved:"Заявка одобрена",tagRejected:"Заявка отклонена",badgeNew:"Новое",badgeRead:"Прочитано",
     supportFollowup:"Обратиться в поддержку",unreadTitle:"Не прочитано",elapsedTime:"Прошло времени:",requesting:"Отправка заявки…",requestPending:"Заявка на проверке…",
-    depositError:"❌ Ошибка отправки заявки на пополнение:",copyFinalTitle:"Копировать итоговую сумму",dir:"ltr"
+    depositError:"❌ Ошибка отправки заявки на пополнение:",copyFinalTitle:"Копировать итоговую сумму",
+    lastChangeLabel:"⏱ Последнее изменение адреса:",lastChangeJustNow:"только что",lastChangeMinAgo:"X минут назад",lastChangeHourAgo:"X часов назад",lastChangeDayAgo:"X дней назад",
+    dir:"ltr"
   },
   es: {
     pageTitle:"Zenix - Depósito",home:"Inicio",quantification:"Cuantificación",deposit:"Depositar",receive:"Retirar",transactions:"Transacciones",profile:"Perfil",support:"Soporte",m_about:"Acerca de la plataforma",logout:"Cerrar sesión",
@@ -494,7 +586,9 @@ const LD = {
     noMsgCategory:"No hay mensajes en esta categoría.",systemMessage:"Mensaje del sistema",
     tagAdmin:"Mensaje del administrador",tagApproved:"Solicitud aprobada",tagRejected:"Solicitud rechazada",badgeNew:"Nuevo",badgeRead:"Leído",
     supportFollowup:"Contactar con soporte",unreadTitle:"Sin leer",elapsedTime:"Tiempo transcurrido:",requesting:"Enviando solicitud…",requestPending:"Solicitud en revisión…",
-    depositError:"❌ Error al enviar la solicitud de depósito:",copyFinalTitle:"Copiar importe final",dir:"ltr"
+    depositError:"❌ Error al enviar la solicitud de depósito:",copyFinalTitle:"Copiar importe final",
+    lastChangeLabel:"⏱ Último cambio de dirección:",lastChangeJustNow:"ahora mismo",lastChangeMinAgo:"hace X minutos",lastChangeHourAgo:"hace X horas",lastChangeDayAgo:"hace X días",
+    dir:"ltr"
   },
   fr: {
     pageTitle:"Zenix - Dépôt",home:"Accueil",quantification:"Quantification",deposit:"Déposer",receive:"Retirer",transactions:"Transactions",profile:"Profil",support:"Assistance",m_about:"À propos de la plateforme",logout:"Déconnexion",
@@ -524,7 +618,9 @@ const LD = {
     noMsgCategory:"Aucun message dans cette catégorie.",systemMessage:"Message système",
     tagAdmin:"Message de l’administrateur",tagApproved:"Demande approuvée",tagRejected:"Demande rejetée",badgeNew:"Nouveau",badgeRead:"Lu",
     supportFollowup:"Contacter l’assistance",unreadTitle:"Non lu",elapsedTime:"Temps écoulé :",requesting:"Envoi de la demande…",requestPending:"Demande en cours d’examen…",
-    depositError:"❌ Erreur lors de l’envoi de la demande de dépôt :",copyFinalTitle:"Copier le montant final",dir:"ltr"
+    depositError:"❌ Erreur lors de l’envoi de la demande de dépôt :",copyFinalTitle:"Copier le montant final",
+    lastChangeLabel:"⏱ Dernier changement d’adresse :",lastChangeJustNow:"à l’instant",lastChangeMinAgo:"il y a X minutes",lastChangeHourAgo:"il y a X heures",lastChangeDayAgo:"il y a X jours",
+    dir:"ltr"
   },
   de: {
     pageTitle:"Zenix - Einzahlung",home:"Startseite",quantification:"Quantifizierung",deposit:"Einzahlen",receive:"Auszahlen",transactions:"Transaktionen",profile:"Profil",support:"Support",m_about:"Über die Plattform",logout:"Abmelden",
@@ -554,7 +650,9 @@ const LD = {
     noMsgCategory:"Keine Nachrichten in dieser Kategorie.",systemMessage:"Systemnachricht",
     tagAdmin:"Admin-Nachricht",tagApproved:"Anfrage genehmigt",tagRejected:"Anfrage abgelehnt",badgeNew:"Neu",badgeRead:"Gelesen",
     supportFollowup:"Support kontaktieren",unreadTitle:"Ungelesen",elapsedTime:"Vergangene Zeit:",requesting:"Anfrage wird gesendet…",requestPending:"Anfrage wird geprüft…",
-    depositError:"❌ Fehler beim Senden der Einzahlungsanfrage:",copyFinalTitle:"Endbetrag kopieren",dir:"ltr"
+    depositError:"❌ Fehler beim Senden der Einzahlungsanfrage:",copyFinalTitle:"Endbetrag kopieren",
+    lastChangeLabel:"⏱ Letzte Adressänderung:",lastChangeJustNow:"gerade eben",lastChangeMinAgo:"vor X Minuten",lastChangeHourAgo:"vor X Stunden",lastChangeDayAgo:"vor X Tagen",
+    dir:"ltr"
   }
 };
 
@@ -565,7 +663,6 @@ function readSavedLanguage(){
 }
 let currLang = readSavedLanguage();
 
-/* ★★★ QR فقط برای نمایش آدرس — بدون تغییر با مبلغ ★★★ */
 window.updateQR = function() {
   const calcVal = parseFloat(document.getElementById('calc-input')?.value) || 0;
   const qr = document.getElementById('qr-code-img');
@@ -574,14 +671,12 @@ window.updateQR = function() {
   const net = window.currentNetwork || 'TRC20';
   const addr = window.wallets[net];
 
-  // اگر مبلغ صفر است یا آدرس خالی است، QR را مخفی کن
   if (calcVal <= 0 || !addr) {
     qr.style.display = 'none';
     if (lbl) lbl.style.display = 'none';
     return;
   }
 
-  // ★ QR را فقط اگر آدرس عوض شده بازسازی کن (نه با تغییر مبلغ)
   if (qr.getAttribute('data-current-addr') !== addr) {
     qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=${encodeURIComponent(addr)}`;
     qr.setAttribute('data-current-addr', addr);
@@ -638,6 +733,7 @@ function setLang(l){
     } catch (e) {}
   }
   try { if (typeof window.updateQR === 'function') window.updateQR(); } catch(e) {}
+  try { if (typeof window.renderWalletLastChange === 'function') window.renderWalletLastChange(); } catch(e) {}
   if (document.body) document.body.classList.add('lang-ready');
 }
 
@@ -741,6 +837,7 @@ window.setNetwork=function(net){
   }
   lbl.textContent=`${t.netLbl} (${net}):`;
   window.updateQR();
+  window.renderWalletLastChange();
   const calcVal = parseFloat(document.getElementById('calc-input').value) || 0;
   const newAddr = window.wallets[net];
   if(calcVal > 0 && newAddr){ addr.value = newAddr; }
@@ -808,10 +905,13 @@ function tM(o,e){e.stopPropagation();[nM,lMenu].forEach(m=>{if(m!==o)m.classList
 if(mB)mB.onclick=(e)=>tM(nM,e);if(lB)lB.onclick=(e)=>tM(lMenu,e);
 document.onclick=()=>{[nM,lMenu].forEach(m=>m.classList.remove('show'));};document.querySelectorAll('.menu').forEach(m=>m.onclick=(e)=>e.stopPropagation());
 
-/* ★★★ راه‌اندازی: اول کیف پول‌ها را لود کن، بعد زبان را اعمال کن ★★★ */
+/* ★★★ راه‌اندازی: کیف پول‌ها + تاریخ آخرین تغییر ★★★ */
 (async () => {
   await window.loadWallets();
+  await window.loadWalletLastChange('wallet_trc20');
+  await window.loadWalletLastChange('wallet_bep20');
   try { setLang(currLang); } catch (e) { console.error('Initial setLang failed:', e); }
+  window.renderWalletLastChange();
   if (document.body) document.body.classList.add('lang-ready');
 })();
 </script>
