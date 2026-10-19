@@ -6,25 +6,18 @@
 (function(){
   var supported=['en','fa','ar','tr','ru','es','fr','de'];
   var lang='en';
-  try { var saved=localStorage.getItem('zenix_lang'); if(supported.indexOf(saved)!==-1) lang=saved; } catch(e) { /* localStorage may be unavailable in private browsing; default to English */ }
+  try { var saved=localStorage.getItem('zenix_lang'); if(supported.indexOf(saved)!==-1) lang=saved; } catch(e) {}
   document.documentElement.lang=lang;
   document.documentElement.dir=(lang==='fa'||lang==='ar')?'rtl':'ltr';
 })();
 </script>
 <title>Zenix - Deposit</title>
 <link rel="icon" href="data:image/x-icon;base64,=">
-
-<!-- ★ اصلاح CDN فونت‌ها -->
 <link rel="preconnect" href="https://fonts.googleapis.cn">
 <link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin>
 <link href="https://fonts.googleapis.cn/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-<!-- ★ اصلاح CDN آیکون‌ها -->
 <link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-<!-- ★ FOUC Fix: پنهان کردن body تا زمانی که زبان اعمال شود -->
 <noscript><style>body{visibility:visible !important;}</style></noscript>
-
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
 body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column;visibility:hidden}
@@ -39,127 +32,63 @@ header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1)
 .lb:hover{background:rgba(56,189,248,.15);border-color:#38bdf8}
 .badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;font-weight:700}
 .badge.show{display:flex}
-
-.menu{
-    display:none;
-    position:absolute;
-    top:42px;
-    background:#0f172a;
-    border:1px solid rgba(56,189,248,.3);
-    border-radius:10px;
-    width:max-content !important;
-    width:-webkit-max-content !important;
-    padding:6px;
-    z-index:999;
-    box-shadow:0 10px 30px rgba(0,0,0,.85);
-    white-space:nowrap;
-}
+.menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(56,189,248,.3);border-radius:10px;width:max-content !important;width:-webkit-max-content !important;padding:6px;z-index:999;box-shadow:0 10px 30px rgba(0,0,0,.85);white-space:nowrap}
 [dir="rtl"] .wrap .menu{left:0;right:auto}
 [dir="ltr"] .wrap .menu{right:0;left:auto}
 .menu.show{display:block}
-
-.mi{
-    padding:8px 12px;
-    font-size:12px;
-    color:#cbd5e1;
-    cursor:pointer;
-    border-radius:6px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    text-decoration:none;
-    transition:all 0.2s ease;
-    white-space:nowrap;
-    width:100%;
-}
+.mi{padding:8px 12px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;transition:all 0.2s ease;white-space:nowrap;width:100%}
 .mi:hover{background:rgba(56,189,248,.15);color:#38bdf8}
-.mi.active{
-    background:rgba(56,189,248,0.15) !important;
-    color:#38bdf8 !important;
-    font-weight:700 !important;
-}
-
+.mi.active{background:rgba(56,189,248,0.15) !important;color:#38bdf8 !important;font-weight:700 !important}
 .c{max-width:800px;width:100%;margin:15px auto;padding:0 12px;flex:1}
 .wel{background:linear-gradient(135deg,rgba(2,132,199,.15),rgba(147,51,234,.15));border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .wel h1{font-size:16px;margin-bottom:3px}
 .wel p{color:#94a3b8;font-size:11px}
-
 .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
 .modal.show{display:flex}
 .modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(56,189,248,.3);border-radius:20px;width:100%;max-width:460px;max-height:85vh;display:flex;flex-direction:column;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.9);overflow:hidden}
 .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;color:#38bdf8;font-weight:800;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;flex-shrink:0}
 .modal-close{background:rgba(255,255,255,.05);border:none;color:#94a3b8;cursor:pointer;font-size:14px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
 .modal-close:hover{background:rgba(239,68,68,.2);color:#ef4444}
-
 .notif-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
 .notif-tab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#94a3b8;padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;white-space:nowrap;transition:0.2s;display:flex;align-items:center;justify-content:center;gap:5px;flex:1 1 auto}
 .notif-tab:hover{background:rgba(56,189,248,.15);color:#38bdf8}
 .notif-tab.active{background:#38bdf8;color:#0f172a;font-weight:bold;border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.3)}
 .tab-badge{background:rgba(255,255,255,.15);color:inherit;padding:1px 6px;border-radius:10px;font-size:10px;font-weight:700;line-height:1.2;min-width:16px;text-align:center;display:inline-block}
 .notif-tab.active .tab-badge{background:rgba(15,23,42,.3);color:#0f172a}
-
 #modal-msg-container{overflow-y:auto;padding-right:6px;flex:1;min-height:0}
 .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px;transition:0.2s}
-.msg-body-box:hover{border-color:rgba(56,189,248,.5)!important;opacity:1!important;}
+.msg-body-box:hover{border-color:rgba(56,189,248,.5)!important;opacity:1!important}
 .msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:0}
 .msg-desc-text{font-size:12px;color:#cbd5e1;line-height:1.5}
-
-#modal-msg-container::-webkit-scrollbar,
-.modal-content div::-webkit-scrollbar {
-  width: 5px;
-}
-#modal-msg-container::-webkit-scrollbar-track,
-.modal-content div::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.6);
-  border-radius: 10px;
-}
-#modal-msg-container::-webkit-scrollbar-thumb,
-.modal-content div::-webkit-scrollbar-thumb {
-  background: rgba(56, 189, 248, 0.35);
-  border-radius: 10px;
-}
-#modal-msg-container::-webkit-scrollbar-thumb:hover,
-.modal-content div::-webkit-scrollbar-thumb:hover {
-  background: rgba(56, 189, 248, 0.7);
-}
-#modal-msg-container, .modal-content div {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(56, 189, 248, 0.35) rgba(15, 23, 42, 0.6);
-}
-
-input[readonly] {
-  background: rgba(15, 23, 42, 0.5) !important;
-  color: #94a3b8 !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
-  cursor: not-allowed;
-}
-
+#modal-msg-container::-webkit-scrollbar,.modal-content div::-webkit-scrollbar{width:5px}
+#modal-msg-container::-webkit-scrollbar-track,.modal-content div::-webkit-scrollbar-track{background:rgba(15,23,42,.6);border-radius:10px}
+#modal-msg-container::-webkit-scrollbar-thumb,.modal-content div::-webkit-scrollbar-thumb{background:rgba(56,189,248,.35);border-radius:10px}
+#modal-msg-container::-webkit-scrollbar-thumb:hover,.modal-content div::-webkit-scrollbar-thumb:hover{background:rgba(56,189,248,.7)}
+#modal-msg-container,.modal-content div{scrollbar-width:thin;scrollbar-color:rgba(56,189,248,0.35) rgba(15,23,42,0.6)}
+input[readonly]{background:rgba(15,23,42,0.5) !important;color:#94a3b8 !important;border-color:rgba(255,255,255,0.08) !important;cursor:not-allowed}
+/* ★ باگ ۵: نشانگر قفل‌شدن شبکه در حالت pending */
+.net-btn{transition:all 0.2s ease}
+.net-btn.net-locked{opacity:0.4 !important;cursor:not-allowed !important;pointer-events:none}
 footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:800px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
-
-/* ★ اصلاحات ریسپانسیو برای موبایل */
 @media (max-width: 480px) {
-    .hr { gap: 4px; flex-wrap: nowrap; }
-    .lb { width: 32px; height: 32px; font-size: 12px; }
-    .logo-text { font-size: 16px; }
-    .wel { flex-direction: column; align-items: flex-start; }
-    input, select, textarea { font-size: 16px !important; }
-    #net-trc20, #net-bep20 { padding: 8px 4px; font-size: 11px; }
-    .group label,
-    .msg-desc-text,
-    .msg-title-text { font-size: 13px; }
-    .wel h1 { font-size: 15px; }
-    .wel p  { font-size: 12px; }
+    .hr{gap:4px;flex-wrap:nowrap}
+    .lb{width:32px;height:32px;font-size:12px}
+    .logo-text{font-size:16px}
+    .wel{flex-direction:column;align-items:flex-start}
+    input,select,textarea{font-size:16px !important}
+    #net-trc20,#net-bep20{padding:8px 4px;font-size:11px}
+    .group label,.msg-desc-text,.msg-title-text{font-size:13px}
+    .wel h1{font-size:15px}
+    .wel p{font-size:12px}
 }
-
-/* ★ گوشی‌های باریک (iPhone SE 1st / اندرویدهای قدیمی ≤ ۳۶۰px) */
 @media (max-width: 360px) {
-    header { padding: 8px 10px; }
-    .logo { gap: 6px; }
-    .logo-icon { width: 30px; height: 30px; font-size: 15px; border-radius: 8px; }
-    .logo-text { font-size: 14px; letter-spacing: 1px; }
-    .hr { gap: 3px; flex-wrap: nowrap; }
-    .lb { width: 30px; height: 30px; font-size: 11px; border-radius: 7px; }
-    .badge { width: 14px; height: 14px; font-size: 8px; top: -3px; right: -3px; }
+    header{padding:8px 10px}
+    .logo{gap:6px}
+    .logo-icon{width:30px;height:30px;font-size:15px;border-radius:8px}
+    .logo-text{font-size:14px;letter-spacing:1px}
+    .hr{gap:3px;flex-wrap:nowrap}
+    .lb{width:30px;height:30px;font-size:11px;border-radius:7px}
+    .badge{width:14px;height:14px;font-size:8px;top:-3px;right:-3px}
 }
 </style>
 </head>
@@ -199,14 +128,16 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
 
 <div style="font-size:13px;color:#38bdf8;font-weight:bold;margin-bottom:12px;"><i class="fas fa-network-wired"></i> <span data-i18n="selectNetwork">انتخاب شبکه و آدرس</span></div>
 <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
-<div id="net-trc20" onclick="setNetwork('TRC20')" style="flex:1;min-width:120px;background:rgba(56,189,248,0.15);border:1px solid #38bdf8;padding:10px;border-radius:8px;text-align:center;font-size:12px;color:#f8fafc;font-weight:bold;cursor:pointer;">USDT (TRC20)</div>
-<div id="net-bep20" onclick="setNetwork('BEP20')" style="flex:1;min-width:120px;background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.1);padding:10px;border-radius:8px;text-align:center;font-size:12px;color:#94a3b8;cursor:pointer;">USDT (BEP20)</div>
+<div id="net-trc20" class="net-btn" onclick="setNetwork('TRC20')" style="flex:1;min-width:120px;background:rgba(56,189,248,0.15);border:1px solid #38bdf8;padding:10px;border-radius:8px;text-align:center;font-size:12px;color:#f8fafc;font-weight:bold;cursor:pointer;">USDT (TRC20)</div>
+<div id="net-bep20" class="net-btn" onclick="setNetwork('BEP20')" style="flex:1;min-width:120px;background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.1);padding:10px;border-radius:8px;text-align:center;font-size:12px;color:#94a3b8;cursor:pointer;">USDT (BEP20)</div>
 </div>
 <div style="text-align:center;margin:16px 0;">
 <div style="background:#fff;display:inline-block;padding:10px;border-radius:8px;margin-bottom:8px;">
 <img id="qr-code-img" src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=TMkUAe5kzL3PdfkwV2vKot3dL3kkDD9z4Y" alt="QR Code" style="display:block;">
 </div>
 <div style="font-size:11px;color:#94a3b8;" data-i18n="scanQr">اسکن جهت واریز مستقیم</div>
+<!-- ★ باگ ۳: برچسب مبلغ دقیق زیر QR -->
+<div id="qr-amount-label" style="display:none;font-size:13px;color:#22c55e;font-weight:800;margin-top:8px;padding:6px 12px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:6px;direction:ltr;text-align:center;"></div>
 </div>
 
 <div style="margin-bottom:16px;">
@@ -221,7 +152,7 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
 <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;margin-bottom:16px;">
 <div style="font-size:12px;color:#38bdf8;font-weight:bold;margin-bottom:8px;"><i class="fas fa-wallet"></i> <span data-i18n="calcTitle">محاسبه مبلغ واریزی</span> <span style="color:#ef4444;">*</span></div>
 <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-<input type="number" id="calc-input" placeholder="Amount in USDT" data-i18n-placeholder="amountPlaceholder" oninput="calculateDeposit()" style="flex:1;background:rgba(15,23,42,0.9);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#f8fafc;padding:8px 10px;font-size:12px;outline:none;">
+<input type="number" id="calc-input" placeholder="Amount in USDT" data-i18n-placeholder="amountPlaceholder" oninput="calculateDeposit()" min="10" max="100000" step="0.01" style="flex:1;background:rgba(15,23,42,0.9);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#f8fafc;padding:8px 10px;font-size:12px;outline:none;">
 <div style="font-size:11px;color:#94a3b8;white-space:nowrap;">USDT</div>
 </div>
 
@@ -236,7 +167,7 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
 </div>
 
 <div style="font-size:12px;color:#38bdf8;font-weight:bold;margin-bottom:6px;"><i class="fas fa-receipt"></i> <span data-i18n="txHashTitle">هش تراکنش (TxID)</span> <span style="color:#ef4444;">*</span></div>
-<input type="text" id="tx-hash-input" placeholder="Example: 5f4d11... or transaction hash" data-i18n-placeholder="txHashPlaceholder" oninput="checkInputs()" style="width:100%;background:rgba(15,23,42,0.9);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#f8fafc;padding:8px 10px;font-size:12px;outline:none;direction:ltr;text-align:left;">
+<input type="text" id="tx-hash-input" placeholder="Example: 5f4d11... or transaction hash" data-i18n-placeholder="txHashPlaceholder" oninput="checkInputs()" maxlength="66" style="width:100%;background:rgba(15,23,42,0.9);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#f8fafc;padding:8px 10px;font-size:12px;outline:none;direction:ltr;text-align:left;">
 
 <div style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:11px;color:#38bdf8;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);padding:6px 10px;border-radius:6px;">
 <i class="fas fa-clock" style="color:#38bdf8;"></i>
@@ -262,14 +193,12 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
             <span id="t-modal-title"><i class="fas fa-bell"></i> صندوق پیام‌ها و اعلان‌ها</span>
             <button class="modal-close" onclick="window.closeMessageModal()"><i class="fas fa-times"></i></button>
         </div>
-        
         <div class="notif-tabs" id="notif-tabs">
             <button type="button" class="notif-tab active" onclick="window.setNotifFilter('all', this)"><i class="fas fa-list"></i> <span id="t-tab-all" data-i18n="tabAll">All</span> <span class="tab-badge" id="cnt-tab-all">0</span></button>
             <button type="button" class="notif-tab" onclick="window.setNotifFilter('approved', this)"><i class="fas fa-check-circle" style="color:#22c55e"></i> <span id="t-tab-approved" data-i18n="tabApproved">Approved</span> <span class="tab-badge" id="cnt-tab-approved">0</span></button>
             <button type="button" class="notif-tab" onclick="window.setNotifFilter('rejected', this)"><i class="fas fa-times-circle" style="color:#ef4444"></i> <span id="t-tab-rejected" data-i18n="tabRejected">Rejected</span> <span class="tab-badge" id="cnt-tab-rejected">0</span></button>
             <button type="button" class="notif-tab" onclick="window.setNotifFilter('admin_message', this)"><i class="fas fa-bullhorn" style="color:#38bdf8"></i> <span id="t-tab-admin" data-i18n="tabAdmin">Admin message</span> <span class="tab-badge" id="cnt-tab-admin">0</span></button>
         </div>
-
         <div id="modal-msg-container"><div style="text-align:center;padding:20px;color:#94a3b8" data-i18n="noMsg">No new messages.</div></div>
     </div>
 </div>
@@ -321,10 +250,10 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
         <div style="overflow-y:auto;padding-right:4px">
             <p style="font-size:13px;color:#cbd5e1;line-height:1.7;margin-bottom:10px;" id="t-ab-m-desc" data-i18n="aboutDesc">Zenix is a modern financial ecosystem for digital assets and transaction processing, designed to provide secure automated services.</p>
             <ul style="font-size:12px;color:#94a3b8;padding-right:18px;line-height:1.7;margin-bottom:0;">
-                <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l1t" data-i18n="aboutL1Title">Main purpose:</strong> <span id="t-ab-m-l1d" data-i18n="aboutL1Desc">Automate trading processes using AI and quantification algorithms.</span></li>
-                <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l2t" data-i18n="aboutL2Title">Security and infrastructure:</strong> <span id="t-ab-m-l2d" data-i18n="aboutL2Desc">Encryption protocols, fast cloud processing nodes, and unified asset management through Supabase.</span></li>
-                <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" id="t-ab-m-l3t" data-i18n="aboutL3Title">Multi-level referrals and team:</strong> <span id="t-ab-m-l3d" data-i18n="aboutL3Desc">A referral network can provide rewards from referred users' activity across multiple levels.</span></li>
-                <li><strong style="color:#f8fafc;" id="t-ab-m-l4t" data-i18n="aboutL4Title">Live platform data:</strong> <span id="t-ab-m-l4d" data-i18n="aboutL4Desc">Live crypto markets, volume indicators, network fees, and system notices provide current information.</span></li>
+                <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" data-i18n="aboutL1Title">Main purpose:</strong> <span data-i18n="aboutL1Desc">Automate trading processes using AI and quantification algorithms.</span></li>
+                <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" data-i18n="aboutL2Title">Security and infrastructure:</strong> <span data-i18n="aboutL2Desc">Encryption protocols, fast cloud processing nodes, and unified asset management through Supabase.</span></li>
+                <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" data-i18n="aboutL3Title">Multi-level referrals and team:</strong> <span data-i18n="aboutL3Desc">A referral network can provide rewards from referred users' activity across multiple levels.</span></li>
+                <li><strong style="color:#f8fafc;" data-i18n="aboutL4Title">Live platform data:</strong> <span data-i18n="aboutL4Desc">Live crypto markets, volume indicators, network fees, and system notices provide current information.</span></li>
             </ul>
         </div>
     </div>
@@ -336,26 +265,270 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
 </footer>
 
 <script>
-const wallets={
-  TRC20:"TMkUAe5kzL3PdfkwV2vKot3dL3kkDD9z4Y",
-  BEP20:"0x9eA4B9aCa9B7505E63BA436d3240718A21574dc4"
+/* ====== ثابت‌ها ====== */
+const wallets = {
+  TRC20: "TMkUAe5kzL3PdfkwV2vKot3dL3kkDD9z4Y",
+  BEP20: "0x9eA4B9aCa9B7505E63BA436d3240718A21574dc4"
 };
-window.currentNetwork='TRC20';
+window.currentNetwork = 'TRC20';
 
-/* ★ State tracking برای بازسازی پیام وضعیت هنگام تغییر زبان */
-window.__statusState = null;   // { getText: fn(t), isErr, showTimer }
+/* ★ باگ ۴: محدوده مبلغ و regex هش */
+const MIN_DEPOSIT = 10;
+const MAX_DEPOSIT = 100000;
+const FEE_RATE = 1.025;
+const TXID_REGEX = /^(?:0x)?[a-fA-F0-9]{64}$/;
+
+window.__statusState = null;
 window.__statusTimerStart = null;
 
 function escapeHtml(value) {
   return String(value == null ? '' : value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
-const LD={"fa":{"pageTitle":"زنیکس - واریز","adminMsg":"پیام مدیریت","welcomeText":"به پلتفرم زنیکس خوش آمدید.","home":"صفحه اصلی","quantification":"کوانتیفیکیشن","deposit":"واریز","receive":"برداشت","transactions":"تراکنش‌ها","profile":"پروفایل","support":"پشتیبانی","m_about":"درباره پلتفرم","logout":"خروج","depositTitle":"واریز","depositSub":"شارژ حساب از شبکه بلاکچین","activeStatus":"فعال","calcTitle":"محاسبه مبلغ واریزی","finalCalcText":"مبلغ واریزی نهایی:","txHashTitle":"هش تراکنش (TxID)","selectNetwork":"انتخاب شبکه و آدرس","scanQr":"اسکن جهت واریز مستقیم","copyBtn":"کپی","copyWarning":"⚠️ برای نمایش و کپی آدرس کیف پول، ابتدا مبلغ واریزی را وارد کنید.","inquiryBtn":"استعلام و واریزی","securityGuide":"راهنمای امنیتی مهم:","securityWarning":"* مبلغ واریزی باید دقیقاً با مبلغ محاسبه‌شده برابر باشد؛ در غیر این صورت کل مبلغ مسدود می‌شود و قابل بازگشت نیست.","sec1":"* لطفاً از واریز هرگونه ارزی غیر از USDT خودداری فرمایید.","sec2":"* تراکنش‌ها پس از تأیید گره‌های شبکه به‌صورت خودکار پردازش می‌شوند.","txTiming":"تأیید تراکنش و شارژ حساب معمولاً بین ۵ تا ۱۵ دقیقه زمان می‌برد.","amountPlaceholder":"مبلغ به USDT","txHashPlaceholder":"مثال: 5f4d11... یا هش تراکنش","walletPlaceholder":"برای نمایش آدرس ابتدا مبلغ واریزی را وارد کنید…","copiedMsg":"📋 آدرس کیف پول با موفقیت در کلیپ‌بورد کپی شد.","copyFailedMsg":"⚠ کپی ناموفق بود. لطفاً متن را دستی انتخاب و کپی کنید.","loginErr":"❌ لطفاً ابتدا وارد حساب کاربری خود شوید.","fillReqErr":"❌ لطفاً مبلغ و هش تراکنش را به‌طور کامل وارد کنید.","pendingSentMsg":"⏳ درخواست واریز شما ثبت شد و برای بررسی به مدیریت ارسال گردید.","netLbl":"آدرس کیف پول","modalTitle":"صندوق پیام‌ها و اعلان‌ها","noMsg":"هیچ پیام جدیدی وجود ندارد.","tNode":"سرور فعال (US-East)","tabAll":"همه","tabApproved":"تأیید درخواست","tabRejected":"لغو درخواست","tabAdmin":"پیام مدیریت","detailTitle":"مشاهده پیام","helpTitle":"راهنمای صفحه واریز","helpSecurityTitle":"راهنمای امنیتی مهم:","helpSecurityText":"حتماً مبلغ واریزی با مبلغ محاسبه‌شده برابر باشد؛ در غیر این صورت کل مبلغ مسدود می‌شود و قابل بازگشت نیست.","helpSelectNetworkTitle":"انتخاب شبکه و آدرس","helpSelectNetworkText":"ابتدا شبکه انتقال خود (مانند TRC20 یا BEP20) را انتخاب کنید. آدرس کیف پول مقصد بر اساس شبکه انتخابی تغییر می‌کند.","helpCalcTitle":"محاسبه مبلغ واریزی","helpCalcText":"با وارد کردن مبلغ به USDT، آدرس کیف پول فعال می‌شود و می‌توانید آن را کپی کنید. مبلغ نهایی با احتساب کارمزد نیز نمایش داده می‌شود.","helpTxTitle":"ثبت هش تراکنش (TxID)","helpTxText":"پس از انجام تراکنش، هش آن (TxID) را وارد کرده و دکمه استعلام واریز را بزنید تا موجودی شما شارژ شود.","aboutTitle":"درباره پلتفرم Zenix (هدف، ماهیت و ساختار)","aboutDesc":"پلتفرم Zenix یک اکوسیستم مالی نوین برای دارایی‌های دیجیتال و پردازش تراکنش‌هاست که با هدف ارائه خدمات امن و خودکار طراحی شده است.","aboutL1Title":"هدف اصلی:","aboutL1Desc":"خودکارسازی فرایندهای معاملاتی با سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن، برای استفاده از نوسانات بازار بدون نیاز به تخصص پیشرفته در معامله‌گری.","aboutL2Title":"امنیت و زیرساخت:","aboutL2Desc":"استفاده از پروتکل‌های رمزنگاری، گره‌های پردازش ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در پایگاه داده ابری Supabase.","aboutL3Title":"معرفی و تیم چندسطحی:","aboutL3Desc":"ایجاد شبکه معرفی دوستان تا کاربران از فعالیت زیرمجموعه‌های خود در چند سطح پاداش دریافت کنند.","aboutL4Title":"اطلاعات زنده پلتفرم:","aboutL4Desc":"نمایش بازار رمزارزها، شاخص‌های حجم معاملات، نرخ گس شبکه و اعلان‌های سیستم برای ارائه اطلاعات به‌روز.","noMsgCategory":"در این دسته‌بندی پیامی وجود ندارد.","systemMessage":"پیام سیستم","tagAdmin":"پیام مدیریت","tagApproved":"تأیید درخواست","tagRejected":"لغو درخواست","badgeNew":"جدید","badgeRead":"خوانده‌شده","supportFollowup":"پیگیری از پشتیبانی","unreadTitle":"خوانده‌نشده","elapsedTime":"زمان سپری‌شده:","requesting":"در حال ثبت درخواست…","requestPending":"درخواست در حال بررسی…","depositError":"❌ خطا در ثبت درخواست واریز:","copyFinalTitle":"کپی مبلغ نهایی","dir":"rtl"},"en":{"pageTitle":"Deposit | Zenix","adminMsg":"Admin message","welcomeText":"Welcome to Zenix.","home":"Home","quantification":"Quantification","deposit":"Deposit","receive":"Withdraw","transactions":"Transactions","profile":"Profile","support":"Support","m_about":"About platform","logout":"Log out","depositTitle":"Deposit","depositSub":"Top up your account through the blockchain network","activeStatus":"Active","calcTitle":"Deposit amount calculator","finalCalcText":"Final deposit amount:","txHashTitle":"Transaction hash (TxID)","selectNetwork":"Select network and address","scanQr":"Scan to deposit directly","copyBtn":"Copy","copyWarning":"⚠ Enter the deposit amount first to display and copy the wallet address.","inquiryBtn":"Check deposit","securityGuide":"Important security notice:","securityWarning":"* The deposit amount must exactly match the calculated amount. Otherwise, the entire deposit will be locked and cannot be refunded.","sec1":"* Do not deposit any currency other than USDT.","sec2":"* Transactions are processed automatically after network nodes confirm them.","txTiming":"Transaction confirmation and account crediting usually take 5–15 minutes.","amountPlaceholder":"Amount in USDT","txHashPlaceholder":"Example: 5f4d11... or transaction hash","walletPlaceholder":"Enter the deposit amount first to display the address…","copiedMsg":"📋 Wallet address copied to the clipboard.","copyFailedMsg":"⚠ Copy failed. Please select and copy manually.","loginErr":"❌ Please log in to your account first.","fillReqErr":"❌ Enter both the amount and transaction hash.","pendingSentMsg":"⏳ Your deposit request has been submitted to the administrator for review.","netLbl":"Wallet address","modalTitle":"Notifications and messages","noMsg":"No new messages.","tNode":"Server active (US-East)","tabAll":"All","tabApproved":"Approved","tabRejected":"Rejected","tabAdmin":"Admin message","detailTitle":"View message","helpTitle":"Deposit page guide","helpSecurityTitle":"Important security notice:","helpSecurityText":"The deposit amount must exactly match the calculated amount. Otherwise, the entire deposit will be locked and cannot be refunded.","helpSelectNetworkTitle":"Choose network and address","helpSelectNetworkText":"Choose your transfer network (such as TRC20 or BEP20). The destination wallet address changes according to the selected network.","helpCalcTitle":"Calculate deposit amount","helpCalcText":"Enter an amount in USDT to enable the wallet address and copy it. The final amount including the fee is also shown.","helpTxTitle":"Submit transaction hash (TxID)","helpTxText":"After making the transfer from your personal wallet, enter the transaction hash (TxID) in the field and select Check Deposit so your balance can be credited.","aboutTitle":"About Zenix (purpose, nature, and structure)","aboutDesc":"Zenix is a modern financial ecosystem for digital assets and transaction processing, designed to provide users with a secure, automated service.","aboutL1Title":"Main purpose:","aboutL1Desc":"Automate trading processes with AI systems and quantification algorithms, helping users engage with global market movements without advanced trading expertise.","aboutL2Title":"Security and infrastructure:","aboutL2Desc":"Uses encryption protocols, high-speed cloud processing nodes, and unified asset management on the Supabase cloud database.","aboutL3Title":"Multi-level referrals and team:","aboutL3Desc":"Builds a referral network where users can receive rewards from the activity of their referrals across multiple levels.","aboutL4Title":"Live platform data:","aboutL4Desc":"Live cryptocurrency markets, trading-volume indicators, network gas rates, and system notices provide current platform information.","noMsgCategory":"No messages in this category.","systemMessage":"System message","tagAdmin":"Admin message","tagApproved":"Request approved","tagRejected":"Request rejected","badgeNew":"New","badgeRead":"Read","supportFollowup":"Contact support","unreadTitle":"Unread","elapsedTime":"Elapsed time:","requesting":"Submitting request…","requestPending":"Request under review…","depositError":"❌ Error submitting deposit request:","copyFinalTitle":"Copy final amount","dir":"ltr"},"ar":{"pageTitle":"Zenix - إيداع","adminMsg":"رسالة الإدارة","welcomeText":"مرحباً بكم في منصة Zenix.","home":"الرئيسية","quantification":"التداول الكمي","deposit":"إيداع","receive":"سحب","transactions":"المعاملات","profile":"الملف الشخصي","support":"الدعم","m_about":"حول المنصة","logout":"تسجيل الخروج","depositTitle":"إيداع","depositSub":"شحن الحساب عبر شبكة البلوك تشين","activeStatus":"نشط","calcTitle":"حاسبة مبلغ الإيداع","finalCalcText":"مبلغ الإيداع النهائي:","txHashTitle":"معرّف المعاملة (TxID)","selectNetwork":"اختيار الشبكة والعنوان","scanQr":"امسح للإيداع المباشر","copyBtn":"نسخ","copyWarning":"⚠ أدخل مبلغ الإيداع أولاً لعرض عنوان المحفظة ونسخه.","inquiryBtn":"التحقق من الإيداع","securityGuide":"تنبيه أمني مهم:","securityWarning":"* يجب أن يطابق مبلغ الإيداع المبلغ المحسوب تماماً، وإلا فسيتم تجميد المبلغ بالكامل ولن يمكن استرداده.","sec1":"* يرجى عدم إيداع أي عملة أخرى غير USDT.","sec2":"* تُعالج المعاملات تلقائياً بعد تأكيد عُقد الشبكة.","txTiming":"يستغرق تأكيد المعاملة وإضافة الرصيد عادةً من 5 إلى 15 دقيقة.","amountPlaceholder":"المبلغ بـ USDT","txHashPlaceholder":"مثال: 5f4d11... أو معرّف المعاملة","walletPlaceholder":"أدخل مبلغ الإيداع أولاً لعرض العنوان…","copiedMsg":"📋 تم نسخ عنوان المحفظة بنجاح.","copyFailedMsg":"⚠ فشل النسخ. يرجى التحديد والنسخ يدوياً.","loginErr":"❌ يرجى تسجيل الدخول أولاً.","fillReqErr":"❌ يرجى إدخال المبلغ ومعرّف المعاملة بالكامل.","pendingSentMsg":"⏳ تم إرسال طلب الإيداع إلى الإدارة للمراجعة.","netLbl":"عنوان المحفظة","modalTitle":"الإشعارات والرسائل","noMsg":"لا توجد رسائل جديدة.","tNode":"الخادم نشط (US-East)","tabAll":"الكل","tabApproved":"تمت الموافقة","tabRejected":"مرفوض","tabAdmin":"رسالة الإدارة","detailTitle":"عرض الرسالة","helpTitle":"دليل صفحة الإيداع","helpSecurityTitle":"تنبيه أمني مهم:","helpSecurityText":"يجب أن يطابق مبلغ الإيداع المبلغ المحسوب تماماً، وإلا فسيتم تجميده ولن يمكن استرداده.","helpSelectNetworkTitle":"اختيار الشبكة والعنوان","helpSelectNetworkText":"اختر شبكة التحويل (مثل TRC20 أو BEP20). يتغير عنوان المحفظة بحسب الشبكة المحددة.","helpCalcTitle":"حساب مبلغ الإيداع","helpCalcText":"أدخل المبلغ بـ USDT لإتاحة عنوان المحفظة ونسخه. سيظهر أيضاً المبلغ النهائي شاملاً الرسوم.","helpTxTitle":"إرسال معرّف المعاملة (TxID)","helpTxText":"بعد التحويل من محفظتك، أدخل معرّف المعاملة واضغط على التحقق من الإيداع لإضافة الرصيد.","aboutTitle":"حول منصة Zenix (الهدف والطبيعة والبنية)","aboutDesc":"Zenix منظومة مالية حديثة للأصول الرقمية ومعالجة المعاملات، صُممت لتقديم خدمات آمنة وآلية.","aboutL1Title":"الهدف الرئيسي:","aboutL1Desc":"أتمتة التداول باستخدام الذكاء الاصطناعي وخوارزميات التداول الكمي للمساعدة في التعامل مع تحركات الأسواق.","aboutL2Title":"الأمان والبنية التحتية:","aboutL2Desc":"بروتوكولات تشفير وعُقد معالجة سحابية سريعة وإدارة موحدة للأصول عبر قاعدة بيانات Supabase.","aboutL3Title":"الإحالات والفريق متعدد المستويات:","aboutL3Desc":"إنشاء شبكة إحالات تتيح للمستخدمين الحصول على مكافآت من نشاط الإحالات عبر مستويات متعددة.","aboutL4Title":"بيانات المنصة المباشرة:","aboutL4Desc":"توفر أسواق العملات الرقمية ومؤشرات حجم التداول ورسوم الشبكة والإشعارات معلومات حديثة.","noMsgCategory":"لا توجد رسائل في هذه الفئة.","systemMessage":"رسالة النظام","tagAdmin":"رسالة الإدارة","tagApproved":"تمت الموافقة","tagRejected":"تم الرفض","badgeNew":"جديد","badgeRead":"مقروء","supportFollowup":"التواصل مع الدعم","unreadTitle":"غير مقروء","elapsedTime":"الوقت المنقضي:","requesting":"جارٍ إرسال الطلب…","requestPending":"الطلب قيد المراجعة…","depositError":"❌ حدث خطأ أثناء إرسال طلب الإيداع:","copyFinalTitle":"نسخ المبلغ النهائي","dir":"rtl"},"tr":{"pageTitle":"Zenix - Para Yatırma","adminMsg":"Yönetici mesajı","welcomeText":"Zenix platformuna hoş geldiniz.","home":"Ana sayfa","quantification":"Kantifikasyon","deposit":"Para yatır","receive":"Para çek","transactions":"İşlemler","profile":"Profil","support":"Destek","m_about":"Platform hakkında","logout":"Çıkış yap","depositTitle":"Para yatır","depositSub":"Blokzincir ağı üzerinden hesaba para yükleyin","activeStatus":"Aktif","calcTitle":"Yatırma tutarı hesaplayıcı","finalCalcText":"Nihai yatırma tutarı:","txHashTitle":"İşlem özeti (TxID)","selectNetwork":"Ağ ve adres seçin","scanQr":"Doğrudan yatırmak için tarayın","copyBtn":"Kopyala","copyWarning":"⚠ Cüzdan adresini görüntülemek ve kopyalamak için önce yatırma tutarını girin.","inquiryBtn":"Yatırmayı kontrol et","securityGuide":"Önemli güvenlik uyarısı:","securityWarning":"* Yatırılan tutar hesaplanan tutarla tam olarak eşleşmelidir. Aksi hâlde tutarın tamamı bloke edilir ve iade edilemez.","sec1":"* Lütfen USDT dışında başka bir para yatırmayın.","sec2":"* İşlemler, ağ düğümleri onayladıktan sonra otomatik olarak işlenir.","txTiming":"İşlemin onaylanması ve bakiyeye yansıması genellikle 5–15 dakika sürer.","amountPlaceholder":"USDT tutarı","txHashPlaceholder":"Örnek: 5f4d11... veya işlem özeti","walletPlaceholder":"Adresi görmek için önce yatırma tutarını girin…","copiedMsg":"📋 Cüzdan adresi panoya kopyalandı.","copyFailedMsg":"⚠ Kopyalama başarısız. Lütfen metni elle seçip kopyalayın.","loginErr":"❌ Lütfen önce hesabınıza giriş yapın.","fillReqErr":"❌ Lütfen tutarı ve işlem özetini eksiksiz girin.","pendingSentMsg":"⏳ Para yatırma talebiniz yönetici incelemesine gönderildi.","netLbl":"Cüzdan adresi","modalTitle":"Bildirimler ve mesajlar","noMsg":"Yeni mesaj yok.","tNode":"Sunucu aktif (US-East)","tabAll":"Tümü","tabApproved":"Onaylandı","tabRejected":"Reddedildi","tabAdmin":"Yönetici mesajı","detailTitle":"Mesajı görüntüle","helpTitle":"Para yatırma sayfası rehberi","helpSecurityTitle":"Önemli güvenlik uyarısı:","helpSecurityText":"Yatırılan tutar hesaplanan tutarla tam olarak eşleşmelidir; aksi hâlde tutar bloke edilir ve iade edilemez.","helpSelectNetworkTitle":"Ağ ve adres seçimi","helpSelectNetworkText":"TRC20 veya BEP20 gibi transfer ağınızı seçin. Hedef cüzdan adresi seçilen ağa göre değişir.","helpCalcTitle":"Yatırma tutarını hesaplama","helpCalcText":"Cüzdan adresini etkinleştirmek ve kopyalamak için USDT tutarını girin. Ücret dâhil nihai tutar da gösterilir.","helpTxTitle":"İşlem özetini (TxID) gönderme","helpTxText":"Transferden sonra işlem özetini alana girin ve bakiyenizin yüklenmesi için yatırma kontrol düğmesine basın.","aboutTitle":"Zenix hakkında (amaç, nitelik ve yapı)","aboutDesc":"Zenix, dijital varlıklar ve işlem süreçleri için güvenli ve otomatik hizmet sunmayı amaçlayan modern bir finansal ekosistemdir.","aboutL1Title":"Temel amaç:","aboutL1Desc":"Yapay zekâ ve kantifikasyon algoritmalarıyla işlem süreçlerini otomatikleştirerek kullanıcıların piyasa hareketlerini değerlendirmesine yardımcı olmak.","aboutL2Title":"Güvenlik ve altyapı:","aboutL2Desc":"Şifreleme protokolleri, hızlı bulut işlem düğümleri ve Supabase veritabanında birleşik varlık yönetimi kullanılır.","aboutL3Title":"Çok düzeyli referans ve ekip:","aboutL3Desc":"Kullanıcıların yönlendirdikleri kişilerin faaliyetlerinden farklı düzeylerde ödül alabilecekleri bir ağ sunar.","aboutL4Title":"Canlı platform verileri:","aboutL4Desc":"Kripto piyasaları, işlem hacmi göstergeleri, ağ ücretleri ve sistem bildirimleri güncel bilgiler sağlar.","noMsgCategory":"Bu kategoride mesaj yok.","systemMessage":"Sistem mesajı","tagAdmin":"Yönetici mesajı","tagApproved":"Talep onaylandı","tagRejected":"Talep reddedildi","badgeNew":"Yeni","badgeRead":"Okundu","supportFollowup":"Destekle iletişime geç","unreadTitle":"Okunmadı","elapsedTime":"Geçen süre:","requesting":"Talep gönderiliyor…","requestPending":"Talep inceleniyor…","depositError":"❌ Para yatırma talebi gönderilirken hata oluştu:","copyFinalTitle":"Son tutarı kopyala","dir":"ltr"},"ru":{"pageTitle":"Zenix — Пополнение","adminMsg":"Сообщение администратора","welcomeText":"Добро пожаловать на платформу Zenix.","home":"Главная","quantification":"Квантификация","deposit":"Пополнение","receive":"Вывод","transactions":"Транзакции","profile":"Профиль","support":"Поддержка","m_about":"О платформе","logout":"Выйти","depositTitle":"Пополнение","depositSub":"Пополнение счёта через блокчейн-сеть","activeStatus":"Активно","calcTitle":"Калькулятор пополнения","finalCalcText":"Итоговая сумма пополнения:","txHashTitle":"Хеш транзакции (TxID)","selectNetwork":"Выберите сеть и адрес","scanQr":"Сканируйте для прямого пополнения","copyBtn":"Копировать","copyWarning":"⚠ Сначала введите сумму, чтобы увидеть и скопировать адрес кошелька.","inquiryBtn":"Проверить пополнение","securityGuide":"Важное предупреждение безопасности:","securityWarning":"* Сумма пополнения должна точно совпадать с рассчитанной суммой. Иначе вся сумма будет заблокирована и возврат невозможен.","sec1":"* Не отправляйте валюту, отличную от USDT.","sec2":"* Транзакции обрабатываются автоматически после подтверждения узлами сети.","txTiming":"Подтверждение транзакции и зачисление обычно занимают 5–15 минут.","amountPlaceholder":"Сумма в USDT","txHashPlaceholder":"Например: 5f4d11... или хеш транзакции","walletPlaceholder":"Сначала введите сумму пополнения, чтобы увидеть адрес…","copiedMsg":"📋 Адрес кошелька скопирован.","copyFailedMsg":"⚠ Не удалось скопировать. Пожалуйста, выделите и скопируйте вручную.","loginErr":"❌ Сначала войдите в аккаунт.","fillReqErr":"❌ Укажите сумму и хеш транзакции полностью.","pendingSentMsg":"⏳ Заявка на пополнение отправлена администратору на проверку.","netLbl":"Адрес кошелька","modalTitle":"Уведомления и сообщения","noMsg":"Новых сообщений нет.","tNode":"Сервер активен (US-East)","tabAll":"Все","tabApproved":"Одобрено","tabRejected":"Отклонено","tabAdmin":"Сообщение администратора","detailTitle":"Просмотр сообщения","helpTitle":"Руководство по странице пополнения","helpSecurityTitle":"Важное предупреждение безопасности:","helpSecurityText":"Сумма пополнения должна точно совпадать с рассчитанной суммой; иначе средства будут заблокированы без возможности возврата.","helpSelectNetworkTitle":"Выбор сети и адреса","helpSelectNetworkText":"Выберите сеть перевода (например, TRC20 или BEP20). Адрес кошелька зависит от выбранной сети.","helpCalcTitle":"Расчёт суммы пополнения","helpCalcText":"Введите сумму в USDT, чтобы открыть возможность копирования адреса кошелька. Итоговая сумма с комиссией также отображается.","helpTxTitle":"Отправка хеша транзакции (TxID)","helpTxText":"После перевода введите хеш транзакции и нажмите проверку пополнения, чтобы средства были зачислены.","aboutTitle":"О Zenix (цель, характер и структура)","aboutDesc":"Zenix — современная финансовая экосистема для цифровых активов и обработки транзакций, созданная для безопасных автоматизированных услуг.","aboutL1Title":"Основная цель:","aboutL1Desc":"Автоматизация торговых процессов с помощью ИИ и алгоритмов количественного анализа рынка.","aboutL2Title":"Безопасность и инфраструктура:","aboutL2Desc":"Используются шифрование, быстрые облачные узлы обработки и управление активами в базе данных Supabase.","aboutL3Title":"Многоуровневые приглашения и команда:","aboutL3Desc":"Сеть приглашений позволяет получать вознаграждения за активность приглашённых пользователей на нескольких уровнях.","aboutL4Title":"Актуальные данные платформы:","aboutL4Desc":"Криптовалютные рынки, объёмы торгов, сетевые комиссии и системные уведомления дают актуальную информацию.","noMsgCategory":"В этой категории нет сообщений.","systemMessage":"Системное сообщение","tagAdmin":"Сообщение администратора","tagApproved":"Заявка одобрена","tagRejected":"Заявка отклонена","badgeNew":"Новое","badgeRead":"Прочитано","supportFollowup":"Обратиться в поддержку","unreadTitle":"Не прочитано","elapsedTime":"Прошло времени:","requesting":"Отправка заявки…","requestPending":"Заявка на проверке…","depositError":"❌ Ошибка отправки заявки на пополнение:","copyFinalTitle":"Копировать итоговую сумму","dir":"ltr"},"es":{"pageTitle":"Zenix - Depósito","adminMsg":"Mensaje del administrador","welcomeText":"Te damos la bienvenida a Zenix.","home":"Inicio","quantification":"Cuantificación","deposit":"Depositar","receive":"Retirar","transactions":"Transacciones","profile":"Perfil","support":"Soporte","m_about":"Acerca de la plataforma","logout":"Cerrar sesión","depositTitle":"Depósito","depositSub":"Recarga la cuenta mediante la red blockchain","activeStatus":"Activo","calcTitle":"Calculadora del depósito","finalCalcText":"Importe final del depósito:","txHashTitle":"Hash de transacción (TxID)","selectNetwork":"Seleccionar red y dirección","scanQr":"Escanea para depositar directamente","copyBtn":"Copiar","copyWarning":"⚠ Introduce primero el importe para mostrar y copiar la dirección de la cartera.","inquiryBtn":"Consultar depósito","securityGuide":"Aviso de seguridad importante:","securityWarning":"* El importe depositado debe coincidir exactamente con el importe calculado. De lo contrario, todo el depósito quedará bloqueado y no se podrá reembolsar.","sec1":"* No deposites monedas distintas de USDT.","sec2":"* Las transacciones se procesan automáticamente tras la confirmación de los nodos de la red.","txTiming":"La confirmación de la transacción y el abono suelen tardar entre 5 y 15 minutos.","amountPlaceholder":"Importe en USDT","txHashPlaceholder":"Ejemplo: 5f4d11... o hash de transacción","walletPlaceholder":"Introduce primero el importe para mostrar la dirección…","copiedMsg":"📋 Dirección de la cartera copiada.","copyFailedMsg":"⚠ Error al copiar. Selecciona y copia manualmente.","loginErr":"❌ Inicia sesión primero.","fillReqErr":"❌ Introduce el importe y el hash de la transacción completos.","pendingSentMsg":"⏳ La solicitud de depósito se ha enviado al administrador para su revisión.","netLbl":"Dirección de la cartera","modalTitle":"Notificaciones y mensajes","noMsg":"No hay mensajes nuevos.","tNode":"Servidor activo (US-East)","tabAll":"Todos","tabApproved":"Aprobado","tabRejected":"Rechazado","tabAdmin":"Mensaje del administrador","detailTitle":"Ver mensaje","helpTitle":"Guía de la página de depósito","helpSecurityTitle":"Aviso de seguridad importante:","helpSecurityText":"El importe depositado debe coincidir exactamente con el calculado; de lo contrario, quedará bloqueado y no será reembolsable.","helpSelectNetworkTitle":"Elegir red y dirección","helpSelectNetworkText":"Elige la red de transferencia (como TRC20 o BEP20). La dirección de la cartera cambia según la red seleccionada.","helpCalcTitle":"Calcular el importe del depósito","helpCalcText":"Introduce el importe en USDT para habilitar y copiar la dirección de la cartera. También se muestra el importe final con la comisión.","helpTxTitle":"Enviar el hash de transacción (TxID)","helpTxText":"Después de transferir desde tu cartera, introduce el hash de la transacción y pulsa Consultar depósito para acreditar el saldo.","aboutTitle":"Acerca de Zenix (objetivo, naturaleza y estructura)","aboutDesc":"Zenix es un ecosistema financiero moderno para activos digitales y procesamiento de transacciones, diseñado para ofrecer servicios seguros y automatizados.","aboutL1Title":"Objetivo principal:","aboutL1Desc":"Automatizar operaciones mediante IA y algoritmos de cuantificación para ayudar a los usuarios a interactuar con los movimientos del mercado.","aboutL2Title":"Seguridad e infraestructura:","aboutL2Desc":"Utiliza protocolos de cifrado, nodos de procesamiento en la nube y gestión unificada de activos en Supabase.","aboutL3Title":"Referidos y equipo multinivel:","aboutL3Desc":"Una red de invitaciones permite obtener recompensas por la actividad de referidos en varios niveles.","aboutL4Title":"Datos en directo:","aboutL4Desc":"Los mercados de criptomonedas, volúmenes, comisiones de red y avisos del sistema ofrecen información actualizada.","noMsgCategory":"No hay mensajes en esta categoría.","systemMessage":"Mensaje del sistema","tagAdmin":"Mensaje del administrador","tagApproved":"Solicitud aprobada","tagRejected":"Solicitud rechazada","badgeNew":"Nuevo","badgeRead":"Leído","supportFollowup":"Contactar con soporte","unreadTitle":"Sin leer","elapsedTime":"Tiempo transcurrido:","requesting":"Enviando solicitud…","requestPending":"Solicitud en revisión…","depositError":"❌ Error al enviar la solicitud de depósito:","copyFinalTitle":"Copiar importe final","dir":"ltr"},"fr":{"pageTitle":"Zenix - Dépôt","adminMsg":"Message de l’administrateur","welcomeText":"Bienvenue sur la plateforme Zenix.","home":"Accueil","quantification":"Quantification","deposit":"Déposer","receive":"Retirer","transactions":"Transactions","profile":"Profil","support":"Assistance","m_about":"À propos de la plateforme","logout":"Déconnexion","depositTitle":"Dépôt","depositSub":"Créditer le compte via le réseau blockchain","activeStatus":"Actif","calcTitle":"Calculateur de dépôt","finalCalcText":"Montant final du dépôt :","txHashTitle":"Hash de transaction (TxID)","selectNetwork":"Choisir le réseau et l’adresse","scanQr":"Scanner pour déposer directement","copyBtn":"Copier","copyWarning":"⚠ Saisissez d’abord le montant du dépôt pour afficher et copier l’adresse du portefeuille.","inquiryBtn":"Vérifier le dépôt","securityGuide":"Avertissement de sécurité important :","securityWarning":"* Le montant déposé doit correspondre exactement au montant calculé. Sinon, le dépôt entier sera bloqué et ne pourra pas être remboursé.","sec1":"* N’envoyez aucune devise autre que l’USDT.","sec2":"* Les transactions sont traitées automatiquement après confirmation des nœuds du réseau.","txTiming":"La confirmation de la transaction et le crédit du compte prennent généralement 5 à 15 minutes.","amountPlaceholder":"Montant en USDT","txHashPlaceholder":"Exemple : 5f4d11... ou hash de transaction","walletPlaceholder":"Saisissez d’abord le montant pour afficher l’adresse…","copiedMsg":"📋 Adresse du portefeuille copiée.","copyFailedMsg":"⚠ La copie a échoué. Sélectionnez et copiez manuellement.","loginErr":"❌ Veuillez d’abord vous connecter.","fillReqErr":"❌ Saisissez le montant et le hash de transaction en entier.","pendingSentMsg":"⏳ Votre demande de dépôt a été envoyée à l’administrateur pour examen.","netLbl":"Adresse du portefeuille","modalTitle":"Notifications et messages","noMsg":"Aucun nouveau message.","tNode":"Serveur actif (US-East)","tabAll":"Tous","tabApproved":"Approuvé","tabRejected":"Rejeté","tabAdmin":"Message de l’administrateur","detailTitle":"Afficher le message","helpTitle":"Guide de la page de dépôt","helpSecurityTitle":"Avertissement de sécurité important :","helpSecurityText":"Le montant déposé doit correspondre exactement au montant calculé ; sinon, il sera bloqué et non remboursable.","helpSelectNetworkTitle":"Choisir le réseau et l’adresse","helpSelectNetworkText":"Choisissez votre réseau de transfert (TRC20 ou BEP20). L’adresse du portefeuille dépend du réseau choisi.","helpCalcTitle":"Calculer le montant du dépôt","helpCalcText":"Saisissez un montant en USDT pour activer et copier l’adresse du portefeuille. Le montant final avec frais est également affiché.","helpTxTitle":"Envoyer le hash de transaction (TxID)","helpTxText":"Après le transfert, saisissez le hash de transaction puis cliquez sur Vérifier le dépôt pour créditer votre solde.","aboutTitle":"À propos de Zenix (objectif, nature et structure)","aboutDesc":"Zenix est un écosystème financier moderne dédié aux actifs numériques et au traitement des transactions, conçu pour offrir des services automatisés et sécurisés.","aboutL1Title":"Objectif principal :","aboutL1Desc":"Automatiser les opérations grâce à l’IA et aux algorithmes de quantification pour aider les utilisateurs à suivre les mouvements du marché.","aboutL2Title":"Sécurité et infrastructure :","aboutL2Desc":"Protocoles de chiffrement, nœuds cloud rapides et gestion unifiée des actifs dans la base de données Supabase.","aboutL3Title":"Parrainage et équipe à plusieurs niveaux :","aboutL3Desc":"Un réseau de parrainage permet de recevoir des récompenses liées à l’activité des filleuls sur plusieurs niveaux.","aboutL4Title":"Données en direct :","aboutL4Desc":"Les marchés crypto, les volumes, les frais réseau et les notifications système fournissent des informations actualisées.","noMsgCategory":"Aucun message dans cette catégorie.","systemMessage":"Message système","tagAdmin":"Message de l’administrateur","tagApproved":"Demande approuvée","tagRejected":"Demande rejetée","badgeNew":"Nouveau","badgeRead":"Lu","supportFollowup":"Contacter l’assistance","unreadTitle":"Non lu","elapsedTime":"Temps écoulé :","requesting":"Envoi de la demande…","requestPending":"Demande en cours d’examen…","depositError":"❌ Erreur lors de l’envoi de la demande de dépôt :","copyFinalTitle":"Copier le montant final","dir":"ltr"},"de":{"pageTitle":"Zenix - Einzahlung","adminMsg":"Admin-Nachricht","welcomeText":"Willkommen bei Zenix.","home":"Startseite","quantification":"Quantifizierung","deposit":"Einzahlen","receive":"Auszahlen","transactions":"Transaktionen","profile":"Profil","support":"Support","m_about":"Über die Plattform","logout":"Abmelden","depositTitle":"Einzahlung","depositSub":"Konto über das Blockchain-Netzwerk aufladen","activeStatus":"Aktiv","calcTitle":"Einzahlungsrechner","finalCalcText":"Endgültiger Einzahlungsbetrag:","txHashTitle":"Transaktions-Hash (TxID)","selectNetwork":"Netzwerk und Adresse auswählen","scanQr":"Für direkte Einzahlung scannen","copyBtn":"Kopieren","copyWarning":"⚠ Gib zuerst den Einzahlungsbetrag ein, um die Wallet-Adresse anzuzeigen und zu kopieren.","inquiryBtn":"Einzahlung prüfen","securityGuide":"Wichtiger Sicherheitshinweis:","securityWarning":"* Der eingezahlte Betrag muss genau dem berechneten Betrag entsprechen. Andernfalls wird die gesamte Einzahlung gesperrt und kann nicht zurückerstattet werden.","sec1":"* Bitte keine andere Währung als USDT einzahlen.","sec2":"* Transaktionen werden nach Bestätigung durch die Netzwerkknoten automatisch verarbeitet.","txTiming":"Die Transaktionsbestätigung und Gutschrift dauern normalerweise 5–15 Minuten.","amountPlaceholder":"Betrag in USDT","txHashPlaceholder":"Beispiel: 5f4d11... oder Transaktions-Hash","walletPlaceholder":"Gib zuerst den Einzahlungsbetrag ein, um die Adresse anzuzeigen…","copiedMsg":"📋 Wallet-Adresse wurde in die Zwischenablage kopiert.","copyFailedMsg":"⚠ Kopieren fehlgeschlagen. Bitte markieren und manuell kopieren.","loginErr":"❌ Bitte melde dich zuerst an.","fillReqErr":"❌ Bitte gib Betrag und Transaktions-Hash vollständig ein.","pendingSentMsg":"⏳ Deine Einzahlungsanfrage wurde zur Prüfung an den Administrator gesendet.","netLbl":"Wallet-Adresse","modalTitle":"Benachrichtigungen und Nachrichten","noMsg":"Keine neuen Nachrichten.","tNode":"Server aktiv (US-East)","tabAll":"Alle","tabApproved":"Genehmigt","tabRejected":"Abgelehnt","tabAdmin":"Admin-Nachricht","detailTitle":"Nachricht anzeigen","helpTitle":"Hilfe zur Einzahlungsseite","helpSecurityTitle":"Wichtiger Sicherheitshinweis:","helpSecurityText":"Der eingezahlte Betrag muss genau dem berechneten Betrag entsprechen; andernfalls wird er gesperrt und kann nicht zurückerstattet werden.","helpSelectNetworkTitle":"Netzwerk und Adresse auswählen","helpSelectNetworkText":"Wähle dein Transfernetzwerk (z. B. TRC20 oder BEP20). Die Ziel-Wallet-Adresse richtet sich nach dem ausgewählten Netzwerk.","helpCalcTitle":"Einzahlungsbetrag berechnen","helpCalcText":"Gib einen Betrag in USDT ein, um die Wallet-Adresse freizuschalten und zu kopieren. Der Endbetrag inklusive Gebühr wird ebenfalls angezeigt.","helpTxTitle":"Transaktions-Hash (TxID) senden","helpTxText":"Gib nach der Überweisung den Transaktions-Hash ein und klicke auf Einzahlung prüfen, damit dein Guthaben gutgeschrieben werden kann.","aboutTitle":"Über Zenix (Ziel, Wesen und Struktur)","aboutDesc":"Zenix ist ein modernes Finanzökosystem für digitale Vermögenswerte und Transaktionsverarbeitung, das sichere und automatisierte Dienste bereitstellen soll.","aboutL1Title":"Hauptziel:","aboutL1Desc":"Handelsprozesse mithilfe von KI und Quantifizierungsalgorithmen automatisieren, damit Nutzer Marktbewegungen besser nutzen können.","aboutL2Title":"Sicherheit und Infrastruktur:","aboutL2Desc":"Verschlüsselung, schnelle Cloud-Verarbeitungsknoten und eine einheitliche Vermögensverwaltung in der Supabase-Datenbank.","aboutL3Title":"Mehrstufige Empfehlungen und Team:","aboutL3Desc":"Ein Empfehlungsnetzwerk ermöglicht Prämien für Aktivitäten geworbener Nutzer auf mehreren Ebenen.","aboutL4Title":"Live-Plattformdaten:","aboutL4Desc":"Kryptomärkte, Handelsvolumen, Netzwerkgebühren und Systemmeldungen liefern aktuelle Informationen.","noMsgCategory":"Keine Nachrichten in dieser Kategorie.","systemMessage":"Systemnachricht","tagAdmin":"Admin-Nachricht","tagApproved":"Anfrage genehmigt","tagRejected":"Anfrage abgelehnt","badgeNew":"Neu","badgeRead":"Gelesen","supportFollowup":"Support kontaktieren","unreadTitle":"Ungelesen","elapsedTime":"Vergangene Zeit:","requesting":"Anfrage wird gesendet…","requestPending":"Anfrage wird geprüft…","depositError":"❌ Fehler beim Senden der Einzahlungsanfrage:","copyFinalTitle":"Endbetrag kopieren","dir":"ltr"}};
+const LD = {
+  fa: {
+    pageTitle:"زنیکس - واریز",home:"صفحه اصلی",quantification:"کوانتیفیکیشن",deposit:"واریز",receive:"برداشت",transactions:"تراکنش‌ها",profile:"پروفایل",support:"پشتیبانی",m_about:"درباره پلتفرم",logout:"خروج",
+    depositTitle:"واریز",depositSub:"شارژ حساب از شبکه بلاکچین",activeStatus:"فعال",calcTitle:"محاسبه مبلغ واریزی",finalCalcText:"مبلغ واریزی نهایی:",
+    txHashTitle:"هش تراکنش (TxID)",selectNetwork:"انتخاب شبکه و آدرس",scanQr:"اسکن جهت واریز مستقیم",
+    copyBtn:"کپی",copyWarning:"⚠️ برای نمایش و کپی آدرس کیف پول، ابتدا مبلغ واریزی را وارد کنید.",inquiryBtn:"استعلام و واریزی",
+    securityGuide:"راهنمای امنیتی مهم:",securityWarning:"* مبلغ واریزی باید دقیقاً با مبلغ محاسبه‌شده برابر باشد؛ در غیر این صورت کل مبلغ مسدود می‌شود و قابل بازگشت نیست.",sec1:"* لطفاً از واریز هرگونه ارزی غیر از USDT خودداری فرمایید.",sec2:"* تراکنش‌ها پس از تأیید گره‌های شبکه به‌صورت خودکار پردازش می‌شوند.",
+    txTiming:"تأیید تراکنش و شارژ حساب معمولاً بین ۵ تا ۱۵ دقیقه زمان می‌برد.",amountPlaceholder:"مبلغ به USDT",txHashPlaceholder:"مثال: 5f4d11... یا هش تراکنش",walletPlaceholder:"برای نمایش آدرس ابتدا مبلغ واریزی را وارد کنید…",
+    copiedMsg:"📋 آدرس کیف پول با موفقیت در کلیپ‌بورد کپی شد.",copyFailedMsg:"⚠ کپی ناموفق بود. لطفاً متن را دستی انتخاب و کپی کنید.",
+    loginErr:"❌ لطفاً ابتدا وارد حساب کاربری خود شوید.",fillReqErr:"❌ لطفاً مبلغ و هش تراکنش را به‌طور کامل وارد کنید.",
+    duplicateTxId:"❌ این هش تراکنش قبلاً ثبت شده است. اگر واریزی شما تایید شده، نیازی به ثبت مجدد نیست.",
+    minAmountErr:"❌ حداقل مبلغ واریز ۱۰ USDT است.",maxAmountErr:"❌ حداکثر مبلغ واریز ۱۰۰,۰۰۰ USDT است.",
+    invalidTxId:"❌ فرمت هش تراکنش نامعتبر است. باید ۶۴ کاراکتر هگز باشد.",
+    sendExactlyLabel:"دقیقاً ارسال کنید",
+    pendingSentMsg:"⏳ درخواست واریز شما ثبت شد و برای بررسی به مدیریت ارسال گردید.",netLbl:"آدرس کیف پول",
+    modalTitle:"صندوق پیام‌ها و اعلان‌ها",noMsg:"هیچ پیام جدیدی وجود ندارد.",tNode:"سرور فعال (US-East)",
+    tabAll:"همه",tabApproved:"تأیید درخواست",tabRejected:"لغو درخواست",tabAdmin:"پیام مدیریت",detailTitle:"مشاهده پیام",
+    helpTitle:"راهنمای صفحه واریز",helpSecurityTitle:"راهنمای امنیتی مهم:",helpSecurityText:"حتماً مبلغ واریزی با مبلغ محاسبه‌شده برابر باشد؛ در غیر این صورت کل مبلغ مسدود می‌شود و قابل بازگشت نیست.",
+    helpSelectNetworkTitle:"انتخاب شبکه و آدرس",helpSelectNetworkText:"ابتدا شبکه انتقال خود (مانند TRC20 یا BEP20) را انتخاب کنید. آدرس کیف پول مقصد بر اساس شبکه انتخابی تغییر می‌کند.",
+    helpCalcTitle:"محاسبه مبلغ واریزی",helpCalcText:"با وارد کردن مبلغ به USDT، آدرس کیف پول فعال می‌شود و می‌توانید آن را کپی کنید. مبلغ نهایی با احتساب کارمزد نیز نمایش داده می‌شود.",
+    helpTxTitle:"ثبت هش تراکنش (TxID)",helpTxText:"پس از انجام تراکنش، هش آن (TxID) را وارد کرده و دکمه استعلام واریز را بزنید تا موجودی شما شارژ شود.",
+    aboutTitle:"درباره پلتفرم Zenix (هدف، ماهیت و ساختار)",aboutDesc:"پلتفرم Zenix یک اکوسیستم مالی نوین برای دارایی‌های دیجیتال و پردازش تراکنش‌هاست که با هدف ارائه خدمات امن و خودکار طراحی شده است.",
+    aboutL1Title:"هدف اصلی:",aboutL1Desc:"خودکارسازی فرایندهای معاملاتی با سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن، برای استفاده از نوسانات بازار بدون نیاز به تخصص پیشرفته در معامله‌گری.",
+    aboutL2Title:"امنیت و زیرساخت:",aboutL2Desc:"استفاده از پروتکل‌های رمزنگاری، گره‌های پردازش ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در پایگاه داده ابری Supabase.",
+    aboutL3Title:"معرفی و تیم چندسطحی:",aboutL3Desc:"ایجاد شبکه معرفی دوستان تا کاربران از فعالیت زیرمجموعه‌های خود در چند سطح پاداش دریافت کنند.",
+    aboutL4Title:"اطلاعات زنده پلتفرم:",aboutL4Desc:"نمایش بازار رمزارزها، شاخص‌های حجم معاملات، نرخ گس شبکه و اعلان‌های سیستم برای ارائه اطلاعات به‌روز.",
+    noMsgCategory:"در این دسته‌بندی پیامی وجود ندارد.",systemMessage:"پیام سیستم",
+    tagAdmin:"پیام مدیریت",tagApproved:"تأیید درخواست",tagRejected:"لغو درخواست",badgeNew:"جدید",badgeRead:"خوانده‌شده",
+    supportFollowup:"پیگیری از پشتیبانی",unreadTitle:"خوانده‌نشده",elapsedTime:"زمان سپری‌شده:",requesting:"در حال ثبت درخواست…",requestPending:"درخواست در حال بررسی…",
+    depositError:"❌ خطا در ثبت درخواست واریز:",copyFinalTitle:"کپی مبلغ نهایی",dir:"rtl"
+  },
+  en: {
+    pageTitle:"Deposit | Zenix",home:"Home",quantification:"Quantification",deposit:"Deposit",receive:"Withdraw",transactions:"Transactions",profile:"Profile",support:"Support",m_about:"About platform",logout:"Log out",
+    depositTitle:"Deposit",depositSub:"Top up your account through the blockchain network",activeStatus:"Active",calcTitle:"Deposit amount calculator",finalCalcText:"Final deposit amount:",
+    txHashTitle:"Transaction hash (TxID)",selectNetwork:"Select network and address",scanQr:"Scan to deposit directly",
+    copyBtn:"Copy",copyWarning:"⚠ Enter the deposit amount first to display and copy the wallet address.",inquiryBtn:"Check deposit",
+    securityGuide:"Important security notice:",securityWarning:"* The deposit amount must exactly match the calculated amount. Otherwise, the entire deposit will be locked and cannot be refunded.",sec1:"* Do not deposit any currency other than USDT.",sec2:"* Transactions are processed automatically after network nodes confirm them.",
+    txTiming:"Transaction confirmation and account crediting usually take 5–15 minutes.",amountPlaceholder:"Amount in USDT",txHashPlaceholder:"Example: 5f4d11... or transaction hash",walletPlaceholder:"Enter the deposit amount first to display the address…",
+    copiedMsg:"📋 Wallet address copied to the clipboard.",copyFailedMsg:"⚠ Copy failed. Please select and copy manually.",
+    loginErr:"❌ Please log in to your account first.",fillReqErr:"❌ Enter both the amount and transaction hash.",
+    duplicateTxId:"❌ This transaction hash has already been submitted.",
+    minAmountErr:"❌ Minimum deposit amount is 10 USDT.",maxAmountErr:"❌ Maximum deposit amount is 100,000 USDT.",
+    invalidTxId:"❌ Invalid transaction hash format. Must be 64 hex characters.",
+    sendExactlyLabel:"Send exactly",
+    pendingSentMsg:"⏳ Your deposit request has been submitted to the administrator for review.",netLbl:"Wallet address",
+    modalTitle:"Notifications and messages",noMsg:"No new messages.",tNode:"Server active (US-East)",
+    tabAll:"All",tabApproved:"Approved",tabRejected:"Rejected",tabAdmin:"Admin message",detailTitle:"View message",
+    helpTitle:"Deposit page guide",helpSecurityTitle:"Important security notice:",helpSecurityText:"The deposit amount must exactly match the calculated amount. Otherwise, the entire deposit will be locked and cannot be refunded.",
+    helpSelectNetworkTitle:"Choose network and address",helpSelectNetworkText:"Choose your transfer network (such as TRC20 or BEP20). The destination wallet address changes according to the selected network.",
+    helpCalcTitle:"Calculate deposit amount",helpCalcText:"Enter an amount in USDT to enable the wallet address and copy it. The final amount including the fee is also shown.",
+    helpTxTitle:"Submit transaction hash (TxID)",helpTxText:"After making the transfer from your personal wallet, enter the transaction hash (TxID) in the field and select Check Deposit so your balance can be credited.",
+    aboutTitle:"About Zenix (purpose, nature, and structure)",aboutDesc:"Zenix is a modern financial ecosystem for digital assets and transaction processing, designed to provide users with a secure, automated service.",
+    aboutL1Title:"Main purpose:",aboutL1Desc:"Automate trading processes with AI systems and quantification algorithms, helping users engage with global market movements without advanced trading expertise.",
+    aboutL2Title:"Security and infrastructure:",aboutL2Desc:"Uses encryption protocols, high-speed cloud processing nodes, and unified asset management on the Supabase cloud database.",
+    aboutL3Title:"Multi-level referrals and team:",aboutL3Desc:"Builds a referral network where users can receive rewards from the activity of their referrals across multiple levels.",
+    aboutL4Title:"Live platform data:",aboutL4Desc:"Live cryptocurrency markets, trading-volume indicators, network gas rates, and system notices provide current platform information.",
+    noMsgCategory:"No messages in this category.",systemMessage:"System message",
+    tagAdmin:"Admin message",tagApproved:"Request approved",tagRejected:"Request rejected",badgeNew:"New",badgeRead:"Read",
+    supportFollowup:"Contact support",unreadTitle:"Unread",elapsedTime:"Elapsed time:",requesting:"Submitting request…",requestPending:"Request under review…",
+    depositError:"❌ Error submitting deposit request:",copyFinalTitle:"Copy final amount",dir:"ltr"
+  },
+  ar: {
+    pageTitle:"Zenix - إيداع",home:"الرئيسية",quantification:"التداول الكمي",deposit:"إيداع",receive:"سحب",transactions:"المعاملات",profile:"الملف الشخصي",support:"الدعم",m_about:"حول المنصة",logout:"تسجيل الخروج",
+    depositTitle:"إيداع",depositSub:"شحن الحساب عبر شبكة البلوك تشين",activeStatus:"نشط",calcTitle:"حاسبة مبلغ الإيداع",finalCalcText:"مبلغ الإيداع النهائي:",
+    txHashTitle:"معرّف المعاملة (TxID)",selectNetwork:"اختيار الشبكة والعنوان",scanQr:"امسح للإيداع المباشر",
+    copyBtn:"نسخ",copyWarning:"⚠ أدخل مبلغ الإيداع أولاً لعرض عنوان المحفظة ونسخه.",inquiryBtn:"التحقق من الإيداع",
+    securityGuide:"تنبيه أمني مهم:",securityWarning:"* يجب أن يطابق مبلغ الإيداع المبلغ المحسوب تماماً، وإلا فسيتم تجميد المبلغ بالكامل ولن يمكن استرداده.",sec1:"* يرجى عدم إيداع أي عملة أخرى غير USDT.",sec2:"* تُعالج المعاملات تلقائياً بعد تأكيد عُقد الشبكة.",
+    txTiming:"يستغرق تأكيد المعاملة وإضافة الرصيد عادةً من 5 إلى 15 دقيقة.",amountPlaceholder:"المبلغ بـ USDT",txHashPlaceholder:"مثال: 5f4d11... أو معرّف المعاملة",walletPlaceholder:"أدخل مبلغ الإيداع أولاً لعرض العنوان…",
+    copiedMsg:"📋 تم نسخ عنوان المحفظة بنجاح.",copyFailedMsg:"⚠ فشل النسخ. يرجى التحديد والنسخ يدوياً.",
+    loginErr:"❌ يرجى تسجيل الدخول أولاً.",fillReqErr:"❌ يرجى إدخال المبلغ ومعرّف المعاملة بالكامل.",
+    duplicateTxId:"❌ تم إرسال معرّف هذه المعاملة مسبقاً.",
+    minAmountErr:"❌ الحد الأدنى للإيداع هو 10 USDT.",maxAmountErr:"❌ الحد الأقصى للإيداع هو 100,000 USDT.",
+    invalidTxId:"❌ صيغة معرّف المعاملة غير صالحة. يجب أن تكون 64 حرفاً سداسياً.",
+    sendExactlyLabel:"أرسل بالضبط",
+    pendingSentMsg:"⏳ تم إرسال طلب الإيداع إلى الإدارة للمراجعة.",netLbl:"عنوان المحفظة",
+    modalTitle:"الإشعارات والرسائل",noMsg:"لا توجد رسائل جديدة.",tNode:"الخادم نشط (US-East)",
+    tabAll:"الكل",tabApproved:"تمت الموافقة",tabRejected:"مرفوض",tabAdmin:"رسالة الإدارة",detailTitle:"عرض الرسالة",
+    helpTitle:"دليل صفحة الإيداع",helpSecurityTitle:"تنبيه أمني مهم:",helpSecurityText:"يجب أن يطابق مبلغ الإيداع المبلغ المحسوب تماماً، وإلا فسيتم تجميده ولن يمكن استرداده.",
+    helpSelectNetworkTitle:"اختيار الشبكة والعنوان",helpSelectNetworkText:"اختر شبكة التحويل (مثل TRC20 أو BEP20). يتغير عنوان المحفظة بحسب الشبكة المحددة.",
+    helpCalcTitle:"حساب مبلغ الإيداع",helpCalcText:"أدخل المبلغ بـ USDT لإتاحة عنوان المحفظة ونسخه. سيظهر أيضاً المبلغ النهائي شاملاً الرسوم.",
+    helpTxTitle:"إرسال معرّف المعاملة (TxID)",helpTxText:"بعد التحويل من محفظتك، أدخل معرّف المعاملة واضغط على التحقق من الإيداع لإضافة الرصيد.",
+    aboutTitle:"حول منصة Zenix (الهدف والطبيعة والبنية)",aboutDesc:"Zenix منظومة مالية حديثة للأصول الرقمية ومعالجة المعاملات، صُممت لتقديم خدمات آمنة وآلية.",
+    aboutL1Title:"الهدف الرئيسي:",aboutL1Desc:"أتمتة التداول باستخدام الذكاء الاصطناعي وخوارزميات التداول الكمي للمساعدة في التعامل مع تحركات الأسواق.",
+    aboutL2Title:"الأمان والبنية التحتية:",aboutL2Desc:"بروتوكولات تشفير وعُقد معالجة سحابية سريعة وإدارة موحدة للأصول عبر قاعدة بيانات Supabase.",
+    aboutL3Title:"الإحالات والفريق متعدد المستويات:",aboutL3Desc:"إنشاء شبكة إحالات تتيح للمستخدمين الحصول على مكافآت من نشاط الإحالات عبر مستويات متعددة.",
+    aboutL4Title:"بيانات المنصة المباشرة:",aboutL4Desc:"توفر أسواق العملات الرقمية ومؤشرات حجم التداول ورسوم الشبكة والإشعارات معلومات حديثة.",
+    noMsgCategory:"لا توجد رسائل في هذه الفئة.",systemMessage:"رسالة النظام",
+    tagAdmin:"رسالة الإدارة",tagApproved:"تمت الموافقة",tagRejected:"تم الرفض",badgeNew:"جديد",badgeRead:"مقروء",
+    supportFollowup:"التواصل مع الدعم",unreadTitle:"غير مقروء",elapsedTime:"الوقت المنقضي:",requesting:"جارٍ إرسال الطلب…",requestPending:"الطلب قيد المراجعة…",
+    depositError:"❌ حدث خطأ أثناء إرسال طلب الإيداع:",copyFinalTitle:"نسخ المبلغ النهائي",dir:"rtl"
+  },
+  tr: {
+    pageTitle:"Zenix - Para Yatırma",home:"Ana sayfa",quantification:"Kantifikasyon",deposit:"Para yatır",receive:"Para çek",transactions:"İşlemler",profile:"Profil",support:"Destek",m_about:"Platform hakkında",logout:"Çıkış yap",
+    depositTitle:"Para yatır",depositSub:"Blokzincir ağı üzerinden hesaba para yükleyin",activeStatus:"Aktif",calcTitle:"Yatırma tutarı hesaplayıcı",finalCalcText:"Nihai yatırma tutarı:",
+    txHashTitle:"İşlem özeti (TxID)",selectNetwork:"Ağ ve adres seçin",scanQr:"Doğrudan yatırmak için tarayın",
+    copyBtn:"Kopyala",copyWarning:"⚠ Cüzdan adresini görüntülemek ve kopyalamak için önce yatırma tutarını girin.",inquiryBtn:"Yatırmayı kontrol et",
+    securityGuide:"Önemli güvenlik uyarısı:",securityWarning:"* Yatırılan tutar hesaplanan tutarla tam olarak eşleşmelidir. Aksi hâlde tutarın tamamı bloke edilir ve iade edilemez.",sec1:"* Lütfen USDT dışında başka bir para yatırmayın.",sec2:"* İşlemler, ağ düğümleri onayladıktan sonra otomatik olarak işlenir.",
+    txTiming:"İşlemin onaylanması ve bakiyeye yansıması genellikle 5–15 dakika sürer.",amountPlaceholder:"USDT tutarı",txHashPlaceholder:"Örnek: 5f4d11... veya işlem özeti",walletPlaceholder:"Adresi görmek için önce yatırma tutarını girin…",
+    copiedMsg:"📋 Cüzdan adresi panoya kopyalandı.",copyFailedMsg:"⚠ Kopyalama başarısız. Lütfen metni elle seçip kopyalayın.",
+    loginErr:"❌ Lütfen önce hesabınıza giriş yapın.",fillReqErr:"❌ Lütfen tutarı ve işlem özetini eksiksiz girin.",
+    duplicateTxId:"❌ Bu işlem özeti zaten gönderildi.",
+    minAmountErr:"❌ Minimum yatırma tutarı 10 USDT'dir.",maxAmountErr:"❌ Maksimum yatırma tutarı 100.000 USDT'dir.",
+    invalidTxId:"❌ Geçersiz işlem özeti biçimi. 64 hex karakter olmalıdır.",
+    sendExactlyLabel:"Tam olarak gönderin",
+    pendingSentMsg:"⏳ Para yatırma talebiniz yönetici incelemesine gönderildi.",netLbl:"Cüzdan adresi",
+    modalTitle:"Bildirimler ve mesajlar",noMsg:"Yeni mesaj yok.",tNode:"Sunucu aktif (US-East)",
+    tabAll:"Tümü",tabApproved:"Onaylandı",tabRejected:"Reddedildi",tabAdmin:"Yönetici mesajı",detailTitle:"Mesajı görüntüle",
+    helpTitle:"Para yatırma sayfası rehberi",helpSecurityTitle:"Önemli güvenlik uyarısı:",helpSecurityText:"Yatırılan tutar hesaplanan tutarla tam olarak eşleşmelidir; aksi hâlde tutar bloke edilir ve iade edilemez.",
+    helpSelectNetworkTitle:"Ağ ve adres seçimi",helpSelectNetworkText:"TRC20 veya BEP20 gibi transfer ağınızı seçin. Hedef cüzdan adresi seçilen ağa göre değişir.",
+    helpCalcTitle:"Yatırma tutarını hesaplama",helpCalcText:"Cüzdan adresini etkinleştirmek ve kopyalamak için USDT tutarını girin. Ücret dâhil nihai tutar da gösterilir.",
+    helpTxTitle:"İşlem özetini (TxID) gönderme",helpTxText:"Transferden sonra işlem özetini alana girin ve bakiyenizin yüklenmesi için yatırma kontrol düğmesine basın.",
+    aboutTitle:"Zenix hakkında (amaç, nitelik ve yapı)",aboutDesc:"Zenix, dijital varlıklar ve işlem süreçleri için güvenli ve otomatik hizmet sunmayı amaçlayan modern bir finansal ekosistemdir.",
+    aboutL1Title:"Temel amaç:",aboutL1Desc:"Yapay zekâ ve kantifikasyon algoritmalarıyla işlem süreçlerini otomatikleştirerek kullanıcıların piyasa hareketlerini değerlendirmesine yardımcı olmak.",
+    aboutL2Title:"Güvenlik ve altyapı:",aboutL2Desc:"Şifreleme protokolleri, hızlı bulut işlem düğümleri ve Supabase veritabanında birleşik varlık yönetimi kullanılır.",
+    aboutL3Title:"Çok düzeyli referans ve ekip:",aboutL3Desc:"Kullanıcıların yönlendirdikleri kişilerin faaliyetlerinden farklı düzeylerde ödül alabilecekleri bir ağ sunar.",
+    aboutL4Title:"Canlı platform verileri:",aboutL4Desc:"Kripto piyasaları, işlem hacmi göstergeleri, ağ ücretleri ve sistem bildirimleri güncel bilgiler sağlar.",
+    noMsgCategory:"Bu kategoride mesaj yok.",systemMessage:"Sistem mesajı",
+    tagAdmin:"Yönetici mesajı",tagApproved:"Talep onaylandı",tagRejected:"Talep reddedildi",badgeNew:"Yeni",badgeRead:"Okundu",
+    supportFollowup:"Destekle iletişime geç",unreadTitle:"Okunmadı",elapsedTime:"Geçen süre:",requesting:"Talep gönderiliyor…",requestPending:"Talep inceleniyor…",
+    depositError:"❌ Para yatırma talebi gönderilirken hata oluştu:",copyFinalTitle:"Son tutarı kopyala",dir:"ltr"
+  },
+  ru: {
+    pageTitle:"Zenix — Пополнение",home:"Главная",quantification:"Квантификация",deposit:"Пополнение",receive:"Вывод",transactions:"Транзакции",profile:"Профиль",support:"Поддержка",m_about:"О платформе",logout:"Выйти",
+    depositTitle:"Пополнение",depositSub:"Пополнение счёта через блокчейн-сеть",activeStatus:"Активно",calcTitle:"Калькулятор пополнения",finalCalcText:"Итоговая сумма пополнения:",
+    txHashTitle:"Хеш транзакции (TxID)",selectNetwork:"Выберите сеть и адрес",scanQr:"Сканируйте для прямого пополнения",
+    copyBtn:"Копировать",copyWarning:"⚠ Сначала введите сумму, чтобы увидеть и скопировать адрес кошелька.",inquiryBtn:"Проверить пополнение",
+    securityGuide:"Важное предупреждение безопасности:",securityWarning:"* Сумма пополнения должна точно совпадать с рассчитанной суммой. Иначе вся сумма будет заблокирована и возврат невозможен.",sec1:"* Не отправляйте валюту, отличную от USDT.",sec2:"* Транзакции обрабатываются автоматически после подтверждения узлами сети.",
+    txTiming:"Подтверждение транзакции и зачисление обычно занимают 5–15 минут.",amountPlaceholder:"Сумма в USDT",txHashPlaceholder:"Например: 5f4d11... или хеш транзакции",walletPlaceholder:"Сначала введите сумму пополнения, чтобы увидеть адрес…",
+    copiedMsg:"📋 Адрес кошелька скопирован.",copyFailedMsg:"⚠ Не удалось скопировать. Пожалуйста, выделите и скопируйте вручную.",
+    loginErr:"❌ Сначала войдите в аккаунт.",fillReqErr:"❌ Укажите сумму и хеш транзакции полностью.",
+    duplicateTxId:"❌ Этот хеш транзакции уже был отправлен.",
+    minAmountErr:"❌ Минимальная сумма пополнения — 10 USDT.",maxAmountErr:"❌ Максимальная сумма пополнения — 100 000 USDT.",
+    invalidTxId:"❌ Неверный формат хеша транзакции. Должно быть 64 hex-символа.",
+    sendExactlyLabel:"Отправьте ровно",
+    pendingSentMsg:"⏳ Заявка на пополнение отправлена администратору на проверку.",netLbl:"Адрес кошелька",
+    modalTitle:"Уведомления и сообщения",noMsg:"Новых сообщений нет.",tNode:"Сервер активен (US-East)",
+    tabAll:"Все",tabApproved:"Одобрено",tabRejected:"Отклонено",tabAdmin:"Сообщение администратора",detailTitle:"Просмотр сообщения",
+    helpTitle:"Руководство по странице пополнения",helpSecurityTitle:"Важное предупреждение безопасности:",helpSecurityText:"Сумма пополнения должна точно совпадать с рассчитанной суммой; иначе средства будут заблокированы без возможности возврата.",
+    helpSelectNetworkTitle:"Выбор сети и адреса",helpSelectNetworkText:"Выберите сеть перевода (например, TRC20 или BEP20). Адрес кошелька зависит от выбранной сети.",
+    helpCalcTitle:"Расчёт суммы пополнения",helpCalcText:"Введите сумму в USDT, чтобы открыть возможность копирования адреса кошелька. Итоговая сумма с комиссией также отображается.",
+    helpTxTitle:"Отправка хеша транзакции (TxID)",helpTxText:"После перевода введите хеш транзакции и нажмите проверку пополнения, чтобы средства были зачислены.",
+    aboutTitle:"О Zenix (цель, характер и структура)",aboutDesc:"Zenix — современная финансовая экосистема для цифровых активов и обработки транзакций, созданная для безопасных автоматизированных услуг.",
+    aboutL1Title:"Основная цель:",aboutL1Desc:"Автоматизация торговых процессов с помощью ИИ и алгоритмов количественного анализа рынка.",
+    aboutL2Title:"Безопасность и инфраструктура:",aboutL2Desc:"Используются шифрование, быстрые облачные узлы обработки и управление активами в базе данных Supabase.",
+    aboutL3Title:"Многоуровневые приглашения и команда:",aboutL3Desc:"Сеть приглашений позволяет получать вознаграждения за активность приглашённых пользователей на нескольких уровнях.",
+    aboutL4Title:"Актуальные данные платформы:",aboutL4Desc:"Криптовалютные рынки, объёмы торгов, сетевые комиссии и системные уведомления дают актуальную информацию.",
+    noMsgCategory:"В этой категории нет сообщений.",systemMessage:"Системное сообщение",
+    tagAdmin:"Сообщение администратора",tagApproved:"Заявка одобрена",tagRejected:"Заявка отклонена",badgeNew:"Новое",badgeRead:"Прочитано",
+    supportFollowup:"Обратиться в поддержку",unreadTitle:"Не прочитано",elapsedTime:"Прошло времени:",requesting:"Отправка заявки…",requestPending:"Заявка на проверке…",
+    depositError:"❌ Ошибка отправки заявки на пополнение:",copyFinalTitle:"Копировать итоговую сумму",dir:"ltr"
+  },
+  es: {
+    pageTitle:"Zenix - Depósito",home:"Inicio",quantification:"Cuantificación",deposit:"Depositar",receive:"Retirar",transactions:"Transacciones",profile:"Perfil",support:"Soporte",m_about:"Acerca de la plataforma",logout:"Cerrar sesión",
+    depositTitle:"Depósito",depositSub:"Recarga la cuenta mediante la red blockchain",activeStatus:"Activo",calcTitle:"Calculadora del depósito",finalCalcText:"Importe final del depósito:",
+    txHashTitle:"Hash de transacción (TxID)",selectNetwork:"Seleccionar red y dirección",scanQr:"Escanea para depositar directamente",
+    copyBtn:"Copiar",copyWarning:"⚠ Introduce primero el importe para mostrar y copiar la dirección de la cartera.",inquiryBtn:"Consultar depósito",
+    securityGuide:"Aviso de seguridad importante:",securityWarning:"* El importe depositado debe coincidir exactamente con el importe calculado. De lo contrario, todo el depósito quedará bloqueado y no se podrá reembolsar.",sec1:"* No deposites monedas distintas de USDT.",sec2:"* Las transacciones se procesan automáticamente tras la confirmación de los nodos de la red.",
+    txTiming:"La confirmación de la transacción y el abono suelen tardar entre 5 y 15 minutos.",amountPlaceholder:"Importe en USDT",txHashPlaceholder:"Ejemplo: 5f4d11... o hash de transacción",walletPlaceholder:"Introduce primero el importe para mostrar la dirección…",
+    copiedMsg:"📋 Dirección de la cartera copiada.",copyFailedMsg:"⚠ Error al copiar. Selecciona y copia manualmente.",
+    loginErr:"❌ Inicia sesión primero.",fillReqErr:"❌ Introduce el importe y el hash de la transacción completos.",
+    duplicateTxId:"❌ Este hash de transacción ya fue enviado.",
+    minAmountErr:"❌ El importe mínimo de depósito es 10 USDT.",maxAmountErr:"❌ El importe máximo de depósito es 100.000 USDT.",
+    invalidTxId:"❌ Formato de hash inválido. Debe ser 64 caracteres hexadecimales.",
+    sendExactlyLabel:"Envía exactamente",
+    pendingSentMsg:"⏳ La solicitud de depósito se ha enviado al administrador para su revisión.",netLbl:"Dirección de la cartera",
+    modalTitle:"Notificaciones y mensajes",noMsg:"No hay mensajes nuevos.",tNode:"Servidor activo (US-East)",
+    tabAll:"Todos",tabApproved:"Aprobado",tabRejected:"Rechazado",tabAdmin:"Mensaje del administrador",detailTitle:"Ver mensaje",
+    helpTitle:"Guía de la página de depósito",helpSecurityTitle:"Aviso de seguridad importante:",helpSecurityText:"El importe depositado debe coincidir exactamente con el calculado; de lo contrario, quedará bloqueado y no será reembolsable.",
+    helpSelectNetworkTitle:"Elegir red y dirección",helpSelectNetworkText:"Elige la red de transferencia (como TRC20 o BEP20). La dirección de la cartera cambia según la red seleccionada.",
+    helpCalcTitle:"Calcular el importe del depósito",helpCalcText:"Introduce el importe en USDT para habilitar y copiar la dirección de la cartera. También se muestra el importe final con la comisión.",
+    helpTxTitle:"Enviar el hash de transacción (TxID)",helpTxText:"Después de transferir desde tu cartera, introduce el hash de la transacción y pulsa Consultar depósito para acreditar el saldo.",
+    aboutTitle:"Acerca de Zenix (objetivo, naturaleza y estructura)",aboutDesc:"Zenix es un ecosistema financiero moderno para activos digitales y procesamiento de transacciones, diseñado para ofrecer servicios seguros y automatizados.",
+    aboutL1Title:"Objetivo principal:",aboutL1Desc:"Automatizar operaciones mediante IA y algoritmos de cuantificación para ayudar a los usuarios a interactuar con los movimientos del mercado.",
+    aboutL2Title:"Seguridad e infraestructura:",aboutL2Desc:"Utiliza protocolos de cifrado, nodos de procesamiento en la nube y gestión unificada de activos en Supabase.",
+    aboutL3Title:"Referidos y equipo multinivel:",aboutL3Desc:"Una red de invitaciones permite obtener recompensas por la actividad de referidos en varios niveles.",
+    aboutL4Title:"Datos en directo:",aboutL4Desc:"Los mercados de criptomonedas, volúmenes, comisiones de red y avisos del sistema ofrecen información actualizada.",
+    noMsgCategory:"No hay mensajes en esta categoría.",systemMessage:"Mensaje del sistema",
+    tagAdmin:"Mensaje del administrador",tagApproved:"Solicitud aprobada",tagRejected:"Solicitud rechazada",badgeNew:"Nuevo",badgeRead:"Leído",
+    supportFollowup:"Contactar con soporte",unreadTitle:"Sin leer",elapsedTime:"Tiempo transcurrido:",requesting:"Enviando solicitud…",requestPending:"Solicitud en revisión…",
+    depositError:"❌ Error al enviar la solicitud de depósito:",copyFinalTitle:"Copiar importe final",dir:"ltr"
+  },
+  fr: {
+    pageTitle:"Zenix - Dépôt",home:"Accueil",quantification:"Quantification",deposit:"Déposer",receive:"Retirer",transactions:"Transactions",profile:"Profil",support:"Assistance",m_about:"À propos de la plateforme",logout:"Déconnexion",
+    depositTitle:"Dépôt",depositSub:"Créditer le compte via le réseau blockchain",activeStatus:"Actif",calcTitle:"Calculateur de dépôt",finalCalcText:"Montant final du dépôt :",
+    txHashTitle:"Hash de transaction (TxID)",selectNetwork:"Choisir le réseau et l’adresse",scanQr:"Scanner pour déposer directement",
+    copyBtn:"Copier",copyWarning:"⚠ Saisissez d’abord le montant du dépôt pour afficher et copier l’adresse du portefeuille.",inquiryBtn:"Vérifier le dépôt",
+    securityGuide:"Avertissement de sécurité important :",securityWarning:"* Le montant déposé doit correspondre exactement au montant calculé. Sinon, le dépôt entier sera bloqué et ne pourra pas être remboursé.",sec1:"* N’envoyez aucune devise autre que l’USDT.",sec2:"* Les transactions sont traitées automatiquement après confirmation des nœuds du réseau.",
+    txTiming:"La confirmation de la transaction et le crédit du compte prennent généralement 5 à 15 minutes.",amountPlaceholder:"Montant en USDT",txHashPlaceholder:"Exemple : 5f4d11... ou hash de transaction",walletPlaceholder:"Saisissez d’abord le montant pour afficher l’adresse…",
+    copiedMsg:"📋 Adresse du portefeuille copiée.",copyFailedMsg:"⚠ La copie a échoué. Sélectionnez et copiez manuellement.",
+    loginErr:"❌ Veuillez d’abord vous connecter.",fillReqErr:"❌ Saisissez le montant et le hash de transaction en entier.",
+    duplicateTxId:"❌ Ce hash de transaction a déjà été soumis.",
+    minAmountErr:"❌ Le montant minimum de dépôt est de 10 USDT.",maxAmountErr:"❌ Le montant maximum de dépôt est de 100 000 USDT.",
+    invalidTxId:"❌ Format de hash invalide. Doit être 64 caractères hexadécimaux.",
+    sendExactlyLabel:"Envoyez exactement",
+    pendingSentMsg:"⏳ Votre demande de dépôt a été envoyée à l’administrateur pour examen.",netLbl:"Adresse du portefeuille",
+    modalTitle:"Notifications et messages",noMsg:"Aucun nouveau message.",tNode:"Serveur actif (US-East)",
+    tabAll:"Tous",tabApproved:"Approuvé",tabRejected:"Rejeté",tabAdmin:"Message de l’administrateur",detailTitle:"Afficher le message",
+    helpTitle:"Guide de la page de dépôt",helpSecurityTitle:"Avertissement de sécurité important :",helpSecurityText:"Le montant déposé doit correspondre exactement au montant calculé ; sinon, il sera bloqué et non remboursable.",
+    helpSelectNetworkTitle:"Choisir le réseau et l’adresse",helpSelectNetworkText:"Choisissez votre réseau de transfert (TRC20 ou BEP20). L’adresse du portefeuille dépend du réseau choisi.",
+    helpCalcTitle:"Calculer le montant du dépôt",helpCalcText:"Saisissez un montant en USDT pour activer et copier l’adresse du portefeuille. Le montant final avec frais est également affiché.",
+    helpTxTitle:"Envoyer le hash de transaction (TxID)",helpTxText:"Après le transfert, saisissez le hash de transaction puis cliquez sur Vérifier le dépôt pour créditer votre solde.",
+    aboutTitle:"À propos de Zenix (objectif, nature et structure)",aboutDesc:"Zenix est un écosystème financier moderne dédié aux actifs numériques et au traitement des transactions, conçu pour offrir des services automatisés et sécurisés.",
+    aboutL1Title:"Objectif principal :",aboutL1Desc:"Automatiser les opérations grâce à l’IA et aux algorithmes de quantification pour aider les utilisateurs à suivre les mouvements du marché.",
+    aboutL2Title:"Sécurité et infrastructure :",aboutL2Desc:"Protocoles de chiffrement, nœuds cloud rapides et gestion unifiée des actifs dans la base de données Supabase.",
+    aboutL3Title:"Parrainage et équipe à plusieurs niveaux :",aboutL3Desc:"Un réseau de parrainage permet de recevoir des récompenses liées à l’activité des filleuls sur plusieurs niveaux.",
+    aboutL4Title:"Données en direct :",aboutL4Desc:"Les marchés crypto, les volumes, les frais réseau et les notifications système fournissent des informations actualisées.",
+    noMsgCategory:"Aucun message dans cette catégorie.",systemMessage:"Message système",
+    tagAdmin:"Message de l’administrateur",tagApproved:"Demande approuvée",tagRejected:"Demande rejetée",badgeNew:"Nouveau",badgeRead:"Lu",
+    supportFollowup:"Contacter l’assistance",unreadTitle:"Non lu",elapsedTime:"Temps écoulé :",requesting:"Envoi de la demande…",requestPending:"Demande en cours d’examen…",
+    depositError:"❌ Erreur lors de l’envoi de la demande de dépôt :",copyFinalTitle:"Copier le montant final",dir:"ltr"
+  },
+  de: {
+    pageTitle:"Zenix - Einzahlung",home:"Startseite",quantification:"Quantifizierung",deposit:"Einzahlen",receive:"Auszahlen",transactions:"Transaktionen",profile:"Profil",support:"Support",m_about:"Über die Plattform",logout:"Abmelden",
+    depositTitle:"Einzahlung",depositSub:"Konto über das Blockchain-Netzwerk aufladen",activeStatus:"Aktiv",calcTitle:"Einzahlungsrechner",finalCalcText:"Endgültiger Einzahlungsbetrag:",
+    txHashTitle:"Transaktions-Hash (TxID)",selectNetwork:"Netzwerk und Adresse auswählen",scanQr:"Für direkte Einzahlung scannen",
+    copyBtn:"Kopieren",copyWarning:"⚠ Gib zuerst den Einzahlungsbetrag ein, um die Wallet-Adresse anzuzeigen und zu kopieren.",inquiryBtn:"Einzahlung prüfen",
+    securityGuide:"Wichtiger Sicherheitshinweis:",securityWarning:"* Der eingezahlte Betrag muss genau dem berechneten Betrag entsprechen. Andernfalls wird die gesamte Einzahlung gesperrt und kann nicht zurückerstattet werden.",sec1:"* Bitte keine andere Währung als USDT einzahlen.",sec2:"* Transaktionen werden nach Bestätigung durch die Netzwerkknoten automatisch verarbeitet.",
+    txTiming:"Die Transaktionsbestätigung und Gutschrift dauern normalerweise 5–15 Minuten.",amountPlaceholder:"Betrag in USDT",txHashPlaceholder:"Beispiel: 5f4d11... oder Transaktions-Hash",walletPlaceholder:"Gib zuerst den Einzahlungsbetrag ein, um die Adresse anzuzeigen…",
+    copiedMsg:"📋 Wallet-Adresse wurde in die Zwischenablage kopiert.",copyFailedMsg:"⚠ Kopieren fehlgeschlagen. Bitte markieren und manuell kopieren.",
+    loginErr:"❌ Bitte melde dich zuerst an.",fillReqErr:"❌ Bitte gib Betrag und Transaktions-Hash vollständig ein.",
+    duplicateTxId:"❌ Dieser Transaktions-Hash wurde bereits eingereicht.",
+    minAmountErr:"❌ Der Mindesteinzahlungsbetrag beträgt 10 USDT.",maxAmountErr:"❌ Der Höchsteinzahlungsbetrag beträgt 100.000 USDT.",
+    invalidTxId:"❌ Ungültiges Transaktions-Hash-Format. Muss aus 64 Hex-Zeichen bestehen.",
+    sendExactlyLabel:"Senden Sie genau",
+    pendingSentMsg:"⏳ Deine Einzahlungsanfrage wurde zur Prüfung an den Administrator gesendet.",netLbl:"Wallet-Adresse",
+    modalTitle:"Benachrichtigungen und Nachrichten",noMsg:"Keine neuen Nachrichten.",tNode:"Server aktiv (US-East)",
+    tabAll:"Alle",tabApproved:"Genehmigt",tabRejected:"Abgelehnt",tabAdmin:"Admin-Nachricht",detailTitle:"Nachricht anzeigen",
+    helpTitle:"Hilfe zur Einzahlungsseite",helpSecurityTitle:"Wichtiger Sicherheitshinweis:",helpSecurityText:"Der eingezahlte Betrag muss genau dem berechneten Betrag entsprechen; andernfalls wird er gesperrt und kann nicht zurückerstattet werden.",
+    helpSelectNetworkTitle:"Netzwerk und Adresse auswählen",helpSelectNetworkText:"Wähle dein Transfernetzwerk (z. B. TRC20 oder BEP20). Die Ziel-Wallet-Adresse richtet sich nach dem ausgewählten Netzwerk.",
+    helpCalcTitle:"Einzahlungsbetrag berechnen",helpCalcText:"Gib einen Betrag in USDT ein, um die Wallet-Adresse freizuschalten und zu kopieren. Der Endbetrag inklusive Gebühr wird ebenfalls angezeigt.",
+    helpTxTitle:"Transaktions-Hash (TxID) senden",helpTxText:"Gib nach der Überweisung den Transaktions-Hash ein und klicke auf Einzahlung prüfen, damit dein Guthaben gutgeschrieben werden kann.",
+    aboutTitle:"Über Zenix (Ziel, Wesen und Struktur)",aboutDesc:"Zenix ist ein modernes Finanzökosystem für digitale Vermögenswerte und Transaktionsverarbeitung, das sichere und automatisierte Dienste bereitstellen soll.",
+    aboutL1Title:"Hauptziel:",aboutL1Desc:"Handelsprozesse mithilfe von KI und Quantifizierungsalgorithmen automatisieren, damit Nutzer Marktbewegungen besser nutzen können.",
+    aboutL2Title:"Sicherheit und Infrastruktur:",aboutL2Desc:"Verschlüsselung, schnelle Cloud-Verarbeitungsknoten und eine einheitliche Vermögensverwaltung in der Supabase-Datenbank.",
+    aboutL3Title:"Mehrstufige Empfehlungen und Team:",aboutL3Desc:"Ein Empfehlungsnetzwerk ermöglicht Prämien für Aktivitäten geworbener Nutzer auf mehreren Ebenen.",
+    aboutL4Title:"Live-Plattformdaten:",aboutL4Desc:"Kryptomärkte, Handelsvolumen, Netzwerkgebühren und Systemmeldungen liefern aktuelle Informationen.",
+    noMsgCategory:"Keine Nachrichten in dieser Kategorie.",systemMessage:"Systemnachricht",
+    tagAdmin:"Admin-Nachricht",tagApproved:"Anfrage genehmigt",tagRejected:"Anfrage abgelehnt",badgeNew:"Neu",badgeRead:"Gelesen",
+    supportFollowup:"Support kontaktieren",unreadTitle:"Ungelesen",elapsedTime:"Vergangene Zeit:",requesting:"Anfrage wird gesendet…",requestPending:"Anfrage wird geprüft…",
+    depositError:"❌ Fehler beim Senden der Einzahlungsanfrage:",copyFinalTitle:"Endbetrag kopieren",dir:"ltr"
+  }
+};
 
 const SUPPORTED_LANGUAGES = ['en','fa','ar','tr','ru','es','fr','de'];
 function readSavedLanguage(){
@@ -364,6 +537,27 @@ function readSavedLanguage(){
 }
 let currLang = readSavedLanguage();
 
+/* ★ باگ ۳: به‌روزرسانی QR و برچسب مبلغ */
+window.updateQR = function() {
+  const calcVal = parseFloat(document.getElementById('calc-input')?.value) || 0;
+  const qr = document.getElementById('qr-code-img');
+  const lbl = document.getElementById('qr-amount-label');
+  if (!qr) return;
+  const net = window.currentNetwork || 'TRC20';
+  const addr = wallets[net];
+  qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=${encodeURIComponent(addr)}`;
+  if (lbl) {
+    const t = window.currentLangData || LD.en;
+    if (calcVal > 0) {
+      const sendAmt = (calcVal * FEE_RATE).toFixed(2);
+      lbl.style.display = 'block';
+      lbl.textContent = `⬇ ${t.sendExactlyLabel}: ${sendAmt} USDT (${net})`;
+    } else {
+      lbl.style.display = 'none';
+    }
+  }
+};
+
 function setLang(l){
   if (!SUPPORTED_LANGUAGES.includes(l)) l = 'en';
   currLang = l;
@@ -371,7 +565,7 @@ function setLang(l){
   const direction = (l === 'fa' || l === 'ar') ? 'rtl' : 'ltr';
   document.documentElement.setAttribute('dir', direction);
   document.documentElement.setAttribute('lang', l);
-  try { localStorage.setItem('zenix_lang', l); } catch (e) { /* quota or privacy mode: language preference is best-effort */ }
+  try { localStorage.setItem('zenix_lang', l); } catch (e) {}
   document.title = t.pageTitle || 'Zenix - Deposit';
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
@@ -397,38 +591,37 @@ function setLang(l){
   const nodeEl = document.getElementById('t-node');
   if (nodeEl) nodeEl.textContent = t.tNode;
 
-  /* ★ بازسازی پیام وضعیت (status-box) با زبان جدید */
   if (window.__statusState && typeof window.__statusState.getText === 'function') {
     const st = window.__statusState;
     try {
       const newText = st.getText(t);
       showMsgRaw(newText, st.isErr, st.showTimer);
-      if (st.showTimer && window.__statusTimerStart) {
-        startTimer(window.__statusTimerStart);
-      }
+      if (st.showTimer && window.__statusTimerStart) startTimer(window.__statusTimerStart);
     } catch (e) { console.warn('status-box rebuild failed:', e); }
   }
 
-  /* ★ FOUC Fix: نمایش body پس از اعمال زبان */
+  try { if (typeof window.updateQR === 'function') window.updateQR(); } catch(e) {}
+
   if (document.body) document.body.classList.add('lang-ready');
 }
 
 function calculateDeposit(){
-  const val = parseFloat(document.getElementById('calc-input').value) || 0;
-  const result = val * 1.025; 
+  const rawInput = document.getElementById('calc-input').value;
+  const val = parseFloat(rawInput);
+  const safeVal = Number.isFinite(val) && val > 0 ? val : 0;
+  const result = safeVal * FEE_RATE;
   document.getElementById('calc-result').innerText = result.toFixed(2) + ' USDT';
+  window.updateQR();
   checkInputs();
 }
 
 function checkInputs(){
   const calcInput = document.getElementById('calc-input');
   const txInput = document.getElementById('tx-hash-input');
-  
   if(calcInput.readOnly || txInput.readOnly) return;
 
   const calcVal = parseFloat(calcInput.value) || 0;
   const txVal = txInput.value.trim();
-  
   const copyBtn = document.getElementById('copy-btn');
   const walletInput = document.getElementById('wallet-address');
   const copyWarning = document.getElementById('copy-warning');
@@ -468,8 +661,12 @@ function checkInputs(){
 }
 
 window.setNetwork=function(net){
+  /* ★ باگ ۵: اگر شبکه قفل است، اجازه تغییر نده */
+  const btn = document.getElementById(net === 'TRC20' ? 'net-trc20' : 'net-bep20');
+  if (btn && btn.classList.contains('net-locked')) return;
+  
   window.currentNetwork=net;
-  const trc=document.getElementById('net-trc20'),bep=document.getElementById('net-bep20'),addr=document.getElementById('wallet-address'),lbl=document.getElementById('wallet-label'),qr=document.getElementById('qr-code-img');
+  const trc=document.getElementById('net-trc20'),bep=document.getElementById('net-bep20'),addr=document.getElementById('wallet-address'),lbl=document.getElementById('wallet-label');
   const t=window.currentLangData||LD.en;
   if(net==='TRC20'){
     trc.style.background='rgba(56,189,248,0.15)';trc.style.borderColor='#38bdf8';trc.style.color='#f8fafc';
@@ -479,15 +676,22 @@ window.setNetwork=function(net){
     trc.style.background='rgba(15,23,42,0.6)';trc.style.borderColor='rgba(255,255,255,0.1)';trc.style.color='#94a3b8';
   }
   lbl.textContent=`${t.netLbl} (${net}):`;
-  qr.src=`https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=${wallets[net]}`;
+  window.updateQR();
   
   const calcVal = parseFloat(document.getElementById('calc-input').value) || 0;
-  if(calcVal > 0){
-    addr.value = wallets[net];
-  }
+  if(calcVal > 0){ addr.value = wallets[net]; }
 }
 
-/* ★ اصلاح: مدیریت خطای کلیپ‌بورد + state برای تغییر زبان */
+/* ★ باگ ۵: قفل کردن شبکه‌ها */
+window.lockNetworks = function(lock) {
+  ['net-trc20','net-bep20'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (lock) el.classList.add('net-locked');
+    else el.classList.remove('net-locked');
+  });
+};
+
 window.copyAddress = async function(){
   const calcVal = parseFloat(document.getElementById('calc-input').value) || 0;
   if(calcVal <= 0) return;
@@ -498,22 +702,16 @@ window.copyAddress = async function(){
     showMsg(t.copiedMsg, false, false, tt => tt.copiedMsg);
   } catch (err) {
     console.warn('Clipboard write failed:', err);
-    try {
-      c.removeAttribute('readonly');
-      c.select();
-      c.setAttribute('readonly', 'readonly');
-    } catch (e) {}
+    try { c.removeAttribute('readonly'); c.select(); c.setAttribute('readonly', 'readonly'); } catch (e) {}
     showMsg(t.copyFailedMsg, true, false, tt => tt.copyFailedMsg);
   }
-}
+};
 
-/* ★ اصلاح: مدیریت خطای کلیپ‌بورد در کپی مبلغ نهایی */
 window.copyFinalAmount = async function(){
   const resEl = document.getElementById('calc-result');
   if(!resEl) return;
   const amountOnly = resEl.innerText.replace(' USDT', '').trim();
   if(!amountOnly || amountOnly === '0.00') return;
-
   const btn = document.getElementById('copy-final-btn');
   try {
     await navigator.clipboard.writeText(amountOnly);
@@ -548,7 +746,6 @@ function tM(o,e){e.stopPropagation();[nM,lMenu].forEach(m=>{if(m!==o)m.classList
 if(mB)mB.onclick=(e)=>tM(nM,e);if(lB)lB.onclick=(e)=>tM(lMenu,e);
 document.onclick=()=>{[nM,lMenu].forEach(m=>m.classList.remove('show'));};document.querySelectorAll('.menu').forEach(m=>m.onclick=(e)=>e.stopPropagation());
 
-/* ★ اجرای اولیه setLang + FOUC safety net */
 try { setLang(currLang); } catch (e) { console.error('Initial setLang failed:', e); }
 if (document.body) document.body.classList.add('lang-ready');
 </script>
@@ -567,23 +764,18 @@ function startTimer(startTimeISO) {
   if (timerInterval) clearInterval(timerInterval);
   window.__statusTimerStart = startTimeISO;
   const startTime = new Date(startTimeISO).getTime();
-  
   function update() {
     const now = new Date().getTime();
     const diff = Math.max(0, Math.floor((now - startTime) / 1000));
     const mins = String(Math.floor(diff / 60)).padStart(2, '0');
     const secs = String(diff % 60).padStart(2, '0');
-    
     const timerEl = document.getElementById('timer-display');
-    if (timerEl) {
-      timerEl.textContent = `${mins}:${secs}`;
-    }
+    if (timerEl) timerEl.textContent = `${mins}:${secs}`;
   }
   update();
   timerInterval = setInterval(update, 1000);
 }
 
-/* ★ showMsgRaw = فقط رندر (بدون state) */
 function showMsgRaw(text, isErr, showTimer) {
   const box = document.getElementById('status-box');
   if (!box) return;
@@ -591,10 +783,8 @@ function showMsgRaw(text, isErr, showTimer) {
   box.style.background = isErr ? 'rgba(239,68,68,0.15)' : 'rgba(34,197,94,0.15)';
   box.style.border = isErr ? '1px solid #ef4444' : '1px solid #22c55e';
   box.style.color = isErr ? '#ef4444' : '#22c55e';
-  
   const safeText = escapeHtml(text);
   const elapsedLabel = escapeHtml((window.currentLangData || LD.en).elapsedTime);
-  
   if (showTimer) {
     box.innerHTML = `<div>${safeText}</div><div style="margin-top:8px;font-size:12px;color:#38bdf8;font-weight:bold;background:rgba(15,23,42,0.6);padding:6px 12px;border-radius:6px;display:inline-block;border:1px solid rgba(56,189,248,0.3);"><i class="fas fa-stopwatch" style="color:#fbbf24;"></i> ${elapsedLabel} <span id="timer-display" style="font-family:monospace;font-size:14px;color:#fbbf24;margin-right:4px;">00:00</span></div>`;
   } else {
@@ -602,8 +792,6 @@ function showMsgRaw(text, isErr, showTimer) {
   }
 }
 
-/* ★ showMsg = رندر + ذخیره state برای بازسازی هنگام تغییر زبان
-   getTextFn: تابعی که با گرفتن t (ترجمه‌ها) متن جدید را برمی‌گرداند. اگر null باشد، state پاک می‌شود. */
 function showMsg(text, isErr, showTimer = false, getTextFn = null) {
   showMsgRaw(text, isErr, showTimer);
   window.__statusState = getTextFn ? { getText: getTextFn, isErr, showTimer } : null;
@@ -626,8 +814,10 @@ function resetDepositForm() {
     inquiryBtn.disabled = true;
     inquiryBtn.style.background = '#475569';
     inquiryBtn.style.cursor = 'not-allowed';
-    inquiryBtn.innerHTML = '<i class="fas fa-sync-alt"></i> <span data-i18n="inquiryBtn">' + escapeHtml((window.currentLangData || LD.en).inquiryBtn) + '</span>'; 
+    inquiryBtn.innerHTML = '<i class="fas fa-sync-alt"></i> <span data-i18n="inquiryBtn">' + escapeHtml((window.currentLangData || LD.en).inquiryBtn) + '</span>';
   }
+  if (typeof window.lockNetworks === 'function') window.lockNetworks(false);
+  if (typeof window.updateQR === 'function') window.updateQR();
   checkInputs();
 }
 
@@ -641,8 +831,25 @@ window.checkAutoDeposit = async function(){
   
   const calcVal = parseFloat(document.getElementById('calc-input').value) || 0;
   const txVal = document.getElementById('tx-hash-input').value.trim();
+  
   if(calcVal <= 0 || !txVal){
     showMsg(t.fillReqErr, true, false, tt => tt.fillReqErr);
+    return;
+  }
+
+  /* ★ باگ ۴: اعتبارسنجی مبلغ */
+  if (!Number.isFinite(calcVal) || calcVal < MIN_DEPOSIT) {
+    showMsg(t.minAmountErr, true, false, tt => tt.minAmountErr);
+    return;
+  }
+  if (calcVal > MAX_DEPOSIT) {
+    showMsg(t.maxAmountErr, true, false, tt => tt.maxAmountErr);
+    return;
+  }
+
+  /* ★ باگ ۴: اعتبارسنجی فرمت TxID */
+  if (!TXID_REGEX.test(txVal)) {
+    showMsg(t.invalidTxId, true, false, tt => tt.invalidTxId);
     return;
   }
 
@@ -650,32 +857,58 @@ window.checkAutoDeposit = async function(){
   inquiryBtn.disabled = true;
   inquiryBtn.style.background = '#475569';
   inquiryBtn.style.cursor = 'not-allowed';
-  inquiryBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + escapeHtml((window.currentLangData || LD.en).requesting);
+  inquiryBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + escapeHtml(t.requesting);
+
+  /* ★ باگ ۱: چک تکراری بودن TxID */
+  try {
+    const { data: existing } = await supabase
+      .from('transactions')
+      .select('id')
+      .eq('type', 'deposit')
+      .filter('description', 'like', `%TxID: ${txVal}%`)
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      showMsg(t.duplicateTxId, true, false, tt => tt.duplicateTxId);
+      inquiryBtn.disabled = false;
+      inquiryBtn.style.background = '#22c55e';
+      inquiryBtn.style.color = '#fff';
+      inquiryBtn.style.cursor = 'pointer';
+      inquiryBtn.innerHTML = '<i class="fas fa-sync-alt"></i> <span>' + escapeHtml(t.inquiryBtn) + '</span>';
+      return;
+    }
+  } catch (chkErr) {
+    /* اگر چک ناموفق بود، اجازه بده ادامه پیدا کند (نباید کاربر واقعی بلاک شود) */
+    console.warn('Duplicate check skipped:', chkErr);
+  }
 
   const nowISO = new Date().toISOString();
 
   try{
-    const amountWithFee = calcVal * 1.025;
+    /* ★ باگ ۲: منطق اصلاح‌شده کارمزد
+       - amount = calcVal (مقدار شارژ شده)
+       - description = شامل مقدار ارسالی و TxID */
+    const amountWithFee = calcVal * FEE_RATE;
     const pendingDepositObj = {
       rawAmount: calcVal,
-      amount: amountWithFee,
+      sentAmount: amountWithFee,
       network: window.currentNetwork || 'TRC20',
       txHash: txVal,
       status: 'pending',
       createdAt: nowISO
     };
 
-    localStorage.setItem('zenix_pending_deposit_' + currentUser.id, JSON.stringify(pendingDepositObj));
+    try { localStorage.setItem('zenix_pending_deposit_' + currentUser.id, JSON.stringify(pendingDepositObj)); } catch(e) {}
 
     try {
       await supabase.from('transactions').insert([{
         user_id: currentUser.id,
-        amount: amountWithFee,
+        amount: calcVal,                                        /* ← مقدار شارژ (نه مبلغ ارسالی) */
         type: 'deposit',
         status: 'pending',
         currency: 'USDT',
         title: `واریز ${window.currentNetwork || 'TRC20'}`,
-        description: `TxID: ${txVal}`,
+        description: `TxID: ${txVal} | Sent: ${amountWithFee.toFixed(2)} | Fee: 2.5%`,
         created_at: nowISO
       }]);
     } catch (dbErr) {
@@ -689,6 +922,7 @@ window.checkAutoDeposit = async function(){
     const txInput = document.getElementById('tx-hash-input');
     if(calcInput) calcInput.readOnly = true;
     if(txInput) txInput.readOnly = true;
+    if (typeof window.lockNetworks === 'function') window.lockNetworks(true);
 
   }catch(err){
     console.error("Deposit error:", err);
@@ -709,157 +943,73 @@ window.formatGregorianDate = function(rawDate) {
   if (!rawDate) return '';
   const d = new Date(rawDate);
   if (isNaN(d.getTime())) return '';
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  const hours = String(d.getHours()).padStart(2, '0');
-  const minutes = String(d.getMinutes()).padStart(2, '0');
-  return `${year}-${month}-${day} ${hours}:${minutes}`;
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 };
 
 window.getNotifCategory = function(n) {
   const type = (n.type || '').toLowerCase();
   const title = (n.title || '').toLowerCase();
-
-  if (type.includes('approved') || type.includes('confirm') || title.includes('تایید') || title.includes('موفق') || title.includes('شارژ شد')) {
-    return 'approved';
-  }
-  if (type.includes('rejected') || type.includes('canceled') || type.includes('cancel') || title.includes('رد') || title.includes('لغو') || title.includes('ناموفق')) {
-    return 'rejected';
-  }
+  if (type.includes('approved') || type.includes('confirm') || title.includes('تایید') || title.includes('موفق') || title.includes('شارژ شد')) return 'approved';
+  if (type.includes('rejected') || type.includes('canceled') || type.includes('cancel') || title.includes('رد') || title.includes('لغو') || title.includes('ناموفق')) return 'rejected';
   return 'admin_message';
 };
 
 window.updateTabBadges = function() {
   const notifs = window.cachedNotifications || [];
-  const allCount = notifs.length;
-  let approvedCount = 0;
-  let rejectedCount = 0;
-  let adminCount = 0;
-
-  notifs.forEach(n => {
-    const cat = window.getNotifCategory(n);
-    if (cat === 'approved') approvedCount++;
-    else if (cat === 'rejected') rejectedCount++;
-    else if (cat === 'admin_message') adminCount++;
-  });
-
-  const elAll = document.getElementById('cnt-tab-all');
-  const elApproved = document.getElementById('cnt-tab-approved');
-  const elRejected = document.getElementById('cnt-tab-rejected');
-  const elAdmin = document.getElementById('cnt-tab-admin');
-
-  if (elAll) elAll.innerText = allCount;
-  if (elApproved) elApproved.innerText = approvedCount;
-  if (elRejected) elRejected.innerText = rejectedCount;
-  if (elAdmin) elAdmin.innerText = adminCount;
+  let a=0,r=0,m=0;
+  notifs.forEach(n => { const c=window.getNotifCategory(n); if(c==='approved')a++; else if(c==='rejected')r++; else m++; });
+  const ids = { 'cnt-tab-all': notifs.length, 'cnt-tab-approved': a, 'cnt-tab-rejected': r, 'cnt-tab-admin': m };
+  Object.entries(ids).forEach(([id,v]) => { const el=document.getElementById(id); if(el) el.innerText=v; });
 };
 
 window.updateBellBadge = function() {
   const unreadCount = window.cachedNotifications.filter(n => !n.read && !n.isRead && !n.is_read).length;
   const badge = document.getElementById('bell-badge');
-  if (badge) {
-    badge.innerText = unreadCount;
-    if (unreadCount > 0) badge.classList.add('show');
-    else badge.classList.remove('show');
-  }
+  if (badge) { badge.innerText = unreadCount; badge.classList.toggle('show', unreadCount > 0); }
   window.updateTabBadges();
 };
 
 window.setNotifFilter = function(filter, element) {
   window.activeNotifFilter = filter;
-  const tabs = document.querySelectorAll('#notif-tabs .notif-tab');
-  tabs.forEach(tab => tab.classList.remove('active'));
-  
-  if (element) {
-    element.classList.add('active');
-  }
-  
+  document.querySelectorAll('#notif-tabs .notif-tab').forEach(tab => tab.classList.remove('active'));
+  if (element) element.classList.add('active');
   window.renderNotifications();
 };
 
-window.closeMsgDetailModal = function() {
-  const modal = document.getElementById('m-msg-detail');
-  if (modal) modal.classList.remove('show');
-};
+window.closeMsgDetailModal = function() { document.getElementById('m-msg-detail')?.classList.remove('show'); };
 
 window.openMsgDetail = async function(idx) {
   const n = window.currentFilteredNotifs[idx];
   if (!n) return;
-
   const isUnread = !n.read && !n.isRead && !n.is_read;
-
   if (isUnread) {
-    n.is_read = true;
-    n.read = true;
-    n.isRead = true;
-
-    window.updateBellBadge();
-    window.renderNotifications();
-
+    n.is_read = true; n.read = true; n.isRead = true;
+    window.updateBellBadge(); window.renderNotifications();
     try {
-      const { data, error } = await supabase
-        .from('notifications')
-        .update({ is_read: true })
-        .eq('id', n.id)
-        .select();
-
-      if (error) {
-        const res2 = await supabase
-          .from('notifications')
-          .update({ read: true })
-          .eq('id', n.id);
-          
-        if (res2.error) {
-          await supabase
-            .from('notifications')
-            .update({ isRead: true })
-            .eq('id', n.id);
-        }
-      }
-    } catch (err) {
-      console.error('خطای ارتباط با Supabase در به‌روزرسانی اعلان:', err);
-    }
+      const { error } = await supabase.from('notifications').update({ is_read: true }).eq('id', n.id);
+      if (error) await supabase.from('notifications').update({ read: true }).eq('id', n.id);
+    } catch (err) { console.error('Notification update failed:', err); }
   }
-
   const title = n.title || (window.currentLangData || LD.en).systemMessage;
   const msg = n.message || n.text || n.body || '';
   const category = window.getNotifCategory(n);
   const dateStr = window.formatGregorianDate(n.created_at || n.date || n.created_date);
-
   const detailTitle = document.getElementById('detail-msg-title');
   const detailDate = document.getElementById('detail-msg-date');
   const detailBody = document.getElementById('detail-msg-body');
   const detailSupport = document.getElementById('detail-msg-support');
-
   if (detailTitle) detailTitle.innerHTML = `<i class="fas fa-bell" style="color:#38bdf8"></i> ${escapeHtml(title)}`;
-  
   if (detailDate) {
-    if (dateStr) {
-      detailDate.innerHTML = `<i class="far fa-clock" style="color:#38bdf8;margin-right:4px;"></i>${escapeHtml(dateStr)}`;
-      detailDate.style.display = 'block';
-    } else {
-      detailDate.style.display = 'none';
-    }
+    if (dateStr) { detailDate.innerHTML = `<i class="far fa-clock" style="color:#38bdf8;margin-right:4px;"></i>${escapeHtml(dateStr)}`; detailDate.style.display = 'block'; }
+    else detailDate.style.display = 'none';
   }
-
   if (detailBody) detailBody.innerText = msg;
-
   if (detailSupport) {
-      if (category === 'rejected') {
-          const supportText = escapeHtml((window.currentLangData || LD.en).supportFollowup);
-          detailSupport.innerHTML = `
-          <div style="margin-top:15px;padding-top:10px;border-top:1px dashed rgba(239,68,68,0.3);display:flex;justify-content:flex-end;">
-            <a href="support.html" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);" style="display:inline-flex;align-items:center;gap:6px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f8fafc;padding:6px 12px;border-radius:6px;font-size:12px;text-decoration:none;font-weight:600;transition:0.2s;">
-              <i class="fas fa-headset" style="color:#ef4444;"></i>
-              <span>${supportText}</span>
-            </a>
-          </div>`;
-      } else {
-          detailSupport.innerHTML = '';
-      }
+    if (category === 'rejected') {
+      const supportText = escapeHtml((window.currentLangData || LD.en).supportFollowup);
+      detailSupport.innerHTML = `<div style="margin-top:15px;padding-top:10px;border-top:1px dashed rgba(239,68,68,0.3);display:flex;justify-content:flex-end;"><a href="support.html" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);" style="display:inline-flex;align-items:center;gap:6px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f8fafc;padding:6px 12px;border-radius:6px;font-size:12px;text-decoration:none;font-weight:600;"><i class="fas fa-headset" style="color:#ef4444;"></i><span>${supportText}</span></a></div>`;
+    } else detailSupport.innerHTML = '';
   }
-
   document.getElementById('m-msg-detail')?.classList.add('show');
 };
 
@@ -867,113 +1017,89 @@ window.renderNotifications = function() {
   window.updateTabBadges();
   const container = document.getElementById('modal-msg-container');
   if (!container) return;
-
-  const filter = window.activeNotifFilter;
-  const filtered = window.cachedNotifications.filter(n => {
-    if (filter === 'all') return true;
-    return window.getNotifCategory(n) === filter;
-  });
-
+  const filtered = window.cachedNotifications.filter(n => window.activeNotifFilter === 'all' || window.getNotifCategory(n) === window.activeNotifFilter);
   window.currentFilteredNotifs = filtered;
-
   if (filtered.length === 0) {
     const uiText = window.currentLangData || LD.en;
     container.innerHTML = `<div style="text-align:center;padding:25px;color:#94a3b8;font-size:12px;"><i class="fas fa-inbox" style="font-size:24px;margin-bottom:8px;display:block;opacity:0.5;"></i>${escapeHtml(uiText.noMsgCategory)}</div>`;
     return;
   }
-
-  let html = '';
   const uiText = window.currentLangData || LD.en;
+  let html = '';
   filtered.forEach((n, idx) => {
-    const title = n.title || (window.currentLangData || LD.en).systemMessage;
+    const title = n.title || uiText.systemMessage;
     const category = window.getNotifCategory(n);
     const isUnread = !n.read && !n.isRead && !n.is_read;
     const dateStr = window.formatGregorianDate(n.created_at || n.date || n.created_date);
-
-    let borderStyle = "border:1px solid rgba(255,255,255,.08);";
-    let bgStyle = "background:rgba(255,255,255,.02);";
-    let icon = '<i class="fas fa-bullhorn" style="color:#38bdf8"></i>';
+    let borderStyle="border:1px solid rgba(255,255,255,.08);",bgStyle="background:rgba(255,255,255,.02);",icon='<i class="fas fa-bullhorn" style="color:#38bdf8"></i>';
     let tagHtml = `<span style="font-size:10px;background:rgba(56,189,248,0.2);color:#38bdf8;padding:2px 6px;border-radius:4px;font-weight:700;">${escapeHtml(uiText.tagAdmin)}</span>`;
-
     if (category === 'approved') {
-      borderStyle = isUnread ? "border:1px solid rgba(34, 197, 94, 0.6);" : "border:1px solid rgba(34, 197, 94, 0.2);";
-      bgStyle = isUnread ? "background:rgba(34, 197, 94, 0.12);" : "background:rgba(34, 197, 94, 0.03);";
+      borderStyle = isUnread ? "border:1px solid rgba(34,197,94,0.6);" : "border:1px solid rgba(34,197,94,0.2);";
+      bgStyle = isUnread ? "background:rgba(34,197,94,0.12);" : "background:rgba(34,197,94,0.03);";
       icon = '<i class="fas fa-check-circle" style="color:#22c55e"></i>';
       tagHtml = `<span style="font-size:10px;background:rgba(34,197,94,0.2);color:#22c55e;padding:2px 6px;border-radius:4px;font-weight:700;">${escapeHtml(uiText.tagApproved)}</span>`;
     } else if (category === 'rejected') {
-      borderStyle = isUnread ? "border:1px solid rgba(239, 68, 68, 0.6);" : "border:1px solid rgba(239, 68, 68, 0.2);";
-      bgStyle = isUnread ? "background:rgba(239, 68, 68, 0.12);" : "background:rgba(239, 68, 68, 0.03);";
+      borderStyle = isUnread ? "border:1px solid rgba(239,68,68,0.6);" : "border:1px solid rgba(239,68,68,0.2);";
+      bgStyle = isUnread ? "background:rgba(239,68,68,0.12);" : "background:rgba(239,68,68,0.03);";
       icon = '<i class="fas fa-times-circle" style="color:#ef4444"></i>';
       tagHtml = `<span style="font-size:10px;background:rgba(239,68,68,0.2);color:#ef4444;padding:2px 6px;border-radius:4px;font-weight:700;">${escapeHtml(uiText.tagRejected)}</span>`;
     } else {
-      bgStyle = isUnread ? "background:rgba(56, 189, 248, 0.12);" : "background:rgba(255, 255, 255, 0.02);";
-      borderStyle = isUnread ? "border:1px solid rgba(56, 189, 248, 0.5);" : "border:1px solid rgba(255, 255, 255, 0.08);";
+      bgStyle = isUnread ? "background:rgba(56,189,248,0.12);" : "background:rgba(255,255,255,0.02);";
+      borderStyle = isUnread ? "border:1px solid rgba(56,189,248,0.5);" : "border:1px solid rgba(255,255,255,0.08);";
     }
-
     const opacityStyle = isUnread ? "opacity:1;" : "opacity:0.65;";
     const unreadDot = isUnread ? `<span style="width:9px;height:9px;background:#ef4444;border-radius:50%;display:inline-block;box-shadow:0 0 8px #ef4444;" title="${escapeHtml(uiText.unreadTitle)}"></span>` : '';
-    const readBadge = isUnread 
+    const readBadge = isUnread
       ? `<span style="font-size:10px;background:#ef4444;color:#fff;padding:2px 7px;border-radius:10px;font-weight:800;box-shadow:0 0 8px rgba(239,68,68,0.5);">${escapeHtml(uiText.badgeNew)}</span>`
       : `<span style="font-size:10px;background:rgba(255,255,255,0.06);color:#94a3b8;padding:2px 6px;border-radius:10px;"><i class="fas fa-check" style="font-size:9px;color:#64748b;"></i> ${escapeHtml(uiText.badgeRead)}</span>`;
-
-    const dateDisplay = dateStr ? `<div style="font-size:11px;color:${isUnread ? '#cbd5e1' : '#64748b'};margin-top:6px;direction:ltr;text-align:left;"><i class="far fa-clock" style="margin-right:4px;"></i>${escapeHtml(dateStr)}</div>` : '';
-
-    html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle} ${opacityStyle} cursor:pointer; position:relative; transition:all 0.2s;" onclick="window.openMsgDetail(${idx})">
+    const dateDisplay = dateStr ? `<div style="font-size:11px;color:${isUnread?'#cbd5e1':'#64748b'};margin-top:6px;direction:ltr;text-align:left;"><i class="far fa-clock" style="margin-right:4px;"></i>${escapeHtml(dateStr)}</div>` : '';
+    html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle} ${opacityStyle} cursor:pointer;position:relative;transition:all 0.2s;" onclick="window.openMsgDetail(${idx})">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-        <div class="msg-title-text" style="display:flex;align-items:center;gap:8px;font-weight:${isUnread ? '800' : '500'};color:${isUnread ? '#f8fafc' : '#cbd5e1'};">
-          ${unreadDot}
-          ${icon}
-          <span>${escapeHtml(title)}</span>
+        <div class="msg-title-text" style="display:flex;align-items:center;gap:8px;font-weight:${isUnread?'800':'500'};color:${isUnread?'#f8fafc':'#cbd5e1'};">
+          ${unreadDot}${icon}<span>${escapeHtml(title)}</span>
         </div>
-        <div style="display:flex;align-items:center;gap:6px;">
-          ${tagHtml}
-          ${readBadge}
-        </div>
-      </div>
-      ${dateDisplay}
-    </div>`;
+        <div style="display:flex;align-items:center;gap:6px;">${tagHtml}${readBadge}</div>
+      </div>${dateDisplay}</div>`;
   });
-
   container.innerHTML = html;
 };
 
 async function loadUserData(user) {
   currentUser = user;
-
   try {
     let pendingDepositData = null;
-
     const { data: txData } = await supabase
-      .from('transactions')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('type', 'deposit')
-      .order('created_at', { ascending: false })
-      .limit(1);
+      .from('transactions').select('*')
+      .eq('user_id', user.id).eq('type', 'deposit')
+      .order('created_at', { ascending: false }).limit(1);
 
     if (txData && txData.length > 0) {
       const p = txData[0];
-      let statusStr = String(p.status || '').toLowerCase();
-
+      const statusStr = String(p.status || '').toLowerCase();
       if (statusStr === 'pending') {
+        /* ★ باگ ۲: مقدار DB = مقدار شارژ؛ مبلغ ارسالی از description خوانده می‌شود */
+        const desc = p.description || '';
+        const txHashMatch = desc.match(/TxID:\s*([a-fA-F0-9x]+)/i);
+        const sentMatch = desc.match(/Sent:\s*([\d.]+)/i);
+        const creditedAmount = parseFloat(p.amount) || 0;
         pendingDepositData = {
-          rawAmount: p.amount ? (p.amount / 1.025) : 0,
-          amount: p.amount,
-          txHash: p.description ? p.description.replace('TxID: ', '') : '',
+          rawAmount: creditedAmount,
+          sentAmount: sentMatch ? parseFloat(sentMatch[1]) : creditedAmount * FEE_RATE,
+          txHash: txHashMatch ? txHashMatch[1] : '',
           createdAt: p.created_at || p.createdAt
         };
       } else {
-        localStorage.removeItem('zenix_pending_deposit_' + user.id);
+        try { localStorage.removeItem('zenix_pending_deposit_' + user.id); } catch(e) {}
       }
     } else {
-      localStorage.removeItem('zenix_pending_deposit_' + user.id);
+      try { localStorage.removeItem('zenix_pending_deposit_' + user.id); } catch(e) {}
     }
 
     if (pendingDepositData) {
       const t = window.currentLangData || LD.en;
-      showMsg(t.pendingSentMsg || '⏳ درخواست واریز شما ثبت شده و در حال بررسی توسط مدیریت می‌باشد.', false, true, tt => tt.pendingSentMsg);
+      showMsg(t.pendingSentMsg, false, true, tt => tt.pendingSentMsg);
       startTimer(pendingDepositData.createdAt);
-      
+
       const calcInput = document.getElementById('calc-input');
       const txInput = document.getElementById('tx-hash-input');
       const inquiryBtn = document.getElementById('inquiry-btn');
@@ -983,10 +1109,10 @@ async function loadUserData(user) {
         txInput.value = pendingDepositData.txHash || '';
         calcInput.readOnly = true;
         txInput.readOnly = true;
-        
         const val = parseFloat(pendingDepositData.rawAmount) || 0;
-        document.getElementById('calc-result').innerText = (val * 1.025).toFixed(2) + ' USDT';
-        
+        document.getElementById('calc-result').innerText = (val * FEE_RATE).toFixed(2) + ' USDT';
+        if (typeof window.updateQR === 'function') window.updateQR();
+
         const walletInput = document.getElementById('wallet-address');
         const copyBtn = document.getElementById('copy-btn');
         const copyWarning = document.getElementById('copy-warning');
@@ -999,38 +1125,27 @@ async function loadUserData(user) {
           if (copyWarning) copyWarning.style.display = 'none';
         }
       }
-
       if (inquiryBtn) {
         inquiryBtn.disabled = true;
         inquiryBtn.style.background = '#475569';
         inquiryBtn.style.cursor = 'not-allowed';
-        inquiryBtn.innerHTML = '<i class="fas fa-hourglass-half"></i> ' + escapeHtml((window.currentLangData || LD.en).requestPending);
+        inquiryBtn.innerHTML = '<i class="fas fa-hourglass-half"></i> ' + escapeHtml(t.requestPending);
       }
+      if (typeof window.lockNetworks === 'function') window.lockNetworks(true);
     } else {
       resetDepositForm();
     }
-  } catch (err) {
-    console.warn("User deposit data check warning:", err);
-  }
+  } catch (err) { console.warn("User deposit data check warning:", err); }
 
   try {
     const { data: notifs, error: notifErr } = await supabase.from('notifications').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
-    if (!notifErr && notifs) {
-      window.cachedNotifications = notifs;
-      window.renderNotifications();
-      window.updateBellBadge();
-    }
-  } catch (err) {
-    console.warn("Notifications load warning:", err);
-  }
+    if (!notifErr && notifs) { window.cachedNotifications = notifs; window.renderNotifications(); window.updateBellBadge(); }
+  } catch (err) { console.warn("Notifications load warning:", err); }
 }
 
 supabase.auth.onAuthStateChange((event, session) => {
-  if (session && session.user) {
-    loadUserData(session.user);
-  } else {
-    window.location.href = 'index.html';
-  }
+  if (session && session.user) loadUserData(session.user);
+  else window.location.href = 'index.html';
 });
 
 const logoutBtn = document.getElementById('logout-btn');
