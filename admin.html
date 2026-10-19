@@ -240,7 +240,6 @@
         .messaging-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         footer { text-align: center; padding: 20px; font-size: 11px; color: #64748b; border-top: 1px solid var(--line); margin-top: auto; }
 
-        /* ★ استایل اختصاصی دکمه‌های تایید/رد در modal تاییدیه */
         .confirm-btn-cancel {
             flex: 1; padding: 11px; background: rgba(255,255,255,.06);
             border: 1px solid rgba(255,255,255,.15); color: #cbd5e1;
@@ -565,7 +564,6 @@
         </div>
     </div>
 
-    <!-- ★★★ modal اختصاصی تایید واریزی (به جای confirm()) ★★★ -->
     <div class="modal" id="m-confirm-approve" style="z-index:1050;">
         <div class="modal-content" style="max-width:420px;">
             <div class="modal-header" style="color:#22c55e; border-bottom-color:rgba(34,197,94,.25);">
@@ -594,7 +592,6 @@
         </div>
     </div>
 
-    <!-- ★★★ modal اختصاصی رد واریزی (به جای prompt()) ★★★ -->
     <div class="modal" id="m-confirm-reject" style="z-index:1050;">
         <div class="modal-content" style="max-width:420px;">
             <div class="modal-header" style="color:#ef4444; border-bottom-color:rgba(239,68,68,.25);">
@@ -1044,10 +1041,6 @@
             document.getElementById('target-uid-hidden').value = '';
         };
 
-        // ============================================================
-        // ★★★ توابع مدیریت واریزی‌ها (با modalهای سفارشی) ★★★
-        // ============================================================
-
         window.renderDepositTable = function() {
             const allDeposits = window.currentDepositList || [];
             const filter = window.currentDepFilter || 'pending';
@@ -1147,7 +1140,6 @@
             });
         };
 
-        // ★ تایید واریزی با modal سفارشی
         window.approveDeposit = function(txId) {
             const dep = (window.currentDepositList || []).find(x => x.txId === txId);
             const amountText = dep ? `$${dep.creditedAmount.toFixed(2)} USDT` : '$0.00';
@@ -1190,7 +1182,6 @@
             });
         };
 
-        // ★ رد واریزی با modal سفارشی
         window.rejectDeposit = function(txId) {
             const reasonInput = document.getElementById('reject-reason-input');
             if (reasonInput) reasonInput.value = '';
@@ -1201,7 +1192,6 @@
             const newBtn = confirmBtn.cloneNode(true);
             confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
 
-            // Focus textarea after modal opens
             setTimeout(() => { if (reasonInput) reasonInput.focus(); }, 100);
 
             newBtn.addEventListener('click', async () => {
@@ -1298,7 +1288,6 @@
             document.getElementById('m-item-details').classList.add('show');
         };
 
-        // اتصال دکمه‌های فیلتر (یک بار)
         document.querySelectorAll('.dep-filter-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 window.currentDepFilter = btn.getAttribute('data-filter');
@@ -1334,7 +1323,7 @@
                             email: u.email || meta.email || '',
                             phone: u.phone || meta.phone || '-',
                             balance: u.balance !== undefined ? Number(u.balance) : 0,
-                            platformProfit: Number(u.platformProfit || u.profit || 0),
+                            platform_profit: Number(u.platform_profit || 0),
                             casino_balance: Number(u.casino_balance || 0),
                             status: u.status || 'active',
                             createdAt: u.created_at || new Date().toISOString()
@@ -1354,7 +1343,7 @@
                         if (st === 'approved' || st === 'success') totUserDeposits += Number(tx.amount || 0);
 
                         let uid = tx.user_id || 'unknown';
-                        if (!uMap[uid]) uMap[uid] = { id: uid, fullname: `کاربر`, email: '-', phone: '-', balance: 0, platformProfit: 0, casino_balance: 0, createdAt: new Date().toISOString() };
+                        if (!uMap[uid]) uMap[uid] = { id: uid, fullname: `کاربر`, email: '-', phone: '-', balance: 0, platform_profit: 0, casino_balance: 0, createdAt: new Date().toISOString() };
 
                         let networkVal = tx.network;
                         if (!networkVal) {
@@ -1405,7 +1394,7 @@
 
                 Object.keys(uMap).forEach(uid => {
                     let u = uMap[uid];
-                    totU++; totB += Number(u.balance || 0); totUserProfit += Number(u.platformProfit || 0);
+                    totU++; totB += Number(u.balance || 0); totUserProfit += Number(u.platform_profit || 0);
                     let idCode = getUserIdCode(uid);
                     let nameStr = getName(u);
                     let emailStr = u.email || '-';
@@ -1420,7 +1409,7 @@
                         totW++; withdrawList.push({ uid, u, idCode, nameStr, data: u.pendingWithdrawal });
                     }
                     let balStr = `$${Number(u.balance||0).toLocaleString()}`;
-                    let profitStr = `$${Number(u.platformProfit||0).toLocaleString()}`;
+                    let profitStr = `$${Number(u.platform_profit||0).toLocaleString()}`;
 
                     if(isBanned){
                         cBan++;
@@ -1570,23 +1559,29 @@
             document.getElementById('e-email').value = u.email || '';
             document.getElementById('e-phone').value = u.phone || '';
             document.getElementById('e-bal').value = u.balance || 0;
-            document.getElementById('e-profit').value = u.platformProfit || 0;
+            document.getElementById('e-profit').value = u.platform_profit || 0;
             document.getElementById('m-edit').classList.add('show');
         };
 
         document.getElementById('f-edit')?.addEventListener('submit', async e => {
             e.preventDefault();
             let uid = document.getElementById('e-uid').value;
-            await supabaseClient.from('users').update({
-                fullname: document.getElementById('e-name').value,
-                email: document.getElementById('e-email').value,
-                phone: document.getElementById('e-phone').value,
-                balance: parseFloat(document.getElementById('e-bal').value) || 0,
-                platformProfit: parseFloat(document.getElementById('e-profit').value) || 0
-            }).eq('id', uid);
-            showToast('مشخصات ویرایش شد.');
-            closeModal('m-edit');
-            loadData();
+            try {
+                const { error } = await supabaseClient.from('users').update({
+                    fullname: document.getElementById('e-name').value,
+                    email: document.getElementById('e-email').value,
+                    phone: document.getElementById('e-phone').value,
+                    balance: parseFloat(document.getElementById('e-bal').value) || 0,
+                    platform_profit: parseFloat(document.getElementById('e-profit').value) || 0
+                }).eq('id', uid);
+                if (error) throw error;
+                showToast('مشخصات ویرایش شد.');
+                closeModal('m-edit');
+                loadData();
+            } catch (err) {
+                console.error('Edit error:', err);
+                showToast('خطا در ویرایش: ' + (err.message || 'خطای نامشخص'), 'error');
+            }
         });
 
         document.getElementById('logout-btn')?.addEventListener('click', async () => { await supabaseClient.auth.signOut(); window.location.href = 'index.html'; });
