@@ -18,7 +18,7 @@
 
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
-        body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
+        body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column;overflow-x:hidden}
         
         .toast-container {
             position: fixed;
@@ -133,12 +133,35 @@
         .card{background:rgba(30,41,59,0.8);border:1px solid rgba(56,189,248,0.3);border-radius:12px;padding:20px;margin-top:12px}
         .fg{margin-bottom:15px}
         .fl{display:block;font-size:13px;color:#94a3b8;margin-bottom:6px}
-        .fi{width:100%;padding:10px 14px;background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#f8fafc;font-size:13px;outline:none}
+        .fi{width:100%;padding:10px 14px;background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#f8fafc;font-size:13px;outline:none;transition:border-color 0.2s}
         .fi:focus{border-color:#38bdf8}
-        .bs{display:block;width:100%;background:#38bdf8;color:#0f172a;border:none;padding:12px;font-weight:bold;border-radius:8px;cursor:pointer;font-size:14px;text-align:center;transition:0.2s}
-        .bs:hover{background:#0ea5e9}
+        .bs{display:block;width:100%;background:#38bdf8;color:#0f172a;border:none;padding:12px;font-weight:bold;border-radius:8px;cursor:pointer;font-size:14px;text-align:center;transition:0.2s;font-family:inherit}
+        .bs:hover:not(:disabled){background:#0ea5e9}
+        .bs:disabled{opacity:0.55;cursor:not-allowed;background:#475569}
 
-        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
+        /* === استایل سفارشی select === */
+        select.fi {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2338bdf8' stroke-width='3' stroke-linecap='round'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-repeat: no-repeat;
+            background-position: left 14px center;
+            padding-left: 38px;
+        }
+        [dir="ltr"] select.fi {
+            background-position: right 14px center;
+            padding-left: 14px;
+            padding-right: 38px;
+        }
+
+        /* بهبود focus برای دسترس‌پذیری */
+        .fi:focus-visible {
+            outline: 2px solid #38bdf8;
+            outline-offset: 1px;
+        }
+
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px);padding:16px}
         .modal.show{display:flex}
         .modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(56,189,248,.3);border-radius:20px;width:100%;max-width:460px;max-height:85vh;display:flex;flex-direction:column;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.9);overflow:hidden}
         .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;color:#38bdf8;font-weight:800;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;flex-shrink:0}
@@ -183,6 +206,86 @@
         }
 
         footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
+
+        /* =========================================================
+           RESPONSIVE — موبایل و تبلت
+           ========================================================= */
+
+        /* تا 640px (تبلت کوچک / گوشی بزرگ) */
+        @media (max-width: 640px) {
+            input, select, textarea, .fi {
+                font-size: 16px !important;
+            }
+
+            header { padding: 8px 12px; }
+            .logo-text { font-size: 16px; letter-spacing: 1px; }
+            .logo-icon { width: 32px; height: 32px; font-size: 15px; }
+            .hr { gap: 5px; }
+
+            .lb { min-width: 40px; height: 40px; font-size: 13px; }
+
+            .c { padding: 0 10px; margin: 10px auto; }
+            .card { padding: 16px 14px; border-radius: 10px; }
+
+            .wel {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .wel > div:last-child {
+                width: 100%;
+                text-align: right;
+            }
+
+            .modal { padding: 12px; }
+            .modal-content {
+                padding: 16px;
+                border-radius: 16px;
+                max-height: 90vh;
+            }
+
+            .toast-container { width: 95%; }
+
+            footer {
+                flex-direction: column;
+                gap: 4px;
+                text-align: center;
+            }
+
+            .wel p { font-size: 12px; }
+            .msg-desc-text { font-size: 13px; }
+            .notif-tab { font-size: 12px; }
+            .fl { font-size: 14px; }
+        }
+
+        /* تا 480px (گوشی متوسط) */
+        @media (max-width: 480px) {
+            .hr { gap: 4px; flex-wrap: nowrap; }
+            .lb { min-width: 36px; height: 36px; font-size: 12px; }
+            .logo-text { font-size: 15px; }
+            .wel h1 { font-size: 15px; }
+            .wel p { font-size: 12px; }
+            .notif-tab { padding: 6px 8px; font-size: 11px; }
+            .notif-tab i { font-size: 11px; }
+        }
+
+        /* تا 380px (iPhone SE, گوشی خیلی کوچک) */
+        @media (max-width: 380px) {
+            header { padding: 6px 8px; }
+            .logo-icon { width: 28px; height: 28px; font-size: 14px; border-radius: 8px; }
+            .logo-text { font-size: 14px; letter-spacing: 0; }
+            .hr { gap: 3px; }
+            .lb { min-width: 34px; height: 34px; font-size: 11px; border-radius: 7px; }
+            .badge { width: 14px; height: 14px; font-size: 8px; top: -3px; right: -3px; }
+
+            .c { padding: 0 8px; }
+            .wel { padding: 12px; }
+            .wel h1 { font-size: 14px; }
+            .card { padding: 14px 12px; }
+
+            .notif-tab { padding: 5px 6px; font-size: 10.5px; gap: 3px; }
+            .notif-tab .tab-badge { font-size: 9px; padding: 0 4px; }
+        }
     </style>
 </head>
 <body>
@@ -247,13 +350,13 @@
 
             <div class="fg">
                 <label class="fl">آدرس کیف پول مقصد</label>
-                <input type="text" id="withdraw-address" class="fi" placeholder="آدرس کیف پول برداشت خود را وارد کنید">
+                <input type="text" id="withdraw-address" class="fi" placeholder="آدرس کیف پول برداشت خود را وارد کنید" autocomplete="off" spellcheck="false">
             </div>
 
             <div class="fg">
                 <label class="fl">مبلغ برداشت (USDT)</label>
-                <input type="number" id="withdraw-amount" class="fi" placeholder="حداقل ۱۰ تتر" oninput="window.calcFee()">
-                <div style="display:flex;justify-content:space-between;font-size:11px;color:#94a3b8;margin-top:6px;">
+                <input type="number" id="withdraw-amount" class="fi" placeholder="حداقل ۱۰ تتر" oninput="window.calcFee()" inputmode="decimal" min="0" step="any" autocomplete="off">
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:#94a3b8;margin-top:6px;gap:8px;flex-wrap:wrap;">
                     <span>کارمزد شبکه: <strong id="withdraw-fee" style="color:#fbbf24;">1 USDT</strong></span>
                     <span>مبلغ دریافتی نهایی: <strong id="withdraw-net" style="color:#22c55e;">0 USDT</strong></span>
                 </div>
@@ -261,7 +364,7 @@
 
             <div class="fg">
                 <label class="fl">رمز تراکنش</label>
-                <input type="password" id="withdraw-pass" class="fi" placeholder="رمز تراکنش ۶ رقمی خود را وارد کنید">
+                <input type="password" id="withdraw-pass" class="fi" placeholder="رمز تراکنش ۶ رقمی خود را وارد کنید" inputmode="numeric" maxlength="6" autocomplete="off">
                 
                 <div style="display:flex;justify-content:flex-end;margin-top:6px;">
                     <a href="profile.html?open=tx_pass#card-tx-pass" id="t-forgot-pass" style="font-size:11px;color:#38bdf8;text-decoration:none;transition:0.2s;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
@@ -512,7 +615,6 @@
           const detailBody = document.getElementById('detail-msg-body');
           const detailSupport = document.getElementById('detail-msg-support');
 
-          // title comes from the notifications table (user/DB) so it must be escaped.
           if (detailTitle) detailTitle.innerHTML = `<i class="fas fa-bell" style="color:#38bdf8"></i> ${escapeHtml(title)}`;
           
           if (detailDate) {
@@ -596,9 +698,8 @@
 
             const dateDisplay = dateStr ? `<div style="font-size:11px;color:${isUnread ? '#cbd5e1' : '#64748b'};margin-top:6px;direction:ltr;text-align:left;"><i class="far fa-clock" style="margin-right:4px;"></i>${escapeHtml(dateStr)}</div>` : '';
 
-            // title comes from the notifications table (user/DB) so it is escaped.
             html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle} ${opacityStyle} cursor:pointer; position:relative; transition:all 0.2s;" onclick="window.openMsgDetail(${idx})">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
                 <div class="msg-title-text" style="display:flex;align-items:center;gap:8px;font-weight:${isUnread ? '800' : '500'};color:${isUnread ? '#f8fafc' : '#cbd5e1'};">
                   ${unreadDot}
                   ${icon}
@@ -627,8 +728,6 @@
             if (type === 'error') iconClass = 'fa-exclamation-circle';
             if (type === 'info') iconClass = 'fa-info-circle';
 
-            // message may contain data derived from user input or DB records;
-            // escape before inserting into innerHTML. iconClass is a literal.
             toast.innerHTML = `<i class="fas ${iconClass}"></i><div style="flex:1;">${escapeHtml(message)}</div>`;
             container.appendChild(toast);
 
