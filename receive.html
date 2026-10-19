@@ -3,76 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <title>Zenix - برداشت وجه</title>
     <link rel="icon" href="data:image/x-icon;base64,=">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
         body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column;overflow-x:hidden}
-        
         .toast-container{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column;gap:10px;pointer-events:none;width:90%;max-width:420px}
-        .toast{padding:14px 18px;border-radius:14px;font-size:13px;font-weight:600;display:flex;align-items:flex-start;gap:12px;box-shadow:0 12px 35px rgba(0,0,0,0.7);backdrop-filter:blur(14px);opacity:0;transform:translateY(-20px);transition:all 0.35s cubic-bezier(0.68,-0.55,0.27,1.55);pointer-events:auto;line-height:1.5}
+        .toast{padding:14px 18px;border-radius:14px;font-size:13px;font-weight:600;display:flex;align-items:flex-start;gap:12px;box-shadow:0 12px 35px rgba(0,0,0,0.7);opacity:0;transform:translateY(-20px);transition:all 0.35s ease;pointer-events:auto;line-height:1.5}
         .toast.show{opacity:1;transform:translateY(0)}
         .toast-success{background:rgba(16,185,129,0.22);border:1px solid rgba(16,185,129,0.6);color:#34d399}
         .toast-error{background:rgba(239,68,68,0.22);border:1px solid rgba(239,68,68,0.6);color:#f87171}
-        .toast-info{background:rgba(15,23,42,0.92);border:1px solid rgba(56,189,248,0.5);color:#38bdf8;box-shadow:0 0 25px rgba(56,189,248,0.25)}
         .toast i{font-size:18px;margin-top:2px}
-
         header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1);padding:10px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
         .logo{display:flex;align-items:center;gap:10px}
-        .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#0ea5e9,#9333ea);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;font-style:italic;transform:skewX(-6deg);box-shadow:0 0 15px rgba(14,165,233,.4)}
-        .logo-text{font-family:'Orbitron',sans-serif;font-size:19px;font-weight:900;letter-spacing:2px;font-style:italic;transform:skewX(-6deg);background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 20px rgba(56,189,248,0.4)}
+        .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#0ea5e9,#9333ea);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;font-style:italic;transform:skewX(-6deg)}
+        .logo-text{font-family:'Orbitron',sans-serif;font-size:19px;font-weight:900;letter-spacing:2px;font-style:italic;transform:skewX(-6deg);background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
         .hr{display:flex;align-items:center;gap:8px}
         .wrap{position:relative}
         .lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none;transition:all 0.2s}
         .lb:hover{background:rgba(56,189,248,.15);border-color:#38bdf8}
         .badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;font-weight:700}
         .badge.show{display:flex}
-        
-        .menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(56,189,248,.3);border-radius:10px;width:max-content !important;width:-webkit-max-content !important;padding:6px;z-index:999;box-shadow:0 10px 30px rgba(0,0,0,.85);white-space:nowrap}
+        .menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(56,189,248,.3);border-radius:10px;width:max-content !important;padding:6px;z-index:999;box-shadow:0 10px 30px rgba(0,0,0,.85);white-space:nowrap}
         [dir="rtl"] .wrap .menu{left:0;right:auto}
         [dir="ltr"] .wrap .menu{right:0;left:auto}
         .menu.show{display:block}
-        
-        .mi{padding:8px 12px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;transition:all 0.2s ease;white-space:nowrap;width:100%}
+        .mi{padding:8px 12px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap;width:100%}
         .mi:hover{background:rgba(56,189,248,.15);color:#38bdf8}
         .mi.active{background:rgba(56,189,248,0.15) !important;color:#38bdf8 !important;font-weight:700 !important}
-
         .c{max-width:900px;width:100%;margin:15px auto;padding:0 12px;flex:1}
         .wel{background:linear-gradient(135deg,rgba(2,132,199,.15),rgba(147,51,234,.15));border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
         .wel h1{font-size:16px;margin-bottom:3px}
         .wel p{color:#94a3b8;font-size:11px}
-
-        /* === Level Info Box === */
-        .level-info-box{
-            background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(239,68,68,.08));
-            border:1px solid rgba(251,191,36,.4);
-            border-radius:12px;
-            padding:12px 15px;
-            margin-bottom:12px;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            gap:10px;
-            flex-wrap:wrap;
-        }
-        .level-info-box .lvl-block{display:flex;align-items:center;gap:10px}
-        .level-info-box .lvl-icon{width:34px;height:34px;border-radius:10px;background:rgba(251,191,36,.2);display:grid;place-items:center;color:#fbbf24;font-size:16px;flex-shrink:0}
-        .level-info-box .lvl-label{font-size:11px;color:#94a3b8;display:block;margin-bottom:2px}
-        .level-info-box .lvl-value{font-size:15px;font-weight:800;color:#fbbf24}
-        .level-info-box .amt-block{display:flex;align-items:center;gap:10px}
-        .level-info-box .amt-icon{width:34px;height:34px;border-radius:10px;background:rgba(34,197,94,.2);display:grid;place-items:center;color:#22c55e;font-size:16px;flex-shrink:0}
-        .level-info-box .amt-value{font-size:15px;font-weight:800;color:#22c55e}
-
+        .level-info-box{background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(239,68,68,.08));border:1px solid rgba(251,191,36,.4);border-radius:12px;padding:12px 15px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+        .lvl-block,.amt-block{display:flex;align-items:center;gap:10px}
+        .lvl-icon,.amt-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:16px;flex-shrink:0}
+        .lvl-icon{background:rgba(251,191,36,.2);color:#fbbf24}
+        .amt-icon{background:rgba(34,197,94,.2);color:#22c55e}
+        .lvl-label{font-size:11px;color:#94a3b8;display:block;margin-bottom:2px}
+        .lvl-value{font-size:15px;font-weight:800;color:#fbbf24}
+        .amt-value{font-size:15px;font-weight:800;color:#22c55e}
+        .status-card{border-radius:12px;padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px;font-size:12px;line-height:1.6;flex-wrap:wrap}
+        .status-card.allowed{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.4);color:#22c55e}
+        .status-card.blocked{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.4);color:#f87171}
+        .status-card.pending{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.4);color:#fbbf24}
+        .status-card i.status-icon{font-size:22px;flex-shrink:0}
+        .status-card .status-text{flex:1;min-width:0}
+        .status-card .status-title{font-weight:800;font-size:13px;margin-bottom:2px;display:block}
+        .status-card .status-sub{font-size:11px;opacity:.85;display:block}
+        .countdown-box{background:rgba(15,23,42,.6);border:1px solid rgba(56,189,248,.25);border-radius:8px;padding:8px 12px;margin-top:8px;display:flex;align-items:center;gap:8px;justify-content:center;font-family:monospace;font-size:14px;font-weight:700;color:#38bdf8;width:100%}
+        .countdown-box i{color:#fbbf24}
         .card{background:rgba(30,41,59,0.8);border:1px solid rgba(56,189,248,0.3);border-radius:12px;padding:20px;margin-top:12px}
         .fg{margin-bottom:15px}
         .fl{display:block;font-size:13px;color:#94a3b8;margin-bottom:6px}
@@ -82,84 +68,32 @@
         .bs{display:block;width:100%;background:#38bdf8;color:#0f172a;border:none;padding:12px;font-weight:bold;border-radius:8px;cursor:pointer;font-size:14px;text-align:center;transition:0.2s;font-family:inherit}
         .bs:hover:not(:disabled){background:#0ea5e9}
         .bs:disabled{opacity:0.55;cursor:not-allowed;background:#475569}
-
         select.fi{-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2338bdf8' stroke-width='3' stroke-linecap='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:left 14px center;padding-left:38px}
         [dir="ltr"] select.fi{background-position:right 14px center;padding-left:14px;padding-right:38px}
-
-        .fi:focus-visible{outline:2px solid #38bdf8;outline-offset:1px}
-
         .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px);padding:16px}
         .modal.show{display:flex}
-        .modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(56,189,248,.3);border-radius:20px;width:100%;max-width:460px;max-height:85vh;display:flex;flex-direction:column;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.9);overflow:hidden}
+        .modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(56,189,248,.3);border-radius:20px;width:100%;max-width:460px;max-height:85vh;display:flex;flex-direction:column;padding:22px;overflow:hidden}
         .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;color:#38bdf8;font-weight:800;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;flex-shrink:0}
         .modal-close{background:rgba(255,255,255,.05);border:none;color:#94a3b8;cursor:pointer;font-size:14px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
-        .modal-close:hover{background:rgba(239,68,68,.2);color:#ef4444}
-        
-        .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px;transition:0.2s}
-        .msg-body-box:hover{border-color:rgba(56,189,248,.5)!important;opacity:1!important;}
+        .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px}
         .msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:0}
         .msg-desc-text{font-size:12px;color:#cbd5e1;line-height:1.5}
-
-        .notif-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
-        .notif-tab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#94a3b8;padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;white-space:nowrap;transition:0.2s;display:flex;align-items:center;justify-content:center;gap:5px;flex:1 1 auto}
-        .notif-tab:hover{background:rgba(56,189,248,.15);color:#38bdf8}
-        .notif-tab.active{background:#38bdf8;color:#0f172a;font-weight:bold;border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.3)}
-        .tab-badge{background:rgba(255,255,255,.15);color:inherit;padding:1px 6px;border-radius:10px;font-size:10px;font-weight:700;line-height:1.2;min-width:16px;text-align:center;display:inline-block}
-        .notif-tab.active .tab-badge{background:rgba(15,23,42,.3);color:#0f172a}
-
-        #modal-msg-container{overflow-y:auto;padding-right:6px;flex:1;min-height:0}
-        #modal-msg-container::-webkit-scrollbar,.modal-content div::-webkit-scrollbar{width:5px}
-        #modal-msg-container::-webkit-scrollbar-track,.modal-content div::-webkit-scrollbar-track{background:rgba(15,23,42,0.6);border-radius:10px}
-        #modal-msg-container::-webkit-scrollbar-thumb,.modal-content div::-webkit-scrollbar-thumb{background:rgba(56,189,248,0.35);border-radius:10px}
-        #modal-msg-container::-webkit-scrollbar-thumb:hover,.modal-content div::-webkit-scrollbar-thumb:hover{background:rgba(56,189,248,0.7)}
-        #modal-msg-container,.modal-content div{scrollbar-width:thin;scrollbar-color:rgba(56,189,248,0.35) rgba(15,23,42,0.6)}
-
         footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
-
-        @media (max-width: 640px) {
-            input, select, textarea, .fi { font-size: 16px !important; }
-            header { padding: 8px 12px; }
-            .logo-text { font-size: 16px; letter-spacing: 1px; }
-            .logo-icon { width: 32px; height: 32px; font-size: 15px; }
-            .hr { gap: 5px; }
-            .lb { min-width: 40px; height: 40px; font-size: 13px; }
-            .c { padding: 0 10px; margin: 10px auto; }
-            .card { padding: 16px 14px; border-radius: 10px; }
-            .wel { flex-direction: column; align-items: flex-start; gap: 8px; }
-            .wel > div:last-child { width: 100%; text-align: right; }
-            .modal { padding: 12px; }
-            .modal-content { padding: 16px; border-radius: 16px; max-height: 90vh; }
-            .toast-container { width: 95%; }
-            footer { flex-direction: column; gap: 4px; text-align: center; }
-            .wel p { font-size: 12px; }
-            .msg-desc-text { font-size: 13px; }
-            .notif-tab { font-size: 12px; }
-            .fl { font-size: 14px; }
-            .level-info-box { flex-direction: column; align-items: stretch; gap: 8px; }
-            .level-info-box .lvl-block, .level-info-box .amt-block { justify-content: flex-start; }
-        }
-        @media (max-width: 480px) {
-            .hr { gap: 4px; flex-wrap: nowrap; }
-            .lb { min-width: 36px; height: 36px; font-size: 12px; }
-            .logo-text { font-size: 15px; }
-            .wel h1 { font-size: 15px; }
-            .wel p { font-size: 12px; }
-            .notif-tab { padding: 6px 8px; font-size: 11px; }
-            .notif-tab i { font-size: 11px; }
-        }
-        @media (max-width: 380px) {
-            header { padding: 6px 8px; }
-            .logo-icon { width: 28px; height: 28px; font-size: 14px; border-radius: 8px; }
-            .logo-text { font-size: 14px; letter-spacing: 0; }
-            .hr { gap: 3px; }
-            .lb { min-width: 34px; height: 34px; font-size: 11px; border-radius: 7px; }
-            .badge { width: 14px; height: 14px; font-size: 8px; top: -3px; right: -3px; }
-            .c { padding: 0 8px; }
-            .wel { padding: 12px; }
-            .wel h1 { font-size: 14px; }
-            .card { padding: 14px 12px; }
-            .notif-tab { padding: 5px 6px; font-size: 10.5px; gap: 3px; }
-            .notif-tab .tab-badge { font-size: 9px; padding: 0 4px; }
+        @media (max-width:640px){
+            input,select,textarea,.fi{font-size:16px !important}
+            header{padding:8px 12px}
+            .logo-text{font-size:16px;letter-spacing:1px}
+            .logo-icon{width:32px;height:32px;font-size:15px}
+            .hr{gap:5px}
+            .lb{min-width:40px;height:40px;font-size:13px}
+            .c{padding:0 10px;margin:10px auto}
+            .card{padding:16px 14px;border-radius:10px}
+            .wel{flex-direction:column;align-items:flex-start;gap:8px}
+            .wel > div:last-child{width:100%;text-align:right}
+            .modal{padding:12px}
+            .modal-content{padding:16px}
+            footer{flex-direction:column;gap:4px;text-align:center}
+            .level-info-box{flex-direction:column;align-items:stretch;gap:8px}
         }
     </style>
 </head>
@@ -170,19 +104,12 @@
         <div class="logo"><div class="logo-icon">Z</div><div class="logo-text">ZENIX</div></div>
         <div class="hr">
             <div class="wrap"><button type="button" class="lb" id="bell-btn"><i class="fas fa-bell" style="color:#fbbf24"></i><span class="badge" id="bell-badge">0</span></button></div>
-            <div class="wrap"><button type="button" class="lb" id="help-btn" data-i18n-title="helpTitle"><i class="fas fa-circle-question" style="color:#38bdf8"></i></button></div>
+            <div class="wrap"><button type="button" class="lb" id="help-btn"><i class="fas fa-circle-question" style="color:#38bdf8"></i></button></div>
             <a href="support.html" class="lb"><i class="fas fa-headset" style="color:#a855f7"></i></a>
             <div class="wrap">
                 <button type="button" class="lb" id="lang-btn"><i class="fas fa-globe" style="color:#22c55e"></i></button>
                 <div class="menu" id="lang-menu">
-                    <div class="mi" data-lang="fa">فارسی</div>
-                    <div class="mi" data-lang="en">English</div>
-                    <div class="mi" data-lang="ar">العربية</div>
-                    <div class="mi" data-lang="tr">Türkçe</div>
-                    <div class="mi" data-lang="ru">Русский</div>
-                    <div class="mi" data-lang="es">Español</div>
-                    <div class="mi" data-lang="fr">Français</div>
-                    <div class="mi" data-lang="de">Deutsch</div>
+                    <div class="mi" data-lang="fa">فارسی</div><div class="mi" data-lang="en">English</div><div class="mi" data-lang="ar">العربية</div><div class="mi" data-lang="tr">Türkçe</div><div class="mi" data-lang="ru">Русский</div><div class="mi" data-lang="es">Español</div><div class="mi" data-lang="fr">Français</div><div class="mi" data-lang="de">Deutsch</div>
                 </div>
             </div>
             <div class="wrap">
@@ -192,7 +119,6 @@
                     <a href="quantification.html" class="mi"><i class="fas fa-robot" style="color:#a855f7"></i><span data-i18n="quantification">کوانتیفیکیشن</span></a>
                     <a href="deposit.html" class="mi"><i class="fas fa-arrow-down" style="color:#22c55e"></i><span data-i18n="deposit">واریز</span></a>
                     <a href="receive.html" class="mi active"><i class="fas fa-arrow-up" style="color:#fbbf24"></i><span data-i18n="receive">برداشت</span></a>
-                    <a href="team.html" class="mi"><i class="fas fa-users" style="color:#ec4899"></i><span data-i18n="team">تیم من</span></a>
                     <a href="transactions.html" class="mi"><i class="fas fa-history" style="color:#06b6d4"></i><span data-i18n="transactions">تراکنش</span></a>
                     <a href="profile.html" class="mi"><i class="fas fa-user-cog" style="color:#ec4899"></i><span data-i18n="profile">پروفایل</span></a>
                     <a href="support.html" class="mi"><i class="fas fa-headset" style="color:#a855f7"></i><span data-i18n="support">پشتیبانی</span></a>
@@ -206,15 +132,15 @@
         <div class="wel">
             <div>
                 <h1 data-i18n="pageHeading">برداشت ارز دیجیتال</h1>
-                <p data-i18n="pageSub">درخواست برداشت سریع و امن USDT به کیف پول مقصد</p>
+                <p data-i18n="pageSub">درخواست برداشت سریع و امن USDT</p>
             </div>
             <div style="text-align:left;">
-                <span style="font-size:10px;color:#94a3b8;display:block;" data-i18n="balanceLabel">موجودی قابل برداشت:</span>
+                <span style="font-size:10px;color:#94a3b8;display:block;" data-i18n="balanceLabel">موجودی:</span>
                 <span id="user-balance" style="font-size:16px;font-weight:bold;color:#38bdf8;">0.00 USDT</span>
             </div>
         </div>
 
-        <div class="level-info-box" id="level-info-box">
+        <div class="level-info-box">
             <div class="lvl-block">
                 <div class="lvl-icon"><i class="fas fa-crown"></i></div>
                 <div>
@@ -231,986 +157,311 @@
             </div>
         </div>
 
+        <div id="status-card" class="status-card blocked">
+            <i class="fas fa-spinner fa-spin status-icon"></i>
+            <div class="status-text"><span class="status-title" data-i18n="statusLoading">در حال بررسی وضعیت...</span></div>
+        </div>
+
         <div class="card">
             <div class="fg">
-                <label class="fl" data-i18n="networkLabel">انتخاب شبکه (Network)</label>
+                <label class="fl" data-i18n="networkLabel">انتخاب شبکه</label>
                 <select id="withdraw-network" class="fi" style="cursor:pointer;" onchange="window.onNetworkChange()">
                     <option value="TRC20">USDT - TRC20 (Tron)</option>
                     <option value="BEP20">USDT - BEP20 (BNB Smart Chain)</option>
                 </select>
             </div>
-
             <div class="fg">
                 <label class="fl" data-i18n="addressLabel">آدرس کیف پول مقصد</label>
-                <input type="text" id="withdraw-address" class="fi" data-i18n-placeholder="addressPlaceholder" placeholder="آدرس کیف پول برداشت خود را وارد کنید" autocomplete="off" spellcheck="false">
+                <input type="text" id="withdraw-address" class="fi" data-i18n-placeholder="addressPlaceholder" placeholder="آدرس کیف پول را وارد کنید" autocomplete="off" spellcheck="false">
             </div>
-
             <div class="fg">
                 <label class="fl" data-i18n="amountLabel">مبلغ برداشت (USDT)</label>
-                <input type="number" id="withdraw-amount" class="fi" readonly data-i18n-placeholder="amountPlaceholder" placeholder="حداقل ۱۰ تتر" inputmode="decimal" min="0" step="any" autocomplete="off">
+                <input type="number" id="withdraw-amount" class="fi" readonly inputmode="decimal">
                 <div style="display:flex;justify-content:space-between;font-size:11px;color:#94a3b8;margin-top:6px;gap:8px;flex-wrap:wrap;">
-                    <span><span data-i18n="feeLabel">کارمزد شبکه:</span> <strong id="withdraw-fee" style="color:#fbbf24;">0.9 USDT</strong></span>
-                    <span><span data-i18n="netLabel">مبلغ دریافتی نهایی:</span> <strong id="withdraw-net" style="color:#22c55e;">0 USDT</strong></span>
+                    <span><span data-i18n="feeLabel">کارمزد:</span> <strong id="withdraw-fee" style="color:#fbbf24;">0.90 USDT</strong></span>
+                    <span><span data-i18n="netLabel">دریافتی:</span> <strong id="withdraw-net" style="color:#22c55e;">0 USDT</strong></span>
                 </div>
             </div>
-
             <div class="fg">
                 <label class="fl" data-i18n="passLabel">رمز تراکنش</label>
-                <input type="password" id="withdraw-pass" class="fi" data-i18n-placeholder="passPlaceholder" placeholder="رمز تراکنش ۶ رقمی خود را وارد کنید" inputmode="numeric" maxlength="6" autocomplete="off">
-                
-                <div style="display:flex;justify-content:flex-end;margin-top:6px;">
-                    <a href="profile.html?open=tx_pass#card-tx-pass" id="t-forgot-pass" style="font-size:11px;color:#38bdf8;text-decoration:none;transition:0.2s;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
-                        <i class="fas fa-key" style="font-size:10px;margin-left:3px;"></i> <span data-i18n="forgotPass">فراموشی رمز تراکنش؟</span>
-                    </a>
-                </div>
+                <input type="password" id="withdraw-pass" class="fi" data-i18n-placeholder="passPlaceholder" placeholder="رمز ۶ رقمی" inputmode="numeric" maxlength="6" autocomplete="off">
             </div>
-
-            <button type="button" id="submit-withdraw-btn" onclick="window.submitWithdrawal()" class="bs" data-i18n="submitBtn">ثبت درخواست برداشت</button>
-        </div>
-    </div>
-
-    <div class="modal" id="m-msg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span id="t-modal-title"><i class="fas fa-bell"></i> <span data-i18n="notifTitle">صندوق پیام‌ها و اعلان‌ها</span></span>
-                <button class="modal-close" onclick="window.closeMessageModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="notif-tabs" id="notif-tabs">
-                <button type="button" class="notif-tab active" onclick="window.setNotifFilter('all', this)"><i class="fas fa-list"></i> <span data-i18n="tabAll">همه</span> <span class="tab-badge" id="cnt-tab-all">0</span></button>
-                <button type="button" class="notif-tab" onclick="window.setNotifFilter('approved', this)"><i class="fas fa-check-circle" style="color:#22c55e"></i> <span data-i18n="tabApproved">تایید درخواست</span> <span class="tab-badge" id="cnt-tab-approved">0</span></button>
-                <button type="button" class="notif-tab" onclick="window.setNotifFilter('rejected', this)"><i class="fas fa-times-circle" style="color:#ef4444"></i> <span data-i18n="tabRejected">لغو درخواست</span> <span class="tab-badge" id="cnt-tab-rejected">0</span></button>
-                <button type="button" class="notif-tab" onclick="window.setNotifFilter('admin_message', this)"><i class="fas fa-bullhorn" style="color:#38bdf8"></i> <span data-i18n="tabAdmin">پیام مدیریت</span> <span class="tab-badge" id="cnt-tab-admin">0</span></button>
-            </div>
-            <div id="modal-msg-container"><div style="text-align:center;padding:20px;color:#94a3b8" data-i18n="noMsg">هیچ پیام جدیدی وجود ندارد.</div></div>
-        </div>
-    </div>
-
-    <div class="modal" id="m-msg-detail" style="z-index:1050;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span id="detail-msg-title"><i class="fas fa-envelope-open"></i> <span data-i18n="notifTitle">صندوق پیام‌ها و اعلان‌ها</span></span>
-                <button class="modal-close" onclick="window.closeMsgDetailModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <div style="overflow-y:auto;padding-right:6px">
-                <div id="detail-msg-date" style="font-size:11px;color:#94a3b8;direction:ltr;text-align:left;margin-bottom:10px;display:none;"></div>
-                <div id="detail-msg-body" style="font-size:13px;color:#cbd5e1;line-height:1.7;white-space:pre-wrap;margin-bottom:12px;"></div>
-                <div id="detail-msg-support"></div>
-            </div>
+            <button type="button" id="submit-withdraw-btn" onclick="window.submitWithdrawal()" class="bs" disabled data-i18n="submitBtn">ثبت درخواست برداشت</button>
         </div>
     </div>
 
     <div class="modal" id="m-help">
         <div class="modal-content">
-            <div class="modal-header">
-                <span data-i18n="helpTitle">راهنمای صفحه برداشت</span>
-                <button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button>
-            </div>
+            <div class="modal-header"><span data-i18n="helpTitle">راهنما</span><button class="modal-close" onclick="document.getElementById('m-help').classList.remove('show')"><i class="fas fa-times"></i></button></div>
             <div style="overflow-y:auto;padding-right:4px">
-                <div class="msg-body-box">
-                    <div class="msg-title-text"><i class="fas fa-arrow-up" style="color:#38bdf8"></i> <span data-i18n="helpStep1Title">نحوه ثبت درخواست برداشت</span></div>
-                    <div class="msg-desc-text" data-i18n="helpStep1Desc">شبکه موردنظر (TRC20 یا BEP20) را انتخاب کرده و آدرس دقیق کیف پول مقصد و مبلغ برداشت را وارد نمایید.</div>
-                </div>
-                <div class="msg-body-box">
-                    <div class="msg-title-text"><i class="fas fa-key" style="color:#a855f7"></i> <span data-i18n="helpStep2Title">رمز تراکنش</span></div>
-                    <div class="msg-desc-text" data-i18n="helpStep2Desc">جهت تایید نهایی نیاز به وارد کردن رمز تراکنش ۶ رقمی دارید.</div>
-                </div>
-                <div class="msg-body-box">
-                    <div class="msg-title-text"><i class="fas fa-crown" style="color:#fbbf24"></i> <span data-i18n="helpStep3Title">سطح و مبلغ برداشت</span></div>
-                    <div class="msg-desc-text" data-i18n="helpStep3Desc">مبلغ برداشت شما بر اساس سطح حساب تعیین می‌شود و به‌صورت خودکار در فیلد مربوطه نمایش داده می‌شود.</div>
-                </div>
+                <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-crown" style="color:#fbbf24"></i> <span data-i18n="helpLevelTitle">سطح برداشت</span></div><div class="msg-desc-text" data-i18n="helpLevelDesc">سطح بر اساس موجودی تعیین می‌شود.</div></div>
+                <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-clock" style="color:#38bdf8"></i> <span data-i18n="helpRulesTitle">قوانین برداشت</span></div><div class="msg-desc-text" data-i18n="helpRulesDesc">بعد از هر تصمیم ادمین، ۲۴ ساعت صبر. شنبه/یکشنبه تعطیل.</div></div>
             </div>
         </div>
     </div>
 
     <footer>
-        <p>&copy; 2026 Zenix. All rights reserved.</p>
-        <p style="color:#22c55e;"><i class="fas fa-circle" style="font-size:6px;"></i> <span data-i18n="serverActive">سرور فعال (US-East)</span></p>
+        <p>&copy; 2026 Zenix</p>
+        <p style="color:#22c55e;"><i class="fas fa-circle" style="font-size:6px;"></i> <span data-i18n="serverActive">سرور فعال</span></p>
     </footer>
 
     <script>
-        function escapeHtml(value) {
-            return String(value == null ? '' : value)
-                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-        }
-
+        function escapeHtml(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
         const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
         var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // ============================================================
-        // LEVEL CONFIG
-        // ============================================================
-        // مبلغ دقیق برداشت برای هر سطح (فقط همین عدد مجاز است)
         const LEVEL_AMOUNTS = { 1: 10, 2: 50, 3: 100, 4: 200, 5: 300, 6: 500 };
-        // کارمزد شبکه (از مبلغ برداشت کم می‌شود)
         const NETWORK_FEE = 0.9;
-        // اسم‌های احتمالی ستون سطح در جدول users
-        const LEVEL_COLUMN_NAMES = ['level', 'user_level', 'tier', 'user_tier', 'vip_level'];
 
-        let userLevel = 1;
-
-        function getUserLevel(data) {
-            if (!data) return 1;
-            for (const col of LEVEL_COLUMN_NAMES) {
-                if (data[col] !== undefined && data[col] !== null && data[col] !== '') {
-                    const n = parseInt(data[col]);
-                    if (Number.isFinite(n)) {
-                        if (n < 1) return 1;
-                        if (n > 6) return 6;
-                        return n;
-                    }
-                }
-            }
-            return 1;
+        function getUserLevel(balance) {
+            const b = parseFloat(balance) || 0;
+            if (b >= 10000) return 6;
+            if (b >= 5000) return 5;
+            if (b >= 2500) return 4;
+            if (b >= 1000) return 3;
+            if (b >= 300) return 2;
+            if (b >= 20) return 1;
+            return 0;
         }
+        function getRequiredAmount(level) { return LEVEL_AMOUNTS[level] || 0; }
 
-        function getRequiredAmount(level) {
-            return LEVEL_AMOUNTS[level] || LEVEL_AMOUNTS[1];
-        }
-        window.getRequiredAmount = getRequiredAmount;
+        let currentUserId = null;
+        let userData = null;
+        let userLevel = 0;
+        let withdrawalAllowed = false;
+        let countdownInterval = null;
 
-        // ============================================================
-        // DICTIONARY: 8 LANGUAGES
-        // ============================================================
         const LD = {
-            fa: {
-                pageTitle: "زنیکس - برداشت وجه",
-                home: "صفحه اصلی", quantification: "کوانتیفیکیشن", deposit: "واریز", receive: "برداشت",
-                team: "تیم من", transactions: "تراکنش", profile: "پروفایل", support: "پشتیبانی", logout: "خروج",
-                pageHeading: "برداشت ارز دیجیتال",
-                pageSub: "درخواست برداشت سریع و امن USDT به کیف پول مقصد",
-                balanceLabel: "موجودی قابل برداشت:",
-                yourLevel: "سطح شما",
-                requiredAmountLabel: "مبلغ برداشت الزامی",
-                networkLabel: "انتخاب شبکه (Network)",
-                addressLabel: "آدرس کیف پول مقصد",
-                addressPlaceholder: "آدرس کیف پول برداشت خود را وارد کنید",
-                amountLabel: "مبلغ برداشت (USDT)",
-                amountPlaceholder: "مبلغ تعیین‌شده بر اساس سطح",
-                feeLabel: "کارمزد شبکه:",
-                netLabel: "مبلغ دریافتی نهایی:",
-                passLabel: "رمز تراکنش",
-                passPlaceholder: "رمز تراکنش ۶ رقمی خود را وارد کنید",
-                forgotPass: "فراموشی رمز تراکنش؟",
-                submitBtn: "ثبت درخواست برداشت",
-                submitting: "در حال ثبت درخواست...",
-                helpTitle: "راهنمای صفحه برداشت",
-                helpStep1Title: "نحوه ثبت درخواست برداشت",
-                helpStep1Desc: "شبکه موردنظر (TRC20 یا BEP20) را انتخاب کرده و آدرس دقیق کیف پول مقصد و مبلغ برداشت را وارد نمایید.",
-                helpStep2Title: "رمز تراکنش",
-                helpStep2Desc: "جهت تایید نهایی نیاز به وارد کردن رمز تراکنش ۶ رقمی دارید.",
-                helpStep3Title: "سطح و مبلغ برداشت",
-                helpStep3Desc: "مبلغ برداشت شما بر اساس سطح حساب تعیین می‌شود و به‌صورت خودکار در فیلد مربوطه نمایش داده می‌شود.",
-                notifTitle: "صندوق پیام‌ها و اعلان‌ها",
-                tabAll: "همه", tabApproved: "تایید درخواست", tabRejected: "لغو درخواست", tabAdmin: "پیام مدیریت",
-                noMsg: "هیچ پیام جدیدی وجود ندارد.",
-                noMsgCategory: "هیچ پیامی در این دسته‌بندی وجود ندارد.",
-                tagAdmin: "پیام مدیریت", tagApproved: "تایید درخواست", tagRejected: "لغو درخواست",
-                badgeNew: "جدید", badgeRead: "خوانده‌شده", unreadTitle: "خوانده نشده",
-                systemMessage: "پیام سیستم",
-                supportFollowup: "پیگیری از طریق پشتیبانی",
-                errAddressRequired: "لطفاً آدرس کیف پول مقصد را وارد کنید.",
-                errAmountMismatch: "برای سطح شما فقط مبلغ {x} USDT قابل برداشت است.",
-                errInsufficientBalance: "موجودی کافی نیست. حداقل موجودی مورد نیاز: {x} USDT",
-                errPassRequired: "لطفاً رمز تراکنش را وارد کنید.",
-                errSuccess: "درخواست برداشت شما با موفقیت ثبت شد و در صف بررسی قرار گرفت.",
-                errFailed: "خطا در ثبت درخواست",
-                errGeneric: "خطایی رخ داد. لطفاً دوباره تلاش کنید.",
-                errDuplicate: "این درخواست قبلاً ثبت شده است.",
-                errRLS: "شما مجاز به این عملیات نیستید.",
-                errConstraint: "اطلاعات وارد شده معتبر نیست.",
-                errJWT: "نشست شما منقضی شده. لطفاً دوباره وارد شوید.",
-                errNetwork: "خطا در اتصال به شبکه. اتصال اینترنت خود را بررسی کنید.",
-                serverActive: "سرور فعال (US-East)",
-                dir: "rtl"
-            },
-            en: {
-                pageTitle: "Zenix - Withdraw",
-                home: "Home", quantification: "Quantification", deposit: "Deposit", receive: "Withdraw",
-                team: "My Team", transactions: "Transactions", profile: "Profile", support: "Support", logout: "Log out",
-                pageHeading: "Withdraw Crypto",
-                pageSub: "Fast and secure USDT withdrawal to your destination wallet",
-                balanceLabel: "Available balance:",
-                yourLevel: "Your Level",
-                requiredAmountLabel: "Required withdrawal amount",
-                networkLabel: "Select Network",
-                addressLabel: "Destination wallet address",
-                addressPlaceholder: "Enter your withdrawal wallet address",
-                amountLabel: "Withdrawal amount (USDT)",
-                amountPlaceholder: "Amount set based on your level",
-                feeLabel: "Network fee:",
-                netLabel: "Net amount:",
-                passLabel: "Transaction password",
-                passPlaceholder: "Enter your 6-digit transaction password",
-                forgotPass: "Forgot transaction password?",
-                submitBtn: "Submit withdrawal request",
-                submitting: "Submitting...",
-                helpTitle: "Withdrawal page guide",
-                helpStep1Title: "How to submit a withdrawal request",
-                helpStep1Desc: "Select your preferred network (TRC20 or BEP20) and enter the exact destination wallet address and withdrawal amount.",
-                helpStep2Title: "Transaction password",
-                helpStep2Desc: "You need to enter your 6-digit transaction password for final confirmation.",
-                helpStep3Title: "Level and amount",
-                helpStep3Desc: "Your withdrawal amount is determined by your account level and is shown automatically in the field.",
-                notifTitle: "Messages and notifications",
-                tabAll: "All", tabApproved: "Approved", tabRejected: "Rejected", tabAdmin: "Admin message",
-                noMsg: "No new messages.",
-                noMsgCategory: "No messages in this category.",
-                tagAdmin: "Admin message", tagApproved: "Request approved", tagRejected: "Request rejected",
-                badgeNew: "New", badgeRead: "Read", unreadTitle: "Unread",
-                systemMessage: "System message",
-                supportFollowup: "Contact support",
-                errAddressRequired: "Please enter the destination wallet address.",
-                errAmountMismatch: "For your level, only {x} USDT can be withdrawn.",
-                errInsufficientBalance: "Insufficient balance. Minimum required: {x} USDT",
-                errPassRequired: "Please enter the transaction password.",
-                errSuccess: "Your withdrawal request has been submitted for review.",
-                errFailed: "Error submitting request",
-                errGeneric: "Something went wrong. Please try again.",
-                errDuplicate: "This request has already been submitted.",
-                errRLS: "You are not allowed to perform this action.",
-                errConstraint: "The information provided is not valid.",
-                errJWT: "Your session has expired. Please log in again.",
-                errNetwork: "Network error. Please check your connection.",
-                serverActive: "Server active (US-East)",
-                dir: "ltr"
-            },
-            ar: {
-                pageTitle: "Zenix - سحب",
-                home: "الرئيسية", quantification: "التداول الكمي", deposit: "إيداع", receive: "سحب",
-                team: "فريقي", transactions: "المعاملات", profile: "الملف الشخصي", support: "الدعم", logout: "تسجيل الخروج",
-                pageHeading: "سحب العملات الرقمية",
-                pageSub: "طلب سحب سريع وآمن لعملة USDT إلى محفظتك",
-                balanceLabel: "الرصيد المتاح:",
-                yourLevel: "مستواك",
-                requiredAmountLabel: "مبلغ السحب المطلوب",
-                networkLabel: "اختر الشبكة",
-                addressLabel: "عنوان محفظة الوجهة",
-                addressPlaceholder: "أدخل عنوان محفظة السحب",
-                amountLabel: "مبلغ السحب (USDT)",
-                amountPlaceholder: "المبلغ المحدد حسب مستواك",
-                feeLabel: "رسوم الشبكة:",
-                netLabel: "المبلغ الصافي:",
-                passLabel: "كلمة مرور المعاملة",
-                passPlaceholder: "أدخل كلمة مرور المعاملة المكونة من 6 أرقام",
-                forgotPass: "نسيت كلمة مرور المعاملة؟",
-                submitBtn: "إرسال طلب السحب",
-                submitting: "جارٍ الإرسال...",
-                helpTitle: "دليل صفحة السحب",
-                helpStep1Title: "كيفية إرسال طلب السحب",
-                helpStep1Desc: "اختر الشبكة المفضلة (TRC20 أو BEP20) وأدخل عنوان محفظة الوجهة بدقة ومبلغ السحب.",
-                helpStep2Title: "كلمة مرور المعاملة",
-                helpStep2Desc: "تحتاج إلى إدخال كلمة مرور المعاملة المكونة من 6 أرقام للتأكيد النهائي.",
-                helpStep3Title: "المستوى والمبلغ",
-                helpStep3Desc: "يتم تحديد مبلغ السحب بناءً على مستوى حسابك ويظهر تلقائياً في الحقل.",
-                notifTitle: "الرسائل والإشعارات",
-                tabAll: "الكل", tabApproved: "تمت الموافقة", tabRejected: "مرفوض", tabAdmin: "رسالة الإدارة",
-                noMsg: "لا توجد رسائل جديدة.",
-                noMsgCategory: "لا توجد رسائل في هذه الفئة.",
-                tagAdmin: "رسالة الإدارة", tagApproved: "تمت الموافقة", tagRejected: "تم الرفض",
-                badgeNew: "جديد", badgeRead: "مقروء", unreadTitle: "غير مقروء",
-                systemMessage: "رسالة النظام",
-                supportFollowup: "التواصل مع الدعم",
-                errAddressRequired: "الرجاء إدخال عنوان محفظة الوجهة.",
-                errAmountMismatch: "لمستواك، يمكن فقط سحب {x} USDT.",
-                errInsufficientBalance: "الرصيد غير كافٍ. الحد الأدنى المطلوب: {x} USDT",
-                errPassRequired: "الرجاء إدخال كلمة مرور المعاملة.",
-                errSuccess: "تم إرسال طلب السحب الخاص بك للمراجعة.",
-                errFailed: "خطأ في إرسال الطلب",
-                errGeneric: "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
-                errDuplicate: "تم إرسال هذا الطلب مسبقاً.",
-                errRLS: "غير مسموح لك بتنفيذ هذا الإجراء.",
-                errConstraint: "المعلومات المقدمة غير صالحة.",
-                errJWT: "انتهت صلاحية جلستك. يرجى تسجيل الدخول مرة أخرى.",
-                errNetwork: "خطأ في الشبكة. يرجى التحقق من اتصالك.",
-                serverActive: "الخادم نشط (US-East)",
-                dir: "rtl"
-            },
-            tr: {
-                pageTitle: "Zenix - Para Çekme",
-                home: "Ana Sayfa", quantification: "Kantifikasyon", deposit: "Para Yatır", receive: "Para Çek",
-                team: "Takımım", transactions: "İşlemler", profile: "Profil", support: "Destek", logout: "Çıkış Yap",
-                pageHeading: "Kripto Para Çekme",
-                pageSub: "Hedef cüzdanınıza hızlı ve güvenli USDT çekme talebi",
-                balanceLabel: "Kullanılabilir bakiye:",
-                yourLevel: "Seviyeniz",
-                requiredAmountLabel: "Gerekli çekim tutarı",
-                networkLabel: "Ağ Seçin",
-                addressLabel: "Hedef cüzdan adresi",
-                addressPlaceholder: "Para çekme cüzdan adresinizi girin",
-                amountLabel: "Çekim tutarı (USDT)",
-                amountPlaceholder: "Seviyenize göre belirlenen tutar",
-                feeLabel: "Ağ ücreti:",
-                netLabel: "Net tutar:",
-                passLabel: "İşlem şifresi",
-                passPlaceholder: "6 haneli işlem şifrenizi girin",
-                forgotPass: "İşlem şifrenizi mi unuttunuz?",
-                submitBtn: "Para çekme talebi gönder",
-                submitting: "Gönderiliyor...",
-                helpTitle: "Para çekme sayfası rehberi",
-                helpStep1Title: "Para çekme talebi nasıl gönderilir",
-                helpStep1Desc: "Tercih ettiğiniz ağı (TRC20 veya BEP20) seçin ve hedef cüzdan adresini ve çekim tutarını doğru girin.",
-                helpStep2Title: "İşlem şifresi",
-                helpStep2Desc: "Son onay için 6 haneli işlem şifrenizi girmeniz gerekir.",
-                helpStep3Title: "Seviye ve tutar",
-                helpStep3Desc: "Çekim tutarınız hesap seviyenize göre belirlenir ve alanda otomatik olarak gösterilir.",
-                notifTitle: "Mesajlar ve bildirimler",
-                tabAll: "Tümü", tabApproved: "Onaylandı", tabRejected: "Reddedildi", tabAdmin: "Yönetici mesajı",
-                noMsg: "Yeni mesaj yok.",
-                noMsgCategory: "Bu kategoride mesaj yok.",
-                tagAdmin: "Yönetici mesajı", tagApproved: "Talep onaylandı", tagRejected: "Talep reddedildi",
-                badgeNew: "Yeni", badgeRead: "Okundu", unreadTitle: "Okunmadı",
-                systemMessage: "Sistem mesajı",
-                supportFollowup: "Destekle iletişime geç",
-                errAddressRequired: "Lütfen hedef cüzdan adresini girin.",
-                errAmountMismatch: "Seviyeniz için yalnızca {x} USDT çekilebilir.",
-                errInsufficientBalance: "Yetersiz bakiye. Gerekli minimum: {x} USDT",
-                errPassRequired: "Lütfen işlem şifresini girin.",
-                errSuccess: "Para çekme talebiniz inceleme için gönderildi.",
-                errFailed: "Talep gönderilirken hata oluştu",
-                errGeneric: "Bir sorun oluştu. Lütfen tekrar deneyin.",
-                errDuplicate: "Bu talep zaten gönderilmiş.",
-                errRLS: "Bu işlemi gerçekleştirme izniniz yok.",
-                errConstraint: "Girilen bilgiler geçersiz.",
-                errJWT: "Oturumunuz sona erdi. Lütfen tekrar giriş yapın.",
-                errNetwork: "Ağ hatası. Lütfen bağlantınızı kontrol edin.",
-                serverActive: "Sunucu aktif (US-East)",
-                dir: "ltr"
-            },
-            ru: {
-                pageTitle: "Zenix - Вывод",
-                home: "Главная", quantification: "Квантификация", deposit: "Пополнение", receive: "Вывод",
-                team: "Моя команда", transactions: "Транзакции", profile: "Профиль", support: "Поддержка", logout: "Выйти",
-                pageHeading: "Вывод криптовалюты",
-                pageSub: "Быстрый и безопасный вывод USDT на ваш кошелёк",
-                balanceLabel: "Доступный баланс:",
-                yourLevel: "Ваш уровень",
-                requiredAmountLabel: "Требуемая сумма вывода",
-                networkLabel: "Выберите сеть",
-                addressLabel: "Адрес кошелька получателя",
-                addressPlaceholder: "Введите адрес кошелька для вывода",
-                amountLabel: "Сумма вывода (USDT)",
-                amountPlaceholder: "Сумма определяется вашим уровнем",
-                feeLabel: "Комиссия сети:",
-                netLabel: "Итоговая сумма:",
-                passLabel: "Пароль транзакции",
-                passPlaceholder: "Введите 6-значный пароль транзакции",
-                forgotPass: "Забыли пароль транзакции?",
-                submitBtn: "Отправить запрос на вывод",
-                submitting: "Отправка...",
-                helpTitle: "Руководство по странице вывода",
-                helpStep1Title: "Как отправить запрос на вывод",
-                helpStep1Desc: "Выберите предпочтительную сеть (TRC20 или BEP20) и точно введите адрес кошелька получателя и сумму вывода.",
-                helpStep2Title: "Пароль транзакции",
-                helpStep2Desc: "Для окончательного подтверждения необходимо ввести 6-значный пароль транзакции.",
-                helpStep3Title: "Уровень и сумма",
-                helpStep3Desc: "Сумма вывода определяется вашим уровнем аккаунта и автоматически отображается в поле.",
-                notifTitle: "Сообщения и уведомления",
-                tabAll: "Все", tabApproved: "Одобрено", tabRejected: "Отклонено", tabAdmin: "Сообщение администратора",
-                noMsg: "Нет новых сообщений.",
-                noMsgCategory: "В этой категории сообщений нет.",
-                tagAdmin: "Сообщение админа", tagApproved: "Запрос одобрен", tagRejected: "Запрос отклонён",
-                badgeNew: "Новое", badgeRead: "Прочитано", unreadTitle: "Не прочитано",
-                systemMessage: "Системное сообщение",
-                supportFollowup: "Обратиться в поддержку",
-                errAddressRequired: "Пожалуйста, введите адрес кошелька получателя.",
-                errAmountMismatch: "Для вашего уровня можно вывести только {x} USDT.",
-                errInsufficientBalance: "Недостаточно средств. Минимум: {x} USDT",
-                errPassRequired: "Пожалуйста, введите пароль транзакции.",
-                errSuccess: "Ваш запрос на вывод отправлен на рассмотрение.",
-                errFailed: "Ошибка при отправке запроса",
-                errGeneric: "Что-то пошло не так. Пожалуйста, попробуйте снова.",
-                errDuplicate: "Этот запрос уже был отправлен.",
-                errRLS: "Вам не разрешено выполнять это действие.",
-                errConstraint: "Введённая информация недействительна.",
-                errJWT: "Ваша сессия истекла. Пожалуйста, войдите снова.",
-                errNetwork: "Ошибка сети. Пожалуйста, проверьте подключение.",
-                serverActive: "Сервер активен (US-East)",
-                dir: "ltr"
-            },
-            es: {
-                pageTitle: "Zenix - Retiro",
-                home: "Inicio", quantification: "Cuantificación", deposit: "Depositar", receive: "Retirar",
-                team: "Mi equipo", transactions: "Transacciones", profile: "Perfil", support: "Soporte", logout: "Cerrar sesión",
-                pageHeading: "Retirar criptomonedas",
-                pageSub: "Solicitud rápida y segura de retiro de USDT a tu billetera",
-                balanceLabel: "Saldo disponible:",
-                yourLevel: "Tu nivel",
-                requiredAmountLabel: "Cantidad requerida de retiro",
-                networkLabel: "Seleccionar red",
-                addressLabel: "Dirección de billetera de destino",
-                addressPlaceholder: "Ingresa tu dirección de billetera para retiro",
-                amountLabel: "Cantidad a retirar (USDT)",
-                amountPlaceholder: "Cantidad según tu nivel",
-                feeLabel: "Comisión de red:",
-                netLabel: "Cantidad neta:",
-                passLabel: "Contraseña de transacción",
-                passPlaceholder: "Ingresa tu contraseña de 6 dígitos",
-                forgotPass: "¿Olvidaste la contraseña de transacción?",
-                submitBtn: "Enviar solicitud de retiro",
-                submitting: "Enviando...",
-                helpTitle: "Guía de la página de retiro",
-                helpStep1Title: "Cómo enviar una solicitud de retiro",
-                helpStep1Desc: "Selecciona tu red preferida (TRC20 o BEP20) e ingresa la dirección exacta de la billetera de destino y la cantidad de retiro.",
-                helpStep2Title: "Contraseña de transacción",
-                helpStep2Desc: "Necesitas ingresar tu contraseña de transacción de 6 dígitos para la confirmación final.",
-                helpStep3Title: "Nivel y cantidad",
-                helpStep3Desc: "Tu cantidad de retiro está determinada por el nivel de tu cuenta y se muestra automáticamente en el campo.",
-                notifTitle: "Mensajes y notificaciones",
-                tabAll: "Todos", tabApproved: "Aprobado", tabRejected: "Rechazado", tabAdmin: "Mensaje del admin",
-                noMsg: "No hay mensajes nuevos.",
-                noMsgCategory: "No hay mensajes en esta categoría.",
-                tagAdmin: "Mensaje del admin", tagApproved: "Solicitud aprobada", tagRejected: "Solicitud rechazada",
-                badgeNew: "Nuevo", badgeRead: "Leído", unreadTitle: "Sin leer",
-                systemMessage: "Mensaje del sistema",
-                supportFollowup: "Contactar soporte",
-                errAddressRequired: "Por favor ingresa la dirección de billetera de destino.",
-                errAmountMismatch: "Para tu nivel, solo se pueden retirar {x} USDT.",
-                errInsufficientBalance: "Saldo insuficiente. Mínimo requerido: {x} USDT",
-                errPassRequired: "Por favor ingresa la contraseña de transacción.",
-                errSuccess: "Tu solicitud de retiro ha sido enviada para revisión.",
-                errFailed: "Error al enviar la solicitud",
-                errGeneric: "Algo salió mal. Por favor intenta de nuevo.",
-                errDuplicate: "Esta solicitud ya ha sido enviada.",
-                errRLS: "No tienes permiso para realizar esta acción.",
-                errConstraint: "La información proporcionada no es válida.",
-                errJWT: "Tu sesión ha expirado. Por favor inicia sesión de nuevo.",
-                errNetwork: "Error de red. Por favor verifica tu conexión.",
-                serverActive: "Servidor activo (US-East)",
-                dir: "ltr"
-            },
-            fr: {
-                pageTitle: "Zenix - Retrait",
-                home: "Accueil", quantification: "Quantification", deposit: "Dépôt", receive: "Retrait",
-                team: "Mon équipe", transactions: "Transactions", profile: "Profil", support: "Support", logout: "Se déconnecter",
-                pageHeading: "Retirer des cryptomonnaies",
-                pageSub: "Demande rapide et sécurisée de retrait USDT vers votre portefeuille",
-                balanceLabel: "Solde disponible :",
-                yourLevel: "Votre niveau",
-                requiredAmountLabel: "Montant de retrait requis",
-                networkLabel: "Sélectionner le réseau",
-                addressLabel: "Adresse du portefeuille de destination",
-                addressPlaceholder: "Saisissez votre adresse de portefeuille de retrait",
-                amountLabel: "Montant du retrait (USDT)",
-                amountPlaceholder: "Montant selon votre niveau",
-                feeLabel: "Frais de réseau :",
-                netLabel: "Montant net :",
-                passLabel: "Mot de passe de transaction",
-                passPlaceholder: "Saisissez votre mot de passe à 6 chiffres",
-                forgotPass: "Mot de passe de transaction oublié ?",
-                submitBtn: "Envoyer la demande de retrait",
-                submitting: "Envoi...",
-                helpTitle: "Guide de la page de retrait",
-                helpStep1Title: "Comment envoyer une demande de retrait",
-                helpStep1Desc: "Sélectionnez votre réseau préféré (TRC20 ou BEP20) et saisissez l'adresse exacte du portefeuille de destination et le montant du retrait.",
-                helpStep2Title: "Mot de passe de transaction",
-                helpStep2Desc: "Vous devez saisir votre mot de passe de transaction à 6 chiffres pour la confirmation finale.",
-                helpStep3Title: "Niveau et montant",
-                helpStep3Desc: "Votre montant de retrait est déterminé par le niveau de votre compte et s'affiche automatiquement dans le champ.",
-                notifTitle: "Messages et notifications",
-                tabAll: "Tous", tabApproved: "Approuvé", tabRejected: "Rejeté", tabAdmin: "Message admin",
-                noMsg: "Aucun nouveau message.",
-                noMsgCategory: "Aucun message dans cette catégorie.",
-                tagAdmin: "Message admin", tagApproved: "Demande approuvée", tagRejected: "Demande rejetée",
-                badgeNew: "Nouveau", badgeRead: "Lu", unreadTitle: "Non lu",
-                systemMessage: "Message système",
-                supportFollowup: "Contacter le support",
-                errAddressRequired: "Veuillez saisir l'adresse du portefeuille de destination.",
-                errAmountMismatch: "Pour votre niveau, seuls {x} USDT peuvent être retirés.",
-                errInsufficientBalance: "Solde insuffisant. Minimum requis : {x} USDT",
-                errPassRequired: "Veuillez saisir le mot de passe de transaction.",
-                errSuccess: "Votre demande de retrait a été soumise pour examen.",
-                errFailed: "Erreur lors de l'envoi de la demande",
-                errGeneric: "Une erreur s'est produite. Veuillez réessayer.",
-                errDuplicate: "Cette demande a déjà été soumise.",
-                errRLS: "Vous n'êtes pas autorisé à effectuer cette action.",
-                errConstraint: "Les informations fournies ne sont pas valides.",
-                errJWT: "Votre session a expiré. Veuillez vous reconnecter.",
-                errNetwork: "Erreur réseau. Veuillez vérifier votre connexion.",
-                serverActive: "Serveur actif (US-East)",
-                dir: "ltr"
-            },
-            de: {
-                pageTitle: "Zenix - Auszahlung",
-                home: "Startseite", quantification: "Quantifizierung", deposit: "Einzahlen", receive: "Auszahlen",
-                team: "Mein Team", transactions: "Transaktionen", profile: "Profil", support: "Support", logout: "Abmelden",
-                pageHeading: "Krypto abheben",
-                pageSub: "Schnelle und sichere USDT-Auszahlung an Ihre Ziel-Wallet",
-                balanceLabel: "Verfügbares Guthaben:",
-                yourLevel: "Ihre Stufe",
-                requiredAmountLabel: "Erforderlicher Auszahlungsbetrag",
-                networkLabel: "Netzwerk auswählen",
-                addressLabel: "Ziel-Wallet-Adresse",
-                addressPlaceholder: "Geben Sie Ihre Auszahlungs-Wallet-Adresse ein",
-                amountLabel: "Auszahlungsbetrag (USDT)",
-                amountPlaceholder: "Betrag je nach Stufe",
-                feeLabel: "Netzwerkgebühr:",
-                netLabel: "Nettobetrag:",
-                passLabel: "Transaktionspasswort",
-                passPlaceholder: "Geben Sie Ihr 6-stelliges Transaktionspasswort ein",
-                forgotPass: "Transaktionspasswort vergessen?",
-                submitBtn: "Auszahlungsanfrage senden",
-                submitting: "Wird gesendet...",
-                helpTitle: "Anleitung zur Auszahlungsseite",
-                helpStep1Title: "So senden Sie eine Auszahlungsanfrage",
-                helpStep1Desc: "Wählen Sie Ihr bevorzugtes Netzwerk (TRC20 oder BEP20) und geben Sie die genaue Ziel-Wallet-Adresse und den Auszahlungsbetrag ein.",
-                helpStep2Title: "Transaktionspasswort",
-                helpStep2Desc: "Zur endgültigen Bestätigung müssen Sie Ihr 6-stelliges Transaktionspasswort eingeben.",
-                helpStep3Title: "Stufe und Betrag",
-                helpStep3Desc: "Ihr Auszahlungsbetrag wird durch Ihre Konto-Stufe bestimmt und automatisch im Feld angezeigt.",
-                notifTitle: "Nachrichten und Benachrichtigungen",
-                tabAll: "Alle", tabApproved: "Genehmigt", tabRejected: "Abgelehnt", tabAdmin: "Admin-Nachricht",
-                noMsg: "Keine neuen Nachrichten.",
-                noMsgCategory: "Keine Nachrichten in dieser Kategorie.",
-                tagAdmin: "Admin-Nachricht", tagApproved: "Anfrage genehmigt", tagRejected: "Anfrage abgelehnt",
-                badgeNew: "Neu", badgeRead: "Gelesen", unreadTitle: "Ungelesen",
-                systemMessage: "Systemnachricht",
-                supportFollowup: "Support kontaktieren",
-                errAddressRequired: "Bitte geben Sie die Ziel-Wallet-Adresse ein.",
-                errAmountMismatch: "Für Ihre Stufe können nur {x} USDT abgehoben werden.",
-                errInsufficientBalance: "Unzureichendes Guthaben. Mindestens erforderlich: {x} USDT",
-                errPassRequired: "Bitte geben Sie das Transaktionspasswort ein.",
-                errSuccess: "Ihre Auszahlungsanfrage wurde zur Überprüfung gesendet.",
-                errFailed: "Fehler beim Senden der Anfrage",
-                errGeneric: "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut.",
-                errDuplicate: "Diese Anfrage wurde bereits gesendet.",
-                errRLS: "Sie sind nicht berechtigt, diese Aktion auszuführen.",
-                errConstraint: "Die eingegebenen Informationen sind ungültig.",
-                errJWT: "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
-                errNetwork: "Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung.",
-                serverActive: "Server aktiv (US-East)",
-                dir: "ltr"
-            }
+            fa: {dir:"rtl",pageTitle:"زنیکس - برداشت",home:"صفحه اصلی",quantification:"کوانتیفیکیشن",deposit:"واریز",receive:"برداشت",transactions:"تراکنش",profile:"پروفایل",support:"پشتیبانی",logout:"خروج",pageHeading:"برداشت ارز دیجیتال",pageSub:"درخواست برداشت سریع و امن USDT",balanceLabel:"موجودی:",yourLevel:"سطح شما",requiredAmountLabel:"مبلغ برداشت الزامی",networkLabel:"انتخاب شبکه",addressLabel:"آدرس کیف پول مقصد",addressPlaceholder:"آدرس کیف پول را وارد کنید",amountLabel:"مبلغ برداشت",feeLabel:"کارمزد:",netLabel:"دریافتی:",passLabel:"رمز تراکنش",passPlaceholder:"رمز ۶ رقمی",submitBtn:"ثبت درخواست برداشت",submitting:"در حال ثبت...",helpTitle:"راهنما",helpLevelTitle:"سطح برداشت",helpLevelDesc:"سطح بر اساس موجودی تعیین می‌شود.",helpRulesTitle:"قوانین برداشت",helpRulesDesc:"بعد از هر تصمیم ادمین، ۲۴ ساعت صبر. شنبه/یکشنبه تعطیل.",statusLoading:"در حال بررسی وضعیت...",statusAllowed:"می‌توانید درخواست برداشت ثبت کنید",statusAllowedSub:"همه شرایط برآورده شده",statusPendingTitle:"درخواست در انتظار",statusPendingSub:"درخواست قبلی شما هنوز بررسی نشده است",statusCooldownTitle:"زمان انتظار",statusCooldownSub:"۲۴ ساعت صبر بعد از تصمیم ادمین",statusWeekendTitle:"تعطیلی آخر هفته",statusWeekendSub:"شنبه و یکشنبه برداشت تعطیل است",nextAllowedLabel:"زمان مجاز بعدی:",errInactive:"حساب غیرفعال — حداقل ۲۰ USDT",errInsufficient:"موجودی کافی نیست. حداقل: {x} USDT",errAddressRequired:"آدرس را وارد کنید.",errPassRequired:"رمز را وارد کنید.",errSuccess:"درخواست ثبت شد.",errFailed:"خطا",errGeneric:"خطایی رخ داد.",errWeekend:"امروز تعطیل است.",errPending:"شما درخواست در انتظار دارید.",errCooldown:"زمان انتظار سپری نشده.",errJWT:"نشست منقضی.",errNetwork:"خطای شبکه.",serverActive:"سرور فعال"},
+            en: {dir:"ltr",pageTitle:"Zenix - Withdraw",home:"Home",quantification:"Quantification",deposit:"Deposit",receive:"Withdraw",transactions:"Transactions",profile:"Profile",support:"Support",logout:"Log out",pageHeading:"Withdraw Crypto",pageSub:"Fast and secure USDT withdrawal",balanceLabel:"Balance:",yourLevel:"Your Level",requiredAmountLabel:"Required amount",networkLabel:"Select Network",addressLabel:"Destination address",addressPlaceholder:"Enter wallet address",amountLabel:"Withdrawal amount",feeLabel:"Fee:",netLabel:"Net:",passLabel:"Password",passPlaceholder:"6-digit",submitBtn:"Submit request",submitting:"Submitting...",helpTitle:"Help",helpLevelTitle:"Withdrawal level",helpLevelDesc:"Level determined by balance.",helpRulesTitle:"Withdrawal rules",helpRulesDesc:"24-hour wait after decision. No withdrawals Sat/Sun.",statusLoading:"Checking status...",statusAllowed:"You can submit a withdrawal request",statusAllowedSub:"All conditions met",statusPendingTitle:"Pending request",statusPendingSub:"Your previous request awaits admin review",statusCooldownTitle:"Cooldown",statusCooldownSub:"24-hour wait after admin decision",statusWeekendTitle:"Weekend holiday",statusWeekendSub:"No withdrawals on Saturday/Sunday",nextAllowedLabel:"Next allowed time:",errInactive:"Account inactive — minimum 20 USDT",errInsufficient:"Insufficient balance. Min: {x} USDT",errAddressRequired:"Enter address.",errPassRequired:"Enter password.",errSuccess:"Request submitted.",errFailed:"Error",errGeneric:"Something went wrong.",errWeekend:"No withdrawals today.",errPending:"You have a pending request.",errCooldown:"Cooldown not expired.",errJWT:"Session expired.",errNetwork:"Network error.",serverActive:"Server active"},
+            ar: {dir:"rtl",pageTitle:"Zenix - سحب",home:"الرئيسية",quantification:"التداول الكمي",deposit:"إيداع",receive:"سحب",transactions:"المعاملات",profile:"الملف الشخصي",support:"الدعم",logout:"خروج",pageHeading:"سحب العملات الرقمية",pageSub:"طلب سحب USDT سريع وآمن",balanceLabel:"الرصيد:",yourLevel:"مستواك",requiredAmountLabel:"المبلغ المطلوب",networkLabel:"اختر الشبكة",addressLabel:"عنوان المحفظة",addressPlaceholder:"أدخل العنوان",amountLabel:"مبلغ السحب",feeLabel:"الرسوم:",netLabel:"الصافي:",passLabel:"كلمة المرور",passPlaceholder:"6 أرقام",submitBtn:"إرسال الطلب",submitting:"جارٍ الإرسال...",helpTitle:"دليل",helpLevelTitle:"مستوى السحب",helpLevelDesc:"المستوى حسب الرصيد.",helpRulesTitle:"قواعد السحب",helpRulesDesc:"انتظر 24 ساعة بعد كل قرار. لا سحب السبت والأحد.",statusLoading:"جارٍ التحقق...",statusAllowed:"يمكنك إرسال طلب سحب",statusAllowedSub:"تم استيفاء الشروط",statusPendingTitle:"طلب معلق",statusPendingSub:"طلبك السابق قيد المراجعة",statusCooldownTitle:"فترة الانتظار",statusCooldownSub:"انتظار 24 ساعة بعد قرار الإدارة",statusWeekendTitle:"عطلة نهاية الأسبوع",statusWeekendSub:"لا سحب السبت والأحد",nextAllowedLabel:"الوقت المسموح التالي:",errInactive:"الحساب غير نشط — الحد الأدنى 20 USDT",errInsufficient:"الرصيد غير كافٍ. الحد الأدنى: {x} USDT",errAddressRequired:"أدخل العنوان.",errPassRequired:"أدخل كلمة المرور.",errSuccess:"تم الإرسال.",errFailed:"خطأ",errGeneric:"حدث خطأ.",errWeekend:"السحب مغلق اليوم.",errPending:"لديك طلب معلق.",errCooldown:"لم تنته فترة الانتظار.",errJWT:"انتهت الجلسة.",errNetwork:"خطأ الشبكة.",serverActive:"الخادم نشط"},
+            tr: {dir:"ltr",pageTitle:"Zenix - Para Çekme",home:"Ana",quantification:"Kantifikasyon",deposit:"Yatır",receive:"Çek",transactions:"İşlemler",profile:"Profil",support:"Destek",logout:"Çıkış",pageHeading:"Kripto Para Çekme",pageSub:"Hızlı ve güvenli USDT çekme",balanceLabel:"Bakiye:",yourLevel:"Seviye",requiredAmountLabel:"Gerekli tutar",networkLabel:"Ağ Seç",addressLabel:"Cüzdan adresi",addressPlaceholder:"Adresi girin",amountLabel:"Çekim tutarı",feeLabel:"Ücret:",netLabel:"Net:",passLabel:"Şifre",passPlaceholder:"6 haneli",submitBtn:"Talep gönder",submitting:"Gönderiliyor...",helpTitle:"Yardım",helpLevelTitle:"Çekim seviyesi",helpLevelDesc:"Bakiye ile belirlenir.",helpRulesTitle:"Kurallar",helpRulesDesc:"Her karardan sonra 24 saat bekleyin. Cmt/Paz çekim yok.",statusLoading:"Kontrol ediliyor...",statusAllowed:"Talep gönderebilirsiniz",statusAllowedSub:"Tüm koşullar sağlandı",statusPendingTitle:"Bekleyen talep",statusPendingSub:"Önceki talebiniz inceleniyor",statusCooldownTitle:"Bekleme",statusCooldownSub:"Karardan sonra 24 saat bekleme",statusWeekendTitle:"Hafta sonu tatili",statusWeekendSub:"Cmt/Paz çekim yok",nextAllowedLabel:"Sonraki izin:",errInactive:"Hesap pasif — min 20 USDT",errInsufficient:"Yetersiz bakiye. Min: {x} USDT",errAddressRequired:"Adres girin.",errPassRequired:"Şifre girin.",errSuccess:"Talep gönderildi.",errFailed:"Hata",errGeneric:"Bir sorun oluştu.",errWeekend:"Bugün çekim yok.",errPending:"Bekleyen talebiniz var.",errCooldown:"Bekleme süresi dolmadı.",errJWT:"Oturum sona erdi.",errNetwork:"Ağ hatası.",serverActive:"Sunucu aktif"},
+            ru: {dir:"ltr",pageTitle:"Zenix - Вывод",home:"Главная",quantification:"Квантификация",deposit:"Депозит",receive:"Вывод",transactions:"Транзакции",profile:"Профиль",support:"Поддержка",logout:"Выход",pageHeading:"Вывод Криптовалюты",pageSub:"Быстрый и безопасный вывод USDT",balanceLabel:"Баланс:",yourLevel:"Уровень",requiredAmountLabel:"Требуемая сумма",networkLabel:"Сеть",addressLabel:"Адрес кошелька",addressPlaceholder:"Введите адрес",amountLabel:"Сумма вывода",feeLabel:"Комиссия:",netLabel:"Итого:",passLabel:"Пароль",passPlaceholder:"6 цифр",submitBtn:"Отправить",submitting:"Отправка...",helpTitle:"Помощь",helpLevelTitle:"Уровень вывода",helpLevelDesc:"Уровень по балансу.",helpRulesTitle:"Правила",helpRulesDesc:"24 часа после решения. Сб/Вс — нет выводов.",statusLoading:"Проверка...",statusAllowed:"Можно отправить запрос",statusAllowedSub:"Все условия выполнены",statusPendingTitle:"Запрос на рассмотрении",statusPendingSub:"Предыдущий запрос ожидает админа",statusCooldownTitle:"Ожидание",statusCooldownSub:"24 часа после решения",statusWeekendTitle:"Выходные",statusWeekendSub:"Сб/Вс — нет выводов",nextAllowedLabel:"Следующее время:",errInactive:"Аккаунт неактивен — мин. 20 USDT",errInsufficient:"Недостаточно средств. Мин: {x} USDT",errAddressRequired:"Введите адрес.",errPassRequired:"Введите пароль.",errSuccess:"Запрос отправлен.",errFailed:"Ошибка",errGeneric:"Что-то пошло не так.",errWeekend:"Сегодня выводов нет.",errPending:"У вас есть запрос на рассмотрении.",errCooldown:"Ожидание не истекло.",errJWT:"Сессия истекла.",errNetwork:"Ошибка сети.",serverActive:"Сервер активен"},
+            es: {dir:"ltr",pageTitle:"Zenix - Retiro",home:"Inicio",quantification:"Cuantificación",deposit:"Depositar",receive:"Retirar",transactions:"Transacciones",profile:"Perfil",support:"Soporte",logout:"Salir",pageHeading:"Retirar Cripto",pageSub:"Retiro rápido y seguro de USDT",balanceLabel:"Saldo:",yourLevel:"Nivel",requiredAmountLabel:"Cantidad requerida",networkLabel:"Red",addressLabel:"Dirección",addressPlaceholder:"Ingresa dirección",amountLabel:"Cantidad",feeLabel:"Comisión:",netLabel:"Neto:",passLabel:"Contraseña",passPlaceholder:"6 dígitos",submitBtn:"Enviar solicitud",submitting:"Enviando...",helpTitle:"Ayuda",helpLevelTitle:"Nivel de retiro",helpLevelDesc:"Nivel por saldo.",helpRulesTitle:"Reglas",helpRulesDesc:"Espera 24h después de cada decisión. Sáb/Dom sin retiros.",statusLoading:"Verificando...",statusAllowed:"Puedes enviar una solicitud",statusAllowedSub:"Todas las condiciones cumplidas",statusPendingTitle:"Solicitud pendiente",statusPendingSub:"Tu solicitud anterior espera revisión",statusCooldownTitle:"Enfriamiento",statusCooldownSub:"Espera 24h después de la decisión",statusWeekendTitle:"Fin de semana",statusWeekendSub:"Sin retiros Sáb/Dom",nextAllowedLabel:"Próximo tiempo:",errInactive:"Cuenta inactiva — min 20 USDT",errInsufficient:"Saldo insuficiente. Mín: {x} USDT",errAddressRequired:"Ingresa dirección.",errPassRequired:"Ingresa contraseña.",errSuccess:"Solicitud enviada.",errFailed:"Error",errGeneric:"Algo salió mal.",errWeekend:"Hoy no hay retiros.",errPending:"Tienes una solicitud pendiente.",errCooldown:"Enfriamiento activo.",errJWT:"Sesión expirada.",errNetwork:"Error de red.",serverActive:"Servidor activo"},
+            fr: {dir:"ltr",pageTitle:"Zenix - Retrait",home:"Accueil",quantification:"Quantification",deposit:"Dépôt",receive:"Retrait",transactions:"Transactions",profile:"Profil",support:"Support",logout:"Déco",pageHeading:"Retirer Crypto",pageSub:"Retrait USDT rapide et sécurisé",balanceLabel:"Solde:",yourLevel:"Niveau",requiredAmountLabel:"Montant requis",networkLabel:"Réseau",addressLabel:"Adresse",addressPlaceholder:"Entrez l'adresse",amountLabel:"Montant",feeLabel:"Frais:",netLabel:"Net:",passLabel:"Mot de passe",passPlaceholder:"6 chiffres",submitBtn:"Envoyer la demande",submitting:"Envoi...",helpTitle:"Aide",helpLevelTitle:"Niveau de retrait",helpLevelDesc:"Niveau par solde.",helpRulesTitle:"Règles",helpRulesDesc:"Attendez 24h après chaque décision. Pas de retrait Sam/Dim.",statusLoading:"Vérification...",statusAllowed:"Vous pouvez envoyer une demande",statusAllowedSub:"Toutes conditions remplies",statusPendingTitle:"Demande en attente",statusPendingSub:"Votre demande attend la révision",statusCooldownTitle:"Attente",statusCooldownSub:"24h après la décision",statusWeekendTitle:"Week-end",statusWeekendSub:"Pas de retrait Sam/Dim",nextAllowedLabel:"Prochain temps:",errInactive:"Compte inactif — min 20 USDT",errInsufficient:"Solde insuffisant. Min: {x} USDT",errAddressRequired:"Entrez l'adresse.",errPassRequired:"Entrez le mot de passe.",errSuccess:"Demande envoyée.",errFailed:"Erreur",errGeneric:"Une erreur est survenue.",errWeekend:"Pas de retrait aujourd'hui.",errPending:"Vous avez une demande en attente.",errCooldown:"Attente active.",errJWT:"Session expirée.",errNetwork:"Erreur réseau.",serverActive:"Serveur actif"},
+            de: {dir:"ltr",pageTitle:"Zenix - Auszahlung",home:"Start",quantification:"Quantifizierung",deposit:"Einzahlen",receive:"Auszahlen",transactions:"Transaktionen",profile:"Profil",support:"Support",logout:"Abmelden",pageHeading:"Krypto abheben",pageSub:"Schnelle und sichere USDT-Auszahlung",balanceLabel:"Guthaben:",yourLevel:"Stufe",requiredAmountLabel:"Erforderlicher Betrag",networkLabel:"Netzwerk",addressLabel:"Adresse",addressPlaceholder:"Adresse eingeben",amountLabel:"Betrag",feeLabel:"Gebühr:",netLabel:"Netto:",passLabel:"Passwort",passPlaceholder:"6-stellig",submitBtn:"Anfrage senden",submitting:"Senden...",helpTitle:"Hilfe",helpLevelTitle:"Auszahlungsstufe",helpLevelDesc:"Stufe nach Guthaben.",helpRulesTitle:"Regeln",helpRulesDesc:"24h nach Entscheidung warten. Sa/So keine Auszahlung.",statusLoading:"Prüfung...",statusAllowed:"Sie können eine Anfrage senden",statusAllowedSub:"Alle Bedingungen erfüllt",statusPendingTitle:"Ausstehende Anfrage",statusPendingSub:"Ihre vorherige Anfrage wird geprüft",statusCooldownTitle:"Wartezeit",statusCooldownSub:"24h nach Entscheidung",statusWeekendTitle:"Wochenende",statusWeekendSub:"Sa/So keine Auszahlung",nextAllowedLabel:"Nächste Zeit:",errInactive:"Konto inaktiv — min 20 USDT",errInsufficient:"Guthaben unzureichend. Min: {x} USDT",errAddressRequired:"Adresse eingeben.",errPassRequired:"Passwort eingeben.",errSuccess:"Anfrage gesendet.",errFailed:"Fehler",errGeneric:"Etwas ist schief gelaufen.",errWeekend:"Heute keine Auszahlung.",errPending:"Sie haben eine ausstehende Anfrage.",errCooldown:"Wartezeit aktiv.",errJWT:"Sitzung abgelaufen.",errNetwork:"Netzwerkfehler.",serverActive:"Server aktiv"}
         };
 
         const SUPPORTED_LANGUAGES = ['fa','en','ar','tr','ru','es','fr','de'];
-        let currentLang = (function(){
-            try {
-                const saved = localStorage.getItem('zenix_lang');
-                return SUPPORTED_LANGUAGES.includes(saved) ? saved : 'fa';
-            } catch(e) { return 'fa'; }
-        })();
+        let currentLang = (function(){try{const s=localStorage.getItem('zenix_lang');return SUPPORTED_LANGUAGES.includes(s)?s:'fa';}catch(e){return 'fa';}})();
         window.currentLangData = LD[currentLang];
 
-        function setLang(l) {
-            if (!SUPPORTED_LANGUAGES.includes(l)) l = 'fa';
-            currentLang = l;
+        function setLang(l){
+            if(!SUPPORTED_LANGUAGES.includes(l)) l='fa';
+            currentLang=l;
             const t = LD[l] || LD.fa;
             window.currentLangData = t;
-
-            try { localStorage.setItem('zenix_lang', l); } catch(e) {}
-
+            try{localStorage.setItem('zenix_lang',l);}catch(e){}
             document.documentElement.lang = l;
-            document.documentElement.dir = t.dir || (['fa','ar'].includes(l) ? 'rtl' : 'ltr');
+            document.documentElement.dir = t.dir;
             document.title = t.pageTitle;
-
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (Object.prototype.hasOwnProperty.call(t, key)) el.textContent = t[key];
-            });
-            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-                const key = el.getAttribute('data-i18n-placeholder');
-                if (Object.prototype.hasOwnProperty.call(t, key)) el.setAttribute('placeholder', t[key]);
-            });
-            document.querySelectorAll('[data-i18n-title]').forEach(el => {
-                const key = el.getAttribute('data-i18n-title');
-                if (Object.prototype.hasOwnProperty.call(t, key)) el.setAttribute('title', t[key]);
-            });
-            document.querySelectorAll('#lang-menu .mi').forEach(item => {
-                item.classList.toggle('active', item.getAttribute('data-lang') === l);
-            });
-
-            try {
-                if (typeof window.renderNotifications === 'function') window.renderNotifications();
-                if (typeof window.calcFee === 'function') window.calcFee();
-                if (typeof window.refreshLevelUI === 'function') window.refreshLevelUI();
-            } catch(e) {}
+            document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(Object.prototype.hasOwnProperty.call(t,k)) el.textContent = t[k];});
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const k=el.getAttribute('data-i18n-placeholder');if(Object.prototype.hasOwnProperty.call(t,k)) el.setAttribute('placeholder', t[k]);});
+            document.querySelectorAll('#lang-menu .mi').forEach(item=>{item.classList.toggle('active', item.getAttribute('data-lang')===l);});
+            try{if(typeof window.calcFee==='function') window.calcFee();if(typeof window.refreshStatusUI==='function') window.refreshStatusUI();}catch(e){}
         }
         window.setLang = setLang;
 
-        function mapSupabaseError(error) {
-            const t = window.currentLangData || LD.fa;
-            if (!error) return t.errGeneric;
-            console.error('[Supabase Error →]', error);
-            const msg = String(error.message || error.error_description || error).toLowerCase();
-            if (msg.includes('duplicate key') || msg.includes('unique constraint')) return t.errDuplicate;
-            if (msg.includes('row-level security') || msg.includes('rls')) return t.errRLS;
-            if (msg.includes('check constraint') || msg.includes('violates check')) return t.errConstraint;
-            if (msg.includes('jwt') || msg.includes('expired') || msg.includes('session')) return t.errJWT;
-            if (msg.includes('networkerror') || msg.includes('failed to fetch') || msg.includes('network request')) return t.errNetwork;
-            return t.errGeneric;
-        }
-        window.mapSupabaseError = mapSupabaseError;
+        document.querySelectorAll('#lang-menu .mi').forEach(el=>{el.onclick=(e)=>{e.stopPropagation();setLang(el.dataset.lang);document.getElementById('lang-menu')?.classList.remove('show');};});
 
-        let currentUser = null;
-        let currentUserId = null;
-        let userData = null;
-
-        document.querySelectorAll('#lang-menu .mi').forEach(el => {
-            el.onclick = (e) => {
-                e.stopPropagation();
-                setLang(el.dataset.lang);
-                document.getElementById('lang-menu')?.classList.remove('show');
-            };
-        });
-
-        window.openMessageModal = () => document.getElementById('m-msg')?.classList.add('show');
-        window.closeMessageModal = () => document.getElementById('m-msg')?.classList.remove('show');
-
-        window.cachedNotifications = [];
-        window.currentFilteredNotifs = [];
-        window.activeNotifFilter = 'all';
-
-        window.formatGregorianDate = function(rawDate) {
-          if (!rawDate) return '';
-          const d = new Date(rawDate);
-          if (isNaN(d.getTime())) return '';
-          const year = d.getFullYear();
-          const month = String(d.getMonth() + 1).padStart(2, '0');
-          const day = String(d.getDate()).padStart(2, '0');
-          const hours = String(d.getHours()).padStart(2, '0');
-          const minutes = String(d.getMinutes()).padStart(2, '0');
-          return `${year}-${month}-${day} ${hours}:${minutes}`;
-        };
-
-        window.getNotifCategory = function(n) {
-          const type = (n.type || '').toLowerCase();
-          const title = (n.title || '').toLowerCase();
-          if (type.includes('approved') || type.includes('confirm') || title.includes('تایید') || title.includes('موفق') || title.includes('شارژ شد') || title.includes('approved')) return 'approved';
-          if (type.includes('rejected') || type.includes('canceled') || type.includes('cancel') || title.includes('رد') || title.includes('لغو') || title.includes('ناموفق') || title.includes('rejected')) return 'rejected';
-          return 'admin_message';
-        };
-
-        window.updateTabBadges = function() {
-          const notifs = window.cachedNotifications || [];
-          let a=0,r=0,m=0;
-          notifs.forEach(n => {
-            const cat = window.getNotifCategory(n);
-            if (cat === 'approved') a++;
-            else if (cat === 'rejected') r++;
-            else m++;
-          });
-          const ids = { 'cnt-tab-all': notifs.length, 'cnt-tab-approved': a, 'cnt-tab-rejected': r, 'cnt-tab-admin': m };
-          Object.entries(ids).forEach(([id, v]) => { const el = document.getElementById(id); if (el) el.innerText = v; });
-        };
-
-        window.updateBellBadge = function() {
-          const unreadCount = window.cachedNotifications.filter(n => !n.read && !n.isRead && !n.is_read).length;
-          const badge = document.getElementById('bell-badge');
-          if (badge) {
-            badge.innerText = unreadCount;
-            if (unreadCount > 0) badge.classList.add('show');
-            else badge.classList.remove('show');
-          }
-          window.updateTabBadges();
-        };
-
-        window.setNotifFilter = function(filter, element) {
-          window.activeNotifFilter = filter;
-          document.querySelectorAll('#notif-tabs .notif-tab').forEach(tab => tab.classList.remove('active'));
-          if (element) element.classList.add('active');
-          window.renderNotifications();
-        };
-
-        window.closeMsgDetailModal = function() {
-          document.getElementById('m-msg-detail')?.classList.remove('show');
-        };
-
-        window.openMsgDetail = async function(idx) {
-          const n = window.currentFilteredNotifs[idx];
-          if (!n) return;
-          const t = window.currentLangData || LD.fa;
-          const isUnread = !n.read && !n.isRead && !n.is_read;
-
-          if (isUnread) {
-            n.is_read = true; n.read = true; n.isRead = true;
-            window.updateBellBadge(); window.renderNotifications();
-            try {
-              const { error } = await supabaseClient.from('notifications').update({ is_read: true }).eq('id', n.id).select();
-              if (error) {
-                const res2 = await supabaseClient.from('notifications').update({ read: true }).eq('id', n.id);
-                if (res2.error) await supabaseClient.from('notifications').update({ isRead: true }).eq('id', n.id);
-              }
-            } catch (err) { console.error('notif update error:', err); }
-          }
-
-          const title = n.title || t.systemMessage;
-          const msg = n.message || n.text || n.body || '';
-          const category = window.getNotifCategory(n);
-          const dateStr = window.formatGregorianDate(n.created_at || n.date || n.created_date);
-
-          const detailTitle = document.getElementById('detail-msg-title');
-          const detailDate = document.getElementById('detail-msg-date');
-          const detailBody = document.getElementById('detail-msg-body');
-          const detailSupport = document.getElementById('detail-msg-support');
-
-          if (detailTitle) detailTitle.innerHTML = `<i class="fas fa-bell" style="color:#38bdf8"></i> ${escapeHtml(title)}`;
-          if (detailDate) {
-            if (dateStr) { detailDate.innerHTML = `<i class="far fa-clock" style="color:#38bdf8;margin-right:4px;"></i>${escapeHtml(dateStr)}`; detailDate.style.display = 'block'; }
-            else detailDate.style.display = 'none';
-          }
-          if (detailBody) detailBody.innerText = msg;
-
-          if (detailSupport) {
-              if (category === 'rejected') {
-                  detailSupport.innerHTML = `
-                  <div style="margin-top:15px;padding-top:10px;border-top:1px dashed rgba(239,68,68,0.3);display:flex;justify-content:flex-end;">
-                    <a href="support.html" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);" style="display:inline-flex;align-items:center;gap:6px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f8fafc;padding:6px 12px;border-radius:6px;font-size:12px;text-decoration:none;font-weight:600;transition:0.2s;">
-                      <i class="fas fa-headset" style="color:#ef4444;"></i>
-                      <span>${escapeHtml(t.supportFollowup)}</span>
-                    </a>
-                  </div>`;
-              } else { detailSupport.innerHTML = ''; }
-          }
-
-          document.getElementById('m-msg-detail')?.classList.add('show');
-        };
-
-        window.renderNotifications = function() {
-          window.updateTabBadges();
-          const container = document.getElementById('modal-msg-container');
-          if (!container) return;
-          const t = window.currentLangData || LD.fa;
-
-          const filter = window.activeNotifFilter;
-          const filtered = window.cachedNotifications.filter(n => filter === 'all' ? true : window.getNotifCategory(n) === filter);
-          window.currentFilteredNotifs = filtered;
-
-          if (filtered.length === 0) {
-            container.innerHTML = `<div style="text-align:center;padding:25px;color:#94a3b8;font-size:12px;"><i class="fas fa-inbox" style="font-size:24px;margin-bottom:8px;display:block;opacity:0.5;"></i>${escapeHtml(t.noMsgCategory)}</div>`;
-            return;
-          }
-
-          let html = '';
-          filtered.forEach((n, idx) => {
-            const title = n.title || t.systemMessage;
-            const category = window.getNotifCategory(n);
-            const isUnread = !n.read && !n.isRead && !n.is_read;
-            const dateStr = window.formatGregorianDate(n.created_at || n.date || n.created_date);
-
-            let borderStyle = "border:1px solid rgba(255,255,255,.08);";
-            let bgStyle = "background:rgba(255,255,255,.02);";
-            let icon = '<i class="fas fa-bullhorn" style="color:#38bdf8"></i>';
-            let tagHtml = `<span style="font-size:10px;background:rgba(56,189,248,0.2);color:#38bdf8;padding:2px 6px;border-radius:4px;font-weight:700;">${escapeHtml(t.tagAdmin)}</span>`;
-
-            if (category === 'approved') {
-              borderStyle = isUnread ? "border:1px solid rgba(34, 197, 94, 0.6);" : "border:1px solid rgba(34, 197, 94, 0.2);";
-              bgStyle = isUnread ? "background:rgba(34, 197, 94, 0.12);" : "background:rgba(34, 197, 94, 0.03);";
-              icon = '<i class="fas fa-check-circle" style="color:#22c55e"></i>';
-              tagHtml = `<span style="font-size:10px;background:rgba(34,197,94,0.2);color:#22c55e;padding:2px 6px;border-radius:4px;font-weight:700;">${escapeHtml(t.tagApproved)}</span>`;
-            } else if (category === 'rejected') {
-              borderStyle = isUnread ? "border:1px solid rgba(239, 68, 68, 0.6);" : "border:1px solid rgba(239, 68, 68, 0.2);";
-              bgStyle = isUnread ? "background:rgba(239, 68, 68, 0.12);" : "background:rgba(239, 68, 68, 0.03);";
-              icon = '<i class="fas fa-times-circle" style="color:#ef4444"></i>';
-              tagHtml = `<span style="font-size:10px;background:rgba(239,68,68,0.2);color:#ef4444;padding:2px 6px;border-radius:4px;font-weight:700;">${escapeHtml(t.tagRejected)}</span>`;
-            } else {
-              bgStyle = isUnread ? "background:rgba(56, 189, 248, 0.12);" : "background:rgba(255, 255, 255, 0.02);";
-              borderStyle = isUnread ? "border:1px solid rgba(56, 189, 248, 0.5);" : "border:1px solid rgba(255, 255, 255, 0.08);";
-            }
-
-            const opacityStyle = isUnread ? "opacity:1;" : "opacity:0.65;";
-            const unreadDot = isUnread ? `<span style="width:9px;height:9px;background:#ef4444;border-radius:50%;display:inline-block;box-shadow:0 0 8px #ef4444;" title="${escapeHtml(t.unreadTitle)}"></span>` : '';
-            const readBadge = isUnread
-              ? `<span style="font-size:10px;background:#ef4444;color:#fff;padding:2px 7px;border-radius:10px;font-weight:800;box-shadow:0 0 8px rgba(239,68,68,0.5);">${escapeHtml(t.badgeNew)}</span>`
-              : `<span style="font-size:10px;background:rgba(255,255,255,0.06);color:#94a3b8;padding:2px 6px;border-radius:10px;"><i class="fas fa-check" style="font-size:9px;color:#64748b;"></i> ${escapeHtml(t.badgeRead)}</span>`;
-
-            const dateDisplay = dateStr ? `<div style="font-size:11px;color:${isUnread ? '#cbd5e1' : '#64748b'};margin-top:6px;direction:ltr;text-align:left;"><i class="far fa-clock" style="margin-right:4px;"></i>${escapeHtml(dateStr)}</div>` : '';
-
-            html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle} ${opacityStyle} cursor:pointer; position:relative; transition:all 0.2s;" onclick="window.openMsgDetail(${idx})">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
-                <div class="msg-title-text" style="display:flex;align-items:center;gap:8px;font-weight:${isUnread ? '800' : '500'};color:${isUnread ? '#f8fafc' : '#cbd5e1'};">
-                  ${unreadDot}${icon}<span>${escapeHtml(title)}</span>
-                </div>
-                <div style="display:flex;align-items:center;gap:6px;">${tagHtml}${readBadge}</div>
-              </div>
-              ${dateDisplay}
-            </div>`;
-          });
-          container.innerHTML = html;
-        };
-
-        window.showToast = function(message, type = 'success', duration = 8000) {
-            const container = document.getElementById('toast-container');
-            if (!container) return;
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            let iconClass = 'fa-check-circle';
-            if (type === 'error') iconClass = 'fa-exclamation-circle';
-            if (type === 'info') iconClass = 'fa-info-circle';
-            toast.innerHTML = `<i class="fas ${iconClass}"></i><div style="flex:1;">${escapeHtml(message)}</div>`;
-            container.appendChild(toast);
-            setTimeout(() => { toast.classList.add('show'); }, 10);
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => { toast.remove(); }, 350);
-            }, duration);
-        };
-
-        // ============================================================
-        // LEVEL UI + CALC FEE
-        // ============================================================
-        window.refreshLevelUI = function() {
-            const t = window.currentLangData || LD.fa;
-            const required = getRequiredAmount(userLevel);
-
-            const lvlEl = document.getElementById('user-level-display');
-            const amtEl = document.getElementById('required-amount-display');
-            const amtInput = document.getElementById('withdraw-amount');
-            const balEl = document.getElementById('user-balance');
-
-            if (lvlEl) lvlEl.textContent = String(userLevel);
-            if (amtEl) amtEl.textContent = required.toFixed(2) + ' USDT';
-
-            if (amtInput) {
-                amtInput.value = required.toFixed(2);
-            }
-
-            // Balance check
-            const balance = userData ? parseFloat(userData.balance || 0) : 0;
-            const submitBtn = document.getElementById('submit-withdraw-btn');
-            if (submitBtn && !submitBtn.dataset.busy) {
-                if (balance < required) {
-                    submitBtn.disabled = true;
-                } else {
-                    submitBtn.disabled = false;
-                }
-            }
-
-            if (balEl) balEl.textContent = balance.toFixed(2) + ' USDT';
-            window.calcFee();
-        };
-
-        window.calcFee = function() {
-            const amt = parseFloat(document.getElementById('withdraw-amount').value) || 0;
+        window.calcFee = function(){
+            const amt = parseFloat(document.getElementById('withdraw-amount').value)||0;
             const net = Math.max(0, amt - NETWORK_FEE);
             document.getElementById('withdraw-fee').innerText = NETWORK_FEE.toFixed(2) + ' USDT';
             document.getElementById('withdraw-net').innerText = net.toFixed(2) + ' USDT';
         };
 
-        window.onNetworkChange = function() {
+        function formatRemaining(ms){
+            if(ms <= 0) return '0:00:00';
+            const totalSec = Math.floor(ms/1000);
+            const d = Math.floor(totalSec/86400);
+            const h = Math.floor((totalSec%86400)/3600);
+            const m = Math.floor((totalSec%3600)/60);
+            const s = totalSec%60;
+            if(d > 0) return `${d}d ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }
+
+        function renderStatusCard(status){
+            const t = window.currentLangData||LD.fa;
+            const card = document.getElementById('status-card');
+            if(!card) return;
+            if(countdownInterval){clearInterval(countdownInterval);countdownInterval=null;}
+
+            const btn = document.getElementById('submit-withdraw-btn');
+
+            if(status.allowed){
+                withdrawalAllowed = true;
+                card.className = 'status-card allowed';
+                card.innerHTML = `<i class="fas fa-check-circle status-icon"></i><div class="status-text"><span class="status-title">${escapeHtml(t.statusAllowed)}</span><span class="status-sub">${escapeHtml(t.statusAllowedSub)}</span></div>`;
+                if(btn && userLevel > 0){ btn.disabled = false; }
+                return;
+            }
+
+            withdrawalAllowed = false;
+            if(btn) btn.disabled = true;
+
+            if(status.reason === 'pending_exists'){
+                card.className = 'status-card pending';
+                card.innerHTML = `<i class="fas fa-hourglass-half status-icon"></i><div class="status-text"><span class="status-title">${escapeHtml(t.statusPendingTitle)}</span><span class="status-sub">${escapeHtml(t.statusPendingSub)}</span></div>`;
+                return;
+            }
+
+            if(status.reason === 'weekend_saturday' || status.reason === 'weekend_sunday'){
+                card.className = 'status-card blocked';
+                card.innerHTML = `<i class="fas fa-calendar-xmark status-icon"></i><div class="status-text"><span class="status-title">${escapeHtml(t.statusWeekendTitle)}</span><span class="status-sub">${escapeHtml(t.statusWeekendSub)}</span></div>`;
+                if(status.next_allowed_at){
+                    const box = document.createElement('div');
+                    box.className = 'countdown-box';
+                    box.innerHTML = `<i class="fas fa-clock"></i> <span>${escapeHtml(t.nextAllowedLabel)}</span> <span class="cd-val">--:--:--</span>`;
+                    card.appendChild(box);
+                    const target = new Date(status.next_allowed_at).getTime();
+                    const tick = () => {
+                        const ms = target - Date.now();
+                        const val = box.querySelector('.cd-val');
+                        if(val) val.textContent = formatRemaining(ms);
+                        if(ms <= 0){ clearInterval(countdownInterval); window.refreshWithdrawalStatus(); }
+                    };
+                    tick();
+                    countdownInterval = setInterval(tick, 1000);
+                }
+                return;
+            }
+
+            if(status.reason === 'cooldown'){
+                card.className = 'status-card blocked';
+                card.innerHTML = `<i class="fas fa-clock status-icon"></i><div class="status-text"><span class="status-title">${escapeHtml(t.statusCooldownTitle)}</span><span class="status-sub">${escapeHtml(t.statusCooldownSub)}</span></div>`;
+                if(status.next_allowed_at){
+                    const box = document.createElement('div');
+                    box.className = 'countdown-box';
+                    box.innerHTML = `<i class="fas fa-hourglass-half"></i> <span>${escapeHtml(t.nextAllowedLabel)}</span> <span class="cd-val">--:--:--</span>`;
+                    card.appendChild(box);
+                    const target = new Date(status.next_allowed_at).getTime();
+                    const tick = () => {
+                        const ms = target - Date.now();
+                        const val = box.querySelector('.cd-val');
+                        if(val) val.textContent = formatRemaining(ms);
+                        if(ms <= 0){ clearInterval(countdownInterval); window.refreshWithdrawalStatus(); }
+                    };
+                    tick();
+                    countdownInterval = setInterval(tick, 1000);
+                }
+                return;
+            }
+
+            card.className = 'status-card blocked';
+            card.innerHTML = `<i class="fas fa-exclamation-triangle status-icon"></i><div class="status-text"><span class="status-title">${escapeHtml(t.errGeneric)}</span></div>`;
+        }
+
+        window.refreshWithdrawalStatus = async function(){
+            try{
+                const {data,error} = await supabaseClient.rpc('can_user_withdraw');
+                if(error){ console.error(error); return; }
+                renderStatusCard(data);
+            }catch(e){ console.error(e); }
+        };
+
+        window.refreshLevelUI = function(){
+            const balance = userData ? parseFloat(userData.balance||0) : 0;
+            const required = getRequiredAmount(userLevel);
+            document.getElementById('user-balance').innerText = balance.toFixed(2) + ' USDT';
+            document.getElementById('user-level-display').textContent = userLevel > 0 ? String(userLevel) : '—';
+            document.getElementById('required-amount-display').textContent = required > 0 ? required.toFixed(2) + ' USDT' : '—';
+            const amtInput = document.getElementById('withdraw-amount');
+            if(amtInput) amtInput.value = required > 0 ? required.toFixed(2) : '';
+            window.calcFee();
+        };
+
+        window.onNetworkChange = function(){
             const net = document.getElementById('withdraw-network').value;
-            if (userData) {
-                if (net === 'TRC20' && userData.trx_address) document.getElementById('withdraw-address').value = userData.trx_address;
-                else if (net === 'BEP20' && userData.bep20_address) document.getElementById('withdraw-address').value = userData.bep20_address;
+            if(userData){
+                if(net==='TRC20' && userData.trx_address) document.getElementById('withdraw-address').value = userData.trx_address;
+                else if(net==='BEP20' && userData.bep20_address) document.getElementById('withdraw-address').value = userData.bep20_address;
             }
         };
 
-        window.submitWithdrawal = async function() {
-            const t = window.currentLangData || LD.fa;
+        window.submitWithdrawal = async function(){
+            const t = window.currentLangData||LD.fa;
+            if(!withdrawalAllowed){ window.showToast(t.errCooldown,'error',4000); return; }
             const net = document.getElementById('withdraw-network').value;
             const addr = document.getElementById('withdraw-address').value.trim();
-            const amt = parseFloat(document.getElementById('withdraw-amount').value);
             const pass = document.getElementById('withdraw-pass').value.trim();
             const required = getRequiredAmount(userLevel);
+            const balance = userData ? parseFloat(userData.balance||0) : 0;
 
-            if (!addr) { window.showToast(t.errAddressRequired, 'error', 4000); return; }
-
-            // مبلغ باید دقیقاً برابر مبلغ سطح باشد
-            if (!Number.isFinite(amt) || Math.abs(amt - required) > 0.001) {
-                window.showToast(t.errAmountMismatch.replace('{x}', required.toFixed(2)), 'error', 5000);
-                return;
-            }
-
-            // چک موجودی
-            const balance = userData ? parseFloat(userData.balance || 0) : 0;
-            if (balance < required) {
-                window.showToast(t.errInsufficientBalance.replace('{x}', required.toFixed(2)), 'error', 5000);
-                return;
-            }
-
-            if (!pass) { window.showToast(t.errPassRequired, 'error', 4000); return; }
+            if(userLevel === 0){window.showToast(t.errInactive,'error',5000);return;}
+            if(balance < required){window.showToast(t.errInsufficient.replace('{x}',required.toFixed(2)),'error',5000);return;}
+            if(!addr){window.showToast(t.errAddressRequired,'error',4000);return;}
+            if(!pass){window.showToast(t.errPassRequired,'error',4000);return;}
 
             const btn = document.getElementById('submit-withdraw-btn');
-            const origText = btn.innerText;
-            btn.dataset.busy = '1';
+            const orig = btn.innerText;
             btn.disabled = true;
             btn.innerText = t.submitting;
 
-            try {
-                const { error } = await supabaseClient.from('withdrawals').insert([{
+            try{
+                const {error} = await supabaseClient.from('transactions').insert([{
                     user_id: currentUserId,
+                    type: 'withdraw',
+                    amount: required,
                     network: net,
-                    address: addr,
-                    amount: amt,
                     status: 'pending',
+                    currency: 'USDT',
+                    title: `Withdraw ${net}`,
+                    description: `Address: ${addr} | Network: ${net} | Fee: ${NETWORK_FEE}`,
                     created_at: new Date().toISOString()
                 }]);
 
-                delete btn.dataset.busy;
-                btn.innerText = origText;
-
-                if (!error) {
-                    window.showToast(t.errSuccess, 'success', 5000);
+                btn.innerText = orig;
+                if(!error){
+                    window.showToast(t.errSuccess,'success',5000);
                     document.getElementById('withdraw-pass').value = '';
-                    window.refreshLevelUI();
+                    await window.refreshWithdrawalStatus();
                 } else {
-                    const friendlyMsg = mapSupabaseError(error);
-                    window.showToast(`${t.errFailed}: ${friendlyMsg}`, 'error', 5000);
-                    window.refreshLevelUI();
+                    const msg = String(error.message||error);
+                    let friendly = t.errFailed;
+                    if(msg.includes('WITHDRAWAL_BLOCKED')){
+                        if(msg.includes('pending_exists')) friendly = t.errPending;
+                        else if(msg.includes('weekend')) friendly = t.errWeekend;
+                        else if(msg.includes('cooldown')) friendly = t.errCooldown;
+                        else friendly = t.errGeneric;
+                    } else if(msg.toLowerCase().includes('jwt')||msg.toLowerCase().includes('expired')) friendly = t.errJWT;
+                    else if(msg.toLowerCase().includes('row-level security')||msg.toLowerCase().includes('rls')) friendly = t.errGeneric;
+                    else if(msg.toLowerCase().includes('check constraint')) friendly = t.errGeneric;
+                    window.showToast(friendly,'error',5000);
+                    await window.refreshWithdrawalStatus();
                 }
-            } catch (e) {
-                delete btn.dataset.busy;
-                btn.innerText = origText;
-                const friendlyMsg = mapSupabaseError(e);
-                window.showToast(`${t.errFailed}: ${friendlyMsg}`, 'error', 5000);
-                window.refreshLevelUI();
+            }catch(e){
+                btn.innerText = orig;
+                window.showToast(t.errGeneric,'error',5000);
+                await window.refreshWithdrawalStatus();
             }
         };
 
-        async function loadUserData(user) {
-            const { data } = await supabaseClient.from('users').select('*').eq('id', user.id).single();
-            if (data) {
+        async function loadUserData(user){
+            const {data} = await supabaseClient.from('users').select('*').eq('id',user.id).single();
+            if(data){
                 userData = data;
-                userLevel = getUserLevel(data);
+                userLevel = getUserLevel(data.balance);
                 window.refreshLevelUI();
                 window.onNetworkChange();
             }
-
-            const { data: notifs, error: notifError } = await supabaseClient
-                .from('notifications').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
-            if (!notifError && notifs) {
-                window.cachedNotifications = notifs;
-                window.renderNotifications();
-                window.updateBellBadge();
-            }
+            await window.refreshWithdrawalStatus();
         }
 
-        supabaseClient.auth.onAuthStateChange(async (event, session) => {
-            if (session && session.user) {
-                currentUser = session.user;
+        supabaseClient.auth.onAuthStateChange(async (e,session)=>{
+            if(session&&session.user){
                 currentUserId = session.user.id;
                 await loadUserData(session.user);
-            } else {
-                window.location.href = "index.html";
-            }
+            } else { window.location.href = 'index.html'; }
         });
 
-        window.closeHelpModal = () => document.getElementById('m-help').classList.remove('show');
-        document.getElementById('help-btn').onclick = () => document.getElementById('m-help').classList.add('show');
-        document.getElementById('bell-btn').onclick = (e) => { e.stopPropagation(); window.openMessageModal(); };
-
-        document.getElementById('menu-btn').onclick = (e) => {
-            e.stopPropagation();
-            document.getElementById('lang-menu').classList.remove('show');
-            document.getElementById('nav-menu').classList.toggle('show');
-        };
-        document.getElementById('lang-btn').onclick = (e) => {
-            e.stopPropagation();
-            document.getElementById('nav-menu').classList.remove('show');
-            document.getElementById('lang-menu').classList.toggle('show');
-        };
-        window.addEventListener('click', (e) => {
-            if (!e.target.closest('.wrap')) {
-                document.getElementById('nav-menu')?.classList.remove('show');
-                document.getElementById('lang-menu')?.classList.remove('show');
-            }
-        });
-
-        document.getElementById('logout-btn').onclick = async () => {
-            await supabaseClient.auth.signOut();
-            window.location.href = "index.html";
-        };
+        document.getElementById('help-btn').onclick = ()=>document.getElementById('m-help').classList.add('show');
+        document.getElementById('menu-btn').onclick = (e)=>{e.stopPropagation();document.getElementById('lang-menu').classList.remove('show');document.getElementById('nav-menu').classList.toggle('show');};
+        document.getElementById('lang-btn').onclick = (e)=>{e.stopPropagation();document.getElementById('nav-menu').classList.remove('show');document.getElementById('lang-menu').classList.toggle('show');};
+        window.addEventListener('click',(e)=>{if(!e.target.closest('.wrap')){document.getElementById('nav-menu')?.classList.remove('show');document.getElementById('lang-menu')?.classList.remove('show');}});
+        document.getElementById('logout-btn').onclick = async ()=>{await supabaseClient.auth.signOut();window.location.href='index.html';};
 
         setLang(currentLang);
     </script>
