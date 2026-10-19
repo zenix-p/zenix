@@ -66,7 +66,6 @@ header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1)
 #modal-msg-container::-webkit-scrollbar-thumb:hover,.modal-content div::-webkit-scrollbar-thumb:hover{background:rgba(56,189,248,.7)}
 #modal-msg-container,.modal-content div{scrollbar-width:thin;scrollbar-color:rgba(56,189,248,0.35) rgba(15,23,42,0.6)}
 input[readonly]{background:rgba(15,23,42,0.5) !important;color:#94a3b8 !important;border-color:rgba(255,255,255,0.08) !important;cursor:not-allowed}
-/* ★ باگ ۵: نشانگر قفل‌شدن شبکه در حالت pending */
 .net-btn{transition:all 0.2s ease}
 .net-btn.net-locked{opacity:0.4 !important;cursor:not-allowed !important;pointer-events:none}
 footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:800px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
@@ -136,7 +135,6 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
 <img id="qr-code-img" src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=TMkUAe5kzL3PdfkwV2vKot3dL3kkDD9z4Y" alt="QR Code" style="display:block;">
 </div>
 <div style="font-size:11px;color:#94a3b8;" data-i18n="scanQr">اسکن جهت واریز مستقیم</div>
-<!-- ★ باگ ۳: برچسب مبلغ دقیق زیر QR -->
 <div id="qr-amount-label" style="display:none;font-size:13px;color:#22c55e;font-weight:800;margin-top:8px;padding:6px 12px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:6px;direction:ltr;text-align:center;"></div>
 </div>
 
@@ -265,14 +263,11 @@ footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1p
 </footer>
 
 <script>
-/* ====== ثابت‌ها ====== */
 const wallets = {
   TRC20: "TMkUAe5kzL3PdfkwV2vKot3dL3kkDD9z4Y",
   BEP20: "0x9eA4B9aCa9B7505E63BA436d3240718A21574dc4"
 };
 window.currentNetwork = 'TRC20';
-
-/* ★ باگ ۴: محدوده مبلغ و regex هش */
 const MIN_DEPOSIT = 10;
 const MAX_DEPOSIT = 100000;
 const FEE_RATE = 1.025;
@@ -537,7 +532,6 @@ function readSavedLanguage(){
 }
 let currLang = readSavedLanguage();
 
-/* ★ باگ ۳: به‌روزرسانی QR و برچسب مبلغ */
 window.updateQR = function() {
   const calcVal = parseFloat(document.getElementById('calc-input')?.value) || 0;
   const qr = document.getElementById('qr-code-img');
@@ -597,11 +591,9 @@ function setLang(l){
       const newText = st.getText(t);
       showMsgRaw(newText, st.isErr, st.showTimer);
       if (st.showTimer && window.__statusTimerStart) startTimer(window.__statusTimerStart);
-    } catch (e) { console.warn('status-box rebuild failed:', e); }
+    } catch (e) {}
   }
-
   try { if (typeof window.updateQR === 'function') window.updateQR(); } catch(e) {}
-
   if (document.body) document.body.classList.add('lang-ready');
 }
 
@@ -661,10 +653,8 @@ function checkInputs(){
 }
 
 window.setNetwork=function(net){
-  /* ★ باگ ۵: اگر شبکه قفل است، اجازه تغییر نده */
   const btn = document.getElementById(net === 'TRC20' ? 'net-trc20' : 'net-bep20');
   if (btn && btn.classList.contains('net-locked')) return;
-  
   window.currentNetwork=net;
   const trc=document.getElementById('net-trc20'),bep=document.getElementById('net-bep20'),addr=document.getElementById('wallet-address'),lbl=document.getElementById('wallet-label');
   const t=window.currentLangData||LD.en;
@@ -677,12 +667,10 @@ window.setNetwork=function(net){
   }
   lbl.textContent=`${t.netLbl} (${net}):`;
   window.updateQR();
-  
   const calcVal = parseFloat(document.getElementById('calc-input').value) || 0;
   if(calcVal > 0){ addr.value = wallets[net]; }
 }
 
-/* ★ باگ ۵: قفل کردن شبکه‌ها */
 window.lockNetworks = function(lock) {
   ['net-trc20','net-bep20'].forEach(id => {
     const el = document.getElementById(id);
@@ -701,7 +689,6 @@ window.copyAddress = async function(){
     await navigator.clipboard.writeText(c.value);
     showMsg(t.copiedMsg, false, false, tt => tt.copiedMsg);
   } catch (err) {
-    console.warn('Clipboard write failed:', err);
     try { c.removeAttribute('readonly'); c.select(); c.setAttribute('readonly', 'readonly'); } catch (e) {}
     showMsg(t.copyFailedMsg, true, false, tt => tt.copyFailedMsg);
   }
@@ -721,7 +708,6 @@ window.copyFinalAmount = async function(){
       setTimeout(() => { btn.innerHTML = origHTML; }, 1500);
     }
   } catch (err) {
-    console.warn('Clipboard write failed:', err);
     if(btn){
       const origHTML = btn.innerHTML;
       btn.innerHTML = '<i class="fas fa-times" style="color:#ef4444;"></i>';
@@ -746,7 +732,7 @@ function tM(o,e){e.stopPropagation();[nM,lMenu].forEach(m=>{if(m!==o)m.classList
 if(mB)mB.onclick=(e)=>tM(nM,e);if(lB)lB.onclick=(e)=>tM(lMenu,e);
 document.onclick=()=>{[nM,lMenu].forEach(m=>m.classList.remove('show'));};document.querySelectorAll('.menu').forEach(m=>m.onclick=(e)=>e.stopPropagation());
 
-try { setLang(currLang); } catch (e) { console.error('Initial setLang failed:', e); }
+try { setLang(currLang); } catch (e) {}
 if (document.body) document.body.classList.add('lang-ready');
 </script>
 
@@ -803,11 +789,9 @@ function resetDepositForm() {
   window.__statusTimerStart = null;
   const box = document.getElementById('status-box');
   if (box) box.style.display = 'none';
-
   const calcInput = document.getElementById('calc-input');
   const txInput = document.getElementById('tx-hash-input');
   const inquiryBtn = document.getElementById('inquiry-btn');
-
   if (calcInput) { calcInput.readOnly = false; calcInput.value = ''; }
   if (txInput) { txInput.readOnly = false; txInput.value = ''; }
   if (inquiryBtn) {
@@ -823,21 +807,16 @@ function resetDepositForm() {
 
 window.checkAutoDeposit = async function(){
   const t = window.currentLangData || LD.en;
-  
   if(!currentUser){
     showMsg(t.loginErr, true, false, tt => tt.loginErr);
     return;
   }
-  
   const calcVal = parseFloat(document.getElementById('calc-input').value) || 0;
   const txVal = document.getElementById('tx-hash-input').value.trim();
-  
   if(calcVal <= 0 || !txVal){
     showMsg(t.fillReqErr, true, false, tt => tt.fillReqErr);
     return;
   }
-
-  /* ★ باگ ۴: اعتبارسنجی مبلغ */
   if (!Number.isFinite(calcVal) || calcVal < MIN_DEPOSIT) {
     showMsg(t.minAmountErr, true, false, tt => tt.minAmountErr);
     return;
@@ -846,8 +825,6 @@ window.checkAutoDeposit = async function(){
     showMsg(t.maxAmountErr, true, false, tt => tt.maxAmountErr);
     return;
   }
-
-  /* ★ باگ ۴: اعتبارسنجی فرمت TxID */
   if (!TXID_REGEX.test(txVal)) {
     showMsg(t.invalidTxId, true, false, tt => tt.invalidTxId);
     return;
@@ -859,7 +836,6 @@ window.checkAutoDeposit = async function(){
   inquiryBtn.style.cursor = 'not-allowed';
   inquiryBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + escapeHtml(t.requesting);
 
-  /* ★ باگ ۱: چک تکراری بودن TxID */
   try {
     const { data: existing } = await supabase
       .from('transactions')
@@ -878,16 +854,12 @@ window.checkAutoDeposit = async function(){
       return;
     }
   } catch (chkErr) {
-    /* اگر چک ناموفق بود، اجازه بده ادامه پیدا کند (نباید کاربر واقعی بلاک شود) */
     console.warn('Duplicate check skipped:', chkErr);
   }
 
   const nowISO = new Date().toISOString();
 
   try{
-    /* ★ باگ ۲: منطق اصلاح‌شده کارمزد
-       - amount = calcVal (مقدار شارژ شده)
-       - description = شامل مقدار ارسالی و TxID */
     const amountWithFee = calcVal * FEE_RATE;
     const pendingDepositObj = {
       rawAmount: calcVal,
@@ -901,9 +873,13 @@ window.checkAutoDeposit = async function(){
     try { localStorage.setItem('zenix_pending_deposit_' + currentUser.id, JSON.stringify(pendingDepositObj)); } catch(e) {}
 
     try {
+      // ★★★ INSERT با ستون‌های جدید ★★★
       await supabase.from('transactions').insert([{
         user_id: currentUser.id,
-        amount: calcVal,                                        /* ← مقدار شارژ (نه مبلغ ارسالی) */
+        amount: calcVal,
+        sent_amount: amountWithFee,
+        network: window.currentNetwork || 'TRC20',
+        tx_hash: txVal,
         type: 'deposit',
         status: 'pending',
         currency: 'USDT',
@@ -988,7 +964,7 @@ window.openMsgDetail = async function(idx) {
     try {
       const { error } = await supabase.from('notifications').update({ is_read: true }).eq('id', n.id);
       if (error) await supabase.from('notifications').update({ read: true }).eq('id', n.id);
-    } catch (err) { console.error('Notification update failed:', err); }
+    } catch (err) {}
   }
   const title = n.title || (window.currentLangData || LD.en).systemMessage;
   const msg = n.message || n.text || n.body || '';
@@ -1072,12 +1048,10 @@ async function loadUserData(user) {
       .from('transactions').select('*')
       .eq('user_id', user.id).eq('type', 'deposit')
       .order('created_at', { ascending: false }).limit(1);
-
     if (txData && txData.length > 0) {
       const p = txData[0];
       const statusStr = String(p.status || '').toLowerCase();
       if (statusStr === 'pending') {
-        /* ★ باگ ۲: مقدار DB = مقدار شارژ؛ مبلغ ارسالی از description خوانده می‌شود */
         const desc = p.description || '';
         const txHashMatch = desc.match(/TxID:\s*([a-fA-F0-9x]+)/i);
         const sentMatch = desc.match(/Sent:\s*([\d.]+)/i);
@@ -1094,16 +1068,13 @@ async function loadUserData(user) {
     } else {
       try { localStorage.removeItem('zenix_pending_deposit_' + user.id); } catch(e) {}
     }
-
     if (pendingDepositData) {
       const t = window.currentLangData || LD.en;
       showMsg(t.pendingSentMsg, false, true, tt => tt.pendingSentMsg);
       startTimer(pendingDepositData.createdAt);
-
       const calcInput = document.getElementById('calc-input');
       const txInput = document.getElementById('tx-hash-input');
       const inquiryBtn = document.getElementById('inquiry-btn');
-
       if (calcInput && txInput) {
         calcInput.value = pendingDepositData.rawAmount ? parseFloat(pendingDepositData.rawAmount).toFixed(2) : '';
         txInput.value = pendingDepositData.txHash || '';
@@ -1112,7 +1083,6 @@ async function loadUserData(user) {
         const val = parseFloat(pendingDepositData.rawAmount) || 0;
         document.getElementById('calc-result').innerText = (val * FEE_RATE).toFixed(2) + ' USDT';
         if (typeof window.updateQR === 'function') window.updateQR();
-
         const walletInput = document.getElementById('wallet-address');
         const copyBtn = document.getElementById('copy-btn');
         const copyWarning = document.getElementById('copy-warning');
