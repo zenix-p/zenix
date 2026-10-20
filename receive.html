@@ -49,10 +49,21 @@
         .lvl-label{font-size:11px;color:#94a3b8;display:block;margin-bottom:2px}
         .lvl-value{font-size:15px;font-weight:800;color:#fbbf24}
         .amt-value{font-size:15px;font-weight:800;color:#22c55e}
+
+        /* Progress bar */
+        .progress-card{background:rgba(15,23,42,.7);border:1px solid rgba(56,189,248,.25);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+        .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:12px;color:#94a3b8}
+        .progress-step{color:#38bdf8;font-weight:800;font-size:13px}
+        .progress-bar-bg{background:rgba(255,255,255,.06);border-radius:20px;height:10px;overflow:hidden;margin-bottom:8px}
+        .progress-bar-fill{height:100%;background:linear-gradient(90deg,#38bdf8,#22c55e);border-radius:20px;transition:width .5s ease}
+        .progress-numbers{display:flex;justify-content:space-between;font-size:11px;color:#94a3b8}
+        .progress-numbers b{color:#22c55e}
+
         .status-card{border-radius:12px;padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px;font-size:12px;line-height:1.6;flex-wrap:wrap}
         .status-card.allowed{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.4);color:#22c55e}
         .status-card.blocked{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.4);color:#f87171}
         .status-card.pending{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.4);color:#fbbf24}
+        .status-card.info{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.4);color:#38bdf8}
         .status-card i.status-icon{font-size:22px;flex-shrink:0}
         .status-card .status-text{flex:1;min-width:0}
         .status-card .status-title{font-weight:800;font-size:13px;margin-bottom:2px;display:block}
@@ -157,6 +168,21 @@
             </div>
         </div>
 
+        <!-- Progress Card -->
+        <div class="progress-card" id="progress-card" style="display:none;">
+            <div class="progress-header">
+                <span data-i18n="progressLabel">مرحله</span>
+                <span class="progress-step" id="progress-step-display">—</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-bar-fill" style="width:0%"></div>
+            </div>
+            <div class="progress-numbers">
+                <span><span data-i18n="progressWithdrawn">برداشت شده:</span> <b id="progress-withdrawn">0</b> USDT</span>
+                <span><span data-i18n="progressRemaining">باقی‌مانده:</span> <b id="progress-remaining">0</b> USDT</span>
+            </div>
+        </div>
+
         <div id="status-card" class="status-card blocked">
             <i class="fas fa-spinner fa-spin status-icon"></i>
             <div class="status-text"><span class="status-title" data-i18n="statusLoading">در حال بررسی وضعیت...</span></div>
@@ -195,7 +221,7 @@
             <div class="modal-header"><span data-i18n="helpTitle">راهنما</span><button class="modal-close" onclick="document.getElementById('m-help').classList.remove('show')"><i class="fas fa-times"></i></button></div>
             <div style="overflow-y:auto;padding-right:4px">
                 <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-crown" style="color:#fbbf24"></i> <span data-i18n="helpLevelTitle">سطح برداشت</span></div><div class="msg-desc-text" data-i18n="helpLevelDesc">سطح بر اساس موجودی تعیین می‌شود.</div></div>
-                <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-clock" style="color:#38bdf8"></i> <span data-i18n="helpRulesTitle">قوانین برداشت</span></div><div class="msg-desc-text" data-i18n="helpRulesDesc">بعد از هر تصمیم ادمین، ۲۴ ساعت صبر. شنبه/یکشنبه تعطیل.</div></div>
+                <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-clock" style="color:#38bdf8"></i> <span data-i18n="helpRulesTitle">قوانین برداشت</span></div><div class="msg-desc-text" data-i18n="helpRulesDesc">بعد از تصمیم ادمین، ۲۴ ساعت صبر. شنبه/یکشنبه تعطیل.</div></div>
             </div>
         </div>
     </div>
@@ -231,16 +257,178 @@
         let userLevel = 0;
         let withdrawalAllowed = false;
         let countdownInterval = null;
+        let lastProgress = null;
 
         const LD = {
-            fa: {dir:"rtl",pageTitle:"زنیکس - برداشت",home:"صفحه اصلی",quantification:"کوانتیفیکیشن",deposit:"واریز",receive:"برداشت",transactions:"تراکنش",profile:"پروفایل",support:"پشتیبانی",logout:"خروج",pageHeading:"برداشت ارز دیجیتال",pageSub:"درخواست برداشت سریع و امن USDT",balanceLabel:"موجودی:",yourLevel:"سطح شما",requiredAmountLabel:"مبلغ برداشت الزامی",networkLabel:"انتخاب شبکه",addressLabel:"آدرس کیف پول مقصد",addressPlaceholder:"آدرس کیف پول را وارد کنید",amountLabel:"مبلغ برداشت",feeLabel:"کارمزد:",netLabel:"دریافتی:",passLabel:"رمز تراکنش",passPlaceholder:"رمز ۶ رقمی",submitBtn:"ثبت درخواست برداشت",submitting:"در حال ثبت...",helpTitle:"راهنما",helpLevelTitle:"سطح برداشت",helpLevelDesc:"سطح بر اساس موجودی تعیین می‌شود.",helpRulesTitle:"قوانین برداشت",helpRulesDesc:"بعد از هر تصمیم ادمین، ۲۴ ساعت صبر. شنبه/یکشنبه تعطیل.",statusLoading:"در حال بررسی وضعیت...",statusAllowed:"می‌توانید درخواست برداشت ثبت کنید",statusAllowedSub:"همه شرایط برآورده شده",statusPendingTitle:"درخواست در انتظار",statusPendingSub:"درخواست قبلی شما هنوز بررسی نشده است",statusCooldownTitle:"زمان انتظار",statusCooldownSub:"۲۴ ساعت صبر بعد از تصمیم ادمین",statusWeekendTitle:"تعطیلی آخر هفته",statusWeekendSub:"شنبه و یکشنبه برداشت تعطیل است",nextAllowedLabel:"زمان مجاز بعدی:",errInactive:"حساب غیرفعال — حداقل ۲۰ USDT",errInsufficient:"موجودی کافی نیست. حداقل: {x} USDT",errAddressRequired:"آدرس را وارد کنید.",errPassRequired:"رمز را وارد کنید.",errPassWrong:"رمز تراکنش اشتباه است",errSuccess:"درخواست ثبت شد.",errFailed:"خطا",errGeneric:"خطایی رخ داد.",errWeekend:"امروز تعطیل است.",errPending:"شما درخواست در انتظار دارید.",errCooldown:"زمان انتظار سپری نشده.",errJWT:"نشست منقضی.",errNetwork:"خطای شبکه.",serverActive:"سرور فعال"},
-            en: {dir:"ltr",pageTitle:"Zenix - Withdraw",home:"Home",quantification:"Quantification",deposit:"Deposit",receive:"Withdraw",transactions:"Transactions",profile:"Profile",support:"Support",logout:"Log out",pageHeading:"Withdraw Crypto",pageSub:"Fast and secure USDT withdrawal",balanceLabel:"Balance:",yourLevel:"Your Level",requiredAmountLabel:"Required amount",networkLabel:"Select Network",addressLabel:"Destination address",addressPlaceholder:"Enter wallet address",amountLabel:"Withdrawal amount",feeLabel:"Fee:",netLabel:"Net:",passLabel:"Password",passPlaceholder:"6-digit",submitBtn:"Submit request",submitting:"Submitting...",helpTitle:"Help",helpLevelTitle:"Withdrawal level",helpLevelDesc:"Level determined by balance.",helpRulesTitle:"Withdrawal rules",helpRulesDesc:"24-hour wait after decision. No withdrawals Sat/Sun.",statusLoading:"Checking status...",statusAllowed:"You can submit a withdrawal request",statusAllowedSub:"All conditions met",statusPendingTitle:"Pending request",statusPendingSub:"Your previous request awaits admin review",statusCooldownTitle:"Cooldown",statusCooldownSub:"24-hour wait after admin decision",statusWeekendTitle:"Weekend holiday",statusWeekendSub:"No withdrawals on Saturday/Sunday",nextAllowedLabel:"Next allowed time:",errInactive:"Account inactive — minimum 20 USDT",errInsufficient:"Insufficient balance. Min: {x} USDT",errAddressRequired:"Enter address.",errPassRequired:"Enter password.",errPassWrong:"Incorrect transaction password",errSuccess:"Request submitted.",errFailed:"Error",errGeneric:"Something went wrong.",errWeekend:"No withdrawals today.",errPending:"You have a pending request.",errCooldown:"Cooldown not expired.",errJWT:"Session expired.",errNetwork:"Network error.",serverActive:"Server active"},
-            ar: {dir:"rtl",pageTitle:"Zenix - سحب",home:"الرئيسية",quantification:"التداول الكمي",deposit:"إيداع",receive:"سحب",transactions:"المعاملات",profile:"الملف الشخصي",support:"الدعم",logout:"خروج",pageHeading:"سحب العملات الرقمية",pageSub:"طلب سحب USDT سريع وآمن",balanceLabel:"الرصيد:",yourLevel:"مستواك",requiredAmountLabel:"المبلغ المطلوب",networkLabel:"اختر الشبكة",addressLabel:"عنوان المحفظة",addressPlaceholder:"أدخل العنوان",amountLabel:"مبلغ السحب",feeLabel:"الرسوم:",netLabel:"الصافي:",passLabel:"كلمة المرور",passPlaceholder:"6 أرقام",submitBtn:"إرسال الطلب",submitting:"جارٍ الإرسال...",helpTitle:"دليل",helpLevelTitle:"مستوى السحب",helpLevelDesc:"المستوى حسب الرصيد.",helpRulesTitle:"قواعد السحب",helpRulesDesc:"انتظر 24 ساعة بعد كل قرار. لا سحب السبت والأحد.",statusLoading:"جارٍ التحقق...",statusAllowed:"يمكنك إرسال طلب سحب",statusAllowedSub:"تم استيفاء الشروط",statusPendingTitle:"طلب معلق",statusPendingSub:"طلبك السابق قيد المراجعة",statusCooldownTitle:"فترة الانتظار",statusCooldownSub:"انتظار 24 ساعة بعد قرار الإدارة",statusWeekendTitle:"عطلة نهاية الأسبوع",statusWeekendSub:"لا سحب السبت والأحد",nextAllowedLabel:"الوقت المسموح التالي:",errInactive:"الحساب غير نشط — الحد الأدنى 20 USDT",errInsufficient:"الرصيد غير كافٍ. الحد الأدنى: {x} USDT",errAddressRequired:"أدخل العنوان.",errPassRequired:"أدخل كلمة المرور.",errPassWrong:"كلمة مرور المعاملة غير صحيحة",errSuccess:"تم الإرسال.",errFailed:"خطأ",errGeneric:"حدث خطأ.",errWeekend:"السحب مغلق اليوم.",errPending:"لديك طلب معلق.",errCooldown:"لم تنته فترة الانتظار.",errJWT:"انتهت الجلسة.",errNetwork:"خطأ الشبكة.",serverActive:"الخادم نشط"},
-            tr: {dir:"ltr",pageTitle:"Zenix - Para Çekme",home:"Ana",quantification:"Kantifikasyon",deposit:"Yatır",receive:"Çek",transactions:"İşlemler",profile:"Profil",support:"Destek",logout:"Çıkış",pageHeading:"Kripto Para Çekme",pageSub:"Hızlı ve güvenli USDT çekme",balanceLabel:"Bakiye:",yourLevel:"Seviye",requiredAmountLabel:"Gerekli tutar",networkLabel:"Ağ Seç",addressLabel:"Cüzdan adresi",addressPlaceholder:"Adresi girin",amountLabel:"Çekim tutarı",feeLabel:"Ücret:",netLabel:"Net:",passLabel:"Şifre",passPlaceholder:"6 haneli",submitBtn:"Talep gönder",submitting:"Gönderiliyor...",helpTitle:"Yardım",helpLevelTitle:"Çekim seviyesi",helpLevelDesc:"Bakiye ile belirlenir.",helpRulesTitle:"Kurallar",helpRulesDesc:"Her karardan sonra 24 saat bekleyin. Cmt/Paz çekim yok.",statusLoading:"Kontrol ediliyor...",statusAllowed:"Talep gönderebilirsiniz",statusAllowedSub:"Tüm koşullar sağlandı",statusPendingTitle:"Bekleyen talep",statusPendingSub:"Önceki talebiniz inceleniyor",statusCooldownTitle:"Bekleme",statusCooldownSub:"Karardan sonra 24 saat bekleme",statusWeekendTitle:"Hafta sonu tatili",statusWeekendSub:"Cmt/Paz çekim yok",nextAllowedLabel:"Sonraki izin:",errInactive:"Hesap pasif — min 20 USDT",errInsufficient:"Yetersiz bakiye. Min: {x} USDT",errAddressRequired:"Adres girin.",errPassRequired:"Şifre girin.",errPassWrong:"İşlem şifresi hatalı",errSuccess:"Talep gönderildi.",errFailed:"Hata",errGeneric:"Bir sorun oluştu.",errWeekend:"Bugün çekim yok.",errPending:"Bekleyen talebiniz var.",errCooldown:"Bekleme süresi dolmadı.",errJWT:"Oturum sona erdi.",errNetwork:"Ağ hatası.",serverActive:"Sunucu aktif"},
-            ru: {dir:"ltr",pageTitle:"Zenix - Вывод",home:"Главная",quantification:"Квантификация",deposit:"Депозит",receive:"Вывод",transactions:"Транзакции",profile:"Профиль",support:"Поддержка",logout:"Выход",pageHeading:"Вывод Криптовалюты",pageSub:"Быстрый и безопасный вывод USDT",balanceLabel:"Баланс:",yourLevel:"Уровень",requiredAmountLabel:"Требуемая сумма",networkLabel:"Сеть",addressLabel:"Адрес кошелька",addressPlaceholder:"Введите адрес",amountLabel:"Сумма вывода",feeLabel:"Комиссия:",netLabel:"Итого:",passLabel:"Пароль",passPlaceholder:"6 цифр",submitBtn:"Отправить",submitting:"Отправка...",helpTitle:"Помощь",helpLevelTitle:"Уровень вывода",helpLevelDesc:"Уровень по балансу.",helpRulesTitle:"Правила",helpRulesDesc:"24 часа после решения. Сб/Вс — нет выводов.",statusLoading:"Проверка...",statusAllowed:"Можно отправить запрос",statusAllowedSub:"Все условия выполнены",statusPendingTitle:"Запрос на рассмотрении",statusPendingSub:"Предыдущий запрос ожидает админа",statusCooldownTitle:"Ожидание",statusCooldownSub:"24 часа после решения",statusWeekendTitle:"Выходные",statusWeekendSub:"Сб/Вс — нет выводов",nextAllowedLabel:"Следующее время:",errInactive:"Аккаунт неактивен — мин. 20 USDT",errInsufficient:"Недостаточно средств. Мин: {x} USDT",errAddressRequired:"Введите адрес.",errPassRequired:"Введите пароль.",errPassWrong:"Неверный пароль транзакции",errSuccess:"Запрос отправлен.",errFailed:"Ошибка",errGeneric:"Что-то пошло не так.",errWeekend:"Сегодня выводов нет.",errPending:"У вас есть запрос на рассмотрении.",errCooldown:"Ожидание не истекло.",errJWT:"Сессия истекла.",errNetwork:"Ошибка сети.",serverActive:"Сервер активен"},
-            es: {dir:"ltr",pageTitle:"Zenix - Retiro",home:"Inicio",quantification:"Cuantificación",deposit:"Depositar",receive:"Retirar",transactions:"Transacciones",profile:"Perfil",support:"Soporte",logout:"Salir",pageHeading:"Retirar Cripto",pageSub:"Retiro rápido y seguro de USDT",balanceLabel:"Saldo:",yourLevel:"Nivel",requiredAmountLabel:"Cantidad requerida",networkLabel:"Red",addressLabel:"Dirección",addressPlaceholder:"Ingresa dirección",amountLabel:"Cantidad",feeLabel:"Comisión:",netLabel:"Neto:",passLabel:"Contraseña",passPlaceholder:"6 dígitos",submitBtn:"Enviar solicitud",submitting:"Enviando...",helpTitle:"Ayuda",helpLevelTitle:"Nivel de retiro",helpLevelDesc:"Nivel por saldo.",helpRulesTitle:"Reglas",helpRulesDesc:"Espera 24h después de cada decisión. Sáb/Dom sin retiros.",statusLoading:"Verificando...",statusAllowed:"Puedes enviar una solicitud",statusAllowedSub:"Todas las condiciones cumplidas",statusPendingTitle:"Solicitud pendiente",statusPendingSub:"Tu solicitud anterior espera revisión",statusCooldownTitle:"Enfriamiento",statusCooldownSub:"Espera 24h después de la decisión",statusWeekendTitle:"Fin de semana",statusWeekendSub:"Sin retiros Sáb/Dom",nextAllowedLabel:"Próximo tiempo:",errInactive:"Cuenta inactiva — min 20 USDT",errInsufficient:"Saldo insuficiente. Mín: {x} USDT",errAddressRequired:"Ingresa dirección.",errPassRequired:"Ingresa contraseña.",errPassWrong:"Contraseña de transacción incorrecta",errSuccess:"Solicitud enviada.",errFailed:"Error",errGeneric:"Algo salió mal.",errWeekend:"Hoy no hay retiros.",errPending:"Tienes una solicitud pendiente.",errCooldown:"Enfriamiento activo.",errJWT:"Sesión expirada.",errNetwork:"Error de red.",serverActive:"Servidor activo"},
-            fr: {dir:"ltr",pageTitle:"Zenix - Retrait",home:"Accueil",quantification:"Quantification",deposit:"Dépôt",receive:"Retrait",transactions:"Transactions",profile:"Profil",support:"Support",logout:"Déco",pageHeading:"Retirer Crypto",pageSub:"Retrait USDT rapide et sécurisé",balanceLabel:"Solde:",yourLevel:"Niveau",requiredAmountLabel:"Montant requis",networkLabel:"Réseau",addressLabel:"Adresse",addressPlaceholder:"Entrez l'adresse",amountLabel:"Montant",feeLabel:"Frais:",netLabel:"Net:",passLabel:"Mot de passe",passPlaceholder:"6 chiffres",submitBtn:"Envoyer la demande",submitting:"Envoi...",helpTitle:"Aide",helpLevelTitle:"Niveau de retrait",helpLevelDesc:"Niveau par solde.",helpRulesTitle:"Règles",helpRulesDesc:"Attendez 24h après chaque décision. Pas de retrait Sam/Dim.",statusLoading:"Vérification...",statusAllowed:"Vous pouvez envoyer une demande",statusAllowedSub:"Toutes conditions remplies",statusPendingTitle:"Demande en attente",statusPendingSub:"Votre demande attend la révision",statusCooldownTitle:"Attente",statusCooldownSub:"24h après la décision",statusWeekendTitle:"Week-end",statusWeekendSub:"Pas de retrait Sam/Dim",nextAllowedLabel:"Prochain temps:",errInactive:"Compte inactif — min 20 USDT",errInsufficient:"Solde insuffisant. Min: {x} USDT",errAddressRequired:"Entrez l'adresse.",errPassRequired:"Entrez le mot de passe.",errPassWrong:"Mot de passe de transaction incorrect",errSuccess:"Demande envoyée.",errFailed:"Erreur",errGeneric:"Une erreur est survenue.",errWeekend:"Pas de retrait aujourd'hui.",errPending:"Vous avez une demande en attente.",errCooldown:"Attente active.",errJWT:"Session expirée.",errNetwork:"Erreur réseau.",serverActive:"Serveur actif"},
-            de: {dir:"ltr",pageTitle:"Zenix - Auszahlung",home:"Start",quantification:"Quantifizierung",deposit:"Einzahlen",receive:"Auszahlen",transactions:"Transaktionen",profile:"Profil",support:"Support",logout:"Abmelden",pageHeading:"Krypto abheben",pageSub:"Schnelle und sichere USDT-Auszahlung",balanceLabel:"Guthaben:",yourLevel:"Stufe",requiredAmountLabel:"Erforderlicher Betrag",networkLabel:"Netzwerk",addressLabel:"Adresse",addressPlaceholder:"Adresse eingeben",amountLabel:"Betrag",feeLabel:"Gebühr:",netLabel:"Netto:",passLabel:"Passwort",passPlaceholder:"6-stellig",submitBtn:"Anfrage senden",submitting:"Senden...",helpTitle:"Hilfe",helpLevelTitle:"Auszahlungsstufe",helpLevelDesc:"Stufe nach Guthaben.",helpRulesTitle:"Regeln",helpRulesDesc:"24h nach Entscheidung warten. Sa/So keine Auszahlung.",statusLoading:"Prüfung...",statusAllowed:"Sie können eine Anfrage senden",statusAllowedSub:"Alle Bedingungen erfüllt",statusPendingTitle:"Ausstehende Anfrage",statusPendingSub:"Ihre vorherige Anfrage wird geprüft",statusCooldownTitle:"Wartezeit",statusCooldownSub:"24h nach Entscheidung",statusWeekendTitle:"Wochenende",statusWeekendSub:"Sa/So keine Auszahlung",nextAllowedLabel:"Nächste Zeit:",errInactive:"Konto inaktiv — min 20 USDT",errInsufficient:"Guthaben unzureichend. Min: {x} USDT",errAddressRequired:"Adresse eingeben.",errPassRequired:"Passwort eingeben.",errPassWrong:"Falsches Transaktionspasswort",errSuccess:"Anfrage gesendet.",errFailed:"Fehler",errGeneric:"Etwas ist schief gelaufen.",errWeekend:"Heute keine Auszahlung.",errPending:"Sie haben eine ausstehende Anfrage.",errCooldown:"Wartezeit aktiv.",errJWT:"Sitzung abgelaufen.",errNetwork:"Netzwerkfehler.",serverActive:"Server aktiv"}
+            fa: {
+                dir:"rtl",pageTitle:"زنیکس - برداشت",home:"صفحه اصلی",quantification:"کوانتیفیکیشن",deposit:"واریز",receive:"برداشت",transactions:"تراکنش",profile:"پروفایل",support:"پشتیبانی",logout:"خروج",
+                pageHeading:"برداشت ارز دیجیتال",pageSub:"درخواست برداشت سریع و امن USDT",balanceLabel:"موجودی:",yourLevel:"سطح شما",requiredAmountLabel:"مبلغ برداشت الزامی",
+                networkLabel:"انتخاب شبکه",addressLabel:"آدرس کیف پول مقصد",addressPlaceholder:"آدرس کیف پول را وارد کنید",amountLabel:"مبلغ برداشت",feeLabel:"کارمزد:",netLabel:"دریافتی:",passLabel:"رمز تراکنش",passPlaceholder:"رمز ۶ رقمی",
+                submitBtn:"ثبت درخواست برداشت",submitting:"در حال ثبت...",
+                helpTitle:"راهنما",helpLevelTitle:"سطح برداشت",helpLevelDesc:"سطح بر اساس موجودی تعیین می‌شود.",helpRulesTitle:"قوانین برداشت",helpRulesDesc:"بعد از هر تصمیم ادمین، ۲۴ ساعت صبر. شنبه/یکشنبه تعطیل.",
+                statusLoading:"در حال بررسی وضعیت...",
+                statusAllowed:"می‌توانید درخواست برداشت ثبت کنید",statusAllowedSub:"همه شرایط برآورده شده",
+                statusPendingTitle:"درخواست در انتظار",statusPendingSub:"درخواست قبلی شما هنوز بررسی نشده است",
+                statusCooldownTitle:"زمان انتظار",statusCooldownSub:"۲۴ ساعت صبر بعد از تصمیم ادمین",
+                statusWeekendTitle:"تعطیلی آخر هفته",statusWeekendSub:"شنبه و یکشنبه برداشت تعطیل است",
+                statusLockedTitle:"حساب قفل است",statusLockedSub:"بعد از ۷ روز از اولین واریز می‌توانید برداشت کنید",
+                statusNeedReferralsTitle:"نیاز به دعوت دوستان",statusNeedReferralsSub:"X از Y دعوت فعال دارید (هر کدام حداقل Z USDT واریز)",
+                statusNeedCasinoTitle:"نیاز به شارژ کازینو",statusNeedCasinoSub:"X از Y USDT در کازینو شارژ کنید",
+                statusNoMoreStepsTitle:"همه مراحل تکمیل شد",statusNoMoreStepsSub:"شما به سقف برداشت رسیده‌اید",
+                nextAllowedLabel:"زمان مجاز بعدی:",unlockAtLabel:"زمان باز شدن:",
+                progressLabel:"مرحله",progressWithdrawn:"برداشت شده:",progressRemaining:"باقی‌مانده:",
+                errInactive:"حساب غیرفعال — حداقل ۲۰ USDT",errInsufficient:"موجودی کافی نیست. حداقل: {x} USDT",errAddressRequired:"آدرس را وارد کنید.",errPassRequired:"رمز را وارد کنید.",errPassWrong:"رمز تراکنش اشتباه است",
+                errSuccess:"درخواست ثبت شد.",errFailed:"خطا",errGeneric:"خطایی رخ داد.",errWeekend:"امروز تعطیل است.",errPending:"شما درخواست در انتظار دارید.",errCooldown:"زمان انتظار سپری نشده.",
+                errLocked:"حساب شما قفل است.",errNeedReferrals:"شرط دعوت را برآورده نکرده‌اید.",errNeedCasino:"شرط کازینو را برآورده نکرده‌اید.",errNoMoreSteps:"به سقف برداشت رسیده‌اید.",errAmountExceeds:"مبلغ بیش از حد مجاز این مرحله است.",
+                errJWT:"نشست منقضی.",errNetwork:"خطای شبکه.",serverActive:"سرور فعال"
+            },
+            en: {
+                dir:"ltr",pageTitle:"Zenix - Withdraw",home:"Home",quantification:"Quantification",deposit:"Deposit",receive:"Withdraw",transactions:"Transactions",profile:"Profile",support:"Support",logout:"Log out",
+                pageHeading:"Withdraw Crypto",pageSub:"Fast and secure USDT withdrawal",balanceLabel:"Balance:",yourLevel:"Your Level",requiredAmountLabel:"Required amount",
+                networkLabel:"Select Network",addressLabel:"Destination address",addressPlaceholder:"Enter wallet address",amountLabel:"Withdrawal amount",feeLabel:"Fee:",netLabel:"Net:",passLabel:"Password",passPlaceholder:"6-digit",
+                submitBtn:"Submit request",submitting:"Submitting...",
+                helpTitle:"Help",helpLevelTitle:"Withdrawal level",helpLevelDesc:"Level determined by balance.",helpRulesTitle:"Withdrawal rules",helpRulesDesc:"24-hour wait after decision. No withdrawals Sat/Sun.",
+                statusLoading:"Checking status...",statusAllowed:"You can submit a withdrawal request",statusAllowedSub:"All conditions met",
+                statusPendingTitle:"Pending request",statusPendingSub:"Your previous request awaits admin review",
+                statusCooldownTitle:"Cooldown",statusCooldownSub:"24-hour wait after admin decision",
+                statusWeekendTitle:"Weekend holiday",statusWeekendSub:"No withdrawals on Saturday/Sunday",
+                statusLockedTitle:"Account locked",statusLockedSub:"You can withdraw after 7 days from first deposit",
+                statusNeedReferralsTitle:"Referrals required",statusNeedReferralsSub:"You have X of Y active referrals (each deposited at least Z USDT)",
+                statusNeedCasinoTitle:"Casino deposit required",statusNeedCasinoSub:"Deposit X of Y USDT in casino",
+                statusNoMoreStepsTitle:"All steps completed",statusNoMoreStepsSub:"You've reached the withdrawal limit",
+                nextAllowedLabel:"Next allowed time:",unlockAtLabel:"Unlock time:",
+                progressLabel:"Step",progressWithdrawn:"Withdrawn:",progressRemaining:"Remaining:",
+                errInactive:"Account inactive — minimum 20 USDT",errInsufficient:"Insufficient balance. Min: {x} USDT",errAddressRequired:"Enter address.",errPassRequired:"Enter password.",errPassWrong:"Incorrect transaction password",
+                errSuccess:"Request submitted.",errFailed:"Error",errGeneric:"Something went wrong.",errWeekend:"No withdrawals today.",errPending:"You have a pending request.",errCooldown:"Cooldown not expired.",
+                errLocked:"Your account is locked.",errNeedReferrals:"Referral condition not met.",errNeedCasino:"Casino condition not met.",errNoMoreSteps:"Withdrawal limit reached.",errAmountExceeds:"Amount exceeds step limit.",
+                errJWT:"Session expired.",errNetwork:"Network error.",serverActive:"Server active"
+            },
+            ar: {
+                dir:"rtl",pageTitle:"Zenix - سحب",home:"الرئيسية",quantification:"التداول الكمي",deposit:"إيداع",receive:"سحب",transactions:"المعاملات",profile:"الملف الشخصي",support:"الدعم",logout:"خروج",
+                pageHeading:"سحب العملات الرقمية",pageSub:"طلب سحب USDT سريع وآمن",balanceLabel:"الرصيد:",yourLevel:"مستواك",requiredAmountLabel:"المبلغ المطلوب",
+                networkLabel:"اختر الشبكة",addressLabel:"عنوان المحفظة",addressPlaceholder:"أدخل العنوان",amountLabel:"مبلغ السحب",feeLabel:"الرسوم:",netLabel:"الصافي:",passLabel:"كلمة المرور",passPlaceholder:"6 أرقام",
+                submitBtn:"إرسال الطلب",submitting:"جارٍ الإرسال...",
+                helpTitle:"دليل",helpLevelTitle:"مستوى السحب",helpLevelDesc:"المستوى حسب الرصيد.",helpRulesTitle:"قواعد السحب",helpRulesDesc:"انتظر 24 ساعة بعد كل قرار. لا سحب السبت والأحد.",
+                statusLoading:"جارٍ التحقق...",statusAllowed:"يمكنك إرسال طلب سحب",statusAllowedSub:"تم استيفاء الشروط",
+                statusPendingTitle:"طلب معلق",statusPendingSub:"طلبك السابق قيد المراجعة",
+                statusCooldownTitle:"فترة الانتظار",statusCooldownSub:"انتظار 24 ساعة بعد قرار الإدارة",
+                statusWeekendTitle:"عطلة نهاية الأسبوع",statusWeekendSub:"لا سحب السبت والأحد",
+                statusLockedTitle:"الحساب مقفل",statusLockedSub:"يمكنك السحب بعد 7 أيام من أول إيداع",
+                statusNeedReferralsTitle:"تحتاج دعوات",statusNeedReferralsSub:"لديك X من Y دعوة نشطة (كل منها أودع Z USDT على الأقل)",
+                statusNeedCasinoTitle:"تحتاج شحن كازينو",statusNeedCasinoSub:"اشحن X من Y USDT في الكازينو",
+                statusNoMoreStepsTitle:"اكتملت جميع المراحل",statusNoMoreStepsSub:"لقد وصلت إلى حد السحب",
+                nextAllowedLabel:"الوقت المسموح التالي:",unlockAtLabel:"وقت الفتح:",
+                progressLabel:"المرحلة",progressWithdrawn:"المسحوب:",progressRemaining:"المتبقي:",
+                errInactive:"الحساب غير نشط — الحد الأدنى 20 USDT",errInsufficient:"الرصيد غير كافٍ. الحد الأدنى: {x} USDT",errAddressRequired:"أدخل العنوان.",errPassRequired:"أدخل كلمة المرور.",errPassWrong:"كلمة مرور المعاملة غير صحيحة",
+                errSuccess:"تم الإرسال.",errFailed:"خطأ",errGeneric:"حدث خطأ.",errWeekend:"السحب مغلق اليوم.",errPending:"لديك طلب معلق.",errCooldown:"لم تنته فترة الانتظار.",
+                errLocked:"حسابك مقفل.",errNeedReferrals:"لم يتم استيفاء شرط الدعوة.",errNeedCasino:"لم يتم استيفاء شرط الكازينو.",errNoMoreSteps:"وصلت إلى حد السحب.",errAmountExceeds:"المبلغ يتجاوز حد المرحلة.",
+                errJWT:"انتهت الجلسة.",errNetwork:"خطأ الشبكة.",serverActive:"الخادم نشط"
+            },
+            tr: {
+                dir:"ltr",pageTitle:"Zenix - Para Çekme",home:"Ana",quantification:"Kantifikasyon",deposit:"Yatır",receive:"Çek",transactions:"İşlemler",profile:"Profil",support:"Destek",logout:"Çıkış",
+                pageHeading:"Kripto Para Çekme",pageSub:"Hızlı ve güvenli USDT çekme",balanceLabel:"Bakiye:",yourLevel:"Seviye",requiredAmountLabel:"Gerekli tutar",
+                networkLabel:"Ağ Seç",addressLabel:"Cüzdan adresi",addressPlaceholder:"Adresi girin",amountLabel:"Çekim tutarı",feeLabel:"Ücret:",netLabel:"Net:",passLabel:"Şifre",passPlaceholder:"6 haneli",
+                submitBtn:"Talep gönder",submitting:"Gönderiliyor...",
+                helpTitle:"Yardım",helpLevelTitle:"Çekim seviyesi",helpLevelDesc:"Bakiye ile belirlenir.",helpRulesTitle:"Kurallar",helpRulesDesc:"Her karardan sonra 24 saat bekleyin. Cmt/Paz çekim yok.",
+                statusLoading:"Kontrol ediliyor...",statusAllowed:"Talep gönderebilirsiniz",statusAllowedSub:"Tüm koşullar sağlandı",
+                statusPendingTitle:"Bekleyen talep",statusPendingSub:"Önceki talebiniz inceleniyor",
+                statusCooldownTitle:"Bekleme",statusCooldownSub:"Karardan sonra 24 saat bekleme",
+                statusWeekendTitle:"Hafta sonu tatili",statusWeekendSub:"Cmt/Paz çekim yok",
+                statusLockedTitle:"Hesap kilitli",statusLockedSub:"İlk yatırımdan 7 gün sonra çekim yapabilirsiniz",
+                statusNeedReferralsTitle:"Davet gerekli",statusNeedReferralsSub:"Y aktif davetiniz var, X gerekli (her biri en az Z USDT yatırmış)",
+                statusNeedCasinoTitle:"Kazino yatırımı gerekli",statusNeedCasinoSub:"Kazinoya X/Y USDT yatırın",
+                statusNoMoreStepsTitle:"Tüm adımlar tamamlandı",statusNoMoreStepsSub:"Çekim limitine ulaştınız",
+                nextAllowedLabel:"Sonraki izin:",unlockAtLabel:"Açılma zamanı:",
+                progressLabel:"Adım",progressWithdrawn:"Çekilen:",progressRemaining:"Kalan:",
+                errInactive:"Hesap pasif — min 20 USDT",errInsufficient:"Yetersiz bakiye. Min: {x} USDT",errAddressRequired:"Adres girin.",errPassRequired:"Şifre girin.",errPassWrong:"İşlem şifresi hatalı",
+                errSuccess:"Talep gönderildi.",errFailed:"Hata",errGeneric:"Bir sorun oluştu.",errWeekend:"Bugün çekim yok.",errPending:"Bekleyen talebiniz var.",errCooldown:"Bekleme süresi dolmadı.",
+                errLocked:"Hesabınız kilitli.",errNeedReferrals:"Davet koşulu karşılanmadı.",errNeedCasino:"Kazino koşulu karşılanmadı.",errNoMoreSteps:"Çekim limitine ulaşıldı.",errAmountExceeds:"Tutar adım limitini aşıyor.",
+                errJWT:"Oturum sona erdi.",errNetwork:"Ağ hatası.",serverActive:"Sunucu aktif"
+            },
+            ru: {
+                dir:"ltr",pageTitle:"Zenix - Вывод",home:"Главная",quantification:"Квантификация",deposit:"Депозит",receive:"Вывод",transactions:"Транзакции",profile:"Профиль",support:"Поддержка",logout:"Выход",
+                pageHeading:"Вывод Криптовалюты",pageSub:"Быстрый и безопасный вывод USDT",balanceLabel:"Баланс:",yourLevel:"Уровень",requiredAmountLabel:"Требуемая сумма",
+                networkLabel:"Сеть",addressLabel:"Адрес кошелька",addressPlaceholder:"Введите адрес",amountLabel:"Сумма вывода",feeLabel:"Комиссия:",netLabel:"Итого:",passLabel:"Пароль",passPlaceholder:"6 цифр",
+                submitBtn:"Отправить",submitting:"Отправка...",
+                helpTitle:"Помощь",helpLevelTitle:"Уровень вывода",helpLevelDesc:"Уровень по балансу.",helpRulesTitle:"Правила",helpRulesDesc:"24 часа после решения. Сб/Вс — нет выводов.",
+                statusLoading:"Проверка...",statusAllowed:"Можно отправить запрос",statusAllowedSub:"Все условия выполнены",
+                statusPendingTitle:"Запрос на рассмотрении",statusPendingSub:"Предыдущий запрос ожидает админа",
+                statusCooldownTitle:"Ожидание",statusCooldownSub:"24 часа после решения",
+                statusWeekendTitle:"Выходные",statusWeekendSub:"Сб/Вс — нет выводов",
+                statusLockedTitle:"Аккаунт заблокирован",statusLockedSub:"Вывод через 7 дней после первого депозита",
+                statusNeedReferralsTitle:"Нужны рефералы",statusNeedReferralsSub:"У вас X из Y активных рефералов (каждый внёс не менее Z USDT)",
+                statusNeedCasinoTitle:"Нужен депозит в казино",statusNeedCasinoSub:"Внесите X из Y USDT в казино",
+                statusNoMoreStepsTitle:"Все этапы завершены",statusNoMoreStepsSub:"Вы достигли лимита вывода",
+                nextAllowedLabel:"Следующее время:",unlockAtLabel:"Время разблокировки:",
+                progressLabel:"Этап",progressWithdrawn:"Выведено:",progressRemaining:"Осталось:",
+                errInactive:"Аккаунт неактивен — мин. 20 USDT",errInsufficient:"Недостаточно средств. Мин: {x} USDT",errAddressRequired:"Введите адрес.",errPassRequired:"Введите пароль.",errPassWrong:"Неверный пароль транзакции",
+                errSuccess:"Запрос отправлен.",errFailed:"Ошибка",errGeneric:"Что-то пошло не так.",errWeekend:"Сегодня выводов нет.",errPending:"У вас есть запрос на рассмотрении.",errCooldown:"Ожидание не истекло.",
+                errLocked:"Ваш аккаунт заблокирован.",errNeedReferrals:"Условие рефералов не выполнено.",errNeedCasino:"Условие казино не выполнено.",errNoMoreSteps:"Лимит вывода достигнут.",errAmountExceeds:"Сумма превышает лимит этапа.",
+                errJWT:"Сессия истекла.",errNetwork:"Ошибка сети.",serverActive:"Сервер активен"
+            },
+            es: {
+                dir:"ltr",pageTitle:"Zenix - Retiro",home:"Inicio",quantification:"Cuantificación",deposit:"Depositar",receive:"Retirar",transactions:"Transacciones",profile:"Perfil",support:"Soporte",logout:"Salir",
+                pageHeading:"Retirar Cripto",pageSub:"Retiro rápido y seguro de USDT",balanceLabel:"Saldo:",yourLevel:"Nivel",requiredAmountLabel:"Cantidad requerida",
+                networkLabel:"Red",addressLabel:"Dirección",addressPlaceholder:"Ingresa dirección",amountLabel:"Cantidad",feeLabel:"Comisión:",netLabel:"Neto:",passLabel:"Contraseña",passPlaceholder:"6 dígitos",
+                submitBtn:"Enviar solicitud",submitting:"Enviando...",
+                helpTitle:"Ayuda",helpLevelTitle:"Nivel de retiro",helpLevelDesc:"Nivel por saldo.",helpRulesTitle:"Reglas",helpRulesDesc:"Espera 24h después de cada decisión. Sáb/Dom sin retiros.",
+                statusLoading:"Verificando...",statusAllowed:"Puedes enviar una solicitud",statusAllowedSub:"Todas las condiciones cumplidas",
+                statusPendingTitle:"Solicitud pendiente",statusPendingSub:"Tu solicitud anterior espera revisión",
+                statusCooldownTitle:"Enfriamiento",statusCooldownSub:"Espera 24h después de la decisión",
+                statusWeekendTitle:"Fin de semana",statusWeekendSub:"Sin retiros Sáb/Dom",
+                statusLockedTitle:"Cuenta bloqueada",statusLockedSub:"Puedes retirar 7 días después del primer depósito",
+                statusNeedReferralsTitle:"Referidos requeridos",statusNeedReferralsSub:"Tienes X de Y referidos activos (cada uno depositó al menos Z USDT)",
+                statusNeedCasinoTitle:"Depósito de casino requerido",statusNeedCasinoSub:"Deposita X de Y USDT en el casino",
+                statusNoMoreStepsTitle:"Todos los pasos completados",statusNoMoreStepsSub:"Has alcanzado el límite de retiro",
+                nextAllowedLabel:"Próximo tiempo:",unlockAtLabel:"Hora de desbloqueo:",
+                progressLabel:"Paso",progressWithdrawn:"Retirado:",progressRemaining:"Restante:",
+                errInactive:"Cuenta inactiva — min 20 USDT",errInsufficient:"Saldo insuficiente. Mín: {x} USDT",errAddressRequired:"Ingresa dirección.",errPassRequired:"Ingresa contraseña.",errPassWrong:"Contraseña incorrecta",
+                errSuccess:"Solicitud enviada.",errFailed:"Error",errGeneric:"Algo salió mal.",errWeekend:"Hoy no hay retiros.",errPending:"Tienes una solicitud pendiente.",errCooldown:"Enfriamiento activo.",
+                errLocked:"Tu cuenta está bloqueada.",errNeedReferrals:"Condición de referidos no cumplida.",errNeedCasino:"Condición de casino no cumplida.",errNoMoreSteps:"Límite de retiro alcanzado.",errAmountExceeds:"Cantidad excede el límite del paso.",
+                errJWT:"Sesión expirada.",errNetwork:"Error de red.",serverActive:"Servidor activo"
+            },
+            fr: {
+                dir:"ltr",pageTitle:"Zenix - Retrait",home:"Accueil",quantification:"Quantification",deposit:"Dépôt",receive:"Retrait",transactions:"Transactions",profile:"Profil",support:"Support",logout:"Déco",
+                pageHeading:"Retirer Crypto",pageSub:"Retrait USDT rapide et sécurisé",balanceLabel:"Solde:",yourLevel:"Niveau",requiredAmountLabel:"Montant requis",
+                networkLabel:"Réseau",addressLabel:"Adresse",addressPlaceholder:"Entrez l'adresse",amountLabel:"Montant",feeLabel:"Frais:",netLabel:"Net:",passLabel:"Mot de passe",passPlaceholder:"6 chiffres",
+                submitBtn:"Envoyer la demande",submitting:"Envoi...",
+                helpTitle:"Aide",helpLevelTitle:"Niveau de retrait",helpLevelDesc:"Niveau par solde.",helpRulesTitle:"Règles",helpRulesDesc:"Attendez 24h après chaque décision. Pas de retrait Sam/Dim.",
+                statusLoading:"Vérification...",statusAllowed:"Vous pouvez envoyer une demande",statusAllowedSub:"Toutes conditions remplies",
+                statusPendingTitle:"Demande en attente",statusPendingSub:"Votre demande attend la révision",
+                statusCooldownTitle:"Attente",statusCooldownSub:"24h après la décision",
+                statusWeekendTitle:"Week-end",statusWeekendSub:"Pas de retrait Sam/Dim",
+                statusLockedTitle:"Compte verrouillé",statusLockedSub:"Retrait possible 7 jours après le premier dépôt",
+                statusNeedReferralsTitle:"Parrainages requis",statusNeedReferralsSub:"Vous avez X sur Y parrainages actifs (chacun a déposé au moins Z USDT)",
+                statusNeedCasinoTitle:"Dépôt casino requis",statusNeedCasinoSub:"Déposez X sur Y USDT au casino",
+                statusNoMoreStepsTitle:"Toutes les étapes terminées",statusNoMoreStepsSub:"Vous avez atteint la limite de retrait",
+                nextAllowedLabel:"Prochain temps:",unlockAtLabel:"Heure de déverrouillage:",
+                progressLabel:"Étape",progressWithdrawn:"Retiré:",progressRemaining:"Restant:",
+                errInactive:"Compte inactif — min 20 USDT",errInsufficient:"Solde insuffisant. Min: {x} USDT",errAddressRequired:"Entrez l'adresse.",errPassRequired:"Entrez le mot de passe.",errPassWrong:"Mot de passe incorrect",
+                errSuccess:"Demande envoyée.",errFailed:"Erreur",errGeneric:"Une erreur est survenue.",errWeekend:"Pas de retrait aujourd'hui.",errPending:"Vous avez une demande en attente.",errCooldown:"Attente active.",
+                errLocked:"Votre compte est verrouillé.",errNeedReferrals:"Condition de parrainage non remplie.",errNeedCasino:"Condition casino non remplie.",errNoMoreSteps:"Limite de retrait atteinte.",errAmountExceeds:"Le montant dépasse la limite de l'étape.",
+                errJWT:"Session expirée.",errNetwork:"Erreur réseau.",serverActive:"Serveur actif"
+            },
+            de: {
+                dir:"ltr",pageTitle:"Zenix - Auszahlung",home:"Start",quantification:"Quantifizierung",deposit:"Einzahlen",receive:"Auszahlen",transactions:"Transaktionen",profile:"Profil",support:"Support",logout:"Abmelden",
+                pageHeading:"Krypto abheben",pageSub:"Schnelle und sichere USDT-Auszahlung",balanceLabel:"Guthaben:",yourLevel:"Stufe",requiredAmountLabel:"Erforderlicher Betrag",
+                networkLabel:"Netzwerk",addressLabel:"Adresse",addressPlaceholder:"Adresse eingeben",amountLabel:"Betrag",feeLabel:"Gebühr:",netLabel:"Netto:",passLabel:"Passwort",passPlaceholder:"6-stellig",
+                submitBtn:"Anfrage senden",submitting:"Senden...",
+                helpTitle:"Hilfe",helpLevelTitle:"Auszahlungsstufe",helpLevelDesc:"Stufe nach Guthaben.",helpRulesTitle:"Regeln",helpRulesDesc:"24h nach Entscheidung warten. Sa/So keine Auszahlung.",
+                statusLoading:"Prüfung...",statusAllowed:"Sie können eine Anfrage senden",statusAllowedSub:"Alle Bedingungen erfüllt",
+                statusPendingTitle:"Ausstehende Anfrage",statusPendingSub:"Ihre vorherige Anfrage wird geprüft",
+                statusCooldownTitle:"Wartezeit",statusCooldownSub:"24h nach Entscheidung",
+                statusWeekendTitle:"Wochenende",statusWeekendSub:"Sa/So keine Auszahlung",
+                statusLockedTitle:"Konto gesperrt",statusLockedSub:"Auszahlung 7 Tage nach der ersten Einzahlung möglich",
+                statusNeedReferralsTitle:"Empfehlungen erforderlich",statusNeedReferralsSub:"Sie haben X von Y aktiven Empfehlungen (jede hat mindestens Z USDT eingezahlt)",
+                statusNeedCasinoTitle:"Casino-Einzahlung erforderlich",statusNeedCasinoSub:"Zahlen Sie X von Y USDT im Casino ein",
+                statusNoMoreStepsTitle:"Alle Schritte abgeschlossen",statusNoMoreStepsSub:"Sie haben das Auszahlungslimit erreicht",
+                nextAllowedLabel:"Nächste Zeit:",unlockAtLabel:"Entsperrzeit:",
+                progressLabel:"Schritt",progressWithdrawn:"Ausgezahlt:",progressRemaining:"Verbleibend:",
+                errInactive:"Konto inaktiv — min 20 USDT",errInsufficient:"Guthaben unzureichend. Min: {x} USDT",errAddressRequired:"Adresse eingeben.",errPassRequired:"Passwort eingeben.",errPassWrong:"Falsches Transaktionspasswort",
+                errSuccess:"Anfrage gesendet.",errFailed:"Fehler",errGeneric:"Etwas ist schief gelaufen.",errWeekend:"Heute keine Auszahlung.",errPending:"Sie haben eine ausstehende Anfrage.",errCooldown:"Wartezeit aktiv.",
+                errLocked:"Ihr Konto ist gesperrt.",errNeedReferrals:"Empfehlungsbedingung nicht erfüllt.",errNeedCasino:"Casino-Bedingung nicht erfüllt.",errNoMoreSteps:"Auszahlungslimit erreicht.",errAmountExceeds:"Betrag überschreitet das Schrittlimit.",
+                errJWT:"Sitzung abgelaufen.",errNetwork:"Netzwerkfehler.",serverActive:"Server aktiv"
+            }
         };
 
         const SUPPORTED_LANGUAGES = ['fa','en','ar','tr','ru','es','fr','de'];
@@ -259,7 +447,10 @@
             document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(Object.prototype.hasOwnProperty.call(t,k)) el.textContent = t[k];});
             document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const k=el.getAttribute('data-i18n-placeholder');if(Object.prototype.hasOwnProperty.call(t,k)) el.setAttribute('placeholder', t[k]);});
             document.querySelectorAll('#lang-menu .mi').forEach(item=>{item.classList.toggle('active', item.getAttribute('data-lang')===l);});
-            try{if(typeof window.calcFee==='function') window.calcFee();}catch(e){}
+            try{
+                if(typeof window.calcFee==='function') window.calcFee();
+                if(typeof window.refreshWithdrawalStatus==='function' && lastProgress) window.renderStatusCardFromProgress(lastProgress);
+            }catch(e){}
         }
         window.setLang = setLang;
 
@@ -283,15 +474,56 @@
             return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
         }
 
-        function renderStatusCard(status){
-            const t = window.currentLangData||LD.fa;
+        function setupCountdown(card, targetTs, label){
+            if(countdownInterval){clearInterval(countdownInterval);countdownInterval=null;}
+            const box = document.createElement('div');
+            box.className = 'countdown-box';
+            box.innerHTML = `<i class="fas fa-clock"></i> <span>${escapeHtml(label)}</span> <span class="cd-val">--:--:--</span>`;
+            card.appendChild(box);
+            const target = new Date(targetTs).getTime();
+            const tick = () => {
+                const ms = target - Date.now();
+                const val = box.querySelector('.cd-val');
+                if(val) val.textContent = formatRemaining(ms);
+                if(ms <= 0){ clearInterval(countdownInterval); window.refreshWithdrawalStatus(); }
+            };
+            tick();
+            countdownInterval = setInterval(tick, 1000);
+        }
+
+        function renderProgress(progress){
+            const card = document.getElementById('progress-card');
+            if(!card) return;
+            if(!progress || !progress.current_step || progress.current_step === 0){
+                card.style.display = 'none';
+                return;
+            }
+            card.style.display = 'block';
+            const step = progress.current_step || 1;
+            const totalWithdrawn = parseFloat(progress.total_withdrawn) || 0;
+            const remaining = parseFloat(progress.remaining_in_step) || 0;
+            const stepMax = totalWithdrawn + remaining;
+            const percent = stepMax > 0 ? Math.min(100, (totalWithdrawn / stepMax) * 100) : 0;
+
+            document.getElementById('progress-step-display').textContent = String(step);
+            document.getElementById('progress-bar-fill').style.width = percent + '%';
+            document.getElementById('progress-withdrawn').textContent = totalWithdrawn.toFixed(2);
+            document.getElementById('progress-remaining').textContent = remaining.toFixed(2);
+        }
+
+        function renderStatusCardFromProgress(progress){
+            const t = window.currentLangData || LD.fa;
             const card = document.getElementById('status-card');
             if(!card) return;
             if(countdownInterval){clearInterval(countdownInterval);countdownInterval=null;}
 
             const btn = document.getElementById('submit-withdraw-btn');
+            lastProgress = progress;
 
-            if(status.allowed){
+            renderProgress(progress);
+
+            // اگر allowed یا شرط جدید OK
+            if(progress.allowed === true){
                 withdrawalAllowed = true;
                 card.className = 'status-card allowed';
                 card.innerHTML = `<i class="fas fa-check-circle status-icon"></i><div class="status-text"><span class="status-title">${escapeHtml(t.statusAllowed)}</span><span class="status-sub">${escapeHtml(t.statusAllowedSub)}</span></div>`;
@@ -302,51 +534,57 @@
             withdrawalAllowed = false;
             if(btn) btn.disabled = true;
 
-            if(status.reason === 'pending_exists'){
+            const reason = progress.reason || '';
+
+            if(reason === 'pending_exists'){
                 card.className = 'status-card pending';
                 card.innerHTML = `<i class="fas fa-hourglass-half status-icon"></i><div class="status-text"><span class="status-title">${escapeHtml(t.statusPendingTitle)}</span><span class="status-sub">${escapeHtml(t.statusPendingSub)}</span></div>`;
                 return;
             }
 
-            if(status.reason === 'weekend_saturday' || status.reason === 'weekend_sunday'){
+            if(reason === 'weekend_saturday' || reason === 'weekend_sunday'){
                 card.className = 'status-card blocked';
                 card.innerHTML = `<i class="fas fa-calendar-xmark status-icon"></i><div class="status-text"><span class="status-title">${escapeHtml(t.statusWeekendTitle)}</span><span class="status-sub">${escapeHtml(t.statusWeekendSub)}</span></div>`;
-                if(status.next_allowed_at){
-                    const box = document.createElement('div');
-                    box.className = 'countdown-box';
-                    box.innerHTML = `<i class="fas fa-clock"></i> <span>${escapeHtml(t.nextAllowedLabel)}</span> <span class="cd-val">--:--:--</span>`;
-                    card.appendChild(box);
-                    const target = new Date(status.next_allowed_at).getTime();
-                    const tick = () => {
-                        const ms = target - Date.now();
-                        const val = box.querySelector('.cd-val');
-                        if(val) val.textContent = formatRemaining(ms);
-                        if(ms <= 0){ clearInterval(countdownInterval); window.refreshWithdrawalStatus(); }
-                    };
-                    tick();
-                    countdownInterval = setInterval(tick, 1000);
-                }
+                if(progress.next_allowed_at) setupCountdown(card, progress.next_allowed_at, t.nextAllowedLabel);
                 return;
             }
 
-            if(status.reason === 'cooldown'){
+            if(reason === 'cooldown'){
                 card.className = 'status-card blocked';
                 card.innerHTML = `<i class="fas fa-clock status-icon"></i><div class="status-text"><span class="status-title">${escapeHtml(t.statusCooldownTitle)}</span><span class="status-sub">${escapeHtml(t.statusCooldownSub)}</span></div>`;
-                if(status.next_allowed_at){
-                    const box = document.createElement('div');
-                    box.className = 'countdown-box';
-                    box.innerHTML = `<i class="fas fa-hourglass-half"></i> <span>${escapeHtml(t.nextAllowedLabel)}</span> <span class="cd-val">--:--:--</span>`;
-                    card.appendChild(box);
-                    const target = new Date(status.next_allowed_at).getTime();
-                    const tick = () => {
-                        const ms = target - Date.now();
-                        const val = box.querySelector('.cd-val');
-                        if(val) val.textContent = formatRemaining(ms);
-                        if(ms <= 0){ clearInterval(countdownInterval); window.refreshWithdrawalStatus(); }
-                    };
-                    tick();
-                    countdownInterval = setInterval(tick, 1000);
-                }
+                if(progress.next_allowed_at) setupCountdown(card, progress.next_allowed_at, t.nextAllowedLabel);
+                return;
+            }
+
+            if(reason === 'locked'){
+                card.className = 'status-card blocked';
+                card.innerHTML = `<i class="fas fa-lock status-icon"></i><div class="status-text"><span class="status-title">${escapeHtml(t.statusLockedTitle)}</span><span class="status-sub">${escapeHtml(t.statusLockedSub)}</span></div>`;
+                if(progress.unlock_at) setupCountdown(card, progress.unlock_at, t.unlockAtLabel);
+                return;
+            }
+
+            if(reason === 'need_referrals'){
+                const have = progress.have_referrals || 0;
+                const need = progress.required_referrals || 0;
+                const dep = progress.required_deposit || 0;
+                const sub = t.statusNeedReferralsSub.replace('X', String(have)).replace('Y', String(need)).replace('Z', String(dep));
+                card.className = 'status-card info';
+                card.innerHTML = `<i class="fas fa-users status-icon"></i><div class="status-text"><span class="status-title">${escapeHtml(t.statusNeedReferralsTitle)}</span><span class="status-sub">${escapeHtml(sub)}</span></div>`;
+                return;
+            }
+
+            if(reason === 'need_casino'){
+                const have = progress.have_casino || 0;
+                const need = progress.required_casino || 0;
+                const sub = t.statusNeedCasinoSub.replace('X', String(have)).replace('Y', String(need));
+                card.className = 'status-card info';
+                card.innerHTML = `<i class="fas fa-dice status-icon"></i><div class="status-text"><span class="status-title">${escapeHtml(t.statusNeedCasinoTitle)}</span><span class="status-sub">${escapeHtml(sub)}</span></div>`;
+                return;
+            }
+
+            if(reason === 'no_more_steps'){
+                card.className = 'status-card blocked';
+                card.innerHTML = `<i class="fas fa-check-double status-icon"></i><div class="status-text"><span class="status-title">${escapeHtml(t.statusNoMoreStepsTitle)}</span><span class="status-sub">${escapeHtml(t.statusNoMoreStepsSub)}</span></div>`;
                 return;
             }
 
@@ -358,7 +596,7 @@
             try{
                 const {data,error} = await supabaseClient.rpc('can_user_withdraw');
                 if(error){ console.error(error); return; }
-                renderStatusCard(data);
+                renderStatusCardFromProgress(data);
             }catch(e){ console.error(e); }
         };
 
@@ -401,20 +639,15 @@
             btn.innerText = t.submitting;
 
             try{
-                // ★ بررسی رمز تراکنش در سرور
                 const { data: passOk, error: passErr } = await supabaseClient.rpc('verify_tx_password', {
-                    p_user_id: currentUserId,
-                    p_password: pass
+                    p_user_id: currentUserId, p_password: pass
                 });
-
                 if (passErr || passOk !== true) {
-                    btn.disabled = false;
-                    btn.innerText = orig;
+                    btn.disabled = false; btn.innerText = orig;
                     window.showToast(t.errPassWrong, 'error', 4000);
                     return;
                 }
 
-                // درج درخواست برداشت
                 const {error} = await supabaseClient.from('transactions').insert([{
                     user_id: currentUserId,
                     type: 'withdraw',
@@ -431,10 +664,7 @@
                 if(!error){
                     window.showToast(t.errSuccess,'success',5000);
                     document.getElementById('withdraw-pass').value = '';
-                    // ★ صبر ۵۰۰ms تا commit کامل، بعد refresh
-                    setTimeout(() => {
-                        window.refreshWithdrawalStatus();
-                    }, 500);
+                    setTimeout(() => window.refreshWithdrawalStatus(), 500);
                 } else {
                     const msg = String(error.message||error);
                     let friendly = t.errFailed;
@@ -442,10 +672,14 @@
                         if(msg.includes('pending_exists')) friendly = t.errPending;
                         else if(msg.includes('weekend')) friendly = t.errWeekend;
                         else if(msg.includes('cooldown')) friendly = t.errCooldown;
+                        else if(msg.includes('locked')) friendly = t.errLocked;
+                        else if(msg.includes('need_referrals')) friendly = t.errNeedReferrals;
+                        else if(msg.includes('need_casino')) friendly = t.errNeedCasino;
+                        else if(msg.includes('no_more_steps')) friendly = t.errNoMoreSteps;
+                        else if(msg.includes('amount_exceeds')) friendly = t.errAmountExceeds;
                         else friendly = t.errGeneric;
-                    } else if(msg.toLowerCase().includes('jwt')||msg.toLowerCase().includes('expired')) friendly = t.errJWT;
-                    else if(msg.toLowerCase().includes('row-level security')||msg.toLowerCase().includes('rls')) friendly = t.errGeneric;
-                    else if(msg.toLowerCase().includes('check constraint')) friendly = t.errGeneric;
+                    } else if(msg.toLowerCase().includes('jwt')) friendly = t.errJWT;
+                    else if(msg.toLowerCase().includes('network')) friendly = t.errNetwork;
                     window.showToast(friendly,'error',5000);
                     setTimeout(() => window.refreshWithdrawalStatus(), 300);
                 }
