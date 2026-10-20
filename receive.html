@@ -431,7 +431,7 @@
                 if(!error){
                     window.showToast(t.errSuccess,'success',5000);
                     document.getElementById('withdraw-pass').value = '';
-                    await window.refreshWithdrawalStatus();
+                    setTimeout(() => window.refreshWithdrawalStatus(), 300);
                 } else {
                     const msg = String(error.message||error);
                     let friendly = t.errFailed;
@@ -444,7 +444,7 @@
                     else if(msg.toLowerCase().includes('row-level security')||msg.toLowerCase().includes('rls')) friendly = t.errGeneric;
                     else if(msg.toLowerCase().includes('check constraint')) friendly = t.errGeneric;
                     window.showToast(friendly,'error',5000);
-                    await window.refreshWithdrawalStatus();
+                   setTimeout(() => window.refreshWithdrawalStatus(), 300);
                 }
             }catch(e){
                 btn.innerText = orig;
