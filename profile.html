@@ -946,8 +946,8 @@
 
             const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-            // ★ ارسال از طریق Supabase Edge Function (bright-handler) که به Resend وصل است
-            const { error: sendError } = await window.supabaseClient.functions.invoke('bright-handler', {
+            // ★ ارسال از طریق Supabase Edge Function (send-otp) که به Resend وصل است
+            const { error: sendError } = await window.supabaseClient.functions.invoke('send-otp', {
               body: { email: email, otpCode: otpCode }
             });
 
