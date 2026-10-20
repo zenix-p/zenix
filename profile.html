@@ -24,13 +24,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-    
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script type="text/javascript">
-        (function(){
-            emailjs.init("pU3AKXBNbLmToyRtX");
-        })();
-    </script>
 
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
@@ -136,9 +129,6 @@
         .c-search{width:100%;padding:8px 10px;background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#fff;font-size:12px;outline:none;font-family:inherit}
         .c-search:focus{border-color:#38bdf8}
         #c-options-container,#welcome-c-options-container{overflow-y:auto;max-height:160px}
-        #c-options-container::-webkit-scrollbar,#welcome-c-options-container::-webkit-scrollbar{width:5px}
-        #c-options-container::-webkit-scrollbar-track,#welcome-c-options-container::-webkit-scrollbar-track{background:rgba(15,23,42,0.6);border-radius:10px}
-        #c-options-container::-webkit-scrollbar-thumb,#welcome-c-options-container::-webkit-scrollbar-thumb{background:rgba(56,189,248,0.35);border-radius:10px}
         .c-option{padding:8px 10px;font-size:12px;color:#cbd5e1;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background 0.15s}
         .c-option:hover{background:rgba(56,189,248,.2);color:#38bdf8}
         .c-option-empty{padding:12px;text-align:center;font-size:11px;color:#64748b}
@@ -365,7 +355,6 @@
         </div>
     </div>
 
-    <!-- ★★★ Modal خوش‌آمدگویی اجباری ★★★ -->
     <div class="modal" id="m-welcome" style="z-index:1100;">
         <div class="modal-content" style="max-width:440px;">
             <div style="text-align:center;margin-bottom:20px;">
@@ -511,7 +500,6 @@
             if (errEl) errEl.style.display = 'none';
         };
 
-        // ★★★ توابع Welcome Modal ★★★
         window.filterWelcomeCountries = function(i) {
             const v = i.value.trim().toLowerCase();
             const container = document.getElementById('welcome-c-options-container');
@@ -667,7 +655,6 @@
             }
         }
 
-        // ★★★ توابع Welcome Modal ★★★
         function showWelcomeModal() {
             const modal = document.getElementById('m-welcome');
             if (!modal) return;
@@ -684,7 +671,6 @@
             const list = document.getElementById('welcome-c-list');
             if (!btn || !list) return;
             
-            // مقداردهی اولیه لیست
             window.filterWelcomeCountries({ value: '' });
             
             btn.onclick = (e) => {
@@ -960,16 +946,14 @@
 
             const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-            await emailjs.send('service_tdvuyju', 'template_bmrp41l', {
-              to_email: email,
-              email: email,
-              otp_code: otpCode,
-              code: otpCode,
-              otp: otpCode,
-              passcode: otpCode,
-              verification_code: otpCode,
-              message: otpCode
+            // ★ ارسال از طریق Supabase Edge Function (bright-handler) که به Resend وصل است
+            const { error: sendError } = await window.supabaseClient.functions.invoke('bright-handler', {
+              body: { email: email, otpCode: otpCode }
             });
+
+            if (sendError) {
+              throw new Error(sendError.message || 'خطا در ارسال ایمیل');
+            }
 
             if (currentUser) {
               await supabaseClient
@@ -994,7 +978,7 @@
               btnEl.disabled = false;
               btnEl.textContent = origText;
             }
-            console.error('خطا در ارسال EmailJS:', error);
+            console.error('خطا در ارسال کد:', error);
             window.showToast('خطا در ارسال ایمیل. لطفاً مجدداً تلاش کنید.', 'error', 4000);
           }
         };
