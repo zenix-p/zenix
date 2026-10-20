@@ -259,7 +259,7 @@
             document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(Object.prototype.hasOwnProperty.call(t,k)) el.textContent = t[k];});
             document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const k=el.getAttribute('data-i18n-placeholder');if(Object.prototype.hasOwnProperty.call(t,k)) el.setAttribute('placeholder', t[k]);});
             document.querySelectorAll('#lang-menu .mi').forEach(item=>{item.classList.toggle('active', item.getAttribute('data-lang')===l);});
-            try{if(typeof window.calcFee==='function') window.calcFee();if(typeof window.refreshStatusUI==='function') window.refreshStatusUI();}catch(e){}
+            try{if(typeof window.calcFee==='function') window.calcFee();}catch(e){}
         }
         window.setLang = setLang;
 
@@ -431,7 +431,10 @@
                 if(!error){
                     window.showToast(t.errSuccess,'success',5000);
                     document.getElementById('withdraw-pass').value = '';
-                    setTimeout(() => window.refreshWithdrawalStatus(), 300);
+                    // ★ صبر ۵۰۰ms تا commit کامل، بعد refresh
+                    setTimeout(() => {
+                        window.refreshWithdrawalStatus();
+                    }, 500);
                 } else {
                     const msg = String(error.message||error);
                     let friendly = t.errFailed;
@@ -444,12 +447,12 @@
                     else if(msg.toLowerCase().includes('row-level security')||msg.toLowerCase().includes('rls')) friendly = t.errGeneric;
                     else if(msg.toLowerCase().includes('check constraint')) friendly = t.errGeneric;
                     window.showToast(friendly,'error',5000);
-                   setTimeout(() => window.refreshWithdrawalStatus(), 300);
+                    setTimeout(() => window.refreshWithdrawalStatus(), 300);
                 }
             }catch(e){
                 btn.innerText = orig;
                 window.showToast(t.errGeneric,'error',5000);
-                await window.refreshWithdrawalStatus();
+                setTimeout(() => window.refreshWithdrawalStatus(), 300);
             }
         };
 
