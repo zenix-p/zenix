@@ -25,6 +25,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
         body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
@@ -611,6 +614,26 @@
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         window.supabaseClient = supabaseClient;
 
+        // =====================================================
+        // EmailJS Configuration
+        // =====================================================
+        const EMAILJS_PUBLIC_KEY  = "oUKHgDSK6qIwpCE9p";
+        const EMAILJS_SERVICE_ID  = "service_61bzf1a";
+        const EMAILJS_TEMPLATE_ID = "template_ru6uwkp";
+
+        // مقداردهی اولیه EmailJS
+        if (typeof emailjs !== 'undefined') {
+            emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+        } else {
+            console.error('EmailJS SDK بارگذاری نشده است. اتصال اینترنت یا آدرس CDN را بررسی کنید.');
+        }
+
+        // برای دسترسی از تابع sendEmailCode در محدوده global
+        window.emailjsConfig = {
+            serviceId: EMAILJS_SERVICE_ID,
+            templateId: EMAILJS_TEMPLATE_ID
+        };
+
         let currentUser = null;
         let currentUserId = null;
         let userRealtimeChannel = null;
@@ -927,12 +950,21 @@
           }, 1000);
         }
 
+        // =====================================================
+        // ارسال کد OTP با EmailJS
+        // =====================================================
         window.sendEmailCode = async function(emailInputId, btnEl) {
           const emailInput = document.getElementById(emailInputId);
           const email = emailInput && emailInput.value ? emailInput.value.trim() : (currentUser ? currentUser.email : '');
 
           if (!email || !email.includes('@')) {
             window.showToast('لطفاً یک ایمیل معتبر وارد کنید.', 'error', 4000);
+            return;
+          }
+
+          // بررسی بارگذاری SDK
+          if (typeof emailjs === 'undefined') {
+            window.showToast('سرویس ایمیل آماده نیست. صفحه را رفرش کنید.', 'error', 5000);
             return;
           }
 
@@ -944,17 +976,21 @@
               btnEl.textContent = 'در حال ارسال...';
             }
 
+            // تولید کد ۶ رقمی
             const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-            // ★ ارسال از طریق Supabase Edge Function (send-otp) که به Resend وصل است
-            const { error: sendError } = await window.supabaseClient.functions.invoke('send-otp', {
-              body: { email: email, otpCode: otpCode }
-            });
+            // ارسال ایمیل با EmailJS
+            await emailjs.send(
+              window.emailjsConfig.serviceId,
+              window.emailjsConfig.templateId,
+              {
+                to_email: email,
+                otp_code: otpCode,
+                to_name: (currentUser && (currentUser.user_metadata?.fullname || currentUser.user_metadata?.full_name)) || email
+              }
+            );
 
-            if (sendError) {
-              throw new Error(sendError.message || 'خطا در ارسال ایمیل');
-            }
-
+            // ذخیره کد OTP در دیتابیس Supabase برای بررسی بعدی
             if (currentUser) {
               await supabaseClient
                 .from('users')
@@ -978,8 +1014,9 @@
               btnEl.disabled = false;
               btnEl.textContent = origText;
             }
-            console.error('خطا در ارسال کد:', error);
-            window.showToast('خطا در ارسال ایمیل. لطفاً مجدداً تلاش کنید.', 'error', 4000);
+            console.error('خطا در ارسال کد با EmailJS:', error);
+            const errorMsg = error?.text || error?.message || 'خطا در ارسال ایمیل';
+            window.showToast('خطا در ارسال ایمیل: ' + errorMsg, 'error', 5000);
           }
         };
 
