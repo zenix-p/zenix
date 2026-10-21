@@ -19,6 +19,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 
+    <!-- ★ EmailJS SDK ★ -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="text/javascript">
+        (function(){
+            emailjs.init("oUKHgDSK6qIwpCE9p");
+        })();
+    </script>
+
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
         body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
@@ -428,6 +436,11 @@
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         window.supabaseClient = supabaseClient;
 
+        // ★ EmailJS configuration ★
+        const EMAILJS_SERVICE_ID = "service_61bzf1a";
+        const EMAILJS_TEMPLATE_ID = "template_jyzgfs8";
+        const EMAILJS_PUBLIC_KEY = "oUKHgDSK6qIwpCE9p";
+
         let currentUser = null, currentUserId = null, userRealtimeChannel = null, notificationRealtimeChannel = null, authInitialized = false, welcomeModalInitialized = false;
 
         window.cachedNotifications = [];
@@ -594,6 +607,7 @@
             }, 1000);
         }
 
+        // ★★★ EmailJS — جایگزین کامل Resend/Edge Function ★★★
         window.sendEmailCode = async function(emailInputId, btnEl) {
             const emailInput = document.getElementById(emailInputId);
             const email = emailInput && emailInput.value ? emailInput.value.trim() : (currentUser ? currentUser.email : '');
@@ -603,9 +617,9 @@
             try {
                 if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'در حال ارسال...'; }
 
+                // ۱. ساخت OTP سمت سرور (همان generate_otp)
                 const { data: otpResult, error: otpErr } = await supabaseClient.rpc('generate_otp');
                 if (otpErr) throw new Error(otpErr.message || 'خطا در ساخت OTP');
-
                 if (!otpResult || otpResult.success !== true) {
                     if (otpResult && otpResult.error === 'too_soon') {
                         const secs = otpResult.retry_after || 60;
@@ -615,23 +629,34 @@
                     }
                     throw new Error('خطا در ساخت OTP');
                 }
-
                 const otpCode = otpResult.otp;
 
-                const { error: sendError } = await window.supabaseClient.functions.invoke('send-otp', {
-                    body: { email: email, otpCode: otpCode }
-                });
-                if (sendError) throw new Error(sendError.message || 'خطا در ارسال ایمیل');
+                // ۲. ارسال با EmailJS (مستقیم از کلاینت)
+                await emailjs.send(
+                    EMAILJS_SERVICE_ID,
+                    EMAILJS_TEMPLATE_ID,
+                    {
+                        to_email: email,
+                        email: email,
+                        otp_code: otpCode,
+                        code: otpCode,
+                        otp: otpCode,
+                        passcode: otpCode,
+                        verification_code: otpCode,
+                        message: otpCode
+                    },
+                    EMAILJS_PUBLIC_KEY
+                );
 
                 window.showToast(`کد تایید به ایمیل ${email} ارسال شد.`, 'success', 5000);
-
                 const expireTime = Date.now() + 60000;
                 localStorage.setItem('otp_cooldown_' + emailInputId, expireTime);
                 if (btnEl) runCountdown(btnEl, emailInputId);
             } catch (error) {
                 if (btnEl) { btnEl.disabled = false; btnEl.textContent = origText; }
                 console.error('خطا در ارسال کد:', error);
-                window.showToast('خطا: ' + (error.message || 'نامشخص'), 'error', 4000);
+                const errMsg = error?.text || error?.message || 'نامشخص';
+                window.showToast('خطا: ' + errMsg, 'error', 4000);
             }
         };
 
@@ -761,7 +786,6 @@
 
         window.validatePasswordForm = function(btn) { window.showToast('رمز ورود با موفقیت به‌روزرسانی شد.', 'success', 4000); };
 
-        // ★★★ تغییر اصلی: مدیریت too_many_attempts و TOO_MANY_ATTEMPTS ★★★
         window.validateTxForm = async function(btn) {
             const code = (document.getElementById('tr-code')?.value || '').trim();
             const newPass = (document.getElementById('tr-new')?.value || '').trim();
@@ -777,8 +801,6 @@
             try {
                 if (currPass) {
                     const { data: ok, error: vErr } = await supabaseClient.rpc('verify_tx_password', { p_user_id: currentUser.id, p_password: currPass });
-
-                    // ★ چک TOO_MANY_ATTEMPTS
                     if (vErr) {
                         const msg = String(vErr.message || '');
                         if (msg.includes('TOO_MANY_ATTEMPTS')) {
@@ -789,7 +811,6 @@
                         if (btn) { btn.disabled = false; btn.textContent = origText; }
                         return;
                     }
-
                     if (ok !== true) {
                         window.showToast('رمز فعلی اشتباه است.', 'error', 4000);
                         if (btn) { btn.disabled = false; btn.textContent = origText; }
