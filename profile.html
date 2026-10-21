@@ -25,9 +25,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 
-    <!-- EmailJS SDK -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
         body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
@@ -162,24 +159,13 @@
     <header>
         <div class="logo"><div class="logo-icon">Z</div><div class="logo-text">ZENIX</div></div>
         <div class="hr">
-            <div class="wrap">
-                <button type="button" class="lb" id="bell-btn"><i class="fas fa-bell" style="color:#fbbf24"></i><span class="badge" id="bell-badge">0</span></button>
-            </div>
-            <div class="wrap">
-                <button type="button" class="lb" id="help-btn" title="راهنمای صفحه پروفایل"><i class="fas fa-circle-question" style="color:#38bdf8"></i></button>
-            </div>
+            <div class="wrap"><button type="button" class="lb" id="bell-btn"><i class="fas fa-bell" style="color:#fbbf24"></i><span class="badge" id="bell-badge">0</span></button></div>
+            <div class="wrap"><button type="button" class="lb" id="help-btn" title="راهنمای صفحه پروفایل"><i class="fas fa-circle-question" style="color:#38bdf8"></i></button></div>
             <a href="support.html" class="lb"><i class="fas fa-headset" style="color:#a855f7"></i></a>
             <div class="wrap">
                 <button type="button" class="lb" id="lang-btn"><i class="fas fa-globe" style="color:#22c55e"></i></button>
                 <div class="menu" id="lang-menu">
-                    <div class="mi" data-lang="fa">فارسی</div>
-                    <div class="mi" data-lang="en">English</div>
-                    <div class="mi" data-lang="ar">العربية</div>
-                    <div class="mi" data-lang="tr">Türkçe</div>
-                    <div class="mi" data-lang="ru">Русский</div>
-                    <div class="mi" data-lang="es">Español</div>
-                    <div class="mi" data-lang="fr">Français</div>
-                    <div class="mi" data-lang="de">Deutsch</div>
+                    <div class="mi" data-lang="fa">فارسی</div><div class="mi" data-lang="en">English</div><div class="mi" data-lang="ar">العربية</div><div class="mi" data-lang="tr">Türkçe</div><div class="mi" data-lang="ru">Русский</div><div class="mi" data-lang="es">Español</div><div class="mi" data-lang="fr">Français</div><div class="mi" data-lang="de">Deutsch</div>
                 </div>
             </div>
             <div class="wrap">
@@ -254,10 +240,7 @@
                 <i class="fas fa-chevron-down ch"></i>
             </div>
             <div class="bd">
-                <div class="fg">
-                    <label class="fl">ایمیل فعلی</label>
-                    <input type="email" class="fi" id="email-curr" readonly disabled placeholder="در حال دریافت ایمیل...">
-                </div>
+                <div class="fg"><label class="fl">ایمیل فعلی</label><input type="email" class="fi" id="email-curr" readonly disabled placeholder="در حال دریافت ایمیل..."></div>
                 <div class="fg">
                     <label class="fl">ایمیل جدید</label>
                     <div style="display:flex;gap:8px;">
@@ -307,8 +290,8 @@
                     </div>
                 </div>
                 <div class="fg"><label class="fl">کد ۶ رقمی تأیید</label><input type="text" class="fi" id="tr-code" maxlength="6" placeholder="مثال: 849201"></div>
-                <div class="fg"><label class="fl">رمز فعلی</label><input type="password" class="fi" id="tr-curr"></div>
-                <div class="fg"><label class="fl">رمز جدید (۶ رقم)</label><input type="password" class="fi" id="tr-new" maxlength="6"></div>
+                <div class="fg"><label class="fl">رمز فعلی (اختیاری برای تغییر)</label><input type="password" class="fi" id="tr-curr"></div>
+                <div class="fg"><label class="fl">رمز جدید (۶ رقم)</label><input type="password" class="fi" id="tr-new" maxlength="6" inputmode="numeric" placeholder="مثال: 849201"></div>
                 <button type="button" class="bs" onclick="window.validateTxForm(this)">ذخیره تغییرات</button>
             </div>
         </div>
@@ -346,14 +329,12 @@
                 <span id="t-modal-title"><i class="fas fa-bell"></i> صندوق پیام‌ها و اعلان‌ها</span>
                 <button class="modal-close" onclick="window.closeMessageModal()"><i class="fas fa-times"></i></button>
             </div>
-            
             <div class="notif-tabs" id="notif-tabs">
                 <button type="button" class="notif-tab active" onclick="window.setNotifFilter('all', this)"><i class="fas fa-list"></i> همه</button>
                 <button type="button" class="notif-tab" onclick="window.setNotifFilter('approved', this)"><i class="fas fa-check-circle" style="color:#22c55e"></i> تایید درخواست</button>
                 <button type="button" class="notif-tab" onclick="window.setNotifFilter('rejected', this)"><i class="fas fa-times-circle" style="color:#ef4444"></i> لغو درخواست</button>
                 <button type="button" class="notif-tab" onclick="window.setNotifFilter('admin_message', this)"><i class="fas fa-bullhorn" style="color:#38bdf8"></i> پیام مدیریت</button>
             </div>
-
             <div id="modal-msg-container"><div style="text-align:center;padding:20px;color:#94a3b8">هیچ پیام جدیدی وجود ندارد.</div></div>
         </div>
     </div>
@@ -365,13 +346,9 @@
                 <h2 style="color:#38bdf8;font-size:20px;margin-bottom:8px;font-weight:800;">به Zenix خوش آمدید!</h2>
                 <p style="color:#94a3b8;font-size:12px;">حساب شما با موفقیت ساخته شد</p>
             </div>
-            
             <div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);border-radius:10px;padding:14px;margin-bottom:18px;">
-                <p style="color:#cbd5e1;font-size:12px;line-height:1.7;text-align:right;margin:0;">
-                    برای دسترسی کامل به تمام امکانات پلتفرم (واریز، برداشت، ربات کوانتیفیکیشن و...)، لطفاً شماره موبایل خود را وارد و ذخیره کنید.
-                </p>
+                <p style="color:#cbd5e1;font-size:12px;line-height:1.7;text-align:right;margin:0;">برای دسترسی کامل به تمام امکانات پلتفرم، لطفاً شماره موبایل خود را وارد و ذخیره کنید.</p>
             </div>
-            
             <div style="margin-bottom:14px;">
                 <label style="display:block;color:#94a3b8;font-size:11px;margin-bottom:6px;text-align:right;">شماره موبایل</label>
                 <div style="display:flex;align-items:center;gap:6px;direction:ltr;">
@@ -380,9 +357,7 @@
                             <span style="color:#94a3b8;font-size:10px;">کد کشور</span> <i class="fas fa-chevron-down" style="font-size:8px;"></i>
                         </div>
                         <div class="c-list" id="welcome-c-list">
-                            <div class="c-search-wrap">
-                                <input type="text" class="c-search" id="welcome-c-search-input" placeholder="جستجو (مثلاً 98 یا Iran)..." oninput="window.filterWelcomeCountries(this)">
-                            </div>
+                            <div class="c-search-wrap"><input type="text" class="c-search" id="welcome-c-search-input" placeholder="جستجو..." oninput="window.filterWelcomeCountries(this)"></div>
                             <div id="welcome-c-options-container"></div>
                         </div>
                     </div>
@@ -391,36 +366,18 @@
                 </div>
                 <div class="err-msg" id="welcome-phone-err" style="font-size:11px;margin-top:4px;text-align:right;color:#ef4444;display:none;"></div>
             </div>
-            
-            <button type="button" id="welcome-save-phone-btn" onclick="window.saveWelcomePhone()" class="bs" style="padding:12px;font-size:14px;">
-                <i class="fas fa-check"></i> ثبت شماره و ورود به پلتفرم
-            </button>
-            
-            <p style="color:#64748b;font-size:10px;margin-top:12px;text-align:center;">
-                <i class="fas fa-lock"></i> اطلاعات شما با رمزنگاری محافظت می‌شود
-            </p>
+            <button type="button" id="welcome-save-phone-btn" onclick="window.saveWelcomePhone()" class="bs" style="padding:12px;font-size:14px;"><i class="fas fa-check"></i> ثبت شماره و ورود به پلتفرم</button>
+            <p style="color:#64748b;font-size:10px;margin-top:12px;text-align:center;"><i class="fas fa-lock"></i> اطلاعات شما با رمزنگاری محافظت می‌شود</p>
         </div>
     </div>
 
     <div class="modal" id="m-help">
         <div class="modal-content">
-            <div class="modal-header">
-                <span>راهنمای صفحه پروفایل</span>
-                <button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button>
-            </div>
+            <div class="modal-header"><span>راهنمای صفحه پروفایل</span><button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button></div>
             <div style="overflow-y:auto;padding-right:4px">
-                <div class="msg-body-box">
-                    <div class="msg-title-text"><i class="fas fa-user-cog" style="color:#38bdf8"></i> کاربرد این صفحه چیست؟</div>
-                    <div class="msg-desc-text">در این صفحه می‌توانید اطلاعات شخصی، شماره تماس، ایمیل و تنظیمات امنیتی مانند تغییر رمز عبور و رمز تراکنش حساب خود را مدیریت کنید.</div>
-                </div>
-                <div class="msg-body-box">
-                    <div class="msg-title-text"><i class="fas fa-shield-alt" style="color:#38bdf8"></i> وضعیت حساب و شماره تماس</div>
-                    <div class="msg-desc-text">وضعیت تایید حساب و ثبت شماره تماس برای امنیت بیشتر در این قسمت مدیریت می‌شود.</div>
-                </div>
-                <div class="msg-body-box">
-                    <div class="msg-title-text"><i class="fas fa-key" style="color:#a855f7"></i> کلمات عبور و کیف پول</div>
-                    <div class="msg-desc-text">جهت حفظ امنیت دارایی‌های خود می‌توانید کلمات عبور و آدرس‌های کیف پول مقصد برداشت را بروزرسانی نمایید.</div>
-                </div>
+                <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-user-cog" style="color:#38bdf8"></i> کاربرد این صفحه چیست؟</div><div class="msg-desc-text">در این صفحه می‌توانید اطلاعات شخصی، شماره تماس، ایمیل و تنظیمات امنیتی مانند تغییر رمز عبور و رمز تراکنش حساب خود را مدیریت کنید.</div></div>
+                <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-shield-alt" style="color:#38bdf8"></i> وضعیت حساب و شماره تماس</div><div class="msg-desc-text">وضعیت تایید حساب و ثبت شماره تماس برای امنیت بیشتر در این قسمت مدیریت می‌شود.</div></div>
+                <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-key" style="color:#a855f7"></i> کلمات عبور و کیف پول</div><div class="msg-desc-text">جهت حفظ امنیت دارایی‌های خود می‌توانید کلمات عبور و آدرس‌های کیف پول مقصد برداشت را بروزرسانی نمایید.</div></div>
             </div>
         </div>
     </div>
@@ -433,33 +390,23 @@
     <script>
         function escapeHtml(value) {
             return String(value == null ? '' : value)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
         window.escapeHtml = escapeHtml;
 
         window.showToast = function(message, type = 'success', duration = 8000) {
             const container = document.getElementById('toast-container');
             if (!container) return;
-
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
-            
             let iconClass = 'fa-check-circle';
             if (type === 'error') iconClass = 'fa-exclamation-circle';
             if (type === 'info') iconClass = 'fa-info-circle';
-
             toast.innerHTML = `<i class="fas ${iconClass}"></i><div style="flex:1;">${escapeHtml(message)}</div>`;
             container.appendChild(toast);
-
             setTimeout(() => { toast.classList.add('show'); }, 10);
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => { toast.remove(); }, 350);
-            }, duration);
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => { toast.remove(); }, 350); }, duration);
         };
 
         const countries=[{n:"Afghanistan",c:"+93",f:"🇦🇫"},{n:"Albania",c:"+355",f:"🇦🇱"},{n:"Algeria",c:"+213",f:"🇩🇿"},{n:"Argentina",c:"+54",f:"🇦🇷"},{n:"Australia",c:"+61",f:"🇦🇺"},{n:"Austria",c:"+43",f:"🇦🇹"},{n:"Azerbaijan",c:"+994",f:"🇦🇿"},{n:"Bahrain",c:"+973",f:"🇧🇭"},{n:"Bangladesh",c:"+880",f:"🇧🇩"},{n:"Belarus",c:"+375",f:"🇧🇾"},{n:"Belgium",c:"+32",f:"🇧🇪"},{n:"Brazil",c:"+55",f:"🇧🇷"},{n:"Canada",c:"+1",f:"🇨🇦"},{n:"China",c:"+86",f:"🇨🇳"},{n:"Egypt",c:"+20",f:"🇪🇬"},{n:"France",c:"+33",f:"🇫🇷"},{n:"Germany",c:"+49",f:"🇩🇪"},{n:"India",c:"+91",f:"🇮🇳"},{n:"Indonesia",c:"+62",f:"🇮🇩"},{n:"Iran",c:"+98",f:"🇮🇷"},{n:"Iraq",c:"+964",f:"🇮🇶"},{n:"Italy",c:"+39",f:"🇮🇹"},{n:"Japan",c:"+81",f:"🇯🇵"},{n:"Jordan",c:"+962",f:"🇯🇴"},{n:"Kuwait",c:"+965",f:"🇰🇼"},{n:"Lebanon",c:"+961",f:"🇱🇧"},{n:"Malaysia",c:"+60",f:"🇲🇾"},{n:"Netherlands",c:"+31",f:"🇳🇱"},{n:"Oman",c:"+968",f:"🇴🇲"},{n:"Pakistan",c:"+92",f:"🇵🇰"},{n:"Qatar",c:"+974",f:"🇶🇦"},{n:"Russia",c:"+7",f:"🇷🇺"},{n:"Saudi Arabia",c:"+966",f:"🇸🇦"},{n:"Spain",c:"+34",f:"🇪🇸"},{n:"Sweden",c:"+46",f:"🇸🇪"},{n:"Switzerland",c:"+41",f:"🇨🇭"},{n:"Turkey",c:"+90",f:"🇹🇷"},{n:"United Arab Emirates",c:"+971",f:"🇦🇪"},{n:"United Kingdom",c:"+44",f:"🇬🇧"},{n:"United States",c:"+1",f:"🇺🇸"}];
@@ -468,25 +415,16 @@
         function renderCountries(l){
             const c=document.getElementById('c-options-container');
             if(!c) return;
-            if (l.length === 0) {
-                c.innerHTML = '<div class="c-option-empty">نتیجه‌ای یافت نشد</div>';
-                return;
-            }
+            if (l.length === 0) { c.innerHTML = '<div class="c-option-empty">نتیجه‌ای یافت نشد</div>'; return; }
             c.innerHTML = l.map(o => `<div class="c-option" onclick="window.selectCountry('${o.f}','${o.c}','${o.n}')"><span>${o.f}</span><span>${o.c}</span><span style="color:#94a3b8;font-size:10px;margin-left:auto;">${o.n}</span></div>`).join('');
         }
         window.renderCountries = renderCountries;
 
         window.filterCountries = function(i){
             const v = i.value.trim().toLowerCase();
-            if (!v) {
-                renderCountries(countries);
-                return;
-            }
+            if (!v) { renderCountries(countries); return; }
             const cleaned = v.replace(/^\+/, '');
-            const filtered = countries.filter(x =>
-                x.n.toLowerCase().includes(v) ||
-                x.c.replace('+','').includes(cleaned)
-            );
+            const filtered = countries.filter(x => x.n.toLowerCase().includes(v) || x.c.replace('+','').includes(cleaned));
             renderCountries(filtered);
         };
 
@@ -507,21 +445,12 @@
             const v = i.value.trim().toLowerCase();
             const container = document.getElementById('welcome-c-options-container');
             if (!container) return;
-            
             let filtered;
-            if (!v) {
-                filtered = countries;
-            } else {
+            if (!v) { filtered = countries; } else {
                 const cleaned = v.replace(/^\+/, '');
-                filtered = countries.filter(x =>
-                    x.n.toLowerCase().includes(v) || x.c.replace('+','').includes(cleaned)
-                );
+                filtered = countries.filter(x => x.n.toLowerCase().includes(v) || x.c.replace('+','').includes(cleaned));
             }
-            
-            if (filtered.length === 0) {
-                container.innerHTML = '<div class="c-option-empty">نتیجه‌ای یافت نشد</div>';
-                return;
-            }
+            if (filtered.length === 0) { container.innerHTML = '<div class="c-option-empty">نتیجه‌ای یافت نشد</div>'; return; }
             container.innerHTML = filtered.map(o => `<div class="c-option" onclick="window.selectWelcomeCountry('${o.f}','${o.c}')"><span>${o.f}</span><span>${o.c}</span><span style="color:#94a3b8;font-size:10px;margin-left:auto;">${o.n}</span></div>`).join('');
         };
 
@@ -540,11 +469,7 @@
 
         window.tc = function(e){
             const card=e.closest('.card'), bd=card.querySelector('.bd'), isOpen=card.classList.contains('open');
-            document.querySelectorAll('.card').forEach(c=>{
-                c.classList.remove('open');
-                const b=c.querySelector('.bd');
-                if(b) b.style.display='none';
-            });
+            document.querySelectorAll('.card').forEach(c=>{ c.classList.remove('open'); const b=c.querySelector('.bd'); if(b) b.style.display='none'; });
             if(!isOpen){ card.classList.add('open'); bd.style.display='block'; }
         };
 
@@ -555,52 +480,32 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             renderCountries(countries);
-            
             const sBtn = document.getElementById('c-select-btn');
             const sList = document.getElementById('c-list');
-            
             if (sBtn) {
                 sBtn.onclick = (e) => {
                     e.stopPropagation();
-                    
-                    if (sList.classList.contains('show')) {
-                        sList.classList.remove('show');
-                        return;
-                    }
-                    
+                    if (sList.classList.contains('show')) { sList.classList.remove('show'); return; }
                     const rect = sBtn.getBoundingClientRect();
                     const ddW = Math.min(240, window.innerWidth - 20);
                     let left = rect.left;
                     if (left + ddW > window.innerWidth - 10) left = window.innerWidth - ddW - 10;
                     if (left < 10) left = 10;
-                    
                     const ddH = 210;
                     let top = rect.bottom + 4;
-                    
-                    if (top + ddH > window.innerHeight - 10) {
-                        top = Math.max(10, rect.top - ddH - 4);
-                    }
-                    
+                    if (top + ddH > window.innerHeight - 10) top = Math.max(10, rect.top - ddH - 4);
                     sList.style.left = left + 'px';
                     sList.style.top = top + 'px';
                     sList.style.width = ddW + 'px';
                     sList.classList.add('show');
-                    
                     setTimeout(() => {
                         const searchInput = document.getElementById('c-search-input');
-                        if (searchInput) {
-                            searchInput.value = '';
-                            renderCountries(countries);
-                            searchInput.focus();
-                        }
+                        if (searchInput) { searchInput.value = ''; renderCountries(countries); searchInput.focus(); }
                     }, 30);
                 };
             }
-            
             window.addEventListener('click', (e) => {
-                if (sList && !e.target.closest('#c-dropdown') && !e.target.closest('#c-list')) {
-                    sList.classList.remove('show');
-                }
+                if (sList && !e.target.closest('#c-dropdown') && !e.target.closest('#c-list')) sList.classList.remove('show');
             }, true);
         });
     </script>
@@ -614,26 +519,6 @@
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         window.supabaseClient = supabaseClient;
 
-        // =====================================================
-        // EmailJS Configuration
-        // =====================================================
-        const EMAILJS_PUBLIC_KEY  = "oUKHgDSK6qIwpCE9p";
-        const EMAILJS_SERVICE_ID  = "service_61bzf1a";
-        const EMAILJS_TEMPLATE_ID = "template_jyzgfs8";
-
-        // مقداردهی اولیه EmailJS
-        if (typeof emailjs !== 'undefined') {
-            emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
-        } else {
-            console.error('EmailJS SDK بارگذاری نشده است. اتصال اینترنت یا آدرس CDN را بررسی کنید.');
-        }
-
-        // برای دسترسی از تابع sendEmailCode در محدوده global
-        window.emailjsConfig = {
-            serviceId: EMAILJS_SERVICE_ID,
-            templateId: EMAILJS_TEMPLATE_ID
-        };
-
         let currentUser = null;
         let currentUserId = null;
         let userRealtimeChannel = null;
@@ -646,42 +531,31 @@
 
         function generateUIDDigits(userId) {
             let hash = 5381;
-            for (let i = 0; i < userId.length; i++) {
-                hash = ((hash << 5) + hash) + userId.charCodeAt(i);
-            }
-            const num = Math.abs(hash % 900000) + 100000;
-            return num.toString();
+            for (let i = 0; i < userId.length; i++) hash = ((hash << 5) + hash) + userId.charCodeAt(i);
+            return (Math.abs(hash % 900000) + 100000).toString();
         }
 
         function lockPhoneInput(phoneNumber) {
             const phoneInput = document.getElementById('user-phone-input');
             const saveBtn = document.getElementById('save-phone-btn');
             const dropdownBtn = document.getElementById('c-select-btn');
-
             if (phoneNumber) {
                 let matchedCountry = window.countries.find(c => phoneNumber.startsWith(c.c));
                 if (matchedCountry) {
                     document.getElementById('country-code').value = matchedCountry.c;
                     dropdownBtn.querySelector('span').innerText = `${matchedCountry.f} ${matchedCountry.c}`;
                     phoneInput.value = phoneNumber.replace(matchedCountry.c, '');
-                } else {
-                    phoneInput.value = phoneNumber;
-                }
-
+                } else { phoneInput.value = phoneNumber; }
                 phoneInput.readOnly = true;
                 phoneInput.disabled = true;
                 if (saveBtn) saveBtn.style.display = 'none';
-                if (dropdownBtn) {
-                    dropdownBtn.style.pointerEvents = 'none';
-                    dropdownBtn.style.opacity = '0.6';
-                }
+                if (dropdownBtn) { dropdownBtn.style.pointerEvents = 'none'; dropdownBtn.style.opacity = '0.6'; }
             }
         }
 
         function showWelcomeModal() {
             const modal = document.getElementById('m-welcome');
             if (!modal) return;
-            
             modal.classList.add('show');
             initWelcomeDropdown();
         }
@@ -689,52 +563,32 @@
         function initWelcomeDropdown() {
             if (welcomeModalInitialized) return;
             welcomeModalInitialized = true;
-            
             const btn = document.getElementById('welcome-c-select-btn');
             const list = document.getElementById('welcome-c-list');
             if (!btn || !list) return;
-            
             window.filterWelcomeCountries({ value: '' });
-            
             btn.onclick = (e) => {
                 e.stopPropagation();
-                
-                if (list.classList.contains('show')) {
-                    list.classList.remove('show');
-                    return;
-                }
-                
+                if (list.classList.contains('show')) { list.classList.remove('show'); return; }
                 const rect = btn.getBoundingClientRect();
                 const ddW = Math.min(240, window.innerWidth - 20);
                 let left = rect.left;
                 if (left + ddW > window.innerWidth - 10) left = window.innerWidth - ddW - 10;
                 if (left < 10) left = 10;
-                
                 const ddH = 210;
                 let top = rect.bottom + 4;
-                if (top + ddH > window.innerHeight - 10) {
-                    top = Math.max(10, rect.top - ddH - 4);
-                }
-                
+                if (top + ddH > window.innerHeight - 10) top = Math.max(10, rect.top - ddH - 4);
                 list.style.left = left + 'px';
                 list.style.top = top + 'px';
                 list.style.width = ddW + 'px';
                 list.classList.add('show');
-                
                 setTimeout(() => {
                     const si = document.getElementById('welcome-c-search-input');
-                    if (si) {
-                        si.value = '';
-                        window.filterWelcomeCountries({ value: '' });
-                        si.focus();
-                    }
+                    if (si) { si.value = ''; window.filterWelcomeCountries({ value: '' }); si.focus(); }
                 }, 30);
             };
-            
             window.addEventListener('click', (e) => {
-                if (!e.target.closest('#welcome-c-dropdown') && !e.target.closest('#welcome-c-list')) {
-                    list.classList.remove('show');
-                }
+                if (!e.target.closest('#welcome-c-dropdown') && !e.target.closest('#welcome-c-list')) list.classList.remove('show');
             }, true);
         }
 
@@ -742,76 +596,35 @@
             const phoneInput = document.getElementById('welcome-phone-input');
             const errEl = document.getElementById('welcome-phone-err');
             const saveBtn = document.getElementById('welcome-save-phone-btn');
-            
             let phone = phoneInput ? phoneInput.value.trim() : '';
             if (phone.startsWith('0')) phone = phone.substring(1);
-            
             let code = document.getElementById('welcome-country-code').value;
-            if (!code) {
-                code = '+98';
-                document.getElementById('welcome-country-code').value = '+98';
-            }
-            
-            if (!currentUser) {
-                window.showToast('نشست شما یافت نشد. دوباره وارد شوید.', 'error', 4000);
-                return;
-            }
-            
+            if (!code) { code = '+98'; document.getElementById('welcome-country-code').value = '+98'; }
+            if (!currentUser) { window.showToast('نشست شما یافت نشد. دوباره وارد شوید.', 'error', 4000); return; }
             if (phone.length !== 10 || !/^\d+$/.test(phone)) {
-                if (errEl) {
-                    errEl.textContent = 'شماره باید ۱۰ رقم و بدون صفر باشد (مثال: 9123456789)';
-                    errEl.style.display = 'block';
-                }
+                if (errEl) { errEl.textContent = 'شماره باید ۱۰ رقم و بدون صفر باشد (مثال: 9123456789)'; errEl.style.display = 'block'; }
                 return;
             }
-            
-            if (saveBtn) {
-                saveBtn.disabled = true;
-                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال ذخیره...';
-            }
-            
+            if (saveBtn) { saveBtn.disabled = true; saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال ذخیره...'; }
             const fullPhone = code + phone;
-            
             try {
-                const { error } = await supabaseClient
-                    .from('users')
-                    .update({ phone: fullPhone })
-                    .eq('id', currentUser.id);
-                
+                const { error } = await supabaseClient.from('users').update({ phone: fullPhone }).eq('id', currentUser.id);
                 if (error) throw error;
-                
                 document.getElementById('m-welcome').classList.remove('show');
                 window.showToast('✅ شماره تماس ثبت شد. به پلتفرم Zenix خوش آمدید!', 'success', 5000);
-                
                 await loadUserData(currentUser);
-                
             } catch (e) {
-                console.error('خطا:', e);
-                if (errEl) {
-                    errEl.textContent = 'خطا در ذخیره: ' + (e.message || 'نامشخص');
-                    errEl.style.display = 'block';
-                }
-                if (saveBtn) {
-                    saveBtn.disabled = false;
-                    saveBtn.innerHTML = '<i class="fas fa-check"></i> ثبت شماره و ورود به پلتفرم';
-                }
+                if (errEl) { errEl.textContent = 'خطا در ذخیره: ' + (e.message || 'نامشخص'); errEl.style.display = 'block'; }
+                if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '<i class="fas fa-check"></i> ثبت شماره و ورود به پلتفرم'; }
             }
         };
 
         async function fetchUserMessages(uid) {
           try {
-            const { data, error } = await supabaseClient
-              .from('notifications')
-              .select('*')
-              .eq('user_id', uid)
-              .order('created_at', { ascending: false });
-
+            const { data, error } = await supabaseClient.from('notifications').select('*').eq('user_id', uid).order('created_at', { ascending: false });
             if (error) throw error;
             return data || [];
-          } catch (e) {
-            console.error('خطا در دریافت اعلانات:', e);
-            return [];
-          }
+          } catch (e) { console.error('خطا در دریافت اعلانات:', e); return []; }
         }
 
         async function updateNotificationBadge() {
@@ -820,23 +633,16 @@
           window.cachedNotifications = data;
           let unread = data.filter(n => !n.read && !n.is_read && !n.isRead).length;
           let b = document.getElementById('bell-badge');
-          if (b) { 
-            b.textContent = unread; 
-            b.classList.toggle('show', unread > 0); 
-          }
+          if (b) { b.textContent = unread; b.classList.toggle('show', unread > 0); }
           window.renderNotifications();
         }
 
         window.openMessageModal = async () => {
-          if (currentUserId) {
-            await updateNotificationBadge();
-          }
+          if (currentUserId) await updateNotificationBadge();
           document.getElementById('m-msg')?.classList.add('show');
         };
 
-        window.closeMessageModal = () => {
-          document.getElementById('m-msg')?.classList.remove('show');
-        };
+        window.closeMessageModal = () => { document.getElementById('m-msg')?.classList.remove('show'); };
 
         window.setNotifFilter = function(filter, btnElement) {
           window.activeNotifFilter = filter;
@@ -848,44 +654,31 @@
         window.getNotifCategory = function(n) {
           const type = (n.type || '').toLowerCase();
           const title = (n.title || n.subject || '').toLowerCase();
-
-          if (type.includes('approved') || type.includes('confirm') || title.includes('تایید') || title.includes('موفق') || title.includes('شارژ شد')) {
-            return 'approved';
-          }
-          if (type.includes('rejected') || type.includes('canceled') || type.includes('cancel') || title.includes('رد') || title.includes('لغو') || title.includes('ناموفق')) {
-            return 'rejected';
-          }
+          if (type.includes('approved') || type.includes('confirm') || title.includes('تایید') || title.includes('موفق') || title.includes('شارژ شد')) return 'approved';
+          if (type.includes('rejected') || type.includes('canceled') || type.includes('cancel') || title.includes('رد') || title.includes('لغو') || title.includes('ناموفق')) return 'rejected';
           return 'admin_message';
         };
 
         window.renderNotifications = function() {
           const container = document.getElementById('modal-msg-container');
           if (!container) return;
-
           const filter = window.activeNotifFilter || 'all';
           const notifs = window.cachedNotifications || [];
-          const filtered = notifs.filter(n => {
-            if (filter === 'all') return true;
-            return window.getNotifCategory(n) === filter;
-          });
-
+          const filtered = notifs.filter(n => filter === 'all' ? true : window.getNotifCategory(n) === filter);
           if (filtered.length === 0) {
             container.innerHTML = `<div style="text-align:center;padding:25px;color:#94a3b8;font-size:12px;"><i class="fas fa-inbox" style="font-size:24px;margin-bottom:8px;display:block;opacity:0.5;"></i>هیچ پیامی در این دسته‌بندی وجود ندارد.</div>`;
             return;
           }
-
           let html = '';
           filtered.forEach(n => {
             const title = n.title || n.subject || 'پیام سیستم';
             const msg = n.message || n.text || n.body || '';
             const category = window.getNotifCategory(n);
-
             let borderStyle = "border:1px solid rgba(255,255,255,.08);";
             let bgStyle = "background:rgba(255,255,255,.03);";
             let icon = '<i class="fas fa-bullhorn" style="color:#38bdf8"></i>';
             let tagHtml = '<span style="font-size:10px;background:rgba(56,189,248,0.2);color:#38bdf8;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">پیام مدیریت</span>';
             let supportBtn = '';
-
             if (category === 'approved') {
               borderStyle = "border:1px solid rgba(34, 197, 94, 0.4);";
               bgStyle = "background:rgba(34, 197, 94, 0.08);";
@@ -896,28 +689,10 @@
               bgStyle = "background:rgba(239, 68, 68, 0.08);";
               icon = '<i class="fas fa-times-circle" style="color:#ef4444"></i>';
               tagHtml = '<span style="font-size:10px;background:rgba(239,68,68,0.2);color:#ef4444;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">لغو درخواست</span>';
-              
-              supportBtn = `
-                <div style="margin-top:10px;padding-top:8px;border-top:1px dashed rgba(239,68,68,0.2);display:flex;justify-content:flex-end;">
-                  <a href="support.html" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);" style="display:inline-flex;align-items:center;gap:6px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f8fafc;padding:5px 10px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:600;transition:0.2s;">
-                    <i class="fas fa-headset" style="color:#ef4444;"></i>
-                    <span>پیگیری از طریق پشتیبانی</span>
-                  </a>
-                </div>
-              `;
+              supportBtn = `<div style="margin-top:10px;padding-top:8px;border-top:1px dashed rgba(239,68,68,0.2);display:flex;justify-content:flex-end;"><a href="support.html" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);" style="display:inline-flex;align-items:center;gap:6px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f8fafc;padding:5px 10px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:600;"><i class="fas fa-headset" style="color:#ef4444;"></i><span>پیگیری از طریق پشتیبانی</span></a></div>`;
             }
-
-            html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle}">
-              <div class="msg-title-text" style="display:flex;align-items:center;gap:8px;">
-                ${icon}
-                <span>${escapeHtml(title)}</span>
-                ${tagHtml}
-              </div>
-              <div class="msg-desc-text" style="margin-top:6px;">${escapeHtml(msg)}</div>
-              ${supportBtn}
-            </div>`;
+            html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle}"><div class="msg-title-text" style="display:flex;align-items:center;gap:8px;">${icon}<span>${escapeHtml(title)}</span>${tagHtml}</div><div class="msg-desc-text" style="margin-top:6px;">${escapeHtml(msg)}</div>${supportBtn}</div>`;
           });
-
           container.innerHTML = html;
         };
 
@@ -925,210 +700,87 @@
           const origText = 'ارسال کد به ایمیل';
           const expireTime = parseInt(localStorage.getItem('otp_cooldown_' + emailInputId) || '0', 10);
           const remaining = Math.ceil((expireTime - Date.now()) / 1000);
-
-          if (remaining <= 0) {
-            btnEl.disabled = false;
-            btnEl.textContent = origText;
-            localStorage.removeItem('otp_cooldown_' + emailInputId);
-            return;
-          }
-
+          if (remaining <= 0) { btnEl.disabled = false; btnEl.textContent = origText; localStorage.removeItem('otp_cooldown_' + emailInputId); return; }
           btnEl.disabled = true;
           let countdown = remaining;
           btnEl.textContent = `${countdown} ثانیه`;
-
           const timer = setInterval(() => {
             countdown--;
-            if (countdown <= 0) {
-              clearInterval(timer);
-              btnEl.disabled = false;
-              btnEl.textContent = origText;
-              localStorage.removeItem('otp_cooldown_' + emailInputId);
-            } else {
-              btnEl.textContent = `${countdown} ثانیه`;
-            }
+            if (countdown <= 0) { clearInterval(timer); btnEl.disabled = false; btnEl.textContent = origText; localStorage.removeItem('otp_cooldown_' + emailInputId); }
+            else { btnEl.textContent = `${countdown} ثانیه`; }
           }, 1000);
         }
 
-        // =====================================================
-        // ارسال کد OTP با EmailJS
-        // =====================================================
         window.sendEmailCode = async function(emailInputId, btnEl) {
           const emailInput = document.getElementById(emailInputId);
           const email = emailInput && emailInput.value ? emailInput.value.trim() : (currentUser ? currentUser.email : '');
-
-          if (!email || !email.includes('@')) {
-            window.showToast('لطفاً یک ایمیل معتبر وارد کنید.', 'error', 4000);
-            return;
-          }
-
-          // بررسی بارگذاری SDK
-          if (typeof emailjs === 'undefined') {
-            window.showToast('سرویس ایمیل آماده نیست. صفحه را رفرش کنید.', 'error', 5000);
-            return;
-          }
-
+          if (!email || !email.includes('@')) { window.showToast('لطفاً یک ایمیل معتبر وارد کنید.', 'error', 4000); return; }
           const origText = btnEl ? btnEl.textContent : 'ارسال کد به ایمیل';
-
           try {
-            if (btnEl) {
-              btnEl.disabled = true;
-              btnEl.textContent = 'در حال ارسال...';
-            }
-
-            // تولید کد ۶ رقمی
+            if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'در حال ارسال...'; }
             const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-            // ارسال ایمیل با EmailJS
-            await emailjs.send(
-              window.emailjsConfig.serviceId,
-              window.emailjsConfig.templateId,
-              {
-                to_email: email,
-                otp_code: otpCode,
-                to_name: (currentUser && (currentUser.user_metadata?.fullname || currentUser.user_metadata?.full_name)) || email
-              }
-            );
-
-            // ذخیره کد OTP در دیتابیس Supabase برای بررسی بعدی
+            const { error: sendError } = await window.supabaseClient.functions.invoke('bright-handler', { body: { email: email, otpCode: otpCode } });
+            if (sendError) throw new Error(sendError.message || 'خطا در ارسال ایمیل');
             if (currentUser) {
-              await supabaseClient
-                .from('users')
-                .update({ 
-                  active_otp: otpCode, 
-                  otp_created_at: new Date().toISOString()
-                })
-                .eq('id', currentUser.id);
+              await supabaseClient.from('users').update({ active_otp: otpCode, otp_created_at: new Date().toISOString() }).eq('id', currentUser.id);
             }
-
             window.showToast(`کد تایید به ایمیل ${email} ارسال شد.`, 'success', 5000);
-
             const expireTime = Date.now() + 60000;
             localStorage.setItem('otp_cooldown_' + emailInputId, expireTime);
-
-            if (btnEl) {
-              runCountdown(btnEl, emailInputId);
-            }
+            if (btnEl) runCountdown(btnEl, emailInputId);
           } catch (error) {
-            if (btnEl) {
-              btnEl.disabled = false;
-              btnEl.textContent = origText;
-            }
-            console.error('خطا در ارسال کد با EmailJS:', error);
-            const errorMsg = error?.text || error?.message || 'خطا در ارسال ایمیل';
-            window.showToast('خطا در ارسال ایمیل: ' + errorMsg, 'error', 5000);
+            if (btnEl) { btnEl.disabled = false; btnEl.textContent = origText; }
+            console.error('خطا در ارسال کد:', error);
+            window.showToast('خطا در ارسال ایمیل. لطفاً مجدداً تلاش کنید.', 'error', 4000);
           }
         };
 
         async function loadUserData(user) {
-          const { data, error } = await supabaseClient
-            .from('users')
-            .select('*')
-            .eq('id', user.id)
-            .single();
-
+          const { data, error } = await supabaseClient.from('users').select('*').eq('id', user.id).single();
           if (data) {
             const fullNameEl = document.getElementById('user-fullname');
-            if (fullNameEl && (data.fullname || data.full_name)) {
-                fullNameEl.textContent = data.fullname || data.full_name;
-            }
-
+            if (fullNameEl && (data.fullname || data.full_name)) fullNameEl.textContent = data.fullname || data.full_name;
             const userIdEl = document.getElementById('user-id');
-            if (userIdEl) {
-                const uidDigits = generateUIDDigits(user.id);
-                userIdEl.textContent = 'UID: SM-' + uidDigits;
-            }
-
-            if (data.phone) {
-                lockPhoneInput(data.phone);
-            } else {
-                showWelcomeModal();
-            }
-
+            if (userIdEl) userIdEl.textContent = 'UID: SM-' + generateUIDDigits(user.id);
+            if (data.phone) lockPhoneInput(data.phone); else showWelcomeModal();
             const statusEl = document.getElementById('account-status');
             if(statusEl) {
-                const isAccountActive = data.verified === true || 
-                                       data.status === 'active' || 
-                                       data.active === true || 
-                                       data.is_activated === true || 
-                                       (Number(data.total_deposit) > 0) || 
-                                       (Number(data.deposit) > 0) ||
-                                       (Number(data.balance) > 0);
-
-                if (isAccountActive) {
-                    statusEl.textContent = 'فعال';
-                    statusEl.style.color = '#22c55e';
-                } else {
-                    statusEl.textContent = 'غیرفعال';
-                    statusEl.style.color = '#ef4444';
-                }
+                const isAccountActive = data.verified === true || data.status === 'active' || data.active === true || data.is_activated === true || (Number(data.total_deposit) > 0) || (Number(data.deposit) > 0) || (Number(data.balance) > 0);
+                if (isAccountActive) { statusEl.textContent = 'فعال'; statusEl.style.color = '#22c55e'; }
+                else { statusEl.textContent = 'غیرفعال'; statusEl.style.color = '#ef4444'; }
             }
-
             if(data.trx_address) document.getElementById('trx-in').value = data.trx_address;
             if(data.bep20_address) document.getElementById('bep-in').value = data.bep20_address;
-          } else {
-            showWelcomeModal();
-          }
+          } else { showWelcomeModal(); }
         }
 
         async function setupRealtimeSubscriptions(userId) {
-            if (userRealtimeChannel) {
-              await supabaseClient.removeChannel(userRealtimeChannel);
-            }
-            if (notificationRealtimeChannel) {
-              await supabaseClient.removeChannel(notificationRealtimeChannel);
-            }
-
-            userRealtimeChannel = supabaseClient
-              .channel('user_realtime_' + userId)
-              .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${userId}` }, payload => {
-                if (currentUser) loadUserData(currentUser);
-              })
-              .subscribe();
-
-            notificationRealtimeChannel = supabaseClient
-              .channel('notifications_realtime_' + userId)
-              .on('postgres_changes', { 
-                event: '*', 
-                schema: 'public', 
-                table: 'notifications' 
-              }, async (payload) => {
+            if (userRealtimeChannel) await supabaseClient.removeChannel(userRealtimeChannel);
+            if (notificationRealtimeChannel) await supabaseClient.removeChannel(notificationRealtimeChannel);
+            userRealtimeChannel = supabaseClient.channel('user_realtime_' + userId).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${userId}` }, payload => { if (currentUser) loadUserData(currentUser); }).subscribe();
+            notificationRealtimeChannel = supabaseClient.channel('notifications_realtime_' + userId).on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, async (payload) => {
                 const newRec = payload.new;
                 if (!newRec || !newRec.user_id || newRec.user_id === userId) {
-                  await updateNotificationBadge();
-                  if (payload.eventType === 'INSERT') {
-                    const title = newRec.title || newRec.subject || 'اعلان جدید';
-                    const msg = newRec.message || newRec.text || newRec.body || '';
-                    window.showToast(`<strong>${escapeHtml(title)}</strong><br>${escapeHtml(msg)}`, 'info', 7000);
-                  }
+                    await updateNotificationBadge();
+                    if (payload.eventType === 'INSERT') {
+                        const title = newRec.title || newRec.subject || 'اعلان جدید';
+                        const msg = newRec.message || newRec.text || newRec.body || '';
+                        window.showToast(`<strong>${escapeHtml(title)}</strong><br>${escapeHtml(msg)}`, 'info', 7000);
+                    }
                 }
-              })
-              .subscribe();
+            }).subscribe();
         }
 
         async function initializeUserSession(session) {
             if (!session || !session.user || authInitialized) return false;
-            
             currentUser = session.user;
             currentUserId = session.user.id;
-
             await updateNotificationBadge();
-
-            ['email-curr', 'pwd-email', 'tr-email', 'wal-email'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = session.user.email || '';
-            });
-
+            ['email-curr', 'pwd-email', 'tr-email', 'wal-email'].forEach(id => { const el = document.getElementById(id); if (el) el.value = session.user.email || ''; });
             const fullNameEl = document.getElementById('user-fullname');
-            if (fullNameEl) {
-                fullNameEl.textContent = session.user.user_metadata?.fullname || 
-                                         session.user.user_metadata?.full_name || 
-                                         session.user.email;
-            }
-
+            if (fullNameEl) fullNameEl.textContent = session.user.user_metadata?.fullname || session.user.user_metadata?.full_name || session.user.email;
             await loadUserData(session.user);
             await setupRealtimeSubscriptions(session.user.id);
-            
             authInitialized = true;
             return true;
         }
@@ -1136,171 +788,75 @@
         (async () => {
             try {
                 const { data: { session }, error } = await supabaseClient.auth.getSession();
-                
-                if (error) {
-                    console.error('getSession error:', error);
-                }
-                
-                if (session && session.user) {
-                    await initializeUserSession(session);
-                } else {
+                if (error) console.error('getSession error:', error);
+                if (session && session.user) { await initializeUserSession(session); }
+                else {
                     const { data: { session: refreshed } } = await supabaseClient.auth.refreshSession();
-                    if (refreshed && refreshed.user) {
-                        await initializeUserSession(refreshed);
-                    } else {
-                        window.location.href = "index.html";
-                        return;
-                    }
+                    if (refreshed && refreshed.user) { await initializeUserSession(refreshed); }
+                    else { window.location.href = "index.html"; return; }
                 }
-                
                 supabaseClient.auth.onAuthStateChange(async (event, session) => {
-                    if (event === 'SIGNED_OUT') {
-                        window.location.href = "index.html";
-                    } else if (event === 'SIGNED_IN' && session && session.user && !authInitialized) {
-                        await initializeUserSession(session);
-                    } else if (event === 'TOKEN_REFRESHED' && session && session.user) {
-                        currentUser = session.user;
-                        currentUserId = session.user.id;
-                    }
+                    if (event === 'SIGNED_OUT') window.location.href = "index.html";
+                    else if (event === 'SIGNED_IN' && session && session.user && !authInitialized) await initializeUserSession(session);
+                    else if (event === 'TOKEN_REFRESHED' && session && session.user) { currentUser = session.user; currentUserId = session.user.id; }
                 });
-            } catch (err) {
-                console.error('Auth init error:', err);
-                window.location.href = "index.html";
-            }
+            } catch (err) { console.error('Auth init error:', err); window.location.href = "index.html"; }
         })();
 
         window.savePhone = async function() {
           const phoneInput = document.getElementById('user-phone-input');
           const errEl = document.getElementById('phone-err-msg');
           const saveBtn = document.getElementById('save-phone-btn');
-
           let phone = phoneInput ? phoneInput.value.trim() : '';
-
-          if (phone.startsWith('0')) {
-            phone = phone.substring(1);
-            phoneInput.value = phone;
-          }
-
+          if (phone.startsWith('0')) { phone = phone.substring(1); phoneInput.value = phone; }
           let code = document.getElementById('country-code').value;
-          if (!code) {
-            code = '+98';
-            document.getElementById('country-code').value = '+98';
-            const dropdownBtn = document.getElementById('c-select-btn');
-            if (dropdownBtn && dropdownBtn.querySelector('span')) {
-              dropdownBtn.querySelector('span').innerText = '🇮🇷 +98';
-            }
-          }
-
-          if (!currentUser) {
-            window.showToast('نشست کاری شما یافت نشد. لطفاً مجدداً وارد شوید.', 'error', 4000);
-            return;
-          }
-
+          if (!code) { code = '+98'; document.getElementById('country-code').value = '+98'; const dropdownBtn = document.getElementById('c-select-btn'); if (dropdownBtn && dropdownBtn.querySelector('span')) dropdownBtn.querySelector('span').innerText = '🇮🇷 +98'; }
+          if (!currentUser) { window.showToast('نشست کاری شما یافت نشد.', 'error', 4000); return; }
           if (phone.length === 10 && /^\d+$/.test(phone)) {
-            if (saveBtn) {
-              saveBtn.disabled = true;
-              saveBtn.innerText = 'در حال ذخیره‌سازی...';
-            }
-
+            if (saveBtn) { saveBtn.disabled = true; saveBtn.innerText = 'در حال ذخیره‌سازی...'; }
             const fullPhone = code + phone;
-
             try {
-              const fullNameVal = currentUser.user_metadata?.fullname || 
-                                 currentUser.user_metadata?.full_name || 
-                                 document.getElementById('user-fullname')?.textContent || 
-                                 currentUser.email;
-
-              let { data, error } = await supabaseClient
-                .from('users')
-                .update({ phone: fullPhone })
-                .eq('id', currentUser.id)
-                .select();
-
+              const fullNameVal = currentUser.user_metadata?.fullname || currentUser.user_metadata?.full_name || document.getElementById('user-fullname')?.textContent || currentUser.email;
+              let { data, error } = await supabaseClient.from('users').update({ phone: fullPhone }).eq('id', currentUser.id).select();
               if (!error && (!data || data.length === 0)) {
-                const upsertRes = await supabaseClient
-                  .from('users')
-                  .upsert({ 
-                    id: currentUser.id, 
-                    phone: fullPhone,
-                    email: currentUser.email,
-                    fullname: fullNameVal
-                  }, { onConflict: 'id' });
+                const upsertRes = await supabaseClient.from('users').upsert({ id: currentUser.id, phone: fullPhone, email: currentUser.email, fullname: fullNameVal }, { onConflict: 'id' });
                 error = upsertRes.error;
               }
-
-              if (saveBtn) {
-                saveBtn.disabled = false;
-                saveBtn.innerText = 'ذخیره';
-              }
-
+              if (saveBtn) { saveBtn.disabled = false; saveBtn.innerText = 'ذخیره'; }
               if (!error) {
                 if (errEl) errEl.style.display = 'none';
                 lockPhoneInput(fullPhone);
                 window.showToast('شماره تماس با موفقیت ثبت شد.', 'success', 5000);
               } else {
-                console.error('خطای دیتابیس سوپابیس:', error);
                 const errMsg = error.message || error.details || 'عدم دسترسی ویرایش به دیتابیس';
-                if (errEl) {
-                  errEl.textContent = 'خطا: ' + errMsg;
-                  errEl.style.display = 'block';
-                }
+                if (errEl) { errEl.textContent = 'خطا: ' + errMsg; errEl.style.display = 'block'; }
                 window.showToast('خطای ذخیره‌سازی: ' + errMsg, 'error', 5000);
               }
             } catch (e) {
-              if (saveBtn) {
-                saveBtn.disabled = false;
-                saveBtn.innerText = 'ذخیره';
-              }
+              if (saveBtn) { saveBtn.disabled = false; saveBtn.innerText = 'ذخیره'; }
               window.showToast('خطای غیرمنتظره: ' + e.message, 'error', 5000);
             }
           } else {
-            if (errEl) {
-              errEl.textContent = 'شماره باید ۱۰ رقم و بدون صفر باشد (مثال: 9123456789)';
-              errEl.style.display = 'block';
-            }
+            if (errEl) { errEl.textContent = 'شماره باید ۱۰ رقم و بدون صفر باشد (مثال: 9123456789)'; errEl.style.display = 'block'; }
             window.showToast('لطفاً شماره را به‌صورت ۱۰ رقمی و بدون صفر وارد کنید.', 'error', 4000);
           }
         };
 
-        window.requestAdminPermission = function() {
-          document.getElementById('selfie-capture').click();
-        };
+        window.requestAdminPermission = function() { document.getElementById('selfie-capture').click(); };
 
         window.handleSelfieCapture = async function(input) {
           if (input.files && input.files[0]) {
             const newEmailInput = document.getElementById('email-new');
             const newEmail = newEmailInput ? newEmailInput.value.trim() : '';
-
-            if (!newEmail || !newEmail.includes('@')) {
-              window.showToast('لطفاً ابتدا ایمیل جدید و معتبر را وارد کنید.', 'error', 4000);
-              return;
-            }
-
-            if (!currentUser) {
-              window.showToast('نشست کاربر یافت نشد. لطفاً مجدداً وارد شوید.', 'error', 4000);
-              return;
-            }
-
+            if (!newEmail || !newEmail.includes('@')) { window.showToast('لطفاً ابتدا ایمیل جدید و معتبر را وارد کنید.', 'error', 4000); return; }
+            if (!currentUser) { window.showToast('نشست کاربر یافت نشد. لطفاً مجدداً وارد شوید.', 'error', 4000); return; }
             try {
               window.showToast('در حال ارسال درخواست به ادمین...', 'info', 4000);
-
-              const { error } = await supabaseClient
-                .from('users')
-                .update({
-                  pending_email: newEmail,
-                  admin_approval_status: 'pending',
-                  request_timestamp: new Date().toISOString()
-                })
-                .eq('id', currentUser.id);
-
+              const { error } = await supabaseClient.from('users').update({ pending_email: newEmail, admin_approval_status: 'pending', request_timestamp: new Date().toISOString() }).eq('id', currentUser.id);
               if (error) throw error;
-
               document.getElementById('admin-status-box').style.display = 'block';
               window.showToast('درخواست تغییر ایمیل با موفقیت برای ادمین ارسال شد.', 'success', 5000);
-            } catch (e) {
-              console.error('خطا در ارسال درخواست به ادمین:', e);
-              window.showToast('خطا در ثبت درخواست: ' + e.message, 'error', 5000);
-            }
+            } catch (e) { console.error('خطا در ارسال درخواست به ادمین:', e); window.showToast('خطا در ثبت درخواست: ' + e.message, 'error', 5000); }
           }
         };
 
@@ -1308,8 +864,71 @@
           window.showToast('رمز ورود با موفقیت به‌روزرسانی شد.', 'success', 4000);
         };
 
-        window.validateTxForm = function(btn) {
-          window.showToast('رمز تراکنش با موفقیت به‌روزرسانی شد.', 'success', 4000);
+        // ★★★ تغییر رمز تراکنش — با RPC و OTP ★★★
+        window.validateTxForm = async function(btn) {
+          const code = (document.getElementById('tr-code')?.value || '').trim();
+          const newPass = (document.getElementById('tr-new')?.value || '').trim();
+          const currPass = (document.getElementById('tr-curr')?.value || '').trim();
+
+          if (!code || code.length !== 6 || !/^\d+$/.test(code)) {
+            window.showToast('کد ۶ رقمی تأیید ایمیل را وارد کنید.', 'error', 4000);
+            return;
+          }
+          if (!newPass || !/^\d{6}$/.test(newPass)) {
+            window.showToast('رمز جدید باید ۶ رقم باشد (بدون حروف).', 'error', 4000);
+            return;
+          }
+          if (!currentUser) {
+            window.showToast('نشست شما یافت نشد.', 'error', 4000);
+            return;
+          }
+
+          const origText = btn ? btn.textContent : 'ذخیره تغییرات';
+          if (btn) { btn.disabled = true; btn.textContent = 'در حال ذخیره...'; }
+
+          try {
+            // اگر رمز فعلی پر شده، اول بررسی کن
+            if (currPass) {
+              const { data: ok, error: vErr } = await supabaseClient.rpc('verify_tx_password', {
+                p_user_id: currentUser.id,
+                p_password: currPass
+              });
+              if (vErr || ok !== true) {
+                window.showToast('رمز فعلی اشتباه است.', 'error', 4000);
+                if (btn) { btn.disabled = false; btn.textContent = origText; }
+                return;
+              }
+            }
+
+            // فراخوانی RPC ذخیره رمز با OTP
+            const { data, error } = await supabaseClient.rpc('set_tx_password', {
+              p_new_password: newPass,
+              p_otp_code: code
+            });
+
+            if (error) throw error;
+
+            if (data && data.success) {
+              window.showToast('✅ رمز تراکنش با موفقیت تنظیم شد.', 'success', 5000);
+              document.getElementById('tr-code').value = '';
+              document.getElementById('tr-curr').value = '';
+              document.getElementById('tr-new').value = '';
+            } else if (data && data.error) {
+              const errMap = {
+                'not_authenticated': 'نشست شما یافت نشد',
+                'invalid_password_format': 'رمز جدید باید ۶ رقم باشد',
+                'no_otp': 'ابتدا کد تأیید را به ایمیل ارسال کنید',
+                'otp_expired': 'کد منقضی شده — دوباره ارسال کنید',
+                'invalid_otp': 'کد تأیید اشتباه است'
+              };
+              window.showToast('خطا: ' + (errMap[data.error] || data.error), 'error', 5000);
+            }
+          } catch (e) {
+            console.error('set_tx_password error:', e);
+            window.showToast('خطا: ' + (e.message || 'نامشخص'), 'error', 5000);
+          } finally {
+            if (btn) { btn.disabled = false; btn.textContent = origText; }
+          }
         };
 
         window.verifyWalletCode = function(btn) {
@@ -1320,49 +939,26 @@
           const trx = document.getElementById('trx-in').value.trim();
           const bep = document.getElementById('bep-in').value.trim();
           if (currentUser) {
-            const { error } = await supabaseClient
-              .from('users')
-              .update({ trx_address: trx, bep20_address: bep })
-              .eq('id', currentUser.id);
-
-            if (!error) {
-              window.showToast('آدرس‌های کیف پول با موفقیت ثبت شدند.', 'success', 5000);
-            } else {
-              window.showToast('خطا در ذخیره کیف پول: ' + error.message, 'error', 5000);
-            }
+            const { error } = await supabaseClient.from('users').update({ trx_address: trx, bep20_address: bep }).eq('id', currentUser.id);
+            if (!error) window.showToast('آدرس‌های کیف پول با موفقیت ثبت شدند.', 'success', 5000);
+            else window.showToast('خطا در ذخیره کیف پول: ' + error.message, 'error', 5000);
           }
         };
 
         window.closeHelpModal = () => document.getElementById('m-help').classList.remove('show');
 
         document.getElementById('help-btn').onclick = () => document.getElementById('m-help').classList.add('show');
-        document.getElementById('bell-btn').onclick = (e) => {
-            e.stopPropagation();
-            window.openMessageModal();
-        };
-
-        document.getElementById('menu-btn').onclick = (e) => {
-            e.stopPropagation();
-            document.getElementById('lang-menu').classList.remove('show');
-            document.getElementById('nav-menu').classList.toggle('show');
-        };
-        document.getElementById('lang-btn').onclick = (e) => {
-            e.stopPropagation();
-            document.getElementById('nav-menu').classList.remove('show');
-            document.getElementById('lang-menu').classList.toggle('show');
-        };
+        document.getElementById('bell-btn').onclick = (e) => { e.stopPropagation(); window.openMessageModal(); };
+        document.getElementById('menu-btn').onclick = (e) => { e.stopPropagation(); document.getElementById('lang-menu').classList.remove('show'); document.getElementById('nav-menu').classList.toggle('show'); };
+        document.getElementById('lang-btn').onclick = (e) => { e.stopPropagation(); document.getElementById('nav-menu').classList.remove('show'); document.getElementById('lang-menu').classList.toggle('show'); };
         window.addEventListener('click', (e) => {
-            if (!e.target.closest('.wrap')) {
-                document.getElementById('nav-menu')?.classList.remove('show');
-                document.getElementById('lang-menu')?.classList.remove('show');
-            }
+            if (!e.target.closest('.wrap')) { document.getElementById('nav-menu')?.classList.remove('show'); document.getElementById('lang-menu')?.classList.remove('show'); }
         });
 
         document.getElementById('logout-btn').onclick = async () => {
             if (userRealtimeChannel) await supabaseClient.removeChannel(userRealtimeChannel);
             if (notificationRealtimeChannel) await supabaseClient.removeChannel(notificationRealtimeChannel);
-            userRealtimeChannel = null;
-            notificationRealtimeChannel = null;
+            userRealtimeChannel = null; notificationRealtimeChannel = null;
             await supabaseClient.auth.signOut();
             window.location.href = "index.html";
         };
