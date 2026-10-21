@@ -543,7 +543,7 @@
         window.getNotifCategory = function(n) {
             const type = (n.type || '').toLowerCase(), title = (n.title || n.subject || '').toLowerCase();
             if (type.includes('approved') || type.includes('confirm') || title.includes('تایید') || title.includes('موفق')) return 'approved';
-            if (type.includes('rejected') || type.includes('cancel') || title.includes('رد') || title.includes('لغو')) return 'rejected';
+            if (type.includes('rejected') || type.includes('cancel') || title.includes('رد') || title.includes('لغو') || title.includes('مشکوک')) return 'rejected';
             return 'admin_message';
         };
 
@@ -594,7 +594,6 @@
             }, 1000);
         }
 
-        // ★★★ تغییر اصلی: generate_otp RPC به جای Math.random() + UPDATE مستقیم ★★★
         window.sendEmailCode = async function(emailInputId, btnEl) {
             const emailInput = document.getElementById(emailInputId);
             const email = emailInput && emailInput.value ? emailInput.value.trim() : (currentUser ? currentUser.email : '');
@@ -604,7 +603,6 @@
             try {
                 if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'در حال ارسال...'; }
 
-                // ۱. ساخت OTP سمت سرور (رمزنگاری‌شده، غیرقابل پیش‌بینی، ضد اسپم ۶۰ ثانیه)
                 const { data: otpResult, error: otpErr } = await supabaseClient.rpc('generate_otp');
                 if (otpErr) throw new Error(otpErr.message || 'خطا در ساخت OTP');
 
@@ -620,7 +618,6 @@
 
                 const otpCode = otpResult.otp;
 
-                // ۲. ارسال به ایمیل از طریق Edge Function (بدون نیاز به UPDATE دیتابیس)
                 const { error: sendError } = await window.supabaseClient.functions.invoke('send-otp', {
                     body: { email: email, otpCode: otpCode }
                 });
@@ -764,6 +761,7 @@
 
         window.validatePasswordForm = function(btn) { window.showToast('رمز ورود با موفقیت به‌روزرسانی شد.', 'success', 4000); };
 
+        // ★★★ تغییر اصلی: مدیریت too_many_attempts و TOO_MANY_ATTEMPTS ★★★
         window.validateTxForm = async function(btn) {
             const code = (document.getElementById('tr-code')?.value || '').trim();
             const newPass = (document.getElementById('tr-new')?.value || '').trim();
@@ -779,7 +777,20 @@
             try {
                 if (currPass) {
                     const { data: ok, error: vErr } = await supabaseClient.rpc('verify_tx_password', { p_user_id: currentUser.id, p_password: currPass });
-                    if (vErr || ok !== true) {
+
+                    // ★ چک TOO_MANY_ATTEMPTS
+                    if (vErr) {
+                        const msg = String(vErr.message || '');
+                        if (msg.includes('TOO_MANY_ATTEMPTS')) {
+                            window.showToast('🚫 تلاش‌های زیاد — ۱۵ دقیقه صبر کنید', 'error', 5000);
+                        } else {
+                            window.showToast('خطا در بررسی رمز: ' + (msg || 'نامشخص'), 'error', 5000);
+                        }
+                        if (btn) { btn.disabled = false; btn.textContent = origText; }
+                        return;
+                    }
+
+                    if (ok !== true) {
                         window.showToast('رمز فعلی اشتباه است.', 'error', 4000);
                         if (btn) { btn.disabled = false; btn.textContent = origText; }
                         return;
@@ -795,7 +806,14 @@
                     document.getElementById('tr-curr').value = '';
                     document.getElementById('tr-new').value = '';
                 } else if (data && data.error) {
-                    const errMap = { 'not_authenticated': 'نشست شما یافت نشد', 'invalid_password_format': 'رمز جدید باید ۶ رقم باشد', 'no_otp': 'ابتدا کد تأیید را ارسال کنید', 'otp_expired': 'کد منقضی شده — دوباره ارسال کنید', 'invalid_otp': 'کد تأیید اشتباه است' };
+                    const errMap = {
+                        'not_authenticated': 'نشست شما یافت نشد',
+                        'invalid_password_format': 'رمز جدید باید ۶ رقم باشد',
+                        'no_otp': 'ابتدا کد تأیید را ارسال کنید',
+                        'otp_expired': 'کد منقضی شده — دوباره ارسال کنید',
+                        'invalid_otp': 'کد تأیید اشتباه است',
+                        'too_many_attempts': '🚫 تلاش‌های زیاد — ۱۵ دقیقه صبر کنید'
+                    };
                     window.showToast('خطا: ' + (errMap[data.error] || data.error), 'error', 5000);
                 }
             } catch (e) {
