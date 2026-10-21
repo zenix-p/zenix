@@ -719,7 +719,7 @@
           try {
             if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'در حال ارسال...'; }
             const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-            const { error: sendError } = await window.supabaseClient.functions.invoke('bright-handler', { body: { email: email, otpCode: otpCode } });
+            const { error: sendError } = await window.supabaseClient.functions.invoke('send-otp', { body: { email: email, otpCode: otpCode } });
             if (sendError) throw new Error(sendError.message || 'خطا در ارسال ایمیل');
             if (currentUser) {
               await supabaseClient.from('users').update({ active_otp: otpCode, otp_created_at: new Date().toISOString() }).eq('id', currentUser.id);
