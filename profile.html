@@ -249,11 +249,11 @@
             <div class="bd">
                 <div id="wal-first-time-hint" class="hint-box hint-first" style="display:none;">
                     <i class="fas fa-check-circle"></i>
-                    <div>در حال تکمیل آدرس‌های کیف پول هستید. اگر فیلدی خالی است، بدون نیاز به کد تأیید می‌توانید آن را پر کنید. برای <strong>تغییر</strong> آدرس‌های موجود، کد تأیید ایمیل لازم است.</div>
+                    <div>اولین بار است که آدرس کیف پول ثبت می‌کنید. بدون نیاز به کد تأیید، آدرس‌ها را وارد و ذخیره کنید.</div>
                 </div>
                 <div id="wal-change-hint" class="hint-box hint-change" style="display:none;">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <div>آدرس‌های کیف پول شما قبلاً ثبت شده‌اند. برای <strong>تغییر</strong>، ابتدا کد تأیید ایمیل را دریافت و وارد کنید.</div>
+                    <div>شما قبلاً آدرس کیف پول ثبت کرده‌اید. برای <strong>تغییر</strong> آدرس‌های موجود، کد تأیید ایمیل لازم است. اما اگر فقط می‌خواهید فیلد خالی را پر کنید، نیازی به کد نیست.</div>
                 </div>
 
                 <div class="fg"><label class="fl">آدرس TRX</label><input type="text" id="trx-in" class="fi" placeholder="T... (۳۴ کاراکتر)" style="direction:ltr;text-align:left;font-family:monospace;"></div>
@@ -462,7 +462,8 @@
         window.activeNotifFilter = 'all';
 
         window._walletOtpVerified = false;
-        window._walletIsFirstTime = true;
+        window._oldTrx = '';
+        window._oldBep = '';
 
         function generateUIDDigits(userId) {
             let hash = 5381;
@@ -680,18 +681,20 @@
                     else { statusEl.textContent = 'غیرفعال'; statusEl.style.color = '#ef4444'; }
                 }
 
-                // ★ منطق جدید: OTP فقط اگر هر دو آدرس پر باشند
-                if(data.trx_address) document.getElementById('trx-in').value = data.trx_address;
-                if(data.bep20_address) document.getElementById('bep-in').value = data.bep20_address;
+                // ★ ذخیره مقادیر قبلی
+                window._oldTrx = data.trx_address || '';
+                window._oldBep = data.bep20_address || '';
 
-                const bothFilled = !!(data.trx_address && data.bep20_address);
-                window._walletIsFirstTime = !bothFilled;
+                document.getElementById('trx-in').value = window._oldTrx;
+                document.getElementById('bep-in').value = window._oldBep;
+
+                const anySaved = !!(window._oldTrx || window._oldBep);
 
                 const otpSection = document.getElementById('wal-otp-section');
                 const firstHint = document.getElementById('wal-first-time-hint');
                 const changeHint = document.getElementById('wal-change-hint');
 
-                if (bothFilled) {
+                if (anySaved) {
                     if (otpSection) otpSection.style.display = 'block';
                     if (firstHint) firstHint.style.display = 'none';
                     if (changeHint) changeHint.style.display = 'flex';
@@ -918,11 +921,18 @@
                 return;
             }
 
+            // ★ منطق دقیق: OTP فقط اگر یک مقدار پر شده را تغییر دهیم
+            const oldTrx = window._oldTrx || '';
+            const oldBep = window._oldBep || '';
+            const changingTrx = oldTrx && trx !== oldTrx;
+            const changingBep = oldBep && bep !== oldBep;
+            const needsOtp = changingTrx || changingBep;
+
             let otpCode = '';
-            if (!window._walletIsFirstTime) {
+            if (needsOtp) {
                 otpCode = (document.getElementById('wal-code')?.value || '').trim();
                 if (!otpCode || otpCode.length !== 6) {
-                    window.showToast('برای تغییر آدرس، ابتدا کد تأیید ایمیل را دریافت و وارد کنید.', 'error', 4000);
+                    window.showToast('برای تغییر آدرس ثبت‌شده، ابتدا کد تأیید ایمیل را دریافت و وارد کنید.', 'error', 5000);
                     return;
                 }
             }
