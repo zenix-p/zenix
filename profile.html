@@ -249,17 +249,16 @@
             <div class="bd">
                 <div id="wal-first-time-hint" class="hint-box hint-first" style="display:none;">
                     <i class="fas fa-check-circle"></i>
-                    <div>اولین بار است که آدرس‌های کیف پول خود را ثبت می‌کنید. نیازی به کد تأیید ایمیل نیست — کافیست آدرس‌ها را وارد و ذخیره کنید.</div>
+                    <div>در حال تکمیل آدرس‌های کیف پول هستید. اگر فیلدی خالی است، بدون نیاز به کد تأیید می‌توانید آن را پر کنید. برای <strong>تغییر</strong> آدرس‌های موجود، کد تأیید ایمیل لازم است.</div>
                 </div>
                 <div id="wal-change-hint" class="hint-box hint-change" style="display:none;">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <div>آدرس کیف پول شما قبلاً ثبت شده است. برای <strong>تغییر</strong>، ابتدا کد تأیید ایمیل را دریافت و وارد کنید.</div>
+                    <div>آدرس‌های کیف پول شما قبلاً ثبت شده‌اند. برای <strong>تغییر</strong>، ابتدا کد تأیید ایمیل را دریافت و وارد کنید.</div>
                 </div>
 
                 <div class="fg"><label class="fl">آدرس TRX</label><input type="text" id="trx-in" class="fi" placeholder="T... (۳۴ کاراکتر)" style="direction:ltr;text-align:left;font-family:monospace;"></div>
                 <div class="fg"><label class="fl">آدرس BEP20</label><input type="text" id="bep-in" class="fi" placeholder="0x... (۴۲ کاراکتر)" style="direction:ltr;text-align:left;font-family:monospace;"></div>
 
-                <!-- بخش OTP که در حالت اول مخفی است -->
                 <div id="wal-otp-section" style="display:none;">
                     <div class="fg">
                         <label class="fl">ایمیل</label>
@@ -681,25 +680,25 @@
                     else { statusEl.textContent = 'غیرفعال'; statusEl.style.color = '#ef4444'; }
                 }
 
-                // ★ کیف پول
+                // ★ منطق جدید: OTP فقط اگر هر دو آدرس پر باشند
                 if(data.trx_address) document.getElementById('trx-in').value = data.trx_address;
                 if(data.bep20_address) document.getElementById('bep-in').value = data.bep20_address;
 
-                const isFirstTime = !data.trx_address && !data.bep20_address;
-                window._walletIsFirstTime = isFirstTime;
+                const bothFilled = !!(data.trx_address && data.bep20_address);
+                window._walletIsFirstTime = !bothFilled;
 
                 const otpSection = document.getElementById('wal-otp-section');
                 const firstHint = document.getElementById('wal-first-time-hint');
                 const changeHint = document.getElementById('wal-change-hint');
 
-                if (isFirstTime) {
-                    if (otpSection) otpSection.style.display = 'none';
-                    if (firstHint) firstHint.style.display = 'flex';
-                    if (changeHint) changeHint.style.display = 'none';
-                } else {
+                if (bothFilled) {
                     if (otpSection) otpSection.style.display = 'block';
                     if (firstHint) firstHint.style.display = 'none';
                     if (changeHint) changeHint.style.display = 'flex';
+                } else {
+                    if (otpSection) otpSection.style.display = 'none';
+                    if (firstHint) firstHint.style.display = 'flex';
+                    if (changeHint) changeHint.style.display = 'none';
                 }
             } else { showWelcomeModal(); }
         }
@@ -869,7 +868,6 @@
             }
         };
 
-        // ★★★ تأیید کد کیف پول — با RPC ★★★
         window.verifyWalletCode = async function(btn) {
             const code = (document.getElementById('wal-code')?.value || '').trim();
             if (!code || code.length !== 6 || !/^\d+$/.test(code)) {
@@ -881,7 +879,6 @@
 
             try {
                 const { data: ok, error } = await supabaseClient.rpc('verify_wallet_otp', { p_otp_code: code });
-
                 if (error) {
                     if (String(error.message).includes('TOO_MANY_ATTEMPTS')) {
                         window.showToast('🚫 تلاش‌های زیاد — ۱۵ دقیقه صبر کنید', 'error', 5000);
@@ -890,7 +887,6 @@
                     }
                     return;
                 }
-
                 if (ok === true) {
                     window._walletOtpVerified = true;
                     window.showToast('✅ کد تایید شد.', 'success', 4000);
@@ -904,7 +900,6 @@
             }
         };
 
-        // ★★★ ذخیره آدرس‌های کیف پول — با RPC ★★★
         window.saveWalletForm = async function(btn) {
             const trx = document.getElementById('trx-in').value.trim();
             const bep = document.getElementById('bep-in').value.trim();
@@ -914,7 +909,6 @@
                 return;
             }
 
-            // اعتبارسنجی فرمت (پیش‌بررسی — سرور هم چک می‌کند)
             if (trx && (trx.length !== 34 || !trx.startsWith('T'))) {
                 window.showToast('آدرس TRX باید با T شروع شود و ۳۴ کاراکتر باشد.', 'error', 4000);
                 return;
@@ -946,10 +940,10 @@
                 if (error) throw error;
 
                 if (data && data.success) {
-                    if (data.is_first_time) {
-                        window.showToast('✅ آدرس‌ها ذخیره شدند.', 'success', 5000);
-                    } else {
+                    if (data.needed_otp) {
                         window.showToast('✅ آدرس‌ها با موفقیت تغییر کردند.', 'success', 5000);
+                    } else {
+                        window.showToast('✅ آدرس‌ها ذخیره شدند.', 'success', 5000);
                     }
                     document.getElementById('wal-code').value = '';
                     window._walletOtpVerified = false;
