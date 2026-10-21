@@ -100,6 +100,7 @@
         .hint-first{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.35);color:#22c55e}
         .hint-change{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.35);color:#fbbf24}
         .hint-box i{font-size:16px;margin-top:2px;flex-shrink:0}
+        .lock-icon{font-size:11px;color:#64748b;margin-inline-start:6px;}
     </style>
 </head>
 <body>
@@ -253,11 +254,17 @@
                 </div>
                 <div id="wal-change-hint" class="hint-box hint-change" style="display:none;">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <div>شما قبلاً آدرس کیف پول ثبت کرده‌اید. برای <strong>تغییر</strong> آدرس‌های موجود، کد تأیید ایمیل لازم است. اما اگر فقط می‌خواهید فیلد خالی را پر کنید، نیازی به کد نیست.</div>
+                    <div>آدرس‌های ثبت‌شده قفل هستند. برای <strong>ویرایش</strong>، ابتدا کد تأیید ایمیل را دریافت و وارد کنید، سپس فیلدها باز می‌شوند. اگر فیلدی خالی است، بدون نیاز به کد می‌توانید آن را پر کنید.</div>
                 </div>
 
-                <div class="fg"><label class="fl">آدرس TRX</label><input type="text" id="trx-in" class="fi" placeholder="T... (۳۴ کاراکتر)" style="direction:ltr;text-align:left;font-family:monospace;"></div>
-                <div class="fg"><label class="fl">آدرس BEP20</label><input type="text" id="bep-in" class="fi" placeholder="0x... (۴۲ کاراکتر)" style="direction:ltr;text-align:left;font-family:monospace;"></div>
+                <div class="fg">
+                    <label class="fl">آدرس TRX <span id="trx-lock-icon" class="lock-icon" style="display:none;"><i class="fas fa-lock"></i> قفل</span></label>
+                    <input type="text" id="trx-in" class="fi" placeholder="T... (۳۴ کاراکتر)" style="direction:ltr;text-align:left;font-family:monospace;">
+                </div>
+                <div class="fg">
+                    <label class="fl">آدرس BEP20 <span id="bep-lock-icon" class="lock-icon" style="display:none;"><i class="fas fa-lock"></i> قفل</span></label>
+                    <input type="text" id="bep-in" class="fi" placeholder="0x... (۴۲ کاراکتر)" style="direction:ltr;text-align:left;font-family:monospace;">
+                </div>
 
                 <div id="wal-otp-section" style="display:none;">
                     <div class="fg">
@@ -268,10 +275,10 @@
                         </div>
                     </div>
                     <div class="fg">
-                        <label class="fl">کد ۶ رقمی تأیید</label>
+                        <label class="fl">کد ۶ رقمی تأیید (برای باز کردن قفل ویرایش)</label>
                         <div style="display:flex;gap:8px;">
                             <input type="text" class="fi" id="wal-code" maxlength="6" placeholder="مثال: 849201" inputmode="numeric">
-                            <button type="button" class="bs" style="width:130px;font-size:12px;background:#22c55e;color:#fff;" onclick="window.verifyWalletCode(this)">تایید کد</button>
+                            <button type="button" class="bs" style="width:130px;font-size:12px;background:#22c55e;color:#fff;" onclick="window.verifyWalletCode(this)">تایید و باز کردن قفل</button>
                         </div>
                     </div>
                 </div>
@@ -328,7 +335,7 @@
             <div style="overflow-y:auto;padding-right:4px">
                 <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-user-cog" style="color:#38bdf8"></i> کاربرد این صفحه چیست؟</div><div class="msg-desc-text">در این صفحه می‌توانید اطلاعات شخصی، شماره تماس، ایمیل و تنظیمات امنیتی حساب خود را مدیریت کنید.</div></div>
                 <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-shield-alt" style="color:#38bdf8"></i> وضعیت حساب</div><div class="msg-desc-text">وضعیت تایید حساب و ثبت شماره تماس برای امنیت بیشتر در این قسمت مدیریت می‌شود.</div></div>
-                <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-key" style="color:#a855f7"></i> کلمات عبور و کیف پول</div><div class="msg-desc-text">جهت حفظ امنیت دارایی‌های خود می‌توانید کلمات عبور و آدرس‌های کیف پول را بروزرسانی نمایید.</div></div>
+                <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-key" style="color:#a855f7"></i> کلمات عبور و کیف پول</div><div class="msg-desc-text">آدرس‌های کیف پول بعد از ثبت قفل می‌شوند. برای تغییر، باید کد تایید ایمیل را وارد کنید.</div></div>
             </div>
         </div>
     </div>
@@ -455,6 +462,8 @@
         const EMAILJS_SERVICE_ID = "service_61bzf1a";
         const EMAILJS_TEMPLATE_ID = "template_jyzgfs8";
         const EMAILJS_PUBLIC_KEY = "oUKHgDSK6qIwpCE9p";
+
+        const OTP_COOLDOWN_MS = 120000; // ★ ۲ دقیقه
 
         let currentUser = null, currentUserId = null, userRealtimeChannel = null, notificationRealtimeChannel = null, authInitialized = false, welcomeModalInitialized = false;
 
@@ -655,7 +664,8 @@
                 );
 
                 window.showToast(`کد تایید به ایمیل ${email} ارسال شد.`, 'success', 5000);
-                const expireTime = Date.now() + 60000;
+                // ★ کول‌داون ۲ دقیقه
+                const expireTime = Date.now() + OTP_COOLDOWN_MS;
                 localStorage.setItem('otp_cooldown_' + emailInputId, expireTime);
                 if (btnEl) runCountdown(btnEl, emailInputId);
             } catch (error) {
@@ -685,8 +695,32 @@
                 window._oldTrx = data.trx_address || '';
                 window._oldBep = data.bep20_address || '';
 
-                document.getElementById('trx-in').value = window._oldTrx;
-                document.getElementById('bep-in').value = window._oldBep;
+                const trxIn = document.getElementById('trx-in');
+                const bepIn = document.getElementById('bep-in');
+                const trxLockIcon = document.getElementById('trx-lock-icon');
+                const bepLockIcon = document.getElementById('bep-lock-icon');
+
+                trxIn.value = window._oldTrx;
+                bepIn.value = window._oldBep;
+
+                // ★ اگه OTP تایید نشده، فیلدهای ذخیره‌شده قفل باشن
+                const otpVerified = window._walletOtpVerified === true;
+
+                if (window._oldTrx && !otpVerified) {
+                    trxIn.readOnly = true;
+                    if (trxLockIcon) trxLockIcon.style.display = 'inline';
+                } else {
+                    trxIn.readOnly = false;
+                    if (trxLockIcon) trxLockIcon.style.display = 'none';
+                }
+
+                if (window._oldBep && !otpVerified) {
+                    bepIn.readOnly = true;
+                    if (bepLockIcon) bepLockIcon.style.display = 'inline';
+                } else {
+                    bepIn.readOnly = false;
+                    if (bepLockIcon) bepLockIcon.style.display = 'none';
+                }
 
                 const anySaved = !!(window._oldTrx || window._oldBep);
 
@@ -871,6 +905,7 @@
             }
         };
 
+        // ★★★ تایید کد → باز کردن قفل فیلدها ★★★
         window.verifyWalletCode = async function(btn) {
             const code = (document.getElementById('wal-code')?.value || '').trim();
             if (!code || code.length !== 6 || !/^\d+$/.test(code)) {
@@ -892,7 +927,16 @@
                 }
                 if (ok === true) {
                     window._walletOtpVerified = true;
-                    window.showToast('✅ کد تایید شد.', 'success', 4000);
+                    // ★ باز کردن قفل فیلدها
+                    const trxIn = document.getElementById('trx-in');
+                    const bepIn = document.getElementById('bep-in');
+                    const trxLockIcon = document.getElementById('trx-lock-icon');
+                    const bepLockIcon = document.getElementById('bep-lock-icon');
+                    trxIn.readOnly = false;
+                    bepIn.readOnly = false;
+                    if (trxLockIcon) trxLockIcon.style.display = 'none';
+                    if (bepLockIcon) bepLockIcon.style.display = 'none';
+                    window.showToast('✅ کد تایید شد. حالا می‌توانید آدرس‌ها را ویرایش کنید.', 'success', 5000);
                 } else {
                     window.showToast('کد اشتباه یا منقضی شده است.', 'error', 4000);
                 }
@@ -921,18 +965,18 @@
                 return;
             }
 
-            // ★ منطق دقیق: OTP فقط اگر یک مقدار پر شده را تغییر دهیم
+            // ★ منطق OTP: فقط اگر مقدار پر را تغییر دهیم و OTP تایید نشده
             const oldTrx = window._oldTrx || '';
             const oldBep = window._oldBep || '';
             const changingTrx = oldTrx && trx !== oldTrx;
             const changingBep = oldBep && bep !== oldBep;
-            const needsOtp = changingTrx || changingBep;
+            const needsOtp = (changingTrx || changingBep) && !window._walletOtpVerified;
 
             let otpCode = '';
             if (needsOtp) {
                 otpCode = (document.getElementById('wal-code')?.value || '').trim();
                 if (!otpCode || otpCode.length !== 6) {
-                    window.showToast('برای تغییر آدرس ثبت‌شده، ابتدا کد تأیید ایمیل را دریافت و وارد کنید.', 'error', 5000);
+                    window.showToast('برای تغییر آدرس ثبت‌شده، ابتدا کد تأیید ایمیل را دریافت و تایید کنید.', 'error', 5000);
                     return;
                 }
             }
