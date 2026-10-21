@@ -19,7 +19,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 
-    <!-- ★ EmailJS SDK ★ -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="text/javascript">
         (function(){
@@ -97,6 +96,10 @@
         .notif-tab.active{background:#38bdf8;color:#0f172a;font-weight:bold;border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.3)}
         #modal-msg-container{overflow-y:auto;padding-right:6px;flex:1;min-height:0}
         footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:800px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
+        .hint-box{padding:12px 14px;border-radius:8px;font-size:12px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px;line-height:1.6}
+        .hint-first{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.35);color:#22c55e}
+        .hint-change{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.35);color:#fbbf24}
+        .hint-box i{font-size:16px;margin-top:2px;flex-shrink:0}
     </style>
 </head>
 <body>
@@ -244,22 +247,36 @@
                 <i class="fas fa-chevron-down ch"></i>
             </div>
             <div class="bd">
-                <div class="fg"><label class="fl">آدرس TRX</label><input type="text" class="fi" id="trx-in" placeholder="T..."></div>
-                <div class="fg"><label class="fl">آدرس BEP20</label><input type="text" class="fi" id="bep-in" placeholder="0x..."></div>
-                <div class="fg">
-                    <label class="fl">ایمیل</label>
-                    <div style="display:flex;gap:8px;">
-                        <input type="email" class="fi" id="wal-email" readonly disabled placeholder="در حال دریافت ایمیل...">
-                        <button type="button" class="bs" style="width:130px;font-size:12px;" onclick="window.sendEmailCode('wal-email', this)">ارسال کد به ایمیل</button>
+                <div id="wal-first-time-hint" class="hint-box hint-first" style="display:none;">
+                    <i class="fas fa-check-circle"></i>
+                    <div>اولین بار است که آدرس‌های کیف پول خود را ثبت می‌کنید. نیازی به کد تأیید ایمیل نیست — کافیست آدرس‌ها را وارد و ذخیره کنید.</div>
+                </div>
+                <div id="wal-change-hint" class="hint-box hint-change" style="display:none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>آدرس کیف پول شما قبلاً ثبت شده است. برای <strong>تغییر</strong>، ابتدا کد تأیید ایمیل را دریافت و وارد کنید.</div>
+                </div>
+
+                <div class="fg"><label class="fl">آدرس TRX</label><input type="text" id="trx-in" class="fi" placeholder="T... (۳۴ کاراکتر)" style="direction:ltr;text-align:left;font-family:monospace;"></div>
+                <div class="fg"><label class="fl">آدرس BEP20</label><input type="text" id="bep-in" class="fi" placeholder="0x... (۴۲ کاراکتر)" style="direction:ltr;text-align:left;font-family:monospace;"></div>
+
+                <!-- بخش OTP که در حالت اول مخفی است -->
+                <div id="wal-otp-section" style="display:none;">
+                    <div class="fg">
+                        <label class="fl">ایمیل</label>
+                        <div style="display:flex;gap:8px;">
+                            <input type="email" class="fi" id="wal-email" readonly disabled placeholder="در حال دریافت ایمیل...">
+                            <button type="button" class="bs" style="width:130px;font-size:12px;" onclick="window.sendEmailCode('wal-email', this)">ارسال کد به ایمیل</button>
+                        </div>
+                    </div>
+                    <div class="fg">
+                        <label class="fl">کد ۶ رقمی تأیید</label>
+                        <div style="display:flex;gap:8px;">
+                            <input type="text" class="fi" id="wal-code" maxlength="6" placeholder="مثال: 849201" inputmode="numeric">
+                            <button type="button" class="bs" style="width:130px;font-size:12px;background:#22c55e;color:#fff;" onclick="window.verifyWalletCode(this)">تایید کد</button>
+                        </div>
                     </div>
                 </div>
-                <div class="fg">
-                    <label class="fl">کد ۶ رقمی تأیید</label>
-                    <div style="display:flex;gap:8px;">
-                        <input type="text" class="fi" id="wal-code" maxlength="6" placeholder="مثال: 849201">
-                        <button type="button" class="bs" style="width:130px;font-size:12px;background:#22c55e;color:#fff;" onclick="window.verifyWalletCode(this)">تایید کد</button>
-                    </div>
-                </div>
+
                 <button type="button" class="bs" onclick="window.saveWalletForm(this)">ذخیره تغییرات</button>
             </div>
         </div>
@@ -436,7 +453,6 @@
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         window.supabaseClient = supabaseClient;
 
-        // ★ EmailJS configuration ★
         const EMAILJS_SERVICE_ID = "service_61bzf1a";
         const EMAILJS_TEMPLATE_ID = "template_jyzgfs8";
         const EMAILJS_PUBLIC_KEY = "oUKHgDSK6qIwpCE9p";
@@ -445,6 +461,9 @@
 
         window.cachedNotifications = [];
         window.activeNotifFilter = 'all';
+
+        window._walletOtpVerified = false;
+        window._walletIsFirstTime = true;
 
         function generateUIDDigits(userId) {
             let hash = 5381;
@@ -607,7 +626,6 @@
             }, 1000);
         }
 
-        // ★★★ EmailJS — جایگزین کامل Resend/Edge Function ★★★
         window.sendEmailCode = async function(emailInputId, btnEl) {
             const emailInput = document.getElementById(emailInputId);
             const email = emailInput && emailInput.value ? emailInput.value.trim() : (currentUser ? currentUser.email : '');
@@ -617,7 +635,6 @@
             try {
                 if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'در حال ارسال...'; }
 
-                // ۱. ساخت OTP سمت سرور (همان generate_otp)
                 const { data: otpResult, error: otpErr } = await supabaseClient.rpc('generate_otp');
                 if (otpErr) throw new Error(otpErr.message || 'خطا در ساخت OTP');
                 if (!otpResult || otpResult.success !== true) {
@@ -631,20 +648,9 @@
                 }
                 const otpCode = otpResult.otp;
 
-                // ۲. ارسال با EmailJS (مستقیم از کلاینت)
                 await emailjs.send(
-                    EMAILJS_SERVICE_ID,
-                    EMAILJS_TEMPLATE_ID,
-                    {
-                        to_email: email,
-                        email: email,
-                        otp_code: otpCode,
-                        code: otpCode,
-                        otp: otpCode,
-                        passcode: otpCode,
-                        verification_code: otpCode,
-                        message: otpCode
-                    },
+                    EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID,
+                    { to_email: email, email: email, otp_code: otpCode, code: otpCode, otp: otpCode, passcode: otpCode, verification_code: otpCode, message: otpCode },
                     EMAILJS_PUBLIC_KEY
                 );
 
@@ -674,8 +680,27 @@
                     if (isAccountActive) { statusEl.textContent = 'فعال'; statusEl.style.color = '#22c55e'; }
                     else { statusEl.textContent = 'غیرفعال'; statusEl.style.color = '#ef4444'; }
                 }
+
+                // ★ کیف پول
                 if(data.trx_address) document.getElementById('trx-in').value = data.trx_address;
                 if(data.bep20_address) document.getElementById('bep-in').value = data.bep20_address;
+
+                const isFirstTime = !data.trx_address && !data.bep20_address;
+                window._walletIsFirstTime = isFirstTime;
+
+                const otpSection = document.getElementById('wal-otp-section');
+                const firstHint = document.getElementById('wal-first-time-hint');
+                const changeHint = document.getElementById('wal-change-hint');
+
+                if (isFirstTime) {
+                    if (otpSection) otpSection.style.display = 'none';
+                    if (firstHint) firstHint.style.display = 'flex';
+                    if (changeHint) changeHint.style.display = 'none';
+                } else {
+                    if (otpSection) otpSection.style.display = 'block';
+                    if (firstHint) firstHint.style.display = 'none';
+                    if (changeHint) changeHint.style.display = 'flex';
+                }
             } else { showWelcomeModal(); }
         }
 
@@ -844,15 +869,107 @@
             }
         };
 
-        window.verifyWalletCode = function(btn) { window.showToast('کد تایید با موفقیت تایید شد.', 'success', 4000); };
+        // ★★★ تأیید کد کیف پول — با RPC ★★★
+        window.verifyWalletCode = async function(btn) {
+            const code = (document.getElementById('wal-code')?.value || '').trim();
+            if (!code || code.length !== 6 || !/^\d+$/.test(code)) {
+                window.showToast('کد ۶ رقمی را وارد کنید.', 'error', 4000);
+                return;
+            }
+            const origText = btn ? btn.textContent : 'تایید کد';
+            if (btn) { btn.disabled = true; btn.textContent = 'در حال بررسی...'; }
 
+            try {
+                const { data: ok, error } = await supabaseClient.rpc('verify_wallet_otp', { p_otp_code: code });
+
+                if (error) {
+                    if (String(error.message).includes('TOO_MANY_ATTEMPTS')) {
+                        window.showToast('🚫 تلاش‌های زیاد — ۱۵ دقیقه صبر کنید', 'error', 5000);
+                    } else {
+                        window.showToast('خطا: ' + (error.message || 'نامشخص'), 'error', 5000);
+                    }
+                    return;
+                }
+
+                if (ok === true) {
+                    window._walletOtpVerified = true;
+                    window.showToast('✅ کد تایید شد.', 'success', 4000);
+                } else {
+                    window.showToast('کد اشتباه یا منقضی شده است.', 'error', 4000);
+                }
+            } catch (e) {
+                window.showToast('خطا: ' + (e.message || 'نامشخص'), 'error', 5000);
+            } finally {
+                if (btn) { btn.disabled = false; btn.textContent = origText; }
+            }
+        };
+
+        // ★★★ ذخیره آدرس‌های کیف پول — با RPC ★★★
         window.saveWalletForm = async function(btn) {
             const trx = document.getElementById('trx-in').value.trim();
             const bep = document.getElementById('bep-in').value.trim();
-            if (currentUser) {
-                const { error } = await supabaseClient.from('users').update({ trx_address: trx, bep20_address: bep }).eq('id', currentUser.id);
-                if (!error) window.showToast('آدرس‌های کیف پول ذخیره شدند.', 'success', 5000);
-                else window.showToast('خطا در ذخیره: ' + error.message, 'error', 5000);
+
+            if (!trx && !bep) {
+                window.showToast('حداقل یک آدرس را وارد کنید.', 'error', 4000);
+                return;
+            }
+
+            // اعتبارسنجی فرمت (پیش‌بررسی — سرور هم چک می‌کند)
+            if (trx && (trx.length !== 34 || !trx.startsWith('T'))) {
+                window.showToast('آدرس TRX باید با T شروع شود و ۳۴ کاراکتر باشد.', 'error', 4000);
+                return;
+            }
+            if (bep && (bep.length !== 42 || !bep.startsWith('0x'))) {
+                window.showToast('آدرس BEP20 باید با 0x شروع شود و ۴۲ کاراکتر باشد.', 'error', 4000);
+                return;
+            }
+
+            let otpCode = '';
+            if (!window._walletIsFirstTime) {
+                otpCode = (document.getElementById('wal-code')?.value || '').trim();
+                if (!otpCode || otpCode.length !== 6) {
+                    window.showToast('برای تغییر آدرس، ابتدا کد تأیید ایمیل را دریافت و وارد کنید.', 'error', 4000);
+                    return;
+                }
+            }
+
+            const origText = btn ? btn.textContent : 'ذخیره تغییرات';
+            if (btn) { btn.disabled = true; btn.textContent = 'در حال ذخیره...'; }
+
+            try {
+                const { data, error } = await supabaseClient.rpc('set_wallet_addresses', {
+                    p_trx: trx || '',
+                    p_bep: bep || '',
+                    p_otp_code: otpCode || ''
+                });
+
+                if (error) throw error;
+
+                if (data && data.success) {
+                    if (data.is_first_time) {
+                        window.showToast('✅ آدرس‌ها ذخیره شدند.', 'success', 5000);
+                    } else {
+                        window.showToast('✅ آدرس‌ها با موفقیت تغییر کردند.', 'success', 5000);
+                    }
+                    document.getElementById('wal-code').value = '';
+                    window._walletOtpVerified = false;
+                    await loadUserData(currentUser);
+                } else if (data && data.error) {
+                    const errMap = {
+                        'not_authenticated': 'نشست شما یافت نشد',
+                        'invalid_trx': 'آدرس TRX نامعتبر است',
+                        'invalid_bep': 'آدرس BEP20 نامعتبر است',
+                        'no_otp': 'ابتدا کد تأیید را ارسال کنید',
+                        'otp_expired': 'کد منقضی شده — دوباره ارسال کنید',
+                        'invalid_otp': 'کد تأیید اشتباه است',
+                        'too_many_attempts': '🚫 تلاش‌های زیاد — ۱۵ دقیقه صبر کنید'
+                    };
+                    window.showToast('خطا: ' + (errMap[data.error] || data.error), 'error', 5000);
+                }
+            } catch (e) {
+                window.showToast('خطا: ' + (e.message || 'نامشخص'), 'error', 5000);
+            } finally {
+                if (btn) { btn.disabled = false; btn.textContent = origText; }
             }
         };
 
