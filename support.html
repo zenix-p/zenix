@@ -370,81 +370,30 @@
             genCodeBtn.disabled = true;
 
             try {
-                // 1. Generate OTP
-                const { data: otpResult, error: otpErr } = await supabase.rpc('generate_otp');
+                // 1. ساخت OTP + درج پیام — همه از طریق تابع امن دیتابیس
+                const { data: result, error: rpcErr } = await supabase.rpc('generate_otp_for_chat');
 
-                if (otpErr) throw new Error(otpErr.message || 'خطا در ساخت کد');
+                if (rpcErr) throw new Error(rpcErr.message || 'خطا در ساخت کد');
 
-                if (!otpResult || otpResult.success !== true) {
-                    if (otpResult && otpResult.error === 'too_soon') {
-                        const secs = otpResult.retry_after || 60;
+                if (!result || result.success !== true) {
+                    if (result && result.error === 'too_soon') {
+                        const secs = result.retry_after || 60;
                         showError(`⏳ لطفاً ${secs} ثانیه صبر کنید`);
                         return;
                     }
-                    throw new Error('خطا در ساخت کد');
+                    throw new Error((result && result.error) || 'خطا در ساخت کد');
                 }
 
-                const otp = otpResult.otp;
-                if (!otp) throw new Error('کد ساخته نشد');
+                currentChatId = result.chat_id;
 
-                // 2. Ensure chat exists
-                if (!currentChatId) {
-                    const { data: existing } = await supabase
-                        .from('support_chats')
-                        .select('id')
-                        .eq('user_email', currentUser.email)
-                        .maybeSingle();
-
-                    if (existing) {
-                        currentChatId = existing.id;
-                    } else {
-                        const { data: created, error: cErr } = await supabase
-                            .from('support_chats')
-                            .insert([{
-                                user_email: currentUser.email,
-                                user_name: currentUser.email.split('@')[0],
-                                last_message: 'کد تأیید ارسال شد',
-                                status: 'active',
-                                unread_by_admin: false,
-                                unread_by_user: true,
-                                created_at: new Date().toISOString(),
-                                updated_at: new Date().toISOString()
-                            }])
-                            .select()
-                            .single();
-
-                        if (cErr) throw cErr;
-                        currentChatId = created.id;
-                    }
-                }
-
-                // 3. Insert code message
-                const codeText = `🛡️ کد محافظ Zenix\n\nکد شما: ${otp}\n\n⏱ اعتبار: ۱۰ دقیقه\n🔒 این کد را در صفحه پروفایل وارد کنید`;
-
-                const { error: mErr } = await supabase.from('support_messages').insert([{
-                    chat_id: currentChatId,
-                    sender: 'system',
-                    text: codeText,
-                    created_at: new Date().toISOString()
-                }]);
-
-                if (mErr) throw mErr;
-
-                // 4. Update chat metadata
-                await supabase.from('support_chats').update({
-                    last_message: 'کد محافظ ارسال شد',
-                    updated_at: new Date().toISOString(),
-                    unread_by_user: true
-                }).eq('id', currentChatId);
-
-                // 5. Switch to chat view if in AI mode
+                // 2. اگر در حالت AI بودیم، به حالت چت سوئیچ کن
                 if (aiMode) {
                     aiMode = false;
                     updateStatusUI();
                     subscribeRealtime();
                 }
 
-                // 6. Reload messages
+                // 3. بارگذاری مجدد پیام‌ها
                 await loadMessagesFromSupabase();
 
             } catch (e) {
