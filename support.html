@@ -28,7 +28,6 @@
         .msg{max-width:85%;padding:10px 14px;border-radius:12px;font-size:12px;line-height:1.7;word-wrap:break-word}
         .msg.system{background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.25);color:#cbd5e1;align-self:center;text-align:center;font-size:11px;max-width:90%}
         .msg.system.code-msg{background:rgba(168,85,247,.15);border:1.5px solid rgba(168,85,247,.5);color:#e0c7ff;font-size:13px;max-width:95%;white-space:pre-line;line-height:1.9;box-shadow:0 0 20px rgba(168,85,247,.2);min-width:220px}
-        .msg.system.code-msg.expired{background:rgba(100,116,139,.1);border-color:rgba(100,116,139,.35);box-shadow:none;color:#94a3b8}
         .otp-code-display{display:flex;align-items:center;justify-content:center;gap:10px;margin:10px 0}
         .otp-code-text{font-size:24px;font-weight:900;letter-spacing:4px;color:#fff;font-family:'Courier New',monospace;direction:ltr;text-shadow:0 0 12px rgba(255,255,255,.3)}
         .copy-otp-btn{background:rgba(168,85,247,.35);border:1px solid rgba(168,85,247,.7);color:#e0c7ff;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:12px;transition:all .2s;display:flex;align-items:center;justify-content:center;min-width:34px;height:34px}
@@ -36,7 +35,6 @@
         .copy-otp-btn.copied{background:rgba(34,197,94,.4);border-color:rgba(34,197,94,.7)}
         .otp-timer-row{font-size:11px;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:4px}
         .otp-timer-val{color:#fbbf24;font-weight:bold;font-family:monospace}
-        .otp-expired-row{margin:6px 0;font-size:12px;opacity:.8;display:flex;align-items:center;justify-content:center;gap:6px}
         .msg.bot{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#cbd5e1;align-self:flex-start;border-top-right-radius:2px}
         .msg.admin{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#4ade80;align-self:flex-start;border-top-right-radius:2px}
         .msg.user{background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);color:#38bdf8;align-self:flex-end;border-top-left-radius:2px}
@@ -118,11 +116,8 @@
 
         function escapeHtml(value) {
             return String(value == null ? '' : value)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
 
         function formatTime(iso) {
@@ -138,6 +133,13 @@
             setTimeout(() => errorBanner.classList.remove('show'), 5000);
         }
 
+        function isCodeExpired(createdAt) {
+            if (!createdAt) return false;
+            const createdMs = new Date(createdAt).getTime();
+            if (isNaN(createdMs)) return false;
+            return (Date.now() - createdMs) >= OTP_EXPIRY_MS;
+        }
+
         window.goBack = function(event) {
             if (event) event.preventDefault();
             if (sessionStorage.getItem('zenix_return_page')) {
@@ -149,9 +151,6 @@
             }
         };
 
-        // ═══════════════════════════════════════════════════
-        // ★ کپی کد + بازگشت خودکار به صفحه قبلی
-        // ═══════════════════════════════════════════════════
         window.copyOtp = async function(code, btn) {
             try {
                 await navigator.clipboard.writeText(code);
@@ -171,10 +170,8 @@
                 btn.innerHTML = '<i class="fas fa-check"></i>';
             }
 
-            // ★ بازگشت خودکار به صفحه‌ای که ازش اومده
             const returnPage = sessionStorage.getItem('zenix_return_page');
             if (returnPage) {
-                // نمایش یک اعلان کوچیک
                 const toast = document.createElement('div');
                 toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:rgba(34,197,94,.95);color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:700;z-index:99999;box-shadow:0 8px 25px rgba(34,197,94,.5);direction:rtl;display:flex;align-items:center;gap:8px;';
                 toast.innerHTML = '<i class="fas fa-check-circle"></i> کد کپی شد، در حال بازگشت...';
@@ -185,7 +182,6 @@
                     window.location.href = returnPage;
                 }, 1200);
             } else {
-                // اگر صفحه قبلی نبود، فقط دکمه رو ریست کن
                 setTimeout(() => {
                     if (btn) {
                         btn.classList.remove('copied');
@@ -206,38 +202,34 @@
             return div;
         }
 
+        // ★ اگر کد منقضی شده باشد، null برمی‌گرداند و چیزی نمایش نمی‌دهد
         function renderCodeMessage(text, timeIso, createdAt) {
-            const div = document.createElement('div');
-            div.className = 'msg system code-msg';
-
             const match = text.match(/کد شما:\s*(\d{6})/);
             const otpCode = match ? match[1] : null;
 
+            // اگر کد پیدا نشد - متن خام
             if (!otpCode) {
+                const div = document.createElement('div');
+                div.className = 'msg system';
                 div.innerHTML = text + `<span class="msg-meta">${formatTime(timeIso)}</span>`;
                 chatBody.appendChild(div);
-                chatBody.scrollTop = chatBody.scrollHeight;
                 return div;
             }
 
             const createdMs = createdAt ? new Date(createdAt).getTime() : Date.now();
             const expiresAt = createdMs + OTP_EXPIRY_MS;
 
+            // ★ اگر از قبل منقضی شده، هیچی نشون نده
+            if (Date.now() >= expiresAt) return null;
+
+            const div = document.createElement('div');
+            div.className = 'msg system code-msg';
+
             const render = () => {
                 if (!div.isConnected) return false;
-
-                const now = Date.now();
-                const remaining = expiresAt - now;
-
+                const remaining = expiresAt - Date.now();
                 if (remaining <= 0) {
-                    div.classList.add('expired');
-                    div.innerHTML = `
-                        <span class="msg-sender" style="opacity:.7">🛡️ کد محافظ Zenix</span>
-                        <div class="otp-expired-row">
-                            <i class="fas fa-lock"></i> کد منقضی شده — لطفاً کد جدید بگیرید
-                        </div>
-                        <span class="msg-meta">${formatTime(timeIso)}</span>
-                    `;
+                    div.remove();
                     return false;
                 }
 
@@ -245,7 +237,6 @@
                 const secs = Math.floor((remaining % 60000) / 1000);
                 const timerText = `${mins}:${String(secs).padStart(2, '0')}`;
 
-                div.classList.remove('expired');
                 div.innerHTML = `
                     <span class="msg-sender" style="opacity:.85">🛡️ کد محافظ Zenix</span>
                     <div class="otp-code-display">
@@ -262,19 +253,14 @@
                 `;
 
                 const cpBtn = div.querySelector('.copy-otp-btn');
-                if (cpBtn) {
-                    cpBtn.onclick = () => window.copyOtp(otpCode, cpBtn);
-                }
-
+                if (cpBtn) cpBtn.onclick = () => window.copyOtp(otpCode, cpBtn);
                 return true;
             };
 
-            render();
-            const timer = setInterval(() => {
-                if (!render()) clearInterval(timer);
-            }, 1000);
-
             chatBody.appendChild(div);
+            render();
+            const timer = setInterval(() => { if (!render()) clearInterval(timer); }, 1000);
+
             chatBody.scrollTop = chatBody.scrollHeight;
             return div;
         }
@@ -291,7 +277,6 @@
         function renderQuickReplies() {
             const existing = document.querySelector('.quick-replies');
             if (existing) existing.remove();
-            
             const div = document.createElement('div');
             div.className = 'quick-replies';
             div.innerHTML = `
@@ -305,86 +290,16 @@
             chatBody.scrollTop = chatBody.scrollHeight;
         }
 
-        window.__quickReply = function(text) {
-            userInput.value = text;
-            sendMessage();
-        };
+        window.__quickReply = function(text) { userInput.value = text; sendMessage(); };
 
         window.generateAIReply = function(question) {
             const q = question.toLowerCase().trim();
-
-            if (q.includes('سلام') || q.includes('درود') || q.includes('وقت بخیر') || q.includes('خسته نباشی') || q.includes('چطوری') || q.includes('هستی')) {
-                return { handled: true, text: 'سلام عزیز دل، وقتت بخیر! 👋 من خوبم ممنون. تو چطوری؟ چیزی شده که کمکت کنم یا سوالی داری؟' };
-            }
-
-            if ((q.includes('کپچا') || q.includes('کد امنیتی') || q.includes('کد تصویر') || q.includes('کد رو نمیخونم') || q.includes('کد چیه')) && !q.includes('فراموش')) {
-                return { handled: true, text: 'آها، اون کد امنیتی رو میگی. حق داری والا، یکم شیطون بازی درمیاره! 😅<br><br>چند تا راه حل دارم برات:<br>۱. روی خود عکس کد کلیک کن یا دکمه چرخش (Refresh) رو بزن تا یه کد واضح‌تر بیاد.<br>۲. حواست باشه حروف بزرگ و کوچیک (مثل A و a) رو دقیق مثل تصویر وارد کنی.<br>۳. اگه گوشی داری، یه ذره زوم کن روش.<br><br>اگه بازم نشد بگو تا وصلت کنم به مدیریت.' };
-            }
-
-            if ((q.includes('وارد نمیشم') || q.includes('لاگین نمیشم') || q.includes('ورود نمیکنه') || q.includes('ارور میده') || q.includes('خطا میده') || q.includes('invalid') || q.includes('اشتباهه')) && (q.includes('رمز') || q.includes('ایمیل') || q.includes('پسورد') || q.includes('یوزر') || q.includes('login'))) {
-                return { handled: true, text: 'آهان، ارور ورود میگیری. نگران نباش، خیلیا این مشکل رو دارن.<br><br>ارور <strong>Invalid credentials</strong> معمولاً یعنی یا ایمیلت رو اشتباه تایپ کردی یا رمز عبورت با اونی که موقع ثبت‌نام زدی فرق داره. یه چک بکن ببین:<br>• Caps Lock (دکمه بزرگ‌نویسی) روشن نباشه.<br>• حتماً کد امنیتی رو هم وارد کرده باشی.<br>• اگه تازه ثبت‌نام کردی، شاید ایمیلت رو تایید نکرده باشی.<br><br>میخوای یه بار دیگه با دقت امتحان کنی؟' };
-            }
-
-            if ((q.includes('قفل') || q.includes('بلاک') || q.includes('موقتا') || q.includes('too many') || q.includes('بستن حساب')) && (q.includes('ورود') || q.includes('لاگین') || q.includes('حساب'))) {
-                return { handled: true, text: 'وای، سیستم ضد هکش فعال شده! 🚨<br><br>چون چندبار پشت سر هم رمز اشتباه زدی، سیستم فکر کرده یکی داره حسابتو هک میکنه و برات یه قفل موقت (معمولاً ۱ تا ۵ دقیقه) گذاشته.<br>نگران نباش، این برای امنیت خودته. یه چایی بریز، یه کم صبر کن، بعدش دوباره با آرامش امتحان کن. حتماً درست میشه.' };
-            }
-
-            if ((q.includes('دکمه') || q.includes('دکمه ورود') || q.includes('غیرفعال') || q.includes('خاکستری') || q.includes('کار نمیکنه')) && (q.includes('ورود') || q.includes('لاگین') || q.includes('btn'))) {
-                return { handled: true, text: 'آها، دکمه ورود خاکستریه و روش کلیک نمیشه؟<br><br>این طبیعیه! دکمه ورود فقط وقتی فعال میشه که ۳ تا شرط برقرار باشه:<br>۱. ایمیلت کامل و درست باشه (مثل test@gmail.com).<br>۲. رمز عبورت حداقل ۶ حرف باشه.<br>۳. کد امنیتی رو دقیقاً ۵ حرف زده باشی.<br><br>وقتی اینا کامل بشه، دکمه رنگی میشه و می‌تونی بزنی. اگه همه رو زدی و بازم خاکستریه، شاید مرورگرت گیر داده، یه بار صفحه رو رفرش کن.' };
-            }
-
-            if ((q.includes('فراموش') || q.includes('یادم رفته') || q.includes('گم کردم') || q.includes('ریست') || q.includes('بازیابی')) && (q.includes('رمز') || q.includes('پسورد') || q.includes('password'))) {
-                return { handled: true, text: 'برای فراموشی رمز، نگران نباش! توی صفحه ورود، روی گزینه <strong>«فراموشی رمز عبور»</strong> کلیک کن.<br><br>اونجا باید ایمیلت رو وارد کنی، بعدش یه کد ۶ رقمی به ایمیلت میاد. کد رو میزنی، رمز جدیدت رو انتخاب میکنی و تمام!<br>اگه کد به ایمیلت نیومد، پوشه Spam (هرزنامه) رو چک کن. اگه بازم نیومد بگو تا وصلت کنم به مدیریت.' };
-            }
-
-            if ((q.includes('تغییر') || q.includes('عوض')) && (q.includes('ایمیل') || q.includes('جمیل') || q.includes('email'))) {
-                return { handled: true, text: 'برای تغییر ایمیل:<br><br>۱. اول باید با حساب فعلیت وارد بشی.<br>۲. برو به بخش <strong>پروفایل / تنظیمات</strong>.<br>۳. اونجا می‌تونی ایمیل جدیدت رو وارد کنی و تاییدش کنی.<br><br>اگه به هر دلیلی نمیتونی وارد بشی، بگو تا وصلت کنم به مدیریت.' };
-            }
-
-            if (q.includes('واریز') || q.includes('شارژ') || q.includes('پول') || q.includes('deposit')) {
-                return { handled: true, text: 'برای واریز و شارژ حساب، از پنل کاربری برو به بخش <strong>واریز</strong>. آدرس کیف پول رو کپی کن و مبلغ رو بفرست. بعدش کد هش تراکنش (TxID) رو اونجا وارد کن تا حسابت شارژ بشه. اگه گیر کردی بگو!' };
-            }
-
-            if (q.includes('برداشت') || q.includes('تسویه') || q.includes('withdraw')) {
-                return { handled: true, text: 'برای برداشت هم از منوی پنل برو به بخش <strong>برداشت</strong>، آدرس کیف پول مقصدت رو بزن و مبلغ رو ثبت کن. درخواستت بعد از تایید سیستم، سریع واریز میشه.' };
-            }
-
-            if (q.includes('تیم') || q.includes('دعوت') || q.includes('کمیسیون') || q.includes('زیرمجموعه')) {
-                return { handled: true, text: 'برای دعوت دوستات، از بخش <strong>تیم / دعوت</strong> لینک اختصاصیت رو کپی کن و بفرست براشون. هرکاری اونا بکنن، کمیسیونش به جیبت میاد. 😉' };
-            }
-
-            if (q.includes('vip') || q.includes('سطح') || q.includes('تاج') || q.includes('سود روزانه') || q.includes('چطور باز میشه')) {
-                return { handled: true, text: 'سیستم سطوح VIP خیلی ساده‌ست! هرچی سطحت بالاتر بره، درصد سود روزانه‌ت بیشتر میشه (از ۱.۵٪ تا ۴٪).<br><br><strong>چطور سطحم رو ارتقا بدم؟</strong><br>شرط اصلی اینه که <strong>واریزی مستقیم</strong> به همون میزان داشته باشی. مثلاً برای VIP 1 باید ۲۰ دلار واریز کنی، برای VIP 2 باید ۳۰۰ دلار و... .<br><br><span style="color:#fbbf24;">⚠️ نکته مهم:</span> سودی که از معاملات ربات به دست میاری رو برای ارتقای سطح حساب نمی‌کنن، فقط پولی که از بیرون واریز می‌کنی مهمه.' };
-            }
-
-            if (q.includes('نیویورک') || q.includes('ساعت') || q.includes('ریست') || q.includes('صفر') || q.includes('چرا ریست شد')) {
-                return { handled: true, text: 'ساعت نیویورک (NY Time) برای اینه که کل پلتفرم ما بین‌المللی و زنده‌ست. ما برای معاملات و محاسبه سود، مبنا رو ساعت رسمی نیویورک گذاشتیم.<br><br>هر روز که این ساعت به پایان می‌رسه (ریست میشه)، ظرفیت ۴ بار معامله‌ی تو دوباره پر میشه و می‌تونی از فردای اون روز دوباره شروع کنی. این یعنی همه کاربرا توی کل دنیا هماهنگ هستن.' };
-            }
-
-            if ((q.includes('۴ بار') || q.includes('چهار بار') || q.includes('محدودیت') || q.includes('چرا نمیشه') || q.includes('دکمه کوانتیفیکیشن')) && !q.includes('دکمه ورود')) {
-                return { handled: true, text: 'آها، اگه دکمه کوانتیفیکیشن برات غیرفعال شده یا نوشته <strong>«پایان ظرفیت امروز»</strong>، به خاطر اینه که تو هر روز فقط ۴ بار می‌تونی از ربات استفاده کنی (سود روزانه به ۴ معامله ۱۰ ثانیه‌ای تقسیم میشه).<br><br>یا ممکنه موجودیت کمتر از ۲۰ دلار باشه که تو این حالت ربات اصلاً فعال نمیشه و باید از بخش واریز، حسابت رو شارژ کنی.' };
-            }
-
-            if (q.includes('کوانتیفیکیشن') || q.includes('ربات') || q.includes('quantification') || q.includes('چطور کار میکنه') || q.includes('سود')) {
-                return { handled: true, text: 'سیستم <strong>کوانتیفیکیشن</strong> (Quantification) یه ربات معامله‌گر هوشمنده!<br><br>ربات ما به صورت لحظه‌ای قیمت ارزهای دیجیتال رو توی صرافی‌های مختلف جهان بررسی می‌کنه و کوچک‌ترین اختلاف قیمت‌ها رو کشف می‌کنه تا از طریق آربیتراژ و هوش مصنوعی سود مطمئن به دست بیاره.<br>برای فعال کردنش، موجودیت باید بالای ۲۰ دلار باشه. بعد از اون، هر بار که دکمه کوانتیفیکیشن رو بزنی، یه معامله ۱۰ ثانیه‌ای شروع میشه و سودش به موجودیت اضافه میشه.' };
-            }
-
-            if (q.includes('موجودی') || q.includes('داشبورد') || q.includes('بالانس') || q.includes('کیف پول')) {
-                return { handled: true, text: 'موجودی کل حسابت رو می‌تونی از بالای صفحه داشبورد یا صفحه کوانتیفیکیشن ببینی. هر سودی هم که از ربات بگیری، به صورت لحظه‌ای به همین موجودی اضافه میشه.<br><br>اگه میخوای موجودیت رو بیشتر کنی، از بخش <strong>واریز</strong> استفاده کن.' };
-            }
-
-            if (q.includes('بازار') || q.includes('قیمت') || q.includes('بیت کوین') || q.includes('اتریوم') || q.includes('ارز دیجیتال')) {
-                return { handled: true, text: 'بخش <strong>بازار ارز جهانی</strong> که توی داشبورد و صفحه کوانتیفیکیشن می‌بینی، به صورت زنده قیمت‌های لحظه‌ای (مثل بیت‌کوین، اتریوم و...) رو نشون میده.<br><br>این برای اینه که کاربر حس کنه توی یه پلتفرم زنده و بین‌المللیه و ببینه ربات داره توی چه بازار پرنوسانی کار می‌کنه.' };
-            }
-
-            if (q.includes('زنگوله') || q.includes('اعلان') || q.includes('پیام') || q.includes('صندوق پیام')) {
-                return { handled: true, text: 'آیکون <strong>زنگوله</strong> (بالای صفحه) صندوق پیام‌ها و اعلان‌های توئه. هر موقع ادمین پیامی برات بفرسته یا درخواست واریز/برداشتت تایید یا رد بشه، اینجا بهت اطلاع میده.<br><br>اگه پیام جدید داشته باشی، یه نقطه قرمز روش ظاهر میشه.' };
-            }
-
-            if (q.includes('مدیر') || q.includes('ادمین') || q.includes('اپراتور') || q.includes('آدم واقعی') || q.includes('انسان') || q.includes('پشتیبان')) {
-                return { handled: 'switch_to_admin' };
-            }
-
+            if (q.includes('سلام') || q.includes('درود') || q.includes('وقت بخیر')) return { handled: true, text: 'سلام عزیز دل، وقتت بخیر! 👋 چطور می‌تونم کمکت کنم؟' };
+            if (q.includes('واریز') || q.includes('شارژ') || q.includes('پول')) return { handled: true, text: 'برای واریز، از منو برو به بخش <strong>واریز</strong>. آدرس کیف پول رو کپی کن و مبلغ رو بفرست. بعدش TxID رو وارد کن.' };
+            if (q.includes('برداشت') || q.includes('تسویه')) return { handled: true, text: 'برای برداشت از منوی پنل برو به بخش <strong>برداشت</strong>، آدرس و مبلغ رو وارد کن.' };
+            if (q.includes('vip') || q.includes('سطح')) return { handled: true, text: 'هرچی موجودیت بالاتر، درصد سود روزانه بیشتر (از ۱.۵٪ تا ۴٪). برای ارتقا باید واریزی مستقیم داشته باشی.' };
+            if (q.includes('کوانتیفیکیشن') || q.includes('ربات') || q.includes('سود')) return { handled: true, text: 'ربات معامله‌گر هوشمند ما از آربیتراژ و هوش مصنوعی برای کسب سود استفاده می‌کنه. حداقل موجودی: ۲۰ دلار.' };
+            if (q.includes('مدیر') || q.includes('ادمین') || q.includes('پشتیبان')) return { handled: 'switch_to_admin' };
             return { handled: false };
         };
 
@@ -393,7 +308,6 @@
             const subEl = document.getElementById('support-status-sub');
             const avatarEl = document.getElementById('chat-avatar-el');
             const avatarIcon = document.getElementById('chat-avatar-icon');
-
             if (aiMode) {
                 titleEl.textContent = 'دستیار هوشمند Zenix';
                 subEl.textContent = 'آماده پاسخگویی';
@@ -419,87 +333,44 @@
                 setTimeout(() => { window.location.href = 'index.html'; }, 2500);
                 return;
             }
-
             if (aiMode === false) return;
-
             aiMode = false;
-
             if (!currentChatId) {
-                const { data: existing, error: findError } = await supabase
-                    .from('support_chats')
-                    .select('*')
-                    .eq('user_email', currentUser.email)
-                    .maybeSingle();
-
-                if (existing) {
-                    currentChatId = existing.id;
-                } else {
-                    const { data: created, error: createError } = await supabase
-                        .from('support_chats')
-                        .insert([{
-                            user_email: currentUser.email,
-                            user_name: currentUser.email.split('@')[0],
-                            last_message: 'درخواست اتصال به پشتیبان',
-                            unread_by_admin: true,
-                            unread_by_user: false,
-                            status: 'waiting_admin',
-                            created_at: new Date().toISOString(),
-                            updated_at: new Date().toISOString()
-                        }])
-                        .select()
-                        .single();
-
-                    if (createError || !created) {
-                        console.error('Create chat error:', createError);
-                        showError('خطا در اتصال به ادمین. لطفاً دوباره تلاش کنید.');
-                        aiMode = true;
-                        updateStatusUI();
-                        return;
-                    }
+                const { data: existing } = await supabase.from('support_chats').select('*').eq('user_email', currentUser.email).maybeSingle();
+                if (existing) { currentChatId = existing.id; }
+                else {
+                    const { data: created, error: createError } = await supabase.from('support_chats').insert([{
+                        user_email: currentUser.email, user_name: currentUser.email.split('@')[0],
+                        last_message: 'درخواست اتصال به پشتیبان', unread_by_admin: true, unread_by_user: false,
+                        status: 'waiting_admin', created_at: new Date().toISOString(), updated_at: new Date().toISOString()
+                    }]).select().single();
+                    if (createError || !created) { aiMode = true; updateStatusUI(); return; }
                     currentChatId = created.id;
                 }
-
                 await supabase.from('support_messages').insert([{
-                    chat_id: currentChatId,
-                    sender: 'user',
-                    text: '🙋 کاربر درخواست اتصال به پشتیبان انسانی دارد.',
-                    created_at: new Date().toISOString()
+                    chat_id: currentChatId, sender: 'user', text: '🙋 کاربر درخواست اتصال به پشتیبان انسانی دارد.', created_at: new Date().toISOString()
                 }]);
             }
-
             updateStatusUI();
             await loadMessagesFromSupabase();
             subscribeRealtime();
         }
 
         window.toggleMode = async function() {
-            if (aiMode) {
-                await switchToHumanMode();
-            } else {
-                aiMode = true;
-                currentChatId = null;
-                unsubscribeRealtime();
-                chatBody.innerHTML = '';
-                renderWelcome();
-                updateStatusUI();
+            if (aiMode) { await switchToHumanMode(); }
+            else {
+                aiMode = true; currentChatId = null; unsubscribeRealtime();
+                chatBody.innerHTML = ''; renderWelcome(); updateStatusUI();
             }
         };
 
         window.generateAndSendCode = async function() {
-            if (!currentUser) {
-                showError('برای دریافت کد، ابتدا وارد حساب خود شوید');
-                return;
-            }
-
+            if (!currentUser) { showError('برای دریافت کد، ابتدا وارد حساب خود شوید'); return; }
             if (isSending) return;
-            isSending = true;
-            genCodeBtn.disabled = true;
-
+            isSending = true; genCodeBtn.disabled = true;
             try {
                 const { data: result, error: rpcErr } = await supabase.rpc('generate_otp_for_chat');
-
                 if (rpcErr) throw new Error(rpcErr.message || 'خطا در ساخت کد');
-
                 if (!result || result.success !== true) {
                     if (result && result.error === 'too_soon') {
                         const secs = result.retry_after || 60;
@@ -508,175 +379,117 @@
                     }
                     throw new Error((result && result.error) || 'خطا در ساخت کد');
                 }
-
                 currentChatId = result.chat_id;
-
-                if (aiMode) {
-                    aiMode = false;
-                    updateStatusUI();
-                    subscribeRealtime();
-                }
-
+                if (aiMode) { aiMode = false; updateStatusUI(); subscribeRealtime(); }
                 await loadMessagesFromSupabase();
-
             } catch (e) {
-                console.error('generateAndSendCode error:', e);
                 showError('خطا: ' + (e.message || 'نامشخص'));
             } finally {
-                isSending = false;
-                genCodeBtn.disabled = false;
+                isSending = false; genCodeBtn.disabled = false;
             }
         };
 
         function renderWelcome() {
             chatBody.innerHTML = '';
-            renderMessage('سلام، وقتت بخیر! 👋<br>من دستیار هوشمند پلتفرم <strong>Zenix</strong> هستم. اگر سوالی داری بپرس یا از موضوعات زیر انتخاب کن. اگر به کمک بیشتری نیاز داشتی، از دکمه‌ی بالا «اتصال به ادمین» استفاده کن.', 'bot', new Date().toISOString());
+            renderMessage('سلام، وقتت بخیر! 👋<br>من دستیار هوشمند <strong>Zenix</strong> هستم. اگر سوالی داری بپرس.', 'bot', new Date().toISOString());
             renderQuickReplies();
         }
 
         async function loadMessagesFromSupabase() {
             if (!currentChatId) return;
-
             try {
-                const { data: messages, error } = await supabase
-                    .from('support_messages')
-                    .select('*')
-                    .eq('chat_id', currentChatId)
-                    .order('created_at', { ascending: true });
-
-                if (error) {
-                    console.error('Load messages error:', error);
-                    return;
-                }
+                const { data: messages, error } = await supabase.from('support_messages').select('*').eq('chat_id', currentChatId).order('created_at', { ascending: true });
+                if (error) return;
 
                 chatBody.innerHTML = '';
+                let visibleCount = 0;
 
-                if (!messages || messages.length === 0) {
-                    renderMessage('هنوز پیامی در این گفتگو ثبت نشده است. اولین پیام را شما بنویسید.', 'system', new Date().toISOString());
-                    return;
+                if (messages && messages.length > 0) {
+                    messages.forEach(msg => {
+                        if (msg.sender === 'system' && (msg.text || '').includes('کد محافظ')) {
+                            // ★ کدهای منقضی رو کلاً نمایش نمی‌دیم
+                            if (isCodeExpired(msg.created_at)) return;
+                            const el = renderCodeMessage(msg.text, msg.created_at, msg.created_at);
+                            if (el) visibleCount++;
+                        } else {
+                            const sender = msg.sender === 'admin' ? 'admin' : (msg.sender === 'system' ? 'system' : 'user');
+                            const label = msg.sender === 'admin' ? 'پشتیبان' : (msg.sender === 'system' ? null : 'شما');
+                            renderMessage(msg.text, sender, msg.created_at, label);
+                            visibleCount++;
+                        }
+                    });
                 }
 
-                messages.forEach(msg => {
-                    if (msg.sender === 'system' && (msg.text || '').includes('کد محافظ')) {
-                        renderCodeMessage(msg.text, msg.created_at, msg.created_at);
-                    } else {
-                        const sender = msg.sender === 'admin' ? 'admin' : (msg.sender === 'system' ? 'system' : 'user');
-                        const label = msg.sender === 'admin' ? 'پشتیبان' : (msg.sender === 'system' ? null : 'شما');
-                        renderMessage(msg.text, sender, msg.created_at, label);
-                    }
-                });
+                // ★ اگر همه پیام‌ها منقضی بودن، پیام خوش‌آمد
+                if (visibleCount === 0) {
+                    renderMessage('هنوز پیامی در این گفتگو وجود ندارد. اگر نیاز به کد تأیید دارید، روی «ارسال کد» بزنید.', 'system', new Date().toISOString());
+                }
             } catch (err) {
                 console.error('loadMessagesFromSupabase error:', err);
             }
         }
 
         function unsubscribeRealtime() {
-            if (realtimeChannel) {
-                supabase.removeChannel(realtimeChannel);
-                realtimeChannel = null;
-            }
+            if (realtimeChannel) { supabase.removeChannel(realtimeChannel); realtimeChannel = null; }
         }
 
         function subscribeRealtime() {
             if (!currentChatId) return;
             unsubscribeRealtime();
-
-            realtimeChannel = supabase
-                .channel('support_rt_' + currentChatId)
-                .on('postgres_changes', {
-                    event: 'INSERT',
-                    schema: 'public',
-                    table: 'support_messages',
-                    filter: `chat_id=eq.${currentChatId}`
-                }, () => {
+            realtimeChannel = supabase.channel('support_rt_' + currentChatId)
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'support_messages', filter: `chat_id=eq.${currentChatId}` }, () => {
                     loadMessagesFromSupabase();
-                })
-                .subscribe();
+                }).subscribe();
         }
 
         async function sendMessage() {
             const text = userInput.value.trim();
             if (!text || isSending) return;
-
-            if (!currentUser && !aiMode) {
-                showError('برای ارسال پیام به ادمین ابتدا وارد شوید.');
-                return;
-            }
-
-            isSending = true;
-            sendBtn.disabled = true;
-
+            if (!currentUser && !aiMode) { showError('برای ارسال پیام به ادمین ابتدا وارد شوید.'); return; }
+            isSending = true; sendBtn.disabled = true;
             const quickRepliesEl = document.querySelector('.quick-replies');
             if (quickRepliesEl) quickRepliesEl.remove();
-
             renderMessage(text, 'user', new Date().toISOString(), 'شما');
             userInput.value = '';
-
             try {
                 if (aiMode) {
                     const reply = window.generateAIReply(text);
-
                     if (reply.handled === 'switch_to_admin') {
                         setTimeout(async () => {
-                            renderMessage('باشه، شما را به پشتیبان انسانی وصل می‌کنم. لطفاً چند لحظه صبر کنید...', 'system', new Date().toISOString());
+                            renderMessage('باشه، شما را به پشتیبان انسانی وصل می‌کنم...', 'system', new Date().toISOString());
                             await switchToHumanMode();
                         }, 700);
                     } else if (reply.handled === true) {
                         const typing = renderTyping();
-                        setTimeout(() => {
-                            typing.remove();
-                            renderMessage(reply.text, 'bot', new Date().toISOString());
-                        }, 800);
+                        setTimeout(() => { typing.remove(); renderMessage(reply.text, 'bot', new Date().toISOString()); }, 800);
                     } else {
                         const typing = renderTyping();
                         setTimeout(() => {
                             typing.remove();
-                            renderMessage('متأسفم، در این مورد نمی‌توانم کمکت کنم. اگر مایل باشید، شما را به پشتیبان انسانی وصل می‌کنم.', 'bot', new Date().toISOString());
+                            renderMessage('متأسفم، در این مورد نمی‌توانم کمکت کنم.', 'bot', new Date().toISOString());
                             const div = document.createElement('div');
                             div.className = 'quick-replies';
-                            div.innerHTML = `
-                                <button class="quick-reply-btn admin-link" onclick="window.__switchAdmin()">💬 بله، به ادمین وصل کن</button>
-                                <button class="quick-reply-btn" onclick="document.getElementById('user-input').focus()">✏️ سوال دیگری دارم</button>
-                            `;
+                            div.innerHTML = `<button class="quick-reply-btn admin-link" onclick="window.__switchAdmin()">💬 اتصال به ادمین</button>`;
                             chatBody.appendChild(div);
-                            chatBody.scrollTop = chatBody.scrollHeight;
                         }, 800);
                     }
                 } else {
-                    if (!currentChatId) {
-                        await switchToHumanMode();
-                    }
-
+                    if (!currentChatId) await switchToHumanMode();
                     const now = new Date().toISOString();
                     const { error: msgError } = await supabase.from('support_messages').insert([{
-                        chat_id: currentChatId,
-                        sender: 'user',
-                        text: text,
-                        created_at: now
+                        chat_id: currentChatId, sender: 'user', text: text, created_at: now
                     }]);
-
                     if (msgError) throw msgError;
-
                     await supabase.from('support_chats').update({
-                        last_message: text,
-                        updated_at: now,
-                        unread_by_admin: true,
-                        status: 'waiting_admin'
+                        last_message: text, updated_at: now, unread_by_admin: true, status: 'waiting_admin'
                     }).eq('id', currentChatId);
                 }
-            } catch (err) {
-                console.error('Send error:', err);
-                showError('خطا در ارسال پیام: ' + (err.message || 'نامشخص'));
-            } finally {
-                isSending = false;
-                sendBtn.disabled = false;
-                userInput.focus();
-            }
+            } catch (err) { showError('خطا در ارسال پیام: ' + (err.message || 'نامشخص')); }
+            finally { isSending = false; sendBtn.disabled = false; userInput.focus(); }
         }
 
         window.__switchAdmin = async function() {
-            const quickRepliesEl = document.querySelector('.quick-replies');
-            if (quickRepliesEl) quickRepliesEl.remove();
+            const q = document.querySelector('.quick-replies'); if (q) q.remove();
             renderMessage('باشه، شما را به پشتیبان انسانی وصل می‌کنم...', 'system', new Date().toISOString());
             await switchToHumanMode();
         };
@@ -684,45 +497,24 @@
         async function init() {
             try {
                 const { data: sessionData } = await supabase.auth.getSession();
-                if (sessionData?.session?.user) {
-                    currentUser = sessionData.session.user;
-                }
-
+                if (sessionData?.session?.user) currentUser = sessionData.session.user;
                 updateStatusUI();
                 renderWelcome();
-                userInput.disabled = false;
-                sendBtn.disabled = false;
-                userInput.focus();
-
+                userInput.disabled = false; sendBtn.disabled = false; userInput.focus();
                 if (currentUser && currentUser.email) {
-                    const { data: existingChat } = await supabase
-                        .from('support_chats')
-                        .select('*')
-                        .eq('user_email', currentUser.email)
-                        .maybeSingle();
-
+                    const { data: existingChat } = await supabase.from('support_chats').select('*').eq('user_email', currentUser.email).maybeSingle();
                     if (existingChat) {
-                        aiMode = false;
-                        currentChatId = existingChat.id;
+                        aiMode = false; currentChatId = existingChat.id;
                         updateStatusUI();
                         await loadMessagesFromSupabase();
                         subscribeRealtime();
                     }
                 }
-            } catch (err) {
-                console.error('init error:', err);
-                showError('خطای اتصال: ' + (err.message || 'نامشخص'));
-            }
+            } catch (err) { showError('خطای اتصال: ' + (err.message || 'نامشخص')); }
         }
 
         sendBtn.addEventListener('click', sendMessage);
-        userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
-
+        userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); sendMessage(); } });
         init();
     </script>
 </body>
