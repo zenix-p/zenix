@@ -16,9 +16,7 @@
 
         .view-section{display:flex;flex-direction:column;gap:12px}
 
-        /* ═══════════════════════════════════════════════════ */
         /* صفحه اول — انتخاب موضوع */
-        /* ═══════════════════════════════════════════════════ */
         .topics-section{background:linear-gradient(135deg,rgba(15,23,42,.95),rgba(30,41,59,.85));border:1px solid rgba(56,189,248,.25);border-radius:20px;padding:22px 18px;box-shadow:0 10px 40px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.05);position:relative;overflow:hidden}
         .topics-section::before{content:'';position:absolute;top:-100px;right:-100px;width:250px;height:250px;background:radial-gradient(circle,rgba(56,189,248,.15),transparent 70%);pointer-events:none}
         .topics-section::after{content:'';position:absolute;bottom:-100px;left:-100px;width:250px;height:250px;background:radial-gradient(circle,rgba(168,85,247,.12),transparent 70%);pointer-events:none}
@@ -50,9 +48,7 @@
         .ni-emerald{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3)}
         .ni-amber{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)}
 
-        /* ═══════════════════════════════════════════════════ */
         /* صفحه دوم — چت با کارشناس */
-        /* ═══════════════════════════════════════════════════ */
         .chat-view-header{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
         .close-chat-btn{background:linear-gradient(135deg,#ef4444,#dc2626);border:1px solid rgba(239,68,68,.5);color:#fff;padding:9px 14px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:all .2s;box-shadow:0 4px 15px rgba(239,68,68,.3)}
         .close-chat-btn:hover{background:linear-gradient(135deg,#dc2626,#b91c1c);transform:translateY(-1px);box-shadow:0 6px 20px rgba(239,68,68,.5)}
@@ -103,7 +99,7 @@
         .send-btn{background:#38bdf8;color:#030712;border:none;border-radius:10px;width:40px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
         .send-btn:disabled{background:#475569;cursor:not-allowed}
 
-        .error-banner{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:#f87171;padding:12px;border-radius:10px;font-size:12px;display:none}
+        .error-banner{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:#f87171;padding:12px;border-radius:10px;font-size:12px;display:none;position:sticky;top:70px;z-index:99}
         .error-banner.show{display:block}
         footer{text-align:center;padding:12px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);margin-top:auto}
 
@@ -159,15 +155,13 @@
     <header>
         <div class="logo"><h2>ZENIX SUPPORT</h2></div>
         <div class="header-actions">
-            <a href="#" class="back-btn" onclick="goBack(event)"><i class="fas fa-arrow-right"></i> بازگشت</a>
+            <a href="#" class="back-btn" onclick="goBack(event)"><i class="fas fa-arrow-right"></i> <span id="back-btn-text">بازگشت</span></a>
         </div>
     </header>
     <div class="c">
         <div id="error-banner" class="error-banner"></div>
 
-        <!-- ═══════════════════════════════════════════════════ -->
         <!-- صفحه اول — انتخاب موضوع -->
-        <!-- ═══════════════════════════════════════════════════ -->
         <div id="view-topics" class="view-section">
             <div class="topics-section">
                 <div class="topics-intro">
@@ -184,9 +178,7 @@
             </div>
         </div>
 
-        <!-- ═══════════════════════════════════════════════════ -->
         <!-- صفحه دوم — چت با کارشناس -->
-        <!-- ═══════════════════════════════════════════════════ -->
         <div id="view-chat" class="view-section" style="display:none;">
             <div class="chat-view-header">
                 <button class="close-chat-btn" onclick="window.requestCloseChat()">
@@ -250,15 +242,18 @@
         const chatAvatarEl = document.getElementById('chat-avatar-el');
         const chatAvatarIcon = document.getElementById('chat-avatar-icon');
         const closeModal = document.getElementById('close-modal');
+        const backBtnText = document.getElementById('back-btn-text');
 
         let currentUser = null;
         let currentChatId = null;
-        let currentView = 'topics';
+        let currentView = 'topics';       // 'topics' | 'expert' | 'admin'
         let currentTopic = null;
         let currentConversationId = null;
         let aiMode = true;
         let realtimeChannel = null;
         let isSending = false;
+        let chatIsOpen = false;           // ★ قفل اصلی — تا وقتی false نشه، انتخاب موضوع ممکن نیست
+        let isProcessingTopicClick = false;
 
         const OTP_EXPIRY_MS = 2 * 60 * 1000;
 
@@ -401,28 +396,63 @@
         }
 
         // ═══════════════════════════════════════════════════
-        // ★ انتخاب موضوع
+        // ★ قفل/آزادسازی صفحه موضوعات
+        // ═══════════════════════════════════════════════════
+        function lockTopicsView() {
+            viewTopics.style.setProperty('display', 'none', 'important');
+            viewTopics.style.setProperty('visibility', 'hidden', 'important');
+            viewTopics.style.setProperty('pointer-events', 'none', 'important');
+        }
+
+        function unlockTopicsView() {
+            viewTopics.style.setProperty('display', 'flex', 'important');
+            viewTopics.style.setProperty('visibility', 'visible', 'important');
+            viewTopics.style.setProperty('pointer-events', 'auto', 'important');
+        }
+
+        function showChatView() {
+            viewChat.style.setProperty('display', 'flex', 'important');
+        }
+
+        function hideChatView() {
+            viewChat.style.setProperty('display', 'none', 'important');
+        }
+
+        // ═══════════════════════════════════════════════════
+        // ★ انتخاب موضوع (با ۳ لایه محافظتی)
         // ═══════════════════════════════════════════════════
         window.selectTopic = function(topicKey) {
-            // ★ جلوگیری از انتخاب موضوع جدید وقتی چت بازه
+            // لایه ۱: جلوگیری از کلیک مضاعف سریع
+            if (isProcessingTopicClick) return;
+
+            // لایه ۲: چک قفل اصلی
+            if (chatIsOpen) {
+                showError('⚠️ شما در حال حاضر یک گفتگوی فعال دارید. ابتدا آن را ببندید.');
+                return;
+            }
+
+            // لایه ۳: چک وضعیت view
             if (currentView === 'expert' || currentView === 'admin') {
-                showError('ابتدا باید گفتگوی فعلی را ببندید تا بتوانید موضوع دیگری انتخاب کنید.');
+                showError('⚠️ شما در حال حاضر یک گفتگوی فعال دارید. ابتدا آن را ببندید.');
                 return;
             }
 
             const topic = TOPICS[topicKey];
             if (!topic) return;
 
+            isProcessingTopicClick = true;
+            chatIsOpen = true;
             currentTopic = topicKey;
             currentView = 'expert';
             aiMode = true;
 
-            // Generate unique conversation ID
             currentConversationId = generateConversationId(currentUser?.id, topicKey);
             conversationIdEl.textContent = currentConversationId;
 
-            viewTopics.style.display = 'none';
-            viewChat.style.display = 'flex';
+            // قفل موضوعات + نمایش چت
+            lockTopicsView();
+            showChatView();
+            backBtnText.textContent = 'بازگشت به موضوعات';
 
             chatAvatarEl.classList.add('expert');
             chatAvatarIcon.className = 'fas fa-user-tie';
@@ -437,7 +467,13 @@
             chatBody.innerHTML = '';
             renderMessage(topic.welcome, 'bot', new Date().toISOString(), `${topic.expert.name} (${topic.expert.role})`);
 
-            setTimeout(() => userInput.focus(), 200);
+            // اسکرول به بالای صفحه
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            setTimeout(() => {
+                userInput.focus();
+                isProcessingTopicClick = false;
+            }, 300);
         };
 
         // ═══════════════════════════════════════════════════
@@ -457,15 +493,21 @@
         };
 
         function closeChat() {
-            unsubscribeRealtime();
+            // آزادسازی قفل
+            chatIsOpen = false;
             currentTopic = null;
             currentChatId = null;
             currentConversationId = null;
             currentView = 'topics';
             aiMode = true;
+            isProcessingTopicClick = false;
 
-            viewChat.style.display = 'none';
-            viewTopics.style.display = 'flex';
+            unsubscribeRealtime();
+
+            // مخفی کردن چت + نمایش موضوعات
+            hideChatView();
+            unlockTopicsView();
+            backBtnText.textContent = 'بازگشت';
 
             userInput.value = '';
             userInput.disabled = true;
@@ -480,9 +522,11 @@
             currentView = 'admin';
             aiMode = false;
             currentTopic = null;
+            chatIsOpen = true;   // ★ قفل
 
-            viewTopics.style.display = 'none';
-            viewChat.style.display = 'flex';
+            lockTopicsView();
+            showChatView();
+            backBtnText.textContent = 'بازگشت به موضوعات';
 
             chatAvatarEl.classList.add('expert');
             chatAvatarIcon.className = 'fas fa-headset';
@@ -504,6 +548,28 @@
             await loadMessagesFromSupabase();
             subscribeRealtime();
         }
+
+        // ═══════════════════════════════════════════════════
+        // ★ goBack هوشمند — اگه در چت هستی، ببند؛ اگه در موضوعات هستی، برو
+        // ═══════════════════════════════════════════════════
+        window.goBack = function(event) {
+            if (event) event.preventDefault();
+
+            // اگر در چت هستیم، اول باید گفتگو بسته شود
+            if (chatIsOpen || currentView === 'expert' || currentView === 'admin') {
+                requestCloseChat();
+                return;
+            }
+
+            // اگر در صفحه موضوعات هستیم، به پلتفرم برگرد
+            if (sessionStorage.getItem('zenix_return_page')) {
+                window.location.href = sessionStorage.getItem('zenix_return_page');
+            } else if (document.referrer && document.referrer.includes(window.location.host)) {
+                window.history.back();
+            } else {
+                window.location.href = 'dashboard.html';
+            }
+        };
 
         function generateTopicReply(question) {
             if (!currentTopic) return { handled: false, text: 'لطفاً ابتدا یک موضوع انتخاب کنید.' };
@@ -550,7 +616,8 @@
         function showError(msg) {
             errorBanner.textContent = msg;
             errorBanner.classList.add('show');
-            setTimeout(() => errorBanner.classList.remove('show'), 5000);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(() => errorBanner.classList.remove('show'), 4000);
         }
 
         function isCodeExpired(createdAt) {
@@ -559,17 +626,6 @@
             if (isNaN(createdMs)) return false;
             return (Date.now() - createdMs) >= OTP_EXPIRY_MS;
         }
-
-        window.goBack = function(event) {
-            if (event) event.preventDefault();
-            if (sessionStorage.getItem('zenix_return_page')) {
-                window.location.href = sessionStorage.getItem('zenix_return_page');
-            } else if (document.referrer && document.referrer.includes(window.location.host)) {
-                window.history.back();
-            } else {
-                window.location.href = 'dashboard.html';
-            }
-        };
 
         window.copyOtp = async function(code, btn) {
             try {
@@ -700,6 +756,7 @@
             aiMode = false;
             currentView = 'admin';
             currentTopic = null;
+            chatIsOpen = true;
 
             chatAvatarEl.classList.add('expert');
             chatAvatarIcon.className = 'fas fa-headset';
@@ -833,7 +890,6 @@
                 const { data: sessionData } = await supabase.auth.getSession();
                 if (sessionData?.session?.user) currentUser = sessionData.session.user;
 
-                // آیا از پروفایل اومده برای دریافت کد؟
                 const fromProfile = !!sessionStorage.getItem('zenix_return_focus');
 
                 if (fromProfile) {
@@ -845,9 +901,12 @@
                     return;
                 }
 
-                viewTopics.style.display = 'flex';
-                viewChat.style.display = 'none';
+                // حالت اولیه — موضوعات باز
+                chatIsOpen = false;
                 currentView = 'topics';
+                unlockTopicsView();
+                hideChatView();
+                backBtnText.textContent = 'بازگشت';
             } catch (err) {
                 console.error('init error:', err);
             }
