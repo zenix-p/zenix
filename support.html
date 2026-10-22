@@ -114,7 +114,7 @@
         let realtimeChannel = null;
         let isSending = false;
 
-        const OTP_EXPIRY_MS = 2 * 60 * 1000; // ۲ دقیقه
+        const OTP_EXPIRY_MS = 2 * 60 * 1000;
 
         function escapeHtml(value) {
             return String(value == null ? '' : value)
@@ -150,13 +150,12 @@
         };
 
         // ═══════════════════════════════════════════════════
-        // ★ کپی کد در کلیپ‌بورد
+        // ★ کپی کد + بازگشت خودکار به صفحه قبلی
         // ═══════════════════════════════════════════════════
         window.copyOtp = async function(code, btn) {
             try {
                 await navigator.clipboard.writeText(code);
             } catch (e) {
-                // Fallback برای مرورگرهای قدیمی
                 const ta = document.createElement('textarea');
                 ta.value = code;
                 ta.style.position = 'fixed';
@@ -170,16 +169,32 @@
                 const orig = btn.innerHTML;
                 btn.classList.add('copied');
                 btn.innerHTML = '<i class="fas fa-check"></i>';
+            }
+
+            // ★ بازگشت خودکار به صفحه‌ای که ازش اومده
+            const returnPage = sessionStorage.getItem('zenix_return_page');
+            if (returnPage) {
+                // نمایش یک اعلان کوچیک
+                const toast = document.createElement('div');
+                toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:rgba(34,197,94,.95);color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:700;z-index:99999;box-shadow:0 8px 25px rgba(34,197,94,.5);direction:rtl;display:flex;align-items:center;gap:8px;';
+                toast.innerHTML = '<i class="fas fa-check-circle"></i> کد کپی شد، در حال بازگشت...';
+                document.body.appendChild(toast);
+
                 setTimeout(() => {
-                    btn.classList.remove('copied');
-                    btn.innerHTML = orig;
+                    sessionStorage.removeItem('zenix_return_page');
+                    window.location.href = returnPage;
+                }, 1200);
+            } else {
+                // اگر صفحه قبلی نبود، فقط دکمه رو ریست کن
+                setTimeout(() => {
+                    if (btn) {
+                        btn.classList.remove('copied');
+                        btn.innerHTML = '<i class="fas fa-copy"></i>';
+                    }
                 }, 1500);
             }
         };
 
-        // ═══════════════════════════════════════════════════
-        // ★ رندر پیام عادی
-        // ═══════════════════════════════════════════════════
         function renderMessage(text, sender, timeIso, senderLabel) {
             const div = document.createElement('div');
             div.className = `msg ${sender}`;
@@ -191,9 +206,6 @@
             return div;
         }
 
-        // ═══════════════════════════════════════════════════
-        // ★ رندر پیام کد محافظ (با تایمر + کپی + انقضا)
-        // ═══════════════════════════════════════════════════
         function renderCodeMessage(text, timeIso, createdAt) {
             const div = document.createElement('div');
             div.className = 'msg system code-msg';
@@ -202,7 +214,6 @@
             const otpCode = match ? match[1] : null;
 
             if (!otpCode) {
-                // اگر کد پیدا نشد، همان متن خام رو نمایش بده
                 div.innerHTML = text + `<span class="msg-meta">${formatTime(timeIso)}</span>`;
                 chatBody.appendChild(div);
                 chatBody.scrollTop = chatBody.scrollHeight;
