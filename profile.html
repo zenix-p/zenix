@@ -19,13 +19,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script type="text/javascript">
-        (function(){
-            emailjs.init("oUKHgDSK6qIwpCE9p");
-        })();
-    </script>
-
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
         body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
@@ -68,6 +61,8 @@
         .bs{display:block;width:100%;background:#38bdf8;color:#0f172a;border:none;padding:10px;font-weight:bold;border-radius:8px;cursor:pointer;font-size:14px;text-align:center}
         .bs:hover{background:#0ea5e9}
         .bs:disabled{opacity:0.6;cursor:not-allowed;background:#64748b;color:#cbd5e1}
+        .bs-purple{background:#a855f7;color:#fff}
+        .bs-purple:hover{background:#9333ea}
         .ibox{display:flex;justify-content:space-between;align-items:center;background:rgba(15,23,42,0.6);padding:12px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);margin-bottom:12px}
         .c-dropdown{position:relative;width:110px}
         .c-select-btn{background:#0f172a;color:#f8fafc;border:1px solid rgba(255,255,255,0.2);padding:8px;border-radius:6px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -99,8 +94,13 @@
         .hint-box{padding:12px 14px;border-radius:8px;font-size:12px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px;line-height:1.6}
         .hint-first{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.35);color:#22c55e}
         .hint-change{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.35);color:#fbbf24}
+        .hint-chat{background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.35);color:#c084fc;margin-bottom:12px}
         .hint-box i{font-size:16px;margin-top:2px;flex-shrink:0}
         .lock-icon{font-size:11px;color:#64748b;margin-inline-start:6px;}
+        .otp-row{display:flex;gap:8px;align-items:flex-start}
+        .otp-row .bs{width:auto;flex-shrink:0;padding:10px 14px;font-size:12px;white-space:nowrap}
+        .chat-link-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);color:#c084fc;padding:8px 14px;border-radius:8px;font-size:12px;text-decoration:none;font-weight:600;cursor:pointer;margin-top:8px}
+        .chat-link-btn:hover{background:rgba(168,85,247,.25);color:#e0c7ff}
     </style>
 </head>
 <body>
@@ -207,14 +207,18 @@
                 <i class="fas fa-chevron-down ch"></i>
             </div>
             <div class="bd">
-                <div class="fg">
-                    <label class="fl">ایمیل</label>
-                    <div style="display:flex;gap:8px;">
-                        <input type="email" class="fi" id="pwd-email" readonly disabled placeholder="در حال دریافت ایمیل...">
-                        <button type="button" class="bs" style="width:130px;font-size:12px;" onclick="window.sendEmailCode('pwd-email', this)">ارسال کد به ایمیل</button>
-                    </div>
+                <div class="hint-box hint-chat">
+                    <i class="fas fa-shield-alt"></i>
+                    <div>برای تغییر رمز، ابتدا از چت پشتیبانی کد ۶ رقمی بگیرید.</div>
                 </div>
-                <div class="fg"><label class="fl">کد ۶ رقمی تأیید ایمیل</label><input type="text" class="fi" id="pwd-code" maxlength="6" placeholder="مثال: 849201"></div>
+                <div class="fg">
+                    <label class="fl">دریافت کد از پشتیبانی</label>
+                    <div class="otp-row">
+                        <button type="button" class="bs bs-purple" onclick="window.requestOtpViaChat(this)" style="flex:1;">🔐 دریافت کد از پشتیبانی</button>
+                    </div>
+                    <a href="support.html" class="chat-link-btn" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);"><i class="fas fa-comments"></i> رفتن به چت پشتیبانی</a>
+                </div>
+                <div class="fg"><label class="fl">کد ۶ رقمی از چت پشتیبانی</label><input type="text" class="fi" id="pwd-code" maxlength="6" placeholder="مثال: 849201" inputmode="numeric"></div>
                 <div class="fg"><label class="fl">رمز فعلی</label><input type="password" class="fi" id="pwd-curr"></div>
                 <div class="fg"><label class="fl">رمز جدید</label><input type="password" class="fi" id="pwd-new"></div>
                 <div class="fg"><label class="fl">تکرار رمز جدید</label><input type="password" class="fi" id="pwd-conf"></div>
@@ -228,14 +232,18 @@
                 <i class="fas fa-chevron-down ch"></i>
             </div>
             <div class="bd">
-                <div class="fg">
-                    <label class="fl">ایمیل</label>
-                    <div style="display:flex;gap:8px;">
-                        <input type="email" class="fi" id="tr-email" readonly disabled placeholder="در حال دریافت ایمیل...">
-                        <button type="button" class="bs" style="width:130px;font-size:12px;" onclick="window.sendEmailCode('tr-email', this)">ارسال کد به ایمیل</button>
-                    </div>
+                <div class="hint-box hint-chat">
+                    <i class="fas fa-shield-alt"></i>
+                    <div>برای تغییر رمز تراکنش، ابتدا از چت پشتیبانی کد ۶ رقمی بگیرید.</div>
                 </div>
-                <div class="fg"><label class="fl">کد ۶ رقمی تأیید</label><input type="text" class="fi" id="tr-code" maxlength="6" placeholder="مثال: 849201"></div>
+                <div class="fg">
+                    <label class="fl">دریافت کد از پشتیبانی</label>
+                    <div class="otp-row">
+                        <button type="button" class="bs bs-purple" onclick="window.requestOtpViaChat(this)" style="flex:1;">🔐 دریافت کد از پشتیبانی</button>
+                    </div>
+                    <a href="support.html" class="chat-link-btn" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);"><i class="fas fa-comments"></i> رفتن به چت پشتیبانی</a>
+                </div>
+                <div class="fg"><label class="fl">کد ۶ رقمی از چت پشتیبانی</label><input type="text" class="fi" id="tr-code" maxlength="6" placeholder="مثال: 849201" inputmode="numeric"></div>
                 <div class="fg"><label class="fl">رمز فعلی (اختیاری برای تغییر)</label><input type="password" class="fi" id="tr-curr"></div>
                 <div class="fg"><label class="fl">رمز جدید (۶ رقم)</label><input type="password" class="fi" id="tr-new" maxlength="6" inputmode="numeric" placeholder="مثال: 849201"></div>
                 <button type="button" class="bs" onclick="window.validateTxForm(this)">ذخیره تغییرات</button>
@@ -254,7 +262,7 @@
                 </div>
                 <div id="wal-change-hint" class="hint-box hint-change" style="display:none;">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <div>آدرس‌های ثبت‌شده قفل هستند. برای <strong>ویرایش</strong>، ابتدا کد تأیید ایمیل را دریافت و وارد کنید، سپس فیلدها باز می‌شوند. اگر فیلدی خالی است، بدون نیاز به کد می‌توانید آن را پر کنید.</div>
+                    <div>آدرس‌های ثبت‌شده قفل هستند. برای <strong>ویرایش</strong>، ابتدا کد تأیید را از چت پشتیبانی دریافت و وارد کنید، سپس فیلدها باز می‌شوند. اگر فیلدی خالی است، بدون نیاز به کد می‌توانید آن را پر کنید.</div>
                 </div>
 
                 <div class="fg">
@@ -267,17 +275,21 @@
                 </div>
 
                 <div id="wal-otp-section" style="display:none;">
-                    <div class="fg">
-                        <label class="fl">ایمیل</label>
-                        <div style="display:flex;gap:8px;">
-                            <input type="email" class="fi" id="wal-email" readonly disabled placeholder="در حال دریافت ایمیل...">
-                            <button type="button" class="bs" style="width:130px;font-size:12px;" onclick="window.sendEmailCode('wal-email', this)">ارسال کد به ایمیل</button>
-                        </div>
+                    <div class="hint-box hint-chat">
+                        <i class="fas fa-shield-alt"></i>
+                        <div>برای ویرایش آدرس‌های ثبت‌شده، از چت پشتیبانی کد ۶ رقمی بگیرید.</div>
                     </div>
                     <div class="fg">
-                        <label class="fl">کد ۶ رقمی تأیید (برای باز کردن قفل ویرایش)</label>
+                        <label class="fl">دریافت کد از پشتیبانی</label>
+                        <div class="otp-row">
+                            <button type="button" class="bs bs-purple" onclick="window.requestOtpViaChat(this)" style="flex:1;">🔐 دریافت کد از پشتیبانی</button>
+                        </div>
+                        <a href="support.html" class="chat-link-btn" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);"><i class="fas fa-comments"></i> رفتن به چت پشتیبانی</a>
+                    </div>
+                    <div class="fg">
+                        <label class="fl">کد ۶ رقمی از چت پشتیبانی (برای باز کردن قفل ویرایش)</label>
                         <div style="display:flex;gap:8px;">
-                            <input type="text" class="fi" id="wal-code" maxlength="6" placeholder="مثال: 849201" inputmode="numeric">
+                            <input type="text" class="fi" id="wal-code" maxlength="6" placeholder="مثال: 849201" inputmode="numeric" style="flex:1;">
                             <button type="button" class="bs" style="width:130px;font-size:12px;background:#22c55e;color:#fff;" onclick="window.verifyWalletCode(this)">تایید و باز کردن قفل</button>
                         </div>
                     </div>
@@ -334,8 +346,8 @@
             <div class="modal-header"><span>راهنمای صفحه پروفایل</span><button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button></div>
             <div style="overflow-y:auto;padding-right:4px">
                 <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-user-cog" style="color:#38bdf8"></i> کاربرد این صفحه چیست؟</div><div class="msg-desc-text">در این صفحه می‌توانید اطلاعات شخصی، شماره تماس، ایمیل و تنظیمات امنیتی حساب خود را مدیریت کنید.</div></div>
-                <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-shield-alt" style="color:#38bdf8"></i> وضعیت حساب</div><div class="msg-desc-text">وضعیت تایید حساب و ثبت شماره تماس برای امنیت بیشتر در این قسمت مدیریت می‌شود.</div></div>
-                <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-key" style="color:#a855f7"></i> کلمات عبور و کیف پول</div><div class="msg-desc-text">آدرس‌های کیف پول بعد از ثبت قفل می‌شوند. برای تغییر، باید کد تایید ایمیل را وارد کنید.</div></div>
+                <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-shield-alt" style="color:#a855f7"></i> کد تأیید از چت پشتیبانی</div><div class="msg-desc-text">برای تغییر رمز یا آدرس کیف پول، ابتدا روی «دریافت کد از پشتیبانی» بزنید، سپس به چت پشتیبانی بروید و کد ۶ رقمی را کپی کنید. کد تا ۲ دقیقه معتبر است.</div></div>
+                <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-key" style="color:#22c55e"></i> رمز تراکنش</div><div class="msg-desc-text">رمز تراکنش برای برداشت و تأیید عملیات مالی استفاده می‌شود. هرگز آن را با کسی به اشتراک نگذارید.</div></div>
             </div>
         </div>
     </div>
@@ -458,12 +470,6 @@
         const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         window.supabaseClient = supabaseClient;
-
-        const EMAILJS_SERVICE_ID = "service_61bzf1a";
-        const EMAILJS_TEMPLATE_ID = "template_jyzgfs8";
-        const EMAILJS_PUBLIC_KEY = "oUKHgDSK6qIwpCE9p";
-
-        const OTP_COOLDOWN_MS = 120000; // ★ ۲ دقیقه
 
         let currentUser = null, currentUserId = null, userRealtimeChannel = null, notificationRealtimeChannel = null, authInitialized = false, welcomeModalInitialized = false;
 
@@ -620,59 +626,52 @@
             container.innerHTML = html;
         };
 
-        function runCountdown(btnEl, emailInputId) {
-            const origText = 'ارسال کد به ایمیل';
-            const expireTime = parseInt(localStorage.getItem('otp_cooldown_' + emailInputId) || '0', 10);
-            const remaining = Math.ceil((expireTime - Date.now()) / 1000);
-            if (remaining <= 0) { btnEl.disabled = false; btnEl.textContent = origText; localStorage.removeItem('otp_cooldown_' + emailInputId); return; }
-            btnEl.disabled = true;
-            let countdown = remaining;
-            btnEl.textContent = `${countdown} ثانیه`;
-            const timer = setInterval(() => {
-                countdown--;
-                if (countdown <= 0) { clearInterval(timer); btnEl.disabled = false; btnEl.textContent = origText; localStorage.removeItem('otp_cooldown_' + emailInputId); }
-                else { btnEl.textContent = `${countdown} ثانیه`; }
-            }, 1000);
-        }
+        // ═══════════════════════════════════════════════════
+        // ★ تابع جدید: درخواست OTP از چت پشتیبانی
+        // ═══════════════════════════════════════════════════
+        window.requestOtpViaChat = async function(btnEl) {
+            if (!currentUser) {
+                window.showToast('ابتدا وارد حساب خود شوید', 'error', 4000);
+                return;
+            }
 
-        window.sendEmailCode = async function(emailInputId, btnEl) {
-            const emailInput = document.getElementById(emailInputId);
-            const email = emailInput && emailInput.value ? emailInput.value.trim() : (currentUser ? currentUser.email : '');
-            if (!email || !email.includes('@')) { window.showToast('لطفاً یک ایمیل معتبر وارد کنید.', 'error', 4000); return; }
+            const origText = btnEl ? btnEl.textContent : 'دریافت کد از پشتیبانی';
+            if (btnEl) { btnEl.disabled = true; btnEl.textContent = '⏳ در حال ارسال...'; }
 
-            const origText = btnEl ? btnEl.textContent : 'ارسال کد به ایمیل';
             try {
-                if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'در حال ارسال...'; }
+                const { data, error } = await supabaseClient.rpc('generate_otp_for_chat');
 
-                const { data: otpResult, error: otpErr } = await supabaseClient.rpc('generate_otp');
-                if (otpErr) throw new Error(otpErr.message || 'خطا در ساخت OTP');
-                if (!otpResult || otpResult.success !== true) {
-                    if (otpResult && otpResult.error === 'too_soon') {
-                        const secs = otpResult.retry_after || 60;
-                        window.showToast(`لطفاً ${secs} ثانیه صبر کنید.`, 'error', 4000);
-                        if (btnEl) { btnEl.disabled = false; btnEl.textContent = origText; }
-                        return;
+                if (error) throw error;
+
+                if (!data || data.success !== true) {
+                    if (data && data.error === 'too_soon') {
+                        const secs = data.retry_after || 60;
+                        window.showToast(`⏳ لطفاً ${secs} ثانیه صبر کنید`, 'error', 4000);
+                    } else {
+                        window.showToast('خطا: ' + (data?.error || 'نامشخص'), 'error', 4000);
                     }
-                    throw new Error('خطا در ساخت OTP');
+                    if (btnEl) { btnEl.disabled = false; btnEl.textContent = origText; }
+                    return;
                 }
-                const otpCode = otpResult.otp;
 
-                await emailjs.send(
-                    EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID,
-                    { to_email: email, email: email, otp_code: otpCode, code: otpCode, otp: otpCode, passcode: otpCode, verification_code: otpCode, message: otpCode },
-                    EMAILJS_PUBLIC_KEY
-                );
+                // ذخیره صفحه فعلی برای بازگشت
+                sessionStorage.setItem('zenix_return_page', window.location.href);
 
-                window.showToast(`کد تایید به ایمیل ${email} ارسال شد.`, 'success', 5000);
-                // ★ کول‌داون ۲ دقیقه
-                const expireTime = Date.now() + OTP_COOLDOWN_MS;
-                localStorage.setItem('otp_cooldown_' + emailInputId, expireTime);
-                if (btnEl) runCountdown(btnEl, emailInputId);
-            } catch (error) {
+                // پیام موفق
+                window.showToast('✅ کد ۶ رقمی به چت پشتیبانی ارسال شد', 'success', 5000);
+
+                // هدایت به چت پس از ۱.۵ ثانیه
+                setTimeout(() => {
+                    if (confirm('کد به چت پشتیبانی ارسال شد.\n\nآیا می‌خواهید به صفحه پشتیبانی بروید و کد را ببینید؟')) {
+                        window.location.href = 'support.html';
+                    }
+                }, 800);
+
                 if (btnEl) { btnEl.disabled = false; btnEl.textContent = origText; }
-                console.error('خطا در ارسال کد:', error);
-                const errMsg = error?.text || error?.message || 'نامشخص';
-                window.showToast('خطا: ' + errMsg, 'error', 4000);
+
+            } catch (e) {
+                window.showToast('خطا: ' + (e.message || 'نامشخص'), 'error', 5000);
+                if (btnEl) { btnEl.disabled = false; btnEl.textContent = origText; }
             }
         };
 
@@ -691,7 +690,6 @@
                     else { statusEl.textContent = 'غیرفعال'; statusEl.style.color = '#ef4444'; }
                 }
 
-                // ★ ذخیره مقادیر قبلی
                 window._oldTrx = data.trx_address || '';
                 window._oldBep = data.bep20_address || '';
 
@@ -703,7 +701,6 @@
                 trxIn.value = window._oldTrx;
                 bepIn.value = window._oldBep;
 
-                // ★ اگه OTP تایید نشده، فیلدهای ذخیره‌شده قفل باشن
                 const otpVerified = window._walletOtpVerified === true;
 
                 if (window._oldTrx && !otpVerified) {
@@ -761,7 +758,6 @@
             if (!session || !session.user || authInitialized) return false;
             currentUser = session.user; currentUserId = session.user.id;
             await updateNotificationBadge();
-            ['email-curr', 'pwd-email', 'tr-email', 'wal-email'].forEach(id => { const el = document.getElementById(id); if (el) el.value = session.user.email || ''; });
             const fullNameEl = document.getElementById('user-fullname');
             if (fullNameEl) fullNameEl.textContent = session.user.user_metadata?.fullname || session.user.user_metadata?.full_name || session.user.email;
             await loadUserData(session.user);
@@ -852,7 +848,7 @@
             const newPass = (document.getElementById('tr-new')?.value || '').trim();
             const currPass = (document.getElementById('tr-curr')?.value || '').trim();
 
-            if (!code || code.length !== 6 || !/^\d+$/.test(code)) { window.showToast('کد ۶ رقمی تأیید ایمیل را وارد کنید.', 'error', 4000); return; }
+            if (!code || code.length !== 6 || !/^\d+$/.test(code)) { window.showToast('کد ۶ رقمی از چت پشتیبانی را وارد کنید.', 'error', 4000); return; }
             if (!newPass || !/^\d{6}$/.test(newPass)) { window.showToast('رمز جدید باید ۶ رقم باشد.', 'error', 4000); return; }
             if (!currentUser) { window.showToast('نشست شما یافت نشد.', 'error', 4000); return; }
 
@@ -891,8 +887,8 @@
                     const errMap = {
                         'not_authenticated': 'نشست شما یافت نشد',
                         'invalid_password_format': 'رمز جدید باید ۶ رقم باشد',
-                        'no_otp': 'ابتدا کد تأیید را ارسال کنید',
-                        'otp_expired': 'کد منقضی شده — دوباره ارسال کنید',
+                        'no_otp': 'ابتدا از چت پشتیبانی کد دریافت کنید',
+                        'otp_expired': 'کد منقضی شده — دوباره از چت دریافت کنید',
                         'invalid_otp': 'کد تأیید اشتباه است',
                         'too_many_attempts': '🚫 تلاش‌های زیاد — ۱۵ دقیقه صبر کنید'
                     };
@@ -905,11 +901,10 @@
             }
         };
 
-        // ★★★ تایید کد → باز کردن قفل فیلدها ★★★
         window.verifyWalletCode = async function(btn) {
             const code = (document.getElementById('wal-code')?.value || '').trim();
             if (!code || code.length !== 6 || !/^\d+$/.test(code)) {
-                window.showToast('کد ۶ رقمی را وارد کنید.', 'error', 4000);
+                window.showToast('کد ۶ رقمی از چت پشتیبانی را وارد کنید.', 'error', 4000);
                 return;
             }
             const origText = btn ? btn.textContent : 'تایید کد';
@@ -927,7 +922,6 @@
                 }
                 if (ok === true) {
                     window._walletOtpVerified = true;
-                    // ★ باز کردن قفل فیلدها
                     const trxIn = document.getElementById('trx-in');
                     const bepIn = document.getElementById('bep-in');
                     const trxLockIcon = document.getElementById('trx-lock-icon');
@@ -965,7 +959,6 @@
                 return;
             }
 
-            // ★ منطق OTP: فقط اگر مقدار پر را تغییر دهیم و OTP تایید نشده
             const oldTrx = window._oldTrx || '';
             const oldBep = window._oldBep || '';
             const changingTrx = oldTrx && trx !== oldTrx;
@@ -976,7 +969,7 @@
             if (needsOtp) {
                 otpCode = (document.getElementById('wal-code')?.value || '').trim();
                 if (!otpCode || otpCode.length !== 6) {
-                    window.showToast('برای تغییر آدرس ثبت‌شده، ابتدا کد تأیید ایمیل را دریافت و تایید کنید.', 'error', 5000);
+                    window.showToast('برای تغییر آدرس ثبت‌شده، ابتدا از چت پشتیبانی کد دریافت و تایید کنید.', 'error', 5000);
                     return;
                 }
             }
@@ -994,11 +987,7 @@
                 if (error) throw error;
 
                 if (data && data.success) {
-                    if (data.needed_otp) {
-                        window.showToast('✅ آدرس‌ها با موفقیت تغییر کردند.', 'success', 5000);
-                    } else {
-                        window.showToast('✅ آدرس‌ها ذخیره شدند.', 'success', 5000);
-                    }
+                    window.showToast('✅ آدرس‌ها با موفقیت ذخیره شدند.', 'success', 5000);
                     document.getElementById('wal-code').value = '';
                     window._walletOtpVerified = false;
                     await loadUserData(currentUser);
@@ -1007,8 +996,8 @@
                         'not_authenticated': 'نشست شما یافت نشد',
                         'invalid_trx': 'آدرس TRX نامعتبر است',
                         'invalid_bep': 'آدرس BEP20 نامعتبر است',
-                        'no_otp': 'ابتدا کد تأیید را ارسال کنید',
-                        'otp_expired': 'کد منقضی شده — دوباره ارسال کنید',
+                        'no_otp': 'ابتدا از چت پشتیبانی کد دریافت کنید',
+                        'otp_expired': 'کد منقضی شده — دوباره از چت دریافت کنید',
                         'invalid_otp': 'کد تأیید اشتباه است',
                         'too_many_attempts': '🚫 تلاش‌های زیاد — ۱۵ دقیقه صبر کنید'
                     };
