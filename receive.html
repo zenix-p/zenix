@@ -77,6 +77,10 @@
         .fi{width:100%;padding:10px 14px;background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#f8fafc;font-size:13px;outline:none;transition:border-color 0.2s}
         .fi:focus{border-color:#38bdf8}
         .fi[readonly]{background:rgba(15,23,42,0.5);color:#38bdf8;cursor:not-allowed;font-weight:700;font-size:15px}
+        #withdraw-address{font-family:ui-monospace,'Courier New',monospace;direction:ltr;text-align:left;letter-spacing:0.3px;font-size:12px}
+        .address-display-locked{padding:10px 14px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.35);border-radius:8px;color:#86efac;font-family:ui-monospace,'Courier New',monospace;font-size:12px;direction:ltr;text-align:left;line-height:1.6;display:flex;align-items:center;gap:10px;min-height:42px;word-break:break-all}
+        .address-display-locked i{color:#22c55e;flex-shrink:0;font-size:14px}
+        .address-display-locked span{flex:1;word-break:break-all}
         .bs{display:block;width:100%;background:#38bdf8;color:#0f172a;border:none;padding:12px;font-weight:bold;border-radius:8px;cursor:pointer;font-size:14px;text-align:center;transition:0.2s;font-family:inherit}
         .bs:hover:not(:disabled){background:#0ea5e9}
         .bs:disabled{opacity:0.55;cursor:not-allowed;background:#475569}
@@ -101,6 +105,8 @@
         footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
         @media (max-width:640px){
             input,select,textarea,.fi{font-size:16px !important}
+            #withdraw-address{font-size:11px !important;padding:10px 8px !important;letter-spacing:0}
+            .address-display-locked{font-size:11px;padding:10px 10px}
             header{padding:8px 12px}
             .logo-text{font-size:16px;letter-spacing:1px}
             .logo-icon{width:32px;height:32px;font-size:15px}
@@ -221,6 +227,10 @@
             <div class="fg">
                 <label class="fl" data-i18n="addressLabel">آدرس کیف پول مقصد</label>
                 <input type="text" id="withdraw-address" class="fi" data-i18n-placeholder="addressPlaceholder" placeholder="آدرس کیف پول را وارد کنید" autocomplete="off" spellcheck="false">
+                <div id="withdraw-address-display" class="address-display-locked" style="display:none;">
+                    <i class="fas fa-lock"></i>
+                    <span></span>
+                </div>
             </div>
             <div class="fg">
                 <label class="fl" data-i18n="amountLabel">مبلغ برداشت (USDT)</label>
@@ -500,9 +510,26 @@
 
         window.onNetworkChange = function(){
             var net = document.getElementById('withdraw-network').value;
+            var addrInput = document.getElementById('withdraw-address');
+            var addrDisplay = document.getElementById('withdraw-address-display');
+            var addrDisplayText = addrDisplay ? addrDisplay.querySelector('span') : null;
+
             if(userData){
-                if(net==='TRC20' && userData.trx_address) document.getElementById('withdraw-address').value = userData.trx_address;
-                else if(net==='BEP20' && userData.bep20_address) document.getElementById('withdraw-address').value = userData.bep20_address;
+                var savedAddr = net==='TRC20' ? (userData.trx_address || '') : (userData.bep20_address || '');
+                if(savedAddr) {
+                    addrInput.value = savedAddr;
+                    addrInput.readOnly = true;
+                    addrInput.style.display = 'none';
+                    if(addrDisplay && addrDisplayText){
+                        addrDisplayText.textContent = savedAddr;
+                        addrDisplay.style.display = 'flex';
+                    }
+                } else {
+                    addrInput.value = '';
+                    addrInput.readOnly = false;
+                    addrInput.style.display = 'block';
+                    if(addrDisplay) addrDisplay.style.display = 'none';
+                }
             }
         };
 
