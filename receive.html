@@ -80,8 +80,16 @@
         .bs{display:block;width:100%;background:#38bdf8;color:#0f172a;border:none;padding:12px;font-weight:bold;border-radius:8px;cursor:pointer;font-size:14px;text-align:center;transition:0.2s;font-family:inherit}
         .bs:hover:not(:disabled){background:#0ea5e9}
         .bs:disabled{opacity:0.55;cursor:not-allowed;background:#475569}
-        select.fi{-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2338bdf8' stroke-width='3' stroke-linecap='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:left 14px center;padding-left:38px}
-        [dir="ltr"] select.fi{background-position:right 14px center;padding-left:14px;padding-right:38px}
+        .network-selector{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+        .network-card{display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;background:rgba(15,23,42,0.8);border:1.5px solid rgba(255,255,255,0.1);cursor:pointer;transition:all 0.2s;position:relative;user-select:none}
+        .network-card:hover{border-color:rgba(56,189,248,0.5);background:rgba(30,41,59,0.9)}
+        .network-card.active{border-color:#38bdf8;background:rgba(56,189,248,0.1);box-shadow:0 0 0 3px rgba(56,189,248,0.15)}
+        .network-icon{width:36px;height:36px;border-radius:9px;display:grid;place-items:center;font-size:15px;flex-shrink:0}
+        .network-body{flex:1;min-width:0}
+        .network-name{font-size:13px;font-weight:800;color:#f8fafc;line-height:1.2}
+        .network-sub{font-size:10px;color:#94a3b8;margin-top:2px}
+        .network-check{opacity:0;color:#38bdf8;font-size:16px;transition:all 0.2s;flex-shrink:0}
+        .network-card.active .network-check{opacity:1}
         .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px);padding:16px}
         .modal.show{display:flex}
         .modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(56,189,248,.3);border-radius:20px;width:100%;max-width:460px;max-height:85vh;display:flex;flex-direction:column;padding:22px;overflow:hidden}
@@ -109,6 +117,11 @@
             .lvl-icon,.amt-icon{width:30px;height:30px;font-size:13px;border-radius:8px}
             .lvl-label{font-size:9px}
             .lvl-value,.amt-value{font-size:13px}
+            .network-card{padding:10px 8px;gap:8px}
+            .network-icon{width:30px;height:30px;font-size:13px;border-radius:8px}
+            .network-name{font-size:12px}
+            .network-sub{font-size:9px}
+            .network-check{font-size:14px}
         }
     </style>
 </head>
@@ -185,10 +198,25 @@
         <div class="card">
             <div class="fg">
                 <label class="fl" data-i18n="networkLabel">انتخاب شبکه</label>
-                <select id="withdraw-network" class="fi" style="cursor:pointer;" onchange="window.onNetworkChange()">
-                    <option value="TRC20">USDT - TRC20 (Tron)</option>
-                    <option value="BEP20">USDT - BEP20 (BNB Smart Chain)</option>
-                </select>
+                <input type="hidden" id="withdraw-network" value="TRC20">
+                <div class="network-selector">
+                    <div class="network-card active" data-network="TRC20" onclick="window.selectNetwork('TRC20')">
+                        <div class="network-icon" style="color:#38bdf8;background:rgba(56,189,248,.15)"><i class="fas fa-bolt"></i></div>
+                        <div class="network-body">
+                            <div class="network-name">TRC20</div>
+                            <div class="network-sub">Tron</div>
+                        </div>
+                        <div class="network-check"><i class="fas fa-check-circle"></i></div>
+                    </div>
+                    <div class="network-card" data-network="BEP20" onclick="window.selectNetwork('BEP20')">
+                        <div class="network-icon" style="color:#f59e0b;background:rgba(245,158,11,.15)"><i class="fas fa-coins"></i></div>
+                        <div class="network-body">
+                            <div class="network-name">BEP20</div>
+                            <div class="network-sub">BNB Chain</div>
+                        </div>
+                        <div class="network-check"><i class="fas fa-check-circle"></i></div>
+                    </div>
+                </div>
             </div>
             <div class="fg">
                 <label class="fl" data-i18n="addressLabel">آدرس کیف پول مقصد</label>
@@ -314,6 +342,14 @@
             var net = Math.max(0, amt - NETWORK_FEE);
             document.getElementById('withdraw-fee').innerText = NETWORK_FEE.toFixed(2) + ' USDT';
             document.getElementById('withdraw-net').innerText = net.toFixed(2) + ' USDT';
+        };
+
+        window.selectNetwork = function(net){
+            document.getElementById('withdraw-network').value = net;
+            document.querySelectorAll('.network-card').forEach(function(card){
+                card.classList.toggle('active', card.getAttribute('data-network') === net);
+            });
+            if(typeof window.onNetworkChange === 'function') window.onNetworkChange();
         };
 
         function formatRemaining(ms){
