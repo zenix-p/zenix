@@ -12,21 +12,32 @@
         .logo h2{font-size:18px;color:#38bdf8;font-weight:800}
         .header-actions{display:flex;gap:8px;align-items:center}
         .back-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;padding:0 12px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:12px;color:#38bdf8;text-decoration:none;font-family:inherit}
-        .c{max-width:700px;width:100%;margin:20px auto;padding:0 12px;flex:1;display:flex;flex-direction:column;gap:14px}
+        .c{max-width:700px;width:100%;margin:20px auto;padding:0 12px;flex:1;display:flex;flex-direction:column;gap:12px}
 
-        /* ═══════════════════════════════════════════════════ */
-        /* ★ چت باکس — اول */
-        /* ═══════════════════════════════════════════════════ */
+        /* نوار شناسه کاربر */
+        .user-badge-bar{background:rgba(15,23,42,.7);border:1px solid rgba(56,189,248,.2);border-radius:10px;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:11px}
+        .user-badge-bar .left{display:flex;align-items:center;gap:8px;color:#94a3b8}
+        .user-badge-bar .left i{color:#38bdf8;font-size:13px}
+        .user-badge-bar .user-id-code{color:#38bdf8;font-weight:800;font-family:'Courier New',monospace;letter-spacing:1px;font-size:12px;background:rgba(56,189,248,.1);padding:3px 8px;border-radius:5px;border:1px solid rgba(56,189,248,.25)}
+
+        /* چت باکس */
         .chat-box{background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.1);border-radius:16px;display:flex;flex-direction:column;height:420px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.8)}
         .chat-header{background:rgba(30,41,59,.9);padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px}
-        .chat-avatar{width:36px;height:36px;background:rgba(56,189,248,.2);border:1px solid #38bdf8;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#38bdf8;font-size:16px;flex-shrink:0}
-        .chat-avatar.admin{border-color:#22c55e;background:rgba(34,197,94,.2);color:#22c55e}
+        .chat-avatar{width:38px;height:38px;background:rgba(56,189,248,.15);border:1px solid #38bdf8;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#38bdf8;font-size:16px;flex-shrink:0;transition:all .3s}
+        .chat-avatar.expert{border-color:#22c55e;background:rgba(34,197,94,.15);color:#22c55e}
         .chat-title{flex:1;min-width:0}
         .chat-title h3{font-size:13.5px;color:#f8fafc;margin-bottom:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-        .chat-title h3 .topic-badge{font-size:10px;background:rgba(56,189,248,.15);color:#38bdf8;padding:2px 7px;border-radius:6px;border:1px solid rgba(56,189,248,.3);font-weight:700}
-        .chat-title p{font-size:10px;color:#22c55e;display:flex;align-items:center;gap:4px}
+        .chat-title h3 .expert-name{font-weight:800}
+        .chat-title h3 .expert-role{font-size:11px;color:#94a3b8;font-weight:500}
+        .chat-title p{font-size:10px;color:#22c55e;display:flex;align-items:center;gap:5px}
+        .chat-title p .expert-id{color:#64748b;font-family:'Courier New',monospace;letter-spacing:.5px}
 
-        .chat-body{flex:1;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+        .chat-body{flex:1;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;position:relative}
+
+        .empty-state{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px;text-align:center}
+        .empty-state i{font-size:48px;color:#334155;margin-bottom:4px}
+        .empty-state .empty-text{color:#64748b;font-size:12.5px;line-height:1.8}
+
         .msg{max-width:85%;padding:9px 13px;border-radius:12px;font-size:12px;line-height:1.7;word-wrap:break-word}
         .msg.system{background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.25);color:#cbd5e1;align-self:center;text-align:center;font-size:11px;max-width:90%}
         .msg.system.code-msg{background:rgba(168,85,247,.15);border:1.5px solid rgba(168,85,247,.5);color:#e0c7ff;font-size:13px;max-width:95%;white-space:pre-line;line-height:1.9;box-shadow:0 0 20px rgba(168,85,247,.2);min-width:220px}
@@ -58,9 +69,7 @@
         .send-btn{background:#38bdf8;color:#030712;border:none;border-radius:10px;width:40px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
         .send-btn:disabled{background:#475569;cursor:not-allowed}
 
-        /* ═══════════════════════════════════════════════════ */
-        /* ★ موضوعات — دوم */
-        /* ═══════════════════════════════════════════════════ */
+        /* موضوعات */
         .topics-section{background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.8)}
         .topics-title{font-size:14px;color:#38bdf8;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08)}
         .topics-title i{font-size:16px}
@@ -92,7 +101,7 @@
             .chat-box{height:380px;border-radius:14px}
             .chat-header{padding:10px 12px}
             .chat-title h3{font-size:12px}
-            .chat-title h3 .topic-badge{font-size:9px;padding:1px 6px}
+            .chat-title h3 .expert-role{font-size:10px}
             .chat-title p{font-size:9px}
             .chat-body{padding:10px;gap:8px}
             .msg{font-size:11.5px;padding:8px 11px}
@@ -105,6 +114,10 @@
             .topic-label{font-size:9.5px}
             .topic-desc{display:none}
             .back-btn{font-size:11px;padding:0 9px;height:33px}
+            .user-badge-bar{font-size:10px;padding:6px 10px}
+            .user-badge-bar .user-id-code{font-size:11px;padding:2px 6px}
+            .empty-state i{font-size:40px}
+            .empty-state .empty-text{font-size:11px}
         }
         @media (max-width: 360px) {
             .topics-grid{grid-template-columns:repeat(2,1fr)}
@@ -124,31 +137,50 @@
     <div class="c">
         <div id="error-banner" class="error-banner"></div>
 
-        <!-- ★ چت باکس — بالا -->
+        <!-- نوار شناسه کاربر -->
+        <div class="user-badge-bar" id="user-badge-bar">
+            <div class="left">
+                <i class="fas fa-user-circle"></i>
+                <span>شناسه کاربری شما:</span>
+            </div>
+            <div class="user-id-code" id="user-id-code">ZE-000000</div>
+        </div>
+
+        <!-- چت باکس — خالی در ابتدا -->
         <div class="chat-box" id="chat-box">
             <div class="chat-header">
-                <div class="chat-avatar" id="chat-avatar-el"><i class="fas fa-robot" id="chat-avatar-icon"></i></div>
+                <div class="chat-avatar" id="chat-avatar-el"><i class="fas fa-headset" id="chat-avatar-icon"></i></div>
                 <div class="chat-title">
-                    <h3 id="support-status-title">
-                        <span>پشتیبانی زنیکس</span>
-                        <span class="topic-badge" id="current-topic-badge" style="display:none;"></span>
+                    <h3 id="chat-title-h3">
+                        <span class="expert-name">پشتیبانی زنیکس</span>
                     </h3>
-                    <p><i class="fas fa-circle" style="font-size:6px;"></i> <span id="support-status-sub">ابتدا یک موضوع انتخاب کنید</span></p>
+                    <p id="chat-title-p" style="color:#94a3b8;">
+                        <i class="fas fa-circle" style="font-size:6px;color:#94a3b8;"></i>
+                        <span id="chat-status-text">در انتظار انتخاب موضوع</span>
+                    </p>
                 </div>
             </div>
-            <div class="chat-body" id="chat-body"></div>
+            <div class="chat-body" id="chat-body">
+                <div class="empty-state" id="empty-state">
+                    <i class="fas fa-comments"></i>
+                    <div class="empty-text">
+                        برای شروع گفتگو،<br>
+                        یکی از موضوعات پایین صفحه را انتخاب کنید
+                    </div>
+                </div>
+            </div>
             <div class="chat-footer">
-                <input type="text" class="chat-input" id="user-input" placeholder="ابتدا یک موضوع از پایین انتخاب کنید..." disabled>
+                <input type="text" class="chat-input" id="user-input" placeholder="ابتدا یک موضوع انتخاب کنید..." disabled>
                 <button class="send-btn" id="send-msg-btn" disabled><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
 
-        <!-- ★ موضوعات — پایین -->
+        <!-- موضوعات — پایین -->
         <div class="topics-section" id="topics-section">
             <div class="topics-title">
-                <i class="fas fa-comments"></i>
+                <i class="fas fa-list-check"></i>
                 <span>موضوع سوال خود را انتخاب کنید</span>
-                <small>یک موضوع انتخاب کنید تا ربات در همان مورد راهنمایی‌تان کند</small>
+                <small>یک موضوع انتخاب کنید تا کارشناس مربوطه پاسخگو باشد</small>
             </div>
             <div class="topics-grid" id="topics-grid"></div>
         </div>
@@ -168,7 +200,12 @@
         const errorBanner = document.getElementById('error-banner');
         const topicsGrid = document.getElementById('topics-grid');
         const chatBox = document.getElementById('chat-box');
-        const currentTopicBadge = document.getElementById('current-topic-badge');
+        const emptyState = document.getElementById('empty-state');
+        const userCodeEl = document.getElementById('user-id-code');
+        const chatTitleH3 = document.getElementById('chat-title-h3');
+        const chatTitleP = document.getElementById('chat-title-p');
+        const chatAvatarEl = document.getElementById('chat-avatar-el');
+        const chatAvatarIcon = document.getElementById('chat-avatar-icon');
 
         let currentUser = null;
         let currentChatId = null;
@@ -176,16 +213,15 @@
         let realtimeChannel = null;
         let isSending = false;
         let currentTopic = null;
+        let currentUserCode = 'ZE-000000';
 
         const OTP_EXPIRY_MS = 2 * 60 * 1000;
 
-        // ═══════════════════════════════════════════════════
-        // ★ دانش‌نامه موضوعات
-        // ═══════════════════════════════════════════════════
         const TOPICS = {
             dashboard: {
                 label: 'داشبورد', desc: 'موجودی و آمار', icon: 'fa-home', color: 'ni-blue',
-                welcome: 'شما موضوع <strong>داشبورد</strong> رو انتخاب کردید. در داشبورد می‌تونید موجودی کل، تعداد زیرمجموعه‌ها و میانبرهای دسترسی سریع رو ببینید. چه سوالی درباره داشبورد داری؟',
+                expert: { name: 'سارا', role: 'کارشناس داشبورد', id: 'SA-1001' },
+                welcome: 'سلام و وقت بخیر 🌹<br>من <strong>سارا</strong> هستم، کارشناس داشبورد.<br>در خدمت شما هستم — درباره داشبورد و آمار حساب چه کمکی می‌تونم بکنم؟',
                 knowledge: [
                     { kw: ['موجودی', 'بالانس', 'چقدر', 'پول'], r: 'موجودی کل حساب شما در بالای صفحه داشبورد نمایش داده می‌شه، دقیقاً زیر عنوان «خوش آمدید». با هر معامله یا واریز، این عدد به‌روز می‌شه.' },
                     { kw: ['زیرمجموعه', 'تعداد', 'تیم', 'رفرال'], r: 'تعداد زیرمجموعه‌های شما در کارت «زیرمجموعه» (کنار موجودی) نمایش داده می‌شه. برای جزئیات بیشتر به بخش «تیم من» برو.' },
@@ -196,7 +232,8 @@
             },
             quantification: {
                 label: 'کوانتیفیکیشن', desc: 'ربات و سود', icon: 'fa-robot', color: 'ni-purple',
-                welcome: 'شما موضوع <strong>کوانتیفیکیشن</strong> رو انتخاب کردید. ربات معامله‌گر هوشمند Zenix با آربیتراژ و AI سود می‌سازه. چه سوالی داری؟',
+                expert: { name: 'امیر', role: 'کارشناس ربات معامله‌گر', id: 'AM-1002' },
+                welcome: 'سلام و وقت بخیر 🌹<br>من <strong>امیر</strong> هستم، کارشناس کوانتیفیکیشن.<br>در خدمت شما هستم — درباره ربات معامله‌گر و سود روزانه چه سوالی داری؟',
                 knowledge: [
                     { kw: ['چیه', 'چیست', 'کار', 'ربات'], r: 'کوانتیفیکیشن یک ربات معامله‌گر هوشمنده که قیمت ارزهای دیجیتال رو در صرافی‌های مختلف بررسی می‌کنه و از اختلاف قیمت‌ها (آربیتراژ) سود به‌دست می‌آره.' },
                     { kw: ['چطور فعال', 'شروع', 'روشن', 'کلیک'], r: 'برای فعال کردن ربات، موجودیت باید حداقل ۲۰ دلار باشه. بعد از اون، دکمه «کوانتیفیکیشن» فعال می‌شه و می‌تونی روی اون کلیک کنی.' },
@@ -208,7 +245,8 @@
             },
             deposit: {
                 label: 'واریز', desc: 'شارژ حساب', icon: 'fa-arrow-down', color: 'ni-green',
-                welcome: 'شما موضوع <strong>واریز</strong> رو انتخاب کردید. برای شارژ حساب از شبکه بلاکچین استفاده می‌کنیم. چه سوالی داری؟',
+                expert: { name: 'نگین', role: 'کارشناس واریز', id: 'NG-1003' },
+                welcome: 'سلام و وقت بخیر 🌹<br>من <strong>نگین</strong> هستم، کارشناس واریز.<br>در خدمت شما هستم — درباره واریز و شارژ حساب چه سوالی داری؟',
                 knowledge: [
                     { kw: ['چطور', 'روش', 'مراحل'], r: 'مراحل واریز:\n۱. برو به بخش واریز\n۲. شبکه (TRC20 یا BEP20) رو انتخاب کن\n۳. مبلغ رو وارد کن\n۴. آدرس نمایش داده می‌شه — کپی کن\n۵. از کیف پولت همون مبلغ رو بفرست\n۶. TxID رو در سایت وارد کن' },
                     { kw: ['حداقل', 'کمترین', 'مبلغ'], r: 'حداقل مبلغ واریز ۱۰ دلار و حداکثر ۱۰۰,۰۰۰ دلار است.' },
@@ -220,7 +258,8 @@
             },
             withdraw: {
                 label: 'برداشت', desc: 'تسویه', icon: 'fa-arrow-up', color: 'ni-yellow',
-                welcome: 'شما موضوع <strong>برداشت</strong> رو انتخاب کردید. برای برداشت باید شرط‌های خاصی رو داشته باشی. چه سوالی داری؟',
+                expert: { name: 'مهدی', role: 'کارشناس برداشت', id: 'MH-1004' },
+                welcome: 'سلام و وقت بخیر 🌹<br>من <strong>مهدی</strong> هستم، کارشناس برداشت.<br>در خدمت شما هستم — درباره برداشت و تسویه چه سوالی داری؟',
                 knowledge: [
                     { kw: ['چطور', 'روش', 'مراحل'], r: 'مراحل برداشت:\n۱. برو به بخش برداشت\n۲. شبکه رو انتخاب کن\n۳. آدرس کیف پول مقصد رو وارد کن\n۴. مبلغ (خودکار بر اساس سطح)\n۵. رمز تراکنش رو وارد کن\n۶. ثبت درخواست' },
                     { kw: ['شرط', 'حداقل', 'مبلغ'], r: 'مبلغ برداشت بر اساس سطح شما تعیین می‌شه:\n• سطح ۱: ۱۰ دلار\n• سطح ۲: ۵۰ دلار\n• سطح ۳: ۱۰۰ دلار\n• سطح ۴: ۲۰۰ دلار\n• سطح ۵: ۳۰۰ دلار\n• سطح ۶: ۵۰۰ دلار' },
@@ -232,7 +271,8 @@
             },
             team: {
                 label: 'تیم', desc: 'زیرمجموعه', icon: 'fa-users', color: 'ni-pink',
-                welcome: 'شما موضوع <strong>تیم</strong> رو انتخاب کردید. با دعوت دوستان می‌تونی کمیسیون بگیری. چه سوالی داری؟',
+                expert: { name: 'مریم', role: 'کارشناس تیم و رفرال', id: 'MR-1005' },
+                welcome: 'سلام و وقت بخیر 🌹<br>من <strong>مریم</strong> هستم، کارشناس تیم و رفرال.<br>در خدمت شما هستم — درباره دعوت دوستان و کمیسیون چه سوالی داری؟',
                 knowledge: [
                     { kw: ['دعوت', 'لینک', 'رفرال'], r: 'برای دعوت دوستان، از بخش «تیم من» لینک اختصاصی خودت رو کپی کن و برای دوستت بفرست. وقتی اون ثبت‌نام کنه و واریز کنه، کمیسیونش به حساب تو اضافه می‌شه.' },
                     { kw: ['کمیسیون', 'چقدر', 'درصد'], r: 'کمیسیون معرفی به‌صورت چندسطحی است:\n• سطح ۱ (مستقیم): بالاترین درصد\n• سطح ۲ (زیرمجموعه دوستت): درصد کمتر\n• سطح ۳ (زیرمجموعه سطح ۲): باز کمتر\nدقیق درصدها در صفحه «تیم من» نمایش داده می‌شه.' },
@@ -242,7 +282,8 @@
             },
             transactions: {
                 label: 'تراکنش', desc: 'تاریخچه مالی', icon: 'fa-history', color: 'ni-cyan',
-                welcome: 'شما موضوع <strong>تراکنش‌ها</strong> رو انتخاب کردید. اینجا تاریخچه همه فعالیت‌های مالیه. چه سوالی داری؟',
+                expert: { name: 'علی', role: 'کارشناس تراکنش‌ها', id: 'AL-1006' },
+                welcome: 'سلام و وقت بخیر 🌹<br>من <strong>علی</strong> هستم، کارشناس تراکنش‌ها.<br>در خدمت شما هستم — درباره تاریخچه مالی و تراکنش‌ها چه سوالی داری؟',
                 knowledge: [
                     { kw: ['چیه', 'چیست', 'کار'], r: 'صفحه تراکنش‌ها گزارش کاملی از تمام فعالیت‌های مالی شما (واریز، برداشت، پاداش) است.' },
                     { kw: ['فیلتر', 'دسته', 'نوع'], r: 'بالای صفحه ۴ دکمه فیلتر هست: همه، واریزها، برداشت‌ها، پاداش‌ها. با هرکدوم می‌تونی لیست رو فیلتر کنی.' },
@@ -252,7 +293,8 @@
             },
             profile: {
                 label: 'پروفایل', desc: 'تنظیمات امنیتی', icon: 'fa-user-cog', color: 'ni-rose',
-                welcome: 'شما موضوع <strong>پروفایل</strong> رو انتخاب کردید. در این بخش اطلاعات حساب و تنظیمات امنیتی رو مدیریت می‌کنی. چه سوالی داری؟',
+                expert: { name: 'حسین', role: 'کارشناس امنیت حساب', id: 'HS-1007' },
+                welcome: 'سلام و وقت بخیر 🌹<br>من <strong>حسین</strong> هستم، کارشناس امنیت حساب.<br>در خدمت شما هستم — درباره تنظیمات امنیتی و پروفایل چه سوالی داری؟',
                 knowledge: [
                     { kw: ['تغییر', 'عوض', 'رمز ورود'], r: 'برای تغییر رمز ورود: از بخش پروفایل، کارت «تغییر رمز ورود» رو باز کن. روی «دریافت کد از پشتیبانی» بزن → به چت برو → کد رو کپی کن → برگرد و وارد کن.' },
                     { kw: ['رمز تراکنش', 'پسورد مالی'], r: 'رمز تراکنش برای تأیید برداشت و تغییر آدرس کیف پول استفاده می‌شه. برای تغییر: کارت «تغییر رمز تراکنش» رو باز کن و از چت پشتیبانی کد بگیر.' },
@@ -263,7 +305,8 @@
             },
             login: {
                 label: 'ورود', desc: 'مشکل ورود', icon: 'fa-sign-in-alt', color: 'ni-emerald',
-                welcome: 'شما موضوع <strong>ورود به حساب</strong> رو انتخاب کردید. اگر در ورود مشکل داری، بگو چه خطایی می‌گیری.',
+                expert: { name: 'فاطمه', role: 'کارشناس ورود', id: 'FT-1008' },
+                welcome: 'سلام و وقت بخیر 🌹<br>من <strong>فاطمه</strong> هستم، کارشناس ورود به حساب.<br>در خدمت شما هستم — درباره مشکل ورود چه سوالی داری؟',
                 knowledge: [
                     { kw: ['وارد', 'لاگین', 'نمیشه', 'خطا'], r: 'اگر خطای ورود می‌گیری، ابتدا چک کن:\n• ایمیل و رمز رو درست وارد کردی\n• Caps Lock روشن نباشه\n• کد امنیتی (کپچا) رو دقیق وارد کردی' },
                     { kw: ['فراموش', 'یادم رفته', 'گم'], r: 'برای بازیابی رمز، از صفحه ورود روی «فراموشی رمز عبور» کلیک کن و ایمیلت رو وارد کن. اگر به هر دلیلی نشد، با پشتیبانی تماس بگیر.' },
@@ -273,7 +316,8 @@
             },
             register: {
                 label: 'ثبت‌نام', desc: 'حساب جدید', icon: 'fa-user-plus', color: 'ni-amber',
-                welcome: 'شما موضوع <strong>ثبت‌نام</strong> رو انتخاب کردید. برای ساخت حساب جدید راهنماییت می‌کنم. چه سوالی داری؟',
+                expert: { name: 'رضا', role: 'کارشناس ثبت‌نام', id: 'RZ-1009' },
+                welcome: 'سلام و وقت بخیر 🌹<br>من <strong>رضا</strong> هستم، کارشناس ثبت‌نام.<br>در خدمت شما هستم — درباره ساخت حساب جدید چه سوالی داری؟',
                 knowledge: [
                     { kw: ['چطور', 'مراحل', 'روش'], r: 'مراحل ثبت‌نام:\n۱. روی «ثبت‌نام» در صفحه ورود بزن\n۲. نام کامل، ایمیل و رمز عبور رو وارد کن\n۳. کد امنیتی (کپچا) رو بزن\n۴. ایمیلت رو تأیید کن\n۵. شماره موبایل رو وارد کن\nتمام!' },
                     { kw: ['ایمیل', 'تایید', 'تأیید'], r: 'بعد از ثبت‌نام، یک ایمیل تأیید برات می‌آد. روی لینک داخلش کلیک کن تا حسابت فعال بشه. اگر ایمیل نیومد، پوشه Spam رو چک کن.' },
@@ -283,6 +327,17 @@
                 ]
             }
         };
+
+        function generateUserCode(uid) {
+            if (!uid) return 'ZE-000000';
+            let hash = 0;
+            for (let i = 0; i < uid.length; i++) {
+                hash = ((hash << 5) - hash) + uid.charCodeAt(i);
+                hash = hash & hash;
+            }
+            const num = Math.abs(hash % 900000) + 100000;
+            return 'ZE-' + num;
+        }
 
         function buildTopicsGrid() {
             topicsGrid.innerHTML = '';
@@ -300,13 +355,29 @@
             });
         }
 
-        function renderInitialChat() {
-            chatBody.innerHTML = '';
-            renderMessage('سلام! 👋<br>برای شروع، یکی از موضوعات پایین صفحه رو انتخاب کن تا بتونم دقیقاً در همون مورد راهنمایی‌ت کنم.', 'bot', new Date().toISOString());
-            userInput.disabled = true;
-            sendBtn.disabled = true;
-            userInput.placeholder = 'ابتدا یک موضوع از پایین انتخاب کنید...';
-            currentTopicBadge.style.display = 'none';
+        function setExpertHeader(topic) {
+            const expert = topic.expert;
+            chatAvatarEl.classList.add('expert');
+            chatAvatarIcon.className = 'fas fa-user-tie';
+            chatTitleH3.innerHTML = `
+                <span class="expert-name">${expert.name}</span>
+                <span class="expert-role">— ${expert.role}</span>
+            `;
+            chatTitleP.innerHTML = `
+                <i class="fas fa-circle" style="font-size:6px;color:#22c55e;"></i>
+                <span>آنلاین</span>
+                <span style="color:#64748b;margin:0 4px;">•</span>
+                <span class="expert-id">${expert.id}</span>
+            `;
+            chatTitleP.style.color = '';
+        }
+
+        function resetExpertHeader() {
+            chatAvatarEl.classList.remove('expert');
+            chatAvatarIcon.className = 'fas fa-headset';
+            chatTitleH3.innerHTML = `<span class="expert-name">پشتیبانی زنیکس</span>`;
+            chatTitleP.innerHTML = `<i class="fas fa-circle" style="font-size:6px;color:#94a3b8;"></i><span>در انتظار انتخاب موضوع</span>`;
+            chatTitleP.style.color = '#94a3b8';
         }
 
         window.selectTopic = async function(topicKey) {
@@ -319,22 +390,17 @@
                 c.classList.toggle('active', c.dataset.topic === topicKey);
             });
 
-            // بروزرسانی badge موضوع
-            currentTopicBadge.textContent = topic.label;
-            currentTopicBadge.style.display = 'inline-block';
+            setExpertHeader(topic);
 
-            // بروزرسانی وضعیت
-            document.getElementById('support-status-sub').textContent = 'آماده پاسخگویی';
+            if (emptyState) emptyState.remove();
 
-            // فعال‌سازی input
             userInput.disabled = false;
             sendBtn.disabled = false;
             userInput.placeholder = `سوال خود را درباره ${topic.label} بنویسید...`;
 
-            // چت خالی و شروع
             chatBody.innerHTML = '';
-            await new Promise(r => setTimeout(r, 80));
-            renderMessage(topic.welcome, 'bot', new Date().toISOString());
+            await new Promise(r => setTimeout(r, 100));
+            renderMessage(topic.welcome, 'bot', new Date().toISOString(), `${topic.expert.name} (${topic.expert.role})`);
 
             setTimeout(() => {
                 chatBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -347,12 +413,10 @@
             const topic = TOPICS[currentTopic];
             const q = question.toLowerCase().trim();
 
-            // درخواست ادمین
             if (q.includes('ادمین') || q.includes('پشتیبان') || q.includes('مدیر') || q.includes('انسان')) {
                 return { handled: 'switch_to_admin' };
             }
 
-            // درخواست کد تأیید
             if ((q.includes('کد') || q.includes('تأیید') || q.includes('تایید')) && (q.includes('تغییر') || q.includes('عوض') || q.includes('گم') || q.includes('فراموش') || q.includes('یادم') || q.includes('بگیرم') || q.includes('میخوام') || q.includes('چطور'))) {
                 return {
                     handled: true,
@@ -360,7 +424,6 @@
                 };
             }
 
-            // جستجو در دانش‌نامه
             for (const item of topic.knowledge) {
                 if (item.kw.some(k => q.includes(k.toLowerCase()))) {
                     return { handled: true, text: item.r };
@@ -530,22 +593,6 @@
             return div;
         }
 
-        function updateStatusUI() {
-            const avatarEl = document.getElementById('chat-avatar-el');
-            const avatarIcon = document.getElementById('chat-avatar-icon');
-            const subEl = document.getElementById('support-status-sub');
-            if (aiMode) {
-                avatarEl.classList.remove('admin');
-                avatarIcon.className = 'fas fa-robot';
-                if (!currentTopic) subEl.textContent = 'ابتدا یک موضوع انتخاب کنید';
-            } else {
-                avatarEl.classList.add('admin');
-                avatarIcon.className = 'fas fa-headset';
-                subEl.textContent = 'متصل - پیام بدهید';
-                currentTopicBadge.style.display = 'none';
-            }
-        }
-
         async function switchToHumanMode() {
             if (!currentUser) {
                 renderMessage('برای اتصال به پشتیبان انسانی، لطفاً ابتدا وارد حساب کاربری خود شوید.', 'system', new Date().toISOString());
@@ -554,6 +601,12 @@
             }
             if (aiMode === false) return;
             aiMode = false;
+
+            chatAvatarEl.classList.add('expert');
+            chatAvatarIcon.className = 'fas fa-headset';
+            chatTitleH3.innerHTML = `<span class="expert-name">پشتیبانی انسانی</span><span class="expert-role">— ادمین</span>`;
+            chatTitleP.innerHTML = `<i class="fas fa-circle" style="font-size:6px;color:#22c55e;"></i><span>متصل</span>`;
+
             if (!currentChatId) {
                 const { data: existing } = await supabase.from('support_chats').select('*').eq('user_email', currentUser.email).maybeSingle();
                 if (existing) { currentChatId = existing.id; }
@@ -563,14 +616,13 @@
                         last_message: 'درخواست اتصال به پشتیبان', unread_by_admin: true, unread_by_user: false,
                         status: 'waiting_admin', created_at: new Date().toISOString(), updated_at: new Date().toISOString()
                     }]).select().single();
-                    if (createError || !created) { aiMode = true; updateStatusUI(); return; }
+                    if (createError || !created) { aiMode = true; return; }
                     currentChatId = created.id;
                 }
                 await supabase.from('support_messages').insert([{
                     chat_id: currentChatId, sender: 'user', text: '🙋 کاربر درخواست اتصال به پشتیبان انسانی دارد.', created_at: new Date().toISOString()
                 }]);
             }
-            updateStatusUI();
             await loadMessagesFromSupabase();
             subscribeRealtime();
         }
@@ -632,6 +684,8 @@
             try {
                 if (aiMode) {
                     const reply = window.generateTopicReply(text);
+                    const topic = TOPICS[currentTopic];
+                    const expertLabel = topic ? `${topic.expert.name} (${topic.expert.role})` : null;
                     if (reply.handled === 'switch_to_admin') {
                         setTimeout(async () => {
                             renderMessage('باشه، شما را به پشتیبان انسانی وصل می‌کنم...', 'system', new Date().toISOString());
@@ -641,7 +695,7 @@
                         const typing = renderTyping();
                         setTimeout(() => {
                             typing.remove();
-                            renderMessage(reply.text, 'bot', new Date().toISOString());
+                            renderMessage(reply.text, 'bot', new Date().toISOString(), expertLabel);
                             if (reply.showAdminBtn) {
                                 const div = document.createElement('div');
                                 div.className = 'quick-replies';
@@ -676,13 +730,16 @@
             try {
                 buildTopicsGrid();
                 const { data: sessionData } = await supabase.auth.getSession();
-                if (sessionData?.session?.user) currentUser = sessionData.session.user;
-                updateStatusUI();
+                if (sessionData?.session?.user) {
+                    currentUser = sessionData.session.user;
+                    currentUserCode = generateUserCode(currentUser.id);
+                    userCodeEl.textContent = currentUserCode;
+                } else {
+                    userCodeEl.textContent = 'ZE-000000';
+                }
 
-                // آیا کاربر از صفحه profile اومده برای دریافت کد؟
                 const fromProfile = !!sessionStorage.getItem('zenix_return_focus');
 
-                // آیا کاربر چت قبلی داره؟
                 let existingChatId = null;
                 if (currentUser && currentUser.email) {
                     const { data: existingChat } = await supabase.from('support_chats').select('*').eq('user_email', currentUser.email).maybeSingle();
@@ -690,24 +747,27 @@
                 }
 
                 if (fromProfile || existingChatId) {
-                    // به حالت چت با ادمین برو
                     aiMode = false;
                     currentChatId = existingChatId;
+                    if (emptyState) emptyState.remove();
                     userInput.disabled = false;
                     sendBtn.disabled = false;
                     userInput.placeholder = 'سوال خود را بنویسید...';
-                    updateStatusUI();
+
+                    chatAvatarEl.classList.add('expert');
+                    chatAvatarIcon.className = 'fas fa-headset';
+                    chatTitleH3.innerHTML = `<span class="expert-name">پشتیبانی انسانی</span><span class="expert-role">— ادمین</span>`;
+                    chatTitleP.innerHTML = `<i class="fas fa-circle" style="font-size:6px;color:#22c55e;"></i><span>متصل</span>`;
+
                     if (currentChatId) {
                         await loadMessagesFromSupabase();
                         subscribeRealtime();
                     }
                 } else {
-                    // حالت اولیه — کاربر باید موضوع انتخاب کنه
-                    renderInitialChat();
+                    resetExpertHeader();
                 }
             } catch (err) {
                 console.error('init error:', err);
-                renderInitialChat();
             }
         }
 
