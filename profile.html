@@ -95,14 +95,16 @@
         .hint-first{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.35);color:#22c55e}
         .hint-change{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.35);color:#fbbf24}
         .hint-chat{background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.35);color:#c084fc;margin-bottom:12px}
+        .hint-pending{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.4);color:#38bdf8}
         .hint-box i{font-size:16px;margin-top:2px;flex-shrink:0}
         .lock-icon{font-size:11px;color:#64748b;margin-inline-start:6px;}
         .otp-row{display:flex;gap:8px;align-items:flex-start}
         .otp-row .bs{width:auto;flex-shrink:0;padding:10px 14px;font-size:12px;white-space:nowrap}
         .chat-link-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);color:#c084fc;padding:8px 14px;border-radius:8px;font-size:12px;text-decoration:none;font-weight:600;cursor:pointer;margin-top:8px}
         .chat-link-btn:hover{background:rgba(168,85,247,.25);color:#e0c7ff}
+        .email-box{font-family:'Courier New',monospace;direction:ltr;color:#38bdf8;font-size:13px;font-weight:600;padding:8px 12px;background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;width:100%;text-align:left;word-break:break-all}
+        .pending-timer{font-family:'Courier New',monospace;font-size:16px;font-weight:900;color:#fbbf24;background:rgba(15,23,42,.7);padding:3px 10px;border-radius:6px;border:1px solid rgba(251,191,36,.3);display:inline-block;margin-top:4px}
 
-        /* ★ اصلاحات موبایل — فونت‌ها یک پله کوچیک‌تر */
         @media (max-width: 640px) {
             .wel{padding:10px;border-radius:9px;margin-bottom:8px}
             .wel h1{font-size:13px !important;margin-bottom:2px !important}
@@ -115,7 +117,6 @@
             .fl{font-size:11px;margin-bottom:4px}
             .fi{font-size:12px;padding:8px 10px;border-radius:7px}
             .bs{font-size:12px;padding:9px;border-radius:7px}
-            .bs-purple{font-size:12px}
             .ibox{padding:9px 10px;font-size:11px;border-radius:7px;margin-bottom:8px;gap:5px}
             .ibox span{font-size:11px !important}
             .hint-box{padding:9px 10px;font-size:10.5px;gap:7px;margin-bottom:8px;border-radius:7px;line-height:1.5}
@@ -125,11 +126,9 @@
             .msg-title-text{font-size:11px}
             .msg-desc-text{font-size:10.5px}
             .notif-tab{font-size:9.5px;padding:4px 7px}
-            .notif-tab i{font-size:9px}
             .otp-row{gap:5px;flex-wrap:wrap}
             .otp-row .bs{flex:1 1 100%;width:100%;font-size:11.5px;padding:9px 10px}
             .chat-link-btn{font-size:10.5px;padding:6px 10px;margin-top:5px}
-            .chat-link-btn i{font-size:10px}
             .lock-icon{font-size:9px}
             .err-msg{font-size:9px}
             .c-select-btn{font-size:9.5px;padding:6px}
@@ -141,11 +140,11 @@
             .toast{padding:9px 12px;font-size:10.5px}
             .toast i{font-size:13px}
             #user-phone-input{font-size:11.5px !important;padding:6px 8px !important}
+            .email-box{font-size:11px;padding:6px 9px}
+            .pending-timer{font-size:13px;padding:2px 7px}
             .card > div:first-child[style*="display:flex"] > div:first-child {
                 width: 36px !important; height: 36px !important; font-size: 14px !important;
             }
-            #admin-status-box{font-size:11px !important;padding:8px !important}
-            #account-status{font-size:11px !important}
         }
 
         @media (max-width: 400px) {
@@ -215,7 +214,7 @@
                 <span style="color:#94a3b8;font-size:13px;">وضعیت حساب:</span>
                 <span id="account-status" style="font-weight:bold;font-size:13px;">در حال بررسی...</span>
             </div>
-            <div class="ibox" style="flex-direction:column;align-items:flex-start;gap:10px;margin-bottom:0;">
+            <div class="ibox" style="flex-direction:column;align-items:flex-start;gap:10px;">
                 <span style="color:#94a3b8;font-size:13px;">شماره تماس:</span>
                 <div style="display:flex;align-items:center;gap:6px;direction:ltr;width:100%;">
                     <div class="c-dropdown" id="c-dropdown">
@@ -234,6 +233,11 @@
                     </div>
                 </div>
                 <button type="button" id="save-phone-btn" onclick="window.savePhone()" class="bs" style="margin-top:4px;">ذخیره</button>
+            </div>
+            <!-- ★ ایمیل - خواندنی -->
+            <div class="ibox" style="flex-direction:column;align-items:flex-start;gap:6px;margin-bottom:0;">
+                <span style="color:#94a3b8;font-size:13px;">ایمیل:</span>
+                <div id="user-email-display" class="email-box">-</div>
             </div>
         </div>
 
@@ -307,6 +311,7 @@
             </div>
         </div>
 
+        <!-- ★★★ بخش کیف پول — بازنویسی شده ★★★ -->
         <div class="card">
             <div class="hd" onclick="window.tc(this)">
                 <h3 style="color:#38bdf8;font-size:15px;margin:0;"><i class="fas fa-wallet"></i> <span>آدرس‌های کیف پول</span></h3>
@@ -315,44 +320,44 @@
             <div class="bd">
                 <div id="wal-first-time-hint" class="hint-box hint-first" style="display:none;">
                     <i class="fas fa-check-circle"></i>
-                    <div>اولین بار است که آدرس کیف پول ثبت می‌کنید. بدون نیاز به کد تأیید، آدرس‌ها را وارد و ذخیره کنید.</div>
-                </div>
-                <div id="wal-change-hint" class="hint-box hint-change" style="display:none;">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <div>آدرس‌های ثبت‌شده قفل هستند. برای <strong>ویرایش</strong>، ابتدا کد تأیید را از چت پشتیبانی دریافت و وارد کنید، سپس فیلدها باز می‌شوند. اگر فیلدی خالی است، بدون نیاز به کد می‌توانید آن را پر کنید.</div>
+                    <div>اولین بار است که آدرس کیف پول ثبت می‌کنید. آدرس‌ها را وارد و ذخیره کنید (بدون نیاز به تایید ادمین).</div>
                 </div>
 
                 <div class="fg">
-                    <label class="fl">آدرس TRX <span id="trx-lock-icon" class="lock-icon" style="display:none;"><i class="fas fa-lock"></i> قفل</span></label>
+                    <label class="fl">آدرس TRX فعلی <span id="trx-lock-icon" class="lock-icon" style="display:none;"><i class="fas fa-lock"></i> قفل</span></label>
                     <input type="text" id="trx-in" class="fi" placeholder="T... (۳۴ کاراکتر)" style="direction:ltr;text-align:left;font-family:monospace;">
                 </div>
                 <div class="fg">
-                    <label class="fl">آدرس BEP20 <span id="bep-lock-icon" class="lock-icon" style="display:none;"><i class="fas fa-lock"></i> قفل</span></label>
+                    <label class="fl">آدرس BEP20 فعلی <span id="bep-lock-icon" class="lock-icon" style="display:none;"><i class="fas fa-lock"></i> قفل</span></label>
                     <input type="text" id="bep-in" class="fi" placeholder="0x... (۴۲ کاراکتر)" style="direction:ltr;text-align:left;font-family:monospace;">
                 </div>
 
-                <div id="wal-otp-section" style="display:none;">
-                    <div class="hint-box hint-chat">
-                        <i class="fas fa-shield-alt"></i>
-                        <div>برای ویرایش آدرس‌های ثبت‌شده، از چت پشتیبانی کد ۶ رقمی بگیرید.</div>
-                    </div>
-                    <div class="fg">
-                        <label class="fl">دریافت کد از پشتیبانی</label>
-                        <div class="otp-row">
-                            <button type="button" class="bs bs-purple" onclick="window.requestOtpViaChat(this, 'wal-code')">🔐 دریافت کد از پشتیبانی</button>
-                        </div>
-                        <a href="support.html" class="chat-link-btn" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);"><i class="fas fa-comments"></i> رفتن به چت پشتیبانی</a>
-                    </div>
-                    <div class="fg">
-                        <label class="fl">کد ۶ رقمی از چت پشتیبانی (برای باز کردن قفل ویرایش)</label>
-                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                            <input type="text" class="fi" id="wal-code" maxlength="6" placeholder="مثال: 849201" inputmode="numeric" style="flex:1;min-width:120px;">
-                            <button type="button" class="bs" style="width:130px;font-size:12px;background:#22c55e;color:#fff;" onclick="window.verifyWalletCode(this)">تایید و باز کردن قفل</button>
-                        </div>
-                    </div>
+                <div id="wal-first-time-save" style="display:none;">
+                    <button type="button" class="bs" onclick="window.saveWalletForm(this)">ذخیره آدرس‌ها</button>
                 </div>
 
-                <button type="button" class="bs" onclick="window.saveWalletForm(this)">ذخیره تغییرات</button>
+                <div id="wal-change-form" style="display:none;">
+                    <div class="hint-box hint-change">
+                        <i class="fas fa-info-circle"></i>
+                        <div>برای تغییر آدرس کیف پول، آدرس جدید را در کادر زیر وارد کرده و روی دکمه <strong>«گرفتن عکس و ارسال به ادمین»</strong> کلیک کنید. ادمین ظرف ۱ تا ۷۲ ساعت درخواست شما را بررسی می‌کند.</div>
+                    </div>
+
+                    <div class="fg">
+                        <label class="fl">آدرس TRX جدید (اختیاری)</label>
+                        <input type="text" id="new-trx-in" class="fi" placeholder="T... (۳۴ کاراکتر)" style="direction:ltr;text-align:left;font-family:monospace;">
+                    </div>
+                    <div class="fg">
+                        <label class="fl">آدرس BEP20 جدید (اختیاری)</label>
+                        <input type="text" id="new-bep-in" class="fi" placeholder="0x... (۴۲ کاراکتر)" style="direction:ltr;text-align:left;font-family:monospace;">
+                    </div>
+
+                    <button type="button" class="bs" style="background:#f59e0b;color:#0f172a;font-weight:800;" onclick="window.requestWalletChange()">
+                        <i class="fas fa-camera"></i> گرفتن عکس و ارسال به ادمین
+                    </button>
+                    <input type="file" id="wallet-photo-input" accept="image/*" capture="user" style="display:none" onchange="window.handleWalletPhoto(this)">
+                </div>
+
+                <div id="wallet-pending-status" style="display:none;"></div>
             </div>
         </div>
     </div>
@@ -403,8 +408,8 @@
             <div class="modal-header"><span>راهنمای صفحه پروفایل</span><button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button></div>
             <div style="overflow-y:auto;padding-right:4px">
                 <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-user-cog" style="color:#38bdf8"></i> کاربرد این صفحه چیست؟</div><div class="msg-desc-text">در این صفحه می‌توانید اطلاعات شخصی، شماره تماس، ایمیل و تنظیمات امنیتی حساب خود را مدیریت کنید.</div></div>
-                <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-shield-alt" style="color:#a855f7"></i> کد تأیید از چت پشتیبانی</div><div class="msg-desc-text">برای تغییر رمز یا آدرس کیف پول، ابتدا روی «دریافت کد از پشتیبانی» بزنید، سپس به چت پشتیبانی بروید و کد ۶ رقمی را کپی کنید. کد تا ۲ دقیقه معتبر است.</div></div>
-                <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-key" style="color:#22c55e"></i> رمز تراکنش</div><div class="msg-desc-text">رمز تراکنش برای برداشت و تأیید عملیات مالی استفاده می‌شود. هرگز آن را با کسی به اشتراک نگذارید.</div></div>
+                <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-shield-alt" style="color:#a855f7"></i> کد تأیید از چت پشتیبانی</div><div class="msg-desc-text">برای تغییر رمز ورود و رمز تراکنش، ابتدا روی «دریافت کد از پشتیبانی» بزنید، سپس به چت بروید و کد ۶ رقمی را کپی کنید.</div></div>
+                <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-wallet" style="color:#f59e0b"></i> تغییر آدرس کیف پول</div><div class="msg-desc-text">برای تغییر آدرس کیف پول، آدرس جدید را در کادر مربوطه وارد کرده، روی «گرفتن عکس و ارسال به ادمین» بزنید. ادمین ظرف ۱ تا ۷۲ ساعت بررسی می‌کند.</div></div>
             </div>
         </div>
     </div>
@@ -529,6 +534,7 @@
         window.supabaseClient = supabaseClient;
 
         let currentUser = null, currentUserId = null, userRealtimeChannel = null, notificationRealtimeChannel = null, authInitialized = false, welcomeModalInitialized = false;
+        window._walletCountdownInt = null;
 
         window.cachedNotifications = [];
         window.activeNotifFilter = 'all';
@@ -683,20 +689,16 @@
             container.innerHTML = html;
         };
 
+        // ═══════════════════════════════════════════════════════
+        // OTP از چت پشتیبانی (برای رمز ورود و رمز تراکنش)
+        // ═══════════════════════════════════════════════════════
         window.requestOtpViaChat = async function(btnEl, targetFieldId) {
-            if (!currentUser) {
-                window.showToast('ابتدا وارد حساب خود شوید', 'error', 4000);
-                return;
-            }
-
+            if (!currentUser) { window.showToast('ابتدا وارد حساب خود شوید', 'error', 4000); return; }
             const origText = btnEl ? btnEl.textContent : 'دریافت کد از پشتیبانی';
             if (btnEl) { btnEl.disabled = true; btnEl.textContent = '⏳ در حال ارسال...'; }
-
             try {
                 const { data, error } = await supabaseClient.rpc('generate_otp_for_chat');
-
                 if (error) throw error;
-
                 if (!data || data.success !== true) {
                     if (data && data.error === 'too_soon') {
                         const secs = data.retry_after || 60;
@@ -707,78 +709,244 @@
                     if (btnEl) { btnEl.disabled = false; btnEl.textContent = origText; }
                     return;
                 }
-
                 sessionStorage.setItem('zenix_return_page', window.location.href.split('#')[0]);
                 if (targetFieldId) sessionStorage.setItem('zenix_return_focus', targetFieldId);
-
                 window.location.href = 'support.html';
-
             } catch (e) {
                 window.showToast('خطا: ' + (e.message || 'نامشخص'), 'error', 5000);
                 if (btnEl) { btnEl.disabled = false; btnEl.textContent = origText; }
             }
         };
 
+        // ═══════════════════════════════════════════════════════
+        // ★★★ Wallet change via photo + admin ★★★
+        // ═══════════════════════════════════════════════════════
+        async function compressImage(file, maxSize = 600, quality = 0.6) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let { width, height } = img;
+                        if (width > maxSize || height > maxSize) {
+                            const ratio = Math.min(maxSize / width, maxSize / height);
+                            width = Math.round(width * ratio);
+                            height = Math.round(height * ratio);
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.onerror = () => reject(new Error('invalid image'));
+                    img.src = e.target.result;
+                };
+                reader.onerror = () => reject(new Error('read failed'));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        window.requestWalletChange = function() {
+            const newTrx = (document.getElementById('new-trx-in')?.value || '').trim();
+            const newBep = (document.getElementById('new-bep-in')?.value || '').trim();
+
+            if (!newTrx && !newBep) {
+                window.showToast('حداقل یک آدرس جدید را وارد کنید.', 'error', 4000);
+                return;
+            }
+            if (newTrx && (newTrx.length !== 34 || !newTrx.startsWith('T'))) {
+                window.showToast('آدرس TRX باید با T شروع شود و ۳۴ کاراکتر باشد.', 'error', 4000);
+                return;
+            }
+            if (newBep && (newBep.length !== 42 || !newBep.startsWith('0x'))) {
+                window.showToast('آدرس BEP20 باید با 0x شروع شود و ۴۲ کاراکتر باشد.', 'error', 4000);
+                return;
+            }
+
+            document.getElementById('wallet-photo-input').click();
+        };
+
+        window.handleWalletPhoto = async function(input) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+            const newTrx = (document.getElementById('new-trx-in')?.value || '').trim();
+            const newBep = (document.getElementById('new-bep-in')?.value || '').trim();
+
+            try {
+                window.showToast('⏳ در حال پردازش عکس...', 'info', 3000);
+
+                let photoData = await compressImage(file, 600, 0.6);
+                if (photoData.length > 500 * 1024) {
+                    photoData = await compressImage(file, 400, 0.5);
+                }
+                if (photoData.length > 700 * 1024) {
+                    window.showToast('عکس بزرگ است، لطفاً عکس دیگری بگیرید.', 'error', 5000);
+                    input.value = '';
+                    return;
+                }
+
+                const { data, error } = await supabaseClient.rpc('request_wallet_change', {
+                    p_new_trx: newTrx || null,
+                    p_new_bep: newBep || null,
+                    p_photo_data: photoData
+                });
+
+                if (error) throw error;
+
+                if (data && data.success) {
+                    window.showToast('✅ درخواست شما به ادمین ارسال شد', 'success', 5000);
+                    document.getElementById('new-trx-in').value = '';
+                    document.getElementById('new-bep-in').value = '';
+                    await loadUserData(currentUser);
+                } else {
+                    const errMap = {
+                        'not_authenticated': 'نشست یافت نشد',
+                        'invalid_trx': 'آدرس TRX نامعتبر است',
+                        'invalid_bep': 'آدرس BEP20 نامعتبر است',
+                        'no_address': 'حداقل یک آدرس وارد کنید',
+                        'already_pending': 'شما یک درخواست در انتظار تایید دارید'
+                    };
+                    window.showToast('خطا: ' + (errMap[data?.error] || data?.error || 'نامشخص'), 'error', 5000);
+                }
+            } catch (e) {
+                window.showToast('خطا: ' + (e.message || 'نامشخص'), 'error', 5000);
+            }
+            input.value = '';
+        };
+
+        function showPendingWalletStatus(req) {
+            const el = document.getElementById('wallet-pending-status');
+            if (!el) return;
+            el.style.display = 'block';
+            renderPendingCountdown(req.created_at);
+        }
+
+        function renderPendingCountdown(createdAt) {
+            const created = new Date(createdAt).getTime();
+            const deadline = created + (72 * 60 * 60 * 1000);
+
+            const update = () => {
+                const el = document.getElementById('wallet-pending-status');
+                if (!el || el.style.display === 'none') return;
+
+                const remaining = deadline - Date.now();
+
+                if (remaining <= 0) {
+                    el.innerHTML = `
+                        <div class="hint-box" style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.4);color:#fbbf24;">
+                            <i class="fas fa-hourglass-end"></i>
+                            <div>
+                                <strong>⏳ در حال بررسی نهایی</strong><br>
+                                زمان اولیه بررسی به پایان رسیده. ادمین به‌زودی درخواست شما را بررسی می‌کند.
+                            </div>
+                        </div>
+                    `;
+                    if (window._walletCountdownInt) clearInterval(window._walletCountdownInt);
+                    return;
+                }
+
+                const hours = Math.floor(remaining / 3600000);
+                const minutes = Math.floor((remaining % 3600000) / 60000);
+
+                el.innerHTML = `
+                    <div class="hint-box" style="background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.4);color:#38bdf8;">
+                        <i class="fas fa-clock"></i>
+                        <div style="flex:1;">
+                            <strong style="display:block;margin-bottom:4px;">⏳ درخواست شما در حال بررسی است</strong>
+                            <div style="font-size:11px;opacity:0.85;margin-bottom:6px;">ادمین ظرف ۱ تا ۷۲ ساعت درخواست را تایید یا رد می‌کند.</div>
+                            <div>زمان باقی‌مانده تا بررسی نهایی:</div>
+                            <div class="pending-timer">${hours} ساعت و ${minutes} دقیقه</div>
+                        </div>
+                    </div>
+                `;
+            };
+
+            update();
+            if (window._walletCountdownInt) clearInterval(window._walletCountdownInt);
+            window._walletCountdownInt = setInterval(update, 60000);
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // loadUserData — با منطق جدید wallet
+        // ═══════════════════════════════════════════════════════
         async function loadUserData(user) {
             const { data, error } = await supabaseClient.from('users').select('*').eq('id', user.id).single();
-            if (data) {
-                const fullNameEl = document.getElementById('user-fullname');
-                if (fullNameEl && (data.fullname || data.full_name)) fullNameEl.textContent = data.fullname || data.full_name;
-                const userIdEl = document.getElementById('user-id');
-                if (userIdEl) userIdEl.textContent = 'UID: SM-' + generateUIDDigits(user.id);
-                if (data.phone) lockPhoneInput(data.phone); else showWelcomeModal();
-                const statusEl = document.getElementById('account-status');
-                if(statusEl) {
-                    const isAccountActive = data.verified === true || data.status === 'active' || data.active === true || data.is_activated === true || (Number(data.total_deposit) > 0) || (Number(data.deposit) > 0) || (Number(data.balance) > 0);
-                    if (isAccountActive) { statusEl.textContent = 'فعال'; statusEl.style.color = '#22c55e'; }
-                    else { statusEl.textContent = 'غیرفعال'; statusEl.style.color = '#ef4444'; }
-                }
+            if (!data) { showWelcomeModal(); return; }
 
-                window._oldTrx = data.trx_address || '';
-                window._oldBep = data.bep20_address || '';
+            const fullNameEl = document.getElementById('user-fullname');
+            if (fullNameEl && (data.fullname || data.full_name)) fullNameEl.textContent = data.fullname || data.full_name;
 
-                const trxIn = document.getElementById('trx-in');
-                const bepIn = document.getElementById('bep-in');
-                const trxLockIcon = document.getElementById('trx-lock-icon');
-                const bepLockIcon = document.getElementById('bep-lock-icon');
+            const userIdEl = document.getElementById('user-id');
+            if (userIdEl) userIdEl.textContent = 'UID: SM-' + generateUIDDigits(user.id);
 
-                trxIn.value = window._oldTrx;
-                bepIn.value = window._oldBep;
+            // ★ نمایش ایمیل (read-only)
+            const emailDisplay = document.getElementById('user-email-display');
+            if (emailDisplay) emailDisplay.textContent = user.email || data.email || '-';
 
-                const otpVerified = window._walletOtpVerified === true;
+            if (data.phone) lockPhoneInput(data.phone); else showWelcomeModal();
 
-                if (window._oldTrx && !otpVerified) {
-                    trxIn.readOnly = true;
-                    if (trxLockIcon) trxLockIcon.style.display = 'inline';
+            const statusEl = document.getElementById('account-status');
+            if (statusEl) {
+                const isAccountActive = data.verified === true || data.status === 'active' || data.active === true || data.is_activated === true || (Number(data.total_deposit) > 0) || (Number(data.deposit) > 0) || (Number(data.balance) > 0);
+                if (isAccountActive) { statusEl.textContent = 'فعال'; statusEl.style.color = '#22c55e'; }
+                else { statusEl.textContent = 'غیرفعال'; statusEl.style.color = '#ef4444'; }
+            }
+
+            // ═══════════════════════════════════════════════
+            // ★ منطق کیف پول — جدیده
+            // ═══════════════════════════════════════════════
+            window._oldTrx = data.trx_address || '';
+            window._oldBep = data.bep20_address || '';
+
+            const trxIn = document.getElementById('trx-in');
+            const bepIn = document.getElementById('bep-in');
+            const trxLockIcon = document.getElementById('trx-lock-icon');
+            const bepLockIcon = document.getElementById('bep-lock-icon');
+            const firstHint = document.getElementById('wal-first-time-hint');
+            const firstSave = document.getElementById('wal-first-time-save');
+            const changeForm = document.getElementById('wal-change-form');
+            const pendingStatus = document.getElementById('wallet-pending-status');
+
+            trxIn.value = window._oldTrx;
+            bepIn.value = window._oldBep;
+
+            const anySaved = !!(window._oldTrx || window._oldBep);
+
+            if (!anySaved) {
+                // ★ حالت اول: هیچ آدرسی ذخیره نشده → فرم ثبت اولیه
+                trxIn.readOnly = false;
+                bepIn.readOnly = false;
+                if (trxLockIcon) trxLockIcon.style.display = 'none';
+                if (bepLockIcon) bepLockIcon.style.display = 'none';
+                if (firstHint) firstHint.style.display = 'flex';
+                if (firstSave) firstSave.style.display = 'block';
+                if (changeForm) changeForm.style.display = 'none';
+                if (pendingStatus) pendingStatus.style.display = 'none';
+                if (window._walletCountdownInt) { clearInterval(window._walletCountdownInt); window._walletCountdownInt = null; }
+            } else {
+                // ★ حالت دوم: آدرس داریم → چک کن آیا درخواست pending داریم
+                trxIn.readOnly = true;
+                bepIn.readOnly = true;
+                if (trxLockIcon) trxLockIcon.style.display = 'inline';
+                if (bepLockIcon) bepLockIcon.style.display = 'inline';
+                if (firstHint) firstHint.style.display = 'none';
+                if (firstSave) firstSave.style.display = 'none';
+
+                const { data: pendingReq } = await supabaseClient.rpc('get_my_pending_wallet_request');
+
+                if (pendingReq) {
+                    // درخواست در انتظار
+                    if (changeForm) changeForm.style.display = 'none';
+                    showPendingWalletStatus(pendingReq);
                 } else {
-                    trxIn.readOnly = false;
-                    if (trxLockIcon) trxLockIcon.style.display = 'none';
+                    // فرم تغییر
+                    if (changeForm) changeForm.style.display = 'block';
+                    if (pendingStatus) pendingStatus.style.display = 'none';
+                    if (window._walletCountdownInt) { clearInterval(window._walletCountdownInt); window._walletCountdownInt = null; }
                 }
-
-                if (window._oldBep && !otpVerified) {
-                    bepIn.readOnly = true;
-                    if (bepLockIcon) bepLockIcon.style.display = 'inline';
-                } else {
-                    bepIn.readOnly = false;
-                    if (bepLockIcon) bepLockIcon.style.display = 'none';
-                }
-
-                const anySaved = !!(window._oldTrx || window._oldBep);
-
-                const otpSection = document.getElementById('wal-otp-section');
-                const firstHint = document.getElementById('wal-first-time-hint');
-                const changeHint = document.getElementById('wal-change-hint');
-
-                if (anySaved) {
-                    if (otpSection) otpSection.style.display = 'block';
-                    if (firstHint) firstHint.style.display = 'none';
-                    if (changeHint) changeHint.style.display = 'flex';
-                } else {
-                    if (otpSection) otpSection.style.display = 'none';
-                    if (firstHint) firstHint.style.display = 'flex';
-                    if (changeHint) changeHint.style.display = 'none';
-                }
-            } else { showWelcomeModal(); }
+            }
         }
 
         async function setupRealtimeSubscriptions(userId) {
@@ -796,6 +964,12 @@
                     }
                 }
             }).subscribe();
+
+            // ★ مانیتور تغییرات wallet_change_requests
+            supabaseClient.channel('wallet_req_' + userId)
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'wallet_change_requests', filter: `user_id=eq.${userId}` }, () => {
+                    if (currentUser) loadUserData(currentUser);
+                }).subscribe();
         }
 
         function handleReturnFocus() {
@@ -806,7 +980,6 @@
             setTimeout(() => {
                 const field = document.getElementById(focusField);
                 if (!field) return;
-
                 const card = field.closest('.card');
                 if (card) {
                     document.querySelectorAll('.card').forEach(c => {
@@ -818,10 +991,9 @@
                     const bd = card.querySelector('.bd');
                     if (bd) bd.style.display = 'block';
                 }
-
                 setTimeout(() => {
                     field.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    field.focus();
+                    try { field.focus(); } catch(e) {}
                 }, 300);
             }, 200);
         }
@@ -974,46 +1146,7 @@
             }
         };
 
-        window.verifyWalletCode = async function(btn) {
-            const code = (document.getElementById('wal-code')?.value || '').trim();
-            if (!code || code.length !== 6 || !/^\d+$/.test(code)) {
-                window.showToast('کد ۶ رقمی از چت پشتیبانی را وارد کنید.', 'error', 4000);
-                return;
-            }
-            const origText = btn ? btn.textContent : 'تایید کد';
-            if (btn) { btn.disabled = true; btn.textContent = 'در حال بررسی...'; }
-
-            try {
-                const { data: ok, error } = await supabaseClient.rpc('verify_wallet_otp', { p_otp_code: code });
-                if (error) {
-                    if (String(error.message).includes('TOO_MANY_ATTEMPTS')) {
-                        window.showToast('🚫 تلاش‌های زیاد — ۱۵ دقیقه صبر کنید', 'error', 5000);
-                    } else {
-                        window.showToast('خطا: ' + (error.message || 'نامشخص'), 'error', 5000);
-                    }
-                    return;
-                }
-                if (ok === true) {
-                    window._walletOtpVerified = true;
-                    const trxIn = document.getElementById('trx-in');
-                    const bepIn = document.getElementById('bep-in');
-                    const trxLockIcon = document.getElementById('trx-lock-icon');
-                    const bepLockIcon = document.getElementById('bep-lock-icon');
-                    trxIn.readOnly = false;
-                    bepIn.readOnly = false;
-                    if (trxLockIcon) trxLockIcon.style.display = 'none';
-                    if (bepLockIcon) bepLockIcon.style.display = 'none';
-                    window.showToast('✅ کد تایید شد. حالا می‌توانید آدرس‌ها را ویرایش کنید.', 'success', 5000);
-                } else {
-                    window.showToast('کد اشتباه یا منقضی شده است.', 'error', 4000);
-                }
-            } catch (e) {
-                window.showToast('خطا: ' + (e.message || 'نامشخص'), 'error', 5000);
-            } finally {
-                if (btn) { btn.disabled = false; btn.textContent = origText; }
-            }
-        };
-
+        // ★ saveWalletForm — فقط برای ثبت اولیه
         window.saveWalletForm = async function(btn) {
             const trx = document.getElementById('trx-in').value.trim();
             const bep = document.getElementById('bep-in').value.trim();
@@ -1022,7 +1155,6 @@
                 window.showToast('حداقل یک آدرس را وارد کنید.', 'error', 4000);
                 return;
             }
-
             if (trx && (trx.length !== 34 || !trx.startsWith('T'))) {
                 window.showToast('آدرس TRX باید با T شروع شود و ۳۴ کاراکتر باشد.', 'error', 4000);
                 return;
@@ -1032,45 +1164,27 @@
                 return;
             }
 
-            const oldTrx = window._oldTrx || '';
-            const oldBep = window._oldBep || '';
-            const changingTrx = oldTrx && trx !== oldTrx;
-            const changingBep = oldBep && bep !== oldBep;
-            const needsOtp = (changingTrx || changingBep) && !window._walletOtpVerified;
-
-            let otpCode = '';
-            if (needsOtp) {
-                otpCode = (document.getElementById('wal-code')?.value || '').trim();
-                if (!otpCode || otpCode.length !== 6) {
-                    window.showToast('برای تغییر آدرس ثبت‌شده، ابتدا از چت پشتیبانی کد دریافت و تایید کنید.', 'error', 5000);
-                    return;
-                }
-            }
-
-            const origText = btn ? btn.textContent : 'ذخیره تغییرات';
+            const origText = btn ? btn.textContent : 'ذخیره آدرس‌ها';
             if (btn) { btn.disabled = true; btn.textContent = 'در حال ذخیره...'; }
 
             try {
                 const { data, error } = await supabaseClient.rpc('set_wallet_addresses', {
                     p_trx: trx || '',
                     p_bep: bep || '',
-                    p_otp_code: otpCode || ''
+                    p_otp_code: ''
                 });
-
                 if (error) throw error;
 
                 if (data && data.success) {
-                    window.showToast('✅ آدرس‌ها با موفقیت ذخیره شدند.', 'success', 5000);
-                    document.getElementById('wal-code').value = '';
-                    window._walletOtpVerified = false;
+                    window.showToast('✅ آدرس‌ها ذخیره شدند.', 'success', 5000);
                     await loadUserData(currentUser);
                 } else if (data && data.error) {
                     const errMap = {
                         'not_authenticated': 'نشست شما یافت نشد',
                         'invalid_trx': 'آدرس TRX نامعتبر است',
                         'invalid_bep': 'آدرس BEP20 نامعتبر است',
-                        'no_otp': 'ابتدا از چت پشتیبانی کد دریافت کنید',
-                        'otp_expired': 'کد منقضی شده — دوباره از چت دریافت کنید',
+                        'no_otp': 'از روش «گرفتن عکس و ارسال به ادمین» استفاده کنید',
+                        'otp_expired': 'کد منقضی شده',
                         'invalid_otp': 'کد تأیید اشتباه است',
                         'too_many_attempts': '🚫 تلاش‌های زیاد — ۱۵ دقیقه صبر کنید'
                     };
@@ -1091,6 +1205,7 @@
         window.addEventListener('click', (e) => { if (!e.target.closest('.wrap')) { document.getElementById('nav-menu')?.classList.remove('show'); document.getElementById('lang-menu')?.classList.remove('show'); } });
 
         document.getElementById('logout-btn').onclick = async () => {
+            if (window._walletCountdownInt) clearInterval(window._walletCountdownInt);
             if (userRealtimeChannel) await supabaseClient.removeChannel(userRealtimeChannel);
             if (notificationRealtimeChannel) await supabaseClient.removeChannel(notificationRealtimeChannel);
             userRealtimeChannel = null; notificationRealtimeChannel = null;
