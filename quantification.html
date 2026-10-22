@@ -526,11 +526,6 @@ window.renderNotifications = function() {
   container.innerHTML = html;
 };
 
-function cleanDateStr(d) { if (!d) return ''; return String(d).replace(/\//g, '-').split('T')[0].split(' ')[0].trim(); }
-
-function getNYDateStr(){return new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York'}).format(new Date());}
-let todayNY=getNYDateStr(),cCnt=0,allTradesArray=[],currentTradeInterval=null;
-
 function formatTradeDate(item){
   if (!item) return '';
   let d = null;
@@ -542,15 +537,18 @@ function formatTradeDate(item){
 }
 
 function uC(){
-  const dateStr=getNYDateStr();
-  if(dateStr!==todayNY){ todayNY=dateStr; }
-  const t=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date());
-  const c=document.getElementById('ny-clock-val');if(c)c.innerText=t;
-  const dEl=document.getElementById('ny-date-val');if(dEl)dEl.innerText=dateStr;
+  const dateStr = new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York'}).format(new Date());
+  const t = new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date());
+  const c = document.getElementById('ny-clock-val'); if(c) c.innerText = t;
+  const dEl = document.getElementById('ny-date-val'); if(dEl) dEl.innerText = dateStr;
 }
 setInterval(uC,1000);uC();
 
 const cList=[{name:'Bitcoin',symbol:'BTC',cls:'fab fa-bitcoin',color:'#f7931a'},{name:'Ethereum',symbol:'ETH',cls:'fab fa-ethereum',color:'#627eea'},{name:'Solana',symbol:'SOL',cls:'fas fa-coins',color:'#14f195'},{name:'Ripple',symbol:'XRP',cls:'fas fa-water',color:'#23292f'},{name:'Cardano',symbol:'ADA',cls:'fas fa-circle-dot',color:'#0033ad'},{name:'Dogecoin',symbol:'DOGE',cls:'fas fa-dog',color:'#c2a633'},{name:'Binance Coin',symbol:'BNB',cls:'fas fa-cube',color:'#f3ba2f'}];
+
+let cCnt = 0;
+let allTradesArray = [];
+let currentTradeInterval = null;
 
 window.checkClickState=function(){
   const qBtn = document.getElementById('quant-btn');
@@ -595,6 +593,14 @@ async function callSecureTrade() {
   } catch (e) {
     return { success: false, error: String(e.message || e) };
   }
+}
+
+async function fetchQuantStatus() {
+  try {
+    const { data, error } = await supabase.rpc('get_quant_status');
+    if (error) return null;
+    return data;
+  } catch (e) { return null; }
 }
 
 function startTradeCountdown(activeTrade) {
@@ -691,31 +697,18 @@ async function initQuantification() {
     if (error || !user) { window.location.href = 'index.html'; return; }
     uUid = user.id;
 
-    const { data: dbUser } = await supabase.from('users').select('*').eq('id', uUid).single();
+    const status = await fetchQuantStatus();
 
-    const { data: qs } = await supabase.from('quant_state').select('*').eq('user_id', uUid).maybeSingle();
-
-    bBal = parseFloat(dbUser?.balance ?? 0);
-    window.bBal = bBal;
-
-    const currentNY = cleanDateStr(getNYDateStr());
-    const qsDate = cleanDateStr(qs?.quant_date || '');
-
-    if (qs && qsDate === currentNY) {
-      cCnt = parseInt(qs.quant_count ?? 0, 10);
-      tProf = parseFloat(qs.today_profit ?? 0);
-      yProf = parseFloat(qs.yesterday_profit ?? 0);
-    } else if (qs) {
-      cCnt = 0;
-      yProf = parseFloat(qs.today_profit ?? 0);
-      tProf = 0;
+    if (status && typeof status.balance !== 'undefined') {
+      bBal = parseFloat(status.balance) || 0;
+      window.bBal = bBal;
+      cCnt = parseInt(status.quantCount, 10) || 0;
+      tProf = parseFloat(status.todayProfit) || 0;
+      yProf = parseFloat(status.yesterdayProfit) || 0;
+      allTradesArray = Array.isArray(status.tradeHistory) ? status.tradeHistory : [];
     } else {
-      cCnt = 0;
-      tProf = 0;
-      yProf = 0;
+      bBal = 0; cCnt = 0; tProf = 0; yProf = 0; allTradesArray = [];
     }
-
-    allTradesArray = Array.isArray(qs?.trade_history) ? qs.trade_history : [];
 
     window.isBotActive = bBal >= 20;
     if (tbEl) tbEl.innerText = `$${bBal.toFixed(2)}`;
