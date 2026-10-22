@@ -264,7 +264,7 @@
                 <li style="margin-bottom:6px"><strong style="color:#f8fafc" data-i18n="abL1T">هدف اصلی:</strong> <span data-i18n="abL1D">اتوماسیون فرآیندهای معاملاتی از طریق سیستم‌های هوش مصنوعی و الگوریتم‌های کوانتیفیکیشن (Quantification)، به‌طوری‌که کاربران بدون نیاز به تخصص پیچیده در ترید، بتوانند از نوسانات بازار جهانی سود کسب کنند.</span></li>
                 <li style="margin-bottom:6px"><strong style="color:#f8fafc" data-i18n="abL2T">امنیت و زیرساخت:</strong> <span data-i18n="abL2D">متکی بر پروتکل‌های رمزنگاری پیشرفته، اتصال به گره‌های پردازشی ابری پرسرعت و مدیریت یکپارچه دارایی‌ها در بستر پایگاه داده ابری امن (Supabase).</span></li>
                 <li style="margin-bottom:6px"><strong style="color:#f8fafc" data-i18n="abL3T">ساختار چندسطحی (Referral & Team):</strong> <span data-i18n="abL3D">ایجاد یک شبکه پویای معرفی دوستان تا کاربران بتوانند از فعالیت زیرمجموعه‌های خود در چند سطح مختلف پاداش و درآمد پایدار دریافت کنند.</span></li>
-                <li><strong style="color:#f8fafc" data-i18n="abL4T">احساس واقع‌گرایی:</strong> <span data-i18n="abL4D">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاعیه‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.</span></li>
+                <li><strong style="color:#f8fafc" data-i18n="abL4T">احساس واقع‌گرایی:</strong> <span data-i18n="abL4D">وجود بازار لحظه‌ای رمزارزها، شاخص‌های زنده حجم معاملات، نرخ گاز شبکه و اطلاع‌رسانی‌های سیستم به کاربر این اطمینان را می‌دهد که با یک پلتفرم بین‌المللی و زنده سروکار دارد.</span></li>
             </ul>
         </div>
     </div>
@@ -333,7 +333,6 @@ function setLang(l){
   const tabMap={'t-tab-all':t.tabAll,'t-tab-approved':t.tabApproved,'t-tab-rejected':t.tabRejected,'t-tab-admin':t.tabAdmin};
   Object.keys(tabMap).forEach(id=>{const el=document.getElementById(id);if(el&&tabMap[id])el.textContent=tabMap[id];});
   
-  // ★ اصلاح شد: ترجمه عنوان مودال پیام‌ها
   let detailTitleEl = document.getElementById('detail-msg-title');
   if(detailTitleEl) detailTitleEl.innerHTML = `<i class="fas fa-envelope-open"></i> ${window.escapeHtml(t.viewMsg || 'مشاهده پیام')}`;
 
@@ -397,7 +396,6 @@ const tpEl=document.getElementById('today-profit-val'),ypEl=document.getElementB
 window.cachedNotifications = [];
 window.currentFilteredNotifs = [];
 window.activeNotifFilter = 'all';
-window.actualUserKeys = [];
 
 window.formatGregorianDate = function(rawDate) {
   if (!rawDate) return '';
@@ -530,41 +528,6 @@ window.renderNotifications = function() {
 
 function cleanDateStr(d) { if (!d) return ''; return String(d).replace(/\//g, '-').split('T')[0].split(' ')[0].trim(); }
 
-async function getFreshUserServerData() {
-  try {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error || !user) return null;
-    return user;
-  } catch(e) { return null; }
-}
-
-async function saveUserFields(dict) {
-  if (!uUid) return;
-  const currentCount = dict.count !== undefined ? dict.count : cCnt;
-  const currentDate = dict.date !== undefined ? dict.date : todayNY;
-  const currentProfit = dict.profit !== undefined ? dict.profit : tProf;
-  const currentYesterdayProfit = dict.yesterdayProfit !== undefined ? dict.yesterdayProfit : yProf;
-  const currentBalance = dict.balance !== undefined ? dict.balance : bBal;
-  const currentHistory = dict.history || allTradesArray;
-  try {
-    await supabase.auth.updateUser({ data: { quantCount: currentCount, quantDate: currentDate, todayProfit: currentProfit, yesterdayProfit: currentYesterdayProfit, tradeHistoryArray: currentHistory } });
-  } catch(e) {}
-  try {
-    localStorage.setItem(`zenix_quant_state_${uUid}`, JSON.stringify({ count: currentCount, date: currentDate, profit: currentProfit, yesterdayProfit: currentYesterdayProfit, balance: currentBalance, history: currentHistory }));
-  } catch(e) {}
-  const payload = {}, keys = window.actualUserKeys || [];
-  const findCol = (candidates) => keys.find(x => candidates.some(c => c.toLowerCase() === x.toLowerCase()));
-  const kCount = findCol(['quantCount', 'quant_count']); if (dict.count !== undefined && kCount) payload[kCount] = currentCount;
-  const kDate = findCol(['quantDate', 'quant_date']); if (dict.date !== undefined && kDate) payload[kDate] = currentDate;
-  const kProfit = findCol(['todayProfit', 'today_profit']); if (dict.profit !== undefined && kProfit) payload[kProfit] = currentProfit;
-  const kYProfit = findCol(['yesterdayProfit', 'yesterday_profit', 'yesterdayProfitVal']); if (dict.yesterdayProfit !== undefined && kYProfit) payload[kYProfit] = currentYesterdayProfit;
-  const kBal = findCol(['balance']); if (dict.balance !== undefined && kBal) payload[kBal] = currentBalance;
-  const kHist = findCol(['tradeHistoryArray', 'quantHistory', 'trades', 'history']); if (dict.history !== undefined && kHist) payload[kHist] = currentHistory;
-  if (Object.keys(payload).length > 0) {
-    await supabase.from("users").update(payload).eq("id", uUid);
-  }
-}
-
 function getNYDateStr(){return new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York'}).format(new Date());}
 let todayNY=getNYDateStr(),cCnt=0,allTradesArray=[],currentTradeInterval=null;
 
@@ -580,12 +543,7 @@ function formatTradeDate(item){
 
 function uC(){
   const dateStr=getNYDateStr();
-  if(dateStr!==todayNY){
-    todayNY=dateStr; cCnt=0; yProf=tProf; tProf=0;
-    saveUserFields({ count: 0, date: todayNY, profit: 0, yesterdayProfit: yProf, history: allTradesArray });
-    if(tpEl)tpEl.innerText='$0.00'; if(ypEl)ypEl.innerText=`$${yProf.toFixed(2)}`;
-    window.checkClickState();
-  }
+  if(dateStr!==todayNY){ todayNY=dateStr; }
   const t=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date());
   const c=document.getElementById('ny-clock-val');if(c)c.innerText=t;
   const dEl=document.getElementById('ny-date-val');if(dEl)dEl.innerText=dateStr;
@@ -629,30 +587,14 @@ window.renderHistory=function(){
   hList.innerHTML=htmlStr;
 };
 
-async function finalizeTrade(activeTrade) {
-  if (uUid) localStorage.removeItem(`zenix_active_trade_${uUid}`);
-  tProf += activeTrade.profit;
-  bBal += activeTrade.profit;
-  window.bBal = bBal;
-  const newTrade = { name: activeTrade.coin.name, symbol: activeTrade.coin.symbol, cls: activeTrade.coin.cls, color: activeTrade.coin.color, profit: activeTrade.profit, timestamp: activeTrade.endTime || Date.now(), nyDate: activeTrade.nyDate, dateStr: formatTradeDate({ timestamp: activeTrade.endTime || Date.now() }) };
-  allTradesArray.unshift(newTrade);
-  await saveUserFields({ count: activeTrade.targetCount, date: activeTrade.nyDate, profit: tProf, balance: bBal, history: allTradesArray });
-  if(tpEl) tpEl.innerText = `$${tProf.toFixed(2)}`;
-  if(tbEl) tbEl.innerText = `$${bBal.toFixed(2)}`;
-  if(window.updateVIPBadges) window.updateVIPBadges();
-  const tBox=document.getElementById('trade-box'),tDet=document.getElementById('trade-details'),l=window.currentActiveLang||'fa',t=(window.LD&&window.LD[l])||(window.LD&&window.LD.fa)||{};
-  if(tBox) tBox.style.display = 'block';
-  if(tDet) {
-    const rc = activeTrade.coin || {};
-    const safeCls = escapeHtml(rc.cls || 'fas fa-coins');
-    const safeColor = escapeHtml(rc.color || '#38bdf8');
-    const safeName = escapeHtml(rc.name || 'Crypto');
-    const safeSymbol = escapeHtml(rc.symbol || '');
-    const safeAmountLabel = escapeHtml(t.tradeAmount || 'مبلغ معامله');
-    const safeSuccessLabel = escapeHtml(t.success || 'موفق!');
-    tDet.innerHTML = `<div style="display:flex;flex-direction:column;gap:6px;align-items:center;width:100%;"><div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;flex-wrap:wrap;"><i class="${safeCls}" style="color:${safeColor}"></i> <span><b>${safeName}</b> (${safeSymbol})</span><span style="color:#64748b;">|</span><span style="color:#cbd5e1;">${safeAmountLabel}: <b style="color:#38bdf8;">$${activeTrade.tradeAmount.toFixed(2)}</b></span></div><div style="color:#22c55e;font-weight:bold;font-size:13px;"><i class="fas fa-check-circle"></i> ${safeSuccessLabel} +$${activeTrade.profit.toFixed(2)}</div></div>`;
+async function callSecureTrade() {
+  try {
+    const { data, error } = await supabase.rpc('execute_quant_trade');
+    if (error) return { success: false, error: error.message || String(error) };
+    return data || { success: false, error: 'empty response' };
+  } catch (e) {
+    return { success: false, error: String(e.message || e) };
   }
-  setTimeout(()=>{ if(tBox) tBox.style.display = 'none'; window.renderHistory(); window.checkClickState(); }, 2000);
 }
 
 function startTradeCountdown(activeTrade) {
@@ -660,7 +602,7 @@ function startTradeCountdown(activeTrade) {
   if(qBtn) { qBtn.disabled = true; qBtn.style.opacity = "0.5"; }
   const tBox=document.getElementById('trade-box'),tDet=document.getElementById('trade-details');
   if(tBox) tBox.style.display='block';
-  const l=window.currentActiveLang||'fa',t=(window.LD&&window.LD[l])||(window.LD&&window.LD.fa)||{}, rc = activeTrade.coin, tradeAmount = activeTrade.tradeAmount;
+  const l=window.currentActiveLang||'fa',t=(window.LD&&window.LD[l])||(window.LD&&window.LD.fa)||{}, rc = activeTrade.coin || {name:'Crypto', symbol:'', cls:'fas fa-coins', color:'#38bdf8'};
   if(currentTradeInterval) clearInterval(currentTradeInterval);
   const updateUI = () => {
     let tLeft = Math.ceil((activeTrade.endTime - Date.now()) / 1000);
@@ -670,40 +612,75 @@ function startTradeCountdown(activeTrade) {
       const safeColor = escapeHtml(rc.color || '#38bdf8');
       const safeName = escapeHtml(rc.name || 'Crypto');
       const safeSymbol = escapeHtml(rc.symbol || '');
-      const safeAmountLabel = escapeHtml(t.tradeAmount || 'مبلغ معامله');
       const safeTradingLabel = escapeHtml(t.trading || 'معامله');
       const safeSecondsLabel = escapeHtml(t.seconds || 'ثانیه');
-      tDet.innerHTML=`<div style="display:flex;flex-direction:column;gap:6px;align-items:center;width:100%;"><div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;flex-wrap:wrap;"><i class="${safeCls}" style="color:${safeColor}"></i> <span><b>${safeName}</b> (${safeSymbol})</span><span style="color:#64748b;">|</span><span style="color:#cbd5e1;">${safeAmountLabel}: <b style="color:#38bdf8;">$${tradeAmount.toFixed(2)}</b></span></div><div style="font-size:12px;color:#38bdf8;font-weight:bold;"><i class="fas fa-spinner fa-spin"></i> ${safeTradingLabel}... <span id="trade-timer-val">${tLeft}</span> ${safeSecondsLabel}</div></div>`;
+      tDet.innerHTML=`<div style="display:flex;flex-direction:column;gap:6px;align-items:center;width:100%;"><div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;flex-wrap:wrap;"><i class="${safeCls}" style="color:${safeColor}"></i> <span><b>${safeName}</b> (${safeSymbol})</span></div><div style="font-size:12px;color:#38bdf8;font-weight:bold;"><i class="fas fa-spinner fa-spin"></i> ${safeTradingLabel}... <span id="trade-timer-val">${tLeft}</span> ${safeSecondsLabel}</div></div>`;
     }
-    if(tLeft <= 0) { if(currentTradeInterval) clearInterval(currentTradeInterval); cCnt = activeTrade.targetCount; finalizeTrade(activeTrade); }
+    if(tLeft <= 0) {
+      if(currentTradeInterval) clearInterval(currentTradeInterval);
+      localStorage.removeItem(`zenix_active_trade_${uUid}`);
+      finalizeTrade();
+    }
   };
   updateUI();
   currentTradeInterval = setInterval(updateUI, 1000);
 }
 
+async function finalizeTrade() {
+  const tBox=document.getElementById('trade-box'),tDet=document.getElementById('trade-details');
+  const result = await callSecureTrade();
+
+  if (!result || !result.success) {
+    const errText = result && result.error ? result.error : 'خطا';
+    const errMap = {
+      'DAILY_LIMIT_REACHED': 'پایان ظرفیت امروز',
+      'INSUFFICIENT_BALANCE': 'موجودی کمتر از $20',
+      'NOT_AUTHENTICATED': 'لطفاً دوباره وارد شوید',
+      'USER_NOT_FOUND': 'کاربر یافت نشد'
+    };
+    const showText = errMap[errText] || errText;
+    if(tDet) tDet.innerHTML = `<div style="color:#ef4444;font-size:13px;"><i class="fas fa-times-circle"></i> ${escapeHtml(showText)}</div>`;
+    setTimeout(() => { if(tBox) tBox.style.display = 'none'; window.checkClickState(); }, 3000);
+    return;
+  }
+
+  bBal = parseFloat(result.newBalance);
+  window.bBal = bBal;
+  cCnt = parseInt(result.quantCount, 10) || 0;
+  const newProfit = parseFloat(result.profit) || 0;
+  tProf += newProfit;
+  if (result.trade) allTradesArray.unshift(result.trade);
+
+  if(tbEl) tbEl.innerText = `$${bBal.toFixed(2)}`;
+  if(tpEl) tpEl.innerText = `$${tProf.toFixed(2)}`;
+  if(window.updateVIPBadges) window.updateVIPBadges();
+  window.isBotActive = bBal >= 20;
+
+  if(tDet) {
+    const trade = result.trade || {};
+    const safeCls = escapeHtml(trade.cls || 'fas fa-coins');
+    const safeColor = escapeHtml(trade.color || '#38bdf8');
+    const safeName = escapeHtml(trade.name || 'Crypto');
+    const safeSymbol = escapeHtml(trade.symbol || '');
+    tDet.innerHTML = `<div style="display:flex;flex-direction:column;gap:6px;align-items:center;width:100%;"><div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;flex-wrap:wrap;"><i class="${safeCls}" style="color:${safeColor}"></i> <span><b>${safeName}</b> (${safeSymbol})</span></div><div style="color:#22c55e;font-weight:bold;font-size:13px;"><i class="fas fa-check-circle"></i> موفق! +$${newProfit.toFixed(2)}</div></div>`;
+  }
+
+  setTimeout(() => { if(tBox) tBox.style.display = 'none'; window.renderHistory(); window.checkClickState(); }, 2000);
+}
+
 function bindQuantButton() {
   const qBtn = document.getElementById('quant-btn');
   if(!qBtn) return;
-  qBtn.onclick = async function(e){
+  qBtn.onclick = function(e){
     e.preventDefault();
-    if(!window.isBotActive || !uUid || localStorage.getItem(`zenix_active_trade_${uUid}`)) return;
-    qBtn.disabled = true; qBtn.style.opacity = "0.5";
-    const freshUser = await getFreshUserServerData(), currentNY = cleanDateStr(todayNY);
-    let serverCount = cCnt, serverHist = allTradesArray;
-    if (freshUser) {
-      const meta = freshUser.user_metadata || {};
-      serverHist = meta.tradeHistoryArray || allTradesArray;
-      const tradesTodayServer = serverHist.filter(t => t && cleanDateStr(t.nyDate || t.dateStr || t.date || t.timestamp) === currentNY);
-      const sCountMeta = Number(meta.quantCount || 0), sDateMeta = cleanDateStr(meta.quantDate || '');
-      serverCount = (sDateMeta === currentNY) ? Math.max(tradesTodayServer.length, sCountMeta) : tradesTodayServer.length;
-    }
-    if (serverCount >= 4) { cCnt = 4; allTradesArray = serverHist; window.renderHistory(); window.checkClickState(); return; }
-    let dailyRate=0.015;
-    if(bBal>=10000)dailyRate=0.04; else if(bBal>=5000)dailyRate=0.035; else if(bBal>=2500)dailyRate=0.03; else if(bBal>=1000)dailyRate=0.025; else if(bBal>=300)dailyRate=0.02;
-    const tradeAmount = bBal, p=(tradeAmount*dailyRate)/4, rc=cList[Math.floor(Math.random()*cList.length)], now = Date.now();
-    const activeTrade = { startTime: now, endTime: now + 10000, coin: rc, tradeAmount: tradeAmount, profit: p, targetCount: serverCount + 1, nyDate: currentNY };
+    if(!window.isBotActive || !uUid) return;
+    if(localStorage.getItem(`zenix_active_trade_${uUid}`)) return;
+    qBtn.disabled = true;
+    qBtn.style.opacity = "0.5";
+    const now = Date.now();
+    const rc = cList[Math.floor(Math.random() * cList.length)];
+    const activeTrade = { startTime: now, endTime: now + 10000, coin: rc };
     localStorage.setItem(`zenix_active_trade_${uUid}`, JSON.stringify(activeTrade));
-    cCnt = serverCount + 1;
     startTradeCountdown(activeTrade);
   };
 }
@@ -713,40 +690,45 @@ async function initQuantification() {
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error || !user) { window.location.href = 'index.html'; return; }
     uUid = user.id;
+
     const { data: dbUser } = await supabase.from('users').select('*').eq('id', uUid).single();
-    if (dbUser) window.actualUserKeys = Object.keys(dbUser);
-    const meta = user.user_metadata || {};
-    bBal = parseFloat(dbUser?.balance ?? meta.balance ?? 0);
+
+    const { data: qs } = await supabase.from('quant_state').select('*').eq('user_id', uUid).maybeSingle();
+
+    bBal = parseFloat(dbUser?.balance ?? 0);
     window.bBal = bBal;
-    const currentNY = cleanDateStr(getNYDateStr()), savedDate = cleanDateStr(meta.quantDate || dbUser?.quantDate || dbUser?.quant_date || '');
-    allTradesArray = meta.tradeHistoryArray || dbUser?.tradeHistoryArray || dbUser?.quantHistory || dbUser?.trades || [];
-    const nyDateObj = new Date(new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
-    nyDateObj.setDate(nyDateObj.getDate() - 1);
-    const yesterdayNY = cleanDateStr(`${nyDateObj.getFullYear()}-${String(nyDateObj.getMonth() + 1).padStart(2, '0')}-${String(nyDateObj.getDate()).padStart(2, '0')}`);
-    if (savedDate === currentNY) {
-      cCnt = parseInt(meta.quantCount || dbUser?.quantCount || dbUser?.quant_count || 0, 10);
-      tProf = parseFloat(meta.todayProfit || dbUser?.todayProfit || dbUser?.today_profit || 0);
-      yProf = parseFloat(meta.yesterdayProfit || dbUser?.yesterdayProfit || dbUser?.yesterday_profit || 0);
+
+    const currentNY = cleanDateStr(getNYDateStr());
+    const qsDate = cleanDateStr(qs?.quant_date || '');
+
+    if (qs && qsDate === currentNY) {
+      cCnt = parseInt(qs.quant_count ?? 0, 10);
+      tProf = parseFloat(qs.today_profit ?? 0);
+      yProf = parseFloat(qs.yesterday_profit ?? 0);
+    } else if (qs) {
+      cCnt = 0;
+      yProf = parseFloat(qs.today_profit ?? 0);
+      tProf = 0;
     } else {
       cCnt = 0;
-      yProf = (savedDate === yesterdayNY) ? parseFloat(meta.todayProfit || dbUser?.todayProfit || dbUser?.today_profit || 0) : parseFloat(meta.yesterdayProfit || dbUser?.yesterdayProfit || dbUser?.yesterday_profit || 0);
       tProf = 0;
-      await saveUserFields({ count: 0, date: currentNY, profit: 0, yesterdayProfit: yProf, history: allTradesArray });
+      yProf = 0;
     }
-    if (allTradesArray && allTradesArray.length > 0) {
-      let calcYProf = 0;
-      allTradesArray.forEach(t => { if (t && cleanDateStr(t.nyDate || t.dateStr || t.date || t.timestamp) === yesterdayNY) calcYProf += parseFloat(t.profit ?? t.amount ?? t.profitAmount ?? 0); });
-      if (calcYProf > 0) yProf = calcYProf;
-    }
+
+    allTradesArray = Array.isArray(qs?.trade_history) ? qs.trade_history : [];
+
     window.isBotActive = bBal >= 20;
     if (tbEl) tbEl.innerText = `$${bBal.toFixed(2)}`;
     if (tpEl) tpEl.innerText = `$${tProf.toFixed(2)}`;
     if (ypEl) ypEl.innerText = `$${yProf.toFixed(2)}`;
     if (window.updateVIPBadges) window.updateVIPBadges();
+
     const { data: notifs, error: notifError } = await supabase.from('notifications').select('*').eq('user_id', uUid).order('created_at', { ascending: false });
     if (!notifError && notifs) { window.cachedNotifications = notifs; window.renderNotifications(); window.updateBellBadge(); }
+
     setLang(localStorage.getItem('zenix_lang') || 'fa');
     bindQuantButton();
+
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
       logoutBtn.onclick = async function(e) {
@@ -755,21 +737,32 @@ async function initQuantification() {
         window.location.href = 'index.html';
       };
     }
+
     const savedActiveTradeStr = localStorage.getItem(`zenix_active_trade_${uUid}`);
-    let restoredActiveTrade = null;
     if (savedActiveTradeStr) {
       try {
         const parsed = JSON.parse(savedActiveTradeStr);
-        if (parsed && parsed.nyDate === currentNY) restoredActiveTrade = parsed;
-        else localStorage.removeItem(`zenix_active_trade_${uUid}`);
-      } catch(e) { localStorage.removeItem(`zenix_active_trade_${uUid}`); }
+        if (parsed && parsed.endTime) {
+          if (Date.now() >= parsed.endTime) {
+            localStorage.removeItem(`zenix_active_trade_${uUid}`);
+            await finalizeTrade();
+          } else {
+            startTradeCountdown(parsed);
+          }
+          return;
+        } else {
+          localStorage.removeItem(`zenix_active_trade_${uUid}`);
+        }
+      } catch(e) {
+        localStorage.removeItem(`zenix_active_trade_${uUid}`);
+      }
     }
-    if (restoredActiveTrade) {
-      const now = Date.now();
-      if (now >= restoredActiveTrade.endTime) { cCnt = restoredActiveTrade.targetCount; await finalizeTrade(restoredActiveTrade); }
-      else { cCnt = restoredActiveTrade.targetCount; startTradeCountdown(restoredActiveTrade); }
-    } else { window.checkClickState(); window.renderHistory(); }
-  } catch (err) {}
+
+    window.checkClickState();
+    window.renderHistory();
+  } catch (err) {
+    console.error('initQuantification error:', err);
+  }
 }
 document.addEventListener('DOMContentLoaded', initQuantification);
 </script>
