@@ -11,50 +11,20 @@
         header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1);padding:12px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
         .logo h2{font-size:18px;color:#38bdf8;font-weight:800}
         .header-actions{display:flex;gap:8px;align-items:center}
-        .back-btn, .mode-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;padding:0 12px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:12px;color:#38bdf8;text-decoration:none;font-family:inherit}
-        .mode-btn.admin-mode{color:#22c55e;border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.1)}
-        .mode-btn.ai-mode{color:#a855f7;border-color:rgba(168,85,247,.3);background:rgba(168,85,247,.1)}
+        .back-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;padding:0 12px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:12px;color:#38bdf8;text-decoration:none;font-family:inherit}
         .c{max-width:700px;width:100%;margin:20px auto;padding:0 12px;flex:1;display:flex;flex-direction:column;gap:14px}
 
-        /* ★ بخش انتخاب موضوع */
-        .topics-section{background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.8)}
-        .topics-title{font-size:14px;color:#38bdf8;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08)}
-        .topics-title i{font-size:16px}
-        .topics-title small{color:#94a3b8;font-weight:500;font-size:11px;margin-right:auto}
-        .topics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-        .topic-card{background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#cbd5e1;cursor:pointer;transition:all .25s ease;min-height:95px;font-family:inherit;position:relative;overflow:hidden}
-        .topic-card:hover{background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.5);transform:translateY(-2px);box-shadow:0 6px 20px rgba(14,165,233,.2);color:#38bdf8}
-        .topic-card.active{background:rgba(56,189,248,.15);border-color:#38bdf8;color:#38bdf8;box-shadow:0 0 20px rgba(56,189,248,.3)}
-        .topic-card.active::after{content:'✓';position:absolute;top:6px;left:6px;background:#22c55e;color:#fff;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900}
-        .topic-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-        .topic-label{font-size:11.5px;font-weight:700;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-        .topic-desc{font-size:9px;color:#64748b;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-
-        .ni-blue{background:rgba(56,189,248,.15);color:#38bdf8;border:1px solid rgba(56,189,248,.3)}
-        .ni-purple{background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.3)}
-        .ni-green{background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.3)}
-        .ni-yellow{background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.3)}
-        .ni-pink{background:rgba(236,72,153,.15);color:#ec4899;border:1px solid rgba(236,72,153,.3)}
-        .ni-cyan{background:rgba(6,182,212,.15);color:#06b6d4;border:1px solid rgba(6,182,212,.3)}
-        .ni-rose{background:rgba(244,63,94,.15);color:#f43f5e;border:1px solid rgba(244,63,94,.3)}
-        .ni-emerald{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3)}
-        .ni-amber{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)}
-
-        /* ★ چت‌باکس (فقط بعد از انتخاب موضوع) */
-        .chat-box{background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.1);border-radius:16px;display:none;flex-direction:column;height:500px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.8)}
-        .chat-box.show{display:flex}
-        .chat-header{background:rgba(30,41,59,.9);padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+        /* ═══════════════════════════════════════════════════ */
+        /* ★ چت باکس — اول */
+        /* ═══════════════════════════════════════════════════ */
+        .chat-box{background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.1);border-radius:16px;display:flex;flex-direction:column;height:420px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.8)}
+        .chat-header{background:rgba(30,41,59,.9);padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px}
         .chat-avatar{width:36px;height:36px;background:rgba(56,189,248,.2);border:1px solid #38bdf8;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#38bdf8;font-size:16px;flex-shrink:0}
         .chat-avatar.admin{border-color:#22c55e;background:rgba(34,197,94,.2);color:#22c55e}
-        .chat-title{flex:1;min-width:120px}
-        .chat-title h3{font-size:13px;color:#f8fafc;margin-bottom:2px}
-        .chat-title h3 span{color:#38bdf8}
+        .chat-title{flex:1;min-width:0}
+        .chat-title h3{font-size:13.5px;color:#f8fafc;margin-bottom:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+        .chat-title h3 .topic-badge{font-size:10px;background:rgba(56,189,248,.15);color:#38bdf8;padding:2px 7px;border-radius:6px;border:1px solid rgba(56,189,248,.3);font-weight:700}
         .chat-title p{font-size:10px;color:#22c55e;display:flex;align-items:center;gap:4px}
-        .change-topic-btn{background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.3);color:#cbd5e1;padding:6px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;white-space:nowrap;transition:all .2s}
-        .change-topic-btn:hover{background:rgba(148,163,184,.25);color:#fff}
-        .gen-code-btn{background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);color:#c084fc;padding:6px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;transition:all .2s;white-space:nowrap}
-        .gen-code-btn:hover{background:rgba(168,85,247,.3);color:#e0c7ff}
-        .gen-code-btn:disabled{opacity:.5;cursor:not-allowed}
 
         .chat-body{flex:1;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
         .msg{max-width:85%;padding:9px 13px;border-radius:12px;font-size:12px;line-height:1.7;word-wrap:break-word}
@@ -87,12 +57,46 @@
         .chat-input:disabled{opacity:.5;cursor:not-allowed}
         .send-btn{background:#38bdf8;color:#030712;border:none;border-radius:10px;width:40px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
         .send-btn:disabled{background:#475569;cursor:not-allowed}
+
+        /* ═══════════════════════════════════════════════════ */
+        /* ★ موضوعات — دوم */
+        /* ═══════════════════════════════════════════════════ */
+        .topics-section{background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.8)}
+        .topics-title{font-size:14px;color:#38bdf8;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08)}
+        .topics-title i{font-size:16px}
+        .topics-title small{color:#94a3b8;font-weight:500;font-size:11px;margin-right:auto}
+        .topics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+        .topic-card{background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#cbd5e1;cursor:pointer;transition:all .25s ease;min-height:95px;font-family:inherit;position:relative;overflow:hidden}
+        .topic-card:hover{background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.5);transform:translateY(-2px);box-shadow:0 6px 20px rgba(14,165,233,.2);color:#38bdf8}
+        .topic-card.active{background:rgba(56,189,248,.15);border-color:#38bdf8;color:#38bdf8;box-shadow:0 0 20px rgba(56,189,248,.3)}
+        .topic-card.active::after{content:'✓';position:absolute;top:6px;left:6px;background:#22c55e;color:#fff;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900}
+        .topic-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+        .topic-label{font-size:11.5px;font-weight:700;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+        .topic-desc{font-size:9px;color:#64748b;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+
+        .ni-blue{background:rgba(56,189,248,.15);color:#38bdf8;border:1px solid rgba(56,189,248,.3)}
+        .ni-purple{background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.3)}
+        .ni-green{background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.3)}
+        .ni-yellow{background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.3)}
+        .ni-pink{background:rgba(236,72,153,.15);color:#ec4899;border:1px solid rgba(236,72,153,.3)}
+        .ni-cyan{background:rgba(6,182,212,.15);color:#06b6d4;border:1px solid rgba(6,182,212,.3)}
+        .ni-rose{background:rgba(244,63,94,.15);color:#f43f5e;border:1px solid rgba(244,63,94,.3)}
+        .ni-emerald{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3)}
+        .ni-amber{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)}
+
         .error-banner{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:#f87171;padding:12px;border-radius:10px;font-size:12px;display:none}
         .error-banner.show{display:block}
         footer{text-align:center;padding:12px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);margin-top:auto}
 
         @media (max-width: 480px) {
-            .topics-section{padding:12px}
+            .chat-box{height:380px;border-radius:14px}
+            .chat-header{padding:10px 12px}
+            .chat-title h3{font-size:12px}
+            .chat-title h3 .topic-badge{font-size:9px;padding:1px 6px}
+            .chat-title p{font-size:9px}
+            .chat-body{padding:10px;gap:8px}
+            .msg{font-size:11.5px;padding:8px 11px}
+            .topics-section{padding:12px;border-radius:14px}
             .topics-title{font-size:12px;margin-bottom:10px;padding-bottom:8px}
             .topics-title small{display:none}
             .topics-grid{gap:7px}
@@ -100,13 +104,7 @@
             .topic-icon{width:32px;height:32px;font-size:14px;border-radius:8px}
             .topic-label{font-size:9.5px}
             .topic-desc{display:none}
-            .chat-box{height:520px}
-            .chat-header{padding:10px}
-            .chat-title h3{font-size:11.5px}
-            .chat-title p{font-size:9px}
-            .change-topic-btn,.gen-code-btn{font-size:10px;padding:5px 8px}
-            .header-actions{gap:5px}
-            .back-btn,.mode-btn{font-size:11px;padding:0 9px;height:33px}
+            .back-btn{font-size:11px;padding:0 9px;height:33px}
         }
         @media (max-width: 360px) {
             .topics-grid{grid-template-columns:repeat(2,1fr)}
@@ -120,16 +118,32 @@
     <header>
         <div class="logo"><h2>ZENIX SUPPORT</h2></div>
         <div class="header-actions">
-            <button id="mode-toggle-btn" class="mode-btn admin-mode" style="display:none;" onclick="toggleMode()">
-                <i class="fas fa-headset"></i> <span id="mode-btn-text">اتصال به ادمین</span>
-            </button>
             <a href="#" class="back-btn" onclick="goBack(event)"><i class="fas fa-arrow-right"></i> بازگشت</a>
         </div>
     </header>
     <div class="c">
         <div id="error-banner" class="error-banner"></div>
 
-        <!-- ★ بخش انتخاب موضوع -->
+        <!-- ★ چت باکس — بالا -->
+        <div class="chat-box" id="chat-box">
+            <div class="chat-header">
+                <div class="chat-avatar" id="chat-avatar-el"><i class="fas fa-robot" id="chat-avatar-icon"></i></div>
+                <div class="chat-title">
+                    <h3 id="support-status-title">
+                        <span>پشتیبانی زنیکس</span>
+                        <span class="topic-badge" id="current-topic-badge" style="display:none;"></span>
+                    </h3>
+                    <p><i class="fas fa-circle" style="font-size:6px;"></i> <span id="support-status-sub">ابتدا یک موضوع انتخاب کنید</span></p>
+                </div>
+            </div>
+            <div class="chat-body" id="chat-body"></div>
+            <div class="chat-footer">
+                <input type="text" class="chat-input" id="user-input" placeholder="ابتدا یک موضوع از پایین انتخاب کنید..." disabled>
+                <button class="send-btn" id="send-msg-btn" disabled><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+
+        <!-- ★ موضوعات — پایین -->
         <div class="topics-section" id="topics-section">
             <div class="topics-title">
                 <i class="fas fa-comments"></i>
@@ -137,28 +151,6 @@
                 <small>یک موضوع انتخاب کنید تا ربات در همان مورد راهنمایی‌تان کند</small>
             </div>
             <div class="topics-grid" id="topics-grid"></div>
-        </div>
-
-        <!-- ★ چت‌باکس (بعد از انتخاب موضوع نمایش داده می‌شه) -->
-        <div class="chat-box" id="chat-box">
-            <div class="chat-header">
-                <div class="chat-avatar" id="chat-avatar-el"><i class="fas fa-robot" id="chat-avatar-icon"></i></div>
-                <div class="chat-title">
-                    <h3 id="support-status-title">پشتیبانی: <span id="current-topic-label">-</span></h3>
-                    <p><i class="fas fa-circle" style="font-size:6px;"></i> <span id="support-status-sub">آماده پاسخگویی</span></p>
-                </div>
-                <button class="change-topic-btn" onclick="window.resetTopic()" title="تغییر موضوع">
-                    <i class="fas fa-redo"></i> <span>تغییر</span>
-                </button>
-                <button id="gen-code-btn" class="gen-code-btn" onclick="window.generateAndSendCode()" title="ارسال کد ۶ رقمی">
-                    <i class="fas fa-shield-alt"></i> کد
-                </button>
-            </div>
-            <div class="chat-body" id="chat-body"></div>
-            <div class="chat-footer">
-                <input type="text" class="chat-input" id="user-input" placeholder="سوال خود را بنویسید..." disabled>
-                <button class="send-btn" id="send-msg-btn" disabled><i class="fas fa-paper-plane"></i></button>
-            </div>
         </div>
     </div>
     <footer><p>&copy; 2026 Zenix. All rights reserved.</p></footer>
@@ -174,12 +166,9 @@
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-msg-btn');
         const errorBanner = document.getElementById('error-banner');
-        const modeBtn = document.getElementById('mode-toggle-btn');
-        const modeBtnText = document.getElementById('mode-btn-text');
-        const genCodeBtn = document.getElementById('gen-code-btn');
         const topicsGrid = document.getElementById('topics-grid');
         const chatBox = document.getElementById('chat-box');
-        const currentTopicLabel = document.getElementById('current-topic-label');
+        const currentTopicBadge = document.getElementById('current-topic-badge');
 
         let currentUser = null;
         let currentChatId = null;
@@ -195,10 +184,7 @@
         // ═══════════════════════════════════════════════════
         const TOPICS = {
             dashboard: {
-                label: 'داشبورد',
-                desc: 'موجودی و آمار',
-                icon: 'fa-home',
-                color: 'ni-blue',
+                label: 'داشبورد', desc: 'موجودی و آمار', icon: 'fa-home', color: 'ni-blue',
                 welcome: 'شما موضوع <strong>داشبورد</strong> رو انتخاب کردید. در داشبورد می‌تونید موجودی کل، تعداد زیرمجموعه‌ها و میانبرهای دسترسی سریع رو ببینید. چه سوالی درباره داشبورد داری؟',
                 knowledge: [
                     { kw: ['موجودی', 'بالانس', 'چقدر', 'پول'], r: 'موجودی کل حساب شما در بالای صفحه داشبورد نمایش داده می‌شه، دقیقاً زیر عنوان «خوش آمدید». با هر معامله یا واریز، این عدد به‌روز می‌شه.' },
@@ -209,10 +195,7 @@
                 ]
             },
             quantification: {
-                label: 'کوانتیفیکیشن',
-                desc: 'ربات و سود',
-                icon: 'fa-robot',
-                color: 'ni-purple',
+                label: 'کوانتیفیکیشن', desc: 'ربات و سود', icon: 'fa-robot', color: 'ni-purple',
                 welcome: 'شما موضوع <strong>کوانتیفیکیشن</strong> رو انتخاب کردید. ربات معامله‌گر هوشمند Zenix با آربیتراژ و AI سود می‌سازه. چه سوالی داری؟',
                 knowledge: [
                     { kw: ['چیه', 'چیست', 'کار', 'ربات'], r: 'کوانتیفیکیشن یک ربات معامله‌گر هوشمنده که قیمت ارزهای دیجیتال رو در صرافی‌های مختلف بررسی می‌کنه و از اختلاف قیمت‌ها (آربیتراژ) سود به‌دست می‌آره.' },
@@ -224,10 +207,7 @@
                 ]
             },
             deposit: {
-                label: 'واریز',
-                desc: 'شارژ حساب',
-                icon: 'fa-arrow-down',
-                color: 'ni-green',
+                label: 'واریز', desc: 'شارژ حساب', icon: 'fa-arrow-down', color: 'ni-green',
                 welcome: 'شما موضوع <strong>واریز</strong> رو انتخاب کردید. برای شارژ حساب از شبکه بلاکچین استفاده می‌کنیم. چه سوالی داری؟',
                 knowledge: [
                     { kw: ['چطور', 'روش', 'مراحل'], r: 'مراحل واریز:\n۱. برو به بخش واریز\n۲. شبکه (TRC20 یا BEP20) رو انتخاب کن\n۳. مبلغ رو وارد کن\n۴. آدرس نمایش داده می‌شه — کپی کن\n۵. از کیف پولت همون مبلغ رو بفرست\n۶. TxID رو در سایت وارد کن' },
@@ -239,10 +219,7 @@
                 ]
             },
             withdraw: {
-                label: 'برداشت',
-                desc: 'تسویه',
-                icon: 'fa-arrow-up',
-                color: 'ni-yellow',
+                label: 'برداشت', desc: 'تسویه', icon: 'fa-arrow-up', color: 'ni-yellow',
                 welcome: 'شما موضوع <strong>برداشت</strong> رو انتخاب کردید. برای برداشت باید شرط‌های خاصی رو داشته باشی. چه سوالی داری؟',
                 knowledge: [
                     { kw: ['چطور', 'روش', 'مراحل'], r: 'مراحل برداشت:\n۱. برو به بخش برداشت\n۲. شبکه رو انتخاب کن\n۳. آدرس کیف پول مقصد رو وارد کن\n۴. مبلغ (خودکار بر اساس سطح)\n۵. رمز تراکنش رو وارد کن\n۶. ثبت درخواست' },
@@ -254,10 +231,7 @@
                 ]
             },
             team: {
-                label: 'تیم',
-                desc: 'زیرمجموعه',
-                icon: 'fa-users',
-                color: 'ni-pink',
+                label: 'تیم', desc: 'زیرمجموعه', icon: 'fa-users', color: 'ni-pink',
                 welcome: 'شما موضوع <strong>تیم</strong> رو انتخاب کردید. با دعوت دوستان می‌تونی کمیسیون بگیری. چه سوالی داری؟',
                 knowledge: [
                     { kw: ['دعوت', 'لینک', 'رفرال'], r: 'برای دعوت دوستان، از بخش «تیم من» لینک اختصاصی خودت رو کپی کن و برای دوستت بفرست. وقتی اون ثبت‌نام کنه و واریز کنه، کمیسیونش به حساب تو اضافه می‌شه.' },
@@ -267,10 +241,7 @@
                 ]
             },
             transactions: {
-                label: 'تراکنش',
-                desc: 'تاریخچه مالی',
-                icon: 'fa-history',
-                color: 'ni-cyan',
+                label: 'تراکنش', desc: 'تاریخچه مالی', icon: 'fa-history', color: 'ni-cyan',
                 welcome: 'شما موضوع <strong>تراکنش‌ها</strong> رو انتخاب کردید. اینجا تاریخچه همه فعالیت‌های مالیه. چه سوالی داری؟',
                 knowledge: [
                     { kw: ['چیه', 'چیست', 'کار'], r: 'صفحه تراکنش‌ها گزارش کاملی از تمام فعالیت‌های مالی شما (واریز، برداشت، پاداش) است.' },
@@ -280,10 +251,7 @@
                 ]
             },
             profile: {
-                label: 'پروفایل',
-                desc: 'تنظیمات امنیتی',
-                icon: 'fa-user-cog',
-                color: 'ni-rose',
+                label: 'پروفایل', desc: 'تنظیمات امنیتی', icon: 'fa-user-cog', color: 'ni-rose',
                 welcome: 'شما موضوع <strong>پروفایل</strong> رو انتخاب کردید. در این بخش اطلاعات حساب و تنظیمات امنیتی رو مدیریت می‌کنی. چه سوالی داری؟',
                 knowledge: [
                     { kw: ['تغییر', 'عوض', 'رمز ورود'], r: 'برای تغییر رمز ورود: از بخش پروفایل، کارت «تغییر رمز ورود» رو باز کن. روی «دریافت کد از پشتیبانی» بزن → به چت برو → کد رو کپی کن → برگرد و وارد کن.' },
@@ -294,10 +262,7 @@
                 ]
             },
             login: {
-                label: 'ورود',
-                desc: 'مشکل ورود',
-                icon: 'fa-sign-in-alt',
-                color: 'ni-emerald',
+                label: 'ورود', desc: 'مشکل ورود', icon: 'fa-sign-in-alt', color: 'ni-emerald',
                 welcome: 'شما موضوع <strong>ورود به حساب</strong> رو انتخاب کردید. اگر در ورود مشکل داری، بگو چه خطایی می‌گیری.',
                 knowledge: [
                     { kw: ['وارد', 'لاگین', 'نمیشه', 'خطا'], r: 'اگر خطای ورود می‌گیری، ابتدا چک کن:\n• ایمیل و رمز رو درست وارد کردی\n• Caps Lock روشن نباشه\n• کد امنیتی (کپچا) رو دقیق وارد کردی' },
@@ -307,10 +272,7 @@
                 ]
             },
             register: {
-                label: 'ثبت‌نام',
-                desc: 'حساب جدید',
-                icon: 'fa-user-plus',
-                color: 'ni-amber',
+                label: 'ثبت‌نام', desc: 'حساب جدید', icon: 'fa-user-plus', color: 'ni-amber',
                 welcome: 'شما موضوع <strong>ثبت‌نام</strong> رو انتخاب کردید. برای ساخت حساب جدید راهنماییت می‌کنم. چه سوالی داری؟',
                 knowledge: [
                     { kw: ['چطور', 'مراحل', 'روش'], r: 'مراحل ثبت‌نام:\n۱. روی «ثبت‌نام» در صفحه ورود بزن\n۲. نام کامل، ایمیل و رمز عبور رو وارد کن\n۳. کد امنیتی (کپچا) رو بزن\n۴. ایمیلت رو تأیید کن\n۵. شماره موبایل رو وارد کن\nتمام!' },
@@ -322,9 +284,6 @@
             }
         };
 
-        // ═══════════════════════════════════════════════════
-        // ★ ساخت کارت‌های موضوع
-        // ═══════════════════════════════════════════════════
         function buildTopicsGrid() {
             topicsGrid.innerHTML = '';
             Object.entries(TOPICS).forEach(([key, topic]) => {
@@ -341,83 +300,76 @@
             });
         }
 
-        // ═══════════════════════════════════════════════════
-        // ★ انتخاب موضوع
-        // ═══════════════════════════════════════════════════
+        function renderInitialChat() {
+            chatBody.innerHTML = '';
+            renderMessage('سلام! 👋<br>برای شروع، یکی از موضوعات پایین صفحه رو انتخاب کن تا بتونم دقیقاً در همون مورد راهنمایی‌ت کنم.', 'bot', new Date().toISOString());
+            userInput.disabled = true;
+            sendBtn.disabled = true;
+            userInput.placeholder = 'ابتدا یک موضوع از پایین انتخاب کنید...';
+            currentTopicBadge.style.display = 'none';
+        }
+
         window.selectTopic = async function(topicKey) {
             const topic = TOPICS[topicKey];
             if (!topic) return;
 
             currentTopic = topicKey;
 
-            // هایلایت کارت
             document.querySelectorAll('.topic-card').forEach(c => {
                 c.classList.toggle('active', c.dataset.topic === topicKey);
             });
 
-            // نمایش چت‌باکس
-            chatBox.classList.add('show');
+            // بروزرسانی badge موضوع
+            currentTopicBadge.textContent = topic.label;
+            currentTopicBadge.style.display = 'inline-block';
 
-            // بروزرسانی هدر
-            currentTopicLabel.textContent = topic.label;
+            // بروزرسانی وضعیت
+            document.getElementById('support-status-sub').textContent = 'آماده پاسخگویی';
 
             // فعال‌سازی input
             userInput.disabled = false;
             sendBtn.disabled = false;
             userInput.placeholder = `سوال خود را درباره ${topic.label} بنویسید...`;
 
-            // پاک کردن و شروع چت جدید
+            // چت خالی و شروع
             chatBody.innerHTML = '';
-            await new Promise(r => setTimeout(r, 100));
+            await new Promise(r => setTimeout(r, 80));
             renderMessage(topic.welcome, 'bot', new Date().toISOString());
 
-            // اسکرول به چت
             setTimeout(() => {
                 chatBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 userInput.focus();
             }, 200);
         };
 
-        // ═══════════════════════════════════════════════════
-        // ★ بازگشت به انتخاب موضوع
-        // ═══════════════════════════════════════════════════
-        window.resetTopic = function() {
-            currentTopic = null;
-            chatBox.classList.remove('show');
-            document.querySelectorAll('.topic-card').forEach(c => c.classList.remove('active'));
-            userInput.value = '';
-            userInput.disabled = true;
-            sendBtn.disabled = true;
-            chatBody.innerHTML = '';
-
-            // اسکرول به بالای کارت‌ها
-            document.getElementById('topics-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        };
-
-        // ═══════════════════════════════════════════════════
-        // ★ پاسخ‌دهی بر اساس موضوع
-        // ═══════════════════════════════════════════════════
         window.generateTopicReply = function(question) {
             if (!currentTopic) return { handled: false, text: 'لطفاً ابتدا یک موضوع انتخاب کنید.' };
             const topic = TOPICS[currentTopic];
             const q = question.toLowerCase().trim();
 
-            // اگر درخواست ادمین بود
+            // درخواست ادمین
             if (q.includes('ادمین') || q.includes('پشتیبان') || q.includes('مدیر') || q.includes('انسان')) {
                 return { handled: 'switch_to_admin' };
             }
 
-            // جستجو در دانش‌نامه موضوع
+            // درخواست کد تأیید
+            if ((q.includes('کد') || q.includes('تأیید') || q.includes('تایید')) && (q.includes('تغییر') || q.includes('عوض') || q.includes('گم') || q.includes('فراموش') || q.includes('یادم') || q.includes('بگیرم') || q.includes('میخوام') || q.includes('چطور'))) {
+                return {
+                    handled: true,
+                    text: 'برای دریافت کد تأیید امنیتی:<br><br>۱. به صفحه <strong>پروفایل</strong> برو<br>۲. کارتی که می‌خوای تغییر بدی رو باز کن<br>۳. روی «🔐 دریافت کد از پشتیبانی» بزن<br>۴. خودکار به این صفحه برمی‌گردی و کد اینجا نمایش داده می‌شه'
+                };
+            }
+
+            // جستجو در دانش‌نامه
             for (const item of topic.knowledge) {
                 if (item.kw.some(k => q.includes(k.toLowerCase()))) {
                     return { handled: true, text: item.r };
                 }
             }
 
-            // اگر پیدا نشد
             return {
                 handled: true,
-                text: `متأسفم، در مورد «${question.slice(0, 40)}» در بخش <strong>${topic.label}</strong> اطلاعاتی ندارم.<br><br>می‌تونی:<br>• سوال رو با کلمات دیگه‌ای بپرسی<br>• موضوع رو عوض کنی<br>• با ادمین صحبت کنی`,
+                text: `متأسفم، در مورد «${question.slice(0, 40)}» در بخش <strong>${topic.label}</strong> اطلاعاتی ندارم.<br><br>می‌تونی:<br>• سوال رو با کلمات دیگه‌ای بپرسی<br>• موضوع دیگه‌ای از پایین انتخاب کنی<br>• با ادمین صحبت کنی`,
                 showAdminBtn: true
             };
         };
@@ -579,26 +531,18 @@
         }
 
         function updateStatusUI() {
-            const titleEl = document.getElementById('support-status-title');
-            const subEl = document.getElementById('support-status-sub');
             const avatarEl = document.getElementById('chat-avatar-el');
             const avatarIcon = document.getElementById('chat-avatar-icon');
+            const subEl = document.getElementById('support-status-sub');
             if (aiMode) {
-                titleEl.innerHTML = `پشتیبانی: <span id="current-topic-label">${currentTopic ? TOPICS[currentTopic].label : '-'}</span>`;
-                subEl.textContent = 'آماده پاسخگویی';
                 avatarEl.classList.remove('admin');
                 avatarIcon.className = 'fas fa-robot';
-                modeBtn.style.display = currentUser ? 'flex' : 'none';
-                modeBtn.className = 'mode-btn admin-mode';
-                modeBtnText.textContent = 'اتصال به ادمین';
+                if (!currentTopic) subEl.textContent = 'ابتدا یک موضوع انتخاب کنید';
             } else {
-                titleEl.innerHTML = `پشتیبانی زنیکس (ادمین)`;
-                subEl.textContent = 'متصل - پیام بدهید';
                 avatarEl.classList.add('admin');
                 avatarIcon.className = 'fas fa-headset';
-                modeBtn.style.display = 'flex';
-                modeBtn.className = 'mode-btn ai-mode';
-                modeBtnText.textContent = 'بازگشت به دستیار';
+                subEl.textContent = 'متصل - پیام بدهید';
+                currentTopicBadge.style.display = 'none';
             }
         }
 
@@ -630,40 +574,6 @@
             await loadMessagesFromSupabase();
             subscribeRealtime();
         }
-
-        window.toggleMode = async function() {
-            if (aiMode) { await switchToHumanMode(); }
-            else {
-                aiMode = true; currentChatId = null; unsubscribeRealtime();
-                chatBody.innerHTML = ''; updateStatusUI();
-                if (currentTopic) window.selectTopic(currentTopic);
-            }
-        };
-
-        window.generateAndSendCode = async function() {
-            if (!currentUser) { showError('برای دریافت کد، ابتدا وارد حساب خود شوید'); return; }
-            if (isSending) return;
-            isSending = true; genCodeBtn.disabled = true;
-            try {
-                const { data: result, error: rpcErr } = await supabase.rpc('generate_otp_for_chat');
-                if (rpcErr) throw new Error(rpcErr.message || 'خطا در ساخت کد');
-                if (!result || result.success !== true) {
-                    if (result && result.error === 'too_soon') {
-                        const secs = result.retry_after || 60;
-                        showError(`⏳ لطفاً ${secs} ثانیه صبر کنید`);
-                        return;
-                    }
-                    throw new Error((result && result.error) || 'خطا در ساخت کد');
-                }
-                currentChatId = result.chat_id;
-                if (aiMode) { aiMode = false; updateStatusUI(); subscribeRealtime(); }
-                await loadMessagesFromSupabase();
-            } catch (e) {
-                showError('خطا: ' + (e.message || 'نامشخص'));
-            } finally {
-                isSending = false; genCodeBtn.disabled = false;
-            }
-        };
 
         async function loadMessagesFromSupabase() {
             if (!currentChatId) return;
@@ -735,10 +645,7 @@
                             if (reply.showAdminBtn) {
                                 const div = document.createElement('div');
                                 div.className = 'quick-replies';
-                                div.innerHTML = `
-                                    <button class="quick-reply-btn" onclick="window.resetTopic()">🔄 تغییر موضوع</button>
-                                    <button class="quick-reply-btn admin-link" onclick="window.__switchAdmin()">💬 اتصال به ادمین</button>
-                                `;
+                                div.innerHTML = `<button class="quick-reply-btn admin-link" onclick="window.__switchAdmin()">💬 اتصال به ادمین</button>`;
                                 chatBody.appendChild(div);
                                 chatBody.scrollTop = chatBody.scrollHeight;
                             }
@@ -772,20 +679,36 @@
                 if (sessionData?.session?.user) currentUser = sessionData.session.user;
                 updateStatusUI();
 
-                // اگر کاربر چت قبلی با ادمین داره، خودکار بره به حالت چت
+                // آیا کاربر از صفحه profile اومده برای دریافت کد؟
+                const fromProfile = !!sessionStorage.getItem('zenix_return_focus');
+
+                // آیا کاربر چت قبلی داره؟
+                let existingChatId = null;
                 if (currentUser && currentUser.email) {
                     const { data: existingChat } = await supabase.from('support_chats').select('*').eq('user_email', currentUser.email).maybeSingle();
-                    if (existingChat) {
-                        aiMode = false; currentChatId = existingChat.id;
-                        chatBox.classList.add('show');
-                        userInput.disabled = false;
-                        sendBtn.disabled = false;
-                        updateStatusUI();
+                    if (existingChat) existingChatId = existingChat.id;
+                }
+
+                if (fromProfile || existingChatId) {
+                    // به حالت چت با ادمین برو
+                    aiMode = false;
+                    currentChatId = existingChatId;
+                    userInput.disabled = false;
+                    sendBtn.disabled = false;
+                    userInput.placeholder = 'سوال خود را بنویسید...';
+                    updateStatusUI();
+                    if (currentChatId) {
                         await loadMessagesFromSupabase();
                         subscribeRealtime();
                     }
+                } else {
+                    // حالت اولیه — کاربر باید موضوع انتخاب کنه
+                    renderInitialChat();
                 }
-            } catch (err) { console.error('init error:', err); }
+            } catch (err) {
+                console.error('init error:', err);
+                renderInitialChat();
+            }
         }
 
         sendBtn.addEventListener('click', sendMessage);
