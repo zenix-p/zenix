@@ -249,6 +249,13 @@
         const OTP_EXPIRY_MS = 2 * 60 * 1000;
         const IS_MOBILE = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
 
+        // ★ دقیقاً مطابق profile.html
+        function generateUIDDigits(userId) {
+            let hash = 5381;
+            for (let i = 0; i < userId.length; i++) hash = ((hash << 5) + hash) + userId.charCodeAt(i);
+            return (Math.abs(hash % 900000) + 100000).toString();
+        }
+
         const EXPERT_IMAGES = {
             dashboard: 'https://randomuser.me/api/portraits/women/44.jpg',
             quantification: 'https://randomuser.me/api/portraits/women/68.jpg',
@@ -434,10 +441,7 @@
             document.querySelectorAll('.lang-item').forEach(el => el.classList.toggle('active', el.dataset.lang === lang));
             buildTopicsGrid();
             if ((currentView === 'expert' || currentView === 'admin') && chatIsOpen) refreshChatHeader();
-            if (currentView === 'admin' && chatIsOpen) {
-                // Re-render messages to update identity labels
-                loadMessagesFromSupabase();
-            }
+            if (currentView === 'admin' && chatIsOpen) loadMessagesFromSupabase();
         }
 
         function refreshChatHeader() {
@@ -547,10 +551,12 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        // ★ نسخه اصلاح‌شده - کد کاربر با الگوریتم profile.html
         async function ensureUserIdentityMessage() {
             if (!currentUser || !currentChatId) return;
             try {
-                await supabase.rpc('insert_chat_identity_message');
+                const userCode = 'SM-' + generateUIDDigits(currentUser.id);
+                await supabase.rpc('insert_chat_identity_message', { p_user_code: userCode });
             } catch (e) { console.error('identity msg error:', e); }
         }
 
@@ -671,7 +677,6 @@
             return div;
         }
 
-        // ★ کارت اطلاعات کاربر
         function renderIdentityMessage(text, timeIso) {
             const parts = text.replace('[CHAT_IDENTITY]|', '').split('|');
             const code = parts[0] || '';
@@ -765,7 +770,6 @@
             chatTitleP.innerHTML = `<i class="fas fa-circle" style="font-size:6px;color:#22c55e;"></i><span style="color:#22c55e;">${t('connected')}</span>`;
             await ensureChatExists();
             if (currentChatId) {
-                // Insert request message if no existing user messages
                 const { data: existingMsgs } = await supabase.from('support_messages').select('id').eq('chat_id', currentChatId).eq('sender', 'user').limit(1);
                 if (!existingMsgs || existingMsgs.length === 0) {
                     await supabase.from('support_messages').insert([{
