@@ -27,7 +27,16 @@
         .chat-body{flex:1;padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
         .msg{max-width:85%;padding:10px 14px;border-radius:12px;font-size:12px;line-height:1.7;word-wrap:break-word}
         .msg.system{background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.25);color:#cbd5e1;align-self:center;text-align:center;font-size:11px;max-width:90%}
-        .msg.system.code-msg{background:rgba(168,85,247,.15);border:1.5px solid rgba(168,85,247,.5);color:#e0c7ff;font-size:13px;max-width:95%;white-space:pre-line;line-height:1.9;box-shadow:0 0 20px rgba(168,85,247,.2)}
+        .msg.system.code-msg{background:rgba(168,85,247,.15);border:1.5px solid rgba(168,85,247,.5);color:#e0c7ff;font-size:13px;max-width:95%;white-space:pre-line;line-height:1.9;box-shadow:0 0 20px rgba(168,85,247,.2);min-width:220px}
+        .msg.system.code-msg.expired{background:rgba(100,116,139,.1);border-color:rgba(100,116,139,.35);box-shadow:none;color:#94a3b8}
+        .otp-code-display{display:flex;align-items:center;justify-content:center;gap:10px;margin:10px 0}
+        .otp-code-text{font-size:24px;font-weight:900;letter-spacing:4px;color:#fff;font-family:'Courier New',monospace;direction:ltr;text-shadow:0 0 12px rgba(255,255,255,.3)}
+        .copy-otp-btn{background:rgba(168,85,247,.35);border:1px solid rgba(168,85,247,.7);color:#e0c7ff;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:12px;transition:all .2s;display:flex;align-items:center;justify-content:center;min-width:34px;height:34px}
+        .copy-otp-btn:hover{background:rgba(168,85,247,.55);color:#fff}
+        .copy-otp-btn.copied{background:rgba(34,197,94,.4);border-color:rgba(34,197,94,.7)}
+        .otp-timer-row{font-size:11px;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:4px}
+        .otp-timer-val{color:#fbbf24;font-weight:bold;font-family:monospace}
+        .otp-expired-row{margin:6px 0;font-size:12px;opacity:.8;display:flex;align-items:center;justify-content:center;gap:6px}
         .msg.bot{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#cbd5e1;align-self:flex-start;border-top-right-radius:2px}
         .msg.admin{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#4ade80;align-self:flex-start;border-top-right-radius:2px}
         .msg.user{background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);color:#38bdf8;align-self:flex-end;border-top-left-radius:2px}
@@ -105,6 +114,8 @@
         let realtimeChannel = null;
         let isSending = false;
 
+        const OTP_EXPIRY_MS = 2 * 60 * 1000; // ۲ دقیقه
+
         function escapeHtml(value) {
             return String(value == null ? '' : value)
                 .replace(/&/g, '&amp;')
@@ -127,10 +138,6 @@
             setTimeout(() => errorBanner.classList.remove('show'), 5000);
         }
 
-        function hideError() {
-            errorBanner.classList.remove('show');
-        }
-
         window.goBack = function(event) {
             if (event) event.preventDefault();
             if (sessionStorage.getItem('zenix_return_page')) {
@@ -142,12 +149,120 @@
             }
         };
 
-        function renderMessage(text, sender, timeIso, senderLabel, isCodeMsg) {
+        // ═══════════════════════════════════════════════════
+        // ★ کپی کد در کلیپ‌بورد
+        // ═══════════════════════════════════════════════════
+        window.copyOtp = async function(code, btn) {
+            try {
+                await navigator.clipboard.writeText(code);
+            } catch (e) {
+                // Fallback برای مرورگرهای قدیمی
+                const ta = document.createElement('textarea');
+                ta.value = code;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                try { document.execCommand('copy'); } catch (_) {}
+                document.body.removeChild(ta);
+            }
+            if (btn) {
+                const orig = btn.innerHTML;
+                btn.classList.add('copied');
+                btn.innerHTML = '<i class="fas fa-check"></i>';
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.innerHTML = orig;
+                }, 1500);
+            }
+        };
+
+        // ═══════════════════════════════════════════════════
+        // ★ رندر پیام عادی
+        // ═══════════════════════════════════════════════════
+        function renderMessage(text, sender, timeIso, senderLabel) {
             const div = document.createElement('div');
-            div.className = `msg ${sender}` + (isCodeMsg ? ' code-msg' : '');
+            div.className = `msg ${sender}`;
             const safeContent = (sender === 'bot' || sender === 'system') ? text : escapeHtml(text);
             const label = senderLabel ? `<span class="msg-sender">${escapeHtml(senderLabel)}</span>` : '';
             div.innerHTML = `${label}${safeContent}<span class="msg-meta">${formatTime(timeIso)}</span>`;
+            chatBody.appendChild(div);
+            chatBody.scrollTop = chatBody.scrollHeight;
+            return div;
+        }
+
+        // ═══════════════════════════════════════════════════
+        // ★ رندر پیام کد محافظ (با تایمر + کپی + انقضا)
+        // ═══════════════════════════════════════════════════
+        function renderCodeMessage(text, timeIso, createdAt) {
+            const div = document.createElement('div');
+            div.className = 'msg system code-msg';
+
+            const match = text.match(/کد شما:\s*(\d{6})/);
+            const otpCode = match ? match[1] : null;
+
+            if (!otpCode) {
+                // اگر کد پیدا نشد، همان متن خام رو نمایش بده
+                div.innerHTML = text + `<span class="msg-meta">${formatTime(timeIso)}</span>`;
+                chatBody.appendChild(div);
+                chatBody.scrollTop = chatBody.scrollHeight;
+                return div;
+            }
+
+            const createdMs = createdAt ? new Date(createdAt).getTime() : Date.now();
+            const expiresAt = createdMs + OTP_EXPIRY_MS;
+
+            const render = () => {
+                if (!div.isConnected) return false;
+
+                const now = Date.now();
+                const remaining = expiresAt - now;
+
+                if (remaining <= 0) {
+                    div.classList.add('expired');
+                    div.innerHTML = `
+                        <span class="msg-sender" style="opacity:.7">🛡️ کد محافظ Zenix</span>
+                        <div class="otp-expired-row">
+                            <i class="fas fa-lock"></i> کد منقضی شده — لطفاً کد جدید بگیرید
+                        </div>
+                        <span class="msg-meta">${formatTime(timeIso)}</span>
+                    `;
+                    return false;
+                }
+
+                const mins = Math.floor(remaining / 60000);
+                const secs = Math.floor((remaining % 60000) / 1000);
+                const timerText = `${mins}:${String(secs).padStart(2, '0')}`;
+
+                div.classList.remove('expired');
+                div.innerHTML = `
+                    <span class="msg-sender" style="opacity:.85">🛡️ کد محافظ Zenix</span>
+                    <div class="otp-code-display">
+                        <span class="otp-code-text">${otpCode}</span>
+                        <button class="copy-otp-btn" data-code="${otpCode}" title="کپی کد">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="otp-timer-row">
+                        <span>⏱ اعتبار:</span>
+                        <span class="otp-timer-val">${timerText}</span>
+                    </div>
+                    <span class="msg-meta">${formatTime(timeIso)}</span>
+                `;
+
+                const cpBtn = div.querySelector('.copy-otp-btn');
+                if (cpBtn) {
+                    cpBtn.onclick = () => window.copyOtp(otpCode, cpBtn);
+                }
+
+                return true;
+            };
+
+            render();
+            const timer = setInterval(() => {
+                if (!render()) clearInterval(timer);
+            }, 1000);
+
             chatBody.appendChild(div);
             chatBody.scrollTop = chatBody.scrollHeight;
             return div;
@@ -204,7 +319,7 @@
             }
 
             if ((q.includes('دکمه') || q.includes('دکمه ورود') || q.includes('غیرفعال') || q.includes('خاکستری') || q.includes('کار نمیکنه')) && (q.includes('ورود') || q.includes('لاگین') || q.includes('btn'))) {
-                return { handled: true, text: 'آها، دکمه ورود خاکستریه و روش کلیک نمیشه؟<br><br>این طبیعیه! دکمه ورود فقط وقتی فعال میشه که ۳ تا شرط برقرار باشه:<br>۱. ایمیلت کامل و درست باشه (مثل test@gmail.com).<br>۲. رمز عبورت حداقل ۶ حرف باشه.<br>۳. کد امنیتی رو دقیقاً ۵ حرف زده باشی.<br><br>وقتی اینا کامل بشه، دکمه رنگی میشه و میتونی بزنی. اگه همه رو زدی و بازم خاکستریه، شاید مرورگرت گیر داده، یه بار صفحه رو رفرش کن.' };
+                return { handled: true, text: 'آها، دکمه ورود خاکستریه و روش کلیک نمیشه؟<br><br>این طبیعیه! دکمه ورود فقط وقتی فعال میشه که ۳ تا شرط برقرار باشه:<br>۱. ایمیلت کامل و درست باشه (مثل test@gmail.com).<br>۲. رمز عبورت حداقل ۶ حرف باشه.<br>۳. کد امنیتی رو دقیقاً ۵ حرف زده باشی.<br><br>وقتی اینا کامل بشه، دکمه رنگی میشه و می‌تونی بزنی. اگه همه رو زدی و بازم خاکستریه، شاید مرورگرت گیر داده، یه بار صفحه رو رفرش کن.' };
             }
 
             if ((q.includes('فراموش') || q.includes('یادم رفته') || q.includes('گم کردم') || q.includes('ریست') || q.includes('بازیابی')) && (q.includes('رمز') || q.includes('پسورد') || q.includes('password'))) {
@@ -212,7 +327,7 @@
             }
 
             if ((q.includes('تغییر') || q.includes('عوض')) && (q.includes('ایمیل') || q.includes('جمیل') || q.includes('email'))) {
-                return { handled: true, text: 'برای تغییر ایمیل:<br><br>۱. اول باید با حساب فعلیت وارد بشی.<br>۲. برو به بخش <strong>پروفایل / تنظیمات</strong>.<br>۳. اونجا میتونی ایمیل جدیدت رو وارد کنی و تاییدش کنی.<br><br>اگه به هر دلیلی نمیتونی وارد بشی، بگو تا وصلت کنم به مدیریت.' };
+                return { handled: true, text: 'برای تغییر ایمیل:<br><br>۱. اول باید با حساب فعلیت وارد بشی.<br>۲. برو به بخش <strong>پروفایل / تنظیمات</strong>.<br>۳. اونجا می‌تونی ایمیل جدیدت رو وارد کنی و تاییدش کنی.<br><br>اگه به هر دلیلی نمیتونی وارد بشی، بگو تا وصلت کنم به مدیریت.' };
             }
 
             if (q.includes('واریز') || q.includes('شارژ') || q.includes('پول') || q.includes('deposit')) {
@@ -370,7 +485,6 @@
             genCodeBtn.disabled = true;
 
             try {
-                // 1. ساخت OTP + درج پیام — همه از طریق تابع امن دیتابیس
                 const { data: result, error: rpcErr } = await supabase.rpc('generate_otp_for_chat');
 
                 if (rpcErr) throw new Error(rpcErr.message || 'خطا در ساخت کد');
@@ -386,14 +500,12 @@
 
                 currentChatId = result.chat_id;
 
-                // 2. اگر در حالت AI بودیم، به حالت چت سوئیچ کن
                 if (aiMode) {
                     aiMode = false;
                     updateStatusUI();
                     subscribeRealtime();
                 }
 
-                // 3. بارگذاری مجدد پیام‌ها
                 await loadMessagesFromSupabase();
 
             } catch (e) {
@@ -434,10 +546,13 @@
                 }
 
                 messages.forEach(msg => {
-                    const sender = msg.sender === 'admin' ? 'admin' : (msg.sender === 'system' ? 'system' : 'user');
-                    const label = msg.sender === 'admin' ? 'پشتیبان' : (msg.sender === 'system' ? null : 'شما');
-                    const isCode = msg.sender === 'system' && (msg.text || '').includes('کد محافظ');
-                    renderMessage(msg.text, sender, msg.created_at, label, isCode);
+                    if (msg.sender === 'system' && (msg.text || '').includes('کد محافظ')) {
+                        renderCodeMessage(msg.text, msg.created_at, msg.created_at);
+                    } else {
+                        const sender = msg.sender === 'admin' ? 'admin' : (msg.sender === 'system' ? 'system' : 'user');
+                        const label = msg.sender === 'admin' ? 'پشتیبان' : (msg.sender === 'system' ? null : 'شما');
+                        renderMessage(msg.text, sender, msg.created_at, label);
+                    }
                 });
             } catch (err) {
                 console.error('loadMessagesFromSupabase error:', err);
