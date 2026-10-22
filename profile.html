@@ -214,7 +214,7 @@
                 <div class="fg">
                     <label class="fl">دریافت کد از پشتیبانی</label>
                     <div class="otp-row">
-                        <button type="button" class="bs bs-purple" onclick="window.requestOtpViaChat(this)" style="flex:1;">🔐 دریافت کد از پشتیبانی</button>
+                        <button type="button" class="bs bs-purple" onclick="window.requestOtpViaChat(this, 'pwd-code')" style="flex:1;">🔐 دریافت کد از پشتیبانی</button>
                     </div>
                     <a href="support.html" class="chat-link-btn" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);"><i class="fas fa-comments"></i> رفتن به چت پشتیبانی</a>
                 </div>
@@ -239,7 +239,7 @@
                 <div class="fg">
                     <label class="fl">دریافت کد از پشتیبانی</label>
                     <div class="otp-row">
-                        <button type="button" class="bs bs-purple" onclick="window.requestOtpViaChat(this)" style="flex:1;">🔐 دریافت کد از پشتیبانی</button>
+                        <button type="button" class="bs bs-purple" onclick="window.requestOtpViaChat(this, 'tr-code')" style="flex:1;">🔐 دریافت کد از پشتیبانی</button>
                     </div>
                     <a href="support.html" class="chat-link-btn" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);"><i class="fas fa-comments"></i> رفتن به چت پشتیبانی</a>
                 </div>
@@ -282,7 +282,7 @@
                     <div class="fg">
                         <label class="fl">دریافت کد از پشتیبانی</label>
                         <div class="otp-row">
-                            <button type="button" class="bs bs-purple" onclick="window.requestOtpViaChat(this)" style="flex:1;">🔐 دریافت کد از پشتیبانی</button>
+                            <button type="button" class="bs bs-purple" onclick="window.requestOtpViaChat(this, 'wal-code')" style="flex:1;">🔐 دریافت کد از پشتیبانی</button>
                         </div>
                         <a href="support.html" class="chat-link-btn" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);"><i class="fas fa-comments"></i> رفتن به چت پشتیبانی</a>
                     </div>
@@ -627,9 +627,9 @@
         };
 
         // ═══════════════════════════════════════════════════
-        // ★ تابع جدید: درخواست OTP از چت پشتیبانی
+        // ★ درخواست OTP از چت پشتیبانی — بدون confirm + با شناسه فیلد مقصد
         // ═══════════════════════════════════════════════════
-        window.requestOtpViaChat = async function(btnEl) {
+        window.requestOtpViaChat = async function(btnEl, targetFieldId) {
             if (!currentUser) {
                 window.showToast('ابتدا وارد حساب خود شوید', 'error', 4000);
                 return;
@@ -654,20 +654,12 @@
                     return;
                 }
 
-                // ذخیره صفحه فعلی برای بازگشت
-                sessionStorage.setItem('zenix_return_page', window.location.href);
+                // ذخیره صفحه فعلی و فیلد مقصد برای بازگشت
+                sessionStorage.setItem('zenix_return_page', window.location.href.split('#')[0]);
+                if (targetFieldId) sessionStorage.setItem('zenix_return_focus', targetFieldId);
 
-                // پیام موفق
-                window.showToast('✅ کد ۶ رقمی به چت پشتیبانی ارسال شد', 'success', 5000);
-
-                // هدایت به چت پس از ۱.۵ ثانیه
-                setTimeout(() => {
-                    if (confirm('کد به چت پشتیبانی ارسال شد.\n\nآیا می‌خواهید به صفحه پشتیبانی بروید و کد را ببینید؟')) {
-                        window.location.href = 'support.html';
-                    }
-                }, 800);
-
-                if (btnEl) { btnEl.disabled = false; btnEl.textContent = origText; }
+                // مستقیم برو به چت پشتیبانی
+                window.location.href = 'support.html';
 
             } catch (e) {
                 window.showToast('خطا: ' + (e.message || 'نامشخص'), 'error', 5000);
@@ -754,6 +746,37 @@
             }).subscribe();
         }
 
+        // ═══════════════════════════════════════════════════
+        // ★ بازگشت به فیلد مقصد بعد از بازگشت از چت پشتیبانی
+        // ═══════════════════════════════════════════════════
+        function handleReturnFocus() {
+            const focusField = sessionStorage.getItem('zenix_return_focus');
+            if (!focusField) return;
+            sessionStorage.removeItem('zenix_return_focus');
+
+            setTimeout(() => {
+                const field = document.getElementById(focusField);
+                if (!field) return;
+
+                const card = field.closest('.card');
+                if (card) {
+                    document.querySelectorAll('.card').forEach(c => {
+                        c.classList.remove('open');
+                        const b = c.querySelector('.bd');
+                        if (b) b.style.display = 'none';
+                    });
+                    card.classList.add('open');
+                    const bd = card.querySelector('.bd');
+                    if (bd) bd.style.display = 'block';
+                }
+
+                setTimeout(() => {
+                    field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    field.focus();
+                }, 300);
+            }, 200);
+        }
+
         async function initializeUserSession(session) {
             if (!session || !session.user || authInitialized) return false;
             currentUser = session.user; currentUserId = session.user.id;
@@ -763,6 +786,10 @@
             await loadUserData(session.user);
             await setupRealtimeSubscriptions(session.user.id);
             authInitialized = true;
+
+            // بازگشت به فیلد مقصد بعد از لود کامل
+            setTimeout(handleReturnFocus, 500);
+
             return true;
         }
 
