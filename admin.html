@@ -251,6 +251,11 @@
         .approve-checkbox-item input[type="checkbox"] { margin-top: 2px; cursor: pointer; width: 16px; height: 16px; flex-shrink: 0; accent-color: #22c55e; }
         .approve-checkbox-item span { color: #cbd5e1; font-size: 11px; line-height: 1.6; }
 
+        .wd-big-send { background: linear-gradient(135deg, rgba(34,197,94,.18), rgba(22,163,74,.1)); border: 2px solid rgba(34,197,94,.5); border-radius: 12px; padding: 16px; margin-bottom: 14px; text-align: center; }
+        .wd-big-send .label { font-size: 10px; color: #86efac; margin-bottom: 6px; letter-spacing: .5px; }
+        .wd-big-send .amount { font-size: 26px; font-weight: 900; color: #22c55e; text-shadow: 0 0 20px rgba(34,197,94,.5); }
+        .wd-big-send .sub { font-size: 10px; color: #86efac; margin-top: 4px; }
+
         @media (max-width: 960px) {
             .app-shell { flex-direction: column; }
             .sidebar { width: 100%; height: auto; position: sticky; top: 0; z-index: 90; border-left: 0; border-bottom: 1px solid var(--line-2); box-shadow: 0 10px 30px rgba(0,0,0,0.5); padding: 12px 14px; gap: 10px; }
@@ -484,7 +489,9 @@
                             <thead>
                                 <tr>
                                     <th>کاربر</th>
-                                    <th>مبلغ</th>
+                                    <th>مبلغ درخواستی</th>
+                                    <th>کارمزد</th>
+                                    <th>پرداختی به کاربر</th>
                                     <th>شبکه</th>
                                     <th>آدرس مقصد</th>
                                     <th>تاریخ</th>
@@ -609,7 +616,7 @@
 
     <div class="modal" id="m-confirm-reject" style="z-index:1050;"><div class="modal-content" style="max-width:420px;"><div class="modal-header" style="color:#ef4444; border-bottom-color:rgba(239,68,68,.25);"><span><i class="fas fa-times-circle"></i> رد واریزی</span><button class="modal-close" onclick="closeModal('m-confirm-reject')"><i class="fas fa-times"></i></button></div><div style="padding:8px 0 16px;"><label style="display:block; color:#94a3b8; font-size:11px; margin-bottom:8px;"><i class="fas fa-comment-dots" style="color:#38bdf8;"></i> دلیل رد واریزی (به کاربر نمایش داده می‌شود):</label><textarea id="reject-reason-input" rows="3" style="width:100%; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.12); border-radius:10px; padding:10px 14px; color:#fff; font-size:12px; outline:none; resize:vertical; font-family:inherit; box-sizing:border-box;" placeholder="مثال: هش تراکنش نامعتبر است یا مبلغ با تراکنش مطابقت ندارد"></textarea><div style="margin-top:10px; padding:10px; background:rgba(56,189,248,.08); border:1px solid rgba(56,189,248,.2); border-radius:8px; color:#38bdf8; font-size:11px; display:flex; align-items:flex-start; gap:8px;"><i class="fas fa-info-circle" style="margin-top:2px; flex-shrink:0;"></i><span>در صورت خالی گذاشتن، دلیل پیش‌فرض «واریزی توسط مدیریت تایید نشد» ثبت می‌شود.</span></div></div><div style="display:flex; gap:10px;"><button type="button" class="confirm-btn-cancel" onclick="closeModal('m-confirm-reject')"><i class="fas fa-times"></i> لغو</button><button type="button" class="confirm-btn-reject" id="confirm-reject-btn"><i class="fas fa-times-circle"></i> رد واریزی</button></div></div></div>
 
-    <div class="modal" id="m-confirm-withdraw-approve" style="z-index:1050;"><div class="modal-content" style="max-width:480px;"><div class="modal-header" style="color:#22c55e; border-bottom-color:rgba(34,197,94,.25);"><span><i class="fas fa-check-circle"></i> تایید برداشت</span><button class="modal-close" onclick="closeModal('m-confirm-withdraw-approve')"><i class="fas fa-times"></i></button></div><div id="confirm-withdraw-approve-body" style="padding:8px 0 16px; max-height:55vh; overflow-y:auto;"></div><div style="display:flex; gap:10px;"><button type="button" class="confirm-btn-cancel" onclick="closeModal('m-confirm-withdraw-approve')"><i class="fas fa-times"></i> لغو</button><button type="button" class="confirm-btn-approve" id="confirm-withdraw-approve-btn"><i class="fas fa-check"></i> تایید برداشت</button></div></div></div>
+    <div class="modal" id="m-confirm-withdraw-approve" style="z-index:1050;"><div class="modal-content" style="max-width:500px;"><div class="modal-header" style="color:#22c55e; border-bottom-color:rgba(34,197,94,.25);"><span><i class="fas fa-check-circle"></i> تایید برداشت</span><button class="modal-close" onclick="closeModal('m-confirm-withdraw-approve')"><i class="fas fa-times"></i></button></div><div id="confirm-withdraw-approve-body" style="padding:8px 0 16px; max-height:60vh; overflow-y:auto;"></div><div style="display:flex; gap:10px;"><button type="button" class="confirm-btn-cancel" onclick="closeModal('m-confirm-withdraw-approve')"><i class="fas fa-times"></i> لغو</button><button type="button" class="confirm-btn-approve" id="confirm-withdraw-approve-btn"><i class="fas fa-check"></i> تایید برداشت</button></div></div></div>
 
     <div class="modal" id="m-confirm-withdraw-reject" style="z-index:1050;"><div class="modal-content" style="max-width:420px;"><div class="modal-header" style="color:#ef4444; border-bottom-color:rgba(239,68,68,.25);"><span><i class="fas fa-times-circle"></i> رد برداشت</span><button class="modal-close" onclick="closeModal('m-confirm-withdraw-reject')"><i class="fas fa-times"></i></button></div><div style="padding:8px 0 16px;"><label style="display:block; color:#94a3b8; font-size:11px; margin-bottom:8px;"><i class="fas fa-comment-dots" style="color:#38bdf8;"></i> دلیل رد برداشت (به کاربر نمایش داده می‌شود):</label><textarea id="withdraw-reject-reason-input" rows="3" style="width:100%; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.12); border-radius:10px; padding:10px 14px; color:#fff; font-size:12px; outline:none; resize:vertical; font-family:inherit; box-sizing:border-box;" placeholder="مثال: آدرس کیف پول نامعتبر است"></textarea><div style="margin-top:10px; padding:10px; background:rgba(34,197,94,.08); border:1px solid rgba(34,197,94,.2); border-radius:8px; color:#22c55e; font-size:11px; display:flex; align-items:flex-start; gap:8px;"><i class="fas fa-info-circle" style="margin-top:2px; flex-shrink:0;"></i><span>با رد برداشت، مبلغ رزرو شده به‌طور خودکار به موجودی کاربر برمی‌گردد.</span></div></div><div style="display:flex; gap:10px;"><button type="button" class="confirm-btn-cancel" onclick="closeModal('m-confirm-withdraw-reject')"><i class="fas fa-times"></i> لغو</button><button type="button" class="confirm-btn-reject" id="confirm-withdraw-reject-btn"><i class="fas fa-times-circle"></i> رد برداشت</button></div></div></div>
 
@@ -625,6 +632,7 @@
         const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const WD_FEE = 0.9;
 
         function base58Decode(str) {
             const alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
@@ -702,9 +710,6 @@
                 .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
 
-        // ============================================================
-        // 2FA-AWARE ADMIN ACCESS GUARD
-        // ============================================================
         async function guardAdminAccess() {
             try {
                 const { data: userData, error: userError } = await supabaseClient.auth.getUser();
@@ -1070,15 +1075,11 @@
             } catch (err) {}
         }
 
-        // ============================================================
-        // WITHDRAWALS
-        // ============================================================
         window.renderWithdrawTable = function() {
             const allWd = window.currentWithdrawList || [];
             const filter = window.currentWdFilter || 'pending';
             const filtered = filter === 'all' ? allWd : allWd.filter(w => w.status === filter);
 
-            // Update counters
             const cntPending = document.getElementById('wd-cnt-pending');
             const cntApproved = document.getElementById('wd-cnt-approved');
             const cntRejected = document.getElementById('wd-cnt-rejected');
@@ -1092,7 +1093,7 @@
             if (!tbWd) return;
 
             if (filtered.length === 0) {
-                tbWd.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:25px;color:#94a3b8;">هیچ درخواست برداشتی با این فیلتر وجود ندارد.</td></tr>`;
+                tbWd.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:25px;color:#94a3b8;">هیچ درخواست برداشتی با این فیلتر وجود ندارد.</td></tr>`;
                 return;
             }
 
@@ -1111,6 +1112,9 @@
                     ? w.address.substring(0, 8) + '...' + w.address.substring(w.address.length - 8)
                     : (w.address || '-');
 
+                const fee = WD_FEE;
+                const toSend = Math.max(0, w.amount - fee);
+
                 let actions = '';
                 if (w.status === 'pending') {
                     actions = `
@@ -1127,6 +1131,8 @@
                         <div style="font-size:10px; color:#94a3b8; margin-top:2px; max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(w.nameStr)}</div>
                     </td>
                     <td style="color:#38bdf8; font-weight:bold;">$${w.amount.toFixed(2)}</td>
+                    <td style="color:#fbbf24; font-weight:bold;">$${fee.toFixed(2)}</td>
+                    <td style="color:#22c55e; font-weight:800; font-size:13px;">$${toSend.toFixed(2)}</td>
                     <td>${netBadge}</td>
                     <td><span style="font-family:monospace; font-size:10px; color:#cbd5e1;" title="${escapeHtml(w.address)}">${escapeHtml(addrShort)}</span></td>
                     <td style="font-size:10px;">${escapeHtml(formatDate(w.createdAt))}</td>
@@ -1144,6 +1150,9 @@
         window.openWithdrawDetails = function(txId) {
             const w = (window.currentWithdrawList || []).find(x => x.txId === txId);
             if (!w) { showToast('برداشت یافت نشد', 'error'); return; }
+
+            const fee = WD_FEE;
+            const toSend = Math.max(0, w.amount - fee);
             let statusHtml = '';
             if (w.status === 'pending') statusHtml = '<span style="color:#fbbf24; font-weight:bold;">⏳ معلق</span>';
             else if (w.status === 'approved') statusHtml = '<span style="color:#22c55e; font-weight:bold;">✅ تایید شده</span>';
@@ -1153,9 +1162,19 @@
                 <div class="detail-row"><span>شناسه کاربر:</span><span>${escapeHtml(w.idCode)}</span></div>
                 <div class="detail-row"><span>نام:</span><span>${escapeHtml(w.nameStr)}</span></div>
                 <div class="detail-row"><span>ایمیل:</span><span>${escapeHtml(w.user.email || '-')}</span></div>
-                <div class="detail-row" style="background:rgba(56,189,248,.08); padding:12px; border-radius:8px; margin-top:10px;">
-                    <span style="color:#38bdf8; font-weight:bold;">💸 مبلغ برداشت:</span>
-                    <span style="color:#38bdf8; font-weight:bold; font-size:16px;">$${w.amount.toFixed(2)}</span>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin:14px 0;">
+                    <div style="background:rgba(56,189,248,.1); border:1px solid rgba(56,189,248,.3); border-radius:10px; padding:10px; text-align:center;">
+                        <div style="font-size:9px; color:#94a3b8; margin-bottom:4px;">مبلغ درخواستی</div>
+                        <div style="font-size:15px; font-weight:800; color:#38bdf8;">$${w.amount.toFixed(2)}</div>
+                    </div>
+                    <div style="background:rgba(251,191,36,.1); border:1px solid rgba(251,191,36,.3); border-radius:10px; padding:10px; text-align:center;">
+                        <div style="font-size:9px; color:#94a3b8; margin-bottom:4px;">کارمزد</div>
+                        <div style="font-size:15px; font-weight:800; color:#fbbf24;">$${fee.toFixed(2)}</div>
+                    </div>
+                    <div style="background:rgba(34,197,94,.1); border:1px solid rgba(34,197,94,.4); border-radius:10px; padding:10px; text-align:center;">
+                        <div style="font-size:9px; color:#94a3b8; margin-bottom:4px;">پرداختی</div>
+                        <div style="font-size:15px; font-weight:800; color:#22c55e;">$${toSend.toFixed(2)}</div>
+                    </div>
                 </div>
                 <div class="detail-row"><span>شبکه:</span><span>${escapeHtml(w.network)}</span></div>
                 <div class="detail-row" style="flex-direction:column; align-items:flex-start; gap:4px;">
@@ -1164,7 +1183,7 @@
                 </div>
                 <div class="detail-row"><span>زمان ثبت:</span><span>${escapeHtml(formatDate(w.createdAt))}</span></div>
                 <div class="detail-row"><span>وضعیت:</span><span>${statusHtml}</span></div>
-                ${w.adminNote ? `<div class="detail-row"><span>یادداشت ادمین:</span><span>${escapeHtml(w.adminNote)}</span></div>` : ''}
+                ${w.adminNote ? `<div class="detail-row"><span>یادداشت:</span><span>${escapeHtml(w.adminNote)}</span></div>` : ''}
                 ${w.reviewedAt ? `<div class="detail-row"><span>زمان بررسی:</span><span>${escapeHtml(formatDate(w.reviewedAt))}</span></div>` : ''}
             `;
             document.getElementById('item-modal-title').innerHTML = '<i class="fas fa-money-bill-transfer"></i> جزئیات برداشت';
@@ -1188,12 +1207,30 @@
             const w = (window.currentWithdrawList || []).find(x => x.txId === txId);
             if (!w) { showToast('برداشت یافت نشد', 'error'); return; }
 
+            const fee = WD_FEE;
+            const toSend = Math.max(0, w.amount - fee);
+
             const bodyHtml = `
-                <div style="background:rgba(34,197,94,.08); border:1px solid rgba(34,197,94,.25); border-radius:10px; padding:12px; margin-bottom:14px; text-align:center;">
-                    <div style="color:#22c55e; font-weight:800; font-size:20px;">$${w.amount.toFixed(2)} USDT</div>
-                    <div style="color:#94a3b8; font-size:11px; margin-top:2px;">مبلغ برداشت کاربر</div>
+                <div class="wd-big-send">
+                    <div class="label">به کیف پول کاربر بفرستید</div>
+                    <div class="amount">$${toSend.toFixed(2)} USDT</div>
+                    <div class="sub">مبلغ نهایی که به کیف پول کاربر واریز می‌شود</div>
                 </div>
-                <div style="background:rgba(15,23,42,.6); border:1px solid rgba(255,255,255,.08); border-radius:8px; padding:10px; margin-bottom:12px;">
+                <div style="background:rgba(15,23,42,.6); border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:12px; margin-bottom:14px;">
+                    <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.04);">
+                        <span style="color:#94a3b8; font-size:11px;">مبلغ درخواستی کاربر:</span>
+                        <span style="color:#38bdf8; font-weight:800; font-size:13px;">$${w.amount.toFixed(2)}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.04);">
+                        <span style="color:#94a3b8; font-size:11px;">کارمزد پلتفرم:</span>
+                        <span style="color:#fbbf24; font-weight:800; font-size:13px;">$${fee.toFixed(2)}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding:8px 0 0;">
+                        <span style="color:#cbd5e1; font-size:11px; font-weight:700;">پرداختی به کاربر:</span>
+                        <span style="color:#22c55e; font-weight:800; font-size:15px;">$${toSend.toFixed(2)}</span>
+                    </div>
+                </div>
+                <div style="background:rgba(15,23,42,.6); border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:12px; margin-bottom:14px;">
                     <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,.04);">
                         <span style="color:#94a3b8; font-size:11px;">کاربر:</span>
                         <span style="color:#38bdf8; font-weight:700; font-size:11px;">${escapeHtml(w.nameStr)} (${escapeHtml(w.idCode)})</span>
@@ -1208,14 +1245,14 @@
                     </div>
                 </div>
                 <div style="background:rgba(251,191,36,.08); border:1px solid rgba(251,191,36,.25); border-radius:8px; padding:12px; margin-bottom:14px;">
-                    <div style="color:#fbbf24; font-weight:700; font-size:12px; margin-bottom:8px;"><i class="fas fa-list-check"></i> چک‌لیست اجباری تایید:</div>
+                    <div style="color:#fbbf24; font-weight:700; font-size:12px; margin-bottom:8px;"><i class="fas fa-list-check"></i> چک‌لیست اجباری:</div>
                     <label class="approve-checkbox-item"><input type="checkbox" id="wd-chk-1"><span>مبلغ از حساب کاربر رزرو شده است</span></label>
-                    <label class="approve-checkbox-item"><input type="checkbox" id="wd-chk-2"><span>آدرس مقصد را بررسی کردم</span></label>
-                    <label class="approve-checkbox-item"><input type="checkbox" id="wd-chk-3"><span>تراکنش on-chain را انجام دادم</span></label>
+                    <label class="approve-checkbox-item"><input type="checkbox" id="wd-chk-2"><span>آدرس مقصد را با دقت بررسی کردم</span></label>
+                    <label class="approve-checkbox-item"><input type="checkbox" id="wd-chk-3"><span>مبلغ <b style="color:#22c55e;">$${toSend.toFixed(2)}</b> را به کیف پول کاربر فرستادم</span></label>
                 </div>
                 <div style="background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.25); border-radius:8px; padding:10px; color:#fbbf24; font-size:10px; line-height:1.6; display:flex; align-items:flex-start; gap:8px;">
                     <i class="fas fa-exclamation-triangle" style="color:#ef4444; margin-top:2px; flex-shrink:0;"></i>
-                    <span>این عمل قابل بازگشت نیست. فقط بعد از ارسال واقعی USDT به آدرس کاربر، تایید کنید.</span>
+                    <span>این عمل قابل بازگشت نیست. کارمزد <b>$${fee.toFixed(2)}</b> به‌طور خودکار به سود کل ادمین اضافه می‌شود. برای تایید، 2FA لازم است.</span>
                 </div>
             `;
             document.getElementById('confirm-withdraw-approve-body').innerHTML = bodyHtml;
@@ -1239,15 +1276,21 @@
                 newBtn.disabled = true;
                 newBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال تایید...';
                 try {
-                    const { data: { user } } = await supabaseClient.auth.getUser();
-                    const { error } = await supabaseClient
-                        .from('transactions')
-                        .update({ status: 'approved', admin_note: 'تایید توسط ادمین', reviewed_by: user?.id, reviewed_at: new Date().toISOString() })
-                        .eq('id', txId);
+                    const { data, error } = await supabaseClient.rpc('approve_withdrawal', {
+                        p_tx_id: txId,
+                        p_admin_note: `تایید توسط ادمین | کارمزد: $${fee.toFixed(2)} | پرداختی: $${toSend.toFixed(2)}`
+                    });
                     if (error) throw error;
-                    closeModal('m-confirm-withdraw-approve');
-                    showToast(`✅ برداشت تایید شد.`);
-                    loadData();
+                    if (data && data.success) {
+                        closeModal('m-confirm-withdraw-approve');
+                        showToast(`✅ برداشت تایید شد. کاربر ${toSend.toFixed(2)}$ دریافت کرد و ${fee.toFixed(2)}$ کارمزد ثبت شد.`);
+                        loadData();
+                    } else if (data && data.error) {
+                        const errMap = { 'not_admin': 'شما ادمین نیستید', 'not_found': 'برداشت یافت نشد', 'not_pending': 'قبلاً بررسی شده', 'mfa_required': '2FA لازم است' };
+                        showToast('خطا: ' + (errMap[data.error] || data.error), 'error');
+                        newBtn.disabled = false;
+                        newBtn.innerHTML = '<i class="fas fa-check"></i> تایید برداشت';
+                    }
                 } catch (err) {
                     console.error('Approve withdrawal error:', err);
                     showToast('خطا در تایید: ' + (err.message || 'نامشخص'), 'error');
@@ -1259,6 +1302,9 @@
         };
 
         window.rejectWithdrawal = function(txId) {
+            const w = (window.currentWithdrawList || []).find(x => x.txId === txId);
+            if (!w) { showToast('برداشت یافت نشد', 'error'); return; }
+
             const reasonInput = document.getElementById('withdraw-reject-reason-input');
             if (reasonInput) reasonInput.value = '';
             document.getElementById('m-confirm-withdraw-reject').classList.add('show');
@@ -1268,27 +1314,34 @@
             setTimeout(() => reasonInput?.focus(), 100);
 
             newBtn.addEventListener('click', async () => {
-                const reason = (reasonInput?.value || '').trim() || 'برداشت توسط مدیریت تایید نشد';
-                closeModal('m-confirm-withdraw-reject');
+                const reason = (reasonInput?.value || '').trim();
+                newBtn.disabled = true;
+                newBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال رد...';
                 try {
-                    const { data: { user } } = await supabaseClient.auth.getUser();
-                    const { error } = await supabaseClient
-                        .from('transactions')
-                        .update({ status: 'rejected', admin_note: reason, reviewed_by: user?.id, reviewed_at: new Date().toISOString() })
-                        .eq('id', txId);
+                    const { data, error } = await supabaseClient.rpc('reject_withdrawal', {
+                        p_tx_id: txId,
+                        p_reason: reason || 'برداشت توسط مدیریت تایید نشد'
+                    });
                     if (error) throw error;
-                    showToast('برداشت رد شد و مبلغ به کاربر برگشت.');
-                    loadData();
+                    if (data && data.success) {
+                        closeModal('m-confirm-withdraw-reject');
+                        showToast(`✅ برداشت رد شد و مبلغ $${w.amount.toFixed(2)} به موجودی کاربر برگشت.`);
+                        loadData();
+                    } else if (data && data.error) {
+                        const errMap = { 'not_admin': 'شما ادمین نیستید', 'not_found': 'برداشت یافت نشد', 'not_pending': 'قبلاً بررسی شده', 'mfa_required': '2FA لازم است' };
+                        showToast('خطا: ' + (errMap[data.error] || data.error), 'error');
+                        newBtn.disabled = false;
+                        newBtn.innerHTML = '<i class="fas fa-times-circle"></i> رد برداشت';
+                    }
                 } catch (err) {
                     console.error('Reject withdrawal error:', err);
                     showToast('خطا در رد: ' + (err.message || 'نامشخص'), 'error');
+                    newBtn.disabled = false;
+                    newBtn.innerHTML = '<i class="fas fa-times-circle"></i> رد برداشت';
                 }
             });
         };
 
-        // ============================================================
-        // WALLET SETTINGS
-        // ============================================================
         async function loadWalletSettings() {
             try {
                 const trcEl = document.getElementById('wallet-trc20-input');
@@ -1404,9 +1457,6 @@
             }
         };
 
-        // ============================================================
-        // SUPPORT CHAT
-        // ============================================================
         async function initSupportChatListener() {
             async function fetchChats() {
                 try {
@@ -1954,4 +2004,3 @@
     </script>
 </body>
 </html>
- 
