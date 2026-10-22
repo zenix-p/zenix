@@ -19,18 +19,26 @@
         /* ═══════════════════════════════════════════════════ */
         /* صفحه اول — انتخاب موضوع */
         /* ═══════════════════════════════════════════════════ */
-        .topics-section{background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.8)}
-        .topics-intro{text-align:center;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.08)}
-        .topics-intro h2{font-size:16px;color:#38bdf8;font-weight:800;margin-bottom:6px}
-        .topics-intro p{font-size:12px;color:#94a3b8;line-height:1.6}
-        .topics-title{font-size:13px;color:#38bdf8;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+        .topics-section{background:linear-gradient(135deg,rgba(15,23,42,.95),rgba(30,41,59,.85));border:1px solid rgba(56,189,248,.25);border-radius:20px;padding:22px 18px;box-shadow:0 10px 40px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.05);position:relative;overflow:hidden}
+        .topics-section::before{content:'';position:absolute;top:-100px;right:-100px;width:250px;height:250px;background:radial-gradient(circle,rgba(56,189,248,.15),transparent 70%);pointer-events:none}
+        .topics-section::after{content:'';position:absolute;bottom:-100px;left:-100px;width:250px;height:250px;background:radial-gradient(circle,rgba(168,85,247,.12),transparent 70%);pointer-events:none}
+        .topics-intro{text-align:center;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,.08);position:relative;z-index:1}
+        .topics-intro .welcome-icon{width:64px;height:64px;background:linear-gradient(135deg,#38bdf8,#a855f7);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:28px;color:#fff;margin-bottom:14px;box-shadow:0 8px 25px rgba(56,189,248,.4)}
+        .topics-intro h2{font-size:18px;font-weight:900;margin-bottom:8px;background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .topics-intro p{font-size:12.5px;color:#cbd5e1;line-height:1.8;max-width:480px;margin:0 auto}
+        .topics-intro p strong{color:#38bdf8;font-weight:700}
+        .topics-title{font-size:13px;color:#38bdf8;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px;position:relative;z-index:1}
         .topics-title i{font-size:15px}
-        .topics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-        .topic-card{background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#cbd5e1;cursor:pointer;transition:all .25s ease;min-height:95px;font-family:inherit;position:relative;overflow:hidden}
-        .topic-card:hover{background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.5);transform:translateY(-2px);box-shadow:0 6px 20px rgba(14,165,233,.2);color:#38bdf8}
-        .topic-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-        .topic-label{font-size:11.5px;font-weight:700;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-        .topic-desc{font-size:9px;color:#64748b;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+        .topics-title small{color:#94a3b8;font-weight:500;font-size:11px;margin-right:auto}
+        .topics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;position:relative;z-index:1}
+        .topic-card{background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.08);border-radius:14px;padding:16px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#cbd5e1;cursor:pointer;transition:all .3s ease;min-height:110px;font-family:inherit;position:relative;overflow:hidden}
+        .topic-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#38bdf8,transparent);opacity:0;transition:opacity .3s}
+        .topic-card:hover{background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.5);transform:translateY(-3px);box-shadow:0 10px 25px rgba(14,165,233,.25);color:#38bdf8}
+        .topic-card:hover::before{opacity:1}
+        .topic-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;transition:transform .3s}
+        .topic-card:hover .topic-icon{transform:scale(1.1) rotate(-5deg)}
+        .topic-label{font-size:12px;font-weight:700;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+        .topic-desc{font-size:9.5px;color:#64748b;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 
         .ni-blue{background:rgba(56,189,248,.15);color:#38bdf8;border:1px solid rgba(56,189,248,.3)}
         .ni-purple{background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.3)}
@@ -46,20 +54,21 @@
         /* صفحه دوم — چت با کارشناس */
         /* ═══════════════════════════════════════════════════ */
         .chat-view-header{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
-        .change-topic-btn{background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.3);color:#cbd5e1;padding:8px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:all .2s}
-        .change-topic-btn:hover{background:rgba(148,163,184,.25);color:#fff}
-        .conversation-id-badge{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.3);color:#38bdf8;padding:8px 12px;border-radius:8px;font-size:11px;display:flex;align-items:center;gap:6px}
-        .conversation-id-badge strong{font-family:'Courier New',monospace;font-weight:900;letter-spacing:1px;font-size:12px}
+        .close-chat-btn{background:linear-gradient(135deg,#ef4444,#dc2626);border:1px solid rgba(239,68,68,.5);color:#fff;padding:9px 14px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:all .2s;box-shadow:0 4px 15px rgba(239,68,68,.3)}
+        .close-chat-btn:hover{background:linear-gradient(135deg,#dc2626,#b91c1c);transform:translateY(-1px);box-shadow:0 6px 20px rgba(239,68,68,.5)}
+        .conversation-id-badge{background:linear-gradient(135deg,rgba(56,189,248,.15),rgba(168,85,247,.15));border:1px solid rgba(56,189,248,.4);color:#38bdf8;padding:9px 14px;border-radius:10px;font-size:11.5px;display:flex;align-items:center;gap:6px;font-weight:600}
+        .conversation-id-badge i{color:#fbbf24}
+        .conversation-id-badge strong{font-family:'Courier New',monospace;font-weight:900;letter-spacing:1.5px;font-size:13px;color:#fff;background:rgba(15,23,42,.6);padding:3px 8px;border-radius:5px;border:1px solid rgba(56,189,248,.3)}
 
         .chat-box{background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.1);border-radius:16px;display:flex;flex-direction:column;height:520px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.8)}
         .chat-header{background:rgba(30,41,59,.9);padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px}
-        .chat-avatar{width:38px;height:38px;background:rgba(56,189,248,.15);border:1px solid #38bdf8;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#38bdf8;font-size:16px;flex-shrink:0;transition:all .3s}
-        .chat-avatar.expert{border-color:#22c55e;background:rgba(34,197,94,.15);color:#22c55e}
+        .chat-avatar{width:42px;height:42px;background:rgba(56,189,248,.15);border:2px solid #38bdf8;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#38bdf8;font-size:17px;flex-shrink:0;transition:all .3s}
+        .chat-avatar.expert{border-color:#22c55e;background:rgba(34,197,94,.15);color:#22c55e;box-shadow:0 0 15px rgba(34,197,94,.3)}
         .chat-title{flex:1;min-width:0}
-        .chat-title h3{font-size:13.5px;color:#f8fafc;margin-bottom:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-        .chat-title h3 .expert-name{font-weight:800}
+        .chat-title h3{font-size:14px;color:#f8fafc;margin-bottom:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+        .chat-title h3 .expert-name{font-weight:900;color:#22c55e}
         .chat-title h3 .expert-role{font-size:11px;color:#94a3b8;font-weight:500}
-        .chat-title p{font-size:10px;display:flex;align-items:center;gap:5px}
+        .chat-title p{font-size:10.5px;display:flex;align-items:center;gap:5px}
 
         .chat-body{flex:1;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
 
@@ -77,7 +86,7 @@
         .msg.admin{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#4ade80;align-self:flex-start;border-top-right-radius:2px}
         .msg.user{background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);color:#38bdf8;align-self:flex-end;border-top-left-radius:2px}
         .msg-meta{font-size:9px;opacity:0.6;margin-top:4px;display:block}
-        .msg-sender{font-size:9px;opacity:0.7;margin-bottom:2px;font-weight:700}
+        .msg-sender{font-size:9px;opacity:0.8;margin-bottom:3px;font-weight:700;color:#22c55e}
         .typing-indicator{display:flex;gap:4px;padding:4px 8px;align-items:center}
         .typing-dot{width:6px;height:6px;background:#38bdf8;border-radius:50%;animation:bounce 1.4s infinite ease-in-out both}
         .typing-dot:nth-child(1){animation-delay:-0.32s}.typing-dot:nth-child(2){animation-delay:-0.16s}
@@ -98,32 +107,51 @@
         .error-banner.show{display:block}
         footer{text-align:center;padding:12px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);margin-top:auto}
 
+        /* مودال تأیید بستن */
+        .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);backdrop-filter:blur(8px);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px}
+        .modal-overlay.show{display:flex}
+        .modal-box{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(239,68,68,.4);border-radius:18px;width:100%;max-width:400px;padding:24px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.9)}
+        .modal-box .modal-icon{width:60px;height:60px;background:rgba(239,68,68,.15);border:2px solid #ef4444;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:26px;color:#ef4444;margin-bottom:14px}
+        .modal-box h3{font-size:16px;color:#f8fafc;font-weight:800;margin-bottom:8px}
+        .modal-box p{font-size:12.5px;color:#94a3b8;line-height:1.7;margin-bottom:20px}
+        .modal-box .modal-actions{display:flex;gap:8px}
+        .modal-box .modal-actions button{flex:1;padding:11px;border-radius:9px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;border:none;transition:all .2s}
+        .modal-box .btn-cancel{background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.3);color:#cbd5e1}
+        .modal-box .btn-cancel:hover{background:rgba(148,163,184,.25)}
+        .modal-box .btn-confirm{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;box-shadow:0 4px 15px rgba(239,68,68,.3)}
+        .modal-box .btn-confirm:hover{background:linear-gradient(135deg,#dc2626,#b91c1c)}
+
         @media (max-width: 480px) {
             .chat-box{height:460px;border-radius:14px}
             .chat-header{padding:10px 12px}
-            .chat-title h3{font-size:12px}
+            .chat-title h3{font-size:12.5px}
             .chat-title h3 .expert-role{font-size:10px}
-            .chat-title p{font-size:9px}
+            .chat-title p{font-size:9.5px}
             .chat-body{padding:10px;gap:8px}
             .msg{font-size:11.5px;padding:8px 11px}
-            .topics-section{padding:14px;border-radius:14px}
-            .topics-intro h2{font-size:14px}
+            .topics-section{padding:16px 12px;border-radius:16px}
+            .topics-intro .welcome-icon{width:52px;height:52px;font-size:22px;margin-bottom:10px}
+            .topics-intro h2{font-size:15px}
             .topics-intro p{font-size:11px}
             .topics-title{font-size:12px;margin-bottom:10px}
+            .topics-title small{display:none}
             .topics-grid{gap:7px}
-            .topic-card{padding:10px 5px;min-height:78px;border-radius:10px;gap:5px}
-            .topic-icon{width:32px;height:32px;font-size:14px;border-radius:8px}
+            .topic-card{padding:10px 5px;min-height:82px;border-radius:10px;gap:5px}
+            .topic-icon{width:34px;height:34px;font-size:15px;border-radius:8px}
             .topic-label{font-size:9.5px}
             .topic-desc{display:none}
             .back-btn{font-size:11px;padding:0 9px;height:33px}
-            .change-topic-btn,.conversation-id-badge{font-size:11px;padding:6px 10px}
-            .conversation-id-badge strong{font-size:11px}
+            .close-chat-btn,.conversation-id-badge{font-size:11px;padding:7px 10px}
+            .conversation-id-badge strong{font-size:11px;padding:2px 6px}
         }
         @media (max-width: 360px) {
             .topics-grid{grid-template-columns:repeat(2,1fr)}
-            .topic-card{min-height:72px}
-            .topic-icon{width:30px;height:30px;font-size:13px}
+            .topic-card{min-height:76px}
+            .topic-icon{width:32px;height:32px;font-size:14px}
             .topic-label{font-size:9px}
+            .modal-box{padding:20px}
+            .modal-box h3{font-size:15px}
+            .modal-box p{font-size:11.5px}
         }
     </style>
 </head>
@@ -143,12 +171,14 @@
         <div id="view-topics" class="view-section">
             <div class="topics-section">
                 <div class="topics-intro">
-                    <h2>👋 خوش آمدید به پشتیبانی زنیکس</h2>
-                    <p>موضوع سوال خود را انتخاب کنید تا کارشناس مربوطه پاسخگو باشد</p>
+                    <div class="welcome-icon"><i class="fas fa-headset"></i></div>
+                    <h2>به پشتیبانی زنیکس خوش آمدید 🌹</h2>
+                    <p>تیم کارشناسان متخصص ما <strong>به صورت ۲۴ ساعته</strong> آماده کمک به شما هستند.<br>کافیست موضوع سوال خود را از بین گزینه‌های زیر انتخاب کنید تا در کمترین زمان راهنمایی شوید.</p>
                 </div>
                 <div class="topics-title">
                     <i class="fas fa-list-check"></i>
                     <span>موضوعات پشتیبانی</span>
+                    <small>برای شروع، یک موضوع انتخاب کنید</small>
                 </div>
                 <div class="topics-grid" id="topics-grid"></div>
             </div>
@@ -159,13 +189,13 @@
         <!-- ═══════════════════════════════════════════════════ -->
         <div id="view-chat" class="view-section" style="display:none;">
             <div class="chat-view-header">
-                <button class="change-topic-btn" onclick="window.changeTopic()">
-                    <i class="fas fa-arrow-right"></i> تغییر موضوع
+                <button class="close-chat-btn" onclick="window.requestCloseChat()">
+                    <i class="fas fa-times-circle"></i> بستن گفتگو
                 </button>
                 <div class="conversation-id-badge">
                     <i class="fas fa-ticket-alt"></i>
                     <span>شناسه گفتگو:</span>
-                    <strong id="conversation-id">-</strong>
+                    <strong id="conversation-id">ZE-000000</strong>
                 </div>
             </div>
 
@@ -187,6 +217,19 @@
     </div>
     <footer><p>&copy; 2026 Zenix. All rights reserved.</p></footer>
 
+    <!-- مودال تأیید بستن -->
+    <div class="modal-overlay" id="close-modal">
+        <div class="modal-box">
+            <div class="modal-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <h3>بستن گفتگو</h3>
+            <p>آیا از بستن این گفتگو مطمئن هستید؟<br>پس از بستن، می‌توانید موضوع دیگری انتخاب کنید.</p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="window.cancelCloseChat()">انصراف</button>
+                <button class="btn-confirm" onclick="window.confirmCloseChat()">بله، بستن</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { createClient } from 'https://cdn.jsdmirror.com/npm/@supabase/supabase-js@2/+esm';
 
@@ -206,11 +249,13 @@
         const chatTitleP = document.getElementById('chat-title-p');
         const chatAvatarEl = document.getElementById('chat-avatar-el');
         const chatAvatarIcon = document.getElementById('chat-avatar-icon');
+        const closeModal = document.getElementById('close-modal');
 
         let currentUser = null;
         let currentChatId = null;
         let currentView = 'topics';
         let currentTopic = null;
+        let currentConversationId = null;
         let aiMode = true;
         let realtimeChannel = null;
         let isSending = false;
@@ -220,8 +265,8 @@
         const TOPICS = {
             dashboard: {
                 label: 'داشبورد', desc: 'موجودی و آمار', icon: 'fa-home', color: 'ni-blue',
-                expert: { name: 'Sophia', role: 'Dashboard Specialist', id: 'SA-1001' },
-                welcome: `Hello! 👋<br>I'm <strong>Sophia</strong>, your Dashboard Specialist.<br>How can I help you with your dashboard and account overview?`,
+                expert: { name: 'Sophia', role: 'Dashboard Specialist' },
+                welcome: `سلام و درود! 🌸<br>من <strong>Sophia</strong> هستم، کارشناس داشبورد.<br>خوشحالم که اینجایید — درباره موجودی، آمار و اطلاعات حساب چه کمکی می‌تونم بکنم؟`,
                 knowledge: [
                     { kw: ['موجودی', 'بالانس', 'چقدر', 'پول'], r: 'موجودی کل حساب شما در بالای صفحه داشبورد نمایش داده می‌شه، دقیقاً زیر عنوان «خوش آمدید». با هر معامله یا واریز، این عدد به‌روز می‌شه.' },
                     { kw: ['زیرمجموعه', 'تعداد', 'تیم', 'رفرال'], r: 'تعداد زیرمجموعه‌های شما در کارت «زیرمجموعه» (کنار موجودی) نمایش داده می‌شه. برای جزئیات بیشتر به بخش «تیم من» برو.' },
@@ -232,8 +277,8 @@
             },
             quantification: {
                 label: 'کوانتیفیکیشن', desc: 'ربات و سود', icon: 'fa-robot', color: 'ni-purple',
-                expert: { name: 'Alex', role: 'Bot Trading Specialist', id: 'AM-1002' },
-                welcome: `Hey there! 👋<br>I'm <strong>Alex</strong>, your Bot Trading Specialist.<br>Ready to help with the trading bot and daily profits — what's your question?`,
+                expert: { name: 'Isabella', role: 'Trading Bot Specialist' },
+                welcome: `سلام و وقت بخیر! 🌺<br>من <strong>Isabella</strong> هستم، کارشناس ربات معامله‌گر.<br>آماده‌ام تا درباره کوانتیفیکیشن، سود روزانه و استراتژی ربات راهنماییت کنم. بفرمایید!`,
                 knowledge: [
                     { kw: ['چیه', 'چیست', 'کار', 'ربات'], r: 'کوانتیفیکیشن یک ربات معامله‌گر هوشمنده که قیمت ارزهای دیجیتال رو در صرافی‌های مختلف بررسی می‌کنه و از اختلاف قیمت‌ها (آربیتراژ) سود به‌دست می‌آره.' },
                     { kw: ['چطور فعال', 'شروع', 'روشن', 'کلیک'], r: 'برای فعال کردن ربات، موجودیت باید حداقل ۲۰ دلار باشه. بعد از اون، دکمه «کوانتیفیکیشن» فعال می‌شه و می‌تونی روی اون کلیک کنی.' },
@@ -245,8 +290,8 @@
             },
             deposit: {
                 label: 'واریز', desc: 'شارژ حساب', icon: 'fa-arrow-down', color: 'ni-green',
-                expert: { name: 'Emma', role: 'Deposit Specialist', id: 'NG-1003' },
-                welcome: `Hi! 👋<br>I'm <strong>Emma</strong>, your Deposit Specialist.<br>I'll guide you through depositing funds — what would you like to know?`,
+                expert: { name: 'Emma', role: 'Deposit Specialist' },
+                welcome: `درود بر شما! 🌷<br>من <strong>Emma</strong> هستم، کارشناس واریز.<br>درباره شارژ حساب، شبکه‌های بلاکچین و مراحل واریز هر سوالی داری بپرس تا کامل راهنماییت کنم.`,
                 knowledge: [
                     { kw: ['چطور', 'روش', 'مراحل'], r: 'مراحل واریز:\n۱. برو به بخش واریز\n۲. شبکه (TRC20 یا BEP20) رو انتخاب کن\n۳. مبلغ رو وارد کن\n۴. آدرس نمایش داده می‌شه — کپی کن\n۵. از کیف پولت همون مبلغ رو بفرست\n۶. TxID رو در سایت وارد کن' },
                     { kw: ['حداقل', 'کمترین', 'مبلغ'], r: 'حداقل مبلغ واریز ۱۰ دلار و حداکثر ۱۰۰,۰۰۰ دلار است.' },
@@ -258,8 +303,8 @@
             },
             withdraw: {
                 label: 'برداشت', desc: 'تسویه', icon: 'fa-arrow-up', color: 'ni-yellow',
-                expert: { name: 'Daniel', role: 'Withdrawal Specialist', id: 'MH-1004' },
-                welcome: `Hello! 👋<br>I'm <strong>Daniel</strong>, your Withdrawal Specialist.<br>Let me help you with withdrawals — what's your question?`,
+                expert: { name: 'Olivia', role: 'Withdrawal Specialist' },
+                welcome: `سلام دوست عزیز! 🌹<br>من <strong>Olivia</strong> هستم، کارشناس برداشت.<br>درباره درخواست برداشت، شرایط سطح و زمان تسویه هر سوالی داری بپرس.`,
                 knowledge: [
                     { kw: ['چطور', 'روش', 'مراحل'], r: 'مراحل برداشت:\n۱. برو به بخش برداشت\n۲. شبکه رو انتخاب کن\n۳. آدرس کیف پول مقصد رو وارد کن\n۴. مبلغ (خودکار)\n۵. رمز تراکنش\n۶. ثبت درخواست' },
                     { kw: ['شرط', 'حداقل', 'مبلغ'], r: 'مبلغ برداشت بر اساس سطح:\n• سطح ۱: ۱۰ دلار\n• سطح ۲: ۵۰ دلار\n• سطح ۳: ۱۰۰ دلار\n• سطح ۴: ۲۰۰ دلار\n• سطح ۵: ۳۰۰ دلار\n• سطح ۶: ۵۰۰ دلار' },
@@ -271,8 +316,8 @@
             },
             team: {
                 label: 'تیم', desc: 'زیرمجموعه', icon: 'fa-users', color: 'ni-pink',
-                expert: { name: 'Olivia', role: 'Team & Referral Specialist', id: 'MR-1005' },
-                welcome: `Hi there! 👋<br>I'm <strong>Olivia</strong>, your Team & Referral Specialist.<br>Let's talk about referrals and commissions — what would you like to know?`,
+                expert: { name: 'Mia', role: 'Team & Referral Specialist' },
+                welcome: `سلام و درود! 🌸<br>من <strong>Mia</strong> هستم، کارشناس تیم و رفرال.<br>درباره دعوت دوستان، کمیسیون چندسطحی و آمار تیم هر سوالی داری بپرس.`,
                 knowledge: [
                     { kw: ['دعوت', 'لینک', 'رفرال'], r: 'از بخش «تیم من» لینک اختصاصی خودت رو کپی کن و برای دوستت بفرست. با واریز دوستت، کمیسیون می‌گیری.' },
                     { kw: ['کمیسیون', 'چقدر', 'درصد'], r: 'کمیسیون چندسطحیه:\n• سطح ۱ (مستقیم): بالاترین\n• سطح ۲: کمتر\n• سطح ۳: باز کمتر' },
@@ -282,8 +327,8 @@
             },
             transactions: {
                 label: 'تراکنش', desc: 'تاریخچه مالی', icon: 'fa-history', color: 'ni-cyan',
-                expert: { name: 'Michael', role: 'Transactions Specialist', id: 'AL-1006' },
-                welcome: `Hello! 👋<br>I'm <strong>Michael</strong>, your Transactions Specialist.<br>Need help with your financial history? Ask away!`,
+                expert: { name: 'Ava', role: 'Transactions Specialist' },
+                welcome: `درود بر شما! 🌺<br>من <strong>Ava</strong> هستم، کارشناس تراکنش‌ها.<br>درباره تاریخچه مالی، فیلترها و وضعیت تراکنش‌ها چه سوالی داری؟`,
                 knowledge: [
                     { kw: ['چیه', 'چیست', 'کار'], r: 'صفحه تراکنش‌ها گزارش کاملی از تمام فعالیت‌های مالیه.' },
                     { kw: ['فیلتر', 'دسته', 'نوع'], r: 'بالای صفحه ۴ دکمه فیلتر: همه، واریزها، برداشت‌ها، پاداش‌ها.' },
@@ -293,8 +338,8 @@
             },
             profile: {
                 label: 'پروفایل', desc: 'تنظیمات امنیتی', icon: 'fa-user-cog', color: 'ni-rose',
-                expert: { name: 'Lucas', role: 'Security Specialist', id: 'HS-1007' },
-                welcome: `Hi! 👋<br>I'm <strong>Lucas</strong>, your Security Specialist.<br>Let me help you with your account security and settings.`,
+                expert: { name: 'Chloe', role: 'Security Specialist' },
+                welcome: `سلام و وقت بخیر! 🌷<br>من <strong>Chloe</strong> هستم، کارشناس امنیت حساب.<br>درباره تغییر رمز، ایمیل و آدرس‌های کیف پول هر سوالی داری بپرس.`,
                 knowledge: [
                     { kw: ['تغییر', 'عوض', 'رمز ورود'], r: 'از بخش پروفایل، کارت «تغییر رمز ورود» رو باز کن. روی «دریافت کد از پشتیبانی» بزن → به چت برو → کد رو کپی کن.' },
                     { kw: ['رمز تراکنش', 'پسورد مالی'], r: 'برای تغییر: کارت «تغییر رمز تراکنش» رو باز کن و از چت پشتیبانی کد بگیر.' },
@@ -305,8 +350,8 @@
             },
             login: {
                 label: 'ورود', desc: 'مشکل ورود', icon: 'fa-sign-in-alt', color: 'ni-emerald',
-                expert: { name: 'Anna', role: 'Login Specialist', id: 'FT-1008' },
-                welcome: `Hello! 👋<br>I'm <strong>Anna</strong>, your Login Specialist.<br>Having trouble logging in? Tell me what's happening.`,
+                expert: { name: 'Lily', role: 'Login Specialist' },
+                welcome: `درود بر شما! 🌸<br>من <strong>Lily</strong> هستم، کارشناس ورود.<br>اگر در ورود به حساب مشکلی داری، بگو چه خطایی می‌گیری تا کمکت کنم.`,
                 knowledge: [
                     { kw: ['وارد', 'لاگین', 'نمیشه', 'خطا'], r: 'چک کن:\n• ایمیل و رمز درست\n• Caps Lock خاموش\n• کپچا دقیق' },
                     { kw: ['فراموش', 'یادم رفته', 'گم'], r: 'از صفحه ورود روی «فراموشی رمز عبور» کلیک کن.' },
@@ -316,8 +361,8 @@
             },
             register: {
                 label: 'ثبت‌نام', desc: 'حساب جدید', icon: 'fa-user-plus', color: 'ni-amber',
-                expert: { name: 'David', role: 'Registration Specialist', id: 'RZ-1009' },
-                welcome: `Hi! 👋<br>I'm <strong>David</strong>, your Registration Specialist.<br>Let me guide you through creating a new account.`,
+                expert: { name: 'Grace', role: 'Registration Specialist' },
+                welcome: `سلام و خوش آمدید! 🌺<br>من <strong>Grace</strong> هستم، کارشناس ثبت‌نام.<br>درباره ساخت حساب جدید، تأیید ایمیل و شماره موبایل هر سوالی داری بپرس.`,
                 knowledge: [
                     { kw: ['چطور', 'مراحل', 'روش'], r: 'مراحل:\n۱. روی «ثبت‌نام» بزن\n۲. نام، ایمیل، رمز\n۳. کپچا\n۴. تأیید ایمیل\n۵. شماره موبایل' },
                     { kw: ['ایمیل', 'تایید', 'تأیید'], r: 'ایمیل تأیید برات می‌آد. پوشه Spam رو چک کن.' },
@@ -327,6 +372,17 @@
                 ]
             }
         };
+
+        function generateConversationId(userId, topicKey) {
+            let hash = 0;
+            const str = (userId || 'guest') + '-' + (topicKey || 'new') + '-' + Date.now().toString().slice(-4);
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                hash = hash & hash;
+            }
+            const num = Math.abs(hash % 900000) + 100000;
+            return 'ZE-' + num;
+        }
 
         function buildTopicsGrid() {
             topicsGrid.innerHTML = '';
@@ -344,7 +400,16 @@
             });
         }
 
+        // ═══════════════════════════════════════════════════
+        // ★ انتخاب موضوع
+        // ═══════════════════════════════════════════════════
         window.selectTopic = function(topicKey) {
+            // ★ جلوگیری از انتخاب موضوع جدید وقتی چت بازه
+            if (currentView === 'expert' || currentView === 'admin') {
+                showError('ابتدا باید گفتگوی فعلی را ببندید تا بتوانید موضوع دیگری انتخاب کنید.');
+                return;
+            }
+
             const topic = TOPICS[topicKey];
             if (!topic) return;
 
@@ -352,35 +417,50 @@
             currentView = 'expert';
             aiMode = true;
 
-            // Switch views
+            // Generate unique conversation ID
+            currentConversationId = generateConversationId(currentUser?.id, topicKey);
+            conversationIdEl.textContent = currentConversationId;
+
             viewTopics.style.display = 'none';
             viewChat.style.display = 'flex';
 
-            // Set header
             chatAvatarEl.classList.add('expert');
             chatAvatarIcon.className = 'fas fa-user-tie';
             chatTitleH3.innerHTML = `<span class="expert-name">${topic.expert.name}</span><span class="expert-role">— ${topic.expert.role}</span>`;
             chatTitleP.innerHTML = `<i class="fas fa-circle" style="font-size:6px;color:#22c55e;"></i><span style="color:#22c55e;">آنلاین</span>`;
-            conversationIdEl.textContent = topic.expert.id;
 
-            // Setup input
             userInput.disabled = false;
             sendBtn.disabled = false;
             userInput.placeholder = `سوال خود را درباره ${topic.label} بنویسید...`;
             userInput.value = '';
 
-            // Clear and welcome
             chatBody.innerHTML = '';
             renderMessage(topic.welcome, 'bot', new Date().toISOString(), `${topic.expert.name} (${topic.expert.role})`);
 
             setTimeout(() => userInput.focus(), 200);
         };
 
-        window.changeTopic = function() {
-            if (currentView === 'admin') {
-                unsubscribeRealtime();
-            }
+        // ═══════════════════════════════════════════════════
+        // ★ درخواست بستن گفتگو
+        // ═══════════════════════════════════════════════════
+        window.requestCloseChat = function() {
+            closeModal.classList.add('show');
+        };
+
+        window.cancelCloseChat = function() {
+            closeModal.classList.remove('show');
+        };
+
+        window.confirmCloseChat = function() {
+            closeModal.classList.remove('show');
+            closeChat();
+        };
+
+        function closeChat() {
+            unsubscribeRealtime();
             currentTopic = null;
+            currentChatId = null;
+            currentConversationId = null;
             currentView = 'topics';
             aiMode = true;
 
@@ -391,13 +471,15 @@
             userInput.disabled = true;
             sendBtn.disabled = true;
             chatBody.innerHTML = '';
+            conversationIdEl.textContent = 'ZE-000000';
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
+        }
 
         async function showAdminChatView() {
             currentView = 'admin';
             aiMode = false;
+            currentTopic = null;
 
             viewTopics.style.display = 'none';
             viewChat.style.display = 'flex';
@@ -408,10 +490,11 @@
             chatTitleP.innerHTML = `<i class="fas fa-circle" style="font-size:6px;color:#22c55e;"></i><span style="color:#22c55e;">متصل</span>`;
 
             if (currentChatId) {
-                conversationIdEl.textContent = 'TKT-' + currentChatId.slice(0, 6).toUpperCase();
+                currentConversationId = 'ZE-' + currentChatId.replace(/-/g, '').slice(0, 6).toUpperCase();
             } else {
-                conversationIdEl.textContent = 'TKT-NEW';
+                currentConversationId = 'ZE-NEW';
             }
+            conversationIdEl.textContent = currentConversationId;
 
             userInput.disabled = false;
             sendBtn.disabled = false;
@@ -446,7 +529,7 @@
 
             return {
                 handled: true,
-                text: `متأسفم، در مورد «${question.slice(0, 40)}» در بخش <strong>${topic.label}</strong> اطلاعاتی ندارم.<br><br>می‌تونی:<br>• سوال رو با کلمات دیگه‌ای بپرسی<br>• موضوع رو تغییر بدی<br>• با ادمین صحبت کنی`,
+                text: `متأسفم، در مورد «${question.slice(0, 40)}» در بخش <strong>${topic.label}</strong> اطلاعاتی ندارم.<br><br>می‌تونی:<br>• سوال رو با کلمات دیگه‌ای بپرسی<br>• گفتگو رو ببندی و موضوع دیگه‌ای انتخاب کنی<br>• با ادمین صحبت کنی`,
                 showAdminBtn: true
             };
         }
@@ -571,7 +654,7 @@
                 const timerText = `${mins}:${String(secs).padStart(2, '0')}`;
 
                 div.innerHTML = `
-                    <span class="msg-sender" style="opacity:.85">🛡️ کد محافظ Zenix</span>
+                    <span class="msg-sender" style="opacity:.85;color:#c084fc;">🛡️ کد محافظ Zenix</span>
                     <div class="otp-code-display">
                         <span class="otp-code-text">${otpCode}</span>
                         <button class="copy-otp-btn" data-code="${otpCode}" title="کپی کد">
@@ -639,7 +722,8 @@
                     chat_id: currentChatId, sender: 'user', text: '🙋 کاربر درخواست اتصال به پشتیبان انسانی دارد.', created_at: new Date().toISOString()
                 }]);
             }
-            conversationIdEl.textContent = 'TKT-' + currentChatId.slice(0, 6).toUpperCase();
+            currentConversationId = 'ZE-' + currentChatId.replace(/-/g, '').slice(0, 6).toUpperCase();
+            conversationIdEl.textContent = currentConversationId;
             await loadMessagesFromSupabase();
             subscribeRealtime();
         }
@@ -753,7 +837,6 @@
                 const fromProfile = !!sessionStorage.getItem('zenix_return_focus');
 
                 if (fromProfile) {
-                    // مستقیم به چت ادمین برو
                     if (currentUser && currentUser.email) {
                         const { data: existingChat } = await supabase.from('support_chats').select('*').eq('user_email', currentUser.email).maybeSingle();
                         if (existingChat) currentChatId = existingChat.id;
@@ -762,7 +845,6 @@
                     return;
                 }
 
-                // پیش‌فرض: نمایش صفحه انتخاب موضوع
                 viewTopics.style.display = 'flex';
                 viewChat.style.display = 'none';
                 currentView = 'topics';
