@@ -17,13 +17,17 @@
         .c{max-width:700px;width:100%;margin:20px auto;padding:0 12px;flex:1;display:flex;flex-direction:column}
         .chat-box{background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.1);border-radius:16px;display:flex;flex-direction:column;height:600px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.8)}
         .chat-header{background:rgba(30,41,59,.9);padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px}
-        .chat-avatar{width:36px;height:36px;background:rgba(56,189,248,.2);border:1px solid #38bdf8;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#38bdf8;font-size:16px}
+        .chat-avatar{width:36px;height:36px;background:rgba(56,189,248,.2);border:1px solid #38bdf8;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#38bdf8;font-size:16px;flex-shrink:0}
         .chat-avatar.admin{border-color:#22c55e;background:rgba(34,197,94,.2);color:#22c55e}
         .chat-title h3{font-size:14px;color:#f8fafc}
         .chat-title p{font-size:10px;color:#22c55e;display:flex;align-items:center;gap:4px}
+        .gen-code-btn{margin-inline-start:auto;background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);color:#c084fc;padding:7px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px;transition:all .2s;white-space:nowrap}
+        .gen-code-btn:hover{background:rgba(168,85,247,.3);color:#e0c7ff}
+        .gen-code-btn:disabled{opacity:.5;cursor:not-allowed}
         .chat-body{flex:1;padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
         .msg{max-width:85%;padding:10px 14px;border-radius:12px;font-size:12px;line-height:1.7;word-wrap:break-word}
         .msg.system{background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.25);color:#cbd5e1;align-self:center;text-align:center;font-size:11px;max-width:90%}
+        .msg.system.code-msg{background:rgba(168,85,247,.15);border:1.5px solid rgba(168,85,247,.5);color:#e0c7ff;font-size:13px;max-width:95%;white-space:pre-line;line-height:1.9;box-shadow:0 0 20px rgba(168,85,247,.2)}
         .msg.bot{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#cbd5e1;align-self:flex-start;border-top-right-radius:2px}
         .msg.admin{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#4ade80;align-self:flex-start;border-top-right-radius:2px}
         .msg.user{background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);color:#38bdf8;align-self:flex-end;border-top-left-radius:2px}
@@ -67,6 +71,9 @@
                     <h3 id="support-status-title">پشتیبانی آنلاین زنیکس</h3>
                     <p><i class="fas fa-circle" style="font-size:6px;"></i> <span id="support-status-sub">در حال اتصال...</span></p>
                 </div>
+                <button id="gen-code-btn" class="gen-code-btn" onclick="window.generateAndSendCode()" title="ارسال کد ۶ رقمی تأیید">
+                    <i class="fas fa-shield-alt"></i> ارسال کد
+                </button>
             </div>
             <div class="chat-body" id="chat-body"></div>
             <div class="chat-footer">
@@ -90,6 +97,7 @@
         const errorBanner = document.getElementById('error-banner');
         const modeBtn = document.getElementById('mode-toggle-btn');
         const modeBtnText = document.getElementById('mode-btn-text');
+        const genCodeBtn = document.getElementById('gen-code-btn');
 
         let currentUser = null;
         let currentChatId = null;
@@ -116,6 +124,7 @@
         function showError(msg) {
             errorBanner.textContent = msg;
             errorBanner.classList.add('show');
+            setTimeout(() => errorBanner.classList.remove('show'), 5000);
         }
 
         function hideError() {
@@ -133,9 +142,9 @@
             }
         };
 
-        function renderMessage(text, sender, timeIso, senderLabel) {
+        function renderMessage(text, sender, timeIso, senderLabel, isCodeMsg) {
             const div = document.createElement('div');
-            div.className = `msg ${sender}`;
+            div.className = `msg ${sender}` + (isCodeMsg ? ' code-msg' : '');
             const safeContent = (sender === 'bot' || sender === 'system') ? text : escapeHtml(text);
             const label = senderLabel ? `<span class="msg-sender">${escapeHtml(senderLabel)}</span>` : '';
             div.innerHTML = `${label}${safeContent}<span class="msg-meta">${formatTime(timeIso)}</span>`;
@@ -178,92 +187,74 @@
         window.generateAIReply = function(question) {
             const q = question.toLowerCase().trim();
 
-            // ۱. احوال‌پرسی
             if (q.includes('سلام') || q.includes('درود') || q.includes('وقت بخیر') || q.includes('خسته نباشی') || q.includes('چطوری') || q.includes('هستی')) {
                 return { handled: true, text: 'سلام عزیز دل، وقتت بخیر! 👋 من خوبم ممنون. تو چطوری؟ چیزی شده که کمکت کنم یا سوالی داری؟' };
             }
 
-            // ۲. مشکل کپچا
             if ((q.includes('کپچا') || q.includes('کد امنیتی') || q.includes('کد تصویر') || q.includes('کد رو نمیخونم') || q.includes('کد چیه')) && !q.includes('فراموش')) {
                 return { handled: true, text: 'آها، اون کد امنیتی رو میگی. حق داری والا، یکم شیطون بازی درمیاره! 😅<br><br>چند تا راه حل دارم برات:<br>۱. روی خود عکس کد کلیک کن یا دکمه چرخش (Refresh) رو بزن تا یه کد واضح‌تر بیاد.<br>۲. حواست باشه حروف بزرگ و کوچیک (مثل A و a) رو دقیق مثل تصویر وارد کنی.<br>۳. اگه گوشی داری، یه ذره زوم کن روش.<br><br>اگه بازم نشد بگو تا وصلت کنم به مدیریت.' };
             }
 
-            // ۳. ارور ورود
             if ((q.includes('وارد نمیشم') || q.includes('لاگین نمیشم') || q.includes('ورود نمیکنه') || q.includes('ارور میده') || q.includes('خطا میده') || q.includes('invalid') || q.includes('اشتباهه')) && (q.includes('رمز') || q.includes('ایمیل') || q.includes('پسورد') || q.includes('یوزر') || q.includes('login'))) {
                 return { handled: true, text: 'آهان، ارور ورود میگیری. نگران نباش، خیلیا این مشکل رو دارن.<br><br>ارور <strong>Invalid credentials</strong> معمولاً یعنی یا ایمیلت رو اشتباه تایپ کردی یا رمز عبورت با اونی که موقع ثبت‌نام زدی فرق داره. یه چک بکن ببین:<br>• Caps Lock (دکمه بزرگ‌نویسی) روشن نباشه.<br>• حتماً کد امنیتی رو هم وارد کرده باشی.<br>• اگه تازه ثبت‌نام کردی، شاید ایمیلت رو تایید نکرده باشی.<br><br>میخوای یه بار دیگه با دقت امتحان کنی؟' };
             }
 
-            // ۴. قفل حساب
             if ((q.includes('قفل') || q.includes('بلاک') || q.includes('موقتا') || q.includes('too many') || q.includes('بستن حساب')) && (q.includes('ورود') || q.includes('لاگین') || q.includes('حساب'))) {
                 return { handled: true, text: 'وای، سیستم ضد هکش فعال شده! 🚨<br><br>چون چندبار پشت سر هم رمز اشتباه زدی، سیستم فکر کرده یکی داره حسابتو هک میکنه و برات یه قفل موقت (معمولاً ۱ تا ۵ دقیقه) گذاشته.<br>نگران نباش، این برای امنیت خودته. یه چایی بریز، یه کم صبر کن، بعدش دوباره با آرامش امتحان کن. حتماً درست میشه.' };
             }
 
-            // ۵. دکمه ورود غیرفعال
             if ((q.includes('دکمه') || q.includes('دکمه ورود') || q.includes('غیرفعال') || q.includes('خاکستری') || q.includes('کار نمیکنه')) && (q.includes('ورود') || q.includes('لاگین') || q.includes('btn'))) {
                 return { handled: true, text: 'آها، دکمه ورود خاکستریه و روش کلیک نمیشه؟<br><br>این طبیعیه! دکمه ورود فقط وقتی فعال میشه که ۳ تا شرط برقرار باشه:<br>۱. ایمیلت کامل و درست باشه (مثل test@gmail.com).<br>۲. رمز عبورت حداقل ۶ حرف باشه.<br>۳. کد امنیتی رو دقیقاً ۵ حرف زده باشی.<br><br>وقتی اینا کامل بشه، دکمه رنگی میشه و میتونی بزنی. اگه همه رو زدی و بازم خاکستریه، شاید مرورگرت گیر داده، یه بار صفحه رو رفرش کن.' };
             }
 
-            // ۶. فراموشی رمز
             if ((q.includes('فراموش') || q.includes('یادم رفته') || q.includes('گم کردم') || q.includes('ریست') || q.includes('بازیابی')) && (q.includes('رمز') || q.includes('پسورد') || q.includes('password'))) {
                 return { handled: true, text: 'برای فراموشی رمز، نگران نباش! توی صفحه ورود، روی گزینه <strong>«فراموشی رمز عبور»</strong> کلیک کن.<br><br>اونجا باید ایمیلت رو وارد کنی، بعدش یه کد ۶ رقمی به ایمیلت میاد. کد رو میزنی، رمز جدیدت رو انتخاب میکنی و تمام!<br>اگه کد به ایمیلت نیومد، پوشه Spam (هرزنامه) رو چک کن. اگه بازم نیومد بگو تا وصلت کنم به مدیریت.' };
             }
 
-            // ۷. تغییر ایمیل
             if ((q.includes('تغییر') || q.includes('عوض')) && (q.includes('ایمیل') || q.includes('جمیل') || q.includes('email'))) {
                 return { handled: true, text: 'برای تغییر ایمیل:<br><br>۱. اول باید با حساب فعلیت وارد بشی.<br>۲. برو به بخش <strong>پروفایل / تنظیمات</strong>.<br>۳. اونجا میتونی ایمیل جدیدت رو وارد کنی و تاییدش کنی.<br><br>اگه به هر دلیلی نمیتونی وارد بشی، بگو تا وصلت کنم به مدیریت.' };
             }
 
-            // ۸. واریز
             if (q.includes('واریز') || q.includes('شارژ') || q.includes('پول') || q.includes('deposit')) {
                 return { handled: true, text: 'برای واریز و شارژ حساب، از پنل کاربری برو به بخش <strong>واریز</strong>. آدرس کیف پول رو کپی کن و مبلغ رو بفرست. بعدش کد هش تراکنش (TxID) رو اونجا وارد کن تا حسابت شارژ بشه. اگه گیر کردی بگو!' };
             }
 
-            // ۹. برداشت
             if (q.includes('برداشت') || q.includes('تسویه') || q.includes('withdraw')) {
                 return { handled: true, text: 'برای برداشت هم از منوی پنل برو به بخش <strong>برداشت</strong>، آدرس کیف پول مقصدت رو بزن و مبلغ رو ثبت کن. درخواستت بعد از تایید سیستم، سریع واریز میشه.' };
             }
 
-            // ۱۰. تیم و رفرال
             if (q.includes('تیم') || q.includes('دعوت') || q.includes('کمیسیون') || q.includes('زیرمجموعه')) {
                 return { handled: true, text: 'برای دعوت دوستات، از بخش <strong>تیم / دعوت</strong> لینک اختصاصیت رو کپی کن و بفرست براشون. هرکاری اونا بکنن، کمیسیونش به جیبت میاد. 😉' };
             }
 
-            // ۱۱. VIP
             if (q.includes('vip') || q.includes('سطح') || q.includes('تاج') || q.includes('سود روزانه') || q.includes('چطور باز میشه')) {
                 return { handled: true, text: 'سیستم سطوح VIP خیلی ساده‌ست! هرچی سطحت بالاتر بره، درصد سود روزانه‌ت بیشتر میشه (از ۱.۵٪ تا ۴٪).<br><br><strong>چطور سطحم رو ارتقا بدم؟</strong><br>شرط اصلی اینه که <strong>واریزی مستقیم</strong> به همون میزان داشته باشی. مثلاً برای VIP 1 باید ۲۰ دلار واریز کنی، برای VIP 2 باید ۳۰۰ دلار و... .<br><br><span style="color:#fbbf24;">⚠️ نکته مهم:</span> سودی که از معاملات ربات به دست میاری رو برای ارتقای سطح حساب نمی‌کنن، فقط پولی که از بیرون واریز می‌کنی مهمه.' };
             }
 
-            // ۱۲. ساعت نیویورک
             if (q.includes('نیویورک') || q.includes('ساعت') || q.includes('ریست') || q.includes('صفر') || q.includes('چرا ریست شد')) {
                 return { handled: true, text: 'ساعت نیویورک (NY Time) برای اینه که کل پلتفرم ما بین‌المللی و زنده‌ست. ما برای معاملات و محاسبه سود، مبنا رو ساعت رسمی نیویورک گذاشتیم.<br><br>هر روز که این ساعت به پایان می‌رسه (ریست میشه)، ظرفیت ۴ بار معامله‌ی تو دوباره پر میشه و می‌تونی از فردای اون روز دوباره شروع کنی. این یعنی همه کاربرا توی کل دنیا هماهنگ هستن.' };
             }
 
-            // ۱۳. محدودیت روزانه
             if ((q.includes('۴ بار') || q.includes('چهار بار') || q.includes('محدودیت') || q.includes('چرا نمیشه') || q.includes('دکمه کوانتیفیکیشن')) && !q.includes('دکمه ورود')) {
                 return { handled: true, text: 'آها، اگه دکمه کوانتیفیکیشن برات غیرفعال شده یا نوشته <strong>«پایان ظرفیت امروز»</strong>، به خاطر اینه که تو هر روز فقط ۴ بار می‌تونی از ربات استفاده کنی (سود روزانه به ۴ معامله ۱۰ ثانیه‌ای تقسیم میشه).<br><br>یا ممکنه موجودیت کمتر از ۲۰ دلار باشه که تو این حالت ربات اصلاً فعال نمیشه و باید از بخش واریز، حسابت رو شارژ کنی.' };
             }
 
-            // ۱۴. کوانتیفیکیشن عمومی
             if (q.includes('کوانتیفیکیشن') || q.includes('ربات') || q.includes('quantification') || q.includes('چطور کار میکنه') || q.includes('سود')) {
                 return { handled: true, text: 'سیستم <strong>کوانتیفیکیشن</strong> (Quantification) یه ربات معامله‌گر هوشمنده!<br><br>ربات ما به صورت لحظه‌ای قیمت ارزهای دیجیتال رو توی صرافی‌های مختلف جهان بررسی می‌کنه و کوچک‌ترین اختلاف قیمت‌ها رو کشف می‌کنه تا از طریق آربیتراژ و هوش مصنوعی سود مطمئن به دست بیاره.<br>برای فعال کردنش، موجودیت باید بالای ۲۰ دلار باشه. بعد از اون، هر بار که دکمه کوانتیفیکیشن رو بزنی، یه معامله ۱۰ ثانیه‌ای شروع میشه و سودش به موجودیت اضافه میشه.' };
             }
 
-            // ۱۵. موجودی/داشبورد
             if (q.includes('موجودی') || q.includes('داشبورد') || q.includes('بالانس') || q.includes('کیف پول')) {
                 return { handled: true, text: 'موجودی کل حسابت رو می‌تونی از بالای صفحه داشبورد یا صفحه کوانتیفیکیشن ببینی. هر سودی هم که از ربات بگیری، به صورت لحظه‌ای به همین موجودی اضافه میشه.<br><br>اگه میخوای موجودیت رو بیشتر کنی، از بخش <strong>واریز</strong> استفاده کن.' };
             }
 
-            // ۱۶. بازار ارز
             if (q.includes('بازار') || q.includes('قیمت') || q.includes('بیت کوین') || q.includes('اتریوم') || q.includes('ارز دیجیتال')) {
                 return { handled: true, text: 'بخش <strong>بازار ارز جهانی</strong> که توی داشبورد و صفحه کوانتیفیکیشن می‌بینی، به صورت زنده قیمت‌های لحظه‌ای (مثل بیت‌کوین، اتریوم و...) رو نشون میده.<br><br>این برای اینه که کاربر حس کنه توی یه پلتفرم زنده و بین‌المللیه و ببینه ربات داره توی چه بازار پرنوسانی کار می‌کنه.' };
             }
 
-            // ۱۷. اعلان
             if (q.includes('زنگوله') || q.includes('اعلان') || q.includes('پیام') || q.includes('صندوق پیام')) {
                 return { handled: true, text: 'آیکون <strong>زنگوله</strong> (بالای صفحه) صندوق پیام‌ها و اعلان‌های توئه. هر موقع ادمین پیامی برات بفرسته یا درخواست واریز/برداشتت تایید یا رد بشه، اینجا بهت اطلاع میده.<br><br>اگه پیام جدید داشته باشی، یه نقطه قرمز روش ظاهر میشه.' };
             }
 
-            // درخواست مستقیم ادمین
             if (q.includes('مدیر') || q.includes('ادمین') || q.includes('اپراتور') || q.includes('آدم واقعی') || q.includes('انسان') || q.includes('پشتیبان')) {
                 return { handled: 'switch_to_admin' };
             }
@@ -368,6 +359,103 @@
             }
         };
 
+        window.generateAndSendCode = async function() {
+            if (!currentUser) {
+                showError('برای دریافت کد، ابتدا وارد حساب خود شوید');
+                return;
+            }
+
+            if (isSending) return;
+            isSending = true;
+            genCodeBtn.disabled = true;
+
+            try {
+                // 1. Generate OTP
+                const { data: otpResult, error: otpErr } = await supabase.rpc('generate_otp');
+
+                if (otpErr) throw new Error(otpErr.message || 'خطا در ساخت کد');
+
+                if (!otpResult || otpResult.success !== true) {
+                    if (otpResult && otpResult.error === 'too_soon') {
+                        const secs = otpResult.retry_after || 60;
+                        showError(`⏳ لطفاً ${secs} ثانیه صبر کنید`);
+                        return;
+                    }
+                    throw new Error('خطا در ساخت کد');
+                }
+
+                const otp = otpResult.otp;
+                if (!otp) throw new Error('کد ساخته نشد');
+
+                // 2. Ensure chat exists
+                if (!currentChatId) {
+                    const { data: existing } = await supabase
+                        .from('support_chats')
+                        .select('id')
+                        .eq('user_email', currentUser.email)
+                        .maybeSingle();
+
+                    if (existing) {
+                        currentChatId = existing.id;
+                    } else {
+                        const { data: created, error: cErr } = await supabase
+                            .from('support_chats')
+                            .insert([{
+                                user_email: currentUser.email,
+                                user_name: currentUser.email.split('@')[0],
+                                last_message: 'کد تأیید ارسال شد',
+                                status: 'active',
+                                unread_by_admin: false,
+                                unread_by_user: true,
+                                created_at: new Date().toISOString(),
+                                updated_at: new Date().toISOString()
+                            }])
+                            .select()
+                            .single();
+
+                        if (cErr) throw cErr;
+                        currentChatId = created.id;
+                    }
+                }
+
+                // 3. Insert code message
+                const codeText = `🛡️ کد محافظ Zenix\n\nکد شما: ${otp}\n\n⏱ اعتبار: ۱۰ دقیقه\n🔒 این کد را در صفحه پروفایل وارد کنید`;
+
+                const { error: mErr } = await supabase.from('support_messages').insert([{
+                    chat_id: currentChatId,
+                    sender: 'system',
+                    text: codeText,
+                    created_at: new Date().toISOString()
+                }]);
+
+                if (mErr) throw mErr;
+
+                // 4. Update chat metadata
+                await supabase.from('support_chats').update({
+                    last_message: 'کد محافظ ارسال شد',
+                    updated_at: new Date().toISOString(),
+                    unread_by_user: true
+                }).eq('id', currentChatId);
+
+                // 5. Switch to chat view if in AI mode
+                if (aiMode) {
+                    aiMode = false;
+                    updateStatusUI();
+                    subscribeRealtime();
+                }
+
+                // 6. Reload messages
+                await loadMessagesFromSupabase();
+
+            } catch (e) {
+                console.error('generateAndSendCode error:', e);
+                showError('خطا: ' + (e.message || 'نامشخص'));
+            } finally {
+                isSending = false;
+                genCodeBtn.disabled = false;
+            }
+        };
+
         function renderWelcome() {
             chatBody.innerHTML = '';
             renderMessage('سلام، وقتت بخیر! 👋<br>من دستیار هوشمند پلتفرم <strong>Zenix</strong> هستم. اگر سوالی داری بپرس یا از موضوعات زیر انتخاب کن. اگر به کمک بیشتری نیاز داشتی، از دکمه‌ی بالا «اتصال به ادمین» استفاده کن.', 'bot', new Date().toISOString());
@@ -397,9 +485,10 @@
                 }
 
                 messages.forEach(msg => {
-                    const sender = msg.sender === 'admin' ? 'admin' : 'user';
-                    const label = msg.sender === 'admin' ? 'پشتیبان' : 'شما';
-                    renderMessage(msg.text, sender, msg.created_at, label);
+                    const sender = msg.sender === 'admin' ? 'admin' : (msg.sender === 'system' ? 'system' : 'user');
+                    const label = msg.sender === 'admin' ? 'پشتیبان' : (msg.sender === 'system' ? null : 'شما');
+                    const isCode = msg.sender === 'system' && (msg.text || '').includes('کد محافظ');
+                    renderMessage(msg.text, sender, msg.created_at, label, isCode);
                 });
             } catch (err) {
                 console.error('loadMessagesFromSupabase error:', err);
