@@ -150,6 +150,9 @@
         .wd-big-send .amount { font-size: 26px; font-weight: 900; color: #22c55e; text-shadow: 0 0 20px rgba(34,197,94,.5); }
         .wd-big-send .sub { font-size: 10px; color: #86efac; margin-top: 4px; }
 
+        .badge-trusted { display:inline-flex; align-items:center; gap:3px; margin-top:4px; padding:2px 6px; border-radius:4px; font-size:9px; font-weight:bold; background:rgba(34,197,94,.15); color:#22c55e; border:1px solid rgba(34,197,94,.3); }
+        .badge-new { display:inline-flex; align-items:center; gap:3px; margin-top:4px; padding:2px 6px; border-radius:4px; font-size:9px; font-weight:bold; background:rgba(245,158,11,.15); color:#f59e0b; border:1px solid rgba(245,158,11,.3); }
+
         @media (max-width: 960px) {
             .app-shell { flex-direction: column; }
             .sidebar { width: 100%; height: auto; position: sticky; top: 0; z-index: 90; border-left: 0; border-bottom: 1px solid var(--line-2); box-shadow: 0 10px 30px rgba(0,0,0,0.5); padding: 12px 14px; gap: 10px; }
@@ -407,6 +410,21 @@
 
     <script type="module">
         import { createClient } from "https://cdn.jsdmirror.com/npm/@supabase/supabase-js@2/+esm";
+
+        // ── محافظ خطا برای جلوگیری از صفحه سیاه ──
+        window.addEventListener('error', function(e) {
+            console.error('Global Error:', e.error || e.message);
+            document.body.classList.add('zenix-authed');
+            const gate = document.getElementById('gate-inner');
+            if (gate) {
+                gate.innerHTML = `
+                    <i class="fas fa-exclamation-triangle" style="color:#ef4444; animation:none;"></i>
+                    <div style="margin-top:12px; color:#ef4444; font-weight:bold;">خطای برنامه‌نویسی رخ داد</div>
+                    <div style="margin-top:6px; color:#94a3b8; font-size:11px; max-width:300px; margin-inline:auto;">${e.message || 'خطای ناشناخته'}</div>
+                    <button onclick="location.reload()" style="margin-top:16px; padding:8px 16px; background:#ef4444; color:#fff; border:none; border-radius:8px; cursor:pointer;">رفرش صفحه</button>
+                `;
+            }
+        });
 
         const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
@@ -685,11 +703,34 @@
                 else if (w.status === 'rejected') statusHtml = '<span style="color:#ef4444; font-weight:bold; font-size:11px;"><i class="fas fa-times-circle"></i> رد شده</span>';
                 else statusHtml = `<span style="color:#94a3b8; font-size:11px;">${escapeHtml(w.status)}</span>`;
                 const addrShort = w.address && w.address.length > 16 ? w.address.substring(0, 8) + '...' + w.address.substring(w.address.length - 8) : (w.address || '-');
+                
+                // نشان امن بودن آدرس
+                const trustedBadge = w.is_trusted 
+                    ? '<span class="badge-trusted"><i class="fas fa-check-circle"></i> امن</span>' 
+                    : '<span class="badge-new"><i class="fas fa-exclamation-triangle"></i> جدید</span>';
+
                 const fee = WD_FEE, toSend = Math.max(0, w.amount - fee);
                 let actions = '';
                 if (w.status === 'pending') actions = `<button type="button" class="btn-action btn-approve" data-wd-approve="${escapeHtml(w.txId)}" style="padding:5px 8px; font-size:10px;"><i class="fas fa-check"></i> تایید</button><button type="button" class="btn-action btn-reject" data-wd-reject="${escapeHtml(w.txId)}" style="padding:5px 8px; font-size:10px;"><i class="fas fa-times"></i> رد</button>`;
                 else actions = `<button type="button" class="btn-action btn-edit" data-wd-view="${escapeHtml(w.txId)}" style="padding:5px 8px; font-size:10px;"><i class="fas fa-eye"></i> جزئیات</button>`;
-                html += `<tr><td><span class="badge-id" data-wd-view="${escapeHtml(w.txId)}" style="cursor:pointer;">${escapeHtml(w.idCode)}</span><div style="font-size:10px; color:#94a3b8; margin-top:2px; max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(w.nameStr)}</div></td><td style="color:#38bdf8; font-weight:bold;">$${w.amount.toFixed(2)}</td><td style="color:#fbbf24; font-weight:bold;">$${fee.toFixed(2)}</td><td style="color:#22c55e; font-weight:800; font-size:13px;">$${toSend.toFixed(2)}</td><td>${netBadge}</td><td><span style="font-family:monospace; font-size:10px; color:#cbd5e1;" title="${escapeHtml(w.address)}">${escapeHtml(addrShort)}</span></td><td style="font-size:10px;">${escapeHtml(formatDate(w.createdAt))}</td><td>${statusHtml}</td><td style="white-space:nowrap;">${actions}</td></tr>`;
+                
+                html += `<tr>
+                    <td>
+                        <span class="badge-id" data-wd-view="${escapeHtml(w.txId)}" style="cursor:pointer;">${escapeHtml(w.idCode)}</span>
+                        <div style="font-size:10px; color:#94a3b8; margin-top:2px; max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(w.nameStr)}</div>
+                    </td>
+                    <td style="color:#38bdf8; font-weight:bold;">$${w.amount.toFixed(2)}</td>
+                    <td style="color:#fbbf24; font-weight:bold;">$${fee.toFixed(2)}</td>
+                    <td style="color:#22c55e; font-weight:800; font-size:13px;">$${toSend.toFixed(2)}</td>
+                    <td>${netBadge}</td>
+                    <td>
+                        <span style="font-family:monospace; font-size:10px; color:#cbd5e1;" title="${escapeHtml(w.address)}">${escapeHtml(addrShort)}</span>
+                        <br>${trustedBadge}
+                    </td>
+                    <td style="font-size:10px;">${escapeHtml(formatDate(w.createdAt))}</td>
+                    <td>${statusHtml}</td>
+                    <td style="white-space:nowrap;">${actions}</td>
+                </tr>`;
             });
             tbWd.innerHTML = html;
             tbWd.querySelectorAll('[data-wd-approve]').forEach(el => el.addEventListener('click', () => window.approveWithdrawal(el.getAttribute('data-wd-approve'))));
@@ -705,7 +746,31 @@
             if (w.status === 'pending') statusHtml = '<span style="color:#fbbf24; font-weight:bold;">⏳ معلق</span>';
             else if (w.status === 'approved') statusHtml = '<span style="color:#22c55e; font-weight:bold;">✅ تایید شده</span>';
             else if (w.status === 'rejected') statusHtml = '<span style="color:#ef4444; font-weight:bold;">❌ رد شده</span>';
-            const html = `<div class="detail-row"><span>شناسه کاربر:</span><span>${escapeHtml(w.idCode)}</span></div><div class="detail-row"><span>نام:</span><span>${escapeHtml(w.nameStr)}</span></div><div class="detail-row"><span>ایمیل:</span><span>${escapeHtml(w.user.email || '-')}</span></div><div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin:14px 0;"><div style="background:rgba(56,189,248,.1); border:1px solid rgba(56,189,248,.3); border-radius:10px; padding:10px; text-align:center;"><div style="font-size:9px; color:#94a3b8; margin-bottom:4px;">مبلغ درخواستی</div><div style="font-size:15px; font-weight:800; color:#38bdf8;">$${w.amount.toFixed(2)}</div></div><div style="background:rgba(251,191,36,.1); border:1px solid rgba(251,191,36,.3); border-radius:10px; padding:10px; text-align:center;"><div style="font-size:9px; color:#94a3b8; margin-bottom:4px;">کارمزد</div><div style="font-size:15px; font-weight:800; color:#fbbf24;">$${fee.toFixed(2)}</div></div><div style="background:rgba(34,197,94,.1); border:1px solid rgba(34,197,94,.4); border-radius:10px; padding:10px; text-align:center;"><div style="font-size:9px; color:#94a3b8; margin-bottom:4px;">پرداختی</div><div style="font-size:15px; font-weight:800; color:#22c55e;">$${toSend.toFixed(2)}</div></div></div><div class="detail-row"><span>شبکه:</span><span>${escapeHtml(w.network)}</span></div><div class="detail-row" style="flex-direction:column; align-items:flex-start; gap:4px;"><span>آدرس مقصد:</span><span style="font-family:monospace; font-size:10px; word-break:break-all; direction:ltr; text-align:left; background:rgba(0,0,0,.3); padding:8px; border-radius:6px; width:100%;">${escapeHtml(w.address)}</span></div><div class="detail-row"><span>زمان ثبت:</span><span>${escapeHtml(formatDate(w.createdAt))}</span></div><div class="detail-row"><span>وضعیت:</span><span>${statusHtml}</span></div>${w.adminNote ? `<div class="detail-row"><span>یادداشت:</span><span>${escapeHtml(w.adminNote)}</span></div>` : ''}${w.reviewedAt ? `<div class="detail-row"><span>زمان بررسی:</span><span>${escapeHtml(formatDate(w.reviewedAt))}</span></div>` : ''}`;
+            
+            const trustedMsg = w.is_trusted 
+                ? '<span style="color:#22c55e; font-weight:bold;"><i class="fas fa-check-circle"></i> آدرس تایید شده (امن)</span>' 
+                : '<span style="color:#f59e0b; font-weight:bold;"><i class="fas fa-exclamation-triangle"></i> آدرس جدید (اولین بار)</span>';
+
+            const html = `
+                <div class="detail-row"><span>شناسه کاربر:</span><span>${escapeHtml(w.idCode)}</span></div>
+                <div class="detail-row"><span>نام:</span><span>${escapeHtml(w.nameStr)}</span></div>
+                <div class="detail-row"><span>ایمیل:</span><span>${escapeHtml(w.user.email || '-')}</span></div>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin:14px 0;">
+                    <div style="background:rgba(56,189,248,.1); border:1px solid rgba(56,189,248,.3); border-radius:10px; padding:10px; text-align:center;"><div style="font-size:9px; color:#94a3b8; margin-bottom:4px;">مبلغ درخواستی</div><div style="font-size:15px; font-weight:800; color:#38bdf8;">$${w.amount.toFixed(2)}</div></div>
+                    <div style="background:rgba(251,191,36,.1); border:1px solid rgba(251,191,36,.3); border-radius:10px; padding:10px; text-align:center;"><div style="font-size:9px; color:#94a3b8; margin-bottom:4px;">کارمزد</div><div style="font-size:15px; font-weight:800; color:#fbbf24;">$${fee.toFixed(2)}</div></div>
+                    <div style="background:rgba(34,197,94,.1); border:1px solid rgba(34,197,94,.4); border-radius:10px; padding:10px; text-align:center;"><div style="font-size:9px; color:#94a3b8; margin-bottom:4px;">پرداختی</div><div style="font-size:15px; font-weight:800; color:#22c55e;">$${toSend.toFixed(2)}</div></div>
+                </div>
+                <div class="detail-row"><span>شبکه:</span><span>${escapeHtml(w.network)}</span></div>
+                <div class="detail-row"><span>وضعیت آدرس:</span><span>${trustedMsg}</span></div>
+                <div class="detail-row" style="flex-direction:column; align-items:flex-start; gap:4px;">
+                    <span>آدرس مقصد:</span>
+                    <span style="font-family:monospace; font-size:10px; word-break:break-all; direction:ltr; text-align:left; background:rgba(0,0,0,.3); padding:8px; border-radius:6px; width:100%;">${escapeHtml(w.address)}</span>
+                </div>
+                <div class="detail-row"><span>زمان ثبت:</span><span>${escapeHtml(formatDate(w.createdAt))}</span></div>
+                <div class="detail-row"><span>وضعیت:</span><span>${statusHtml}</span></div>
+                ${w.adminNote ? `<div class="detail-row"><span>یادداشت:</span><span>${escapeHtml(w.adminNote)}</span></div>` : ''}
+                ${w.reviewedAt ? `<div class="detail-row"><span>زمان بررسی:</span><span>${escapeHtml(formatDate(w.reviewedAt))}</span></div>` : ''}
+            `;
             document.getElementById('item-modal-title').innerHTML = '<i class="fas fa-money-bill-transfer"></i> جزئیات برداشت';
             document.getElementById('item-details-body').innerHTML = html;
             const actionsEl = document.getElementById('item-modal-actions');
@@ -721,7 +786,12 @@
             const w = (window.currentWithdrawList || []).find(x => x.txId === txId);
             if (!w) { showToast('برداشت یافت نشد', 'error'); return; }
             const fee = WD_FEE, toSend = Math.max(0, w.amount - fee);
-            const bodyHtml = `<div class="wd-big-send"><div class="label">به کیف پول کاربر بفرستید</div><div class="amount">$${toSend.toFixed(2)} USDT</div><div class="sub">مبلغ نهایی که به کیف پول کاربر واریز می‌شود</div></div><div style="background:rgba(15,23,42,.6); border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:12px; margin-bottom:14px;"><div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.04);"><span style="color:#94a3b8; font-size:11px;">مبلغ درخواستی کاربر:</span><span style="color:#38bdf8; font-weight:800; font-size:13px;">$${w.amount.toFixed(2)}</span></div><div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.04);"><span style="color:#94a3b8; font-size:11px;">کارمزد پلتفرم:</span><span style="color:#fbbf24; font-weight:800; font-size:13px;">$${fee.toFixed(2)}</span></div><div style="display:flex; justify-content:space-between; padding:8px 0 0;"><span style="color:#cbd5e1; font-size:11px; font-weight:700;">پرداختی به کاربر:</span><span style="color:#22c55e; font-weight:800; font-size:15px;">$${toSend.toFixed(2)}</span></div></div><div style="background:rgba(15,23,42,.6); border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:12px; margin-bottom:14px;"><div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,.04);"><span style="color:#94a3b8; font-size:11px;">کاربر:</span><span style="color:#38bdf8; font-weight:700; font-size:11px;">${escapeHtml(w.nameStr)} (${escapeHtml(w.idCode)})</span></div><div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,.04);"><span style="color:#94a3b8; font-size:11px;">شبکه:</span><span style="color:#38bdf8; font-weight:700; font-size:11px;">${escapeHtml(w.network)}</span></div><div style="padding:5px 0;"><div style="color:#94a3b8; font-size:11px; margin-bottom:3px;">آدرس مقصد:</div><div style="font-family:monospace; font-size:10px; color:#cbd5e1; word-break:break-all; direction:ltr; text-align:left; background:rgba(0,0,0,.3); padding:6px; border-radius:4px;">${escapeHtml(w.address)}</div></div></div><div style="background:rgba(251,191,36,.08); border:1px solid rgba(251,191,36,.25); border-radius:8px; padding:12px; margin-bottom:14px;"><div style="color:#fbbf24; font-weight:700; font-size:12px; margin-bottom:8px;"><i class="fas fa-list-check"></i> چک‌لیست اجباری:</div><label class="approve-checkbox-item"><input type="checkbox" id="wd-chk-1"><span>مبلغ از حساب کاربر رزرو شده است</span></label><label class="approve-checkbox-item"><input type="checkbox" id="wd-chk-2"><span>آدرس مقصد را با دقت بررسی کردم</span></label><label class="approve-checkbox-item"><input type="checkbox" id="wd-chk-3"><span>مبلغ <b style="color:#22c55e;">$${toSend.toFixed(2)}</b> را به کیف پول کاربر فرستادم</span></label></div><div style="background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.25); border-radius:8px; padding:10px; color:#fbbf24; font-size:10px; line-height:1.6; display:flex; align-items:flex-start; gap:8px;"><i class="fas fa-exclamation-triangle" style="color:#ef4444; margin-top:2px; flex-shrink:0;"></i><span>این عمل قابل بازگشت نیست. کارمزد <b>$${fee.toFixed(2)}</b> به‌طور خودکار به سود کل ادمین اضافه می‌شود. برای تایید، 2FA لازم است.</span></div>`;
+            
+            const trustedMsg = w.is_trusted 
+                ? '<span style="color:#22c55e; font-weight:bold;"><i class="fas fa-check-circle"></i> آدرس امن (قبلاً استفاده شده)</span>' 
+                : '<span style="color:#f59e0b; font-weight:bold;"><i class="fas fa-exclamation-triangle"></i> آدرس جدید (اولین بار)</span>';
+
+            const bodyHtml = `<div class="wd-big-send"><div class="label">به کیف پول کاربر بفرستید</div><div class="amount">$${toSend.toFixed(2)} USDT</div><div class="sub">مبلغ نهایی که به کیف پول کاربر واریز می‌شود</div></div><div style="background:rgba(15,23,42,.6); border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:12px; margin-bottom:14px;"><div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.04);"><span style="color:#94a3b8; font-size:11px;">مبلغ درخواستی کاربر:</span><span style="color:#38bdf8; font-weight:800; font-size:13px;">$${w.amount.toFixed(2)}</span></div><div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.04);"><span style="color:#94a3b8; font-size:11px;">کارمزد پلتفرم:</span><span style="color:#fbbf24; font-weight:800; font-size:13px;">$${fee.toFixed(2)}</span></div><div style="display:flex; justify-content:space-between; padding:8px 0 0;"><span style="color:#cbd5e1; font-size:11px; font-weight:700;">پرداختی به کاربر:</span><span style="color:#22c55e; font-weight:800; font-size:15px;">$${toSend.toFixed(2)}</span></div></div><div style="background:rgba(15,23,42,.6); border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:12px; margin-bottom:14px;"><div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,.04);"><span style="color:#94a3b8; font-size:11px;">کاربر:</span><span style="color:#38bdf8; font-weight:700; font-size:11px;">${escapeHtml(w.nameStr)} (${escapeHtml(w.idCode)})</span></div><div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,.04);"><span style="color:#94a3b8; font-size:11px;">شبکه:</span><span style="color:#38bdf8; font-weight:700; font-size:11px;">${escapeHtml(w.network)}</span></div><div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,.04);"><span style="color:#94a3b8; font-size:11px;">وضعیت آدرس:</span>${trustedMsg}</div><div style="padding:5px 0;"><div style="color:#94a3b8; font-size:11px; margin-bottom:3px;">آدرس مقصد:</div><div style="font-family:monospace; font-size:10px; color:#cbd5e1; word-break:break-all; direction:ltr; text-align:left; background:rgba(0,0,0,.3); padding:6px; border-radius:4px;">${escapeHtml(w.address)}</div></div></div><div style="background:rgba(251,191,36,.08); border:1px solid rgba(251,191,36,.25); border-radius:8px; padding:12px; margin-bottom:14px;"><div style="color:#fbbf24; font-weight:700; font-size:12px; margin-bottom:8px;"><i class="fas fa-list-check"></i> چک‌لیست اجباری:</div><label class="approve-checkbox-item"><input type="checkbox" id="wd-chk-1"><span>مبلغ از حساب کاربر رزرو شده است</span></label><label class="approve-checkbox-item"><input type="checkbox" id="wd-chk-2"><span>آدرس مقصد را با دقت بررسی کردم</span></label><label class="approve-checkbox-item"><input type="checkbox" id="wd-chk-3"><span>مبلغ <b style="color:#22c55e;">$${toSend.toFixed(2)}</b> را به کیف پول کاربر فرستادم</span></label></div><div style="background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.25); border-radius:8px; padding:10px; color:#fbbf24; font-size:10px; line-height:1.6; display:flex; align-items:flex-start; gap:8px;"><i class="fas fa-exclamation-triangle" style="color:#ef4444; margin-top:2px; flex-shrink:0;"></i><span>این عمل قابل بازگشت نیست. کارمزد <b>$${fee.toFixed(2)}</b> به‌طور خودکار به سود کل ادمین اضافه می‌شود. برای تایید، 2FA لازم است.</span></div>`;
             document.getElementById('confirm-withdraw-approve-body').innerHTML = bodyHtml;
             const oldBtn = document.getElementById('confirm-withdraw-approve-btn'), newBtn = oldBtn.cloneNode(true);
             oldBtn.parentNode.replaceChild(newBtn, oldBtn);
@@ -750,543 +820,3 @@
                         const errMap = { 'not_admin': 'شما ادمین نیستید', 'not_found': 'برداشت یافت نشد', 'not_pending': 'قبلاً بررسی شده', 'mfa_required': '2FA لازم است' };
                         showToast('خطا: ' + (errMap[data.error] || data.error), 'error');
                         newBtn.disabled = false;
-                        newBtn.innerHTML = '<i class="fas fa-check"></i> تایید برداشت';
-                    }
-                } catch (err) {
-                    const msg = String(err.message || '');
-                    if (msg.includes('mfa_required')) {
-                        showToast('⚠️ جلسه 2FA شما منقضی شده — صفحه رفرش می‌شود...', 'error');
-                        setTimeout(() => window.location.reload(), 1800);
-                    } else {
-                        showToast('خطا در تایید: ' + (msg || 'نامشخص'), 'error');
-                        newBtn.disabled = false;
-                        newBtn.innerHTML = '<i class="fas fa-check"></i> تایید برداشت';
-                    }
-                }
-            });
-            document.getElementById('m-confirm-withdraw-approve').classList.add('show');
-        };
-
-        window.rejectWithdrawal = function(txId) {
-            const reasonInput = document.getElementById('withdraw-reject-reason-input');
-            if (reasonInput) reasonInput.value = '';
-            document.getElementById('m-confirm-withdraw-reject').classList.add('show');
-            const confirmBtn = document.getElementById('confirm-withdraw-reject-btn');
-            const newBtn = confirmBtn.cloneNode(true);
-            confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
-            setTimeout(() => reasonInput?.focus(), 100);
-            newBtn.addEventListener('click', async () => {
-                const reason = (reasonInput?.value || '').trim() || 'برداشت توسط مدیریت تایید نشد';
-                closeModal('m-confirm-withdraw-reject');
-                try {
-                    const { data, error } = await supabaseClient.rpc('reject_withdrawal', {
-                        p_tx_id: txId,
-                        p_reason: reason
-                    });
-                    if (error) throw error;
-                    if (data && data.success) {
-                        showToast('برداشت رد شد و مبلغ به کاربر برگشت.');
-                        loadData();
-                    } else if (data && data.error) {
-                        const errMap = { 'not_admin': 'شما ادمین نیستید', 'not_found': 'برداشت یافت نشد', 'not_pending': 'قبلاً بررسی شده', 'mfa_required': '2FA لازم است' };
-                        showToast('خطا: ' + (errMap[data.error] || data.error), 'error');
-                    }
-                } catch (err) {
-                    const msg = String(err.message || '');
-                    if (msg.includes('mfa_required')) {
-                        showToast('⚠️ جلسه 2FA شما منقضی شده — صفحه رفرش می‌شود...', 'error');
-                        setTimeout(() => window.location.reload(), 1800);
-                    } else {
-                        showToast('خطا در رد: ' + (msg || 'نامشخص'), 'error');
-                    }
-                }
-            });
-        };
-
-        async function loadWalletSettings() {
-            try {
-                const trcEl = document.getElementById('wallet-trc20-input'), bepEl = document.getElementById('wallet-bep20-input'), previewEl = document.getElementById('wallet-preview-text'), statusEl = document.getElementById('wallet-save-status');
-                if (statusEl) statusEl.style.display = 'none';
-                const { data, error } = await supabaseClient.from('app_settings').select('key, value').in('key', ['wallet_trc20', 'wallet_bep20']); if (error) throw error;
-                let trc = '', bep = '';
-                if (data) data.forEach(row => { if (row.key === 'wallet_trc20') trc = row.value || ''; if (row.key === 'wallet_bep20') bep = row.value || ''; });
-                if (trcEl) trcEl.value = trc;
-                if (bepEl) bepEl.value = bep;
-                if (previewEl) {
-                    if (trc || bep) previewEl.innerHTML = `<div style="margin-bottom:6px;"><strong>TRC20:</strong> <span style="font-family:monospace;direction:ltr;display:inline-block;color:#38bdf8;">${escapeHtml(trc || '—')}</span></div><div><strong>BEP20:</strong> <span style="font-family:monospace;direction:ltr;display:inline-block;color:#f59e0b;">${escapeHtml(bep || '—')}</span></div>`;
-                    else previewEl.textContent = 'هنوز آدرسی ذخیره نشده است';
-                }
-            } catch (e) { showToast('خطا: ' + (e.message || 'نامشخص'), 'error'); }
-        }
-
-        function showWalletConfirmModal(changes) {
-            const body = document.getElementById('wallet-confirm-body'), confirmBtn = document.getElementById('confirm-wallet-btn');
-            let html = `<div style="background:rgba(251,191,36,.08); border:1px solid rgba(251,191,36,.3); border-radius:10px; padding:12px; margin-bottom:14px; font-size:12px; color:#fbbf24; display:flex; gap:8px; align-items:flex-start;"><i class="fas fa-exclamation-triangle" style="font-size:16px; margin-top:2px; flex-shrink:0;"></i><div>با این تغییر، آدرس واریزی‌های بعدی عوض می‌شود.</div></div>`;
-            if (changes.trcChanged) {
-                const last6Trc = changes.newTrc.slice(-6);
-                html += `<div style="margin-bottom:14px;"><div style="font-size:11px; color:#38bdf8; font-weight:700; margin-bottom:8px;"><i class="fas fa-coins"></i> تغییر TRC20</div><div style="font-size:10px; color:#94a3b8; margin-bottom:4px;">آدرس قدیم:</div><div style="font-family:monospace; direction:ltr; text-align:left; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.2); border-radius:6px; padding:6px 10px; font-size:10px; color:#f87171; word-break:break-all; margin-bottom:8px;">${escapeHtml(changes.oldTrc || '—')}</div><div style="font-size:10px; color:#94a3b8; margin-bottom:4px;">آدرس جدید:</div><div style="font-family:monospace; direction:ltr; text-align:left; background:rgba(34,197,94,.08); border:1px solid rgba(34,197,94,.3); border-radius:6px; padding:6px 10px; font-size:10px; color:#4ade80; word-break:break-all; margin-bottom:10px;">${escapeHtml(changes.newTrc)}</div><label style="font-size:11px; color:#cbd5e1; display:block; margin-bottom:4px;">۶ کاراکتر آخر آدرس جدید:</label><input type="text" id="confirm-trc-input" maxlength="6" placeholder="${escapeHtml(last6Trc)}" autocomplete="off" style="width:100%; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.12); border-radius:8px; padding:10px 12px; color:#fff; font-size:12px; outline:none; font-family:monospace; direction:ltr; text-align:left; letter-spacing:2px;"></div>`;
-            }
-            if (changes.bepChanged) {
-                const last6Bep = changes.newBep.slice(-6);
-                html += `<div style="margin-bottom:14px;"><div style="font-size:11px; color:#f59e0b; font-weight:700; margin-bottom:8px;"><i class="fas fa-coins"></i> تغییر BEP20</div><div style="font-size:10px; color:#94a3b8; margin-bottom:4px;">آدرس قدیم:</div><div style="font-family:monospace; direction:ltr; text-align:left; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.2); border-radius:6px; padding:6px 10px; font-size:10px; color:#f87171; word-break:break-all; margin-bottom:8px;">${escapeHtml(changes.oldBep || '—')}</div><div style="font-size:10px; color:#94a3b8; margin-bottom:4px;">آدرس جدید:</div><div style="font-family:monospace; direction:ltr; text-align:left; background:rgba(34,197,94,.08); border:1px solid rgba(34,197,94,.3); border-radius:6px; padding:6px 10px; font-size:10px; color:#4ade80; word-break:break-all; margin-bottom:10px;">${escapeHtml(changes.newBep)}</div><label style="font-size:11px; color:#cbd5e1; display:block; margin-bottom:4px;">۶ کاراکتر آخر آدرس جدید:</label><input type="text" id="confirm-bep-input" maxlength="6" placeholder="${escapeHtml(last6Bep)}" autocomplete="off" style="width:100%; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.12); border-radius:8px; padding:10px 12px; color:#fff; font-size:12px; outline:none; font-family:monospace; direction:ltr; text-align:left; letter-spacing:2px;"></div>`;
-            }
-            body.innerHTML = html;
-            const newBtn = confirmBtn.cloneNode(true);
-            confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
-            newBtn.addEventListener('click', async () => {
-                if (changes.trcChanged) {
-                    const input = document.getElementById('confirm-trc-input');
-                    if (!input || input.value.trim() !== changes.newTrc.slice(-6)) { modalInputError('confirm-trc-input', 'کد TRC20 اشتباه.'); return; }
-                }
-                if (changes.bepChanged) {
-                    const input = document.getElementById('confirm-bep-input');
-                    if (!input || input.value.trim() !== changes.newBep.slice(-6)) { modalInputError('confirm-bep-input', 'کد BEP20 اشتباه.'); return; }
-                }
-                newBtn.disabled = true;
-                newBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال ذخیره...';
-                try {
-                    const now = new Date().toISOString();
-                    const { error: e1 } = await supabaseClient.from('app_settings').upsert({ key: 'wallet_trc20', value: changes.newTrc, updated_at: now }, { onConflict: 'key' }); if (e1) throw e1;
-                    const { error: e2 } = await supabaseClient.from('app_settings').upsert({ key: 'wallet_bep20', value: changes.newBep, updated_at: now }, { onConflict: 'key' }); if (e2) throw e2;
-                    closeModal('m-confirm-wallet');
-                    const statusEl = document.getElementById('wallet-save-status');
-                    if (statusEl) { statusEl.style.display = 'block'; statusEl.style.background = 'rgba(34,197,94,.15)'; statusEl.style.color = '#22c55e'; statusEl.style.border = '1px solid rgba(34,197,94,.3)'; statusEl.innerHTML = '<i class="fas fa-check-circle"></i> ذخیره شد.'; }
-                    showToast('آدرس‌ها ذخیره شدند.');
-                    await loadWalletSettings();
-                } catch (e) {
-                    showWalletError('خطا: ' + (e.message || 'نامشخص'));
-                    newBtn.disabled = false;
-                    newBtn.innerHTML = '<i class="fas fa-check"></i> تایید و ذخیره';
-                }
-            });
-            document.getElementById('m-confirm-wallet').classList.add('show');
-            setTimeout(() => { const trcInput = document.getElementById('confirm-trc-input'), bepInput = document.getElementById('confirm-bep-input'); if (trcInput) trcInput.focus(); else if (bepInput) bepInput.focus(); }, 250);
-        }
-
-        window.saveWalletSettings = async function() {
-            const trcVal = (document.getElementById('wallet-trc20-input')?.value || '').trim(), bepVal = (document.getElementById('wallet-bep20-input')?.value || '').trim();
-            const saveBtn = document.querySelector('#t-wallets .btn-save');
-            if (!trcVal || trcVal.length !== 34 || !trcVal.startsWith('T')) { showWalletError('آدرس TRC20 باید ۳۴ کاراکتر باشد و با T شروع شود.'); return; }
-            if (!validateBep20Format(bepVal)) { showWalletError('آدرس BEP20 باید با 0x شروع شود و ۴۰ کاراکتر hex باشد.'); return; }
-            let origHTML = '';
-            if (saveBtn) { saveBtn.disabled = true; origHTML = saveBtn.innerHTML; saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال بررسی checksum...'; }
-            try {
-                const trcValid = await validateTrc20Checksum(trcVal);
-                if (!trcValid) { showWalletError('آدرس TRC20 نامعتبر (checksum رد شد).'); if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = origHTML; } return; }
-                const { data: currentData } = await supabaseClient.from('app_settings').select('key, value').in('key', ['wallet_trc20', 'wallet_bep20']);
-                let oldTrc = '', oldBep = '';
-                if (currentData) currentData.forEach(row => { if (row.key === 'wallet_trc20') oldTrc = row.value || ''; if (row.key === 'wallet_bep20') oldBep = row.value || ''; });
-                const trcChanged = trcVal !== oldTrc, bepChanged = bepVal !== oldBep;
-                if (!trcChanged && !bepChanged) { showToast('هیچ تغییری اعمال نشد.', 'error'); if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = origHTML; } return; }
-                showWalletConfirmModal({ oldTrc, newTrc: trcVal, trcChanged, oldBep, newBep: bepVal, bepChanged });
-            } catch (e) { showWalletError('خطا: ' + (e.message || 'نامشخص')); }
-            finally { if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = origHTML; } }
-        };
-
-        async function initSupportChatListener() {
-            async function fetchChats() {
-                try {
-                    const { data: chats, error } = await supabaseClient.from('support_chats').select('*').order('updated_at', { ascending: false });
-                    let listContainer = document.getElementById('admin-chat-list'); if(!listContainer) return;
-                    if (error || !chats || chats.length === 0) {
-                        listContainer.innerHTML = `<div style="text-align:center; color:#64748b; margin-top:20px;">هیچ چتی ثبت نشده است.</div>`;
-                        let badge = document.getElementById('chat-badge'); if (badge) { badge.innerText = '0'; badge.className = 'tab-badge zero'; }
-                        prevChat = 0; return;
-                    }
-                    let unreadCount = 0, html = '';
-                    chats.forEach(chat => {
-                        let chatId = chat.id;
-                        let userName = chat.user_name || chat.userName || chat.fullname || chat.user_email || 'کاربر';
-                        let lastMsg = chat.last_message || chat.lastMessage || 'درخواست چت جدید';
-                        let isUnread = chat.unread_by_admin === true; if (isUnread) unreadCount++;
-                        let isActive = currentActiveChatId === chatId;
-                        html += `<div class="chat-item ${isActive ? 'active' : ''}" data-chat-id="${escapeHtml(chatId)}" data-user-name="${escapeHtml(userName)}" data-user-email="${escapeHtml(chat.user_email || '')}"><div class="chat-item-header"><span class="chat-item-title">${escapeHtml(userName)} ${isUnread ? '<span style="color:#ef4444; font-size:14px;">●</span>' : ''}</span><span class="chat-item-time">${escapeHtml(formatDate(chat.updated_at || chat.created_at))}</span></div><div class="chat-item-sub">${escapeHtml(lastMsg)}</div></div>`;
-                    });
-                    listContainer.innerHTML = html;
-                    listContainer.querySelectorAll('.chat-item[data-chat-id]').forEach(el => el.addEventListener('click', () => window.openAdminChat(el.getAttribute('data-chat-id'), el.getAttribute('data-user-name'), el.getAttribute('data-user-email'))));
-                    let badge = document.getElementById('chat-badge'); if (badge) { badge.innerText = unreadCount; badge.className = unreadCount > 0 ? 'tab-badge' : 'tab-badge zero'; }
-                    if (prevChat !== -1 && unreadCount > prevChat) { playAlertSound(); sendNtfyAlert("💬 پیام پشتیبانی جدید", "کاربری در پشتیبانی پیام ارسال کرده."); }
-                    prevChat = unreadCount;
-                } catch(err) { console.error('fetchChats error:', err); }
-            }
-            await fetchChats();
-            if (chatChannel) supabaseClient.removeChannel(chatChannel);
-            chatChannel = supabaseClient.channel('realtime_support_chats').on('postgres_changes', { event: '*', schema: 'public', table: 'support_chats' }, () => fetchChats()).subscribe();
-        }
-
-        window.openAdminChat = async (chatId, userName, userEmail) => {
-            currentActiveChatId = chatId;
-            const headerEl = document.getElementById('admin-chat-header');
-            headerEl.innerHTML = `<div><span><i class="fas fa-user-circle"></i> گفتگو با <strong>${escapeHtml(userName)}</strong></span><span style="font-size:10px; color:#94a3b8; display:block;">${escapeHtml(userEmail)}</span></div><button type="button" class="chat-delete-btn" style="background:rgba(239,68,68,.15); border:1px solid rgba(239,68,68,.3); color:#ef4444; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:11px; font-weight:600; display:flex; align-items:center; gap:4px;"><i class="fas fa-trash-alt"></i> بستن</button>`;
-            headerEl.querySelector('.chat-delete-btn')?.addEventListener('click', () => window.deleteAdminChat(chatId));
-            document.getElementById('admin-chat-form').style.display = 'flex';
-            await supabaseClient.from('support_chats').update({ unread_by_admin: false }).eq('id', chatId);
-            async function fetchMessages() {
-                const { data: messages } = await supabaseClient.from('support_messages').select('*').eq('chat_id', chatId).order('created_at', { ascending: true });
-                let msgBox = document.getElementById('admin-chat-messages'); if(!msgBox) return;
-                if (!messages || messages.length === 0) { msgBox.innerHTML = `<div style="text-align:center; color:#64748b; margin-top:50px;">هنوز پیامی رد و بدل نشده.</div>`; return; }
-                let msgHtml = '';
-                messages.forEach(msg => {
-                    let isAdmin = msg.sender === 'admin';
-                    msgHtml += `<div class="chat-msg-box ${isAdmin ? 'admin' : 'user'}"><div style="font-size:10px; opacity:0.7; margin-bottom:2px;">${isAdmin ? 'پشتیبان (شما)' : escapeHtml(userName)}</div><div>${escapeHtml(msg.text)}</div></div>`;
-                });
-                msgBox.innerHTML = msgHtml;
-                msgBox.scrollTop = msgBox.scrollHeight;
-            }
-            await fetchMessages();
-            if (messageChannel) supabaseClient.removeChannel(messageChannel);
-            messageChannel = supabaseClient.channel(`realtime_messages_${chatId}`).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'support_messages', filter: `chat_id=eq.${chatId}` }, () => fetchMessages()).subscribe();
-        };
-
-        window.deleteAdminChat = async (chatId) => {
-            if (!confirm('حذف کامل این گفتگو؟')) return;
-            await supabaseClient.from('support_messages').delete().eq('chat_id', chatId);
-            await supabaseClient.from('support_chats').delete().eq('id', chatId);
-            currentActiveChatId = null;
-            document.getElementById('admin-chat-header').innerHTML = `<span>یک کاربر را انتخاب کنید...</span>`;
-            document.getElementById('admin-chat-messages').innerHTML = `<div style="text-align: center; color: #64748b; margin-top: 80px;">لطفاً از لیست انتخاب کنید.</div>`;
-            document.getElementById('admin-chat-form').style.display = 'none';
-            showToast('گفتگو بسته شد.');
-            initSupportChatListener();
-        };
-
-        document.getElementById('admin-chat-form').onsubmit = async (e) => {
-            e.preventDefault();
-            let input = document.getElementById('admin-chat-input'), text = input.value.trim();
-            if (!text || !currentActiveChatId) return;
-            input.value = '';
-            await supabaseClient.from('support_messages').insert([{ chat_id: currentActiveChatId, sender: 'admin', text, created_at: new Date().toISOString() }]);
-            await supabaseClient.from('support_chats').update({ last_message: text, updated_at: new Date().toISOString(), status: 'answered', unread_by_user: true }).eq('id', currentActiveChatId);
-        };
-
-        function updateSelectOptions(filter=""){
-            let smSelect = document.getElementById('sm-uid'); if(!smSelect) return;
-            let currentVal = smSelect.value;
-            let html = '<option value="">انتخاب کاربر...</option>';
-            let q = filter.toLowerCase();
-            for(let uid in uMap){
-                let u = uMap[uid];
-                let searchStr = `${getUserIdCode(uid)} ${getName(u)} ${u.email||''} ${u.phone||''}`.toLowerCase();
-                if(!q || searchStr.includes(q)) html += `<option value="${escapeHtml(uid)}">${escapeHtml(getName(u))} (${escapeHtml(getUserIdCode(uid))} - ${escapeHtml(u.email || '-')})</option>`;
-            }
-            smSelect.innerHTML = html;
-            smSelect.value = currentVal;
-        }
-
-        window.appEm = async (uid, newEmail) => {
-            if (!confirm(`تایید ایمیل ${newEmail}؟`)) return;
-            try {
-                const { error } = await supabaseClient.from('users').update({ email: newEmail, pending_email: null, pendingEmail: null, admin_approval_status: 'approved' }).eq('id', uid);
-                if (error) throw error;
-                await sendNotificationToUser(uid, 'تایید تغییر ایمیل', `ایمیل شما به ${newEmail} تایید شد.`);
-                showToast('درخواست تایید شد.');
-                loadData();
-            } catch (e) { showToast('خطا: ' + e.message, 'error'); }
-        };
-
-        window.rejEm = async (uid) => {
-            if (!confirm('رد درخواست؟')) return;
-            try {
-                const { error } = await supabaseClient.from('users').update({ pending_email: null, pendingEmail: null, admin_approval_status: 'rejected' }).eq('id', uid);
-                if (error) throw error;
-                await sendNotificationToUser(uid, 'رد درخواست تغییر ایمیل', 'درخواست شما رد شد.');
-                showToast('درخواست رد شد.');
-                loadData();
-            } catch (e) { showToast('خطا: ' + e.message, 'error'); }
-        };
-
-        window.toggleBan = async (uid, banState) => {
-            let actionText = banState ? 'لغو' : 'فعال‌سازی';
-            if (!confirm(`آیا از ${actionText} این کاربر مطمئنید؟`)) return;
-            try {
-                const { error } = await supabaseClient.from('users').update({ status: banState ? 'cancelled' : 'active' }).eq('id', uid);
-                if (error) throw error;
-                showToast(`کاربر ${actionText} شد.`);
-                loadData();
-            } catch (e) { showToast('خطا: ' + e.message, 'error'); }
-        };
-
-        window.selectUserForMessage = uid => {
-            let u = uMap[uid]; if(!u) return;
-            document.getElementById('sel-user-name').textContent = `${getName(u)} (${getUserIdCode(uid)} - ${u.email || '-'})`;
-            document.getElementById('selected-user-card').style.display = 'flex';
-            document.getElementById('sm-uid-container').style.display = 'none';
-            document.getElementById('target-uid-hidden').value = uid;
-        };
-
-        window.clearSelectedUser = () => {
-            document.getElementById('selected-user-card').style.display = 'none';
-            document.getElementById('sm-uid-container').style.display = 'block';
-            document.getElementById('sm-uid').value = '';
-            document.getElementById('target-uid-hidden').value = '';
-        };
-
-        window.renderDepositTable = function() {
-            const allDeposits = window.currentDepositList || [];
-            const filter = window.currentDepFilter || 'pending';
-            const filtered = filter === 'all' ? allDeposits : allDeposits.filter(d => d.status === filter);
-            const cntPending = document.getElementById('dep-cnt-pending'), cntApproved = document.getElementById('dep-cnt-approved'), cntRejected = document.getElementById('dep-cnt-rejected'), cntAll = document.getElementById('dep-cnt-all');
-            if (cntPending) cntPending.innerText = allDeposits.filter(d => d.status === 'pending').length;
-            if (cntApproved) cntApproved.innerText = allDeposits.filter(d => d.status === 'approved').length;
-            if (cntRejected) cntRejected.innerText = allDeposits.filter(d => d.status === 'rejected').length;
-            if (cntAll) cntAll.innerText = allDeposits.length;
-            let tbDep = document.getElementById('tb-deposit'); if (!tbDep) return;
-            if (filtered.length === 0) { tbDep.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:25px;color:#94a3b8;">هیچ درخواستی با این فیلتر نیست.</td></tr>`; return; }
-            let html = '';
-            filtered.forEach(d => {
-                let statusHtml = '';
-                if (d.status === 'pending') statusHtml = '<span style="color:#fbbf24; font-weight:bold; font-size:11px;"><i class="fas fa-clock"></i> معلق</span>';
-                else if (d.status === 'approved') statusHtml = '<span style="color:#22c55e; font-weight:bold; font-size:11px;"><i class="fas fa-check-circle"></i> تایید</span>';
-                else if (d.status === 'rejected') statusHtml = '<span style="color:#ef4444; font-weight:bold; font-size:11px;"><i class="fas fa-times-circle"></i> رد</span>';
-                const networkBadge = d.network === 'TRC20' ? '<span style="background:rgba(56,189,248,.15); color:#38bdf8; padding:2px 8px; border-radius:6px; font-size:10px; font-weight:700;">TRC20</span>' : '<span style="background:rgba(245,158,11,.15); color:#f59e0b; padding:2px 8px; border-radius:6px; font-size:10px; font-weight:700;">BEP20</span>';
-                const txHashShort = d.txHash && d.txHash.length > 12 ? d.txHash.substring(0, 6) + '...' + d.txHash.substring(d.txHash.length - 6) : (d.txHash || '-');
-                let actionsHtml = '';
-                if (d.status === 'pending') actionsHtml = `<button type="button" class="btn-action btn-approve" data-dep-approve="${escapeHtml(d.txId)}" style="padding:5px 8px; font-size:10px;"><i class="fas fa-check"></i> تایید</button><button type="button" class="btn-action btn-reject" data-dep-reject="${escapeHtml(d.txId)}" style="padding:5px 8px; font-size:10px;"><i class="fas fa-times"></i> رد</button>`;
-                else actionsHtml = `<button type="button" class="btn-action btn-edit" data-dep-view="${escapeHtml(d.txId)}" style="padding:5px 8px; font-size:10px;"><i class="fas fa-eye"></i> جزئیات</button>`;
-                html += `<tr><td><span class="badge-id" data-dep-view="${escapeHtml(d.txId)}" style="cursor:pointer;">${escapeHtml(d.idCode)}</span><div style="font-size:10px; color:#94a3b8; margin-top:2px; max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(d.nameStr)}</div></td><td style="color:#22c55e; font-weight:bold;">$${d.creditedAmount.toFixed(2)}</td><td style="color:#38bdf8; font-weight:bold;">$${d.sentAmount.toFixed(2)}</td><td>${networkBadge}</td><td><span style="font-family:monospace; font-size:10px; color:#cbd5e1; cursor:pointer;" data-txid="${escapeHtml(d.txHash)}" title="کپی">${escapeHtml(txHashShort)}</span></td><td style="font-size:10px;">${escapeHtml(formatDate(d.createdAt))}</td><td>${statusHtml}</td><td style="white-space:nowrap;">${actionsHtml}</td></tr>`;
-            });
-            tbDep.innerHTML = html;
-            tbDep.querySelectorAll('[data-dep-approve]').forEach(el => el.addEventListener('click', () => window.approveDeposit(el.getAttribute('data-dep-approve'))));
-            tbDep.querySelectorAll('[data-dep-reject]').forEach(el => el.addEventListener('click', () => window.rejectDeposit(el.getAttribute('data-dep-reject'))));
-            tbDep.querySelectorAll('[data-dep-view]').forEach(el => el.addEventListener('click', () => window.openDepositDetails(el.getAttribute('data-dep-view'))));
-            tbDep.querySelectorAll('[data-txid]').forEach(el => el.addEventListener('click', () => { const h = el.getAttribute('data-txid'); if (h && h !== '-') { navigator.clipboard.writeText(h); showToast('TxID کپی شد.'); } }));
-        };
-
-        window.approveDeposit = function(txId) {
-            const dep = (window.currentDepositList || []).find(x => x.txId === txId);
-            if (!dep) { showToast('واریزی یافت نشد', 'error'); return; }
-            const creditedAmount = dep.creditedAmount || 0, sentAmount = dep.sentAmount || 0, network = dep.network || 'TRC20', txHash = dep.txHash || '-';
-            const explorerName = network === 'TRC20' ? 'TronScan' : 'BscScan';
-            let explorerUrl = '';
-            if (txHash && txHash !== '-') { if (network === 'TRC20') explorerUrl = `https://tronscan.org/#/transaction/${txHash}`; else if (network === 'BEP20') explorerUrl = `https://bscscan.com/tx/${txHash}`; }
-            const bodyHtml = `<div style="background:rgba(34,197,94,.08); border:1px solid rgba(34,197,94,.25); border-radius:10px; padding:12px; margin-bottom:14px; text-align:center;"><div style="color:#22c55e; font-weight:800; font-size:20px;">$${creditedAmount.toFixed(2)} USDT</div><div style="color:#94a3b8; font-size:11px; margin-top:2px;">مبلغ شارژ</div></div><div style="background:rgba(15,23,42,.6); border:1px solid rgba(255,255,255,.08); border-radius:8px; padding:10px; margin-bottom:12px;"><div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,.04);"><span style="color:#94a3b8; font-size:11px;">شبکه:</span><span style="color:#38bdf8; font-weight:700; font-size:11px;">${escapeHtml(network)}</span></div><div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,.04);"><span style="color:#94a3b8; font-size:11px;">مبلغ ارسالی:</span><span style="color:#22c55e; font-weight:700; font-size:11px;">$${sentAmount.toFixed(2)}</span></div><div style="padding:5px 0;"><div style="color:#94a3b8; font-size:11px; margin-bottom:3px;">TxID:</div><div style="font-family:monospace; font-size:10px; color:#cbd5e1; word-break:break-all; direction:ltr; text-align:left; background:rgba(0,0,0,.3); padding:6px; border-radius:4px;">${escapeHtml(txHash)}</div></div>${explorerUrl ? `<div style="padding:5px 0 0; text-align:center;"><a href="${escapeHtml(explorerUrl)}" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:6px; background:rgba(56,189,248,.15); border:1px solid rgba(56,189,248,.4); color:#38bdf8; padding:8px 16px; border-radius:6px; text-decoration:none; font-size:11px; font-weight:600;"><i class="fas fa-external-link-alt"></i> ${explorerName}</a></div>` : ''}</div><div style="background:rgba(251,191,36,.08); border:1px solid rgba(251,191,36,.25); border-radius:8px; padding:12px; margin-bottom:14px;"><div style="color:#fbbf24; font-weight:700; font-size:12px; margin-bottom:8px;"><i class="fas fa-list-check"></i> چک‌لیست:</div><label class="approve-checkbox-item"><input type="checkbox" id="chk-txid"><span>TxID در ${explorerName} بررسی شد</span></label><label class="approve-checkbox-item"><input type="checkbox" id="chk-amount"><span>مبلغ on-chain با $${sentAmount.toFixed(2)} مطابقت دارد</span></label><label class="approve-checkbox-item"><input type="checkbox" id="chk-address"><span>آدرس مقصد یکسان است</span></label></div>`;
-            document.getElementById('confirm-approve-body').innerHTML = bodyHtml;
-            const oldBtn = document.getElementById('confirm-approve-btn'), newBtn = oldBtn.cloneNode(true);
-            oldBtn.parentNode.replaceChild(newBtn, oldBtn); newBtn.disabled = true;
-            const updateBtnState = () => { const c1 = document.getElementById('chk-txid')?.checked, c2 = document.getElementById('chk-amount')?.checked, c3 = document.getElementById('chk-address')?.checked; newBtn.disabled = !(c1 && c2 && c3); };
-            ['chk-txid', 'chk-amount', 'chk-address'].forEach(id => document.getElementById(id)?.addEventListener('change', updateBtnState));
-            newBtn.addEventListener('click', async () => {
-                if (newBtn.disabled) return;
-                newBtn.disabled = true; newBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال تایید...';
-                try {
-                    const { data, error } = await supabaseClient.rpc('approve_deposit', { p_transaction_id: txId, p_admin_note: 'تایید توسط ادمین' });
-                    if (error) throw error;
-                    if (data && data.success) { closeModal('m-confirm-approve'); showToast(`✅ واریزی تایید شد. $${Number(data.amount).toFixed(2)} اضافه شد.`); loadData(); }
-                    else if (data && data.error) { const errMsg = { 'not_admin': 'دسترسی', 'not_found': 'یافت نشد', 'not_pending': 'قبلاً بررسی', 'not_deposit': 'نوع اشتباه', 'mfa_required': '2FA' }[data.error] || data.error; showToast('خطا: ' + errMsg, 'error'); loadData(); }
-                } catch (err) { showToast('خطا: ' + (err.message || 'نامشخص'), 'error'); newBtn.disabled = false; newBtn.innerHTML = '<i class="fas fa-check"></i> تایید'; }
-            });
-            document.getElementById('m-confirm-approve').classList.add('show');
-        };
-
-        window.rejectDeposit = function(txId) {
-            const reasonInput = document.getElementById('reject-reason-input'); if (reasonInput) reasonInput.value = '';
-            document.getElementById('m-confirm-reject').classList.add('show');
-            const confirmBtn = document.getElementById('confirm-reject-btn'), newBtn = confirmBtn.cloneNode(true);
-            confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
-            setTimeout(() => reasonInput?.focus(), 100);
-            newBtn.addEventListener('click', async () => {
-                const reason = (reasonInput?.value || '').trim();
-                closeModal('m-confirm-reject');
-                try {
-                    const { data, error } = await supabaseClient.rpc('reject_deposit', { p_transaction_id: txId, p_reason: reason || 'واریزی تایید نشد' });
-                    if (error) throw error;
-                    if (data && data.success) { showToast('واریزی رد شد.'); loadData(); }
-                    else if (data && data.error) { showToast('خطا: ' + data.error, 'error'); loadData(); }
-                } catch (err) { showToast('خطا: ' + (err.message || 'نامشخص'), 'error'); }
-            });
-        };
-
-        window.openDepositDetails = function(txId) {
-            const d = (window.currentDepositList || []).find(x => x.txId === txId); if (!d) { showToast('یافت نشد', 'error'); return; }
-            let explorerUrl = '';
-            if (d.txHash && d.txHash !== '-') { if (d.network === 'TRC20') explorerUrl = `https://tronscan.org/#/transaction/${d.txHash}`; else if (d.network === 'BEP20') explorerUrl = `https://bscscan.com/tx/${d.txHash}`; }
-            let statusHtml = '';
-            if (d.status === 'pending') statusHtml = '<span style="color:#fbbf24; font-weight:bold;">⏳ معلق</span>';
-            else if (d.status === 'approved') statusHtml = '<span style="color:#22c55e; font-weight:bold;">✅ تایید</span>';
-            else if (d.status === 'rejected') statusHtml = '<span style="color:#ef4444; font-weight:bold;">❌ رد</span>';
-            const html = `<div class="detail-row"><span>شناسه:</span><span>${escapeHtml(d.idCode)}</span></div><div class="detail-row"><span>نام:</span><span>${escapeHtml(d.nameStr)}</span></div><div class="detail-row"><span>ایمیل:</span><span>${escapeHtml(d.user.email || '-')}</span></div><div class="detail-row" style="background:rgba(34,197,94,.08); padding:12px; border-radius:8px; margin-top:10px;"><span style="color:#22c55e; font-weight:bold;">💰 مبلغ شارژ:</span><span style="color:#22c55e; font-weight:bold; font-size:16px;">$${d.creditedAmount.toFixed(2)}</span></div><div class="detail-row" style="background:rgba(56,189,248,.08); padding:12px; border-radius:8px; margin-top:8px;"><span style="color:#38bdf8; font-weight:bold;">📤 مبلغ ارسالی:</span><span style="color:#38bdf8; font-weight:bold; font-size:16px;">$${d.sentAmount.toFixed(2)}</span></div><div class="detail-row"><span>شبکه:</span><span>${escapeHtml(d.network)}</span></div><div class="detail-row"><span>هش:</span><span style="font-family:monospace; font-size:10px; word-break:break-all; direction:ltr; text-align:left;">${escapeHtml(d.txHash)}</span></div>${explorerUrl ? `<div style="text-align:center; margin:12px 0;"><a href="${escapeHtml(explorerUrl)}" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:6px; background:rgba(56,189,248,.15); border:1px solid rgba(56,189,248,.4); color:#38bdf8; padding:9px 18px; border-radius:8px; text-decoration:none; font-size:12px; font-weight:600;"><i class="fas fa-external-link-alt"></i> ${d.network === 'TRC20' ? 'TronScan' : 'BscScan'}</a></div>` : ''}<div class="detail-row"><span>زمان:</span><span>${escapeHtml(formatDate(d.createdAt))}</span></div><div class="detail-row"><span>وضعیت:</span><span>${statusHtml}</span></div>`;
-            document.getElementById('item-modal-title').innerHTML = '<i class="fas fa-arrow-down"></i> جزئیات واریزی';
-            document.getElementById('item-details-body').innerHTML = html;
-            const actionsEl = document.getElementById('item-modal-actions');
-            if (d.status === 'pending') {
-                actionsEl.innerHTML = `<button type="button" class="btn-action btn-approve" style="flex:1; justify-content:center; padding:11px;" data-dep-approve-modal="${escapeHtml(d.txId)}"><i class="fas fa-check"></i> تایید</button><button type="button" class="btn-action btn-reject" style="flex:1; justify-content:center; padding:11px;" data-dep-reject-modal="${escapeHtml(d.txId)}"><i class="fas fa-times"></i> رد</button>`;
-                actionsEl.querySelector('[data-dep-approve-modal]').addEventListener('click', () => { closeModal('m-item-details'); window.approveDeposit(d.txId); });
-                actionsEl.querySelector('[data-dep-reject-modal]').addEventListener('click', () => { closeModal('m-item-details'); window.rejectDeposit(d.txId); });
-            } else { actionsEl.innerHTML = `<button type="button" class="btn-action" style="width:100%; justify-content:center; padding:11px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); color:#cbd5e1;" onclick="closeModal('m-item-details')">بستن</button>`; }
-            document.getElementById('m-item-details').classList.add('show');
-        };
-
-        document.querySelectorAll('.dep-filter-btn').forEach(btn => btn.addEventListener('click', () => {
-            window.currentDepFilter = btn.getAttribute('data-filter');
-            document.querySelectorAll('.dep-filter-btn').forEach(b => { b.classList.remove('active'); b.style.background = 'rgba(255,255,255,.05)'; b.style.borderColor = 'rgba(255,255,255,.1)'; b.style.color = '#94a3b8'; });
-            btn.classList.add('active'); btn.style.background = 'rgba(56,189,248,.15)'; btn.style.borderColor = 'rgba(56,189,248,.5)'; btn.style.color = '#38bdf8';
-            window.renderDepositTable();
-        }));
-
-        document.querySelectorAll('.wd-filter-btn').forEach(btn => btn.addEventListener('click', () => {
-            window.currentWdFilter = btn.getAttribute('data-filter');
-            document.querySelectorAll('.wd-filter-btn').forEach(b => { b.classList.remove('active'); b.style.background = 'rgba(255,255,255,.05)'; b.style.borderColor = 'rgba(255,255,255,.1)'; b.style.color = '#94a3b8'; });
-            btn.classList.add('active'); btn.style.background = 'rgba(56,189,248,.15)'; btn.style.borderColor = 'rgba(56,189,248,.5)'; btn.style.color = '#38bdf8';
-            window.renderWithdrawTable();
-        }));
-
-        async function loadData(){
-            try {
-                let adminProfitTotal = 0, totUserDeposits = 0, totUserProfit = 0;
-                const { data: statsData } = await supabaseClient.from('system_stats').select('total_admin_profit').maybeSingle();
-                if (statsData) adminProfitTotal = Number(statsData.total_admin_profit || 0);
-
-                uMap = {};
-                const { data: supaUsers } = await supabaseClient.from('users').select('*');
-                if (supaUsers) supaUsers.forEach(u => {
-                    let uid = u.id || u.uid;
-                    let meta = u.raw_user_meta_data || u.user_metadata || {};
-                    uMap[uid] = { ...u, id: uid, fullname: u.fullname || meta.fullname || u.email?.split('@')[0] || 'کاربر', email: u.email || meta.email || '', phone: u.phone || meta.phone || '-', balance: u.balance !== undefined ? Number(u.balance) : 0, platform_profit: Number(u.platform_profit || 0), casino_balance: Number(u.casino_balance || 0), status: u.status || 'active', createdAt: u.created_at || new Date().toISOString() };
-                });
-
-                let allDeposits = [], allWithdrawals = [];
-                const { data: txData } = await supabaseClient.from('transactions').select('*');
-                if (txData) txData.forEach(tx => {
-                    let st = String(tx.status || '').toLowerCase();
-                    let typeStr = String(tx.type || tx.title || '').toLowerCase();
-                    let isDeposit = typeStr.includes('deposit') || typeStr.includes('واریز') || typeStr.includes('charge');
-                    let isWithdraw = typeStr.includes('withdraw') || typeStr.includes('برداشت');
-                    let uid = tx.user_id || 'unknown';
-                    if (!uMap[uid]) uMap[uid] = { id: uid, fullname: 'کاربر', email: '-', phone: '-', balance: 0, platform_profit: 0, casino_balance: 0, createdAt: new Date().toISOString() };
-
-                    if (isDeposit) {
-                        if (st === 'approved' || st === 'success') totUserDeposits += Number(tx.amount || 0);
-                        let networkVal = tx.network;
-                        if (!networkVal) { let c = `${tx.title || ''} ${tx.description || ''}`; if (c.includes('BEP20')) networkVal = 'BEP20'; else if (c.includes('TRC20')) networkVal = 'TRC20'; else networkVal = 'TRC20'; }
-                        let sentVal = Number(tx.sent_amount || 0);
-                        if (!sentVal && tx.description) { let m = tx.description.match(/Sent:\s*([\d.]+)/i); if (m) sentVal = parseFloat(m[1]); else sentVal = Number(tx.amount || 0) * 1.025; }
-                        let hashVal = tx.tx_hash;
-                        if (!hashVal && tx.description) { let m = tx.description.match(/TxID:\s*([a-fA-F0-9x]+)/i); if (m) hashVal = m[1]; }
-                        allDeposits.push({ txId: tx.id, uid, user: uMap[uid], idCode: getUserIdCode(uid), nameStr: getName(uMap[uid]), creditedAmount: Number(tx.amount || 0), sentAmount: sentVal, network: networkVal, txHash: hashVal || '-', status: st, createdAt: tx.created_at, adminNote: tx.admin_note || null, reviewedAt: tx.reviewed_at || null });
-                    } else if (isWithdraw) {
-                        let addrMatch = (tx.description || '').match(/Address:\s*(.+?)\s*(?:\||$)/);
-                        let address = addrMatch ? addrMatch[1].trim() : '-';
-                        let netVal = tx.network || 'TRC20';
-                        allWithdrawals.push({ txId: tx.id, uid, user: uMap[uid], idCode: getUserIdCode(uid), nameStr: getName(uMap[uid]), amount: Number(tx.amount || 0), network: netVal, address, status: st, createdAt: tx.created_at, adminNote: tx.admin_note || null, reviewedAt: tx.reviewed_at || null });
-                    }
-                });
-
-                let depositList = allDeposits.filter(d => d.status === 'pending');
-                let withdrawPending = allWithdrawals.filter(w => w.status === 'pending');
-
-                let tbAct = document.getElementById('tb-act'), tbPend = document.getElementById('tb-pend'), tbBan = document.getElementById('tb-ban');
-                if(tbAct) tbAct.innerHTML = ""; if(tbPend) tbPend.innerHTML = ""; if(tbBan) tbBan.innerHTML = "";
-
-                let totU = 0, totB = 0, totR = 0, totW = withdrawPending.length, totD = depositList.length, reqList = [];
-                Object.keys(uMap).forEach(uid => {
-                    let u = uMap[uid];
-                    totU++; totB += Number(u.balance || 0); totUserProfit += Number(u.platform_profit || 0);
-                    let idCode = getUserIdCode(uid), nameStr = getName(u), emailStr = u.email || '-', phoneStr = u.phone || '-', regStr = formatDate(u.createdAt);
-                    let isBanned = (u.status === 'cancelled' || u.status === 'banned' || u.isBanned === true);
-                    let hasPend = (u.pending_email || u.pendingEmail || u.admin_approval_status === 'pending');
-                    let requestedEmail = u.pending_email || u.pendingEmail || u.newEmail || '-';
-                    let balStr = `$${Number(u.balance||0).toLocaleString()}`, profitStr = `$${Number(u.platform_profit||0).toLocaleString()}`;
-                    if(isBanned) {
-                        if(tbBan) tbBan.innerHTML += `<tr><td><span class="badge-id" data-open-details="${escapeHtml(uid)}">${escapeHtml(idCode)}</span></td><td><b>${escapeHtml(nameStr)}</b></td><td>${escapeHtml(emailStr)}</td><td dir="ltr" style="text-align:right">${escapeHtml(phoneStr)}</td><td style="color:#22c55e;font-weight:bold">${escapeHtml(balStr)}</td><td style="color:#38bdf8;font-weight:bold">${escapeHtml(profitStr)}</td><td><button class="btn-action btn-approve" data-toggle-ban="${escapeHtml(uid)}" data-ban-state="false"><i class="fas fa-undo"></i> فعال‌سازی</button></td></tr>`;
-                    } else if(hasPend) {
-                        totR++;
-                        reqList.push({uid, u, requestedEmail, time: u.request_timestamp||u.requestTimestamp||u.createdAt});
-                        if(tbPend) tbPend.innerHTML += `<tr><td><span class="badge-id" data-open-details="${escapeHtml(uid)}">${escapeHtml(idCode)}</span></td><td><b>${escapeHtml(nameStr)}</b></td><td>${escapeHtml(emailStr)}</td><td style="color:#fbbf24;font-weight:bold">${escapeHtml(requestedEmail)}</td><td dir="ltr" style="text-align:right">${escapeHtml(phoneStr)}</td><td style="color:#22c55e;font-weight:bold">${escapeHtml(balStr)}</td><td><button class="btn-action btn-approve" data-approve-email="${escapeHtml(uid)}" data-new-email="${escapeHtml(requestedEmail)}">تایید</button><button class="btn-action btn-reject" data-reject-email="${escapeHtml(uid)}">رد</button></td></tr>`;
-                    } else {
-                        if(tbAct) tbAct.innerHTML += `<tr><td><span class="badge-id" data-open-details="${escapeHtml(uid)}">${escapeHtml(idCode)}</span></td><td><b>${escapeHtml(nameStr)}</b></td><td>${escapeHtml(emailStr)}</td><td dir="ltr" style="text-align:right">${escapeHtml(phoneStr)}</td><td style="color:#22c55e;font-weight:bold">${escapeHtml(balStr)}</td><td style="color:#38bdf8;font-weight:bold">${escapeHtml(profitStr)}</td><td>${escapeHtml(regStr)}</td><td><button class="btn-action btn-ban" data-toggle-ban="${escapeHtml(uid)}" data-ban-state="true">لغو</button></td></tr>`;
-                    }
-                });
-
-                let reqContainer = document.getElementById('req-container');
-                if (reqContainer) {
-                    if (reqList.length === 0) reqContainer.innerHTML = `<div style="text-align:center;padding:25px;color:#94a3b8">هیچ درخواستی در انتظار بررسی نیست.</div>`;
-                    else {
-                        let reqHtml = '';
-                        reqList.forEach(item => { reqHtml += `<div style="background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;"><div><div style="font-weight:bold; color:#38bdf8; font-size:13px; margin-bottom:4px;"><i class="fas fa-envelope"></i> تغییر ایمیل (${escapeHtml(getUserIdCode(item.uid))})</div><div style="color:#cbd5e1; font-size:12px;">نام: <b>${escapeHtml(getName(item.u))}</b> | جدید: <b style="color:#fbbf24">${escapeHtml(item.requestedEmail)}</b></div></div><div style="display:flex; gap:8px;"><button class="btn-action btn-approve" data-approve-email="${escapeHtml(item.uid)}" data-new-email="${escapeHtml(item.requestedEmail)}"><i class="fas fa-check"></i> تایید</button><button class="btn-action btn-reject" data-reject-email="${escapeHtml(item.uid)}"><i class="fas fa-times"></i> رد</button></div></div>`; });
-                        reqContainer.innerHTML = reqHtml;
-                    }
-                }
-
-                document.querySelectorAll('[data-open-details]').forEach(el => el.addEventListener('click', () => window.openDetails(el.getAttribute('data-open-details'))));
-                document.querySelectorAll('[data-toggle-ban]').forEach(el => el.addEventListener('click', () => window.toggleBan(el.getAttribute('data-toggle-ban'), el.getAttribute('data-ban-state') === 'true')));
-                document.querySelectorAll('[data-approve-email]').forEach(el => el.addEventListener('click', () => window.appEm(el.getAttribute('data-approve-email'), el.getAttribute('data-new-email'))));
-                document.querySelectorAll('[data-reject-email]').forEach(el => el.addEventListener('click', () => window.rejEm(el.getAttribute('data-reject-email'))));
-
-                updateSelectOptions(document.getElementById('sm-search')?.value || '');
-
-                document.getElementById('st-users').innerText = totU;
-                document.getElementById('st-bal').innerText = '$' + totB.toLocaleString('en-US',{minimumFractionDigits:2});
-                document.getElementById('st-admin-profit').innerText = '$' + adminProfitTotal.toLocaleString('en-US',{minimumFractionDigits:2});
-                document.getElementById('st-req').innerText = totR;
-                document.getElementById('st-d-req').innerText = totD;
-                document.getElementById('st-w-req').innerText = totW;
-                document.getElementById('st-user-deposits').innerText = '$' + totUserDeposits.toLocaleString('en-US',{minimumFractionDigits:2});
-                document.getElementById('st-user-profit').innerText = '$' + totUserProfit.toLocaleString('en-US',{minimumFractionDigits:2});
-
-                if (prevD !== -1) {
-                    let alertsList = [];
-                    if (totD > prevD) alertsList.push("واریز وجه");
-                    if (totW > prevW) alertsList.push("برداشت وجه");
-                    if (totR > prevR) alertsList.push("احراز هویت");
-                    if (alertsList.length > 0) { playAlertSound(); sendNtfyAlert("🔔 درخواست جدید در پنل Zenix", `نوع: ${alertsList.join("، ")}`); }
-                }
-                prevD = totD; prevW = totW; prevR = totR;
-
-                let badge = document.getElementById('req-badge'); if(badge){ badge.innerText = totR; badge.className = totR > 0 ? 'tab-badge' : 'tab-badge zero'; }
-                let dBadge = document.getElementById('d-badge'); if(dBadge){ dBadge.innerText = totD; dBadge.className = totD > 0 ? 'tab-badge' : 'tab-badge zero'; }
-                let wBadge = document.getElementById('w-badge'); if(wBadge){ wBadge.innerText = totW; wBadge.className = totW > 0 ? 'tab-badge' : 'tab-badge zero'; }
-
-                window.currentDepositList = allDeposits;
-                window.renderDepositTable();
-                window.currentWithdrawList = allWithdrawals;
-                window.renderWithdrawTable();
-            } catch(err) { console.error('loadData error:', err); }
-        }
-
-        window.openDetails = uid => {
-            let u = uMap[uid]; if (!u) return;
-            document.getElementById('user-details-body').innerHTML = `<div class="detail-row"><span>شناسه:</span><span>${escapeHtml(getUserIdCode(uid))}</span></div><div class="detail-row"><span>نام:</span><span>${escapeHtml(getName(u))}</span></div><div class="detail-row"><span>ایمیل:</span><span>${escapeHtml(u.email||'-')}</span></div><div class="detail-row"><span>موجودی:</span><span>$${Number(u.balance||0).toLocaleString()}</span></div><div class="detail-row"><span>کازینو:</span><span>$${Number(u.casino_balance||0).toLocaleString()}</span></div>`;
-            const btnWrap = document.getElementById('modal-action-btn');
-            btnWrap.innerHTML = `<button class="btn-action btn-edit" style="width:100%;justify-content:center;padding:8px"><i class="fas fa-edit"></i> ویرایش</button>`;
-            btnWrap.querySelector('button').addEventListener('click', () => { closeModal('m-details'); window.openE(uid); });
-            document.getElementById('m-details').classList.add('show');
-        };
-
-        window.openE = uid => {
-            let u = uMap[uid]; if (!u) return;
-            document.getElementById('e-uid').value = uid;
-            document.getElementById('e-name').value = getName(u);
-            document.getElementById('e-email').value = u.email || '';
-            document.getElementById('e-phone').value = u.phone || '';
-            document.getElementById('e-bal').value = u.balance || 0;
-            document.getElementById('e-profit').value = u.platform_profit || 0;
-            document.getElementById('m-edit').classList.add('show');
-        };
-
-        document.getElementById('f-edit')?.addEventListener('submit', async e => {
-            e.preventDefault();
-            let uid = document.getElementById('e-uid').value;
-            try {
-                const { error } = await supabaseClient.from('users').update({ fullname: document.getElementById('e-name').value, email: document.getElementById('e-email').value, phone: document.getElementById('e-phone').value, balance: parseFloat(document.getElementById('e-bal').value) || 0, platform_profit: parseFloat(document.getElementById('e-profit').value) || 0 }).eq('id', uid);
-                if (error) throw error;
-                showToast('مشخصات ویرایش شد.');
-                closeModal('m-edit'); loadData();
-            } catch (err) { showToast('خطا: ' + (err.message || 'نامشخص'), 'error'); }
-        });
-
-        document.getElementById('logout-btn')?.addEventListener('click', async () => { await supabaseClient.auth.signOut(); window.location.href = 'index.html'; });
-        document.getElementById('mobile-logout-btn')?.addEventListener('click', async () => { await supabaseClient.auth.signOut(); window.location.href = 'index.html'; });
-
-        (async () => {
-            const ok = await guardAdminAccess();
-            if (!ok) return;
-            document.body.classList.add('zenix-authed');
-            await loadNtfyTopic();
-            loadData();
-            loadCasinoData();
-            initSupportChatListener();
-            initRealtimeDataListeners();
-        })();
-    </script>
-</body>
-</html>
