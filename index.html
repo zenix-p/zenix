@@ -14,19 +14,14 @@
 
     <script>
         window.__cfToken = null;
-
         window.onCaptchaSuccess = function (token) {
-            window.__cfToken = token ||
-                (document.querySelector('[name="cf-turnstile-response"]') || {}).value ||
-                null;
+            window.__cfToken = token || (document.querySelector('[name="cf-turnstile-response"]') || {}).value || null;
             try { document.dispatchEvent(new CustomEvent('cf-token-ready')); } catch (e) {}
         };
-
         window.onCaptchaExpired = function () {
             window.__cfToken = null;
             try { document.dispatchEvent(new CustomEvent('cf-token-ready')); } catch (e) {}
         };
-
         window.onCaptchaError = function () {
             window.__cfToken = null;
             try { document.dispatchEvent(new CustomEvent('cf-token-ready')); } catch (e) {}
@@ -36,26 +31,11 @@
     <script>(function(){var s=localStorage.getItem('zenix_lang')||'en',r=['fa','ar'];document.documentElement.setAttribute('dir',r.includes(s)?'rtl':'ltr');document.documentElement.setAttribute('lang',s);})();</script>
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Vazirmatn',system-ui,sans-serif}
-        body{
-            background:#030712;
-            min-height:100vh;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            color:#f8fafc;
-            padding:15px;
-            position:relative;
-            overflow-x:hidden;
-            -webkit-text-size-adjust:100%;
-            -moz-text-size-adjust:100%;
-            text-size-adjust:100%;
-        }
+        body{background:#030712;min-height:100vh;display:flex;justify-content:center;align-items:center;color:#f8fafc;padding:15px;position:relative;overflow-x:hidden;-webkit-text-size-adjust:100%;-moz-text-size-adjust:100%;text-size-adjust:100%;}
         .glow-1,.glow-2{position:absolute;border-radius:50%;filter:blur(80px);opacity:.35;pointer-events:none;z-index:1}
         .glow-1{width:250px;height:250px;background:#0ea5e9;top:10%;left:10%}
         .glow-2{width:250px;height:250px;background:#a855f7;bottom:10%;right:10%}
-        
         .auth-card{width:100%;max-width:400px;background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:24px 22px;box-shadow:0 20px 50px rgba(0,0,0,.7);position:relative;z-index:10;backdrop-filter:blur(10px);opacity:1;transition:opacity .2s ease-in-out}
-        
         .header-actions{position:relative;z-index:20;display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-bottom:12px}
         .wrap{position:relative}
         .lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none;transition:.2s}
@@ -65,13 +45,11 @@
         .menu.show{display:block!important}
         .mi{padding:6px 12px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap;transition:.2s}
         .mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}
-        
         .logo{text-align:center;margin-bottom:20px}
         .logo-header{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;margin-bottom:8px}
         .logo-icon{width:46px;height:46px;background:linear-gradient(135deg,#0ea5e9,#9333ea);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:24px;font-weight:900;font-style:italic;transform:skewX(-6deg);box-shadow:0 0 18px rgba(14,165,233,.45)}
         .logo-text{font-family:'Orbitron',sans-serif;font-size:26px;font-weight:900;letter-spacing:3px;font-style:italic;transform:skewX(-6deg);background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 20px rgba(56,189,248,.4)}
         .logo p{color:#94a3b8;font-size:12px;margin-top:4px}
-        
         .group{margin-bottom:14px}
         .group label{display:block;margin-bottom:6px;font-size:12px;color:#cbd5e1}
         .req{color:#ef4444;font-weight:700;margin-inline-start:3px}
@@ -86,101 +64,17 @@
         html[dir="rtl"] .group input{padding-right:40px;padding-left:40px}
         html[dir="ltr"] .group input{padding-left:40px;padding-right:40px}
         .group input:-webkit-autofill,.group input:-webkit-autofill:hover,.group input:-webkit-autofill:focus,.group input:-webkit-autofill:active{-webkit-box-shadow:0 0 0 30px rgba(10,15,30,.95) inset!important;-webkit-text-fill-color:#fff!important;caret-color:#fff}
-
-        #user::placeholder,
-        #pass::placeholder{
-            color:#64748b !important;
-            opacity:.55 !important;
-            font-size:12px !important;
-        }
+        #user::placeholder,#pass::placeholder{color:#64748b !important;opacity:.55 !important;font-size:12px !important;}
         .group input:focus{border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.2)}
-
-        ::spelling-error {
-            text-decoration: none !important;
-            -webkit-text-decoration: none !important;
-            text-decoration-line: none !important;
-            -webkit-text-decoration-line: none !important;
-            background: transparent !important;
-        }
-        ::grammar-error {
-            text-decoration: none !important;
-            -webkit-text-decoration: none !important;
-            text-decoration-line: none !important;
-            -webkit-text-decoration-line: none !important;
-            background: transparent !important;
-        }
-        #user,
-        #pass,
-        .group input,
-        .group input:hover,
-        .group input:focus,
-        .group input:active,
-        .group input:valid,
-        .group input:invalid,
-        .group input:placeholder-shown,
-        .group input:-webkit-autofill {
-            text-decoration: none !important;
-            -webkit-text-decoration: none !important;
-            text-decoration-line: none !important;
-            -webkit-text-decoration-line: none !important;
-            text-decoration-style: none !important;
-            text-decoration-color: transparent !important;
-            -webkit-text-decorations-in-effect: none !important;
-            border-bottom: none !important;
-            outline: none;
-        }
-
-        /* ============================================================
-           ★ Cloudflare Turnstile — Lazy Loaded
-           ============================================================ */
-        .captcha-wrap{
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            margin-bottom:14px;
-        }
-        #turnstile-container{
-            min-height:65px;
-            min-width:300px;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-        }
-        .captcha-loading{
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            gap:8px;
-            min-height:65px;
-            min-width:300px;
-            color:#94a3b8;
-            font-size:12px;
-            border:1px solid rgba(255,255,255,.08);
-            border-radius:8px;
-            background:rgba(10,15,30,.4);
-            animation:captchaPulse 1.5s ease-in-out infinite;
-        }
-        @keyframes captchaPulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-        .captcha-error{
-            color:#f87171 !important;
-            border-color:rgba(239,68,68,.3) !important;
-            background:rgba(239,68,68,.08) !important;
-            animation:none !important;
-            padding:10px;
-            text-align:center;
-            font-size:11px;
-            line-height:1.4;
-        }
-        @media (max-width: 400px) {
-            #turnstile-container{
-                transform: scale(0.92);
-                transform-origin: center center;
-            }
-        }
-
+        ::spelling-error {text-decoration: none !important;-webkit-text-decoration: none !important;text-decoration-line: none !important;-webkit-text-decoration-line: none !important;background: transparent !important;}
+        ::grammar-error {text-decoration: none !important;-webkit-text-decoration: none !important;text-decoration-line: none !important;-webkit-text-decoration-line: none !important;background: transparent !important;}
+        #user,#pass,.group input,.group input:hover,.group input:focus,.group input:active,.group input:valid,.group input:invalid,.group input:placeholder-shown,.group input:-webkit-autofill {text-decoration: none !important;-webkit-text-decoration: none !important;text-decoration-line: none !important;-webkit-text-decoration-line: none !important;text-decoration-style: none !important;text-decoration-color: transparent !important;-webkit-text-decorations-in-effect: none !important;border-bottom: none !important;outline: none;}
+        .captcha-wrap{display:flex;justify-content:center;align-items:center;margin-bottom:14px;}
+        #turnstile-container{min-height:65px;min-width:300px;display:flex;align-items:center;justify-content:center;}
+        .captcha-loading{display:flex;align-items:center;justify-content:center;gap:8px;min-height:65px;min-width:300px;color:#94a3b8;font-size:12px;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(10,15,30,.4);animation:captchaPulse 1.5s ease-in-out infinite;}
+        @keyframes captchaPulse {0%, 100% { opacity: 0.5; }50% { opacity: 1; }}
+        .captcha-error{color:#f87171 !important;border-color:rgba(239,68,68,.3) !important;background:rgba(239,68,68,.08) !important;animation:none !important;padding:10px;text-align:center;font-size:11px;line-height:1.4;}
+        @media (max-width: 400px) {#turnstile-container{transform: scale(0.92);transform-origin: center center;}}
         .extra-links{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;font-size:11px}
         .extra-links a{color:#38bdf8;text-decoration:none}
         .extra-links a:hover{text-decoration:underline}
@@ -192,18 +86,14 @@
         #msg.show{display:block}
         .err{color:#f87171;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3)}
         .succ{color:#4ade80;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3)}
-
-        /* ============ موبایل ============ */
         @media (max-width: 768px) {
             .group input { font-size: 14px !important; }
             .group input:focus { font-size: 16px !important; }
             #user::placeholder, #pass::placeholder { font-size: 13px !important; }
-
             .auth-card { padding: 22px 20px; }
             .logo-text { font-size: 24px; letter-spacing: 2px; }
             .logo-icon { width: 42px; height: 42px; font-size: 22px; }
         }
-
         @media (max-width: 480px) {
             body { padding: 10px; }
             .auth-card { padding: 18px 16px; border-radius: 20px; }
@@ -224,7 +114,6 @@
             #msg { font-size: 11px; padding: 10px; }
             .lb { height: 34px; width: 34px; font-size: 12px; }
             .mi { font-size: 11px; padding: 6px 10px; }
-
             .captcha-wrap{ margin-bottom:12px; }
         }
     </style>
@@ -261,47 +150,22 @@
                 <label id="l-user"><i class="fas fa-envelope"></i> <span id="txt-user"></span> <span class="req">*</span></label>
                 <div class="wrap-input">
                     <i class="fas fa-envelope f-icon"></i>
-                    <input
-                        type="text"
-                        id="user"
-                        inputmode="email"
-                        pattern="[^\s@]+@[^\s@]+\.[^\s@]+"
-                        aria-label="Email address"
-                        autocomplete="email"
-                        autocorrect="off"
-                        autocapitalize="none"
-                        spellcheck="false"
-                        lang="en"
-                        data-lpignore="true"
-                        data-form-type="other"
-                        required>
+                    <input type="text" id="user" inputmode="email" pattern="[^\s@]+@[^\s@]+\.[^\s@]+" aria-label="Email address" autocomplete="email" autocorrect="off" autocapitalize="none" spellcheck="false" lang="en" data-lpignore="true" data-form-type="other" required>
                 </div>
             </div>
             <div class="group">
                 <label id="l-pass"><i class="fas fa-lock"></i> <span id="txt-pass"></span> <span class="req">*</span></label>
                 <div class="wrap-input">
                     <i class="fas fa-key f-icon"></i>
-                    <input
-                        type="password"
-                        id="pass"
-                        aria-label="Password"
-                        autocomplete="current-password"
-                        autocorrect="off"
-                        autocapitalize="none"
-                        spellcheck="false"
-                        lang="en"
-                        data-lpignore="true"
-                        required>
+                    <input type="password" id="pass" aria-label="Password" autocomplete="current-password" autocorrect="off" autocapitalize="none" spellcheck="false" lang="en" data-lpignore="true" required>
                     <button type="button" class="eye-btn" id="eye-btn" aria-label="Toggle password visibility" onclick="togglePassword('pass',this)"><i class="fas fa-eye"></i></button>
                 </div>
             </div>
-            
             <div class="captcha-wrap">
                 <div id="turnstile-container">
                     <div class="captcha-loading">⏳ Loading security check...</div>
                 </div>
             </div>
-
             <div class="extra-links">
                 <label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:#cbd5e1;">
                     <input type="checkbox" id="remember-me" checked style="accent-color:#38bdf8;cursor:pointer;">
@@ -309,7 +173,6 @@
                 </label>
                 <a href="forgot-password.html" id="t-forgot"></a>
             </div>
-
             <button type="submit" id="t-btn" class="btn" disabled></button>
         </form>
         <div id="msg"></div>
@@ -356,8 +219,9 @@
         let submitCounter = 0;
         let isSubmitting = false;
         
-        // ── Lockout State (In-Memory, authoritative from DB) ──
+        // ── Lockout State (از دیتابیس، گره‌خورده به ایمیل) ──
         let currentLockoutUntil = 0;
+        let lockedEmail = '';
         let countdownTimer = null;
 
         // ── Turnstile Lazy Load ──
@@ -468,6 +332,7 @@
             if (currentLockoutUntil > now) return Math.ceil((currentLockoutUntil - now) / 1000);
             if (currentLockoutUntil > 0 && currentLockoutUntil <= now) {
                 currentLockoutUntil = 0;
+                lockedEmail = '';
             }
             return 0;
         }
@@ -492,6 +357,8 @@
         function startCountdownIfNeeded() {
             if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
             if (getRemainingLockoutSec() <= 0) return;
+            // فقط اگر ایمیل فعلی همان ایمیل قفل‌شده باشد
+            if (lockedEmail && lockedEmail !== userIn.value.trim().toLowerCase()) return;
 
             showLockoutMessage();
             checkInputs();
@@ -507,6 +374,12 @@
                 }
                 showLockoutMessage();
             }, 1000);
+        }
+
+        function stopCountdownAndClear() {
+            if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+            currentLockoutUntil = 0;
+            lockedEmail = '';
         }
 
         async function getTargetPage(userId) {
@@ -575,10 +448,6 @@
 
         function checkInputs() {
             if (isSubmitting) return;
-            if (getRemainingLockoutSec() > 0) {
-                submitBtn.disabled = true;
-                return;
-            }
             const emailOk = isValidEmail(userIn.value.trim());
             const passOk = passIn.value.length >= 6;
             const capOk = !!getCaptchaToken();
@@ -588,7 +457,15 @@
         document.addEventListener('cf-token-ready', checkInputs);
 
         userIn.addEventListener('focus', clearError);
-        userIn.addEventListener('input', () => { clearError(); checkInputs(); });
+        userIn.addEventListener('input', () => {
+            clearError();
+            // اگر ایمیل تغییر کرده و با ایمیل قفل‌شده فرق دارد → قفل محلی را پاک کن
+            const currentEmail = userIn.value.trim().toLowerCase();
+            if (lockedEmail && lockedEmail !== currentEmail) {
+                stopCountdownAndClear();
+            }
+            checkInputs();
+        });
         passIn.addEventListener('focus', clearError);
         passIn.addEventListener('input', checkInputs);
 
@@ -615,13 +492,6 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // بررسی قفل محلی (برای جلوگیری از ارسال درخواست در حین قفل)
-            if (getRemainingLockoutSec() > 0) {
-                startCountdownIfNeeded();
-                checkInputs();
-                return;
-            }
-
             if (!turnstileInitStarted) {
                 startTurnstileLoad();
             }
@@ -630,6 +500,12 @@
             const passVal = passIn.value.trim();
 
             if (!isValidEmail(emailVal)) return showError('errEmail');
+
+            // اگر همان ایمیل قفل‌شده و هنوز قفل است → بدون درخواست، تایمر را نشان بده
+            if (lockedEmail === emailVal && getRemainingLockoutSec() > 0) {
+                startCountdownIfNeeded();
+                return;
+            }
 
             const captchaToken = getCaptchaToken();
             if (!captchaToken) {
@@ -651,6 +527,7 @@
                 if (lockError) throw lockError;
                 if (lockoutTime) {
                     currentLockoutUntil = new Date(lockoutTime).getTime();
+                    lockedEmail = emailVal;
                     isSubmitting = false;
                     startCountdownIfNeeded();
                     return;
@@ -666,13 +543,13 @@
                 if (currentSubmit !== submitCounter) { isSubmitting = false; return; }
 
                 if (error) {
-                    // ── 3. ثبت تلاش ناموفق در دیتابیس ──
+                    // ── 3. ثبت تلاش ناموفق ──
                     await supabaseClient.rpc('record_failed_login', { user_email: emailVal });
                     
-                    // بررسی اینکه آیا این تلاش باعث قفل شد؟
                     const { data: newLockout } = await supabaseClient.rpc('check_login_lockout', { user_email: emailVal });
                     if (newLockout) {
                         currentLockoutUntil = new Date(newLockout).getTime();
+                        lockedEmail = emailVal;
                         startCountdownIfNeeded();
                     } else {
                         showError('errNoUser');
@@ -685,7 +562,7 @@
 
                 // ── 4. ورود موفق ──
                 await supabaseClient.rpc('clear_failed_login', { user_email: emailVal });
-                currentLockoutUntil = 0;
+                stopCountdownAndClear();
 
                 const targetPage = await getTargetPage(data.user.id);
                 if (currentSubmit !== submitCounter) { isSubmitting = false; return; }
@@ -723,7 +600,9 @@
 
         window.addEventListener('pageshow', () => {
             clearError();
-            startCountdownIfNeeded();
+            if (lockedEmail && lockedEmail === userIn.value.trim().toLowerCase()) {
+                startCountdownIfNeeded();
+            }
             checkInputs();
         });
 
