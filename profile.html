@@ -2,278 +2,115 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script>
-        (function () {
-            var supported = ['en', 'fa', 'ar', 'tr', 'ru', 'es', 'fr', 'de'];
-            var language = 'en';
-            try {
-                var saved = localStorage.getItem('zenix_lang');
-                if (supported.indexOf(saved) !== -1) language = saved;
-            } catch (e) {}
-            document.documentElement.setAttribute('lang', language);
-            document.documentElement.setAttribute('dir', language === 'fa' || language === 'ar' ? 'rtl' : 'ltr');
+    (function () {
+        const supportedLanguages = ['en', 'fa', 'ar', 'tr', 'ru', 'es', 'fr', 'de'];
+        let selectedLang = 'en';
+        try { const savedLang = localStorage.getItem('zenix_lang'); if (supportedLanguages.includes(savedLang)) selectedLang = savedLang; } catch (_) {}
+        document.documentElement.setAttribute('lang', selectedLang);
+        document.documentElement.setAttribute('dir', ['fa', 'ar'].includes(selectedLang) ? 'rtl' : 'ltr');
+    })();
+    </script>
+    <title>Zenix - پروفایل</title>
+    <link rel="icon" href="data:image/x-icon;base64,=">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="text/javascript">
+        (function(){
+            emailjs.init("oUKHgDSK6qIwpCE9p");
         })();
     </script>
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>Zenix - Dashboard</title>
-    <link rel="icon" href="data:image/x-icon;base64,=">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.cn">
-    <link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin>
-    <link href="https://fonts.googleapis.cn/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-    
+
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
         body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
+        .toast-container{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column;gap:10px;pointer-events:none;width:90%;max-width:420px}
+        .toast{padding:14px 18px;border-radius:14px;font-size:13px;font-weight:600;display:flex;align-items:flex-start;gap:12px;box-shadow:0 12px 35px rgba(0,0,0,0.7);backdrop-filter:blur(14px);opacity:0;transform:translateY(-20px);transition:all 0.35s cubic-bezier(0.68,-0.55,0.27,1.55);pointer-events:auto;direction:rtl;line-height:1.5}
+        .toast.show{opacity:1;transform:translateY(0)}
+        .toast-success{background:rgba(16,185,129,0.22);border:1px solid rgba(16,185,129,0.6);color:#34d399}
+        .toast-error{background:rgba(239,68,68,0.22);border:1px solid rgba(239,68,68,0.6);color:#f87171}
+        .toast-info{background:rgba(15,23,42,0.92);border:1px solid rgba(56,189,248,0.5);color:#38bdf8;box-shadow:0 0 25px rgba(56,189,248,0.25)}
+        .toast i{font-size:18px;margin-top:2px}
         header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1);padding:10px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
         .logo{display:flex;align-items:center;gap:10px}
-        .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#0ea5e9,#9333ea);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;font-style:italic;transform:skewX(-6deg);box-shadow:0 0 15px rgba(14,165,233,.4)}
-        .logo-text{font-family:'Orbitron',sans-serif;font-size:19px;font-weight:900;letter-spacing:2px;font-style:italic;transform:skewX(-6deg);background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 20px rgba(56,189,248,0.4)}
+        .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#0ea5e9,#9333ea);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;transform:skewX(-6deg);box-shadow:0 0 15px rgba(14,165,233,.4)}
+        .logo-text{font-family:'Orbitron',sans-serif;font-size:19px;font-weight:900;letter-spacing:2px;transform:skewX(-6deg);background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 20px rgba(56,189,248,0.4)}
         .hr{display:flex;align-items:center;gap:8px}
         .wrap{position:relative}
         .lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none}
         .badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;font-weight:700}
         .badge.show{display:flex}
-        .menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;min-width:max-content;padding:6px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8)}
+        .menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;width:max-content;min-width:max-content;white-space:nowrap;padding:6px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8)}
         [dir="rtl"] .wrap .menu{left:0}
         [dir="ltr"] .wrap .menu{right:0}
         .menu.show{display:block}
-        .mi{padding:7px 10px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap}
+        .mi{padding:7px 12px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap;transition:all 0.2s ease}
         .mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}
-        .c{max-width:900px;width:100%;margin:15px auto;padding:0 12px;flex:1}
-        .wel{background:linear-gradient(135deg,rgba(2,132,199,.15),rgba(147,51,234,.15));border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
-        .wel h1{font-size:16px;margin-bottom:3px}
-        .wel p{color:#94a3b8;font-size:11px}
-        .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:12px}
-        .sc{border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;min-width:0}
-        .sc-bal{background:linear-gradient(135deg,rgba(15,23,42,.95),rgba(14,165,233,.18));border:1px solid rgba(56,189,248,.4)}
-        .sc-ref{background:linear-gradient(135deg,rgba(15,23,42,.95),rgba(168,85,247,.18));border:1px solid rgba(168,85,247,.4)}
-        .sc-bal .si{width:40px;height:40px;background:rgba(56,189,248,.2);border:1px solid #38bdf8;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#38bdf8;font-size:16px;flex-shrink:0}
-        .sc-ref .si{width:40px;height:40px;background:rgba(168,85,247,.2);border:1px solid #a855f7;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#c084fc;font-size:16px;flex-shrink:0}
-        .sn{min-width:0}
-        .sn span{font-size:11px;color:#94a3b8;display:block;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .sn h3{font-size:16px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .banner-box{width:100%;max-height:150px;margin-bottom:12px;border-radius:12px;overflow:hidden;border:1px solid rgba(56,189,248,.35);box-shadow:0 10px 25px rgba(2,132,199,.15)}
-        .banner-box img{width:100%;height:150px;display:block;object-fit:cover}
-        .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}
-        .nc{background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px;text-decoration:none;color:inherit;display:flex;align-items:center;justify-content:space-between;min-width:0}
-        .nc:hover{border-color:#38bdf8;background:rgba(15,23,42,1)}
-        .ncl{display:flex;align-items:center;gap:10px;min-width:0}
-        .nci{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
-        .ninf{min-width:0}
-        .ninf h3{font-size:14px;color:#f8fafc;margin-bottom:2px}
-        .ninf p{font-size:11px;color:#94a3b8}
-        .nca{color:#64748b;font-size:12px;margin-inline-start:4px}
-        .market-box{background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px;margin-bottom:12px}
-        #crypto-ticker-list{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-        @media(max-width:768px){#crypto-ticker-list{grid-template-columns:1fr}}
-        .crypto-row{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid rgba(255,255,255,0.05);font-size:12px;direction:ltr;transition:all .4s ease}
-        .crypto-info{display:flex;align-items:center;gap:8px}
-        .crypto-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;overflow:hidden}
-        .crypto-icon img{width:100%;height:100%;object-fit:cover}
-        .price-up{color:#22c55e!important;font-weight:bold}
-        .price-down{color:#ef4444!important;font-weight:bold}
-        
-        .platform-info-box{background:rgba(15,23,42,.85);border:1px solid rgba(56,189,248,.25);border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
-        
+        .c{max-width:800px;width:100%;margin:15px auto;padding:0 12px;flex:1}
+        .wel{background:linear-gradient(135deg,rgba(2,132,199,.15),rgba(147,51,234,.15));border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px;margin-bottom:12px}
+        .card{background:rgba(30,41,59,0.8);border:1px solid rgba(56,189,248,0.3);border-radius:12px;padding:20px;margin-top:12px}
+        .hd{display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none}
+        .hd i.ch{transition:0.3s;color:#38bdf8}
+        .card.open .hd i.ch{transform:rotate(180deg)}
+        .bd{display:none;margin-top:15px;border-top:1px solid rgba(255,255,255,0.1);padding-top:15px}
+        .card.open .bd{display:block}
+        .fg{margin-bottom:15px}
+        .fl{display:block;font-size:14px;color:#94a3b8;margin-bottom:6px}
+        .fi{width:100%;padding:10px 14px;background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#f8fafc;font-size:14px;outline:none}
+        .fi:focus{border-color:#38bdf8}
+        .fi[readonly], .fi[disabled]{opacity:0.65;background:rgba(15,23,42,0.5)!important;cursor:not-allowed;color:#cbd5e1!important;border-color:rgba(255,255,255,0.08)}
+        .err-msg{color:#ef4444;font-size:12px;margin-top:4px;display:none}
+        .bs{display:block;width:100%;background:#38bdf8;color:#0f172a;border:none;padding:10px;font-weight:bold;border-radius:8px;cursor:pointer;font-size:14px;text-align:center}
+        .bs:hover{background:#0ea5e9}
+        .bs:disabled{opacity:0.6;cursor:not-allowed;background:#64748b;color:#cbd5e1}
+        .ibox{display:flex;justify-content:space-between;align-items:center;background:rgba(15,23,42,0.6);padding:12px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);margin-bottom:12px}
+        .c-dropdown{position:relative;width:110px}
+        .c-select-btn{background:#0f172a;color:#f8fafc;border:1px solid rgba(255,255,255,0.2);padding:8px;border-radius:6px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .c-select-btn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80px;display:inline-block;text-align:left}
+        .c-list{display:none;position:fixed;background:#0f172a;border:1px solid rgba(255,255,255,0.2);border-radius:8px;overflow:hidden;z-index:99999;box-shadow:0 10px 25px rgba(0,0,0,.9);flex-direction:column}
+        .c-list.show{display:flex}
+        .c-search-wrap{padding:6px;border-bottom:1px solid rgba(255,255,255,0.08);background:#0f172a;flex-shrink:0}
+        .c-search{width:100%;padding:8px 10px;background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#fff;font-size:12px;outline:none;font-family:inherit}
+        .c-search:focus{border-color:#38bdf8}
+        #c-options-container,#welcome-c-options-container{overflow-y:auto;max-height:160px}
+        .c-option{padding:8px 10px;font-size:12px;color:#cbd5e1;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background 0.15s}
+        .c-option:hover{background:rgba(56,189,248,.2);color:#38bdf8}
+        .c-option-empty{padding:12px;text-align:center;font-size:11px;color:#64748b}
         .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
         .modal.show{display:flex}
         .modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(56,189,248,.3);border-radius:20px;width:100%;max-width:460px;max-height:85vh;display:flex;flex-direction:column;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.9);overflow:hidden}
         .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;color:#38bdf8;font-weight:800;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;flex-shrink:0}
         .modal-close{background:rgba(255,255,255,.05);border:none;color:#94a3b8;cursor:pointer;font-size:14px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
         .modal-close:hover{background:rgba(239,68,68,.2);color:#ef4444}
-        
+        .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px;transition:0.2s}
+        .msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:4px}
+        .msg-desc-text{font-size:12px;color:#cbd5e1;line-height:1.5}
         .notif-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
         .notif-tab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#94a3b8;padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;white-space:nowrap;transition:0.2s;display:flex;align-items:center;justify-content:center;gap:5px;flex:1 1 auto}
         .notif-tab:hover{background:rgba(56,189,248,.15);color:#38bdf8}
         .notif-tab.active{background:#38bdf8;color:#0f172a;font-weight:bold;border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.3)}
-        .tab-badge{background:rgba(255,255,255,.15);color:inherit;padding:1px 6px;border-radius:10px;font-size:10px;font-weight:700;line-height:1.2;min-width:16px;text-align:center;display:inline-block}
-        .notif-tab.active .tab-badge{background:rgba(15,23,42,.3);color:#0f172a}
-        
-        #modal-msg-container, .modal-content div[style*="overflow-y:auto"]{overflow-y:auto;padding-right:6px}
-        #modal-msg-container::-webkit-scrollbar, .modal-content div::-webkit-scrollbar{width:5px}
-        #modal-msg-container::-webkit-scrollbar-track, .modal-content div::-webkit-scrollbar-track{background:rgba(15,23,42,.6);border-radius:10px}
-        #modal-msg-container::-webkit-scrollbar-thumb, .modal-content div::-webkit-scrollbar-thumb{background:rgba(56,189,248,.35);border-radius:10px}
-        #modal-msg-container::-webkit-scrollbar-thumb:hover, .modal-content div::-webkit-scrollbar-thumb:hover{background:rgba(56,189,248,.7)}
-        
-        .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px;transition:0.2s}
-        .msg-body-box:hover{border-color:rgba(56,189,248,.5)!important;opacity:1!important;}
-        .msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:0}
-        .msg-desc-text{font-size:12px;color:#cbd5e1;line-height:1.5}
-        
-        footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
-        
-        /* ★ دکمه شناور کازینو */
-        .floating-casino-wrap {
-            position: fixed; 
-            right: 24px; 
-            bottom: 28px; 
-            z-index: 9999;
-        }
-        [dir="rtl"] .floating-casino-wrap {
-            right: auto;
-            left: 24px;
-        }
-        
-        .floating-casino {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            overflow: hidden;
-        }
-
-        .floating-casino::before {
-            content: '';
-            position: absolute;
-            inset: -3px;
-            background: conic-gradient(from 0deg, #f43f5e, #a855f7, #38bdf8, #f43f5e);
-            z-index: -1;
-            border-radius: 50%;
-            animation: spinCasinoBorder 3s linear infinite;
-            opacity: 0.8;
-        }
-
-        .floating-casino::after {
-            content: '';
-            position: absolute;
-            inset: 2px;
-            background: #0f172a;
-            border-radius: 50%;
-            z-index: -1;
-        }
-
-        .floating-casino:hover {
-            transform: translateY(-5px) scale(1.08);
-            box-shadow: 0 15px 45px rgba(244, 63, 94, 0.5), inset 0 0 20px rgba(168, 85, 247, 0.3);
-        }
-
-        .floating-casino i {
-            font-size: 24px;
-            background: linear-gradient(135deg, #38bdf8, #c084fc, #f43f5e);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 3px;
-            transition: transform 0.4s ease;
-        }
-
-        .floating-casino:hover i {
-            transform: rotate(25deg) scale(1.1);
-        }
-
-        .floating-casino span {
-            font-size: 9px;
-            font-weight: 800;
-            color: #fff;
-            letter-spacing: 0.5px;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-            z-index: 1;
-        }
-
-        @keyframes spinCasinoBorder {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* ★ اصلاحات ریسپانسیو برای موبایل */
-        @media (max-width: 480px) {
-            .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-            .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-
-            .hr { gap: 5px; }
-            .lb { width: 32px; height: 32px; font-size: 12px; }
-            .logo-text { font-size: 16px; }
-            .wel { flex-direction: column; align-items: flex-start; }
-
-            .sc { padding: 10px; gap: 8px; }
-            .sc-bal .si, .sc-ref .si { width: 32px; height: 32px; font-size: 13px; }
-            .sn span { font-size: 9.5px; }
-            .sn h3 { font-size: 13px; }
-
-            .nc { padding: 9px; }
-            .ncl { gap: 7px; }
-            .nci { width: 30px; height: 30px; font-size: 12px; }
-            .ninf h3 { font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-            .ninf p  { font-size: 9.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-            .nca { font-size: 10px; }
-        }
-
-        @media (max-width: 360px) {
-            .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
-            .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
-
-            .sc { padding: 8px; gap: 6px; }
-            .sc-bal .si, .sc-ref .si { width: 28px; height: 28px; font-size: 11px; }
-            .sn span { font-size: 9px; }
-            .sn h3 { font-size: 11.5px; }
-
-            .nc  { padding: 7px; }
-            .nci { width: 26px; height: 26px; font-size: 11px; }
-            .ninf h3 { font-size: 10.5px; }
-            .ninf p  { font-size: 9px; }
-            .nca { display: none; }
-        }
+        #modal-msg-container{overflow-y:auto;padding-right:6px;flex:1;min-height:0}
+        footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:800px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
+        .hint-box{padding:12px 14px;border-radius:8px;font-size:12px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px;line-height:1.6}
+        .hint-first{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.35);color:#22c55e}
+        .hint-change{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.35);color:#fbbf24}
+        .hint-box i{font-size:16px;margin-top:2px;flex-shrink:0}
+        .lock-icon{font-size:11px;color:#64748b;margin-inline-start:6px;}
     </style>
 </head>
 <body>
-    <div class="floating-casino-wrap">
-        <button type="button" class="floating-casino" id="floating-casino-btn" title="کازینو" onclick="window.openCasinoModal(); return false;">
-            <i class="fas fa-dice"></i>
-            <span id="t-floating-casino">کازینو</span>
-        </button>
-    </div>
-
-    <div class="modal" id="m-casino-modal" style="z-index:1050;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span id="t-casino-modal-title"><i class="fas fa-dice" style="color:#f43f5e;"></i> انتخاب بازی‌های کازینو</span>
-                <button class="modal-close" onclick="window.closeCasinoModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <div style="overflow-y:auto;padding-right:6px;display:flex;flex-direction:column;gap:10px;">
-                <a href="roulette.html" class="nc" style="text-decoration:none;color:inherit;">
-                    <div class="ncl">
-                        <div class="nci" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#ef4444"><i class="fas fa-dice-roulette"></i></div>
-                        <div class="ninf">
-                            <h3 id="t-casino-poker">رولت آنلاین</h3>
-                            <p id="t-casino-poker-desc">بازی هیجان‌انگیز و شانس</p>
-                        </div>
-                    </div>
-                    <div class="nca"><i class="fas fa-chevron-left"></i></div>
-                </a>
-                <a href="plinko.html" class="nc" style="text-decoration:none;color:inherit;">
-                    <div class="ncl">
-                        <div class="nci" style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#22c55e"><i class="fas fa-circle-dot"></i></div>
-                        <div class="ninf">
-                            <h3 id="t-casino-plinko">پلینکو (پاپالان)</h3>
-                            <p id="t-casino-plinko-desc">بازی محبوب ریزش مهره‌ها</p>
-                        </div>
-                    </div>
-                    <div class="nca"><i class="fas fa-chevron-left"></i></div>
-                </a>
-            </div>
-        </div>
-    </div>
+    <div id="toast-container" class="toast-container"></div>
 
     <header>
         <div class="logo"><div class="logo-icon">Z</div><div class="logo-text">ZENIX</div></div>
         <div class="hr">
             <div class="wrap"><button type="button" class="lb" id="bell-btn"><i class="fas fa-bell" style="color:#fbbf24"></i><span class="badge" id="bell-badge">0</span></button></div>
-            <div class="wrap"><button type="button" class="lb" id="help-btn" title="راهنمای صفحه داشبورد"><i class="fas fa-circle-question" style="color:#38bdf8"></i></button></div>
+            <div class="wrap"><button type="button" class="lb" id="help-btn" title="راهنمای صفحه پروفایل"><i class="fas fa-circle-question" style="color:#38bdf8"></i></button></div>
             <a href="support.html" class="lb"><i class="fas fa-headset" style="color:#a855f7"></i></a>
             <div class="wrap">
                 <button type="button" class="lb" id="lang-btn"><i class="fas fa-globe" style="color:#22c55e"></i></button>
@@ -284,153 +121,920 @@
             <div class="wrap">
                 <button type="button" class="lb" id="menu-btn"><i class="fas fa-bars" style="color:#f43f5e"></i></button>
                 <div class="menu" id="nav-menu">
-                    <a href="dashboard.html" class="mi active"><i class="fas fa-home" style="color:#38bdf8"></i><span id="m1">صفحه اصلی</span></a>
-                    <a href="quantification.html" class="mi"><i class="fas fa-robot" style="color:#a855f7"></i><span id="m2">کوانتیفیکیشن</span></a>
-                    <a href="deposit.html" class="mi"><i class="fas fa-arrow-down" style="color:#22c55e"></i><span id="m3">واریز</span></a>
-                    <a href="receive.html" class="mi"><i class="fas fa-arrow-up" style="color:#fbbf24"></i><span id="m4">برداشت</span></a>
-                    <a href="team.html" class="mi"><i class="fas fa-users" style="color:#ec4899"></i><span id="m_team">تیم من</span></a>
-                    <a href="transactions.html" class="mi"><i class="fas fa-history" style="color:#06b6d4"></i><span id="m5">تراکنش</span></a>
-                    <a href="profile.html" class="mi"><i class="fas fa-user-cog" style="color:#ec4899"></i><span id="m6">پروفایل</span></a>
-                    <a href="support.html" class="mi"><i class="fas fa-headset" style="color:#a855f7"></i><span id="m7">پشتیبانی</span></a>
-                    <a href="#" class="mi" onclick="window.openAboutModal();return false;"><i class="fas fa-info-circle" style="color:#38bdf8"></i><span id="m_about">درباره پلتفرم</span></a>
-                    <a href="index.html" class="mi" id="logout-btn" style="color:#ef4444"><i class="fas fa-power-off"></i><span id="m8">خروج</span></a>
+                    <a href="dashboard.html" class="mi"><i class="fas fa-home" style="color:#38bdf8"></i><span>صفحه اصلی</span></a>
+                    <a href="quantification.html" class="mi"><i class="fas fa-robot" style="color:#a855f7"></i><span>کوانتیفیکیشن</span></a>
+                    <a href="deposit.html" class="mi"><i class="fas fa-arrow-down" style="color:#22c55e"></i><span>واریز</span></a>
+                    <a href="receive.html" class="mi"><i class="fas fa-arrow-up" style="color:#fbbf24"></i><span>برداشت</span></a>
+                    <a href="team.html" class="mi"><i class="fas fa-users" style="color:#ec4899"></i><span>تیم من</span></a>
+                    <a href="transactions.html" class="mi"><i class="fas fa-history" style="color:#06b6d4"></i><span>تراکنش</span></a>
+                    <a href="profile.html" class="mi active"><i class="fas fa-user-cog" style="color:#ec4899"></i><span>پروفایل</span></a>
+                    <a href="support.html" class="mi"><i class="fas fa-headset" style="color:#a855f7"></i><span>پشتیبانی</span></a>
+                    <a href="index.html" class="mi" id="logout-btn" style="color:#ef4444"><i class="fas fa-power-off"></i><span>خروج</span></a>
                 </div>
             </div>
         </div>
     </header>
 
     <div class="c">
-        <div class="wel"><div><h1 id="t-wel">خوش آمدید</h1><p id="t-sub">پنل مدیریت کاربری</p></div><div style="font-size:11px;background:rgba(56,189,248,.1);border:1px solid #38bdf8;padding:4px 8px;border-radius:6px;color:#38bdf8"><i class="fas fa-shield-check"></i> <span id="t-st">تایید شده</span></div></div>
-        <div class="stats">
-            <div class="sc sc-bal"><div class="si"><i class="fas fa-wallet" style="color:#38bdf8"></i></div><div class="sn"><span id="ts1">موجودی</span><h3 id="val-balance">$0.00</h3></div></div>
-            <div class="sc sc-ref"><div class="si"><i class="fas fa-users" style="color:#c084fc"></i></div><div class="sn"><span id="ts2">زیرمجموعه</span><h3 id="val-ref">0</h3></div></div>
-        </div>
-        <div class="banner-box"><img src="https://i.postimg.cc/XvHYmsLK/Gemini-Generated-Image-d7mieqd7mieqd7mi.jpg" alt="Zenix Banner"></div>
-        <div class="grid">
-            <a href="quantification.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.3);color:#c084fc"><i class="fas fa-robot"></i></div><div class="ninf"><h3 id="c1">کوانتیفیکیشن</h3><p id="d1">معاملات هوشمند</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i1"></i></div></a>
-            <a href="deposit.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#22c55e"><i class="fas fa-arrow-down"></i></div><div class="ninf"><h3 id="c2">واریز</h3><p id="d2">شارژ حساب</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i2"></i></div></a>
-            <a href="receive.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);color:#fbbf24"><i class="fas fa-arrow-up"></i></div><div class="ninf"><h3 id="c3">برداشت</h3><p id="d3">برداشت دارایی</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i3"></i></div></a>
-            <a href="team.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(236,72,153,.15);border:1px solid rgba(236,72,153,.3);color:#ec4899"><i class="fas fa-users"></i></div><div class="ninf"><h3 id="c4">تیم</h3><p id="d4">زیرمجموعه‌ها</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i4"></i></div></a>
-            <a href="transactions.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(6,182,212,.15);border:1px solid rgba(6,182,212,.3);color:#06b6d4"><i class="fas fa-history"></i></div><div class="ninf"><h3 id="c5">تراکنش‌ها</h3><p id="d5">تاریخچه مالی</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i5"></i></div></a>
-            <a href="profile.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);color:#38bdf8"><i class="fas fa-user-cog"></i></div><div class="ninf"><h3 id="c6">پروفایل</h3><p id="d6">تنظیمات امنیت</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i6"></i></div></a>
-        </div>
-        
-        <div class="market-box">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-                <h3 style="font-size:13px;color:#38bdf8;" id="t-mkt"><i class="fas fa-chart-line" style="color:#22c55e"></i> بازار ارزهای دیجیتال (۳ ارز برتر از ۳۰ ارز رصد شده)</h3>
-                <span style="font-size:10px;color:#22c55e;background:rgba(34,197,94,0.15);padding:2px 8px;border-radius:10px;font-weight:600;"><i class="fas fa-circle" style="font-size:6px;vertical-align:middle;margin-left:3px;"></i> <span id="t-live">زنده</span></span>
+        <div class="wel">
+            <div>
+                <h1 style="font-size:18px;margin-bottom:3px;">پروفایل کاربر</h1>
+                <p style="font-size:12px;color:#94a3b8;">مدیریت اطلاعات حساب کاربری و تنظیمات امنیتی</p>
             </div>
-            <div id="crypto-ticker-list"></div>
         </div>
 
-        <div class="platform-info-box">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;">
-                <div style="width:34px;height:34px;background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#38bdf8;font-size:15px;">
-                    <i class="fas fa-shield-alt"></i>
+        <div class="card" style="cursor:default;">
+            <div style="display:flex;align-items:center;gap:15px;margin-bottom:20px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:15px;">
+                <div style="width:50px;height:50px;background:rgba(56,189,248,0.2);border:1px solid #38bdf8;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#38bdf8;"><i class="fas fa-user"></i></div>
+                <div>
+                    <div style="font-size:16px;font-weight:bold;color:#f8fafc;" id="user-fullname">در حال بارگذاری...</div>
+                    <div style="font-size:12px;color:#94a3b8;display:flex;align-items:center;gap:6px;margin-top:2px;">
+                        <span id="user-id">UID: SM-000000</span>
+                        <i class="fas fa-copy" title="کپی UID" style="cursor:pointer;color:#38bdf8;font-size:13px;" onclick="window.copyUserId()"></i>
+                    </div>
                 </div>
-                <h3 style="font-size:13px;color:#38bdf8;font-weight:800;" id="t-about-box-title">درباره پلتفرم هوشمند زِنیکس (Zenix)</h3>
             </div>
-            <div style="font-size:11px;color:#cbd5e1;line-height:1.8;display:flex;flex-direction:column;gap:10px;">
-                <p id="t-about-box-intro">به زِنیکس (Zenix) خوش آمدید؛ جایی که افق‌های مالی دیجیتال و قدرت فناوری مدرن در هم می‌آمیزند تا مسیری به سوی آینده‌ای روشن‌تر را روشن کنند. زِنیکس بر پایه یک باور عمیق بنا شده است: دنیای دارایی‌های دیجیتال نباید یک هزارتوی پیچیده باشد، بلکه باید یک اکوسیستم شفاف، در دسترس و امن برای همه باشد.</p>
-                <p id="t-about-box-desc">در عصری که با شتاب بی‌وقفه تعریف می‌شود، جایی که بازارهای جهانی هرگز نمی‌خوابند و تغییر تنها ثابتِ آن است، داشتن یک همراه مطمئن و هوشمند امری حیاتی است. زِنیکس با تکیه بر معماری ابری پیشرفته، الگوریتم‌های کوانتیفیکیشن نوین و لایه‌های امنیتی چندگانه و نفوذناپذیر، پناهگاهی یکپارچه و یکدست برای مدیریت ثروت شما فراهم کرده است. ما فقط در حال ساختن یک پلتفرم نیستیم؛ ما در حال خلق محیطی هستیم که در آن فناوری در خدمت جاه‌طلبی‌های انسانی قرار می‌گیرد، موانع را از بین می‌برد و آنچه را که در اقتصاد دیجیتال ممکن است، بازتعریف می‌کند.</p>
-                <p id="t-about-box-goal"><strong style="color:#38bdf8;">هدف ما:</strong> دموکراتیزه کردن امور استثنایی است. ما تلاش می‌کنیم همان ابزارهای مالی قدرتمندی که نخبگان نهادی از آن استفاده می‌کنند را در اختیار صاحبان دید روزمره قرار دهیم. چه در حال برداشتن اولین قدم خود باشید و چه یک متخصص کارکشته، زِنیکس به شما قدرت می‌دهد تا با اطمینان در بازارهای جهانی حرکت کنید، بدون نیاز به تخصص پیچیده، و تضمین می‌کند که سرمایه شما در محیطی از امنیت مطلق، شفافیت و پتانسیل پویا رشد کند.</p>
-                <p id="t-about-box-strategy"><strong style="color:#38bdf8;">استراتژی ما:</strong> بر یک سه‌گانه ناگسستنی بنا شده است—امنیت بدون سازش، شفافیت رادیکال و نوآوری بی‌وقفه. با ادغام الگوریتم‌های پردازش داده پیشرفته، یک سیستم پاداش چندلایه پویا و زیرساخت‌های بی‌نهایت مقیاس‌پذیر، ما تجربه‌ای بی‌نقص، فوق‌العاده سریع و بسیار قابل اعتماد را مهندسی می‌کنیم. ما پیچیدگی‌ها را مدیریت می‌کنیم تا تمرکز شما تنها روی مهم‌ترین چیز باقی بماند: رشد و موفقیت شما.</p>
-                <p id="t-about-box-conclusion" style="color:#94a3b8;border-top:1px dashed rgba(255,255,255,.08);padding-top:8px;margin-top:2px;"><i class="fas fa-quote-right" style="color:#38bdf8;margin-left:4px;"></i> زِنیکس فراتر از تعریف یک پلتفرم صرف است؛ این یک اکوسیستم پرجنب‌وجوش است که در آن فناوری، سرمایه و جامعه‌ای از پیشروان اندیشه گرد هم می‌آیند. ما شریک استوار شما در این سفر هستیم و متعهد به هدایت شما به سوی آینده‌ای با آزادی مالی بیشتر، فرصت‌های بی‌کران و دستاوردهای عظیم هستیم. ما با هم نه تنها آینده را پیش‌بینی می‌کنیم—بلکه آن را می‌سازیم.</p>
+            <div class="ibox">
+                <span style="color:#94a3b8;font-size:13px;">وضعیت حساب:</span>
+                <span id="account-status" style="font-weight:bold;font-size:13px;">در حال بررسی...</span>
+            </div>
+            <div class="ibox" style="flex-direction:column;align-items:flex-start;gap:10px;margin-bottom:0;">
+                <span style="color:#94a3b8;font-size:13px;">شماره تماس:</span>
+                <div style="display:flex;align-items:center;gap:6px;direction:ltr;width:100%;">
+                    <div class="c-dropdown" id="c-dropdown">
+                        <div class="c-select-btn" id="c-select-btn">
+                            <span style="color:#94a3b8;font-size:10px;">کد کشور</span> <i class="fas fa-chevron-down" style="font-size:8px;"></i>
+                        </div>
+                        <div class="c-list" id="c-list">
+                            <div class="c-search-wrap"><input type="text" class="c-search" id="c-search-input" placeholder="جستجو (مثلاً 98 یا Iran)..." oninput="window.filterCountries(this)"></div>
+                            <div id="c-options-container"></div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="country-code" value="">
+                    <div style="display:flex;flex-direction:column;flex:1;">
+                        <input type="text" id="user-phone-input" placeholder="9123456789" maxlength="10" oninput="window.clearPhoneError()" style="background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#fff;padding:6px 10px;font-size:13px;width:100%;outline:none;">
+                        <div class="err-msg" id="phone-err-msg" style="font-size:10px;margin-top:2px;">شماره باید ۱۰ رقم و بدون صفر باشد</div>
+                    </div>
+                </div>
+                <button type="button" id="save-phone-btn" onclick="window.savePhone()" class="bs" style="margin-top:4px;">ذخیره</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="hd" onclick="window.tc(this)">
+                <h3 style="color:#38bdf8;font-size:15px;margin:0;"><i class="fas fa-envelope"></i> <span>تغییر ایمیل</span></h3>
+                <i class="fas fa-chevron-down ch"></i>
+            </div>
+            <div class="bd">
+                <div class="fg"><label class="fl">ایمیل فعلی</label><input type="email" class="fi" id="email-curr" readonly disabled placeholder="در حال دریافت ایمیل..."></div>
+                <div class="fg">
+                    <label class="fl">ایمیل جدید</label>
+                    <div style="display:flex;gap:8px;">
+                        <input type="email" class="fi" id="email-new" placeholder="ایمیل جدید را وارد کنید">
+                        <button type="button" class="bs" id="req-admin-btn" style="width:190px;font-size:12px;background:#f59e0b;color:#0f172a;" onclick="window.requestAdminPermission()">گرفتن عکس و ارسال به ادمین</button>
+                    </div>
+                    <input type="file" id="selfie-capture" accept="image/*" capture="user" style="display:none" onchange="window.handleSelfieCapture(this)">
+                </div>
+                <div id="admin-status-box" style="margin-top:15px;padding:10px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;font-size:13px;color:#f59e0b;display:none;text-align:center;">
+                    <i class="fas fa-clock"></i> در انتظار تایید مدیریت (از ۱ تا ۷۲ ساعت)...
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="card-pwd">
+            <div class="hd" onclick="window.tc(this)">
+                <h3 style="color:#38bdf8;font-size:15px;margin:0;"><i class="fas fa-lock"></i> <span>تغییر رمز ورود</span></h3>
+                <i class="fas fa-chevron-down ch"></i>
+            </div>
+            <div class="bd">
+                <div class="fg">
+                    <label class="fl">ایمیل</label>
+                    <div style="display:flex;gap:8px;">
+                        <input type="email" class="fi" id="pwd-email" readonly disabled placeholder="در حال دریافت ایمیل...">
+                        <button type="button" class="bs" style="width:130px;font-size:12px;" onclick="window.sendEmailCode('pwd-email', this)">ارسال کد به ایمیل</button>
+                    </div>
+                </div>
+                <div class="fg"><label class="fl">کد ۶ رقمی تأیید ایمیل</label><input type="text" class="fi" id="pwd-code" maxlength="6" placeholder="مثال: 849201"></div>
+                <div class="fg"><label class="fl">رمز فعلی</label><input type="password" class="fi" id="pwd-curr"></div>
+                <div class="fg"><label class="fl">رمز جدید</label><input type="password" class="fi" id="pwd-new"></div>
+                <div class="fg"><label class="fl">تکرار رمز جدید</label><input type="password" class="fi" id="pwd-conf"></div>
+                <button type="button" class="bs" onclick="window.validatePasswordForm(this)">ذخیره تغییرات</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-tx-pass">
+            <div class="hd" onclick="window.tc(this)">
+                <h3 style="color:#38bdf8;font-size:15px;margin:0;"><i class="fas fa-key"></i> <span>تغییر رمز تراکنش</span></h3>
+                <i class="fas fa-chevron-down ch"></i>
+            </div>
+            <div class="bd">
+                <div class="fg">
+                    <label class="fl">ایمیل</label>
+                    <div style="display:flex;gap:8px;">
+                        <input type="email" class="fi" id="tr-email" readonly disabled placeholder="در حال دریافت ایمیل...">
+                        <button type="button" class="bs" style="width:130px;font-size:12px;" onclick="window.sendEmailCode('tr-email', this)">ارسال کد به ایمیل</button>
+                    </div>
+                </div>
+                <div class="fg"><label class="fl">کد ۶ رقمی تأیید</label><input type="text" class="fi" id="tr-code" maxlength="6" placeholder="مثال: 849201"></div>
+                <div class="fg"><label class="fl">رمز فعلی (اختیاری برای تغییر)</label><input type="password" class="fi" id="tr-curr"></div>
+                <div class="fg"><label class="fl">رمز جدید (۶ رقم)</label><input type="password" class="fi" id="tr-new" maxlength="6" inputmode="numeric" placeholder="مثال: 849201"></div>
+                <button type="button" class="bs" onclick="window.validateTxForm(this)">ذخیره تغییرات</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="hd" onclick="window.tc(this)">
+                <h3 style="color:#38bdf8;font-size:15px;margin:0;"><i class="fas fa-wallet"></i> <span>آدرس‌های کیف پول</span></h3>
+                <i class="fas fa-chevron-down ch"></i>
+            </div>
+            <div class="bd">
+                <div id="wal-first-time-hint" class="hint-box hint-first" style="display:none;">
+                    <i class="fas fa-check-circle"></i>
+                    <div>اولین بار است که آدرس کیف پول ثبت می‌کنید. بدون نیاز به کد تأیید، آدرس‌ها را وارد و ذخیره کنید.</div>
+                </div>
+                <div id="wal-change-hint" class="hint-box hint-change" style="display:none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>آدرس‌های ثبت‌شده قفل هستند. برای <strong>ویرایش</strong>، ابتدا کد تأیید ایمیل را دریافت و وارد کنید، سپس فیلدها باز می‌شوند. اگر فیلدی خالی است، بدون نیاز به کد می‌توانید آن را پر کنید.</div>
+                </div>
+
+                <div class="fg">
+                    <label class="fl">آدرس TRX <span id="trx-lock-icon" class="lock-icon" style="display:none;"><i class="fas fa-lock"></i> قفل</span></label>
+                    <input type="text" id="trx-in" class="fi" placeholder="T... (۳۴ کاراکتر)" style="direction:ltr;text-align:left;font-family:monospace;">
+                </div>
+                <div class="fg">
+                    <label class="fl">آدرس BEP20 <span id="bep-lock-icon" class="lock-icon" style="display:none;"><i class="fas fa-lock"></i> قفل</span></label>
+                    <input type="text" id="bep-in" class="fi" placeholder="0x... (۴۲ کاراکتر)" style="direction:ltr;text-align:left;font-family:monospace;">
+                </div>
+
+                <div id="wal-otp-section" style="display:none;">
+                    <div class="fg">
+                        <label class="fl">ایمیل</label>
+                        <div style="display:flex;gap:8px;">
+                            <input type="email" class="fi" id="wal-email" readonly disabled placeholder="در حال دریافت ایمیل...">
+                            <button type="button" class="bs" style="width:130px;font-size:12px;" onclick="window.sendEmailCode('wal-email', this)">ارسال کد به ایمیل</button>
+                        </div>
+                    </div>
+                    <div class="fg">
+                        <label class="fl">کد ۶ رقمی تأیید (برای باز کردن قفل ویرایش)</label>
+                        <div style="display:flex;gap:8px;">
+                            <input type="text" class="fi" id="wal-code" maxlength="6" placeholder="مثال: 849201" inputmode="numeric">
+                            <button type="button" class="bs" style="width:130px;font-size:12px;background:#22c55e;color:#fff;" onclick="window.verifyWalletCode(this)">تایید و باز کردن قفل</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="bs" onclick="window.saveWalletForm(this)">ذخیره تغییرات</button>
             </div>
         </div>
     </div>
 
     <div class="modal" id="m-msg">
         <div class="modal-content">
-            <div class="modal-header">
-                <span id="t-modal-title"><i class="fas fa-bell"></i> صندوق پیام‌ها و اعلان‌ها</span>
-                <button class="modal-close" onclick="window.closeMessageModal()"><i class="fas fa-times"></i></button>
-            </div>
+            <div class="modal-header"><span id="t-modal-title"><i class="fas fa-bell"></i> صندوق پیام‌ها و اعلان‌ها</span><button class="modal-close" onclick="window.closeMessageModal()"><i class="fas fa-times"></i></button></div>
             <div class="notif-tabs" id="notif-tabs">
-                <button type="button" class="notif-tab active" onclick="window.setNotifFilter('all', this)"><i class="fas fa-list"></i> <span id="t-tab-all">همه</span> <span class="tab-badge" id="cnt-tab-all">0</span></button>
-                <button type="button" class="notif-tab" onclick="window.setNotifFilter('approved', this)"><i class="fas fa-check-circle" style="color:#22c55e"></i> <span id="t-tab-approved">تایید درخواست</span> <span class="tab-badge" id="cnt-tab-approved">0</span></button>
-                <button type="button" class="notif-tab" onclick="window.setNotifFilter('rejected', this)"><i class="fas fa-times-circle" style="color:#ef4444"></i> <span id="t-tab-rejected">لغو درخواست</span> <span class="tab-badge" id="cnt-tab-rejected">0</span></button>
-                <button type="button" class="notif-tab" onclick="window.setNotifFilter('admin_message', this)"><i class="fas fa-bullhorn" style="color:#38bdf8"></i> <span id="t-tab-admin">پیام مدیریت</span> <span class="tab-badge" id="cnt-tab-admin">0</span></button>
+                <button type="button" class="notif-tab active" onclick="window.setNotifFilter('all', this)"><i class="fas fa-list"></i> همه</button>
+                <button type="button" class="notif-tab" onclick="window.setNotifFilter('approved', this)"><i class="fas fa-check-circle" style="color:#22c55e"></i> تایید درخواست</button>
+                <button type="button" class="notif-tab" onclick="window.setNotifFilter('rejected', this)"><i class="fas fa-times-circle" style="color:#ef4444"></i> لغو درخواست</button>
+                <button type="button" class="notif-tab" onclick="window.setNotifFilter('admin_message', this)"><i class="fas fa-bullhorn" style="color:#38bdf8"></i> پیام مدیریت</button>
             </div>
             <div id="modal-msg-container"><div style="text-align:center;padding:20px;color:#94a3b8">هیچ پیام جدیدی وجود ندارد.</div></div>
         </div>
     </div>
 
-    <div class="modal" id="m-msg-detail" style="z-index:1050;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span id="detail-msg-title"><i class="fas fa-envelope-open"></i> مشاهده پیام</span>
-                <button class="modal-close" onclick="window.closeMsgDetailModal()"><i class="fas fa-times"></i></button>
+    <div class="modal" id="m-welcome" style="z-index:1100;">
+        <div class="modal-content" style="max-width:440px;">
+            <div style="text-align:center;margin-bottom:20px;">
+                <div style="font-size:56px;margin-bottom:12px;">🎉</div>
+                <h2 style="color:#38bdf8;font-size:20px;margin-bottom:8px;font-weight:800;">به Zenix خوش آمدید!</h2>
+                <p style="color:#94a3b8;font-size:12px;">حساب شما با موفقیت ساخته شد</p>
             </div>
-            <div style="overflow-y:auto;padding-right:6px">
-                <div id="detail-msg-date" style="font-size:11px;color:#94a3b8;direction:ltr;text-align:left;margin-bottom:10px;display:none;"></div>
-                <div id="detail-msg-body" style="font-size:13px;color:#cbd5e1;line-height:1.7;white-space:pre-wrap;margin-bottom:12px;"></div>
-                <div id="detail-msg-support"></div>
+            <div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);border-radius:10px;padding:14px;margin-bottom:18px;"><p style="color:#cbd5e1;font-size:12px;line-height:1.7;text-align:right;margin:0;">برای دسترسی کامل به تمام امکانات پلتفرم، لطفاً شماره موبایل خود را وارد و ذخیره کنید.</p></div>
+            <div style="margin-bottom:14px;">
+                <label style="display:block;color:#94a3b8;font-size:11px;margin-bottom:6px;text-align:right;">شماره موبایل</label>
+                <div style="display:flex;align-items:center;gap:6px;direction:ltr;">
+                    <div class="c-dropdown" id="welcome-c-dropdown">
+                        <div class="c-select-btn" id="welcome-c-select-btn"><span style="color:#94a3b8;font-size:10px;">کد کشور</span> <i class="fas fa-chevron-down" style="font-size:8px;"></i></div>
+                        <div class="c-list" id="welcome-c-list">
+                            <div class="c-search-wrap"><input type="text" class="c-search" id="welcome-c-search-input" placeholder="جستجو..." oninput="window.filterWelcomeCountries(this)"></div>
+                            <div id="welcome-c-options-container"></div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="welcome-country-code" value="">
+                    <input type="text" id="welcome-phone-input" placeholder="9123456789" maxlength="10" oninput="window.clearWelcomePhoneError()" style="flex:1;background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;padding:10px 14px;font-size:14px;outline:none;">
+                </div>
+                <div class="err-msg" id="welcome-phone-err" style="font-size:11px;margin-top:4px;text-align:right;color:#ef4444;display:none;"></div>
             </div>
+            <button type="button" id="welcome-save-phone-btn" onclick="window.saveWelcomePhone()" class="bs" style="padding:12px;font-size:14px;"><i class="fas fa-check"></i> ثبت شماره و ورود به پلتفرم</button>
+            <p style="color:#64748b;font-size:10px;margin-top:12px;text-align:center;"><i class="fas fa-lock"></i> اطلاعات شما با رمزنگاری محافظت می‌شود</p>
         </div>
     </div>
 
-    <div class="modal" id="m-about-modal" style="z-index:1050;">
+    <div class="modal" id="m-help">
         <div class="modal-content">
-            <div class="modal-header">
-                <span id="t-about-modal-title"><i class="fas fa-info-circle"></i> درباره پلتفرم هوشمند زِنیکس</span>
-                <button class="modal-close" onclick="window.closeAboutModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <div style="overflow-y:auto;padding-right:6px;font-size:12px;color:#cbd5e1;line-height:1.8;display:flex;flex-direction:column;gap:12px;">
-                <p id="t-about-modal-intro"></p>
-                <p id="t-about-modal-desc"></p>
-                <p id="t-about-modal-goal"></p>
-                <p id="t-about-modal-strategy"></p>
-                <p id="t-about-modal-conclusion" style="color:#94a3b8;border-top:1px dashed rgba(255,255,255,.08);padding-top:10px;margin-top:2px;"></p>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="m-help-modal" style="z-index:1050;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span id="t-help-modal-title"><i class="fas fa-circle-question" style="color:#38bdf8;"></i> راهنمای جامع داشبورد زِنیکس</span>
-                <button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <div style="overflow-y:auto;padding-right:6px;font-size:12px;color:#cbd5e1;line-height:1.8;display:flex;flex-direction:column;gap:12px;">
-                <div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);border-radius:10px;padding:10px;margin-bottom:4px;">
-                    <p id="t-help-intro" style="color:#f8fafc;font-weight:600;">به بخش مدیریت و داشبورد کاربری پلتفرم زِنیکس خوش آمدید. در این بخش می‌توانید خلاصه‌ای از عملکرد مالی و دسترسی سریع به بخش‌های اصلی داشته باشید.</p>
-                </div>
-                
-                <div>
-                    <h4 style="color:#38bdf8;font-size:13px;margin-bottom:4px;" id="t-help-s1-title"><i class="fas fa-wallet" style="margin-left:5px;"></i> ۱. آمار و موجودی</h4>
-                    <p id="t-help-s1-desc">در بالای صفحه، کل موجودی حساب (USDT) و تعداد کاربران زیرمجموعه شبکه شما به صورت زنده نمایش داده می‌شود.</p>
-                </div>
-
-                <div>
-                    <h4 style="color:#38bdf8;font-size:13px;margin-bottom:4px;" id="t-help-s2-title"><i class="fas fa-th-large" style="margin-left:5px;"></i> ۲. دسترسی سریع (میانبرها)</h4>
-                    <ul style="padding-right:18px;display:flex;flex-direction:column;gap:4px;" id="t-help-s2-list">
-                        <li><strong>کوانتیفیکیشن:</strong> ورود به بخش معاملات هوشمند و رباتیک و دریافت سود روزانه.</li>
-                        <li><strong>واریز:</strong> شارژ حساب کاربری از طریق ولت‌های دیجیتال با تأیید شبکه.</li>
-                        <li><strong>برداشت:</strong> ثبت درخواست برداشت درآمدها و دارایی‌ها به کیف پول شخصی.</li>
-                        <li><strong>تیم:</strong> مشاهده آمار کامل اعضا و لینک اختصاصی دعوت زیرمجموعه‌ها (سطوح ۱ تا ۳).</li>
-                        <li><strong>تراکنش‌ها:</strong> بررسی تاریخچه کامل وضیعت ریز تراکنش‌های مالی، واریزی‌ها و برداشت‌ها.</li>
-                        <li><strong>پروفایل:</strong> مدیریت امنیت حساب، رمز عبور و تنظیمات کاربری.</li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 style="color:#38bdf8;font-size:13px;margin-bottom:4px;" id="t-help-s3-title"><i class="fas fa-chart-line" style="margin-left:5px;"></i> ۳. بازار ارزهای دیجیتال و اعلان‌ها</h4>
-                    <p id="t-help-s3-desc">قیمت ۳ ارز برتر بازار به صورت زنده به‌روزرسانی می‌شود. همچنین با کلیک روی آیکون زنگوله هدر می‌توانید پیام‌ها و اطلاعیه‌های سیستم را مشاهده کنید.</p>
-                </div>
-
-                <div style="border-top:1px dashed rgba(255,255,255,.1);padding-top:8px;color:#94a3b8;font-size:11px;" id="t-help-footer">
-                    <i class="fas fa-headset" style="color:#a855f7;margin-left:4px;"></i> در صورت نیاز به راهنمایی بیشتر می‌توانید با پشتیبانی زِنیکس در ارتباط باشید.
-                </div>
+            <div class="modal-header"><span>راهنمای صفحه پروفایل</span><button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button></div>
+            <div style="overflow-y:auto;padding-right:4px">
+                <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-user-cog" style="color:#38bdf8"></i> کاربرد این صفحه چیست؟</div><div class="msg-desc-text">در این صفحه می‌توانید اطلاعات شخصی، شماره تماس، ایمیل و تنظیمات امنیتی حساب خود را مدیریت کنید.</div></div>
+                <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-shield-alt" style="color:#38bdf8"></i> وضعیت حساب</div><div class="msg-desc-text">وضعیت تایید حساب و ثبت شماره تماس برای امنیت بیشتر در این قسمت مدیریت می‌شود.</div></div>
+                <div class="msg-body-box"><div class="msg-title-text"><i class="fas fa-key" style="color:#a855f7"></i> کلمات عبور و کیف پول</div><div class="msg-desc-text">آدرس‌های کیف پول بعد از ثبت قفل می‌شوند. برای تغییر، باید کد تایید ایمیل را وارد کنید.</div></div>
             </div>
         </div>
     </div>
 
     <footer>
         <p>&copy; 2026 Zenix. All rights reserved.</p>
+        <p style="color:#22c55e;"><i class="fas fa-circle" style="font-size:6px;"></i> <span>سرور فعال (US-East)</span></p>
     </footer>
 
-    <script src="https://cdn.jsdmirror.com/npm/@supabase/supabase-js@2" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script type="module" src="dashboard.js?v=22"></script>
+    <script>
+        function escapeHtml(value) {
+            return String(value == null ? '' : value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+        window.escapeHtml = escapeHtml;
+
+        window.showToast = function(message, type = 'success', duration = 8000) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            let iconClass = 'fa-check-circle';
+            if (type === 'error') iconClass = 'fa-exclamation-circle';
+            if (type === 'info') iconClass = 'fa-info-circle';
+            toast.innerHTML = `<i class="fas ${iconClass}"></i><div style="flex:1;">${escapeHtml(message)}</div>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.add('show'); }, 10);
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => { toast.remove(); }, 350); }, duration);
+        };
+
+        const countries=[{n:"Afghanistan",c:"+93",f:"🇦🇫"},{n:"Albania",c:"+355",f:"🇦🇱"},{n:"Algeria",c:"+213",f:"🇩🇿"},{n:"Argentina",c:"+54",f:"🇦🇷"},{n:"Australia",c:"+61",f:"🇦🇺"},{n:"Austria",c:"+43",f:"🇦🇹"},{n:"Azerbaijan",c:"+994",f:"🇦🇿"},{n:"Bahrain",c:"+973",f:"🇧🇭"},{n:"Bangladesh",c:"+880",f:"🇧🇩"},{n:"Belarus",c:"+375",f:"🇧🇾"},{n:"Belgium",c:"+32",f:"🇧🇪"},{n:"Brazil",c:"+55",f:"🇧🇷"},{n:"Canada",c:"+1",f:"🇨🇦"},{n:"China",c:"+86",f:"🇨🇳"},{n:"Egypt",c:"+20",f:"🇪🇬"},{n:"France",c:"+33",f:"🇫🇷"},{n:"Germany",c:"+49",f:"🇩🇪"},{n:"India",c:"+91",f:"🇮🇳"},{n:"Indonesia",c:"+62",f:"🇮🇩"},{n:"Iran",c:"+98",f:"🇮🇷"},{n:"Iraq",c:"+964",f:"🇮🇶"},{n:"Italy",c:"+39",f:"🇮🇹"},{n:"Japan",c:"+81",f:"🇯🇵"},{n:"Jordan",c:"+962",f:"🇯🇴"},{n:"Kuwait",c:"+965",f:"🇰🇼"},{n:"Lebanon",c:"+961",f:"🇱🇧"},{n:"Malaysia",c:"+60",f:"🇲🇾"},{n:"Netherlands",c:"+31",f:"🇳🇱"},{n:"Oman",c:"+968",f:"🇴🇲"},{n:"Pakistan",c:"+92",f:"🇵🇰"},{n:"Qatar",c:"+974",f:"🇶🇦"},{n:"Russia",c:"+7",f:"🇷🇺"},{n:"Saudi Arabia",c:"+966",f:"🇸🇦"},{n:"Spain",c:"+34",f:"🇪🇸"},{n:"Sweden",c:"+46",f:"🇸🇪"},{n:"Switzerland",c:"+41",f:"🇨🇭"},{n:"Turkey",c:"+90",f:"🇹🇷"},{n:"United Arab Emirates",c:"+971",f:"🇦🇪"},{n:"United Kingdom",c:"+44",f:"🇬🇧"},{n:"United States",c:"+1",f:"🇺🇸"}];
+        window.countries = countries;
+
+        function renderCountries(l){
+            const c=document.getElementById('c-options-container'); if(!c) return;
+            if (l.length === 0) { c.innerHTML = '<div class="c-option-empty">نتیجه‌ای یافت نشد</div>'; return; }
+            c.innerHTML = l.map(o => `<div class="c-option" onclick="window.selectCountry('${o.f}','${o.c}','${o.n}')"><span>${o.f}</span><span>${o.c}</span><span style="color:#94a3b8;font-size:10px;margin-left:auto;">${o.n}</span></div>`).join('');
+        }
+        window.renderCountries = renderCountries;
+
+        window.filterCountries = function(i){
+            const v = i.value.trim().toLowerCase();
+            if (!v) { renderCountries(countries); return; }
+            const cleaned = v.replace(/^\+/, '');
+            const filtered = countries.filter(x => x.n.toLowerCase().includes(v) || x.c.replace('+','').includes(cleaned));
+            renderCountries(filtered);
+        };
+
+        window.selectCountry = function(f,c,n){
+            document.getElementById('country-code').value=c;
+            const btn = document.getElementById('c-select-btn');
+            if (btn) btn.querySelector('span').innerText=`${f} ${c}`;
+            document.getElementById('c-list').classList.remove('show');
+            window.clearPhoneError();
+        };
+
+        window.clearPhoneError = function() { const errEl = document.getElementById('phone-err-msg'); if (errEl) errEl.style.display = 'none'; };
+
+        window.filterWelcomeCountries = function(i) {
+            const v = i.value.trim().toLowerCase();
+            const container = document.getElementById('welcome-c-options-container'); if (!container) return;
+            let filtered;
+            if (!v) { filtered = countries; } else {
+                const cleaned = v.replace(/^\+/, '');
+                filtered = countries.filter(x => x.n.toLowerCase().includes(v) || x.c.replace('+','').includes(cleaned));
+            }
+            if (filtered.length === 0) { container.innerHTML = '<div class="c-option-empty">نتیجه‌ای یافت نشد</div>'; return; }
+            container.innerHTML = filtered.map(o => `<div class="c-option" onclick="window.selectWelcomeCountry('${o.f}','${o.c}')"><span>${o.f}</span><span>${o.c}</span><span style="color:#94a3b8;font-size:10px;margin-left:auto;">${o.n}</span></div>`).join('');
+        };
+
+        window.selectWelcomeCountry = function(f, c) {
+            document.getElementById('welcome-country-code').value = c;
+            const btn = document.getElementById('welcome-c-select-btn');
+            if (btn) btn.querySelector('span').innerText = `${f} ${c}`;
+            document.getElementById('welcome-c-list').classList.remove('show');
+            window.clearWelcomePhoneError();
+        };
+
+        window.clearWelcomePhoneError = function() { const e = document.getElementById('welcome-phone-err'); if (e) e.style.display = 'none'; };
+
+        window.tc = function(e){
+            const card=e.closest('.card'), bd=card.querySelector('.bd'), isOpen=card.classList.contains('open');
+            document.querySelectorAll('.card').forEach(c=>{ c.classList.remove('open'); const b=c.querySelector('.bd'); if(b) b.style.display='none'; });
+            if(!isOpen){ card.classList.add('open'); bd.style.display='block'; }
+        };
+
+        window.copyUserId = function(){
+            const uidText=document.getElementById('user-id').textContent.replace('UID: ','');
+            navigator.clipboard.writeText(uidText).then(()=>window.showToast('شناسه کاربر کپی شد: ' + uidText, 'info', 4000));
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCountries(countries);
+            const sBtn = document.getElementById('c-select-btn');
+            const sList = document.getElementById('c-list');
+            if (sBtn) {
+                sBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    if (sList.classList.contains('show')) { sList.classList.remove('show'); return; }
+                    const rect = sBtn.getBoundingClientRect();
+                    const ddW = Math.min(240, window.innerWidth - 20);
+                    let left = rect.left;
+                    if (left + ddW > window.innerWidth - 10) left = window.innerWidth - ddW - 10;
+                    if (left < 10) left = 10;
+                    const ddH = 210;
+                    let top = rect.bottom + 4;
+                    if (top + ddH > window.innerHeight - 10) top = Math.max(10, rect.top - ddH - 4);
+                    sList.style.left = left + 'px'; sList.style.top = top + 'px'; sList.style.width = ddW + 'px';
+                    sList.classList.add('show');
+                    setTimeout(() => { const si = document.getElementById('c-search-input'); if (si) { si.value = ''; renderCountries(countries); si.focus(); } }, 30);
+                };
+            }
+            window.addEventListener('click', (e) => { if (sList && !e.target.closest('#c-dropdown') && !e.target.closest('#c-list')) sList.classList.remove('show'); }, true);
+        });
+    </script>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdmirror.com/npm/@supabase/supabase-js@2/+esm';
+
+        const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        window.supabaseClient = supabaseClient;
+
+        const EMAILJS_SERVICE_ID = "service_61bzf1a";
+        const EMAILJS_TEMPLATE_ID = "template_jyzgfs8";
+        const EMAILJS_PUBLIC_KEY = "oUKHgDSK6qIwpCE9p";
+
+        const OTP_COOLDOWN_MS = 120000; // ★ ۲ دقیقه
+
+        let currentUser = null, currentUserId = null, userRealtimeChannel = null, notificationRealtimeChannel = null, authInitialized = false, welcomeModalInitialized = false;
+
+        window.cachedNotifications = [];
+        window.activeNotifFilter = 'all';
+
+        window._walletOtpVerified = false;
+        window._oldTrx = '';
+        window._oldBep = '';
+
+        function generateUIDDigits(userId) {
+            let hash = 5381;
+            for (let i = 0; i < userId.length; i++) hash = ((hash << 5) + hash) + userId.charCodeAt(i);
+            return (Math.abs(hash % 900000) + 100000).toString();
+        }
+
+        function lockPhoneInput(phoneNumber) {
+            const phoneInput = document.getElementById('user-phone-input');
+            const saveBtn = document.getElementById('save-phone-btn');
+            const dropdownBtn = document.getElementById('c-select-btn');
+            if (phoneNumber) {
+                let matchedCountry = window.countries.find(c => phoneNumber.startsWith(c.c));
+                if (matchedCountry) {
+                    document.getElementById('country-code').value = matchedCountry.c;
+                    dropdownBtn.querySelector('span').innerText = `${matchedCountry.f} ${matchedCountry.c}`;
+                    phoneInput.value = phoneNumber.replace(matchedCountry.c, '');
+                } else { phoneInput.value = phoneNumber; }
+                phoneInput.readOnly = true; phoneInput.disabled = true;
+                if (saveBtn) saveBtn.style.display = 'none';
+                if (dropdownBtn) { dropdownBtn.style.pointerEvents = 'none'; dropdownBtn.style.opacity = '0.6'; }
+            }
+        }
+
+        function showWelcomeModal() {
+            const modal = document.getElementById('m-welcome'); if (!modal) return;
+            modal.classList.add('show'); initWelcomeDropdown();
+        }
+
+        function initWelcomeDropdown() {
+            if (welcomeModalInitialized) return;
+            welcomeModalInitialized = true;
+            const btn = document.getElementById('welcome-c-select-btn'), list = document.getElementById('welcome-c-list');
+            if (!btn || !list) return;
+            window.filterWelcomeCountries({ value: '' });
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                if (list.classList.contains('show')) { list.classList.remove('show'); return; }
+                const rect = btn.getBoundingClientRect();
+                const ddW = Math.min(240, window.innerWidth - 20);
+                let left = rect.left;
+                if (left + ddW > window.innerWidth - 10) left = window.innerWidth - ddW - 10;
+                if (left < 10) left = 10;
+                const ddH = 210;
+                let top = rect.bottom + 4;
+                if (top + ddH > window.innerHeight - 10) top = Math.max(10, rect.top - ddH - 4);
+                list.style.left = left + 'px'; list.style.top = top + 'px'; list.style.width = ddW + 'px';
+                list.classList.add('show');
+                setTimeout(() => { const si = document.getElementById('welcome-c-search-input'); if (si) { si.value = ''; window.filterWelcomeCountries({ value: '' }); si.focus(); } }, 30);
+            };
+            window.addEventListener('click', (e) => { if (!e.target.closest('#welcome-c-dropdown') && !e.target.closest('#welcome-c-list')) list.classList.remove('show'); }, true);
+        }
+
+        window.saveWelcomePhone = async function() {
+            const phoneInput = document.getElementById('welcome-phone-input');
+            const errEl = document.getElementById('welcome-phone-err');
+            const saveBtn = document.getElementById('welcome-save-phone-btn');
+            let phone = phoneInput ? phoneInput.value.trim() : '';
+            if (phone.startsWith('0')) phone = phone.substring(1);
+            let code = document.getElementById('welcome-country-code').value;
+            if (!code) { code = '+98'; document.getElementById('welcome-country-code').value = '+98'; }
+            if (!currentUser) { window.showToast('نشست شما یافت نشد. دوباره وارد شوید.', 'error', 4000); return; }
+            if (phone.length !== 10 || !/^\d+$/.test(phone)) {
+                if (errEl) { errEl.textContent = 'شماره باید ۱۰ رقم و بدون صفر باشد'; errEl.style.display = 'block'; }
+                return;
+            }
+            if (saveBtn) { saveBtn.disabled = true; saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال ذخیره...'; }
+            const fullPhone = code + phone;
+            try {
+                const { error } = await supabaseClient.from('users').update({ phone: fullPhone }).eq('id', currentUser.id);
+                if (error) throw error;
+                document.getElementById('m-welcome').classList.remove('show');
+                window.showToast('✅ شماره تماس ثبت شد.', 'success', 5000);
+                await loadUserData(currentUser);
+            } catch (e) {
+                if (errEl) { errEl.textContent = 'خطا: ' + (e.message || 'نامشخص'); errEl.style.display = 'block'; }
+                if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '<i class="fas fa-check"></i> ثبت شماره'; }
+            }
+        };
+
+        async function fetchUserMessages(uid) {
+            try {
+                const { data, error } = await supabaseClient.from('notifications').select('*').eq('user_id', uid).order('created_at', { ascending: false });
+                if (error) throw error;
+                return data || [];
+            } catch (e) { return []; }
+        }
+
+        async function updateNotificationBadge() {
+            if (!currentUserId) return;
+            const data = await fetchUserMessages(currentUserId);
+            window.cachedNotifications = data;
+            let unread = data.filter(n => !n.read && !n.is_read && !n.isRead).length;
+            let b = document.getElementById('bell-badge');
+            if (b) { b.textContent = unread; b.classList.toggle('show', unread > 0); }
+            window.renderNotifications();
+        }
+
+        window.openMessageModal = async () => { if (currentUserId) await updateNotificationBadge(); document.getElementById('m-msg')?.classList.add('show'); };
+        window.closeMessageModal = () => { document.getElementById('m-msg')?.classList.remove('show'); };
+
+        window.setNotifFilter = function(filter, btnElement) {
+            window.activeNotifFilter = filter;
+            document.querySelectorAll('.notif-tab').forEach(t => t.classList.remove('active'));
+            if(btnElement) btnElement.classList.add('active');
+            window.renderNotifications();
+        };
+
+        window.getNotifCategory = function(n) {
+            const type = (n.type || '').toLowerCase(), title = (n.title || n.subject || '').toLowerCase();
+            if (type.includes('approved') || type.includes('confirm') || title.includes('تایید') || title.includes('موفق')) return 'approved';
+            if (type.includes('rejected') || type.includes('cancel') || title.includes('رد') || title.includes('لغو') || title.includes('مشکوک')) return 'rejected';
+            return 'admin_message';
+        };
+
+        window.renderNotifications = function() {
+            const container = document.getElementById('modal-msg-container'); if (!container) return;
+            const filter = window.activeNotifFilter || 'all';
+            const notifs = window.cachedNotifications || [];
+            const filtered = notifs.filter(n => filter === 'all' ? true : window.getNotifCategory(n) === filter);
+            if (filtered.length === 0) {
+                container.innerHTML = `<div style="text-align:center;padding:25px;color:#94a3b8;font-size:12px;"><i class="fas fa-inbox" style="font-size:24px;margin-bottom:8px;display:block;opacity:0.5;"></i>هیچ پیامی در این دسته‌بندی وجود ندارد.</div>`;
+                return;
+            }
+            let html = '';
+            filtered.forEach(n => {
+                const title = n.title || n.subject || 'پیام سیستم';
+                const msg = n.message || n.text || n.body || '';
+                const category = window.getNotifCategory(n);
+                let borderStyle = "border:1px solid rgba(255,255,255,.08);", bgStyle = "background:rgba(255,255,255,.03);", icon = '<i class="fas fa-bullhorn" style="color:#38bdf8"></i>';
+                let tagHtml = '<span style="font-size:10px;background:rgba(56,189,248,0.2);color:#38bdf8;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">پیام مدیریت</span>';
+                let supportBtn = '';
+                if (category === 'approved') {
+                    borderStyle = "border:1px solid rgba(34, 197, 94, 0.4);"; bgStyle = "background:rgba(34, 197, 94, 0.08);";
+                    icon = '<i class="fas fa-check-circle" style="color:#22c55e"></i>';
+                    tagHtml = '<span style="font-size:10px;background:rgba(34,197,94,0.2);color:#22c55e;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">تایید</span>';
+                } else if (category === 'rejected') {
+                    borderStyle = "border:1px solid rgba(239, 68, 68, 0.4);"; bgStyle = "background:rgba(239, 68, 68, 0.08);";
+                    icon = '<i class="fas fa-times-circle" style="color:#ef4444"></i>';
+                    tagHtml = '<span style="font-size:10px;background:rgba(239,68,68,0.2);color:#ef4444;padding:2px 6px;border-radius:4px;margin-right:auto;font-weight:700;">رد</span>';
+                    supportBtn = `<div style="margin-top:10px;padding-top:8px;border-top:1px dashed rgba(239,68,68,0.2);display:flex;justify-content:flex-end;"><a href="support.html" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);" style="display:inline-flex;align-items:center;gap:6px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f8fafc;padding:5px 10px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:600;"><i class="fas fa-headset" style="color:#ef4444"></i><span>پیگیری از پشتیبانی</span></a></div>`;
+                }
+                html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle}"><div class="msg-title-text" style="display:flex;align-items:center;gap:8px;">${icon}<span>${escapeHtml(title)}</span>${tagHtml}</div><div class="msg-desc-text" style="margin-top:6px;">${escapeHtml(msg)}</div>${supportBtn}</div>`;
+            });
+            container.innerHTML = html;
+        };
+
+        function runCountdown(btnEl, emailInputId) {
+            const origText = 'ارسال کد به ایمیل';
+            const expireTime = parseInt(localStorage.getItem('otp_cooldown_' + emailInputId) || '0', 10);
+            const remaining = Math.ceil((expireTime - Date.now()) / 1000);
+            if (remaining <= 0) { btnEl.disabled = false; btnEl.textContent = origText; localStorage.removeItem('otp_cooldown_' + emailInputId); return; }
+            btnEl.disabled = true;
+            let countdown = remaining;
+            btnEl.textContent = `${countdown} ثانیه`;
+            const timer = setInterval(() => {
+                countdown--;
+                if (countdown <= 0) { clearInterval(timer); btnEl.disabled = false; btnEl.textContent = origText; localStorage.removeItem('otp_cooldown_' + emailInputId); }
+                else { btnEl.textContent = `${countdown} ثانیه`; }
+            }, 1000);
+        }
+
+        window.sendEmailCode = async function(emailInputId, btnEl) {
+            const emailInput = document.getElementById(emailInputId);
+            const email = emailInput && emailInput.value ? emailInput.value.trim() : (currentUser ? currentUser.email : '');
+            if (!email || !email.includes('@')) { window.showToast('لطفاً یک ایمیل معتبر وارد کنید.', 'error', 4000); return; }
+
+            const origText = btnEl ? btnEl.textContent : 'ارسال کد به ایمیل';
+            try {
+                if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'در حال ارسال...'; }
+
+                const { data: otpResult, error: otpErr } = await supabaseClient.rpc('generate_otp');
+                if (otpErr) throw new Error(otpErr.message || 'خطا در ساخت OTP');
+                if (!otpResult || otpResult.success !== true) {
+                    if (otpResult && otpResult.error === 'too_soon') {
+                        const secs = otpResult.retry_after || 60;
+                        window.showToast(`لطفاً ${secs} ثانیه صبر کنید.`, 'error', 4000);
+                        if (btnEl) { btnEl.disabled = false; btnEl.textContent = origText; }
+                        return;
+                    }
+                    throw new Error('خطا در ساخت OTP');
+                }
+                const otpCode = otpResult.otp;
+
+                await emailjs.send(
+                    EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID,
+                    { to_email: email, email: email, otp_code: otpCode, code: otpCode, otp: otpCode, passcode: otpCode, verification_code: otpCode, message: otpCode },
+                    EMAILJS_PUBLIC_KEY
+                );
+
+                window.showToast(`کد تایید به ایمیل ${email} ارسال شد.`, 'success', 5000);
+                // ★ کول‌داون ۲ دقیقه
+                const expireTime = Date.now() + OTP_COOLDOWN_MS;
+                localStorage.setItem('otp_cooldown_' + emailInputId, expireTime);
+                if (btnEl) runCountdown(btnEl, emailInputId);
+            } catch (error) {
+                if (btnEl) { btnEl.disabled = false; btnEl.textContent = origText; }
+                console.error('خطا در ارسال کد:', error);
+                const errMsg = error?.text || error?.message || 'نامشخص';
+                window.showToast('خطا: ' + errMsg, 'error', 4000);
+            }
+        };
+
+        async function loadUserData(user) {
+            const { data, error } = await supabaseClient.from('users').select('*').eq('id', user.id).single();
+            if (data) {
+                const fullNameEl = document.getElementById('user-fullname');
+                if (fullNameEl && (data.fullname || data.full_name)) fullNameEl.textContent = data.fullname || data.full_name;
+                const userIdEl = document.getElementById('user-id');
+                if (userIdEl) userIdEl.textContent = 'UID: SM-' + generateUIDDigits(user.id);
+                if (data.phone) lockPhoneInput(data.phone); else showWelcomeModal();
+                const statusEl = document.getElementById('account-status');
+                if(statusEl) {
+                    const isAccountActive = data.verified === true || data.status === 'active' || data.active === true || data.is_activated === true || (Number(data.total_deposit) > 0) || (Number(data.deposit) > 0) || (Number(data.balance) > 0);
+                    if (isAccountActive) { statusEl.textContent = 'فعال'; statusEl.style.color = '#22c55e'; }
+                    else { statusEl.textContent = 'غیرفعال'; statusEl.style.color = '#ef4444'; }
+                }
+
+                // ★ ذخیره مقادیر قبلی
+                window._oldTrx = data.trx_address || '';
+                window._oldBep = data.bep20_address || '';
+
+                const trxIn = document.getElementById('trx-in');
+                const bepIn = document.getElementById('bep-in');
+                const trxLockIcon = document.getElementById('trx-lock-icon');
+                const bepLockIcon = document.getElementById('bep-lock-icon');
+
+                trxIn.value = window._oldTrx;
+                bepIn.value = window._oldBep;
+
+                // ★ اگه OTP تایید نشده، فیلدهای ذخیره‌شده قفل باشن
+                const otpVerified = window._walletOtpVerified === true;
+
+                if (window._oldTrx && !otpVerified) {
+                    trxIn.readOnly = true;
+                    if (trxLockIcon) trxLockIcon.style.display = 'inline';
+                } else {
+                    trxIn.readOnly = false;
+                    if (trxLockIcon) trxLockIcon.style.display = 'none';
+                }
+
+                if (window._oldBep && !otpVerified) {
+                    bepIn.readOnly = true;
+                    if (bepLockIcon) bepLockIcon.style.display = 'inline';
+                } else {
+                    bepIn.readOnly = false;
+                    if (bepLockIcon) bepLockIcon.style.display = 'none';
+                }
+
+                const anySaved = !!(window._oldTrx || window._oldBep);
+
+                const otpSection = document.getElementById('wal-otp-section');
+                const firstHint = document.getElementById('wal-first-time-hint');
+                const changeHint = document.getElementById('wal-change-hint');
+
+                if (anySaved) {
+                    if (otpSection) otpSection.style.display = 'block';
+                    if (firstHint) firstHint.style.display = 'none';
+                    if (changeHint) changeHint.style.display = 'flex';
+                } else {
+                    if (otpSection) otpSection.style.display = 'none';
+                    if (firstHint) firstHint.style.display = 'flex';
+                    if (changeHint) changeHint.style.display = 'none';
+                }
+            } else { showWelcomeModal(); }
+        }
+
+        async function setupRealtimeSubscriptions(userId) {
+            if (userRealtimeChannel) await supabaseClient.removeChannel(userRealtimeChannel);
+            if (notificationRealtimeChannel) await supabaseClient.removeChannel(notificationRealtimeChannel);
+            userRealtimeChannel = supabaseClient.channel('user_realtime_' + userId).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${userId}` }, payload => { if (currentUser) loadUserData(currentUser); }).subscribe();
+            notificationRealtimeChannel = supabaseClient.channel('notifications_realtime_' + userId).on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, async (payload) => {
+                const newRec = payload.new;
+                if (!newRec || !newRec.user_id || newRec.user_id === userId) {
+                    await updateNotificationBadge();
+                    if (payload.eventType === 'INSERT') {
+                        const title = newRec.title || newRec.subject || 'اعلان جدید';
+                        const msg = newRec.message || newRec.text || newRec.body || '';
+                        window.showToast(`<strong>${escapeHtml(title)}</strong><br>${escapeHtml(msg)}`, 'info', 7000);
+                    }
+                }
+            }).subscribe();
+        }
+
+        async function initializeUserSession(session) {
+            if (!session || !session.user || authInitialized) return false;
+            currentUser = session.user; currentUserId = session.user.id;
+            await updateNotificationBadge();
+            ['email-curr', 'pwd-email', 'tr-email', 'wal-email'].forEach(id => { const el = document.getElementById(id); if (el) el.value = session.user.email || ''; });
+            const fullNameEl = document.getElementById('user-fullname');
+            if (fullNameEl) fullNameEl.textContent = session.user.user_metadata?.fullname || session.user.user_metadata?.full_name || session.user.email;
+            await loadUserData(session.user);
+            await setupRealtimeSubscriptions(session.user.id);
+            authInitialized = true;
+            return true;
+        }
+
+        (async () => {
+            try {
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                if (error) console.error('getSession error:', error);
+                if (session && session.user) { await initializeUserSession(session); }
+                else {
+                    const { data: { session: refreshed } } = await supabaseClient.auth.refreshSession();
+                    if (refreshed && refreshed.user) { await initializeUserSession(refreshed); }
+                    else { window.location.href = "index.html"; return; }
+                }
+                supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                    if (event === 'SIGNED_OUT') window.location.href = "index.html";
+                    else if (event === 'SIGNED_IN' && session && session.user && !authInitialized) await initializeUserSession(session);
+                    else if (event === 'TOKEN_REFRESHED' && session && session.user) { currentUser = session.user; currentUserId = session.user.id; }
+                });
+            } catch (err) { window.location.href = "index.html"; }
+        })();
+
+        window.savePhone = async function() {
+            const phoneInput = document.getElementById('user-phone-input');
+            const errEl = document.getElementById('phone-err-msg');
+            const saveBtn = document.getElementById('save-phone-btn');
+            let phone = phoneInput ? phoneInput.value.trim() : '';
+            if (phone.startsWith('0')) { phone = phone.substring(1); phoneInput.value = phone; }
+            let code = document.getElementById('country-code').value;
+            if (!code) { code = '+98'; document.getElementById('country-code').value = '+98'; const dropdownBtn = document.getElementById('c-select-btn'); if (dropdownBtn && dropdownBtn.querySelector('span')) dropdownBtn.querySelector('span').innerText = '🇮🇷 +98'; }
+            if (!currentUser) { window.showToast('نشست کاری شما یافت نشد.', 'error', 4000); return; }
+            if (phone.length === 10 && /^\d+$/.test(phone)) {
+                if (saveBtn) { saveBtn.disabled = true; saveBtn.innerText = 'در حال ذخیره‌سازی...'; }
+                const fullPhone = code + phone;
+                try {
+                    const fullNameVal = currentUser.user_metadata?.fullname || currentUser.user_metadata?.full_name || document.getElementById('user-fullname')?.textContent || currentUser.email;
+                    let { data, error } = await supabaseClient.from('users').update({ phone: fullPhone }).eq('id', currentUser.id).select();
+                    if (!error && (!data || data.length === 0)) {
+                        const upsertRes = await supabaseClient.from('users').upsert({ id: currentUser.id, phone: fullPhone, email: currentUser.email, fullname: fullNameVal }, { onConflict: 'id' });
+                        error = upsertRes.error;
+                    }
+                    if (saveBtn) { saveBtn.disabled = false; saveBtn.innerText = 'ذخیره'; }
+                    if (!error) {
+                        if (errEl) errEl.style.display = 'none';
+                        lockPhoneInput(fullPhone);
+                        window.showToast('شماره تماس با موفقیت ثبت شد.', 'success', 5000);
+                    } else {
+                        const errMsg = error.message || error.details || 'عدم دسترسی';
+                        if (errEl) { errEl.textContent = 'خطا: ' + errMsg; errEl.style.display = 'block'; }
+                        window.showToast('خطای ذخیره‌سازی: ' + errMsg, 'error', 5000);
+                    }
+                } catch (e) {
+                    if (saveBtn) { saveBtn.disabled = false; saveBtn.innerText = 'ذخیره'; }
+                    window.showToast('خطای غیرمنتظره: ' + e.message, 'error', 5000);
+                }
+            } else {
+                if (errEl) { errEl.textContent = 'شماره باید ۱۰ رقم و بدون صفر باشد'; errEl.style.display = 'block'; }
+                window.showToast('لطفاً شماره را به‌صورت ۱۰ رقمی و بدون صفر وارد کنید.', 'error', 4000);
+            }
+        };
+
+        window.requestAdminPermission = function() { document.getElementById('selfie-capture').click(); };
+
+        window.handleSelfieCapture = async function(input) {
+            if (input.files && input.files[0]) {
+                const newEmailInput = document.getElementById('email-new');
+                const newEmail = newEmailInput ? newEmailInput.value.trim() : '';
+                if (!newEmail || !newEmail.includes('@')) { window.showToast('لطفاً ابتدا ایمیل جدید و معتبر را وارد کنید.', 'error', 4000); return; }
+                if (!currentUser) { window.showToast('نشست کاربر یافت نشد.', 'error', 4000); return; }
+                try {
+                    window.showToast('در حال ارسال درخواست به ادمین...', 'info', 4000);
+                    const { error } = await supabaseClient.from('users').update({ pending_email: newEmail, admin_approval_status: 'pending', request_timestamp: new Date().toISOString() }).eq('id', currentUser.id);
+                    if (error) throw error;
+                    document.getElementById('admin-status-box').style.display = 'block';
+                    window.showToast('درخواست تغییر ایمیل با موفقیت ارسال شد.', 'success', 5000);
+                } catch (e) { window.showToast('خطا در ثبت درخواست: ' + e.message, 'error', 5000); }
+            }
+        };
+
+        window.validatePasswordForm = function(btn) { window.showToast('رمز ورود با موفقیت به‌روزرسانی شد.', 'success', 4000); };
+
+        window.validateTxForm = async function(btn) {
+            const code = (document.getElementById('tr-code')?.value || '').trim();
+            const newPass = (document.getElementById('tr-new')?.value || '').trim();
+            const currPass = (document.getElementById('tr-curr')?.value || '').trim();
+
+            if (!code || code.length !== 6 || !/^\d+$/.test(code)) { window.showToast('کد ۶ رقمی تأیید ایمیل را وارد کنید.', 'error', 4000); return; }
+            if (!newPass || !/^\d{6}$/.test(newPass)) { window.showToast('رمز جدید باید ۶ رقم باشد.', 'error', 4000); return; }
+            if (!currentUser) { window.showToast('نشست شما یافت نشد.', 'error', 4000); return; }
+
+            const origText = btn ? btn.textContent : 'ذخیره تغییرات';
+            if (btn) { btn.disabled = true; btn.textContent = 'در حال ذخیره...'; }
+
+            try {
+                if (currPass) {
+                    const { data: ok, error: vErr } = await supabaseClient.rpc('verify_tx_password', { p_user_id: currentUser.id, p_password: currPass });
+                    if (vErr) {
+                        const msg = String(vErr.message || '');
+                        if (msg.includes('TOO_MANY_ATTEMPTS')) {
+                            window.showToast('🚫 تلاش‌های زیاد — ۱۵ دقیقه صبر کنید', 'error', 5000);
+                        } else {
+                            window.showToast('خطا در بررسی رمز: ' + (msg || 'نامشخص'), 'error', 5000);
+                        }
+                        if (btn) { btn.disabled = false; btn.textContent = origText; }
+                        return;
+                    }
+                    if (ok !== true) {
+                        window.showToast('رمز فعلی اشتباه است.', 'error', 4000);
+                        if (btn) { btn.disabled = false; btn.textContent = origText; }
+                        return;
+                    }
+                }
+
+                const { data, error } = await supabaseClient.rpc('set_tx_password', { p_new_password: newPass, p_otp_code: code });
+                if (error) throw error;
+
+                if (data && data.success) {
+                    window.showToast('✅ رمز تراکنش با موفقیت تنظیم شد.', 'success', 5000);
+                    document.getElementById('tr-code').value = '';
+                    document.getElementById('tr-curr').value = '';
+                    document.getElementById('tr-new').value = '';
+                } else if (data && data.error) {
+                    const errMap = {
+                        'not_authenticated': 'نشست شما یافت نشد',
+                        'invalid_password_format': 'رمز جدید باید ۶ رقم باشد',
+                        'no_otp': 'ابتدا کد تأیید را ارسال کنید',
+                        'otp_expired': 'کد منقضی شده — دوباره ارسال کنید',
+                        'invalid_otp': 'کد تأیید اشتباه است',
+                        'too_many_attempts': '🚫 تلاش‌های زیاد — ۱۵ دقیقه صبر کنید'
+                    };
+                    window.showToast('خطا: ' + (errMap[data.error] || data.error), 'error', 5000);
+                }
+            } catch (e) {
+                window.showToast('خطا: ' + (e.message || 'نامشخص'), 'error', 5000);
+            } finally {
+                if (btn) { btn.disabled = false; btn.textContent = origText; }
+            }
+        };
+
+        // ★★★ تایید کد → باز کردن قفل فیلدها ★★★
+        window.verifyWalletCode = async function(btn) {
+            const code = (document.getElementById('wal-code')?.value || '').trim();
+            if (!code || code.length !== 6 || !/^\d+$/.test(code)) {
+                window.showToast('کد ۶ رقمی را وارد کنید.', 'error', 4000);
+                return;
+            }
+            const origText = btn ? btn.textContent : 'تایید کد';
+            if (btn) { btn.disabled = true; btn.textContent = 'در حال بررسی...'; }
+
+            try {
+                const { data: ok, error } = await supabaseClient.rpc('verify_wallet_otp', { p_otp_code: code });
+                if (error) {
+                    if (String(error.message).includes('TOO_MANY_ATTEMPTS')) {
+                        window.showToast('🚫 تلاش‌های زیاد — ۱۵ دقیقه صبر کنید', 'error', 5000);
+                    } else {
+                        window.showToast('خطا: ' + (error.message || 'نامشخص'), 'error', 5000);
+                    }
+                    return;
+                }
+                if (ok === true) {
+                    window._walletOtpVerified = true;
+                    // ★ باز کردن قفل فیلدها
+                    const trxIn = document.getElementById('trx-in');
+                    const bepIn = document.getElementById('bep-in');
+                    const trxLockIcon = document.getElementById('trx-lock-icon');
+                    const bepLockIcon = document.getElementById('bep-lock-icon');
+                    trxIn.readOnly = false;
+                    bepIn.readOnly = false;
+                    if (trxLockIcon) trxLockIcon.style.display = 'none';
+                    if (bepLockIcon) bepLockIcon.style.display = 'none';
+                    window.showToast('✅ کد تایید شد. حالا می‌توانید آدرس‌ها را ویرایش کنید.', 'success', 5000);
+                } else {
+                    window.showToast('کد اشتباه یا منقضی شده است.', 'error', 4000);
+                }
+            } catch (e) {
+                window.showToast('خطا: ' + (e.message || 'نامشخص'), 'error', 5000);
+            } finally {
+                if (btn) { btn.disabled = false; btn.textContent = origText; }
+            }
+        };
+
+        window.saveWalletForm = async function(btn) {
+            const trx = document.getElementById('trx-in').value.trim();
+            const bep = document.getElementById('bep-in').value.trim();
+
+            if (!trx && !bep) {
+                window.showToast('حداقل یک آدرس را وارد کنید.', 'error', 4000);
+                return;
+            }
+
+            if (trx && (trx.length !== 34 || !trx.startsWith('T'))) {
+                window.showToast('آدرس TRX باید با T شروع شود و ۳۴ کاراکتر باشد.', 'error', 4000);
+                return;
+            }
+            if (bep && (bep.length !== 42 || !bep.startsWith('0x'))) {
+                window.showToast('آدرس BEP20 باید با 0x شروع شود و ۴۲ کاراکتر باشد.', 'error', 4000);
+                return;
+            }
+
+            // ★ منطق OTP: فقط اگر مقدار پر را تغییر دهیم و OTP تایید نشده
+            const oldTrx = window._oldTrx || '';
+            const oldBep = window._oldBep || '';
+            const changingTrx = oldTrx && trx !== oldTrx;
+            const changingBep = oldBep && bep !== oldBep;
+            const needsOtp = (changingTrx || changingBep) && !window._walletOtpVerified;
+
+            let otpCode = '';
+            if (needsOtp) {
+                otpCode = (document.getElementById('wal-code')?.value || '').trim();
+                if (!otpCode || otpCode.length !== 6) {
+                    window.showToast('برای تغییر آدرس ثبت‌شده، ابتدا کد تأیید ایمیل را دریافت و تایید کنید.', 'error', 5000);
+                    return;
+                }
+            }
+
+            const origText = btn ? btn.textContent : 'ذخیره تغییرات';
+            if (btn) { btn.disabled = true; btn.textContent = 'در حال ذخیره...'; }
+
+            try {
+                const { data, error } = await supabaseClient.rpc('set_wallet_addresses', {
+                    p_trx: trx || '',
+                    p_bep: bep || '',
+                    p_otp_code: otpCode || ''
+                });
+
+                if (error) throw error;
+
+                if (data && data.success) {
+                    if (data.needed_otp) {
+                        window.showToast('✅ آدرس‌ها با موفقیت تغییر کردند.', 'success', 5000);
+                    } else {
+                        window.showToast('✅ آدرس‌ها ذخیره شدند.', 'success', 5000);
+                    }
+                    document.getElementById('wal-code').value = '';
+                    window._walletOtpVerified = false;
+                    await loadUserData(currentUser);
+                } else if (data && data.error) {
+                    const errMap = {
+                        'not_authenticated': 'نشست شما یافت نشد',
+                        'invalid_trx': 'آدرس TRX نامعتبر است',
+                        'invalid_bep': 'آدرس BEP20 نامعتبر است',
+                        'no_otp': 'ابتدا کد تأیید را ارسال کنید',
+                        'otp_expired': 'کد منقضی شده — دوباره ارسال کنید',
+                        'invalid_otp': 'کد تأیید اشتباه است',
+                        'too_many_attempts': '🚫 تلاش‌های زیاد — ۱۵ دقیقه صبر کنید'
+                    };
+                    window.showToast('خطا: ' + (errMap[data.error] || data.error), 'error', 5000);
+                }
+            } catch (e) {
+                window.showToast('خطا: ' + (e.message || 'نامشخص'), 'error', 5000);
+            } finally {
+                if (btn) { btn.disabled = false; btn.textContent = origText; }
+            }
+        };
+
+        window.closeHelpModal = () => document.getElementById('m-help').classList.remove('show');
+        document.getElementById('help-btn').onclick = () => document.getElementById('m-help').classList.add('show');
+        document.getElementById('bell-btn').onclick = (e) => { e.stopPropagation(); window.openMessageModal(); };
+        document.getElementById('menu-btn').onclick = (e) => { e.stopPropagation(); document.getElementById('lang-menu').classList.remove('show'); document.getElementById('nav-menu').classList.toggle('show'); };
+        document.getElementById('lang-btn').onclick = (e) => { e.stopPropagation(); document.getElementById('nav-menu').classList.remove('show'); document.getElementById('lang-menu').classList.toggle('show'); };
+        window.addEventListener('click', (e) => { if (!e.target.closest('.wrap')) { document.getElementById('nav-menu')?.classList.remove('show'); document.getElementById('lang-menu')?.classList.remove('show'); } });
+
+        document.getElementById('logout-btn').onclick = async () => {
+            if (userRealtimeChannel) await supabaseClient.removeChannel(userRealtimeChannel);
+            if (notificationRealtimeChannel) await supabaseClient.removeChannel(notificationRealtimeChannel);
+            userRealtimeChannel = null; notificationRealtimeChannel = null;
+            await supabaseClient.auth.signOut();
+            window.location.href = "index.html";
+        };
+    </script>
 </body>
 </html>
