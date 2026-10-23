@@ -48,6 +48,28 @@ function generateUIDDigits(userId) {
 }
 
 // ==========================================
+// ★★ اصلاح موبایل: غیرفعال‌سازی انیمیشن آکاردئون راهنما در گوشی
+// (grid-template-rows روی موبایل نرم انیمیت نمی‌شود و پله‌پله باز می‌شود)
+// ==========================================
+(function injectHelpAccordionMobileFix() {
+    if (document.getElementById('zenix-help-accordion-fix')) return;
+    const style = document.createElement('style');
+    style.id = 'zenix-help-accordion-fix';
+    style.textContent = `
+        @media (max-width: 768px) {
+            .help-acc-content,
+            .help-acc-inner {
+                transition: none !important;
+            }
+            .help-acc-arrow {
+                transition: transform .15s ease !important;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+})();
+
+// ==========================================
 // 2. مدیریت مدال‌های پلتفرم + قفل اسکرول
 // ==========================================
 function lockBody() { document.body.classList.add('modal-open'); }
@@ -88,63 +110,12 @@ window.closeCasinoModal = function() {
     unlockBody();
 };
 
-// ★ آکاردئون راهنما — نسخه اصلاح‌شده: اسکرول نرم، دقیق و بدون پرش روی موبایل
+// ★ آکاردئون راهنما — نسخه ساده و سریع
+// در موبایل بدون انیمیشن (باز شدن فوری) و در دسکتاپ با انیمیشن نرم قبلی
 window.toggleHelpAccordion = function(btn) {
     const item = btn.closest('.help-accordion');
     if (!item) return;
-    const wasOpen = item.classList.contains('open');
     item.classList.toggle('open');
-    if (wasOpen) return; // فقط هنگام باز شدن، اسکرول را تنظیم می‌کنیم
-
-    const body = item.closest('.help-modal-body');
-    if (!body) return;
-
-    let settled = false;
-    const ensureVisible = () => {
-        if (settled) return;
-        settled = true;
-        if (!item.classList.contains('open')) return;
-
-        const bodyRect = body.getBoundingClientRect();
-        const headerRect = btn.getBoundingClientRect();
-        const itemRect = item.getBoundingClientRect();
-        const pad = 12;
-        const viewTop = bodyRect.top + pad;
-        const viewBottom = bodyRect.bottom - pad;
-
-        // اگر هدر آکاردئون بالاتر از محدوده دید است، آن را به بالا برگردان
-        if (headerRect.top < viewTop) {
-            body.scrollTo({ top: body.scrollTop + (headerRect.top - viewTop), behavior: 'smooth' });
-            return;
-        }
-
-        // اگر کل آکاردئون داخل محدوده دید است، اسکرول نکن
-        const overflowBottom = itemRect.bottom - viewBottom;
-        if (overflowBottom <= 0) return;
-
-        // فقط به اندازه‌ای اسکرول کن که هدر از بالای کادر خارج نشود
-        const maxDown = Math.max(0, headerRect.top - viewTop);
-        const amount = Math.min(overflowBottom, maxDown);
-        if (amount > 1) {
-            body.scrollTo({ top: body.scrollTop + amount, behavior: 'smooth' });
-        }
-    };
-
-    // اجرای تنظیم اسکرول پس از پایان انیمیشن باز شدن (با پشتیبان زمانی)
-    const content = item.querySelector('.help-acc-content');
-    let onEnd = null;
-    if (content) {
-        onEnd = (e) => {
-            if (e.target !== content) return;
-            content.removeEventListener('transitionend', onEnd);
-            ensureVisible();
-        };
-        content.addEventListener('transitionend', onEnd);
-    }
-    setTimeout(() => {
-        if (onEnd && content) content.removeEventListener('transitionend', onEnd);
-        ensureVisible();
-    }, 500);
 };
 
 // ★ متن معرفی جمع‌شونده
