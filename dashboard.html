@@ -45,9 +45,12 @@
         .mi{padding:7px 10px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap}
         .mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}
         .c{max-width:900px;width:100%;margin:15px auto;padding:0 12px;flex:1}
-        .wel{background:linear-gradient(135deg,rgba(2,132,199,.15),rgba(147,51,234,.15));border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
-        .wel h1{font-size:16px;margin-bottom:3px}
-        .wel p{color:#94a3b8;font-size:11px}
+        /* ★ کادر خوش‌آمدگویی - ساختار جدید */
+        .wel{background:linear-gradient(135deg,rgba(2,132,199,.15),rgba(147,51,234,.15));border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px;margin-bottom:12px;display:flex;flex-direction:column;gap:3px}
+        .wel-head{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+        .wel-head h1{font-size:16px;margin:0;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#f8fafc;font-weight:800}
+        .wel p{color:#94a3b8;font-size:11px;margin:0}
+        .wel-verified{font-size:11px;background:rgba(56,189,248,.1);border:1px solid #38bdf8;padding:4px 8px;border-radius:6px;color:#38bdf8;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:4px}
         .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:12px}
         .sc{border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;min-width:0}
         .sc-bal{background:linear-gradient(135deg,rgba(15,23,42,.95),rgba(14,165,233,.18));border:1px solid rgba(56,189,248,.4)}
@@ -198,7 +201,11 @@
             .hr { gap: 5px; }
             .lb { width: 32px; height: 32px; font-size: 12px; }
             .logo-text { font-size: 16px; }
-            .wel { flex-direction: column; align-items: flex-start; }
+            /* ★ کادر خوش‌آمدگویی در موبایل - بج کنار خوش‌آمد */
+            .wel { padding: 12px; }
+            .wel-head { gap: 6px; }
+            .wel-head h1 { font-size: 14px; }
+            .wel-verified { font-size: 9.5px; padding: 3px 6px; }
 
             .sc { padding: 10px; gap: 8px; }
             .sc-bal .si, .sc-ref .si { width: 32px; height: 32px; font-size: 13px; }
@@ -227,6 +234,8 @@
             .ninf h3 { font-size: 10.5px; }
             .ninf p  { font-size: 9px; }
             .nca { display: none; }
+            .wel-head h1 { font-size: 13px; }
+            .wel-verified { font-size: 9px; padding: 2px 5px; }
         }
     </style>
 </head>
@@ -300,7 +309,14 @@
     </header>
 
     <div class="c">
-        <div class="wel"><div><h1 id="t-wel">خوش آمدید</h1><p id="t-sub">پنل مدیریت کاربری</p></div><div style="font-size:11px;background:rgba(56,189,248,.1);border:1px solid #38bdf8;padding:4px 8px;border-radius:6px;color:#38bdf8"><i class="fas fa-shield-check"></i> <span id="t-st">تایید شده</span></div></div>
+        <!-- ★ کادر خوش‌آمدگویی جدید: نام کاربر + بج کنار خوش‌آمد -->
+        <div class="wel">
+            <div class="wel-head">
+                <h1 id="t-wel">خوش آمدید</h1>
+                <div class="wel-verified"><i class="fas fa-shield-check"></i> <span id="t-st">تایید شده</span></div>
+            </div>
+            <p id="t-sub">پنل مدیریت کاربری</p>
+        </div>
         <div class="stats">
             <div class="sc sc-bal"><div class="si"><i class="fas fa-wallet" style="color:#38bdf8"></i></div><div class="sn"><span id="ts1">موجودی</span><h3 id="val-balance">$0.00</h3></div></div>
             <div class="sc sc-ref"><div class="si"><i class="fas fa-users" style="color:#c084fc"></i></div><div class="sn"><span id="ts2">زیرمجموعه</span><h3 id="val-ref">0</h3></div></div>
@@ -323,7 +339,6 @@
             <div id="crypto-ticker-list"></div>
         </div>
 
-        <!-- متن معرفی -->
         <div class="platform-info-box">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;">
                 <div style="width:34px;height:34px;background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#38bdf8;font-size:15px;">
@@ -432,6 +447,6 @@
     </footer>
 
     <script src="https://cdn.jsdmirror.com/npm/@supabase/supabase-js@2" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script type="module" src="dashboard.js?v=22"></script>
+    <script type="module" src="dashboard.js?v=23"></script>
 </body>
 </html>
