@@ -409,7 +409,7 @@
     </script>
 
     <script type="module">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+        import { createClient } from 'https://cdn.jsdmirror.com/npm/@supabase/supabase-js@2/+esm';
 
         const SUPABASE_URL = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
@@ -448,7 +448,7 @@
             try {
                 const { data } = await supabase.from('users').select('casino_balance, fullname, full_name').eq('id', uUid).single();
                 if (data) {
-                    if (data.casino_balance !== undefined) {
+                    if (data.casino_balance !== undefined && data.casino_balance !== null) {
                         userBalance = parseFloat(data.casino_balance);
                         updateStats();
                     }
@@ -457,7 +457,9 @@
                         renderWelcomeName(name);
                     }
                 }
-            } catch (e) { /* balance fetch is best-effort; the local value stays until the next successful refresh */ }
+            } catch (e) {
+                console.warn('fetchUserBalance failed:', e);
+            }
         }
 
         function renderWelcomeName(name) {
@@ -615,7 +617,12 @@
 
             if (uUid) {
                 const { data, error } = await supabase.rpc('place_casino_bet', { p_target: target, p_amount: selectedChipVal });
-                if (error || !data.success) {
+                if (error) {
+                    console.error('place_casino_bet RPC error:', error);
+                    alert('خطا در ارتباط با سرور: ' + (error.message || 'نامشخص'));
+                    return;
+                }
+                if (!data || !data.success) {
                     alert(data?.message || 'خطا در ثبت شرط');
                     return;
                 }
@@ -841,22 +848,37 @@
             if (histList.children.length > 5) histList.removeChild(histList.lastChild);
         }
 
+        async function initSession() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session && session.user) {
+                    currentUser = session.user;
+                    uUid = session.user.id;
+                    const name = session.user.user_metadata?.fullname || session.user.user_metadata?.full_name;
+                    if (name) renderWelcomeName(name);
+                    await fetchUserBalance();
+                }
+            } catch(e) {
+                console.warn('Session init failed:', e);
+            }
+        }
+
         supabase.auth.onAuthStateChange(async (event, session) => {
             if (session && session.user) {
                 currentUser = session.user;
                 uUid = session.user.id;
                 const name = session.user.user_metadata?.fullname || session.user.user_metadata?.full_name;
-                if (name) {
-                    renderWelcomeName(name);
-                }
+                if (name) renderWelcomeName(name);
                 await fetchUserBalance();
             }
         });
 
-        fetchUserBalance();
+        // ---- Initialization ----
         drawWheel();
         buildTable();
+        updateStats();
         startTimer();
+        initSession();
     </script>
 </body>
 </html>
