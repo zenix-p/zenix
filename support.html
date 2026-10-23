@@ -256,6 +256,12 @@
             return (Math.abs(hash % 900000) + 100000).toString();
         }
 
+        // ★★ تاخیر انسانی: طول پاسخ تعیین می‌کند چقدر صبر کنیم (۱.۲ تا ۳ ثانیه)
+        function humanDelay(text) {
+            const len = String(text || '').length;
+            return Math.min(3000, Math.max(1200, 1000 + len * 20));
+        }
+
         const EXPERT_POOL = {
             dashboard: [
                 { name: 'Sophia', img: 'https://randomuser.me/api/portraits/women/44.jpg' },
@@ -344,8 +350,6 @@
             return re.test(t);
         }
 
-        // ===== Cross-reference: اگه کاربر سوالی پرسید که مربوط به موضوع دیگه‌ست، ارجاع بده =====
-        // فقط ارجاع، نه جواب کامل. اینطوری هر کارشناس در تخصص خودش می‌مونه.
         const CROSS_REDIRECTS = {
             fa: [
                 { kw: ['موجودی','بالانس','balance'], to: 'dashboard' },
@@ -1237,12 +1241,11 @@
             else { window.location.href = 'dashboard.html'; }
         };
 
-        // ===== اتصال به هوش مصنوعی =====
+        // ★★ نسخه بهبودیافته: AI با فکر کردن و تمرکز
         async function askAI(userPrompt) {
             const data = LD[currentLang];
             const topic = currentTopic ? data.topics[currentTopic] : null;
 
-            // فقط دانشنامه اختصاصی موضوع (نه shared، چون shared فقط ارجاع بود)
             let knowledgeContext = '';
             if (topic?.knowledge?.length) {
                 knowledgeContext = '\nدانش تخصصی تو:\n';
@@ -1259,12 +1262,14 @@
 زنیکس یک پلتفرم معاملات کریپتوکارنسی است.
 تخصص تو فقط «${topicLabel}» است.
 
-⚠️ قاعده بسیار مهم: فقط در مورد تخصص خودت (${topicLabel}) جواب بده.
-اگر سوال کاربر مربوط به بخش دیگه‌ای از پلتفرم بود (مثلاً تغییر رمز/ایمیل → پروفایل، واریز → واریز، برداشت → برداشت، تیم/رفرال → تیم، تاریخچه → تراکنش‌ها، ثبت‌نام → ثبت‌نام)، به هیچ وجه جواب مستقیم نده.
-به جای جواب دادن، مودبانه بگو: «این سوال مربوط به بخش X است. لطفاً از موضوع X در صفحه پشتیبانی سوال کنید یا به صفحه مربوطه در داشبورد مراجعه کنید.»
+⚠️ قواعد مهم:
+۱. قبل از پاسخ، با دقت به سوال کاربر فکر کن. پاسخ‌ها باید دقیق و با تامل باشند.
+۲. اگر اطلاعات دقیق نداری، صادق باش و بگو با ادمین در ارتباط باشه. هرگز حدس نزن.
+۳. فقط در مورد تخصص خودت (${topicLabel}) جواب بده. اگر سوال مربوط به بخش دیگه‌ای بود (مثلاً تغییر رمز/ایمیل → پروفایل، واریز → واریز، برداشت → برداشت، تیم/رفرال → تیم، تاریخچه → تراکنش‌ها، ثبت‌نام → ثبت‌نام)، به هیچ وجه جواب مستقیم نده.
+۴. به جای جواب دادن به سوالات خارج از تخصص، مودبانه بگو: «این سوال مربوط به بخش X است. لطفاً از موضوع X در صفحه پشتیبانی سوال کنید یا به صفحه مربوطه در داشبورد مراجعه کنید.»
+۵. هرگز اطلاعات ساختگی تولید نکن.
 
 لحن: صمیمی، کوتاه (۲-۴ خط)، با ۱-۲ ایموجی.
-هرگز اطلاعات ساختگی تولید نکن.
 ${knowledgeContext}
 پاسخ را به زبان ${langName} بده.`;
 
@@ -1319,20 +1324,17 @@ ${knowledgeContext}
             const adminKw = ['ادمین','پشتیبان','مدیر','admin','support','human','yönetici','destek','админ','поддержка','soporte','administrateur'];
             if (adminKw.some(k => q.includes(normalizeFa(k)))) return { handled: 'switch_to_admin' };
 
-            // ۱. اول redirects رو چک کن (ارجاع به موضوع دیگه)
             const redirects = CROSS_REDIRECTS[currentLang] || CROSS_REDIRECTS.fa;
             for (const r of redirects) {
-                if (r.to === currentTopic) continue; // اگه مقصد خودشه، رد کن
+                if (r.to === currentTopic) continue;
                 if (r.kw.some(k => keywordMatches(question, k))) {
                     return { handled: true, text: getRedirectMessage(r.to, currentLang) };
                 }
             }
 
-            // ۲. بعد دانشنامه اختصاصی موضوع
             const kb = scoreKnowledge(question, topic.knowledge || []);
             if (kb.item && kb.score >= 4) return { handled: true, text: kb.item.r };
 
-            // ۳. small-talk
             const smallTalk = data.smallTalk || LD.fa.smallTalk;
             if (smallTalk) {
                 const order = ['greeting', 'howAreYou', 'goodMorning', 'goodNight', 'thanks', 'bye', 'whoAreYou', 'whatCanYouDo'];
@@ -1360,7 +1362,6 @@ ${knowledgeContext}
                 }
             }
 
-            // ۴. AI
             return { handled: 'ai' };
         }
 
@@ -1425,10 +1426,7 @@ ${knowledgeContext}
             const div = document.createElement('div');
             div.className = 'msg system identity-msg';
             div.innerHTML = `
-                <div class="identity-header">
-                    <i class="fas fa-user-shield"></i>
-                    <span>${escapeHtml(t('userInfoHeader'))}</span>
-                </div>
+                <div class="identity-header"><i class="fas fa-user-shield"></i><span>${escapeHtml(t('userInfoHeader'))}</span></div>
                 <div class="identity-row"><strong>${escapeHtml(t('userIdLabel'))}:</strong><span class="code-val">${escapeHtml(code)}</span></div>
                 <div class="identity-row"><strong>${escapeHtml(t('userNameLabel'))}:</strong><span class="val">${escapeHtml(name)}</span></div>
                 <div class="identity-row"><strong>${escapeHtml(t('userEmailLabel'))}:</strong><span class="email-val">${escapeHtml(email)}</span></div>
@@ -1580,9 +1578,16 @@ ${knowledgeContext}
                             await switchToHumanMode();
                         }, 700);
                     } else if (reply.handled === 'ai') {
+                        // ★★ AI با حداقل زمان ۱.۵ ثانیه برای typing
                         const typing = renderTyping();
+                        const startTime = Date.now();
                         let aiText = null;
                         try { aiText = await askAI(text); } catch(e) { console.error(e); }
+                        const elapsed = Date.now() - startTime;
+                        const minWait = 1500;
+                        if (elapsed < minWait) {
+                            await new Promise(r => setTimeout(r, minWait - elapsed));
+                        }
                         typing.remove();
                         if (aiText) {
                             renderMessage(aiText, 'bot', new Date().toISOString(), expertLabel);
@@ -1595,6 +1600,7 @@ ${knowledgeContext}
                             chatBody.scrollTop = chatBody.scrollHeight;
                         }
                     } else if (reply.handled === true) {
+                        // ★★ تاخیر انسانی برای پاسخ‌های دانشنامه
                         const typing = renderTyping();
                         setTimeout(() => {
                             typing.remove();
@@ -1606,7 +1612,7 @@ ${knowledgeContext}
                                 chatBody.appendChild(div);
                                 chatBody.scrollTop = chatBody.scrollHeight;
                             }
-                        }, 700);
+                        }, humanDelay(reply.text));
                     }
                 } else if (currentView === 'admin') {
                     if (!currentChatId) await switchToHumanMode();
@@ -1635,7 +1641,7 @@ ${knowledgeContext}
                     const hashParams = new URLSearchParams(hashStr);
                     urlTopic = hashParams.get('topic');
                 }
-            } catch (e) { console.error('[Zenix Support] URL parse error:', e); }
+            } catch (e) {}
 
             try {
                 try {
