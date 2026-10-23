@@ -261,19 +261,18 @@
             return Math.min(3000, Math.max(1200, 1000 + len * 20));
         }
 
-        // ★★★ فیلتر نهایی: حذف کامل کاراکترهای غیر لاتین از پاسخ‌های انگلیسی
-        // این فیلتر از هر کاراکتر فارسی، عربی، روسی، چینی، ژاپنی، کره‌ای، عبری، یونانی، تایلندی، هندی که در پاسخ انگلیسی AI باشد پاک می‌کند.
+        // ★★★ فیلتر نهایی: حذف کامل کاراکترهای غیر لاتین
         function cleanEnglishText(text) {
             if (!text) return text;
             return String(text)
-                .replace(/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/g, '') // Arabic/Persian
-                .replace(/[\u0400-\u04FF]/g, '') // Cyrillic
-                .replace(/[\u0590-\u05FF]/g, '') // Hebrew
-                .replace(/[\u4E00-\u9FFF\u3040-\u309F\u30A0-\u30FF\uAC00-\uD7AF]/g, '') // CJK
-                .replace(/[\u0370-\u03FF]/g, '') // Greek
-                .replace(/[\u0E00-\u0E7F]/g, '') // Thai
-                .replace(/[\u0900-\u097F]/g, '') // Devanagari
-                .replace(/[\u0980-\u09FF]/g, '') // Bengali
+                .replace(/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/g, '')
+                .replace(/[\u0400-\u04FF]/g, '')
+                .replace(/[\u0590-\u05FF]/g, '')
+                .replace(/[\u4E00-\u9FFF\u3040-\u309F\u30A0-\u30FF\uAC00-\uD7AF]/g, '')
+                .replace(/[\u0370-\u03FF]/g, '')
+                .replace(/[\u0E00-\u0E7F]/g, '')
+                .replace(/[\u0900-\u097F]/g, '')
+                .replace(/[\u0980-\u09FF]/g, '')
                 .replace(/\s{2,}/g, ' ')
                 .trim();
         }
@@ -581,9 +580,10 @@
             });
         }
 
+        // ★★★ اصلاح اصلی: استفاده از label انگلیسی (نه فارسی) در پیام ارجاع
         function getRedirectMessage(toKey) {
-            const label = labelOf(toKey);
-            return `🌸 This question belongs to the "${label}" section. Please select the "${label}" topic on the support page or visit the related page in the dashboard.`;
+            const labelEn = (UI.en.labels && UI.en.labels[toKey]) || toKey;
+            return `🌸 This question belongs to the "${labelEn}" section. Please select the "${labelEn}" topic on the support page or visit the related page in the dashboard.`;
         }
 
         function applyLang(lang) {
@@ -690,7 +690,10 @@
                 .split('Chloe').join(currentExpert.name)
                 .split('Lily').join(currentExpert.name)
                 .split('Grace').join(currentExpert.name);
-            renderBotMessage(welcomeText, `${currentExpert.name} (${roleOf(topicKey)})`);
+            
+            const roleEn = (UI.en.roles && UI.en.roles[topicKey]) || topicKey;
+            renderBotMessage(welcomeText, `${currentExpert.name} (${roleEn})`);
+            
             pushChatState();
             window.scrollTo({ top: 0, behavior: 'smooth' });
             setTimeout(() => {
@@ -819,7 +822,6 @@
             }
         }
 
-        // ★★★ askAI — با فیلتر cleanEnglishText روی خروجی
         async function askAI(userPrompt) {
             const topic = currentTopic ? EN_TOPICS[currentTopic] : null;
             let knowledgeContext = '';
@@ -854,7 +856,6 @@
                 } finally { clearTimeout(timeoutId); }
                 if (!res.ok) throw new Error('fail');
                 const j = await res.json();
-                // ★★★ فیلتر نهایی: حذف کامل کاراکترهای فارسی/عربی/چینی/... از پاسخ
                 return cleanEnglishText(j.text) || null;
             } catch (e) { console.error('[askAI] error:', e); return null; }
         }
@@ -892,7 +893,8 @@
                 if (item && item.kw && kwMatchSmallTalk(question, item.kw)) {
                     if (key === 'greeting' && isFirstMessage) return { handled: true, text: 'Hello again! 🌸 Yes, I am here. How can I help you?' };
                     const name = (currentExpert && currentExpert.name) || 'Sophia';
-                    const role = roleOf(currentTopic);
+                    // ★★★ اصلاح: استفاده از نقش انگلیسی در پاسخ smalltalk
+                    const role = (UI.en.roles && UI.en.roles[currentTopic]) || currentTopic;
                     return { handled: true, text: item.r.replace(/\{name\}/g, name).replace(/\{role\}/g, role) };
                 }
             }
@@ -1078,7 +1080,10 @@
             try {
                 if (currentView === 'expert') {
                     const reply = generateTopicReply(text, isFirstUserMessage);
-                    const expertLabel = (currentExpert && currentTopic) ? `${currentExpert.name} (${roleOf(currentTopic)})` : null;
+                    // ★★★ اصلاح: استفاده از نقش انگلیسی در لیبل
+                    const roleEn = (UI.en.roles && UI.en.roles[currentTopic]) || currentTopic;
+                    const expertLabel = (currentExpert && currentTopic) ? `${currentExpert.name} (${roleEn})` : null;
+                    
                     if (reply.handled === 'switch_to_admin') {
                         setTimeout(async () => { renderSystemMessage(t('switchingToAdmin')); await switchToHumanMode(); }, 700);
                     } else if (reply.handled === 'ai') {
