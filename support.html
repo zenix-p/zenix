@@ -261,6 +261,23 @@
             return Math.min(3000, Math.max(1200, 1000 + len * 20));
         }
 
+        // ★★★ فیلتر نهایی: حذف کامل کاراکترهای غیر لاتین از پاسخ‌های انگلیسی
+        // این فیلتر از هر کاراکتر فارسی، عربی، روسی، چینی، ژاپنی، کره‌ای، عبری، یونانی، تایلندی، هندی که در پاسخ انگلیسی AI باشد پاک می‌کند.
+        function cleanEnglishText(text) {
+            if (!text) return text;
+            return String(text)
+                .replace(/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/g, '') // Arabic/Persian
+                .replace(/[\u0400-\u04FF]/g, '') // Cyrillic
+                .replace(/[\u0590-\u05FF]/g, '') // Hebrew
+                .replace(/[\u4E00-\u9FFF\u3040-\u309F\u30A0-\u30FF\uAC00-\uD7AF]/g, '') // CJK
+                .replace(/[\u0370-\u03FF]/g, '') // Greek
+                .replace(/[\u0E00-\u0E7F]/g, '') // Thai
+                .replace(/[\u0900-\u097F]/g, '') // Devanagari
+                .replace(/[\u0980-\u09FF]/g, '') // Bengali
+                .replace(/\s{2,}/g, ' ')
+                .trim();
+        }
+
         // ===== experts =====
         const EXPERT_POOL = {
             dashboard: [
@@ -417,7 +434,7 @@
             }
         };
 
-        // ===== ENGLISH KNOWLEDGE (always English) =====
+        // ===== ENGLISH KNOWLEDGE =====
         const EN_SMALLTALK = {
             greeting: { kw: ['hi','hello','hey','greetings','salam','سلام','hola','merhaba','привет','salut','hallo','مرحبا'], r: 'Hi there! 🌸 Great to see you. I am {name}, {role}. How can I help you today?' },
             howAreYou: { kw: ['how are you',"how's it going",'how are you doing'], r: 'I am doing great, thanks for asking! 😊 How about you?' },
@@ -765,7 +782,6 @@
             else { window.location.href = 'dashboard.html'; }
         };
 
-        // ===== translate (با timeout ۲۵ ثانیه) =====
         async function translateAIText(originalText, targetLang, btn, container) {
             btn.disabled = true;
             btn.style.opacity = '0.6';
@@ -803,7 +819,7 @@
             }
         }
 
-        // ===== askAI (با prompt انگلیسی + timeout) =====
+        // ★★★ askAI — با فیلتر cleanEnglishText روی خروجی
         async function askAI(userPrompt) {
             const topic = currentTopic ? EN_TOPICS[currentTopic] : null;
             let knowledgeContext = '';
@@ -838,7 +854,8 @@
                 } finally { clearTimeout(timeoutId); }
                 if (!res.ok) throw new Error('fail');
                 const j = await res.json();
-                return j.text || null;
+                // ★★★ فیلتر نهایی: حذف کامل کاراکترهای فارسی/عربی/چینی/... از پاسخ
+                return cleanEnglishText(j.text) || null;
             } catch (e) { console.error('[askAI] error:', e); return null; }
         }
 
