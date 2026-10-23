@@ -132,31 +132,20 @@
         }
 
         /* ============================================================
-           ★ کادر Cloudflare Turnstile — هم‌رنگ با پلتفرم
+           ★ Cloudflare Turnstile — بدون کادر اضافی، فقط وسط‌چین
            ============================================================ */
         .captcha-wrap{
             display:flex;
             justify-content:center;
             align-items:center;
-            padding:8px 10px;
             margin-bottom:14px;
-            background:rgba(10,15,30,.7);
-            border:1px solid rgba(255,255,255,.1);
-            border-radius:12px;
-            overflow:hidden;
-            transition:border-color .2s ease, box-shadow .2s ease;
         }
-        .captcha-wrap:hover{ border-color:rgba(56,189,248,.35); }
-        .captcha-wrap .cf-turnstile{
-            width:100%;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-        }
-        /* خود iframe کلودفلر — نمی‌شه داخلش رو تغییر داد، ولی می‌شه ظاهرش رو تیره‌تر کرد تا با کارت یکی بشه */
-        .captcha-wrap .cf-turnstile iframe{
-            border-radius:8px;
-            filter: brightness(0.85) contrast(1.05);
+        /* فشرده‌سازی روی موبایل تا دقیقاً به عرض کارت جا بشه */
+        @media (max-width: 400px) {
+            .captcha-wrap .cf-turnstile{
+                transform: scale(0.92);
+                transform-origin: center center;
+            }
         }
 
         .extra-links{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;font-size:11px}
@@ -203,7 +192,7 @@
             .lb { height: 34px; width: 34px; font-size: 12px; }
             .mi { font-size: 11px; padding: 6px 10px; }
 
-            .captcha-wrap{ padding:6px 8px; margin-bottom:12px; }
+            .captcha-wrap{ margin-bottom:12px; }
         }
     </style>
 </head>
@@ -274,12 +263,11 @@
                 </div>
             </div>
             
-            <!-- ★ Turnstile داخل کادر هم‌رنگ با پلتفرم -->
+            <!-- ★ Turnstile: بدون کادر اضافی، فقط وسط‌چین -->
             <div class="captcha-wrap">
                 <div class="cf-turnstile"
                      data-sitekey="0x4AAAAAAFaU1RVZfnTURKOc"
                      data-theme="dark"
-                     data-size="flexible"
                      data-callback="onCaptchaSuccess"
                      data-expired-callback="onCaptchaExpired"
                      data-error-callback="onCaptchaError"></div>
