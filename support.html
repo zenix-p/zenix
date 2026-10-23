@@ -1244,74 +1244,69 @@
         };
 
         async function init() {
-            let urlTopic = null;
-            try {
-                const params = new URLSearchParams(window.location.search);
-                urlTopic = params.get('topic');
-                if (!urlTopic && window.location.hash) {
-                    const hashStr = window.location.hash.startsWith('#') ? window.location.hash.slice(1) : window.location.hash;
-                    const hashParams = new URLSearchParams(hashStr);
-                    urlTopic = hashParams.get('topic');
-                }
-            } catch (e) { console.error('[Zenix Support] URL parse error:', e); }
+            const urlParams = new URLSearchParams(window.location.search);
+            const isOtpMode = urlParams.get('otp') === '1'; // ★ چک میکنیم آیا از پروفایل/فراموشی آمده یا نه
+            let urlTopic = urlParams.get('topic');
 
-            console.log('[Zenix Support] URL topic:', urlTopic);
+            if (!urlTopic && window.location.hash) {
+                const hashStr = window.location.hash.startsWith('#') ? window.location.hash.slice(1) : window.location.hash;
+                urlTopic = new URLSearchParams(hashStr).get('topic');
+            }
 
             try {
-                try {
-                    const savedLang = localStorage.getItem('zenix_lang') || 'fa';
-                    applyLang(savedLang);
-                } catch (e) { console.error('[Zenix Support] applyLang error:', e); }
+                const savedLang = localStorage.getItem('zenix_lang') || 'fa';
+                applyLang(savedLang);
+            } catch (e) {}
 
-                try {
-                    const { data: sessionData } = await supabase.auth.getSession();
-                    if (sessionData?.session?.user) currentUser = sessionData.session.user;
-                } catch (e) { console.error('[Zenix Support] getSession error:', e); }
+            try {
+                const { data: sessionData } = await supabase.auth.getSession();
+                if (sessionData?.session?.user) currentUser = sessionData.session.user;
+            } catch (e) {}
 
-                try {
-                    supabase.auth.onAuthStateChange((event, session) => {
-                        if (session?.user && !currentUser) currentUser = session.user;
-                    });
-                } catch (e) {}
+            try {
+                supabase.auth.onAuthStateChange((event, session) => {
+                    if (session?.user && !currentUser) currentUser = session.user;
+                });
+            } catch (e) {}
 
-                console.log('[Zenix Support] currentUser:', currentUser ? currentUser.email : 'null');
+            if (isOtpMode) {
+                // ★ اگر از پروفایل یا فراموشی رمز آمده، مستقیم چت را باز کن
+                await showAdminChatView();
+                return;
+            } else {
+                // ★ اگر کاربر عادی از داشبورد روی پشتیبانی کلیک کرده، حافظه‌ها را پاک کن
+                sessionStorage.removeItem('zenix_return_focus');
+                sessionStorage.removeItem('zenix_return_page');
+                sessionStorage.removeItem('zenix_reset_otp');
+                sessionStorage.removeItem('zenix_reset_email');
+            }
 
-                const validTopics = Object.keys(LD.fa.topics);
-                if (urlTopic && validTopics.includes(urlTopic)) {
-                    console.log('[Zenix Support] Auto-opening chat for topic:', urlTopic);
-                    chatIsOpen = false;
-                    currentView = 'topics';
-                    try { unlockTopicsView(); } catch (e) {}
-                    try { hideChatView(); } catch (e) {}
-                    try { backBtnText.textContent = t('back'); } catch (e) {}
-
-                    setTimeout(() => {
-                        try {
-                            window.selectTopic(urlTopic);
-                            try {
-                                window.history.replaceState({}, document.title, window.location.pathname);
-                            } catch (e) {}
-                        } catch (err) {
-                            console.error('[Zenix Support] selectTopic failed:', err);
-                            showError('Unable to open the chat. Please select a topic below.');
-                        }
-                    }, 100);
-                    return;
-                }
-
-                const fromProfile = !!sessionStorage.getItem('zenix_return_focus');
-                if (fromProfile) {
-                    await showAdminChatView();
-                    return;
-                }
+            const validTopics = Object.keys(LD.fa.topics);
+            if (urlTopic && validTopics.includes(urlTopic)) {
                 chatIsOpen = false;
                 currentView = 'topics';
-                unlockTopicsView();
-                hideChatView();
-                backBtnText.textContent = t('back');
-            } catch (err) {
-                console.error('[Zenix Support] init error:', err);
+                try { unlockTopicsView(); } catch (e) {}
+                try { hideChatView(); } catch (e) {}
+                try { backBtnText.textContent = t('back'); } catch (e) {}
+
+                setTimeout(() => {
+                    try {
+                        window.selectTopic(urlTopic);
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                    } catch (err) {
+                        console.error('[Zenix Support] selectTopic failed:', err);
+                        showError('Unable to open the chat. Please select a topic below.');
+                    }
+                }, 100);
+                return;
             }
+
+            // حالت عادی: نمایش موضوعات
+            chatIsOpen = false;
+            currentView = 'topics';
+            unlockTopicsView();
+            hideChatView();
+            backBtnText.textContent = t('back');
         }
 
         sendBtn.addEventListener('click', sendMessage);
