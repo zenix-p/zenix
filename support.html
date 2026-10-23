@@ -239,6 +239,7 @@
         let currentView = 'topics';
         let currentTopic = null;
         let currentConversationId = null;
+        let currentExpert = null;
         let aiMode = true;
         let realtimeChannel = null;
         let isSending = false;
@@ -255,17 +256,68 @@
             return (Math.abs(hash % 900000) + 100000).toString();
         }
 
-        const EXPERT_IMAGES = {
-            dashboard: 'https://randomuser.me/api/portraits/women/44.jpg',
-            quantification: 'https://randomuser.me/api/portraits/women/68.jpg',
-            deposit: 'https://randomuser.me/api/portraits/women/21.jpg',
-            withdraw: 'https://randomuser.me/api/portraits/women/45.jpg',
-            team: 'https://randomuser.me/api/portraits/women/33.jpg',
-            transactions: 'https://randomuser.me/api/portraits/women/79.jpg',
-            profile: 'https://randomuser.me/api/portraits/women/90.jpg',
-            login: 'https://randomuser.me/api/portraits/women/65.jpg',
-            register: 'https://randomuser.me/api/portraits/women/56.jpg'
+        // ===== استخر کارشناسان (چند کارشناس برای هر موضوع) =====
+        // اولین عضو هر آرایه، نام پیش‌فرض داخل پیام welcome است.
+        const EXPERT_POOL = {
+            dashboard: [
+                { name: 'Sophia', img: 'https://randomuser.me/api/portraits/women/44.jpg' },
+                { name: 'Emma',   img: 'https://randomuser.me/api/portraits/women/21.jpg' },
+                { name: 'Olivia', img: 'https://randomuser.me/api/portraits/women/45.jpg' }
+            ],
+            quantification: [
+                { name: 'Isabella', img: 'https://randomuser.me/api/portraits/women/68.jpg' },
+                { name: 'Mia',      img: 'https://randomuser.me/api/portraits/women/33.jpg' },
+                { name: 'Ava',      img: 'https://randomuser.me/api/portraits/women/79.jpg' }
+            ],
+            deposit: [
+                { name: 'Emma',  img: 'https://randomuser.me/api/portraits/women/21.jpg' },
+                { name: 'Chloe', img: 'https://randomuser.me/api/portraits/women/90.jpg' },
+                { name: 'Grace', img: 'https://randomuser.me/api/portraits/women/56.jpg' }
+            ],
+            withdraw: [
+                { name: 'Olivia', img: 'https://randomuser.me/api/portraits/women/45.jpg' },
+                { name: 'Lily',   img: 'https://randomuser.me/api/portraits/women/65.jpg' },
+                { name: 'Emma',   img: 'https://randomuser.me/api/portraits/women/21.jpg' }
+            ],
+            team: [
+                { name: 'Mia',      img: 'https://randomuser.me/api/portraits/women/33.jpg' },
+                { name: 'Ava',      img: 'https://randomuser.me/api/portraits/women/79.jpg' },
+                { name: 'Isabella', img: 'https://randomuser.me/api/portraits/women/68.jpg' }
+            ],
+            transactions: [
+                { name: 'Ava',   img: 'https://randomuser.me/api/portraits/women/79.jpg' },
+                { name: 'Chloe', img: 'https://randomuser.me/api/portraits/women/90.jpg' },
+                { name: 'Lily',  img: 'https://randomuser.me/api/portraits/women/65.jpg' }
+            ],
+            profile: [
+                { name: 'Chloe', img: 'https://randomuser.me/api/portraits/women/90.jpg' },
+                { name: 'Lily',  img: 'https://randomuser.me/api/portraits/women/65.jpg' },
+                { name: 'Grace', img: 'https://randomuser.me/api/portraits/women/56.jpg' }
+            ],
+            login: [
+                { name: 'Lily',  img: 'https://randomuser.me/api/portraits/women/65.jpg' },
+                { name: 'Grace', img: 'https://randomuser.me/api/portraits/women/56.jpg' },
+                { name: 'Emma',  img: 'https://randomuser.me/api/portraits/women/21.jpg' }
+            ],
+            register: [
+                { name: 'Grace',  img: 'https://randomuser.me/api/portraits/women/56.jpg' },
+                { name: 'Emma',   img: 'https://randomuser.me/api/portraits/women/21.jpg' },
+                { name: 'Olivia', img: 'https://randomuser.me/api/portraits/women/45.jpg' }
+            ]
         };
+
+        // انتخاب قطعی کارشناس بر اساس هش (user_id + topic) → توزیع یکنواخت بین کارشناسان
+        function pickExpertForTopic(topicKey, userSeed) {
+            const pool = EXPERT_POOL[topicKey];
+            if (!pool || !pool.length) return { name: 'Sophia', img: '' };
+            let hash = 0;
+            const seed = String(userSeed || 'guest') + '|' + topicKey;
+            for (let i = 0; i < seed.length; i++) {
+                hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+                hash |= 0;
+            }
+            return pool[Math.abs(hash) % pool.length];
+        }
 
         const TOPIC_ICONS = {
             dashboard: { icon: 'fa-home', color: 'ni-blue' },
@@ -278,8 +330,6 @@
             login: { icon: 'fa-sign-in-alt', color: 'ni-emerald' },
             register: { icon: 'fa-user-plus', color: 'ni-amber' }
         };
-
-        const EXPERT_NAMES = { dashboard: 'Sophia', quantification: 'Isabella', deposit: 'Emma', withdraw: 'Olivia', team: 'Mia', transactions: 'Ava', profile: 'Chloe', login: 'Lily', register: 'Grace' };
 
         const LD = {
             fa: {
@@ -793,8 +843,8 @@
         }
 
         function refreshChatHeader() {
-            if (currentView === 'expert' && currentTopic) {
-                chatTitleH3.innerHTML = `<span class="expert-name">${EXPERT_NAMES[currentTopic]}</span><span class="expert-role">— ${LD[currentLang].roles[currentTopic]}</span>`;
+            if (currentView === 'expert' && currentTopic && currentExpert) {
+                chatTitleH3.innerHTML = `<span class="expert-name">${currentExpert.name}</span><span class="expert-role">— ${LD[currentLang].roles[currentTopic]}</span>`;
                 chatTitleP.innerHTML = `<i class="fas fa-circle" style="font-size:6px;color:#22c55e;"></i><span style="color:#22c55e;">${LD[currentLang].ui.online}</span>`;
             } else if (currentView === 'admin') {
                 chatTitleH3.innerHTML = `<span class="expert-name">${LD[currentLang].ui.adminView}</span><span class="expert-role">— ${LD[currentLang].ui.adminRole}</span>`;
@@ -852,22 +902,34 @@
             aiMode = true;
             currentConversationId = generateConversationId(currentUser?.id, topicKey);
             conversationIdEl.textContent = currentConversationId;
+
+            // انتخاب کارشناس از استخر (توزیع یکنواخت بر اساس user + topic)
+            currentExpert = pickExpertForTopic(topicKey, currentUser?.id || 'guest');
+
             lockTopicsView();
             showChatView();
             backBtnText.textContent = data.ui.backToTopics;
             chatAvatarIcon.style.display = 'none';
             chatAvatarImg.style.display = 'block';
-            chatAvatarImg.src = EXPERT_IMAGES[topicKey] || '';
-            chatAvatarImg.alt = EXPERT_NAMES[topicKey];
+            chatAvatarImg.src = currentExpert.img;
+            chatAvatarImg.alt = currentExpert.name;
             chatAvatarEl.classList.add('expert');
-            chatTitleH3.innerHTML = `<span class="expert-name">${EXPERT_NAMES[topicKey]}</span><span class="expert-role">— ${data.roles[topicKey]}</span>`;
+            chatTitleH3.innerHTML = `<span class="expert-name">${currentExpert.name}</span><span class="expert-role">— ${data.roles[topicKey]}</span>`;
             chatTitleP.innerHTML = `<i class="fas fa-circle" style="font-size:6px;color:#22c55e;"></i><span style="color:#22c55e;">${data.ui.online}</span>`;
             userInput.disabled = false;
             sendBtn.disabled = false;
             userInput.placeholder = `${data.ui.inputAbout} ${topic.label} ${data.ui.inputAboutSuffix}`;
             userInput.value = '';
             chatBody.innerHTML = '';
-            renderMessage(topic.welcome, 'bot', new Date().toISOString(), `${EXPERT_NAMES[topicKey]} (${data.roles[topicKey]})`);
+
+            // جایگزینی نام پیش‌فرض داخل پیام welcome با نام کارشناس انتخابی
+            const primaryName = (EXPERT_POOL[topicKey] && EXPERT_POOL[topicKey][0] && EXPERT_POOL[topicKey][0].name) || 'Sophia';
+            const welcomeText = (primaryName === currentExpert.name)
+                ? topic.welcome
+                : topic.welcome.split(primaryName).join(currentExpert.name);
+
+            renderMessage(welcomeText, 'bot', new Date().toISOString(), `${currentExpert.name} (${data.roles[topicKey]})`);
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
             setTimeout(() => {
                 if (!IS_MOBILE) { try { userInput.focus(); } catch(e) {} }
@@ -884,6 +946,7 @@
             currentTopic = null;
             currentChatId = null;
             currentConversationId = null;
+            currentExpert = null;
             currentView = 'topics';
             aiMode = true;
             isProcessingTopicClick = false;
@@ -958,7 +1021,7 @@
             else { window.location.href = 'dashboard.html'; }
         };
 
-        function generateTopicReply(question) {
+        function generateTopicReply(question, isFirstMessage = false) {
             if (!currentTopic) return { handled: false, text: t('mustSelectTopic') };
             const data = LD[currentLang];
             const topic = data.topics[currentTopic];
@@ -971,14 +1034,28 @@
                 if (item.kw.some(k => q.includes(k.toLowerCase()))) return { handled: true, text: item.r };
             }
 
-            // ★★ Small talk: پاسخ انسانی به سلام و احوالپرسی (بعد از knowledge و قبل از noInfoFound)
             const smallTalk = data.smallTalk || LD.fa.smallTalk;
             if (smallTalk) {
                 const order = ['greeting', 'howAreYou', 'goodMorning', 'goodNight', 'thanks', 'bye', 'whoAreYou', 'whatCanYouDo'];
                 for (const key of order) {
                     const item = smallTalk[key];
                     if (item && item.kw && kwMatchSmallTalk(q, item.kw)) {
-                        const name = EXPERT_NAMES[currentTopic] || 'Sophia';
+                        // ★★ اگر اولین پیام کاربر سلام است، معرفی مجدد نکن
+                        if (key === 'greeting' && isFirstMessage) {
+                            const briefGreetings = {
+                                fa: 'سلام دوباره! 🌸 بله من اینجام، چطور می‌تونم کمکت کنم؟',
+                                en: 'Hello again! 🌸 Yes, I am here. How can I help you?',
+                                ar: 'مرحباً مجدداً! 🌸 نعم أنا هنا. كيف أساعدك؟',
+                                tr: 'Tekrar merhaba! 🌸 Evet buradayım. Nasıl yardımcı olabilirim?',
+                                ru: 'Снова привет! 🌸 Да, я здесь. Чем помочь?',
+                                es: '¡Hola de nuevo! 🌸 Sí, estoy aquí. ¿En qué puedo ayudarte?',
+                                fr: 'Rebonjour ! 🌸 Oui, je suis là. Comment puis-je aider ?',
+                                de: 'Hallo nochmal! 🌸 Ja, ich bin hier. Wie kann ich helfen?'
+                            };
+                            return { handled: true, text: briefGreetings[currentLang] || briefGreetings.fa };
+                        }
+
+                        const name = (currentExpert && currentExpert.name) || 'Sophia';
                         const role = data.roles[currentTopic] || '';
                         const reply = String(item.r).replace(/\{name\}/g, name).replace(/\{role\}/g, role);
                         return { handled: true, text: reply };
@@ -1197,14 +1274,20 @@
             if (!text || isSending) return;
             if (currentView === 'topics') { showError(t('mustSelectTopic')); return; }
             if (!currentUser && currentView === 'admin') { showError('Please login first.'); return; }
+
+            // ★★ تشخیص اولین پیام کاربر قبل از افزودن پیام فعلی
+            const isFirstUserMessage = !chatBody.querySelector('.msg.user');
+
             isSending = true; sendBtn.disabled = true;
             renderMessage(text, 'user', new Date().toISOString(), 'You');
             userInput.value = '';
             try {
                 if (currentView === 'expert') {
-                    const reply = generateTopicReply(text);
+                    const reply = generateTopicReply(text, isFirstUserMessage);
                     const data = LD[currentLang];
-                    const expertLabel = currentTopic ? `${EXPERT_NAMES[currentTopic]} (${data.roles[currentTopic]})` : null;
+                    const expertLabel = (currentExpert && currentTopic)
+                        ? `${currentExpert.name} (${data.roles[currentTopic]})`
+                        : null;
                     if (reply.handled === 'switch_to_admin') {
                         setTimeout(async () => {
                             renderMessage(t('switchingToAdmin'), 'system', new Date().toISOString());
