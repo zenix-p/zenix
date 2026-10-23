@@ -327,6 +327,12 @@
         let submitCounter = 0;
         let isSubmitting = false;
 
+        // ── Rate Limiting سمت کلاینت ──
+        const MAX_ATTEMPTS = 5;
+        const LOCKOUT_MS = 60 * 1000; // ۱ دقیقه
+        let attemptCount = parseInt(localStorage.getItem('zenix_attempts') || '0', 10);
+        let lockoutUntil = parseInt(localStorage.getItem('zenix_lockout_until') || '0', 10);
+
         const langBtn = document.getElementById('lang-btn'),
               langMenu = document.getElementById('lang-menu'),
               userIn = document.getElementById('user'),
@@ -363,6 +369,40 @@
         function getCaptchaToken() {
             const domToken = document.querySelector('[name="cf-turnstile-response"]')?.value;
             return domToken || window.__cfToken || null;
+        }
+
+        // ── Rate Limit helpers ──
+        function getRemainingLockoutSec() {
+            const now = Date.now();
+            if (lockoutUntil > now) return Math.ceil((lockoutUntil - now) / 1000);
+            if (lockoutUntil > 0 && lockoutUntil <= now) {
+                // قفل منقضی شده
+                attemptCount = 0;
+                lockoutUntil = 0;
+                localStorage.removeItem('zenix_attempts');
+                localStorage.removeItem('zenix_lockout_until');
+            }
+            return 0;
+        }
+
+        function registerFailedAttempt() {
+            attemptCount++;
+            localStorage.setItem('zenix_attempts', String(attemptCount));
+            if (attemptCount >= MAX_ATTEMPTS) {
+                lockoutUntil = Date.now() + LOCKOUT_MS;
+                localStorage.setItem('zenix_lockout_until', String(lockoutUntil));
+                attemptCount = 0;
+                localStorage.setItem('zenix_attempts', '0');
+                return true;
+            }
+            return false;
+        }
+
+        function resetAttempts() {
+            attemptCount = 0;
+            lockoutUntil = 0;
+            localStorage.removeItem('zenix_attempts');
+            localStorage.removeItem('zenix_lockout_until');
         }
 
         async function getTargetPage(userId) {
@@ -421,6 +461,10 @@
 
         function checkInputs() {
             if (isSubmitting) return;
+            if (getRemainingLockoutSec() > 0) {
+                submitBtn.disabled = true;
+                return;
+            }
             const emailOk = isValidEmail(userIn.value.trim());
             const passOk = passIn.value.length >= 6;
             const capOk = !!getCaptchaToken();
@@ -454,9 +498,23 @@
             isSubmitting = false;
         }
 
+        function showLockoutMessage() {
+            const t = langData[currentLang] || langData.en;
+            const remainSec = getRemainingLockoutSec();
+            msg.textContent = `${t.errTooMany} (${remainSec}s)`;
+            msg.className = 'err show';
+        }
+
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
+            // بررسی قفل
+            if (getRemainingLockoutSec() > 0) {
+                showLockoutMessage();
+                checkInputs();
+                return;
+            }
+
             const emailVal = userIn.value.trim().toLowerCase();
             const passVal = passIn.value.trim();
 
@@ -489,6 +547,9 @@
                     return;
                 }
 
+                // ورود موفق → پاکسازی شمارنده
+                resetAttempts();
+
                 const t = langData[currentLang] || langData.en;
                 msg.textContent = t.succ;
                 msg.className = 'succ show';
@@ -502,17 +563,30 @@
                 try { if (window.turnstile) window.turnstile.reset(); } catch(e) {}
 
                 if (error.status === 429 || (error.message && error.message.toLowerCase().includes('too many requests'))) {
+                    // محدودیت سمت سرور — شمارنده کلاینت را زیاد نکن
                     const t = langData[currentLang] || langData.en;
                     msg.textContent = t.errTooMany;
                     msg.className = 'err show';
                 } else {
-                    showError('errNoUser');
+                    // اعتبارنامه غلط → شمارنده کلاینت
+                    const locked = registerFailedAttempt();
+                    if (locked) {
+                        showLockoutMessage();
+                    } else {
+                        showError('errNoUser');
+                    }
                 }
                 checkInputs();
             }
         });
 
-        window.addEventListener('pageshow', () => { clearError(); checkInputs(); });
+        window.addEventListener('pageshow', () => {
+            clearError();
+            if (getRemainingLockoutSec() > 0) {
+                showLockoutMessage();
+            }
+            checkInputs();
+        });
         setLang(currentLang);
     </script>
 </body>
