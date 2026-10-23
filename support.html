@@ -344,6 +344,118 @@
             return re.test(t);
         }
 
+        // ===== Cross-reference: اگه کاربر سوالی پرسید که مربوط به موضوع دیگه‌ست، ارجاع بده =====
+        // فقط ارجاع، نه جواب کامل. اینطوری هر کارشناس در تخصص خودش می‌مونه.
+        const CROSS_REDIRECTS = {
+            fa: [
+                { kw: ['موجودی','بالانس','balance'], to: 'dashboard' },
+                { kw: ['تغییر رمز','عوض کردن رمز','عوض رمز','تغییر پسورد','تغییر رمز عبور','change password','reset password'], to: 'profile' },
+                { kw: ['تغییر ایمیل','عوض کردن ایمیل','change email'], to: 'profile' },
+                { kw: ['رمز تراکنش','transaction password'], to: 'profile' },
+                { kw: ['واریز','شارژ حساب','شارژ','deposit'], to: 'deposit' },
+                { kw: ['برداشت','تسویه','withdraw'], to: 'withdraw' },
+                { kw: ['کوانتیفیکیشن','ربات معامله','quantification'], to: 'quantification' },
+                { kw: ['تیم من','زیرمجموعه','رفرال','کمیسیون','دعوت'], to: 'team' },
+                { kw: ['تاریخچه تراکنش','تراکنش‌ها','transactions'], to: 'transactions' },
+                { kw: ['ثبت نام','ثبت‌نام','register'], to: 'register' }
+            ],
+            en: [
+                { kw: ['balance'], to: 'dashboard' },
+                { kw: ['change password','reset password'], to: 'profile' },
+                { kw: ['change email'], to: 'profile' },
+                { kw: ['transaction password'], to: 'profile' },
+                { kw: ['deposit','fund'], to: 'deposit' },
+                { kw: ['withdraw','withdrawal'], to: 'withdraw' },
+                { kw: ['quantification'], to: 'quantification' },
+                { kw: ['my team','referral','commission','invite'], to: 'team' },
+                { kw: ['transactions','history'], to: 'transactions' },
+                { kw: ['register','sign up','signup'], to: 'register' }
+            ],
+            ar: [
+                { kw: ['رصيد'], to: 'dashboard' },
+                { kw: ['تغيير كلمة المرور','كلمة المرور'], to: 'profile' },
+                { kw: ['تغيير البريد','البريد'], to: 'profile' },
+                { kw: ['إيداع'], to: 'deposit' },
+                { kw: ['سحب'], to: 'withdraw' },
+                { kw: ['تكميم'], to: 'quantification' },
+                { kw: ['فريق','إحالة','عمولة'], to: 'team' },
+                { kw: ['معاملات'], to: 'transactions' },
+                { kw: ['تسجيل'], to: 'register' }
+            ],
+            tr: [
+                { kw: ['bakiye'], to: 'dashboard' },
+                { kw: ['şifre değiştir','şifre'], to: 'profile' },
+                { kw: ['email değiştir'], to: 'profile' },
+                { kw: ['yatırım'], to: 'deposit' },
+                { kw: ['çekim'], to: 'withdraw' },
+                { kw: ['kuantifikasyon'], to: 'quantification' },
+                { kw: ['ekip','referans','komisyon'], to: 'team' },
+                { kw: ['işlemler'], to: 'transactions' },
+                { kw: ['kayıt'], to: 'register' }
+            ],
+            ru: [
+                { kw: ['баланс'], to: 'dashboard' },
+                { kw: ['пароль'], to: 'profile' },
+                { kw: ['email'], to: 'profile' },
+                { kw: ['депозит'], to: 'deposit' },
+                { kw: ['вывод'], to: 'withdraw' },
+                { kw: ['квантификация'], to: 'quantification' },
+                { kw: ['команда','реферал','комиссия'], to: 'team' },
+                { kw: ['транзакции'], to: 'transactions' },
+                { kw: ['регистрация'], to: 'register' }
+            ],
+            es: [
+                { kw: ['saldo'], to: 'dashboard' },
+                { kw: ['contraseña'], to: 'profile' },
+                { kw: ['email'], to: 'profile' },
+                { kw: ['depósito'], to: 'deposit' },
+                { kw: ['retiro'], to: 'withdraw' },
+                { kw: ['cuantificación'], to: 'quantification' },
+                { kw: ['equipo','referido','comisión'], to: 'team' },
+                { kw: ['transacciones'], to: 'transactions' },
+                { kw: ['registro'], to: 'register' }
+            ],
+            fr: [
+                { kw: ['solde'], to: 'dashboard' },
+                { kw: ['mot de passe'], to: 'profile' },
+                { kw: ['email'], to: 'profile' },
+                { kw: ['dépôt'], to: 'deposit' },
+                { kw: ['retrait'], to: 'withdraw' },
+                { kw: ['quantification'], to: 'quantification' },
+                { kw: ['équipe','parrainage','commission'], to: 'team' },
+                { kw: ['transactions'], to: 'transactions' },
+                { kw: ['inscription'], to: 'register' }
+            ],
+            de: [
+                { kw: ['guthaben'], to: 'dashboard' },
+                { kw: ['passwort'], to: 'profile' },
+                { kw: ['email'], to: 'profile' },
+                { kw: ['einzahlung'], to: 'deposit' },
+                { kw: ['auszahlung'], to: 'withdraw' },
+                { kw: ['quantifizierung'], to: 'quantification' },
+                { kw: ['team','empfehlung','provision'], to: 'team' },
+                { kw: ['transaktionen'], to: 'transactions' },
+                { kw: ['registrierung'], to: 'register' }
+            ]
+        };
+
+        function getRedirectMessage(toTopicKey, lang) {
+            const targetTopic = (LD[lang] && LD[lang].topics[toTopicKey]) || (LD.fa.topics[toTopicKey]);
+            if (!targetTopic) return null;
+            const label = targetTopic.label;
+            const messages = {
+                fa: `🌸 این سوال مربوط به بخش «${label}» هست. لطفاً از موضوع «${label}» در صفحه پشتیبانی سوال کنید یا به صفحه مربوطه در داشبورد مراجعه کنید.`,
+                en: `🌸 This question belongs to the "${label}" section. Please select the "${label}" topic on the support page or visit the relevant dashboard page.`,
+                ar: `🌸 هذا السؤال يتعلق بقسم «${label}». يرجى اختيار موضوع «${label}» في صفحة الدعم أو زيارة الصفحة ذات الصلة في لوحة التحكم.`,
+                tr: `🌸 Bu soru "${label}" bölümüne aittir. Lütfen destek sayfasında "${label}" konusunu seçin veya ilgili sayfayı ziyaret edin.`,
+                ru: `🌸 Этот вопрос относится к разделу «${label}». Пожалуйста, выберите тему «${label}» на странице поддержки или посетите соответствующую страницу.`,
+                es: `🌸 Esta pregunta pertenece a la sección "${label}". Por favor selecciona el tema "${label}" en la página de soporte o visita la página correspondiente.`,
+                fr: `🌸 Cette question appartient à la section "${label}". Veuillez sélectionner le sujet "${label}" sur la page d'assistance ou visiter la page correspondante.`,
+                de: `🌸 Diese Frage gehört zum Bereich "${label}". Bitte wählen Sie das Thema "${label}" auf der Support-Seite oder besuchen Sie die entsprechende Seite.`
+            };
+            return messages[lang] || messages.fa;
+        }
+
         function isOnChatState() {
             const s = history.state;
             return !!(s && s.zenixChat);
@@ -380,16 +492,9 @@
                     goodNight: { kw: ['شب بخیر', 'good night'], r: 'شب بخیر! 🌙 امیدوارم روز خوبی داشته باشی.' },
                     thanks: { kw: ['ممنون', 'مرسی', 'متشکرم', 'تشکر', 'thank', 'thanks'], r: 'خواهش می‌کنم! 🌷 خوشحالم که تونستم کمک کنم. چیز دیگه‌ای هست؟' },
                     bye: { kw: ['خداحافظ', 'خدافظ', 'bye', 'goodbye'], r: 'خداحافظ! 🌸 هر وقت سوالی داشتی، من اینجام.' },
-                    whoAreYou: { kw: ['تو کی هستی', 'کی هستی', 'اسمت چیه', 'who are you'], r: 'من {name} هستم، {role} تیم پشتیبانی زنیکس 🌸 اینجام تا به هر سوالی درباره‌ی داشبورد و پلتفرم کمکت کنم.' },
-                    whatCanYouDo: { kw: ['چیکار میتونی', 'چه کاری میتونی', 'چی میتونی بکنی', 'what can you do'], r: 'من می‌تونم درباره موجودی، زیرمجموعه، اعلان‌ها، صندوق پیام، میانبرها، بازار ارز، تنظیمات زبان، منو، کازینو، درباره پلتفرم، خروج و همه‌ی بخش‌های داشبورد راهنمایی‌ت کنم. فقط بپرس! 🌸' }
+                    whoAreYou: { kw: ['تو کی هستی', 'کی هستی', 'اسمت چیه', 'who are you'], r: 'من {name} هستم، {role} تیم پشتیبانی زنیکس 🌸 اینجام تا به هر سوالی درباره‌ی {role} کمکت کنم.' },
+                    whatCanYouDo: { kw: ['چیکار میتونی', 'چه کاری میتونی', 'چی میتونی بکنی', 'what can you do'], r: 'من {role} هستم و در تخصص خودم راهنمایی‌ت می‌کنم. سوالات مربوط به بخش‌های دیگه رو به کارشناس مربوطه ارجاع می‌دم. 🌸' }
                 },
-                shared: [
-                    { kw: ['موجودی','بالانس','چقدر پول دارم','چقدر موجودی'], r: 'موجودی کل حساب شما (USDT) در کارت آبی «موجودی» بالای داشبورد نمایش داده می‌شه و با هر تراکنش خودکار به‌روز می‌شه.' },
-                    { kw: ['تیم من','زیرمجموعه','رفرال','دعوت','لینک دعوت'], r: 'برای مدیریت تیم، دعوت دوستان، مشاهده زیرمجموعه‌ها (سطوح ۱ تا ۳) و کپی لینک اختصاصی، به صفحه «تیم من» (team.html) مراجعه کنید.' },
-                    { kw: ['تراکنش','تاریخچه','سابقه','لیست تراکنش'], r: 'برای مشاهده تاریخچه کامل واریز، برداشت و پاداش‌ها، به صفحه «تراکنش‌ها» (transactions.html) مراجعه کنید.' },
-                    { kw: ['پروفایل','امنیت','تغییر رمز','تنظیمات'], r: 'برای مدیریت امنیت حساب، تغییر رمز عبور و تنظیمات، به صفحه «پروفایل» (profile.html) مراجعه کنید.' },
-                    { kw: ['کازینو','رولت','پلینکو','بازی'], r: 'بازی‌های کازینو از طریق دکمه شناور گوشه صفحه داشبورد قابل دسترسه. رولت و پلینکو به‌صورت دمو اجرا می‌شن.' }
-                ],
                 topics: {
                     dashboard: {
                         label: 'داشبورد', desc: 'موجودی و آمار',
@@ -422,6 +527,8 @@
                             { kw: ['برداشت','withdraw','تسویه'], r: 'برای برداشت، از میانبر «برداشت» استفاده کنید. جزئیات کارمزد، حداقل برداشت و زمان تأیید در صفحه برداشت (receive.html) نمایش داده می‌شه.' },
                             { kw: ['واریز','deposit','شارژ'], r: 'برای واریز، از میانبر «واریز» استفاده کنید. شبکه‌های پشتیبانی‌شده، حداقل مبلغ و زمان تأیید در صفحه واریز (deposit.html) نمایش داده می‌شه.' },
                             { kw: ['کوانتیفیکیشن','ربات','سود','معامله','quantification'], r: 'برای فعال‌سازی ربات معامله‌گر، از میانبر «کوانتیفیکیشن» استفاده کنید. حداقل موجودی، نرخ سود روزانه و جزئیات مربوط به سطح VIP در صفحه کوانتیفیکیشن (quantification.html) نمایش داده می‌شه.' },
+                            { kw: ['تراکنش','تاریخچه','transactions','سابقه'], r: 'برای مشاهده‌ی تاریخچه‌ی کامل واریز، برداشت و پاداش‌ها، از میانبر «تراکنش‌ها» (transactions.html) استفاده کنید.' },
+                            { kw: ['پروفایل','امنیت','تنظیمات','profile','رمز'], r: 'برای مدیریت امنیت حساب، تغییر رمز عبور و تنظیمات، از میانبر «پروفایل» (profile.html) استفاده کنید.' },
                             { kw: ['تیم','زیرمجموعه','team','کمیسیون'], r: 'برای مشاهده‌ی اعضای زیرمجموعه (سطوح ۱ تا ۳) و لینک دعوت اختصاصی، از میانبر «تیم» یا صفحه team.html استفاده کنید.' }
                         ]
                     },
@@ -433,8 +540,7 @@
                             { kw: ['چطور فعال','شروع','روشن','فعال‌سازی'], r: 'برای فعال‌سازی ربات، وارد صفحه کوانتیفیکیشن (quantification.html) بشید. حداقل موجودی لازم برای فعال‌سازی در همون صفحه به شما نمایش داده می‌شه.' },
                             { kw: ['چند بار','روزانه','تعداد معامله','چند معامله'], r: 'تعداد معاملات روزانه و جزئیات مربوط به اون در صفحه کوانتیفیکیشن نمایش داده می‌شه.' },
                             { kw: ['سود','درصد','چقدر','نرخ'], r: 'نرخ سود روزانه بر اساس سطح VIP شما متفاوته و جدول کامل نرخ‌ها در صفحه کوانتیفیکیشن (quantification.html) نمایش داده می‌شه.' },
-                            { kw: ['ریست','نیویورک','ساعت'], r: 'ریست روزانه سود طبق ساعت نیویورک (NY Time) انجام می‌شه.' },
-                            { kw: ['موجودی','بالانس'], r: 'برای فعال‌سازی ربات به موجودی نیاز دارید. موجودی فعلی شما در کارت آبی «موجودی» بالای داشبورد قابل مشاهده‌ست.' }
+                            { kw: ['ریست','نیویورک','ساعت'], r: 'ریست روزانه سود طبق ساعت نیویورک (NY Time) انجام می‌شه.' }
                         ]
                     },
                     deposit: {
@@ -445,8 +551,7 @@
                             { kw: ['حداقل','مبلغ','چقدر'], r: 'حداقل و حداکثر مبلغ واریز در صفحه واریز (deposit.html) به شما نمایش داده می‌شه.' },
                             { kw: ['شبکه','trc20','bep20','ترون','bsc'], r: 'شبکه‌های پشتیبانی‌شده برای واریز در صفحه واریز (deposit.html) نمایش داده می‌شن. دقت کنید آدرس هر شبکه متفاوته و باید حتماً شبکه‌ی درست رو انتخاب کنید.' },
                             { kw: ['زمان','کی','تایید'], r: 'زمان تأیید واریز پس از ثبت TxID در صفحه واریز نمایش داده می‌شه.' },
-                            { kw: ['txid','هش','کد تراکنش'], r: 'کد TxID یک رشته‌ی طولانی (معمولاً ۶۴ کاراکتر) هست که بعد از ارسال تراکنش از کیف پول خودتون دریافت می‌کنید و باید در صفحه واریز ثبت کنید.' },
-                            { kw: ['موجودی','بالانس'], r: 'موجودی فعلی شما در کارت آبی «موجودی» بالای داشبورد قابل مشاهده‌ست. پس از تأیید واریز، این عدد خودکار به‌روز می‌شه.' }
+                            { kw: ['txid','هش','کد تراکنش'], r: 'کد TxID یک رشته‌ی طولانی (معمولاً ۶۴ کاراکتر) هست که بعد از ارسال تراکنش از کیف پول خودتون دریافت می‌کنید و باید در صفحه واریز ثبت کنید.' }
                         ]
                     },
                     withdraw: {
@@ -458,8 +563,7 @@
                             { kw: ['کارمزد','هزینه','fee'], r: 'کارمزد برداشت در صفحه برداشت (receive.html) نمایش داده می‌شه.' },
                             { kw: ['زمان','کی','تایید'], r: 'زمان تأیید برداشت توسط مدیریت در صفحه برداشت به شما نمایش داده می‌شه.' },
                             { kw: ['رمز','پسورد','رمز تراکنش'], r: 'رمز تراکنش یک کد ۶ رقمی هست که برای تأیید برداشت باید وارد کنید. اگر رمز تراکنش رو فراموش کردید، از طریق پشتیبانی قابل بازیابیه.' },
-                            { kw: ['رد','لغو','چرا'], r: 'اگر برداشت شما رد شده، ابتدا در صندوق پیام‌ها (آیکون زنگوله) تب «لغو درخواست» رو باز کنید و پیام مربوطه رو بخونید. اگر سوال بیشتری دارید، همینجا بپرسید تا بررسی کنیم.' },
-                            { kw: ['موجودی','بالانس'], r: 'موجودی فعلی شما در کارت آبی «موجودی» بالای داشبورد قابل مشاهده‌ست. حداقل برداشت بر اساس موجودی و سطح شما تعیین می‌شه.' }
+                            { kw: ['رد','لغو','چرا'], r: 'اگر برداشت شما رد شده، ابتدا در صندوق پیام‌ها (آیکون زنگوله) تب «لغو درخواست» رو باز کنید و پیام مربوطه رو بخونید. اگر سوال بیشتری دارید، همینجا بپرسید تا بررسی کنیم.' }
                         ]
                     },
                     team: {
@@ -525,16 +629,9 @@
                     goodNight: { kw: ['good night', 'goodnight'], r: 'Good night! 🌙 Hope you had a good day.' },
                     thanks: { kw: ['thank', 'thanks', 'thx'], r: "You're welcome! 🌷 Glad I could help. Anything else?" },
                     bye: { kw: ['bye', 'goodbye', 'farewell'], r: 'Goodbye! 🌸 Come back anytime you have a question.' },
-                    whoAreYou: { kw: ['who are you', 'what is your name'], r: 'I am {name}, {role} on the Zenix support team 🌸 I am here to help with any question about the dashboard and platform.' },
-                    whatCanYouDo: { kw: ['what can you do', 'how can you help'], r: 'I can guide you through balance, referrals, notifications, message box, shortcuts, crypto market, language settings, menu, casino, about platform, logout and every section of the dashboard. Just ask! 🌸' }
+                    whoAreYou: { kw: ['who are you', 'what is your name'], r: 'I am {name}, {role} on the Zenix support team 🌸 I am here to help with any question about {role}.' },
+                    whatCanYouDo: { kw: ['what can you do', 'how can you help'], r: 'I am a {role} and I guide you within my specialty. I will refer you to the relevant specialist for other sections. 🌸' }
                 },
-                shared: [
-                    { kw: ['balance','how much','wallet'], r: 'Your total balance (USDT) is shown in the blue "Balance" card at the top of the dashboard and updates automatically with each transaction.' },
-                    { kw: ['team','referral','invite'], r: 'To manage your team, invite friends, and view referrals (levels 1-3), go to the "My Team" page (team.html).' },
-                    { kw: ['transactions','history','record'], r: 'To view your full transaction history, go to the "Transactions" page (transactions.html).' },
-                    { kw: ['profile','security','password'], r: 'To manage account security and settings, go to the "Profile" page (profile.html).' },
-                    { kw: ['casino','roulette','plinko'], r: 'Casino games are accessible via the floating dice button on the dashboard. Roulette and plinko are demo games.' }
-                ],
                 topics: {
                     dashboard: {
                         label: 'Dashboard', desc: 'Balance & Stats',
@@ -559,15 +656,17 @@
                             { kw: ['logout','sign out','exit'], r: 'To log out, select "Logout" from the navigation menu. You will be signed out and redirected to the login page.' },
                             { kw: ['verified','confirmed','badge'], r: 'The green "Verified" badge at the top of the dashboard means your account is active.' },
                             { kw: ['banner','image','ad','promotion'], r: 'A promotional banner is shown in the middle of the dashboard and updates periodically.' },
-                            { kw: ['panel','user panel','management panel'], r: 'Under the welcome message at the top of the dashboard, the text "User Management Panel" is displayed, indicating you are in your user panel.' },
+                            { kw: ['panel','user panel','management panel'], r: 'Under the welcome message at the top of the dashboard, the text "User Management Panel" is displayed.' },
                             { kw: ['name','my name','welcome'], r: 'Your full name is displayed in the "Welcome" section at the top of the dashboard.' },
-                            { kw: ['referral code','invite code','ms-'], r: 'Your personal referral code has the format <strong>MS-XXXXXX</strong> (MS- followed by 6 digits) and can be copied from the "My Team" page (team.html).' },
-                            { kw: ['not opening','load','login','dashboard'], r: 'If the dashboard does not open, first make sure you are logged in. If not, you will be redirected to the login page. If logged in but the page does not load, check your internet and clear browser cache.' },
-                            { kw: ['withdraw rejection','why rejected','cancel reason','withdrawal cancelled'], r: 'If your withdrawal was cancelled, open the related message in the "Rejected" tab of the message box. You will see an explanation and a "Contact Support" button that connects you directly to the withdrawal expert.' },
+                            { kw: ['referral code','invite code','ms-'], r: 'Your personal referral code has the format <strong>MS-XXXXXX</strong> and can be copied from the "My Team" page (team.html).' },
+                            { kw: ['not opening','load','login','dashboard'], r: 'If the dashboard does not open, first make sure you are logged in. If not, you will be redirected to the login page.' },
+                            { kw: ['withdraw rejection','why rejected','cancel reason','withdrawal cancelled'], r: 'If your withdrawal was cancelled, open the related message in the "Rejected" tab of the message box. You will see an explanation and a "Contact Support" button.' },
                             { kw: ['withdraw','withdrawal'], r: 'Use the "Withdraw" shortcut. Full details on fees, minimum amount, and approval time are displayed on the Withdraw page (receive.html).' },
                             { kw: ['deposit','fund'], r: 'Use the "Deposit" shortcut. Supported networks, minimum amount, and confirmation time are displayed on the Deposit page (deposit.html).' },
                             { kw: ['quantification','bot','profit','trade'], r: 'To activate the trading bot, use the "Quantification" shortcut. Minimum balance, daily profit rate and VIP level details are displayed on the Quantification page (quantification.html).' },
-                            { kw: ['team','referral','commission'], r: 'To view your team (levels 1-3) and get your referral link, use the "Team" shortcut or go to team.html.' }
+                            { kw: ['transactions','history','record'], r: 'To see the full history of deposits, withdrawals and rewards, use the "Transactions" shortcut (transactions.html).' },
+                            { kw: ['profile','security','settings'], r: 'To manage account security and settings, use the "Profile" shortcut (profile.html).' },
+                            { kw: ['team','commission'], r: 'To view your team (levels 1-3) and get your referral link, use the "Team" shortcut (team.html).' }
                         ]
                     },
                     quantification: { label: 'Quantification', desc: 'Bot & Profits', welcome: 'Hi! 🌺<br>I am <strong>Isabella</strong>, Trading Bot Specialist.<br>Ask me about the trading bot and daily profits.', knowledge: [{ kw: ['what','how','bot'], r: 'A smart trading bot that uses arbitrage and AI to generate profits.' }, { kw: ['activate','start','enable'], r: 'To activate the bot, go to the Quantification page (quantification.html). The minimum required balance is displayed there.' }, { kw: ['how many','daily','limit'], r: 'Daily trade count and details are displayed on the Quantification page.' }, { kw: ['profit','percent','rate'], r: 'The daily profit rate depends on your VIP level. Full rates are shown on the Quantification page (quantification.html).' }, { kw: ['reset','new york','time'], r: 'Daily reset follows New York Time.' }] },
@@ -591,57 +690,46 @@
                     goodNight: { kw: ['مساء الخير', 'تصبح على خير', 'good night'], r: 'مساء الخير! 🌙 أتمنى لك يوماً جيداً.' },
                     thanks: { kw: ['شكرا', 'شكراً', 'مشكور', 'thank', 'thanks'], r: 'العفو! 🌷 سعيد بمساعدتك. هل هناك شيء آخر؟' },
                     bye: { kw: ['مع السلامة', 'وداعا', 'bye', 'goodbye'], r: 'مع السلامة! 🌸 عد في أي وقت.' },
-                    whoAreYou: { kw: ['من أنت', 'ما اسمك', 'who are you'], r: 'أنا {name}، {role} في فريق دعم زينيكس 🌸 أنا هنا لمساعدتك في أي سؤال.' },
-                    whatCanYouDo: { kw: ['ماذا يمكنك أن تفعل', 'how can you help'], r: 'يمكنني إرشادك حول الرصيد، الإحالات، الإشعارات، صندوق الرسائل، الاختصارات، السوق، إعدادات اللغة، القائمة، الكازينو، والأقسام الأخرى. اسأل فقط! 🌸' }
+                    whoAreYou: { kw: ['من أنت', 'ما اسمك', 'who are you'], r: 'أنا {name}، {role} في فريق دعم زينيكس 🌸 أنا هنا لمساعدتك في تخصصي.' },
+                    whatCanYouDo: { kw: ['ماذا يمكنك أن تفعل', 'how can you help'], r: 'أنا {role} وأرشدك في تخصصي. سأحيلك إلى الأخصائي المختص للأقسام الأخرى. 🌸' }
                 },
-                shared: [
-                    { kw: ['رصيد','مال'], r: 'إجمالي الرصيد (USDT) يظهر في بطاقة «الرصيد» الزرقاء أعلى اللوحة ويتحدّث تلقائياً مع كل معاملة.' },
-                    { kw: ['فريق','إحالة'], r: 'لإدارة فريقك والإحالات، انتقل إلى صفحة «فريقي» (team.html).' },
-                    { kw: ['معاملات','سجل'], r: 'لعرض السجل الكامل، انتقل إلى صفحة «المعاملات» (transactions.html).' },
-                    { kw: ['ملف شخصي','أمان'], r: 'لإدارة الأمان والإعدادات، انتقل إلى صفحة «الملف الشخصي» (profile.html).' },
-                    { kw: ['كازينو','لعبة'], r: 'ألعاب الكازينو متاحة عبر الزر العائم في اللوحة.' }
-                ],
                 topics: {
-                    dashboard: {
-                        label: 'لوحة التحكم', desc: 'الرصيد والإحصاءات',
-                        welcome: 'مرحباً! 🌸<br>أنا <strong>Sophia</strong>، أخصائية لوحة التحكم.<br>اسأليني عن الرصيد، الإحالات، الإشعارات، الرسائل، الاختصارات أو أي ميزة في اللوحة. ماذا تريد أن تعرف؟',
-                        knowledge: [
-                            { kw: ['رصيد','مال','حساب','دولار','usdt'], r: 'إجمالي الرصيد (USDT) يظهر في أعلى اللوحة في بطاقة «الرصيد» الزرقاء، ويتحدّث تلقائياً مع كل معاملة.' },
-                            { kw: ['إحالات','فريق','عدد','دعوة','شبكة'], r: 'إجمالي الإحالات (المستويات 1-3) يظهر في بطاقة «الإحالات» البنفسجية بجانب الرصيد.' },
-                            { kw: ['سوق','سعر','عملة','بيتكوين','إيثيريوم','كريبتو','تتر'], r: 'قسم «سوق العملات الرقمية» يعرض أسعار أفضل 3 عملات (عادة BTC و ETH و USDT) مباشرة ويُحدّث كل 30 ثانية.' },
-                            { kw: ['اختصار','وصول','سريع','بطاقة','رابط'], r: 'ستة اختصارات رئيسية في منتصف الصفحة: التكميم، الإيداع، السحب، الفريق، المعاملات، الملف الشخصي.' },
-                            { kw: ['إشعار','جرس','تنبيه','رسالة','شارة'], r: 'انقر على أيقونة الجرس في الترويسة لفتح صندوق الرسائل. عدد الرسائل غير المقروءة يظهر كشارة حمراء على الجرس.' },
-                            { kw: ['صندوق','قائمة الرسائل','تبويب','فلتر'], r: 'صندوق الرسائل يحتوي على 4 تبويبات: الكل، طلبات مقبولة، طلبات مرفوضة، رسائل الإدارة.' },
-                            { kw: ['مقروء','غير مقروء','جديد','علامة'], r: 'الرسائل غير المقروءة لها خلفية زرقاء وشريط جانبي وشارة «جديد».' },
-                            { kw: ['مقبول','موافق','نجاح','تم'], r: 'طلبات الإيداع/السحب المقبولة تظهر بأيقونة خضراء في تبويب «طلبات مقبولة».' },
-                            { kw: ['مرفوض','ملغى','فشل','إلغاء'], r: 'الطلبات المرفوضة تظهر بأيقونة حمراء في تبويب «طلبات مرفوضة».' },
-                            { kw: ['إدارة','مشرف','إعلان','رسائل الإدارة'], r: 'رسائل الإدارة تظهر في تبويب «رسائل الإدارة» بأيقونة زرقاء.' },
-                            { kw: ['مساعدة','دليل','شرح','سؤال'], r: 'انقر على أيقونة علامة الاستفهام (؟) في الترويسة لفتح دليل اللوحة الشامل بـ6 أقسام.' },
-                            { kw: ['لغة','تغيير اللغة','عربي','إنجليزي','ترجمة'], r: 'انقر على أيقونة الكرة الأرضية (🌐) واختر اللغة للتبديل بين 8 لغات.' },
-                            { kw: ['قائمة','همبرغر','تنقل','ثلاثة خطوط'], r: 'انقر على أيقونة الخطوط الثلاثة (≡) لفتح قائمة التنقل.' },
-                            { kw: ['كازينو','لعبة','روليت','بلينكو','حظ','نرد'], r: 'الزر العائم في زاوية الصفحة يفتح ألعاب الكازينو: الروليت والبلينكو.' },
-                            { kw: ['حول','منصة','زنيكس','zenix','ما هو'], r: 'قسم «حول المنصة» أسفل اللوحة يشرح زنيكس. انقر على «عرض المزيد».' },
-                            { kw: ['دعم','تواصل','سماعة','مساعدة'], r: 'استخدم أيقونة السماعة في الترويسة أو خيار الدعم في القائمة.' },
-                            { kw: ['خروج','تسجيل خروج','إنهاء'], r: 'لتسجيل الخروج، اختر «خروج» من قائمة التنقل.' },
-                            { kw: ['موثق','مؤكد','شعار','نشط'], r: 'شارة «موثق» الخضراء أعلى اللوحة تعني أن حسابك نشط.' },
-                            { kw: ['بنر','صورة','إعلان'], r: 'بنر ترويجي يظهر في منتصف اللوحة.' },
-                            { kw: ['لوحة','لوحة الإدارة'], r: 'تحت رسالة الترحيب، تظهر عبارة «لوحة إدارة المستخدم».' },
-                            { kw: ['اسم','اسمي'], r: 'اسمك الكامل يظهر في قسم «مرحباً» أعلى اللوحة.' },
-                            { kw: ['كود الإحالة','ms-'], r: 'كود الإحالة الخاص بك بصيغة <strong>MS-XXXXXX</strong>.' },
-                            { kw: ['لا يفتح','تحميل','دخول','لوحة'], r: 'إذا لم تُفتح اللوحة، تأكد أولاً من تسجيل الدخول.' },
-                            { kw: ['رفض السحب','سبب الإلغاء'], r: 'إذا أُلغي سحبك، افتح الرسالة في تبويب «طلبات مرفوضة».' },
-                            { kw: ['سحب','withdraw'], r: 'التفاصيل الكاملة تُعرض في صفحة السحب (receive.html).' },
-                            { kw: ['إيداع','deposit'], r: 'التفاصيل الكاملة تُعرض في صفحة الإيداع (deposit.html).' },
-                            { kw: ['تكميم','بوت','ربح','تداول'], r: 'التفاصيل في صفحة التكميم (quantification.html).' },
-                            { kw: ['معاملات','سجل','تاريخ'], r: 'لعرض السجل الكامل، استخدم اختصار «المعاملات».' },
-                            { kw: ['ملف شخصي','أمان','إعدادات','كلمة مرور'], r: 'لإدارة الأمان والإعدادات، استخدم اختصار «الملف الشخصي».' },
-                            { kw: ['فريق','إحالة','عمولة'], r: 'لعرض فريقك، استخدم اختصار «الفريق».' }
-                        ]
-                    },
+                    dashboard: { label: 'لوحة التحكم', desc: 'الرصيد والإحصاءات', welcome: 'مرحباً! 🌸<br>أنا <strong>Sophia</strong>، أخصائية لوحة التحكم.<br>اسأليني عن الرصيد، الإحالات، الإشعارات، الرسائل، الاختصارات.', knowledge: [
+                        { kw: ['رصيد','مال','حساب','دولار','usdt'], r: 'إجمالي الرصيد (USDT) يظهر في أعلى اللوحة في بطاقة «الرصيد» الزرقاء، ويتحدّث تلقائياً مع كل معاملة.' },
+                        { kw: ['إحالات','فريق','عدد','دعوة','شبكة'], r: 'إجمالي الإحالات (المستويات 1-3) يظهر في بطاقة «الإحالات» البنفسجية بجانب الرصيد.' },
+                        { kw: ['سوق','سعر','عملة','بيتكوين','إيثيريوم','كريبتو','تتر'], r: 'قسم «سوق العملات الرقمية» يعرض أسعار أفضل 3 عملات (عادة BTC و ETH و USDT) مباشرة ويُحدّث كل 30 ثانية.' },
+                        { kw: ['اختصار','وصول','سريع','بطاقة','رابط'], r: 'ستة اختصارات رئيسية في منتصف الصفحة: التكميم، الإيداع، السحب، الفريق، المعاملات، الملف الشخصي.' },
+                        { kw: ['إشعار','جرس','تنبيه','رسالة','شارة'], r: 'انقر على أيقونة الجرس في الترويسة لفتح صندوق الرسائل.' },
+                        { kw: ['صندوق','قائمة الرسائل','تبويب','فلتر'], r: 'صندوق الرسائل يحتوي على 4 تبويبات: الكل، طلبات مقبولة، طلبات مرفوضة، رسائل الإدارة.' },
+                        { kw: ['مقروء','غير مقروء','جديد','علامة'], r: 'الرسائل غير المقروءة لها خلفية زرقاء وشارة «جديد».' },
+                        { kw: ['مقبول','موافق','نجاح','تم'], r: 'طلبات الإيداع/السحب المقبولة تظهر بأيقونة خضراء.' },
+                        { kw: ['مرفوض','ملغى','فشل','إلغاء'], r: 'الطلبات المرفوضة تظهر بأيقونة حمراء.' },
+                        { kw: ['إدارة','مشرف','إعلان','رسائل الإدارة'], r: 'رسائل الإدارة تظهر في تبويب «رسائل الإدارة» بأيقونة زرقاء.' },
+                        { kw: ['مساعدة','دليل','شرح','سؤال'], r: 'انقر على أيقونة علامة الاستفهام (؟) لفتح دليل اللوحة الشامل.' },
+                        { kw: ['لغة','تغيير اللغة','عربي','إنجليزي','ترجمة'], r: 'انقر على أيقونة الكرة الأرضية (🌐) واختر اللغة للتبديل بين 8 لغات.' },
+                        { kw: ['قائمة','همبرغر','تنقل','ثلاثة خطوط'], r: 'انقر على أيقونة الخطوط الثلاثة (≡) لفتح قائمة التنقل.' },
+                        { kw: ['كازينو','لعبة','روليت','بلينكو','حظ','نرد'], r: 'الزر العائم في زاوية الصفحة يفتح ألعاب الكازينو: الروليت والبلينكو.' },
+                        { kw: ['حول','منصة','زنيكس','zenix','ما هو'], r: 'قسم «حول المنصة» أسفل اللوحة يشرح زنيكس.' },
+                        { kw: ['دعم','تواصل','سماعة','مساعدة'], r: 'استخدم أيقونة السماعة في الترويسة أو خيار الدعم في القائمة.' },
+                        { kw: ['خروج','تسجيل خروج','إنهاء'], r: 'لتسجيل الخروج، اختر «خروج» من قائمة التنقل.' },
+                        { kw: ['موثق','مؤكد','شعار','نشط'], r: 'شارة «موثق» الخضراء أعلى اللوحة تعني أن حسابك نشط.' },
+                        { kw: ['بنر','صورة','إعلان'], r: 'بنر ترويجي يظهر في منتصف اللوحة.' },
+                        { kw: ['لوحة','لوحة الإدارة'], r: 'تحت رسالة الترحيب، تظهر عبارة «لوحة إدارة المستخدم».' },
+                        { kw: ['اسم','اسمي'], r: 'اسمك الكامل يظهر في قسم «مرحباً» أعلى اللوحة.' },
+                        { kw: ['كود الإحالة','ms-'], r: 'كود الإحالة الخاص بك بصيغة <strong>MS-XXXXXX</strong>.' },
+                        { kw: ['لا يفتح','تحميل','دخول','لوحة'], r: 'إذا لم تُفتح اللوحة، تأكد أولاً من تسجيل الدخول.' },
+                        { kw: ['رفض السحب','سبب الإلغاء'], r: 'إذا أُلغي سحبك، افتح الرسالة في تبويب «طلبات مرفوضة».' },
+                        { kw: ['سحب','withdraw'], r: 'التفاصيل الكاملة تُعرض في صفحة السحب (receive.html).' },
+                        { kw: ['إيداع','deposit'], r: 'التفاصيل الكاملة تُعرض في صفحة الإيداع (deposit.html).' },
+                        { kw: ['تكميم','بوت','ربح','تداول'], r: 'التفاصيل في صفحة التكميم (quantification.html).' },
+                        { kw: ['معاملات','سجل','تاريخ'], r: 'لعرض السجل الكامل، استخدم اختصار «المعاملات» (transactions.html).' },
+                        { kw: ['ملف شخصي','أمان','إعدادات'], r: 'لإدارة الأمان والإعدادات، استخدم اختصار «الملف الشخصي» (profile.html).' },
+                        { kw: ['فريق','عمولة'], r: 'لعرض فريقك، استخدم اختصار «الفريق» (team.html).' }
+                    ] },
                     quantification: { label: 'التداول الكمي', desc: 'البوت والأرباح', welcome: 'أهلاً! 🌺<br>أنا <strong>Isabella</strong>، أخصائية بوت التداول.', knowledge: [{ kw: ['بوت','كيف'], r: 'بوت تداول ذكي يستخدم المراجحة والذكاء الاصطناعي.' }, { kw: ['تفعيل'], r: 'للتفعيل، انتقل إلى صفحة التكميم (quantification.html).' }, { kw: ['أرباح','نسبة'], r: 'نسبة الأرباح حسب مستوى VIP معروضة في صفحة التكميم.' }] },
                     deposit: { label: 'إيداع', desc: 'شحن الحساب', welcome: 'مرحباً! 🌷<br>أنا <strong>Emma</strong>، أخصائية الإيداع.', knowledge: [{ kw: ['كيف','خطوات'], r: '1) الإيداع 2) الشبكة 3) المبلغ 4) نسخ العنوان 5) إرسال 6) TXID' }, { kw: ['حد أدنى'], r: 'الحد الأدنى والأقصى معروضان في صفحة الإيداع.' }, { kw: ['شبكة','trc20','bep20'], r: 'الشبكات المدعومة معروضة في صفحة الإيداع.' }] },
                     withdraw: { label: 'سحب', desc: 'الدفع', welcome: 'أهلاً! 🌹<br>أنا <strong>Olivia</strong>، أخصائية السحب.', knowledge: [{ kw: ['كيف','خطوات'], r: '1) السحب 2) الشبكة 3) العنوان 4) المبلغ 5) كلمة المرور 6) إرسال.' }, { kw: ['حد أدنى'], r: 'الحد الأدنى معروض في صفحة السحب (receive.html).' }, { kw: ['رسوم'], r: 'الرسوم معروضة في صفحة السحب.' }, { kw: ['رفض','إلغاء','لماذا'], r: 'إذا تم إلغاء طلب السحب، راجع رسائل لوحة التحكم.' }] },
-                    team: { label: 'الفريق', desc: 'الإحالات', welcome: 'مرحباً! 🌸<br>أنا <strong>Mia</strong>، أخصائية الفريق.', knowledge: [{ kw: ['دعوة','رابط'], r: 'انسخ رابطك من صفحة "فريقي".' }, { kw: ['عمولة'], r: 'جدول العمولات معروض في صفحة "فريقي".' }] },
+                    team: { label: 'الفريق', desc: 'الإحالات', welcome: 'مرحباً! 🌸<br>أنا <strong>Mia</strong>، أخصائية الفريق.', knowledge: [{ kw: ['دعوة','رابط'], r: 'انسخ رابطك من صفحة "فريقي" (team.html).' }, { kw: ['عمولة'], r: 'جدول العمولات معروض في صفحة "فريقي".' }] },
                     transactions: { label: 'المعاملات', desc: 'السجل المالي', welcome: 'أهلاً! 🌺<br>أنا <strong>Ava</strong>، أخصائية المعاملات.', knowledge: [{ kw: ['فلتر'], r: 'يمكنك التصفية حسب نوع المعاملة.' }, { kw: ['حالة'], r: '🟢 مقبول | 🟡 قيد المراجعة | 🔴 مرفوض' }] },
                     profile: { label: 'الملف الشخصي', desc: 'إعدادات الأمان', welcome: 'مرحباً! 🌷<br>أنا <strong>Chloe</strong>، أخصائية الأمان.', knowledge: [{ kw: ['تغيير','كلمة'], r: 'افتح البطاقة واضغط "الحصول على رمز من الدعم".' }, { kw: ['بريد'], r: 'بطاقة "تغيير البريد" + صورة شخصية.' }, { kw: ['محفظة'], r: 'العناوين مقفلة بعد أول حفظ.' }] },
                     login: { label: 'تسجيل الدخول', desc: 'مشاكل الدخول', welcome: 'مرحباً! 🌸<br>أنا <strong>Lily</strong>، أخصائية الدخول.', knowledge: [{ kw: ['دخول','خطأ'], r: 'تحقق من البريد وكلمة المرور والكابتشا.' }, { kw: ['نسيت'], r: 'اضغط "نسيت كلمة المرور".' }, { kw: ['مقفل'], r: 'بعد محاولات خاطئة، الحساب مقفل مؤقتاً.' }] },
@@ -653,59 +741,48 @@
                 ui: { back: 'Geri', backToTopics: 'Konulara dön', welcomeTitle: "Zenix Desteğe Hoş Geldiniz 🌹", welcomeText: 'Uzman ekibimiz size yardımcı olmak için 24/7 hazır. Aşağıdan bir konu seçin.', topicsTitle: 'Destek Konuları', topicsHint: 'Başlamak için bir konu seçin', closeChat: 'Sohbeti Kapat', conversationId: 'Sohbet Kimliği:', online: 'Çevrimiçi', connected: 'Bağlandı', closeModalTitle: 'Sohbeti Kapat', closeModalText: 'Bu sohbeti kapatmak istediğinizden emin misiniz?', cancel: 'İptal', confirm: 'Evet, kapat', adminView: 'İnsan Desteği', adminRole: 'Zenix Yöneticisi', inputDefault: 'Mesajınızı yazın...', inputAbout: 'Sorunuzu şu konuda yazın:', inputAboutSuffix: '...', mustSelectTopic: 'Lütfen önce bir konu seçin.', activeChatError: '⚠️ Zaten aktif bir sohbetiniz var. Önce onu kapatın.', noInfoFound: 'Üzgünüm, sorunuzu tam anlamadım. 🌸 Farklı şekilde sorabilir veya sizi insan desteğe bağlayabilirim.', switchingToAdmin: 'İnsan desteğe bağlıyorum...', sendError: 'Mesaj gönderme hatası:', noMessages: 'Henüz mesaj yok.', copySuccess: 'Kod kopyalandı, dönülüyor...', switchToAdminBtn: '💬 Yöneticiyle İletişim', userInfoHeader: 'Kullanıcı Bilgileri', userIdLabel: 'Kullanıcı ID', userNameLabel: 'Ad', userEmailLabel: 'E-posta' },
                 roles: { dashboard: 'Panel Uzmanı', quantification: 'İşlem Botu Uzmanı', deposit: 'Yatırım Uzmanı', withdraw: 'Çekim Uzmanı', team: 'Ekip Uzmanı', transactions: 'İşlemler Uzmanı', profile: 'Güvenlik Uzmanı', login: 'Giriş Uzmanı', register: 'Kayıt Uzmanı' },
                 smallTalk: {
-                    greeting: { kw: ['merhaba','selam','hi','hello'], r: 'Merhaba! 🌸 Seni görmek güzel. Ben {name}, {role}. Nasıl yardımcı olabilirim?' },
-                    howAreYou: { kw: ['nasılsın','naber','how are you'], r: 'Harikayım, sorduğun için teşekkürler! 😊 Sen nasılsın?' },
+                    greeting: { kw: ['merhaba','selam','hi','hello'], r: 'Merhaba! 🌸 Ben {name}, {role}. Nasıl yardımcı olabilirim?' },
+                    howAreYou: { kw: ['nasılsın','naber','how are you'], r: 'Harikayım, sorduğun için teşekkürler! 😊' },
                     goodMorning: { kw: ['günaydın','good morning'], r: 'Günaydın! ☀️' },
                     goodNight: { kw: ['iyi geceler','good night'], r: 'İyi geceler! 🌙' },
-                    thanks: { kw: ['teşekkür','sağol','thank','thanks'], r: 'Rica ederim! 🌷 Başka bir şey var mı?' },
+                    thanks: { kw: ['teşekkür','sağol','thank','thanks'], r: 'Rica ederim! 🌷' },
                     bye: { kw: ['görüşürüz','hoşçakal','bye','goodbye'], r: 'Hoşçakal! 🌸' },
-                    whoAreYou: { kw: ['sen kimsin','adın ne','who are you'], r: 'Ben {name}, {role} 🌸' },
-                    whatCanYouDo: { kw: ['ne yapabilirsin','how can you help'], r: 'Bakiye, referanslar, bildirimler, mesaj kutusu, kısayollar, piyasa, dil ayarları, menü, casino hakkında rehberlik edebilirim. 🌸' }
+                    whoAreYou: { kw: ['sen kimsin','adın ne','who are you'], r: 'Ben {name}, {role}.' },
+                    whatCanYouDo: { kw: ['ne yapabilirsin','how can you help'], r: 'Ben {role}. Uzmanlık alanımda yardımcı olurum, diğer konular için ilgili uzmana yönlendiririm. 🌸' }
                 },
-                shared: [
-                    { kw: ['bakiye','para'], r: 'Toplam bakiye mavi "Bakiye" kartında gösterilir.' },
-                    { kw: ['ekip','referans'], r: 'Ekibinizi yönetmek için "Ekibim" (team.html) sayfasına gidin.' },
-                    { kw: ['işlemler','geçmiş'], r: 'Tam işlem geçmişi için "İşlemler" (transactions.html) sayfasına gidin.' },
-                    { kw: ['profil','güvenlik'], r: 'Hesap güvenliği için "Profil" (profile.html) sayfasına gidin.' },
-                    { kw: ['casino','oyun'], r: 'Casino oyunları panele yüzen düğme ile erişilebilir.' }
-                ],
                 topics: {
-                    dashboard: {
-                        label: 'Panel', desc: 'Bakiye ve İstatistikler',
-                        welcome: 'Merhaba! 🌸<br>Ben <strong>Sophia</strong>, Panel Uzmanıyım.<br>Bakiye, istatistik, bildirim, mesaj, kısayollar hakkında sorabilirsiniz.',
-                        knowledge: [
-                            { kw: ['bakiye','para','hesap','dolar','usdt'], r: 'Toplam bakiye panelin üst kısmındaki mavi "Bakiye" kartında gösterilir.' },
-                            { kw: ['referans','ekip','sayı','davet'], r: 'Toplam referanslar mor "Referanslar" kartında gösterilir.' },
-                            { kw: ['piyasa','fiyat','kripto','bitcoin'], r: 'Kripto piyasası en iyi 3 coini (genellikle BTC, ETH, USDT) canlı olarak günceller.' },
-                            { kw: ['kısayol','erişim'], r: 'Ortada altı ana kısayol: Kuantifikasyon, Yatırım, Çekim, Ekip, İşlemler, Profil.' },
-                            { kw: ['bildirim','zil'], r: 'Mesaj kutusunu açmak için zil simgesine tıklayın.' },
-                            { kw: ['gelen kutusu','sekme'], r: 'Mesaj kutusunda 4 sekme var: Tümü, Onaylanan, Reddedilen, Yönetici.' },
-                            { kw: ['okundu','okunmadı'], r: 'Okunmamış mesajlar mavi arka plan ve "YENİ" rozetine sahiptir.' },
-                            { kw: ['onaylandı','başarılı'], r: 'Onaylanan talepler yeşil simgeyle görünür.' },
-                            { kw: ['reddedildi','iptal'], r: 'Reddedilen talepler kırmızı simgeyle görünür.' },
-                            { kw: ['yönetici','duyuru'], r: 'Yönetici mesajları mavi simgeyle görünür.' },
-                            { kw: ['yardım','kılavuz'], r: 'Soru işareti (?) simgesine tıklayarak kılavuzu açın.' },
-                            { kw: ['dil','türkçe'], r: 'Dünya (🌐) simgesine tıklayıp dil seçin.' },
-                            { kw: ['menü','hamburger'], r: 'Üç çizgi (≡) simgesine tıklayarak menüyü açın.' },
-                            { kw: ['casino','oyun','rulet','plinko'], r: 'Yüzen zar düğmesi casino oyunlarını açar.' },
-                            { kw: ['hakkında','platform'], r: '"Platform Hakkında" bölümü Zenix\'i anlatır.' },
-                            { kw: ['destek','iletişim'], r: 'Kulaklık simgesinden destek bölümüne gidin.' },
-                            { kw: ['çıkış'], r: 'Menüden "Çıkış"ı seçin.' },
-                            { kw: ['doğrulandı','rozet'], r: 'Yeşil "Doğrulandı" rozeti hesabınızın aktif olduğunu gösterir.' },
-                            { kw: ['banner','reklam'], r: 'Panelin ortasında tanıtım banner\'ı gösterilir.' },
-                            { kw: ['panel','yönetim'], r: 'Üst kısımda "Kullanıcı Yönetim Paneli" yazısı görünür.' },
-                            { kw: ['isim','adım'], r: 'Adınız "Hoş Geldiniz" bölümünde gösterilir.' },
-                            { kw: ['referral kodu','ms-'], r: 'Referral kodunuz <strong>MS-XXXXXX</strong> formatındadır.' },
-                            { kw: ['açılmıyor','yükleme'], r: 'Panel açılmıyorsa önce giriş yaptığınızdan emin olun.' },
-                            { kw: ['çekim reddi','neden reddedildi'], r: 'Çekim reddedildiyse "Reddedilen" sekmesindeki mesajı açın.' },
-                            { kw: ['çekim','withdraw'], r: 'Detaylar receive.html sayfasında.' },
-                            { kw: ['yatırım','deposit'], r: 'Detaylar deposit.html sayfasında.' },
-                            { kw: ['kuantifikasyon','bot'], r: 'Detaylar quantification.html sayfasında.' },
-                            { kw: ['işlemler','geçmiş'], r: 'Tam geçmiş için "İşlemler" kısayolunu kullanın.' },
-                            { kw: ['profil','güvenlik'], r: 'Güvenlik için "Profil" kısayolunu kullanın.' },
-                            { kw: ['ekip','referans'], r: 'Ekibiniz için "Ekip" kısayolunu kullanın.' }
-                        ]
-                    },
+                    dashboard: { label: 'Panel', desc: 'Bakiye ve İstatistikler', welcome: 'Merhaba! 🌸<br>Ben <strong>Sophia</strong>, Panel Uzmanıyım.', knowledge: [
+                        { kw: ['bakiye','para','hesap','dolar','usdt'], r: 'Toplam bakiye panelin üst kısmındaki mavi "Bakiye" kartında gösterilir.' },
+                        { kw: ['referans','ekip','sayı','davet'], r: 'Toplam referanslar mor "Referanslar" kartında gösterilir.' },
+                        { kw: ['piyasa','fiyat','kripto','bitcoin'], r: 'Kripto piyasası en iyi 3 coini (genellikle BTC, ETH, USDT) canlı olarak günceller.' },
+                        { kw: ['kısayol','erişim'], r: 'Ortada altı ana kısayol: Kuantifikasyon, Yatırım, Çekim, Ekip, İşlemler, Profil.' },
+                        { kw: ['bildirim','zil'], r: 'Mesaj kutusunu açmak için zil simgesine tıklayın.' },
+                        { kw: ['gelen kutusu','sekme'], r: '4 sekme: Tümü, Onaylanan, Reddedilen, Yönetici.' },
+                        { kw: ['okundu','okunmadı'], r: 'Okunmamış mesajlar mavi arka plan ve "YENİ" rozetine sahiptir.' },
+                        { kw: ['onaylandı','başarılı'], r: 'Onaylanan talepler yeşil simgeyle.' },
+                        { kw: ['reddedildi','iptal'], r: 'Reddedilen talepler kırmızı simgeyle.' },
+                        { kw: ['yönetici','duyuru'], r: 'Yönetici mesajları mavi simgeyle.' },
+                        { kw: ['yardım','kılavuz'], r: 'Soru işareti (?) simgesine tıklayın.' },
+                        { kw: ['dil','türkçe'], r: 'Dünya (🌐) simgesine tıklayın.' },
+                        { kw: ['menü','hamburger'], r: 'Üç çizgi (≡) simgesine tıklayın.' },
+                        { kw: ['casino','oyun','rulet','plinko'], r: 'Yüzen zar düğmesi casino oyunlarını açar.' },
+                        { kw: ['hakkında','platform'], r: '"Platform Hakkında" bölümü Zenix\'i anlatır.' },
+                        { kw: ['destek','iletişim'], r: 'Kulaklık simgesinden destek bölümüne gidin.' },
+                        { kw: ['çıkış'], r: 'Menüden "Çıkış"ı seçin.' },
+                        { kw: ['doğrulandı','rozet'], r: 'Yeşil "Doğrulandı" rozeti hesabınızın aktif olduğunu gösterir.' },
+                        { kw: ['banner','reklam'], r: 'Panelin ortasında tanıtım banner\'ı gösterilir.' },
+                        { kw: ['panel','yönetim'], r: 'Üst kısımda "Kullanıcı Yönetim Paneli" yazısı görünür.' },
+                        { kw: ['isim','adım'], r: 'Adınız "Hoş Geldiniz" bölümünde gösterilir.' },
+                        { kw: ['referral kodu','ms-'], r: 'Referral kodunuz <strong>MS-XXXXXX</strong> formatındadır.' },
+                        { kw: ['açılmıyor','yükleme'], r: 'Panel açılmıyorsa önce giriş yaptığınızdan emin olun.' },
+                        { kw: ['çekim reddi'], r: '"Reddedilen" sekmesindeki mesajı açın.' },
+                        { kw: ['çekim','withdraw'], r: 'Detaylar receive.html sayfasında.' },
+                        { kw: ['yatırım','deposit'], r: 'Detaylar deposit.html sayfasında.' },
+                        { kw: ['kuantifikasyon','bot'], r: 'Detaylar quantification.html sayfasında.' },
+                        { kw: ['işlemler','geçmiş'], r: 'Tam geçmiş için "İşlemler" kısayolunu kullanın.' },
+                        { kw: ['profil','güvenlik'], r: 'Güvenlik için "Profil" kısayolunu kullanın.' },
+                        { kw: ['ekip','komisyon'], r: 'Ekibiniz için "Ekip" kısayolunu kullanın.' }
+                    ] },
                     quantification: { label: 'Kuantifikasyon', desc: 'Bot ve Kâr', welcome: 'Selam! 🌺<br>Ben <strong>Isabella</strong>, İşlem Botu Uzmanıyım.', knowledge: [{ kw: ['bot'], r: 'Arbitraj ve AI kullanan akıllı işlem botu.' }, { kw: ['aktif'], r: 'Aktivasyon için quantification.html sayfasına gidin.' }, { kw: ['kâr','yüzde'], r: 'Günlük kâr oranı VIP seviyesine göre değişir.' }] },
                     deposit: { label: 'Yatırım', desc: 'Hesap Yükleme', welcome: 'Merhaba! 🌷<br>Ben <strong>Emma</strong>, Yatırım Uzmanıyım.', knowledge: [{ kw: ['nasıl','adımlar'], r: '1) Yatırım 2) Ağ 3) Tutar 4) Adres kopyala 5) Gönder 6) TXID' }, { kw: ['minimum'], r: 'Minimum/maksimum deposit.html sayfasında gösterilir.' }, { kw: ['ağ','trc20','bep20'], r: 'Desteklenen ağlar deposit.html sayfasında gösterilir.' }] },
                     withdraw: { label: 'Çekim', desc: 'Para Çekme', welcome: 'Selam! 🌹<br>Ben <strong>Olivia</strong>, Çekim Uzmanıyım.', knowledge: [{ kw: ['nasıl'], r: '1) Çekim 2) Ağ 3) Adres 4) Tutar 5) Şifre 6) Gönder.' }, { kw: ['minimum'], r: 'Minimum receive.html sayfasında gösterilir.' }, { kw: ['ücret'], r: 'Ücret receive.html sayfasında gösterilir.' }, { kw: ['reddedildi','iptal'], r: 'Çekim iptal edildiyse panel mesajlarını kontrol edin.' }] },
@@ -728,52 +805,41 @@
                     thanks: { kw: ['спасибо','thank','thanks'], r: 'Пожалуйста! 🌷' },
                     bye: { kw: ['пока','bye'], r: 'Пока! 🌸' },
                     whoAreYou: { kw: ['кто ты'], r: 'Я {name}, {role}.' },
-                    whatCanYouDo: { kw: ['что ты умеешь'], r: 'Могу подсказать по всем разделам панели.' }
+                    whatCanYouDo: { kw: ['что ты умеешь'], r: 'Я {role} и помогу в рамках моей специализации. По другим вопросам направлю к соответствующему специалисту. 🌸' }
                 },
-                shared: [
-                    { kw: ['баланс','деньги'], r: 'Баланс в карточке «Баланс» вверху панели.' },
-                    { kw: ['команда','реферал'], r: 'Управление командой в «Моя команда» (team.html).' },
-                    { kw: ['транзакции','история'], r: 'История в «Транзакции» (transactions.html).' },
-                    { kw: ['профиль','безопасность'], r: 'Управление безопасностью в «Профиль» (profile.html).' },
-                    { kw: ['казино','игра'], r: 'Игры казино доступны по плавающей кнопке.' }
-                ],
                 topics: {
-                    dashboard: {
-                        label: 'Панель', desc: 'Баланс и статистика',
-                        welcome: 'Привет! 🌸<br>Я <strong>Sophia</strong>, специалист панели.',
-                        knowledge: [
-                            { kw: ['баланс','деньги','счет','доллар','usdt'], r: 'Общий баланс в USDT в синей карточке «Баланс» вверху панели.' },
-                            { kw: ['рефералы','команда','количество'], r: 'Рефералы в фиолетовой карточке рядом с балансом.' },
-                            { kw: ['рынок','цена','крипто'], r: 'Рынок показывает топ-3 монеты (обычно BTC, ETH, USDT).' },
-                            { kw: ['ярлык','доступ'], r: 'Шесть ярлыков: Квантификация, Депозит, Вывод, Команда, Транзакции, Профиль.' },
-                            { kw: ['уведомление','колокольчик'], r: 'Колокольчик в шапке открывает почтовый ящик.' },
-                            { kw: ['входящие','вкладка'], r: '4 вкладки: Все, Одобрено, Отклонено, Сообщения админа.' },
-                            { kw: ['прочитано','новое'], r: 'Непрочитанные: синий фон, метка «НОВОЕ».' },
-                            { kw: ['одобрено'], r: 'Одобренные заявки: зелёная иконка.' },
-                            { kw: ['отклонено'], r: 'Отклонённые: красная иконка.' },
-                            { kw: ['админ','объявление'], r: 'Сообщения админа: синяя иконка.' },
-                            { kw: ['помощь','руководство'], r: 'Иконка (?) открывает полное руководство.' },
-                            { kw: ['язык'], r: 'Иконка глобуса (🌐) переключает языки.' },
-                            { kw: ['меню'], r: 'Иконка трёх линий (≡) открывает меню.' },
-                            { kw: ['казино','игра','рулетка'], r: 'Плавающая кнопка открывает игры казино.' },
-                            { kw: ['о платформе','платформа'], r: 'Раздел «О платформе» внизу.' },
-                            { kw: ['поддержка','связаться'], r: 'Через иконку наушников в шапке.' },
-                            { kw: ['выход'], r: 'Через меню «Выход».' },
-                            { kw: ['подтверждено','бейдж'], r: 'Зелёный бейдж «Подтверждено» вверху.' },
-                            { kw: ['баннер','реклама'], r: 'Рекламный баннер в центре панели.' },
-                            { kw: ['панель'], r: 'Под приветствием показано «Панель управления пользователя».' },
-                            { kw: ['имя'], r: 'Ваше имя показано в разделе «Добро пожаловать».' },
-                            { kw: ['реферальный код','ms-'], r: 'Ваш реферальный код в формате <strong>MS-XXXXXX</strong>.' },
-                            { kw: ['не открывается'], r: 'Если панель не открывается, проверьте вход и интернет.' },
-                            { kw: ['отказ вывода'], r: 'Если вывод отменён, откройте вкладку «Отклонено».' },
-                            { kw: ['вывод','withdraw'], r: 'Детали в receive.html.' },
-                            { kw: ['депозит','deposit'], r: 'Детали в deposit.html.' },
-                            { kw: ['квантификация','бот'], r: 'Детали в quantification.html.' },
-                            { kw: ['транзакции','история'], r: 'Полная история в transactions.html.' },
-                            { kw: ['профиль','безопасность'], r: 'Настройки в profile.html.' },
-                            { kw: ['команда','реферал'], r: 'Team page в team.html.' }
-                        ]
-                    },
+                    dashboard: { label: 'Панель', desc: 'Баланс и статистика', welcome: 'Привет! 🌸<br>Я <strong>Sophia</strong>, специалист панели.', knowledge: [
+                        { kw: ['баланс','деньги','счет','доллар','usdt'], r: 'Общий баланс в USDT в синей карточке «Баланс» вверху панели.' },
+                        { kw: ['рефералы','команда','количество'], r: 'Рефералы в фиолетовой карточке рядом с балансом.' },
+                        { kw: ['рынок','цена','крипто'], r: 'Рынок показывает топ-3 монеты (обычно BTC, ETH, USDT).' },
+                        { kw: ['ярлык','доступ'], r: 'Шесть ярлыков: Квантификация, Депозит, Вывод, Команда, Транзакции, Профиль.' },
+                        { kw: ['уведомление','колокольчик'], r: 'Колокольчик в шапке открывает почтовый ящик.' },
+                        { kw: ['входящие','вкладка'], r: '4 вкладки: Все, Одобрено, Отклонено, Сообщения админа.' },
+                        { kw: ['прочитано','новое'], r: 'Непрочитанные: синий фон, метка «НОВОЕ».' },
+                        { kw: ['одобрено'], r: 'Одобренные заявки: зелёная иконка.' },
+                        { kw: ['отклонено'], r: 'Отклонённые: красная иконка.' },
+                        { kw: ['админ','объявление'], r: 'Сообщения админа: синяя иконка.' },
+                        { kw: ['помощь','руководство'], r: 'Иконка (?) открывает полное руководство.' },
+                        { kw: ['язык'], r: 'Иконка глобуса (🌐) переключает языки.' },
+                        { kw: ['меню'], r: 'Иконка трёх линий (≡) открывает меню.' },
+                        { kw: ['казино','игра','рулетка'], r: 'Плавающая кнопка открывает игры казино.' },
+                        { kw: ['о платформе','платформа'], r: 'Раздел «О платформе» внизу.' },
+                        { kw: ['поддержка','связаться'], r: 'Через иконку наушников в шапке.' },
+                        { kw: ['выход'], r: 'Через меню «Выход».' },
+                        { kw: ['подтверждено','бейдж'], r: 'Зелёный бейдж «Подтверждено» вверху.' },
+                        { kw: ['баннер','реклама'], r: 'Рекламный баннер в центре панели.' },
+                        { kw: ['панель'], r: 'Под приветствием показано «Панель управления пользователя».' },
+                        { kw: ['имя'], r: 'Ваше имя показано в разделе «Добро пожаловать».' },
+                        { kw: ['реферальный код','ms-'], r: 'Ваш реферальный код в формате <strong>MS-XXXXXX</strong>.' },
+                        { kw: ['не открывается'], r: 'Если панель не открывается, проверьте вход и интернет.' },
+                        { kw: ['отказ вывода'], r: 'Если вывод отменён, откройте вкладку «Отклонено».' },
+                        { kw: ['вывод','withdraw'], r: 'Детали в receive.html.' },
+                        { kw: ['депозит','deposit'], r: 'Детали в deposit.html.' },
+                        { kw: ['квантификация','бот'], r: 'Детали в quantification.html.' },
+                        { kw: ['транзакции','история'], r: 'Полная история в transactions.html.' },
+                        { kw: ['профиль','безопасность'], r: 'Настройки в profile.html.' },
+                        { kw: ['команда','комиссия'], r: 'Team page в team.html.' }
+                    ] },
                     quantification: { label: 'Квантификация', desc: 'Бот и прибыль', welcome: 'Привет! 🌺<br>Я <strong>Isabella</strong>, специалист бота.', knowledge: [{ kw: ['бот'], r: 'Умный бот с арбитражем и ИИ.' }, { kw: ['активация'], r: 'Минимум на quantification.html.' }, { kw: ['прибыль'], r: 'Ставки на quantification.html.' }] },
                     deposit: { label: 'Депозит', desc: 'Пополнение', welcome: 'Привет! 🌷<br>Я <strong>Emma</strong>, специалист депозитов.', knowledge: [{ kw: ['как'], r: '1) Депозит 2) Сеть 3) Сумма 4) Копировать адрес 5) Отправить 6) TXID' }, { kw: ['минимум'], r: 'На deposit.html.' }, { kw: ['сеть'], r: 'TRC20 и BEP20.' }] },
                     withdraw: { label: 'Вывод', desc: 'Обналичивание', welcome: 'Привет! 🌹<br>Я <strong>Olivia</strong>, специалист выводов.', knowledge: [{ kw: ['как'], r: '1) Вывод 2) Сеть 3) Адрес 4) Сумма 5) Пароль 6) Отправить.' }, { kw: ['минимум'], r: 'На receive.html.' }, { kw: ['комиссия'], r: 'На receive.html.' }, { kw: ['отклонен','отмена'], r: 'Проверьте сообщения панели.' }] },
@@ -796,52 +862,41 @@
                     thanks: { kw: ['gracias','thank','thanks'], r: '¡De nada! 🌷 ¿Algo más?' },
                     bye: { kw: ['adiós','hasta luego','bye','goodbye'], r: '¡Adiós! 🌸' },
                     whoAreYou: { kw: ['quién eres','cómo te llamas','who are you'], r: 'Soy {name}, {role}.' },
-                    whatCanYouDo: { kw: ['qué puedes hacer','how can you help'], r: 'Puedo guiarte sobre saldo, referidos, notificaciones, y todas las secciones. ¡Solo pregunta! 🌸' }
+                    whatCanYouDo: { kw: ['qué puedes hacer','how can you help'], r: 'Soy {role} y te guío en mi especialidad. Te derivaré al especialista correspondiente para otras secciones. 🌸' }
                 },
-                shared: [
-                    { kw: ['saldo','dinero'], r: 'El saldo total se muestra en la tarjeta "Saldo" azul.' },
-                    { kw: ['equipo','referido'], r: 'Para gestionar tu equipo, ve a team.html.' },
-                    { kw: ['transacciones','historial'], r: 'Para el historial completo, ve a transactions.html.' },
-                    { kw: ['perfil','seguridad'], r: 'Para gestionar la seguridad, ve a profile.html.' },
-                    { kw: ['casino','juego'], r: 'Los juegos de casino están disponibles con el botón flotante.' }
-                ],
                 topics: {
-                    dashboard: {
-                        label: 'Panel', desc: 'Saldo y Estadísticas',
-                        welcome: '¡Hola! 🌸<br>Soy <strong>Sophia</strong>, Especialista del Panel.<br>Pregúntame sobre saldo, estadísticas, notificaciones, mensajes, accesos rápidos.',
-                        knowledge: [
-                            { kw: ['saldo','dinero','cuenta','dólar','usdt'], r: 'El saldo total en USDT se muestra en la tarjeta azul "Saldo" en la parte superior del panel.' },
-                            { kw: ['referidos','equipo','cantidad','invitar'], r: 'Los referidos se muestran en la tarjeta morada "Referidos" junto al saldo.' },
-                            { kw: ['mercado','precio','cripto','bitcoin','ethereum','tether'], r: 'La sección "Mercado Cripto" muestra las 3 principales monedas (usualmente BTC, ETH, USDT).' },
-                            { kw: ['acceso','rápido','atajo'], r: 'Seis accesos rápidos: Cuantificación, Depósito, Retiro, Equipo, Transacciones, Perfil.' },
-                            { kw: ['notificación','campana'], r: 'Haz clic en la campana para abrir la bandeja de mensajes.' },
-                            { kw: ['bandeja','pestaña'], r: '4 pestañas: Todo, Aprobado, Rechazado, Admin.' },
-                            { kw: ['leído','no leído','nuevo'], r: 'Los no leídos tienen fondo azul e insignia "NUEVO".' },
-                            { kw: ['aprobado','éxito'], r: 'Aprobados: icono verde.' },
-                            { kw: ['rechazado','cancelado'], r: 'Rechazados: icono rojo.' },
-                            { kw: ['admin','anuncio'], r: 'Mensajes admin: icono azul.' },
-                            { kw: ['ayuda','guía'], r: 'Icono (?) abre la guía completa.' },
-                            { kw: ['idioma','español'], r: 'Icono del globo (🌐) cambia idioma.' },
-                            { kw: ['menú','hamburguesa'], r: 'Icono de tres líneas (≡) abre el menú.' },
-                            { kw: ['casino','juego','ruleta','plinko'], r: 'El botón flotante abre los juegos de casino.' },
-                            { kw: ['acerca','plataforma'], r: 'Sección "Acerca de la plataforma" en la parte inferior.' },
-                            { kw: ['soporte','contacto'], r: 'Icono de auriculares en el encabezado.' },
-                            { kw: ['cerrar sesión','salir'], r: 'Menú "Cerrar sesión".' },
-                            { kw: ['verificado','insignia'], r: 'La insignia verde "Verificado" indica cuenta activa.' },
-                            { kw: ['banner','publicidad'], r: 'Banner promocional en el centro del panel.' },
-                            { kw: ['panel','gestión'], r: 'Bajo el mensaje de bienvenida aparece "Panel de gestión de usuario".' },
-                            { kw: ['nombre'], r: 'Tu nombre aparece en la sección "Bienvenido".' },
-                            { kw: ['código de referido','ms-'], r: 'Tu código de referido tiene el formato <strong>MS-XXXXXX</strong>.' },
-                            { kw: ['no abre','carga'], r: 'Si el panel no se abre, asegúrate de haber iniciado sesión.' },
-                            { kw: ['rechazo de retiro'], r: 'Si tu retiro fue cancelado, abre la pestaña "Rechazado".' },
-                            { kw: ['retiro','withdraw'], r: 'Detalles completos en receive.html.' },
-                            { kw: ['depósito','deposit'], r: 'Detalles completos en deposit.html.' },
-                            { kw: ['cuantificación','bot'], r: 'Detalles en quantification.html.' },
-                            { kw: ['transacciones','historial'], r: 'Historial completo en transactions.html.' },
-                            { kw: ['perfil','seguridad'], r: 'Configuración en profile.html.' },
-                            { kw: ['equipo','referido'], r: 'Team page en team.html.' }
-                        ]
-                    },
+                    dashboard: { label: 'Panel', desc: 'Saldo y Estadísticas', welcome: '¡Hola! 🌸<br>Soy <strong>Sophia</strong>, Especialista del Panel.', knowledge: [
+                        { kw: ['saldo','dinero','cuenta','dólar','usdt'], r: 'El saldo total en USDT se muestra en la tarjeta azul "Saldo" en la parte superior del panel.' },
+                        { kw: ['referidos','equipo','cantidad','invitar'], r: 'Los referidos se muestran en la tarjeta morada "Referidos".' },
+                        { kw: ['mercado','precio','cripto','bitcoin','ethereum','tether'], r: 'La sección "Mercado Cripto" muestra las 3 principales monedas (usualmente BTC, ETH, USDT).' },
+                        { kw: ['acceso','rápido','atajo'], r: 'Seis accesos rápidos: Cuantificación, Depósito, Retiro, Equipo, Transacciones, Perfil.' },
+                        { kw: ['notificación','campana'], r: 'Haz clic en la campana para abrir la bandeja de mensajes.' },
+                        { kw: ['bandeja','pestaña'], r: '4 pestañas: Todo, Aprobado, Rechazado, Admin.' },
+                        { kw: ['leído','no leído','nuevo'], r: 'Los no leídos tienen fondo azul e insignia "NUEVO".' },
+                        { kw: ['aprobado','éxito'], r: 'Aprobados: icono verde.' },
+                        { kw: ['rechazado','cancelado'], r: 'Rechazados: icono rojo.' },
+                        { kw: ['admin','anuncio'], r: 'Mensajes admin: icono azul.' },
+                        { kw: ['ayuda','guía'], r: 'Icono (?) abre la guía completa.' },
+                        { kw: ['idioma','español'], r: 'Icono del globo (🌐) cambia idioma.' },
+                        { kw: ['menú','hamburguesa'], r: 'Icono de tres líneas (≡) abre el menú.' },
+                        { kw: ['casino','juego','ruleta','plinko'], r: 'El botón flotante abre los juegos de casino.' },
+                        { kw: ['acerca','plataforma'], r: 'Sección "Acerca de la plataforma" en la parte inferior.' },
+                        { kw: ['soporte','contacto'], r: 'Icono de auriculares en el encabezado.' },
+                        { kw: ['cerrar sesión','salir'], r: 'Menú "Cerrar sesión".' },
+                        { kw: ['verificado','insignia'], r: 'La insignia verde "Verificado" indica cuenta activa.' },
+                        { kw: ['banner','publicidad'], r: 'Banner promocional en el centro del panel.' },
+                        { kw: ['panel','gestión'], r: 'Bajo el mensaje de bienvenida aparece "Panel de gestión de usuario".' },
+                        { kw: ['nombre'], r: 'Tu nombre aparece en la sección "Bienvenido".' },
+                        { kw: ['código de referido','ms-'], r: 'Tu código de referido tiene el formato <strong>MS-XXXXXX</strong>.' },
+                        { kw: ['no abre','carga'], r: 'Si el panel no se abre, asegúrate de haber iniciado sesión.' },
+                        { kw: ['rechazo de retiro'], r: 'Abre la pestaña "Rechazado" para más detalles.' },
+                        { kw: ['retiro','withdraw'], r: 'Detalles completos en receive.html.' },
+                        { kw: ['depósito','deposit'], r: 'Detalles completos en deposit.html.' },
+                        { kw: ['cuantificación','bot'], r: 'Detalles en quantification.html.' },
+                        { kw: ['transacciones','historial'], r: 'Historial completo en transactions.html.' },
+                        { kw: ['perfil','seguridad'], r: 'Configuración en profile.html.' },
+                        { kw: ['equipo','comisión'], r: 'Team page en team.html.' }
+                    ] },
                     quantification: { label: 'Cuantificación', desc: 'Bot y Ganancias', welcome: '¡Hola! 🌺<br>Soy <strong>Isabella</strong>, Especialista del Bot.', knowledge: [{ kw: ['bot'], r: 'Bot inteligente con arbitraje e IA.' }, { kw: ['activar'], r: 'Mínimo en quantification.html.' }, { kw: ['ganancia'], r: 'Tasas en quantification.html.' }] },
                     deposit: { label: 'Depósito', desc: 'Recargar Cuenta', welcome: '¡Hola! 🌷<br>Soy <strong>Emma</strong>, Especialista de Depósitos.', knowledge: [{ kw: ['cómo'], r: '1) Depósito 2) Red 3) Monto 4) Copiar dirección 5) Enviar 6) TXID' }, { kw: ['mínimo'], r: 'En deposit.html.' }, { kw: ['red'], r: 'TRC20 y BEP20.' }] },
                     withdraw: { label: 'Retiro', desc: 'Retirar Efectivo', welcome: '¡Hola! 🌹<br>Soy <strong>Olivia</strong>, Especialista de Retiros.', knowledge: [{ kw: ['cómo'], r: '1) Retiro 2) Red 3) Dirección 4) Monto 5) Contraseña 6) Enviar.' }, { kw: ['mínimo'], r: 'En receive.html.' }, { kw: ['comisión'], r: 'En receive.html.' }, { kw: ['rechazado','cancelado'], r: 'Revisa los mensajes del panel.' }] },
@@ -864,52 +919,41 @@
                     thanks: { kw: ['merci','thank','thanks'], r: 'De rien ! 🌷 Autre chose ?' },
                     bye: { kw: ['au revoir','bye','goodbye'], r: 'Au revoir ! 🌸' },
                     whoAreYou: { kw: ['qui es-tu','comment tu t\'appelles','who are you'], r: 'Je suis {name}, {role}.' },
-                    whatCanYouDo: { kw: ['que peux-tu faire','how can you help'], r: 'Je peux t\'orienter sur le solde, les parrainages, les notifications et toutes les sections. Demande-moi ! 🌸' }
+                    whatCanYouDo: { kw: ['que peux-tu faire','how can you help'], r: 'Je suis {role} et je t\'oriente dans ma spécialité. Je te dirige vers le spécialiste concerné pour les autres sections. 🌸' }
                 },
-                shared: [
-                    { kw: ['solde','argent'], r: 'Le solde total est affiché dans la carte bleue "Solde".' },
-                    { kw: ['équipe','parrainage'], r: 'Pour gérer votre équipe, allez sur team.html.' },
-                    { kw: ['transactions','historique'], r: 'Pour l\'historique complet, allez sur transactions.html.' },
-                    { kw: ['profil','sécurité'], r: 'Pour gérer la sécurité, allez sur profile.html.' },
-                    { kw: ['casino','jeu'], r: 'Les jeux de casino sont accessibles via le bouton flottant.' }
-                ],
                 topics: {
-                    dashboard: {
-                        label: 'Tableau', desc: 'Solde et Stats',
-                        welcome: 'Salut ! 🌸<br>Je suis <strong>Sophia</strong>, Spécialiste du Tableau.<br>Posez-moi des questions sur le solde, les statistiques, les notifications.',
-                        knowledge: [
-                            { kw: ['solde','argent','compte','dollar','usdt'], r: 'Le solde total en USDT est affiché en haut du tableau dans la carte bleue "Solde".' },
-                            { kw: ['parrainage','équipe','nombre','inviter'], r: 'Les parrainages s\'affichent dans la carte violette "Parrainages" à côté du solde.' },
-                            { kw: ['marché','prix','crypto','bitcoin','ethereum','tether'], r: 'La section "Marché des cryptos" affiche les 3 principales pièces (généralement BTC, ETH, USDT).' },
-                            { kw: ['raccourci','accès','rapide'], r: 'Six raccourcis : Quantification, Dépôt, Retrait, Équipe, Transactions, Profil.' },
-                            { kw: ['notification','cloche'], r: 'Cliquez sur la cloche pour ouvrir la boîte de messages.' },
-                            { kw: ['boîte','onglet'], r: '4 onglets : Tout, Approuvé, Rejeté, Admin.' },
-                            { kw: ['lu','non lu','nouveau'], r: 'Les non lus ont un fond bleu et un badge "NOUVEAU".' },
-                            { kw: ['approuvé','succès'], r: 'Approuvés : icône verte.' },
-                            { kw: ['rejeté','annulé'], r: 'Rejetés : icône rouge.' },
-                            { kw: ['admin','annonce'], r: 'Messages admin : icône bleue.' },
-                            { kw: ['aide','guide'], r: 'Icône (?) ouvre le guide complet.' },
-                            { kw: ['langue','français'], r: 'Icône globe (🌐) change la langue.' },
-                            { kw: ['menu','hamburger'], r: 'Icône trois lignes (≡) ouvre le menu.' },
-                            { kw: ['casino','jeu','roulette','plinko'], r: 'Le bouton flottant ouvre les jeux de casino.' },
-                            { kw: ['à propos','plateforme'], r: 'Section "À propos de la plateforme" en bas.' },
-                            { kw: ['support','contact'], r: 'Icône casque dans l\'en-tête.' },
-                            { kw: ['déconnexion','sortir'], r: 'Menu "Déconnexion".' },
-                            { kw: ['vérifié','badge'], r: 'Le badge vert "Vérifié" indique un compte actif.' },
-                            { kw: ['bannière','publicité'], r: 'Bannière promotionnelle au milieu du tableau.' },
-                            { kw: ['tableau','gestion'], r: 'Sous le message de bienvenue, "Panneau de gestion utilisateur" est affiché.' },
-                            { kw: ['nom'], r: 'Votre nom apparaît dans la section "Bienvenue".' },
-                            { kw: ['code de parrainage','ms-'], r: 'Votre code de parrainage a le format <strong>MS-XXXXXX</strong>.' },
-                            { kw: ['ne s\'ouvre pas','chargement'], r: 'Si le tableau ne s\'ouvre pas, vérifiez que vous êtes connecté.' },
-                            { kw: ['rejet de retrait'], r: 'Ouvrez l\'onglet "Rejeté" pour plus de détails.' },
-                            { kw: ['retrait','withdraw'], r: 'Détails complets sur receive.html.' },
-                            { kw: ['dépôt','deposit'], r: 'Détails complets sur deposit.html.' },
-                            { kw: ['quantification','bot'], r: 'Détails sur quantification.html.' },
-                            { kw: ['transactions','historique'], r: 'Historique complet sur transactions.html.' },
-                            { kw: ['profil','sécurité'], r: 'Paramètres sur profile.html.' },
-                            { kw: ['équipe','parrainage'], r: 'Team page sur team.html.' }
-                        ]
-                    },
+                    dashboard: { label: 'Tableau', desc: 'Solde et Stats', welcome: 'Salut ! 🌸<br>Je suis <strong>Sophia</strong>, Spécialiste du Tableau.', knowledge: [
+                        { kw: ['solde','argent','compte','dollar','usdt'], r: 'Le solde total en USDT est affiché en haut du tableau dans la carte bleue "Solde".' },
+                        { kw: ['parrainage','équipe','nombre','inviter'], r: 'Les parrainages s\'affichent dans la carte violette "Parrainages".' },
+                        { kw: ['marché','prix','crypto','bitcoin','ethereum','tether'], r: 'La section "Marché des cryptos" affiche les 3 principales pièces (généralement BTC, ETH, USDT).' },
+                        { kw: ['raccourci','accès','rapide'], r: 'Six raccourcis : Quantification, Dépôt, Retrait, Équipe, Transactions, Profil.' },
+                        { kw: ['notification','cloche'], r: 'Cliquez sur la cloche pour ouvrir la boîte de messages.' },
+                        { kw: ['boîte','onglet'], r: '4 onglets : Tout, Approuvé, Rejeté, Admin.' },
+                        { kw: ['lu','non lu','nouveau'], r: 'Les non lus ont un fond bleu et un badge "NOUVEAU".' },
+                        { kw: ['approuvé','succès'], r: 'Approuvés : icône verte.' },
+                        { kw: ['rejeté','annulé'], r: 'Rejetés : icône rouge.' },
+                        { kw: ['admin','annonce'], r: 'Messages admin : icône bleue.' },
+                        { kw: ['aide','guide'], r: 'Icône (?) ouvre le guide complet.' },
+                        { kw: ['langue','français'], r: 'Icône globe (🌐) change la langue.' },
+                        { kw: ['menu','hamburger'], r: 'Icône trois lignes (≡) ouvre le menu.' },
+                        { kw: ['casino','jeu','roulette','plinko'], r: 'Le bouton flottant ouvre les jeux de casino.' },
+                        { kw: ['à propos','plateforme'], r: 'Section "À propos de la plateforme" en bas.' },
+                        { kw: ['support','contact'], r: 'Icône casque dans l\'en-tête.' },
+                        { kw: ['déconnexion','sortir'], r: 'Menu "Déconnexion".' },
+                        { kw: ['vérifié','badge'], r: 'Le badge vert "Vérifié" indique un compte actif.' },
+                        { kw: ['bannière','publicité'], r: 'Bannière promotionnelle au milieu du tableau.' },
+                        { kw: ['tableau','gestion'], r: 'Sous le message de bienvenue, "Panneau de gestion utilisateur" est affiché.' },
+                        { kw: ['nom'], r: 'Votre nom apparaît dans la section "Bienvenue".' },
+                        { kw: ['code de parrainage','ms-'], r: 'Votre code de parrainage a le format <strong>MS-XXXXXX</strong>.' },
+                        { kw: ['ne s\'ouvre pas','chargement'], r: 'Si le tableau ne s\'ouvre pas, vérifiez que vous êtes connecté.' },
+                        { kw: ['rejet de retrait'], r: 'Ouvrez l\'onglet "Rejeté" pour plus de détails.' },
+                        { kw: ['retrait','withdraw'], r: 'Détails complets sur receive.html.' },
+                        { kw: ['dépôt','deposit'], r: 'Détails complets sur deposit.html.' },
+                        { kw: ['quantification','bot'], r: 'Détails sur quantification.html.' },
+                        { kw: ['transactions','historique'], r: 'Historique complet sur transactions.html.' },
+                        { kw: ['profil','sécurité'], r: 'Paramètres sur profile.html.' },
+                        { kw: ['équipe','commission'], r: 'Team page sur team.html.' }
+                    ] },
                     quantification: { label: 'Quantification', desc: 'Bot et Profits', welcome: 'Salut ! 🌺<br>Je suis <strong>Isabella</strong>, Spécialiste du Bot.', knowledge: [{ kw: ['bot'], r: 'Bot intelligent avec arbitrage et IA.' }, { kw: ['activer'], r: 'Minimum sur quantification.html.' }, { kw: ['profit'], r: 'Taux sur quantification.html.' }] },
                     deposit: { label: 'Dépôt', desc: 'Recharger', welcome: 'Salut ! 🌷<br>Je suis <strong>Emma</strong>, Spécialiste des Dépôts.', knowledge: [{ kw: ['comment'], r: '1) Dépôt 2) Réseau 3) Montant 4) Copier adresse 5) Envoyer 6) TXID' }, { kw: ['minimum'], r: 'Sur deposit.html.' }, { kw: ['réseau'], r: 'TRC20 et BEP20.' }] },
                     withdraw: { label: 'Retrait', desc: 'Retirer', welcome: 'Salut ! 🌹<br>Je suis <strong>Olivia</strong>, Spécialiste des Retraits.', knowledge: [{ kw: ['comment'], r: '1) Retrait 2) Réseau 3) Adresse 4) Montant 5) Mot de passe 6) Envoyer.' }, { kw: ['minimum'], r: 'Sur receive.html.' }, { kw: ['frais'], r: 'Sur receive.html.' }, { kw: ['rejeté','annulé'], r: 'Consultez les messages du tableau de bord.' }] },
@@ -932,52 +976,41 @@
                     thanks: { kw: ['danke','thank','thanks'], r: 'Gern geschehen! 🌷 Noch etwas?' },
                     bye: { kw: ['tschüss','auf wiedersehen','bye','goodbye'], r: 'Tschüss! 🌸' },
                     whoAreYou: { kw: ['wer bist du','wie heißt du','who are you'], r: 'Ich bin {name}, {role}.' },
-                    whatCanYouDo: { kw: ['was kannst du','how can you help'], r: 'Ich kann dich zu Guthaben, Empfehlungen, Benachrichtigungen und allen Bereichen führen. Frag einfach! 🌸' }
+                    whatCanYouDo: { kw: ['was kannst du','how can you help'], r: 'Ich bin {role} und helfe in meiner Spezialisierung. Für andere Bereiche verweise ich an den zuständigen Spezialisten. 🌸' }
                 },
-                shared: [
-                    { kw: ['guthaben','geld'], r: 'Das Gesamtguthaben wird in der blauen "Guthaben"-Karte angezeigt.' },
-                    { kw: ['team','empfehlung'], r: 'Für Teamverwaltung: team.html.' },
-                    { kw: ['transaktionen','historie'], r: 'Für die vollständige Historie: transactions.html.' },
-                    { kw: ['profil','sicherheit'], r: 'Für Sicherheitseinstellungen: profile.html.' },
-                    { kw: ['casino','spiel'], r: 'Casino-Spiele über den schwebenden Button.' }
-                ],
                 topics: {
-                    dashboard: {
-                        label: 'Dashboard', desc: 'Guthaben & Statistiken',
-                        welcome: 'Hallo! 🌸<br>Ich bin <strong>Sophia</strong>, Dashboard-Spezialistin.<br>Fragen Sie mich zu Guthaben, Statistiken, Benachrichtigungen.',
-                        knowledge: [
-                            { kw: ['guthaben','geld','konto','dollar','usdt'], r: 'Das Gesamtguthaben in USDT wird oben im Dashboard in der blauen "Guthaben"-Karte angezeigt.' },
-                            { kw: ['empfehlung','team','anzahl','einladen'], r: 'Die Gesamtzahl der Empfehlungen wird in der lila "Empfehlungen"-Karte angezeigt.' },
-                            { kw: ['markt','preis','krypto','bitcoin','ethereum','tether'], r: 'Der Bereich "Krypto-Markt" zeigt die Top-3-Coins (normalerweise BTC, ETH, USDT).' },
-                            { kw: ['schnellzugriff','zugriff'], r: 'Sechs Schnellzugriffe: Quantifizierung, Einzahlung, Auszahlung, Team, Transaktionen, Profil.' },
-                            { kw: ['benachrichtigung','glocke'], r: 'Klicken Sie auf das Glockensymbol, um den Posteingang zu öffnen.' },
-                            { kw: ['posteingang','tab'], r: '4 Tabs: Alle, Genehmigt, Abgelehnt, Admin.' },
-                            { kw: ['gelesen','ungelesen','neu'], r: 'Ungelesene haben blauen Hintergrund und "NEU"-Badge.' },
-                            { kw: ['genehmigt','erfolg'], r: 'Genehmigte: grünes Symbol.' },
-                            { kw: ['abgelehnt','storniert'], r: 'Abgelehnte: rotes Symbol.' },
-                            { kw: ['admin','ankündigung'], r: 'Admin-Nachrichten: blaues Symbol.' },
-                            { kw: ['hilfe','anleitung'], r: 'Fragezeichen-Symbol (?) öffnet die vollständige Anleitung.' },
-                            { kw: ['sprache','deutsch'], r: 'Globus-Symbol (🌐) wechselt die Sprache.' },
-                            { kw: ['menü','hamburger'], r: 'Drei-Linien-Symbol (≡) öffnet das Menü.' },
-                            { kw: ['casino','spiel','roulette','plinko'], r: 'Die schwebende Würfel-Schaltfläche öffnet Casino-Spiele.' },
-                            { kw: ['über','plattform'], r: 'Bereich "Über die Plattform" unten.' },
-                            { kw: ['support','kontakt'], r: 'Headset-Symbol in der Kopfzeile.' },
-                            { kw: ['abmelden','logout'], r: 'Menü "Abmelden".' },
-                            { kw: ['verifiziert','badge'], r: 'Grünes "Verifiziert"-Badge bedeutet aktives Konto.' },
-                            { kw: ['banner','werbung'], r: 'Werbebanner in der Mitte des Dashboards.' },
-                            { kw: ['dashboard','verwaltung'], r: 'Unter der Begrüßung wird "Benutzerverwaltungs-Panel" angezeigt.' },
-                            { kw: ['name'], r: 'Ihr Name erscheint im Bereich "Willkommen".' },
-                            { kw: ['empfehlungscode','ms-'], r: 'Ihr Empfehlungscode hat das Format <strong>MS-XXXXXX</strong>.' },
-                            { kw: ['öffnet nicht','laden'], r: 'Wenn das Dashboard nicht öffnet, stellen Sie sicher, dass Sie angemeldet sind.' },
-                            { kw: ['auszahlungsablehnung'], r: 'Öffnen Sie den Tab "Abgelehnt" für Details.' },
-                            { kw: ['auszahlung','withdraw'], r: 'Details auf receive.html.' },
-                            { kw: ['einzahlung','deposit'], r: 'Details auf deposit.html.' },
-                            { kw: ['quantifizierung','bot'], r: 'Details auf quantification.html.' },
-                            { kw: ['transaktionen','historie'], r: 'Vollständige Historie auf transactions.html.' },
-                            { kw: ['profil','sicherheit'], r: 'Einstellungen auf profile.html.' },
-                            { kw: ['team','empfehlung'], r: 'Team-Seite auf team.html.' }
-                        ]
-                    },
+                    dashboard: { label: 'Dashboard', desc: 'Guthaben & Statistiken', welcome: 'Hallo! 🌸<br>Ich bin <strong>Sophia</strong>, Dashboard-Spezialistin.', knowledge: [
+                        { kw: ['guthaben','geld','konto','dollar','usdt'], r: 'Das Gesamtguthaben in USDT wird oben im Dashboard in der blauen "Guthaben"-Karte angezeigt.' },
+                        { kw: ['empfehlung','team','anzahl','einladen'], r: 'Die Gesamtzahl der Empfehlungen wird in der lila "Empfehlungen"-Karte angezeigt.' },
+                        { kw: ['markt','preis','krypto','bitcoin','ethereum','tether'], r: 'Der Bereich "Krypto-Markt" zeigt die Top-3-Coins (normalerweise BTC, ETH, USDT).' },
+                        { kw: ['schnellzugriff','zugriff'], r: 'Sechs Schnellzugriffe: Quantifizierung, Einzahlung, Auszahlung, Team, Transaktionen, Profil.' },
+                        { kw: ['benachrichtigung','glocke'], r: 'Klicken Sie auf das Glockensymbol, um den Posteingang zu öffnen.' },
+                        { kw: ['posteingang','tab'], r: '4 Tabs: Alle, Genehmigt, Abgelehnt, Admin.' },
+                        { kw: ['gelesen','ungelesen','neu'], r: 'Ungelesene haben blauen Hintergrund und "NEU"-Badge.' },
+                        { kw: ['genehmigt','erfolg'], r: 'Genehmigte: grünes Symbol.' },
+                        { kw: ['abgelehnt','storniert'], r: 'Abgelehnte: rotes Symbol.' },
+                        { kw: ['admin','ankündigung'], r: 'Admin-Nachrichten: blaues Symbol.' },
+                        { kw: ['hilfe','anleitung'], r: 'Fragezeichen-Symbol (?) öffnet die vollständige Anleitung.' },
+                        { kw: ['sprache','deutsch'], r: 'Globus-Symbol (🌐) wechselt die Sprache.' },
+                        { kw: ['menü','hamburger'], r: 'Drei-Linien-Symbol (≡) öffnet das Menü.' },
+                        { kw: ['casino','spiel','roulette','plinko'], r: 'Die schwebende Würfel-Schaltfläche öffnet Casino-Spiele.' },
+                        { kw: ['über','plattform'], r: 'Bereich "Über die Plattform" unten.' },
+                        { kw: ['support','kontakt'], r: 'Headset-Symbol in der Kopfzeile.' },
+                        { kw: ['abmelden','logout'], r: 'Menü "Abmelden".' },
+                        { kw: ['verifiziert','badge'], r: 'Grünes "Verifiziert"-Badge bedeutet aktives Konto.' },
+                        { kw: ['banner','werbung'], r: 'Werbebanner in der Mitte des Dashboards.' },
+                        { kw: ['dashboard','verwaltung'], r: 'Unter der Begrüßung wird "Benutzerverwaltungs-Panel" angezeigt.' },
+                        { kw: ['name'], r: 'Ihr Name erscheint im Bereich "Willkommen".' },
+                        { kw: ['empfehlungscode','ms-'], r: 'Ihr Empfehlungscode hat das Format <strong>MS-XXXXXX</strong>.' },
+                        { kw: ['öffnet nicht','laden'], r: 'Wenn das Dashboard nicht öffnet, stellen Sie sicher, dass Sie angemeldet sind.' },
+                        { kw: ['auszahlungsablehnung'], r: 'Öffnen Sie den Tab "Abgelehnt" für Details.' },
+                        { kw: ['auszahlung','withdraw'], r: 'Details auf receive.html.' },
+                        { kw: ['einzahlung','deposit'], r: 'Details auf deposit.html.' },
+                        { kw: ['quantifizierung','bot'], r: 'Details auf quantification.html.' },
+                        { kw: ['transaktionen','historie'], r: 'Vollständige Historie auf transactions.html.' },
+                        { kw: ['profil','sicherheit'], r: 'Einstellungen auf profile.html.' },
+                        { kw: ['team','provision'], r: 'Team-Seite auf team.html.' }
+                    ] },
                     quantification: { label: 'Quantifizierung', desc: 'Bot & Gewinn', welcome: 'Hallo! 🌺<br>Ich bin <strong>Isabella</strong>, Trading-Bot-Spezialistin.', knowledge: [{ kw: ['bot'], r: 'Intelligenter Bot mit Arbitrage und KI.' }, { kw: ['aktivieren'], r: 'Minimum auf quantification.html.' }, { kw: ['gewinn'], r: 'Raten auf quantification.html.' }] },
                     deposit: { label: 'Einzahlung', desc: 'Konto aufladen', welcome: 'Hallo! 🌷<br>Ich bin <strong>Emma</strong>, Einzahlungs-Spezialistin.', knowledge: [{ kw: ['wie'], r: '1) Einzahlung 2) Netzwerk 3) Betrag 4) Adresse kopieren 5) Senden 6) TXID' }, { kw: ['minimum'], r: 'Auf deposit.html.' }, { kw: ['netzwerk'], r: 'TRC20 und BEP20.' }] },
                     withdraw: { label: 'Auszahlung', desc: 'Geld abheben', welcome: 'Hallo! 🌹<br>Ich bin <strong>Olivia</strong>, Auszahlungs-Spezialistin.', knowledge: [{ kw: ['wie'], r: '1) Auszahlung 2) Netzwerk 3) Adresse 4) Betrag 5) Passwort 6) Senden.' }, { kw: ['minimum'], r: 'Auf receive.html.' }, { kw: ['gebühr'], r: 'Auf receive.html.' }, { kw: ['abgelehnt','storniert'], r: 'Prüfen Sie die Dashboard-Nachrichten.' }] },
@@ -1091,9 +1124,7 @@
             aiMode = true;
             currentConversationId = generateConversationId(currentUser?.id, topicKey);
             conversationIdEl.textContent = currentConversationId;
-
             currentExpert = pickExpertForTopic(topicKey, currentUser?.id || getGuestId());
-
             lockTopicsView();
             showChatView();
             backBtnText.textContent = data.ui.backToTopics;
@@ -1109,14 +1140,9 @@
             userInput.placeholder = `${data.ui.inputAbout} ${topic.label} ${data.ui.inputAboutSuffix}`;
             userInput.value = '';
             chatBody.innerHTML = '';
-
             const primaryName = (EXPERT_POOL[topicKey] && EXPERT_POOL[topicKey][0] && EXPERT_POOL[topicKey][0].name) || 'Sophia';
-            const welcomeText = (primaryName === currentExpert.name)
-                ? topic.welcome
-                : topic.welcome.split(primaryName).join(currentExpert.name);
-
+            const welcomeText = (primaryName === currentExpert.name) ? topic.welcome : topic.welcome.split(primaryName).join(currentExpert.name);
             renderMessage(welcomeText, 'bot', new Date().toISOString(), `${currentExpert.name} (${data.roles[topicKey]})`);
-
             pushChatState();
             window.scrollTo({ top: 0, behavior: 'smooth' });
             setTimeout(() => {
@@ -1147,9 +1173,7 @@
             sendBtn.disabled = true;
             chatBody.innerHTML = '';
             conversationIdEl.textContent = 'ZE-000000';
-            if (isOnChatState()) {
-                try { history.back(); } catch(e) {}
-            }
+            if (isOnChatState()) { try { history.back(); } catch(e) {} }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -1213,33 +1237,37 @@
             else { window.location.href = 'dashboard.html'; }
         };
 
-        // ===== اتصال به هوش مصنوعی (Pollinations از طریق Edge Function) =====
+        // ===== اتصال به هوش مصنوعی =====
         async function askAI(userPrompt) {
             const data = LD[currentLang];
             const topic = currentTopic ? data.topics[currentTopic] : null;
 
-            // جمع‌آوری دانش‌نامه (اختصاصی موضوع + مشترک)
+            // فقط دانشنامه اختصاصی موضوع (نه shared، چون shared فقط ارجاع بود)
             let knowledgeContext = '';
-            const allKnowledge = [...(topic?.knowledge || []), ...(data.shared || [])];
-            if (allKnowledge.length) {
+            if (topic?.knowledge?.length) {
                 knowledgeContext = '\nدانش تخصصی تو:\n';
-                allKnowledge.forEach(k => { knowledgeContext += `- ${k.r}\n`; });
+                topic.knowledge.forEach(k => { knowledgeContext += `- ${k.r}\n`; });
             }
 
             const langMap = { fa: 'فارسی', en: 'English', ar: 'العربية', tr: 'Türkçe', ru: 'Русский', es: 'Español', fr: 'Français', de: 'Deutsch' };
             const langName = langMap[currentLang] || 'فارسی';
             const expertName = currentExpert?.name || 'Sophia';
             const expertRole = currentTopic ? data.roles[currentTopic] : 'کارشناس پشتیبانی';
+            const topicLabel = topic?.label || '';
 
             const systemInstruction = `تو ${expertName} هستی، ${expertRole} در تیم پشتیبانی پلتفرم زنیکس (Zenix).
 زنیکس یک پلتفرم معاملات کریپتوکارنسی است.
+تخصص تو فقط «${topicLabel}» است.
+
+⚠️ قاعده بسیار مهم: فقط در مورد تخصص خودت (${topicLabel}) جواب بده.
+اگر سوال کاربر مربوط به بخش دیگه‌ای از پلتفرم بود (مثلاً تغییر رمز/ایمیل → پروفایل، واریز → واریز، برداشت → برداشت، تیم/رفرال → تیم، تاریخچه → تراکنش‌ها، ثبت‌نام → ثبت‌نام)، به هیچ وجه جواب مستقیم نده.
+به جای جواب دادن، مودبانه بگو: «این سوال مربوط به بخش X است. لطفاً از موضوع X در صفحه پشتیبانی سوال کنید یا به صفحه مربوطه در داشبورد مراجعه کنید.»
+
 لحن: صمیمی، کوتاه (۲-۴ خط)، با ۱-۲ ایموجی.
-اگر اطلاعات دقیق نداری، صادق باش و بگو کاربر با ادمین در ارتباط باشه.
 هرگز اطلاعات ساختگی تولید نکن.
 ${knowledgeContext}
 پاسخ را به زبان ${langName} بده.`;
 
-            // ساخت تاریخچه ۱۰ پیام آخر
             const history = [];
             const msgs = chatBody.querySelectorAll('.msg.user, .msg.bot');
             const lastMsgs = Array.from(msgs).slice(-11);
@@ -1291,14 +1319,20 @@ ${knowledgeContext}
             const adminKw = ['ادمین','پشتیبان','مدیر','admin','support','human','yönetici','destek','админ','поддержка','soporte','administrateur'];
             if (adminKw.some(k => q.includes(normalizeFa(k)))) return { handled: 'switch_to_admin' };
 
-            // جستجو در دانشنامه اختصاصی + دانش مشترک
-            const allKnowledge = [...(topic.knowledge || []), ...(data.shared || [])];
-            const kb = scoreKnowledge(question, allKnowledge);
+            // ۱. اول redirects رو چک کن (ارجاع به موضوع دیگه)
+            const redirects = CROSS_REDIRECTS[currentLang] || CROSS_REDIRECTS.fa;
+            for (const r of redirects) {
+                if (r.to === currentTopic) continue; // اگه مقصد خودشه، رد کن
+                if (r.kw.some(k => keywordMatches(question, k))) {
+                    return { handled: true, text: getRedirectMessage(r.to, currentLang) };
+                }
+            }
 
-            // اطمینان بالا → جواب قطعی از دانشنامه
+            // ۲. بعد دانشنامه اختصاصی موضوع
+            const kb = scoreKnowledge(question, topic.knowledge || []);
             if (kb.item && kb.score >= 4) return { handled: true, text: kb.item.r };
 
-            // small-talk
+            // ۳. small-talk
             const smallTalk = data.smallTalk || LD.fa.smallTalk;
             if (smallTalk) {
                 const order = ['greeting', 'howAreYou', 'goodMorning', 'goodNight', 'thanks', 'bye', 'whoAreYou', 'whatCanYouDo'];
@@ -1326,7 +1360,7 @@ ${knowledgeContext}
                 }
             }
 
-            // اطمینان پایین یا هیچ چیز پیدا نشد → AI
+            // ۴. AI
             return { handled: 'ai' };
         }
 
@@ -1395,18 +1429,9 @@ ${knowledgeContext}
                     <i class="fas fa-user-shield"></i>
                     <span>${escapeHtml(t('userInfoHeader'))}</span>
                 </div>
-                <div class="identity-row">
-                    <strong>${escapeHtml(t('userIdLabel'))}:</strong>
-                    <span class="code-val">${escapeHtml(code)}</span>
-                </div>
-                <div class="identity-row">
-                    <strong>${escapeHtml(t('userNameLabel'))}:</strong>
-                    <span class="val">${escapeHtml(name)}</span>
-                </div>
-                <div class="identity-row">
-                    <strong>${escapeHtml(t('userEmailLabel'))}:</strong>
-                    <span class="email-val">${escapeHtml(email)}</span>
-                </div>
+                <div class="identity-row"><strong>${escapeHtml(t('userIdLabel'))}:</strong><span class="code-val">${escapeHtml(code)}</span></div>
+                <div class="identity-row"><strong>${escapeHtml(t('userNameLabel'))}:</strong><span class="val">${escapeHtml(name)}</span></div>
+                <div class="identity-row"><strong>${escapeHtml(t('userEmailLabel'))}:</strong><span class="email-val">${escapeHtml(email)}</span></div>
                 <span class="msg-meta">${formatTime(timeIso)}</span>
             `;
             chatBody.appendChild(div);
@@ -1540,7 +1565,6 @@ ${knowledgeContext}
             if (!currentUser && currentView === 'admin') { showError('Please login first.'); return; }
 
             const isFirstUserMessage = !chatBody.querySelector('.msg.user');
-
             isSending = true; sendBtn.disabled = true;
             renderMessage(text, 'user', new Date().toISOString(), 'You');
             userInput.value = '';
@@ -1548,23 +1572,18 @@ ${knowledgeContext}
                 if (currentView === 'expert') {
                     const reply = generateTopicReply(text, isFirstUserMessage);
                     const data = LD[currentLang];
-                    const expertLabel = (currentExpert && currentTopic)
-                        ? `${currentExpert.name} (${data.roles[currentTopic]})`
-                        : null;
+                    const expertLabel = (currentExpert && currentTopic) ? `${currentExpert.name} (${data.roles[currentTopic]})` : null;
 
                     if (reply.handled === 'switch_to_admin') {
                         setTimeout(async () => {
                             renderMessage(t('switchingToAdmin'), 'system', new Date().toISOString());
                             await switchToHumanMode();
                         }, 700);
-
                     } else if (reply.handled === 'ai') {
-                        // ارجاع به هوش مصنوعی
                         const typing = renderTyping();
                         let aiText = null;
                         try { aiText = await askAI(text); } catch(e) { console.error(e); }
                         typing.remove();
-
                         if (aiText) {
                             renderMessage(aiText, 'bot', new Date().toISOString(), expertLabel);
                         } else {
@@ -1575,7 +1594,6 @@ ${knowledgeContext}
                             chatBody.appendChild(div);
                             chatBody.scrollTop = chatBody.scrollHeight;
                         }
-
                     } else if (reply.handled === true) {
                         const typing = renderTyping();
                         setTimeout(() => {
@@ -1619,18 +1637,16 @@ ${knowledgeContext}
                 }
             } catch (e) { console.error('[Zenix Support] URL parse error:', e); }
 
-            console.log('[Zenix Support] URL topic:', urlTopic);
-
             try {
                 try {
                     const savedLang = localStorage.getItem('zenix_lang') || 'fa';
                     applyLang(savedLang);
-                } catch (e) { console.error('[Zenix Support] applyLang error:', e); }
+                } catch (e) {}
 
                 try {
                     const { data: sessionData } = await supabase.auth.getSession();
                     if (sessionData?.session?.user) currentUser = sessionData.session.user;
-                } catch (e) { console.error('[Zenix Support] getSession error:', e); }
+                } catch (e) {}
 
                 try {
                     supabase.auth.onAuthStateChange((event, session) => {
@@ -1638,23 +1654,18 @@ ${knowledgeContext}
                     });
                 } catch (e) {}
 
-                console.log('[Zenix Support] currentUser:', currentUser ? currentUser.email : 'null');
-
                 const validTopics = Object.keys(LD.fa.topics);
                 if (urlTopic && validTopics.includes(urlTopic)) {
-                    console.log('[Zenix Support] Auto-opening chat for topic:', urlTopic);
                     chatIsOpen = false;
                     currentView = 'topics';
                     try { unlockTopicsView(); } catch (e) {}
                     try { hideChatView(); } catch (e) {}
                     try { backBtnText.textContent = t('back'); } catch (e) {}
-
                     setTimeout(() => {
                         try {
                             try { window.history.replaceState({}, document.title, window.location.pathname); } catch (e) {}
                             window.selectTopic(urlTopic);
                         } catch (err) {
-                            console.error('[Zenix Support] selectTopic failed:', err);
                             showError('Unable to open the chat. Please select a topic below.');
                         }
                     }, 100);
