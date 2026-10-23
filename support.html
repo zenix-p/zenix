@@ -750,13 +750,33 @@ INSTRUCTIONS:
             return { item: bestScore > 0 ? best : null, score: bestScore };
         }
 
+        // ★★★ منطق اصلاح‌شده: اولویت با موضوع و دانش است، نه احوال‌پرسی
         function generateTopicReply(question, isFirstMessage = false) {
             if (!currentTopic) return { handled: false, text: t('mustSelectTopic') };
             const q = normalizeFa(question);
 
+            // 1. ادمین
             const adminKw = ['admin','support','human','ادمین','پشتیبان','مدیر','yönetici','destek','админ','поддержка','soporte','administrateur'];
             if (adminKw.some(k => q.includes(normalizeFa(k)))) return { handled: 'switch_to_admin' };
 
+            // 2. خلاصه موضوع (اولویت بالا)
+            const explainWords = ['explain', 'summary', 'tell me about', 'what is', 'how does', 'توضیح', 'بگو', 'چیه', 'چیست', 'شرح', 'خلاصه', 'اطلاعات', 'بهم بگو', 'میخوام بدونم', 'میخوام', 'راهنما'];
+            const currentLabelEn = (UI.en.labels && UI.en.labels[currentTopic]) || currentTopic;
+            const currentLabelFa = (UI.fa.labels && UI.fa.labels[currentTopic]) || currentTopic;
+            
+            const asksForExplain = explainWords.some(w => q.includes(normalizeFa(w)));
+            const mentionsTopic = q.includes(normalizeFa(currentLabelEn)) || q.includes(normalizeFa(currentLabelFa));
+
+            if ((asksForExplain || mentionsTopic) && TOPIC_SUMMARIES[currentTopic]) {
+                return { handled: true, text: TOPIC_SUMMARIES[currentTopic] };
+            }
+
+            // 3. دانشنامه دقیق
+            const topicKb = EN_TOPICS_KNOWLEDGE[currentTopic] || [];
+            const kb = scoreKnowledge(question, topicKb);
+            if (kb.item && kb.score >= 4) return { handled: true, text: kb.item.r };
+
+            // 4. احوال‌پرسی (بعد از دانشنامه)
             const order = ['greeting','howAreYou','goodMorning','goodNight','thanks','bye','whoAreYou','whatCanYouDo'];
             for (const key of order) {
                 const item = EN_SMALLTALK[key];
@@ -766,21 +786,6 @@ INSTRUCTIONS:
                     const role = (UI.en.roles && UI.en.roles[currentTopic]) || 'Specialist';
                     return { handled: true, text: item.r.replace(/\{name\}/g, name).replace(/\{role\}/g, role) };
                 }
-            }
-
-            const topicKb = EN_TOPICS_KNOWLEDGE[currentTopic] || [];
-            const kb = scoreKnowledge(question, topicKb);
-            if (kb.item && kb.score >= 4) return { handled: true, text: kb.item.r };
-
-            const explainWords = ['explain', 'summary', 'tell me about', 'what is', 'how does', 'توضیح', 'بگو', 'چیه', 'چیست', 'شرح', 'خلاصه', 'اطلاعات', 'بهم بگو'];
-            const currentLabelEn = (UI.en.labels && UI.en.labels[currentTopic]) || currentTopic;
-            const currentLabelFa = (UI.fa.labels && UI.fa.labels[currentTopic]) || currentTopic;
-            
-            const asksForExplain = explainWords.some(w => q.includes(normalizeFa(w)));
-            const mentionsTopic = q.includes(normalizeFa(currentLabelEn)) || q.includes(normalizeFa(currentLabelFa));
-
-            if ((asksForExplain || mentionsTopic) && TOPIC_SUMMARIES[currentTopic]) {
-                return { handled: true, text: TOPIC_SUMMARIES[currentTopic] };
             }
 
             return { handled: 'ai' };
