@@ -215,7 +215,6 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // ===== DOM =====
         const chatBody = document.getElementById('chat-body');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-msg-btn');
@@ -234,7 +233,6 @@
         const langBtn = document.getElementById('lang-btn');
         const langMenu = document.getElementById('lang-menu');
 
-        // ===== state =====
         let currentUser = null;
         let currentChatId = null;
         let currentView = 'topics';
@@ -276,7 +274,12 @@
                 .trim();
         }
 
-        // ===== experts =====
+        function isAISayingNoInfo(text) {
+            if (!text) return true;
+            const t = String(text).toLowerCase();
+            return t.includes("don't have precise") || t.includes("don't know") || t.includes('contact the admin') || t.includes("i don't have") || t.includes('no information');
+        }
+
         const EXPERT_POOL = {
             dashboard: [
                 { name: 'Sophia', img: 'https://randomuser.me/api/portraits/women/44.jpg' },
@@ -372,7 +375,6 @@
             register: { icon: 'fa-user-plus', color: 'ni-amber' }
         };
 
-        // ===== UI TRANSLATIONS =====
         const UI = {
             fa: {
                 dir: 'rtl',
@@ -432,70 +434,101 @@
             }
         };
 
-        // ★★★ دانشنامه جامع پلتفرم (همه بخش‌ها)
+        // ★★★ دانشنامه اختصاصی هر بخش (برای پاسخ سریع و دقیق محلی)
+        const EN_TOPICS_KNOWLEDGE = {
+            dashboard: [
+                { kw: ['balance','money','how much','account','wallet','usdt','موجودی','بالانس'], r: 'Your total balance in USDT is shown at the top of the dashboard in the blue "Balance" card. It updates automatically with each transaction.' },
+                { kw: ['referral','team','count','downline','invite','زیرمجموعه'], r: 'Total referrals (levels 1-3) are shown in the purple "Referrals" card next to your balance.' },
+                { kw: ['market','price','crypto','bitcoin','btc','eth','ethereum','coin','tether','بازار','قیمت','ارز'], r: 'The "Crypto Market" section shows the top 3 coins (usually BTC, ETH and USDT) live, updated every 30 seconds. Green = growth, red = 24h decline.' },
+                { kw: ['shortcut','access','quick','card','link','میانبر','دسترسی'], r: 'Six main shortcuts at the center: Quantification, Deposit, Withdraw, Team, Transactions, Profile.' },
+                { kw: ['notification','bell','alert','message','badge','اعلان','زنگوله'], r: 'Click the bell icon in the header to open the message box. Unread count appears as a red badge on the bell.' },
+                { kw: ['inbox','message list','tab','filter','صندوق پیام'], r: 'The message box has 4 tabs: All, Approved, Rejected, Admin Msg. Click any message to view its full content.' },
+                { kw: ['read','unread','new','mark','نخوانده'], r: 'Unread messages have a blue background, side bar and "NEW" badge. Opening a message marks it as read automatically.' },
+                { kw: ['approved','success','confirmed','تایید'], r: 'Approved requests (deposit/withdraw) have a green icon and appear under the "Approved" tab.' },
+                { kw: ['rejected','cancel','failed','declined','لغو'], r: 'Rejected requests appear with a red icon under the "Rejected" tab. For withdrawal rejections, a "Contact Support" button appears at the bottom.' },
+                { kw: ['admin','management','announcement','bullhorn','اطلاعیه'], r: 'Admin messages (announcements, news) appear in the "Admin Msg" tab with a blue icon.' },
+                { kw: ['help','guide','tutorial','question','راهنما'], r: 'Click the question mark (?) icon in the header to open the full dashboard guide with 6 sections.' },
+                { kw: ['language','change language','translate','زبان','ترجمه'], r: 'Click the globe icon (🌐) in the header and pick a language to switch between 8 options.' },
+                { kw: ['menu','hamburger','nav','navigation','منو'], r: 'Click the three-line icon (≡) in the header to open the navigation menu: Home, Quantification, Deposit, Withdraw, My Team, Transactions, Profile, Support, About, Logout.' },
+                { kw: ['casino','game','roulette','plinko','bet','dice','کازینو','رولت'], r: 'The floating dice button in the corner opens casino games: online roulette and plinko. These are demo games with separate balance.' },
+                { kw: ['about','platform','zenix','who','what is','درباره پلتفرم'], r: 'The "About Platform" section at the bottom of the dashboard explains Zenix, its goals and strategy.' },
+                { kw: ['support','contact','headset','help me','پشتیبانی'], r: 'Use the headset icon in the header or the Support option in the menu to reach the support section and chat with the relevant expert.' },
+                { kw: ['logout','sign out','exit','خروج'], r: 'To log out, select "Logout" from the navigation menu.' },
+                { kw: ['verified','confirmed','badge','تایید شده'], r: 'The green "Verified" badge at the top of the dashboard means your account is active.' },
+                { kw: ['banner','image','ad','promotion','بنر'], r: 'A promotional banner is shown in the middle of the dashboard and updates periodically.' },
+                { kw: ['panel','user panel','management panel','پنل'], r: 'Under the welcome message at the top of the dashboard, the text "User Management Panel" is displayed.' },
+                { kw: ['name','my name','welcome','نام من'], r: 'Your full name is displayed in the "Welcome" section at the top of the dashboard.' },
+                { kw: ['referral code','invite code','ms-','کد رفرال'], r: 'Your personal referral code has the format MS-XXXXXX and can be copied from the "My Team" page (team.html).' },
+                { kw: ['not opening','load','login','dashboard','باز نمیشه'], r: 'If the dashboard does not open, first make sure you are logged in.' },
+                { kw: ['withdraw rejection','why rejected','cancel reason','رد برداشت'], r: 'If your withdrawal was cancelled, open the related message in the "Rejected" tab of the message box.' }
+            ],
+            quantification: [
+                { kw: ['what','how','bot','ربات'], r: 'A smart trading bot that uses arbitrage and AI to generate daily profits.' },
+                { kw: ['activate','start','enable','فعال'], r: 'To activate the bot, go to the Quantification page (quantification.html). The minimum required balance is displayed there.' },
+                { kw: ['how many','daily','limit','چند'], r: 'Daily trade count and details are displayed on the Quantification page.' },
+                { kw: ['profit','percent','rate','سود','درصد'], r: 'The daily profit rate depends on your VIP level. VIP1=1.5%, VIP2=2%, VIP3=2.5%, VIP4=3%, VIP5=3.5%, VIP6=4%.' },
+                { kw: ['reset','new york','time','ریست'], r: 'Daily reset follows New York Time.' }
+            ],
+            deposit: [
+                { kw: ['how','steps','process','چطور','مراحل'], r: 'Steps: 1) Open deposit.html 2) Choose network (TRC20 or BEP20) 3) Enter amount 4) Copy address 5) Send crypto 6) Submit TxID.' },
+                { kw: ['minimum','amount','حداقل'], r: 'Minimum deposit is $10. Maximum is $100,000.' },
+                { kw: ['network','trc20','bep20','شبکه'], r: 'Two networks are supported: TRC20 and BEP20. Make sure to choose the correct one.' },
+                { kw: ['time','when','confirm','زمان'], r: 'Deposit is confirmed 5 to 15 minutes after TxID submission.' },
+                { kw: ['txid','hash','هش'], r: 'TxID is a long string (usually 64 chars) you receive after sending the crypto.' }
+            ],
+            withdraw: [
+                { kw: ['how','steps','process','چطور','مراحل','شرایط','condition'], r: 'Withdrawal steps: 1) Open receive.html 2) Choose network 3) Enter destination address 4) Confirm amount 5) Enter 6-digit transaction password 6) Submit.' },
+                { kw: ['minimum','amount','حداقل','شرایط'], r: 'Minimum withdrawal depends on your VIP level: VIP1=$10, VIP2=$50, VIP3=$100, VIP4=$200, VIP5=$300, VIP6=$500.' },
+                { kw: ['fee','commission','کارمزد'], r: 'The withdrawal fee is $0.90 per transaction.' },
+                { kw: ['time','when','confirm','approval','زمان'], r: 'Withdrawal approval takes 1 to 24 business hours.' },
+                { kw: ['password','رمز','transaction password'], r: 'A 6-digit transaction password is required. If you forget it, you can recover it via support.' },
+                { kw: ['rejected','cancel','why','رد'], r: 'If your withdrawal was cancelled, open the message in the "Rejected" tab of the message box first.' },
+                { kw: ['condition','requirement','شرایط'], r: 'To withdraw: minimum balance depends on your level ($10-$500), fee is $0.90, requires 6-digit transaction password, and approval takes 1-24 hours.' }
+            ],
+            team: [
+                { kw: ['invite','link','دعوت','لینک'], r: 'Copy your personal link from the "My Team" page (team.html) and send it to friends.' },
+                { kw: ['commission','percent','کمیسیون'], r: 'Commission is calculated in 3 levels: Level 1 gives the highest, Level 2 lower, Level 3 lowest.' },
+                { kw: ['stats','count','آمار'], r: 'Full team stats (levels 1-3) are shown on the "My Team" page (team.html).' },
+                { kw: ['referral code','ms-','کد رفرال'], r: 'Your referral code has the format MS-XXXXXX and can be copied from the "My Team" page.' }
+            ],
+            transactions: [
+                { kw: ['filter','type','فیلتر'], r: 'The Transactions page (transactions.html) allows filtering by: All, Deposits, Withdrawals, Rewards.' },
+                { kw: ['status','color','وضعیت'], r: 'Transaction status colors: Approved (green), Pending (yellow), Rejected (red).' },
+                { kw: ['rejected','why','رد'], r: 'Rejected transaction details are in the "Rejected" tab of the message box.' }
+            ],
+            profile: [
+                { kw: ['change','password','تغییر رمز','پسورد'], r: 'Open the Profile page (profile.html) and click the relevant card. A verification code is sent via support.' },
+                { kw: ['transaction password','رمز تراکنش'], r: 'Open the "Change Transaction Password" card in the Profile page.' },
+                { kw: ['email','ایمیل'], r: 'Open the "Change Email" card. Requires a selfie and support approval (1-72 hours).' },
+                { kw: ['address','wallet','آدرس','کیف پول'], r: 'Wallet addresses are locked after first save. To change, get a verification code from support.' },
+                { kw: ['code','تایید'], r: 'All verification codes come through the support chat.' }
+            ],
+            login: [
+                { kw: ['login','sign in','error','وارد','لاگین'], r: 'Check: 1) correct email/password 2) Caps Lock off 3) captcha entered correctly.' },
+                { kw: ['forgot','reset','فراموش'], r: 'Click "Forgot Password" on the login page.' },
+                { kw: ['locked','blocked','قفل'], r: 'Your account may be locked for 15 minutes after 5 failed attempts.' },
+                { kw: ['captcha','کپچا'], r: 'Click the refresh button next to the image to get a new captcha.' }
+            ],
+            register: [
+                { kw: ['how','steps','مراحل'], r: 'Registration: name, email, password, captcha, email verification, phone number.' },
+                { kw: ['email','verify','ایمیل'], r: 'Check the Spam/Junk folder if you did not receive the verification email.' },
+                { kw: ['phone','mobile','موبایل'], r: 'Enter the phone with country code (e.g., +98 for Iran) and without leading zero.' },
+                { kw: ['age','سن'], r: 'Minimum age is 18 years old.' }
+            ]
+        };
+
+        // دانشنامه جامع برای AI
         const EN_PLATFORM_KNOWLEDGE = `
-1. DASHBOARD:
-- Balance in USDT is in the top blue card.
-- Referrals (levels 1-3) are in the purple card.
-- Crypto Market shows top 3 coins (BTC, ETH, USDT) live every 30s.
-- Shortcuts: Quantification, Deposit, Withdraw, Team, Transactions, Profile.
-- Notifications: Bell icon shows 4 tabs (All, Approved, Rejected, Admin). Unread has blue background.
-- Help: Question mark (?) icon opens the full guide.
-- Language: Globe (🌐) icon switches between 8 languages.
-- Menu: Three-line (≡) icon opens navigation.
-- Casino: Floating dice button opens Roulette and Plinko demo games.
-- About Platform: Text at the bottom explains Zenix.
-- Support: Headset icon goes to this chat.
-- Logout: In the navigation menu.
-- Verified badge: Green badge at top means account is active.
-- Referral code format is MS-XXXXXX (found in Team page).
-- User's name is displayed in the welcome message.
-
-2. DEPOSIT (deposit.html):
-- Steps: Choose network (TRC20 or BEP20) -> Enter amount -> Copy address -> Send crypto -> Submit TxID.
-- Minimum deposit: $10 (Maximum: $100,000).
-- Confirmation time: 5 to 15 minutes after submitting TxID.
-
-3. WITHDRAW (receive.html):
-- Steps: Choose network -> Enter destination address -> Confirm amount -> Enter 6-digit transaction password -> Submit.
-- Minimum withdrawal based on VIP level: VIP1=$10, VIP2=$50, VIP3=$100, VIP4=$200, VIP5=$300, VIP6=$500.
-- Fee: $0.90.
-- Approval time: 1 to 24 business hours.
-- Transaction password: 6 digits. Can be recovered via support if forgotten.
-
-4. QUANTIFICATION (quantification.html):
-- Smart trading bot using AI and arbitrage.
-- Minimum balance to activate: $20.
-- Trades per day: 4 trades, each 10 seconds.
-- Daily profit rates by VIP level: VIP1=1.5%, VIP2=2%, VIP3=2.5%, VIP4=3%, VIP5=3.5%, VIP6=4%.
-- Daily reset happens at New York Time (NY Time).
-
-5. TEAM (team.html):
-- 3-level commission structure.
-- Copy your personal referral link from this page.
-- Referral code format: MS-XXXXXX.
-
-6. TRANSACTIONS (transactions.html):
-- Filter by type: All, Deposits, Withdrawals, Rewards.
-- Status colors: Green = Approved, Yellow = Pending, Red = Rejected.
-
-7. PROFILE (profile.html):
-- Change password: Click the card, get a verification code from support.
-- Change transaction password: Open the specific card.
-- Change email: Requires a selfie and support approval (1 to 72 hours).
-- Wallet addresses: Locked after the first save. To change, get a code from support.
-
-8. LOGIN (index.html):
-- Check email/password, turn off Caps Lock, enter captcha correctly.
-- Forgot password: Click "Forgot Password" on the login page.
-- Account lockout: Temporarily locked after 5 failed attempts (15 minutes).
-- Captcha: Click the refresh button to get a new one.
-
-9. REGISTER:
-- Requirements: Name, email, password, captcha, email verification, phone number.
-- Minimum age: 18 years old.
-- Email verification: Check Spam/Junk folder if not received.
-- Phone number: Enter with country code, no leading zero.
+PLATFORM KNOWLEDGE:
+- DEPOSIT: Steps: choose network (TRC20/BEP20), enter amount, copy address, send crypto, submit TxID. Min $10, Max $100,000. Confirmation 5-15 min.
+- WITHDRAW: Steps: choose network, enter address, confirm amount, enter 6-digit password, submit. Min: VIP1=$10, VIP2=$50, VIP3=$100, VIP4=$200, VIP5=$300, VIP6=$500. Fee $0.90. Approval 1-24 business hours.
+- QUANTIFICATION (Bot): Min balance $20. 4 trades per day. Profit: VIP1=1.5%, VIP2=2%, VIP3=2.5%, VIP4=3%, VIP5=3.5%, VIP6=4%. Reset at NY Time.
+- TEAM: 3-level commissions. Referral code format MS-XXXXXX.
+- DASHBOARD: Balance in top blue card, referrals in purple card, top 3 crypto live, shortcuts, notifications bell, help icon, language globe, menu, casino dice button, About Platform section.
+- TRANSACTIONS: Filter by type. Status: Green=Approved, Yellow=Pending, Red=Rejected.
+- PROFILE: Change password, email, transaction password. Wallet addresses lock after first save.
+- LOGIN: Forgot password, account locked after 5 attempts for 15 min.
+- REGISTER: Name, email, password, captcha, phone. Min age 18.
         `;
 
         const EN_SMALLTALK = {
@@ -506,10 +539,9 @@
             thanks: { kw: ['thank','thanks','thx'], r: "You're welcome! 🌷 Glad I could help. Anything else?" },
             bye: { kw: ['bye','goodbye','farewell'], r: 'Goodbye! 🌸 Come back anytime.' },
             whoAreYou: { kw: ['who are you','what is your name'], r: 'I am {name}, {role} on the Zenix support team 🌸' },
-            whatCanYouDo: { kw: ['what can you do','how can you help'], r: 'I am a {role}. I know everything about the Zenix platform and can answer any question you have. 🌸' }
+            whatCanYouDo: { kw: ['what can you do','how can you help'], r: 'I am a {role}. I know the whole Zenix platform and can answer any question. 🌸' }
         };
 
-        // ===== helpers =====
         function t(key) { return (UI[currentLang]?.ui && UI[currentLang].ui[key]) || UI.fa.ui[key] || key; }
         function roleOf(k) { return (UI[currentLang]?.roles && UI[currentLang].roles[k]) || UI.en.roles[k] || k; }
         function labelOf(k) { return (UI[currentLang]?.labels && UI[currentLang].labels[k]) || UI.en.labels[k] || k; }
@@ -752,9 +784,17 @@
             }
         }
 
+        // ★★★ askAI: دانشنامه جامع + دانشنامه topic + تشخیص "نمی‌دونم"
         async function askAI(userPrompt) {
             const roleEn = (UI.en.roles && UI.en.roles[currentTopic]) || 'Support Specialist';
             const expertName = currentExpert?.name || 'Sophia';
+
+            let topicContext = '';
+            const topicKb = EN_TOPICS_KNOWLEDGE[currentTopic] || [];
+            if (topicKb.length) {
+                topicContext = '\nSpecific to this section:\n';
+                topicKb.forEach(k => { topicContext += `- ${k.r}\n`; });
+            }
 
             const history = [];
             const msgs = chatBody.querySelectorAll('.msg.user, .msg.bot');
@@ -778,15 +818,15 @@
                         body: JSON.stringify({
                             prompt: `[User message — may be in any language; understand it but respond ONLY in English]:\n${userPrompt}`,
                             systemInstruction: `You are ${expertName}, a ${roleEn} at Zenix.
-Here is the complete knowledge base of the Zenix platform:
+${topicContext}
+Full platform knowledge:
 ${EN_PLATFORM_KNOWLEDGE}
 
 INSTRUCTIONS:
-1. Answer the user's question accurately using ONLY the knowledge base above.
-2. Even if the user's question is about a different section (e.g., asking about deposit while in dashboard), answer it directly. You are a platform expert.
-3. Keep answers short (2-4 lines), friendly, and use 1-2 emojis.
-4. If you don't know something that is not in the knowledge base, say: "I don't have precise information about that. Please contact the admin for more details."
-5. ABSOLUTELY NO PERSIAN, ARABIC, OR NON-ENGLISH WORDS. Respond 100% in English.`,
+1. Answer accurately based on the knowledge above.
+2. Answer questions about ANY section (not just yours) since you are a platform expert.
+3. Short answer (2-4 lines), friendly tone, 1-2 emojis.
+4. 100% English. Never use Persian/Arabic/other non-English words.`,
                             history
                         }),
                         signal: controller.signal
@@ -798,6 +838,17 @@ INSTRUCTIONS:
             } catch (e) { console.error('[askAI] error:', e); return null; }
         }
 
+        function scoreKnowledge(question, list) {
+            if (!list || !list.length) return { item: null, score: 0 };
+            let best = null, bestScore = 0;
+            for (const item of list) {
+                let s = 0;
+                for (const k of (item.kw || [])) if (keywordMatches(question, k)) s += Math.min(String(k).length, 10);
+                if (s > bestScore) { bestScore = s; best = item; }
+            }
+            return { item: bestScore > 0 ? best : null, score: bestScore };
+        }
+
         function generateTopicReply(question, isFirstMessage = false) {
             if (!currentTopic) return { handled: false, text: t('mustSelectTopic') };
             const q = normalizeFa(question);
@@ -805,6 +856,12 @@ INSTRUCTIONS:
             const adminKw = ['admin','support','human','ادمین','پشتیبان','مدیر','yönetici','destek','админ','поддержка','soporte','administrateur'];
             if (adminKw.some(k => q.includes(normalizeFa(k)))) return { handled: 'switch_to_admin' };
 
+            // ★★★ اول دانشنامه topic محلی (سریع و دقیق)
+            const topicKb = EN_TOPICS_KNOWLEDGE[currentTopic] || [];
+            const kb = scoreKnowledge(question, topicKb);
+            if (kb.item && kb.score >= 4) return { handled: true, text: kb.item.r };
+
+            // small talk
             const order = ['greeting','howAreYou','goodMorning','goodNight','thanks','bye','whoAreYou','whatCanYouDo'];
             for (const key of order) {
                 const item = EN_SMALLTALK[key];
@@ -816,6 +873,7 @@ INSTRUCTIONS:
                 }
             }
 
+            // ★★★ اگه محلی پیدا نشد، برو AI
             return { handled: 'ai' };
         }
 
@@ -1010,13 +1068,24 @@ INSTRUCTIONS:
                         const elapsed = Date.now() - startTime;
                         if (elapsed < 1500) await new Promise(r => setTimeout(r, 1500 - elapsed));
                         typing.remove();
-                        if (aiText) renderBotMessage(aiText, expertLabel);
-                        else {
-                            renderBotMessage(t('noInfoFound'), expertLabel);
-                            const div = document.createElement('div'); div.className = 'quick-replies';
-                            div.innerHTML = `<button class="quick-reply-btn admin-link" onclick="window.__switchAdmin()">${t('switchToAdminBtn')}</button>`;
-                            chatBody.appendChild(div);
-                            chatBody.scrollTop = chatBody.scrollHeight;
+                        
+                        // ★★★ اگه AI گفت نمی‌دونم، از دانشنامه محلی با آستانه پایین‌تر استفاده کن
+                        if (!aiText || isAISayingNoInfo(aiText)) {
+                            const topicKb = EN_TOPICS_KNOWLEDGE[currentTopic] || [];
+                            const kb = scoreKnowledge(text, topicKb);
+                            if (kb.item && kb.score >= 2) {
+                                renderBotMessage(kb.item.r, expertLabel);
+                            } else if (aiText) {
+                                renderBotMessage(aiText, expertLabel);
+                            } else {
+                                renderBotMessage(t('noInfoFound'), expertLabel);
+                                const div = document.createElement('div'); div.className = 'quick-replies';
+                                div.innerHTML = `<button class="quick-reply-btn admin-link" onclick="window.__switchAdmin()">${t('switchToAdminBtn')}</button>`;
+                                chatBody.appendChild(div);
+                                chatBody.scrollTop = chatBody.scrollHeight;
+                            }
+                        } else {
+                            renderBotMessage(aiText, expertLabel);
                         }
                     } else if (reply.handled === true) {
                         const typing = renderTyping();
