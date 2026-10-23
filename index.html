@@ -87,7 +87,14 @@
         html[dir="rtl"] .group input{padding-right:40px;padding-left:40px}
         html[dir="ltr"] .group input{padding-left:40px;padding-right:40px}
         .group input:-webkit-autofill,.group input:-webkit-autofill:hover,.group input:-webkit-autofill:focus,.group input:-webkit-autofill:active{-webkit-box-shadow:0 0 0 30px rgba(10,15,30,.95) inset!important;-webkit-text-fill-color:#fff!important;caret-color:#fff}
-        #user::placeholder,#pass::placeholder{color:#9ca3af;opacity:1}
+
+        /* ==== پلیس‌هولدر کم‌رنگ و نامحسوس ==== */
+        #user::placeholder,
+        #pass::placeholder{
+            color:#64748b !important;
+            opacity:.55 !important;
+            font-size:12px !important;
+        }
         .group input:focus{border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.2)}
 
         ::spelling-error {
@@ -137,10 +144,14 @@
         .err{color:#f87171;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3)}
         .succ{color:#4ade80;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3)}
 
-        /* ============ موبایل: جلوگیری از بزرگ شدن فونت‌ها + تنظیم سایزها ============ */
+        /* ============ موبایل: تنظیم سایز فونت‌ها ============ */
         @media (max-width: 768px) {
-            /* فقط input ها 16px باشن تا iOS هنگام فوکوس زوم نکنه */
-            .group input { font-size: 16px !important; }
+            /* فونت داخل input کوچک‌تر از قبل (به‌جای 16px) */
+            .group input { font-size: 14px !important; }
+            /* فقط هنگام فوکوس به ۱۶px می‌ره تا iOS زوم خودکار نکنه */
+            .group input:focus { font-size: 16px !important; }
+            #user::placeholder, #pass::placeholder { font-size: 13px !important; }
+
             .auth-card { padding: 22px 20px; }
             .logo-text { font-size: 24px; letter-spacing: 2px; }
             .logo-icon { width: 42px; height: 42px; font-size: 22px; }
@@ -314,6 +325,18 @@
         }
         hardDisableSpellcheck(userIn);
         hardDisableSpellcheck(passIn);
+
+        /* ================================================================
+           ★ پاک شدن پلیس‌هولدر هنگام فوکوس + بازگشت هنگام بلور (اگر خالی باشد)
+           ================================================================ */
+        function setupPlaceholderClear(inp, getPh) {
+            inp.addEventListener('focus', () => { inp.placeholder = ''; });
+            inp.addEventListener('blur', () => {
+                if (!inp.value.trim()) inp.placeholder = getPh();
+            });
+        }
+        setupPlaceholderClear(userIn, () => (langData[currentLang] || langData.en).userP);
+        setupPlaceholderClear(passIn, () => (langData[currentLang] || langData.en).passP);
 
         function getCaptchaToken() {
             const domToken = document.querySelector('[name="cf-turnstile-response"]')?.value;
