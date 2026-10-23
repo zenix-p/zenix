@@ -257,7 +257,6 @@
         }
 
         // ===== استخر کارشناسان (چند کارشناس برای هر موضوع) =====
-        // اولین عضو هر آرایه، نام پیش‌فرض داخل پیام welcome است.
         const EXPERT_POOL = {
             dashboard: [
                 { name: 'Sophia', img: 'https://randomuser.me/api/portraits/women/44.jpg' },
@@ -306,7 +305,6 @@
             ]
         };
 
-        // انتخاب قطعی کارشناس بر اساس هش (user_id + topic) → توزیع یکنواخت بین کارشناسان
         function pickExpertForTopic(topicKey, userSeed) {
             const pool = EXPERT_POOL[topicKey];
             if (!pool || !pool.length) return { name: 'Sophia', img: '' };
@@ -318,6 +316,79 @@
             }
             return pool[Math.abs(hash) % pool.length];
         }
+
+        function getGuestId() {
+            let id = null;
+            try { id = sessionStorage.getItem('zenix_guest_id'); } catch(e) {}
+            if (!id) {
+                id = 'guest-' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+                try { sessionStorage.setItem('zenix_guest_id', id); } catch(e) {}
+            }
+            return id;
+        }
+
+        // ===== نرمال‌سازی متن (یکسان‌سازی حروف عربی/فارسی) =====
+        function normalizeFa(text) {
+            return String(text == null ? '' : text)
+                .toLowerCase()
+                .replace(/ي/g, 'ی')
+                .replace(/ى/g, 'ی')
+                .replace(/ك/g, 'ک')
+                .trim();
+        }
+
+        // ===== تطبیق کلیدواژه با مرز واژه برای کلمات کوتاه =====
+        function keywordMatches(text, keyword) {
+            if (!keyword) return false;
+            const t = normalizeFa(text);
+            const k = normalizeFa(keyword);
+            if (!k) return false;
+            if (k.length >= 4) return t.includes(k);
+            if (k.length < 2) return false;
+            const esc = k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const re = new RegExp('(^|[\\s,.:;!?؟،؛\\-()\\[\\]{}"\'])' + esc, 'i');
+            return re.test(t);
+        }
+
+        // ===== امتیازدهی به آیتم‌های دانش و انتخاب بهترین =====
+        function scoreKnowledge(question, knowledgeList) {
+            if (!knowledgeList || !knowledgeList.length) return null;
+            let best = null;
+            let bestScore = 0;
+            for (const item of knowledgeList) {
+                let score = 0;
+                for (const k of (item.kw || [])) {
+                    if (keywordMatches(question, k)) {
+                        score += Math.min(String(k).length, 10);
+                    }
+                }
+                if (score > bestScore) {
+                    bestScore = score;
+                    best = item;
+                }
+            }
+            return bestScore > 0 ? best : null;
+        }
+
+        // ===== مدیریت دکمه بک مرورگر/گوشی =====
+        function isOnChatState() {
+            const s = history.state;
+            return !!(s && s.zenixChat);
+        }
+
+        function pushChatState() {
+            if (isOnChatState()) return;
+            try {
+                history.pushState({ zenixChat: true }, '', location.href);
+            } catch(e) {}
+        }
+
+        window.addEventListener('popstate', function() {
+            if (chatIsOpen) {
+                pushChatState();
+                requestCloseChat();
+            }
+        });
 
         const TOPIC_ICONS = {
             dashboard: { icon: 'fa-home', color: 'ni-blue' },
@@ -334,7 +405,7 @@
         const LD = {
             fa: {
                 dir: 'rtl',
-                ui: { back: 'بازگشت', backToTopics: 'بازگشت به موضوعات', welcomeTitle: 'به پشتیبانی زنیکس خوش آمدید 🌹', welcomeText: 'تیم کارشناسان متخصص ما به صورت ۲۴ ساعته آماده کمک به شما هستند. کافیست موضوع سوال خود را از بین گزینه‌های زیر انتخاب کنید.', topicsTitle: 'موضوعات پشتیبانی', topicsHint: 'برای شروع، یک موضوع انتخاب کنید', closeChat: 'بستن گفتگو', conversationId: 'شناسه گفتگو:', online: 'آنلاین', connected: 'متصل', closeModalTitle: 'بستن گفتگو', closeModalText: 'آیا از بستن این گفتگو مطمئن هستید؟ پس از بستن، می‌توانید موضوع دیگری انتخاب کنید.', cancel: 'انصراف', confirm: 'بله، بستن', adminView: 'پشتیبانی انسانی', adminRole: 'ادمین زنیکس', inputDefault: 'سوال خود را بنویسید...', inputAbout: 'سوال خود را درباره', inputAboutSuffix: 'بنویسید...', mustSelectTopic: 'لطفاً ابتدا یک موضوع انتخاب کنید.', activeChatError: '⚠️ شما در حال حاضر یک گفتگوی فعال دارید. ابتدا آن را ببندید.', noInfoFound: 'متأسفم، در این مورد اطلاعاتی ندارم.', switchingToAdmin: 'باشه، شما را به پشتیبان انسانی وصل می‌کنم...', sendError: 'خطا در ارسال پیام:', noMessages: 'هنوز پیامی در این گفتگو وجود ندارد.', copySuccess: 'کد کپی شد، در حال بازگشت...', switchToAdminBtn: '💬 اتصال به ادمین', userInfoHeader: 'اطلاعات کاربر', userIdLabel: 'شناسه کاربر', userNameLabel: 'نام', userEmailLabel: 'ایمیل' },
+                ui: { back: 'بازگشت', backToTopics: 'بازگشت به موضوعات', welcomeTitle: 'به پشتیبانی زنیکس خوش آمدید 🌹', welcomeText: 'تیم کارشناسان متخصص ما به صورت ۲۴ ساعته آماده کمک به شما هستند. کافیست موضوع سوال خود را از بین گزینه‌های زیر انتخاب کنید.', topicsTitle: 'موضوعات پشتیبانی', topicsHint: 'برای شروع، یک موضوع انتخاب کنید', closeChat: 'بستن گفتگو', conversationId: 'شناسه گفتگو:', online: 'آنلاین', connected: 'متصل', closeModalTitle: 'بستن گفتگو', closeModalText: 'آیا از بستن این گفتگو مطمئن هستید؟ پس از بستن، می‌توانید موضوع دیگری انتخاب کنید.', cancel: 'انصراف', confirm: 'بله، بستن', adminView: 'پشتیبانی انسانی', adminRole: 'ادمین زنیکس', inputDefault: 'سوال خود را بنویسید...', inputAbout: 'سوال خود را درباره', inputAboutSuffix: 'بنویسید...', mustSelectTopic: 'لطفاً ابتدا یک موضوع انتخاب کنید.', activeChatError: '⚠️ شما در حال حاضر یک گفتگوی فعال دارید. ابتدا آن را ببندید.', noInfoFound: 'متأسفم، سوال شما رو دقیق متوجه نشدم. 🌸 می‌تونید یه جور دیگه بپرسید یا اگر مایلید به پشتیبان انسانی وصلتون کنم.', switchingToAdmin: 'باشه، شما را به پشتیبان انسانی وصل می‌کنم...', sendError: 'خطا در ارسال پیام:', noMessages: 'هنوز پیامی در این گفتگو وجود ندارد.', copySuccess: 'کد کپی شد، در حال بازگشت...', switchToAdminBtn: '💬 اتصال به ادمین', userInfoHeader: 'اطلاعات کاربر', userIdLabel: 'شناسه کاربر', userNameLabel: 'نام', userEmailLabel: 'ایمیل' },
                 roles: { dashboard: 'کارشناس داشبورد', quantification: 'کارشناس ربات معامله‌گر', deposit: 'کارشناس واریز', withdraw: 'کارشناس برداشت', team: 'کارشناس تیم و رفرال', transactions: 'کارشناس تراکنش‌ها', profile: 'کارشناس امنیت حساب', login: 'کارشناس ورود', register: 'کارشناس ثبت‌نام' },
                 smallTalk: {
                     greeting: { kw: ['سلام', 'درود', 'hi', 'hello', 'hey', 'salam'], r: 'سلام! 🌸 خوشحالم که اینجایی. من {name} هستم، {role}. چطور می‌تونم امروز کمکت کنم؟' },
@@ -392,7 +463,7 @@
             },
             en: {
                 dir: 'ltr',
-                ui: { back: 'Back', backToTopics: 'Back to topics', welcomeTitle: 'Welcome to Zenix Support 🌹', welcomeText: 'Our team of expert specialists is available 24/7 to help you. Just select a topic below to get started.', topicsTitle: 'Support Topics', topicsHint: 'Select a topic to begin', closeChat: 'Close Chat', conversationId: 'Conversation ID:', online: 'Online', connected: 'Connected', closeModalTitle: 'Close Conversation', closeModalText: 'Are you sure you want to close this conversation?', cancel: 'Cancel', confirm: 'Yes, close', adminView: 'Human Support', adminRole: 'Zenix Admin', inputDefault: 'Type your message...', inputAbout: 'Type your question about', inputAboutSuffix: '...', mustSelectTopic: 'Please select a topic first.', activeChatError: '⚠️ You already have an active conversation. Please close it first.', noInfoFound: 'Sorry, I do not have information about that.', switchingToAdmin: 'Okay, connecting you to human support...', sendError: 'Error sending message:', noMessages: 'No messages yet.', copySuccess: 'Code copied, returning...', switchToAdminBtn: '💬 Contact Admin', userInfoHeader: 'User Information', userIdLabel: 'User ID', userNameLabel: 'Name', userEmailLabel: 'Email' },
+                ui: { back: 'Back', backToTopics: 'Back to topics', welcomeTitle: 'Welcome to Zenix Support 🌹', welcomeText: 'Our team of expert specialists is available 24/7 to help you. Just select a topic below to get started.', topicsTitle: 'Support Topics', topicsHint: 'Select a topic to begin', closeChat: 'Close Chat', conversationId: 'Conversation ID:', online: 'Online', connected: 'Connected', closeModalTitle: 'Close Conversation', closeModalText: 'Are you sure you want to close this conversation?', cancel: 'Cancel', confirm: 'Yes, close', adminView: 'Human Support', adminRole: 'Zenix Admin', inputDefault: 'Type your message...', inputAbout: 'Type your question about', inputAboutSuffix: '...', mustSelectTopic: 'Please select a topic first.', activeChatError: '⚠️ You already have an active conversation. Please close it first.', noInfoFound: 'Sorry, I did not quite understand. 🌸 Could you rephrase, or would you like me to connect you to a human agent?', switchingToAdmin: 'Okay, connecting you to human support...', sendError: 'Error sending message:', noMessages: 'No messages yet.', copySuccess: 'Code copied, returning...', switchToAdminBtn: '💬 Contact Admin', userInfoHeader: 'User Information', userIdLabel: 'User ID', userNameLabel: 'Name', userEmailLabel: 'Email' },
                 roles: { dashboard: 'Dashboard Specialist', quantification: 'Trading Bot Specialist', deposit: 'Deposit Specialist', withdraw: 'Withdrawal Specialist', team: 'Team & Referral Specialist', transactions: 'Transactions Specialist', profile: 'Security Specialist', login: 'Login Specialist', register: 'Registration Specialist' },
                 smallTalk: {
                     greeting: { kw: ['hi', 'hello', 'hey', 'greetings'], r: 'Hi there! 🌸 Great to see you. I am {name}, {role}. How can I help you today?' },
@@ -450,7 +521,7 @@
             },
             ar: {
                 dir: 'rtl',
-                ui: { back: 'رجوع', backToTopics: 'العودة للمواضيع', welcomeTitle: 'مرحباً بك في دعم زينيكس 🌹', welcomeText: 'فريق خبرائنا متاح 24/7 لمساعدتك. اختر موضوعاً من الأسفل.', topicsTitle: 'مواضيع الدعم', topicsHint: 'اختر موضوعاً للبدء', closeChat: 'إغلاق المحادثة', conversationId: 'معرف المحادثة:', online: 'متصل', connected: 'متصل', closeModalTitle: 'إغلاق المحادثة', closeModalText: 'هل أنت متأكد من إغلاق هذه المحادثة؟', cancel: 'إلغاء', confirm: 'نعم، إغلاق', adminView: 'الدعم البشري', adminRole: 'مدير زينيكس', inputDefault: 'اكتب رسالتك...', inputAbout: 'اكتب سؤالك حول', inputAboutSuffix: '...', mustSelectTopic: 'يرجى اختيار موضوع أولاً.', activeChatError: '⚠️ لديك محادثة نشطة. أغلقها أولاً.', noInfoFound: 'عذراً، لا أملك معلومات حول ذلك.', switchingToAdmin: 'حسناً، جارٍ تحويلك للدعم البشري...', sendError: 'خطأ في الإرسال:', noMessages: 'لا رسائل بعد.', copySuccess: 'تم نسخ الرمز، جارٍ العودة...', switchToAdminBtn: '💬 تواصل مع الإدارة', userInfoHeader: 'معلومات المستخدم', userIdLabel: 'معرف المستخدم', userNameLabel: 'الاسم', userEmailLabel: 'البريد' },
+                ui: { back: 'رجوع', backToTopics: 'العودة للمواضيع', welcomeTitle: 'مرحباً بك في دعم زينيكس 🌹', welcomeText: 'فريق خبرائنا متاح 24/7 لمساعدتك. اختر موضوعاً من الأسفل.', topicsTitle: 'مواضيع الدعم', topicsHint: 'اختر موضوعاً للبدء', closeChat: 'إغلاق المحادثة', conversationId: 'معرف المحادثة:', online: 'متصل', connected: 'متصل', closeModalTitle: 'إغلاق المحادثة', closeModalText: 'هل أنت متأكد من إغلاق هذه المحادثة؟', cancel: 'إلغاء', confirm: 'نعم، إغلاق', adminView: 'الدعم البشري', adminRole: 'مدير زينيكس', inputDefault: 'اكتب رسالتك...', inputAbout: 'اكتب سؤالك حول', inputAboutSuffix: '...', mustSelectTopic: 'يرجى اختيار موضوع أولاً.', activeChatError: '⚠️ لديك محادثة نشطة. أغلقها أولاً.', noInfoFound: 'عذراً، لم أفهم سؤالك بدقة. 🌸 هل يمكنك إعادة صياغته أو تريدني أن أوصلك بالدعم البشري؟', switchingToAdmin: 'حسناً، جارٍ تحويلك للدعم البشري...', sendError: 'خطأ في الإرسال:', noMessages: 'لا رسائل بعد.', copySuccess: 'تم نسخ الرمز، جارٍ العودة...', switchToAdminBtn: '💬 تواصل مع الإدارة', userInfoHeader: 'معلومات المستخدم', userIdLabel: 'معرف المستخدم', userNameLabel: 'الاسم', userEmailLabel: 'البريد' },
                 roles: { dashboard: 'أخصائي لوحة التحكم', quantification: 'أخصائي بوت التداول', deposit: 'أخصائي الإيداع', withdraw: 'أخصائي السحب', team: 'أخصائي الفريق', transactions: 'أخصائي المعاملات', profile: 'أخصائي الأمان', login: 'أخصائي تسجيل الدخول', register: 'أخصائي التسجيل' },
                 smallTalk: {
                     greeting: { kw: ['مرحبا', 'أهلا', 'اهلا', 'السلام', 'hi', 'hello', 'salam'], r: 'مرحباً! 🌸 سعيد بلقائك. أنا {name}، {role}. كيف يمكنني مساعدتك؟' },
@@ -508,7 +579,7 @@
             },
             tr: {
                 dir: 'ltr',
-                ui: { back: 'Geri', backToTopics: 'Konulara dön', welcomeTitle: "Zenix Desteğe Hoş Geldiniz 🌹", welcomeText: 'Uzman ekibimiz size yardımcı olmak için 24/7 hazır. Aşağıdan bir konu seçin.', topicsTitle: 'Destek Konuları', topicsHint: 'Başlamak için bir konu seçin', closeChat: 'Sohbeti Kapat', conversationId: 'Sohbet Kimliği:', online: 'Çevrimiçi', connected: 'Bağlandı', closeModalTitle: 'Sohbeti Kapat', closeModalText: 'Bu sohbeti kapatmak istediğinizden emin misiniz?', cancel: 'İptal', confirm: 'Evet, kapat', adminView: 'İnsan Desteği', adminRole: 'Zenix Yöneticisi', inputDefault: 'Mesajınızı yazın...', inputAbout: 'Sorunuzu şu konuda yazın:', inputAboutSuffix: '...', mustSelectTopic: 'Lütfen önce bir konu seçin.', activeChatError: '⚠️ Zaten aktif bir sohbetiniz var. Önce onu kapatın.', noInfoFound: 'Üzgünüm, bu konuda bilgim yok.', switchingToAdmin: 'İnsan desteğe bağlıyorum...', sendError: 'Mesaj gönderme hatası:', noMessages: 'Henüz mesaj yok.', copySuccess: 'Kod kopyalandı, dönülüyor...', switchToAdminBtn: '💬 Yöneticiyle İletişim', userInfoHeader: 'Kullanıcı Bilgileri', userIdLabel: 'Kullanıcı ID', userNameLabel: 'Ad', userEmailLabel: 'E-posta' },
+                ui: { back: 'Geri', backToTopics: 'Konulara dön', welcomeTitle: "Zenix Desteğe Hoş Geldiniz 🌹", welcomeText: 'Uzman ekibimiz size yardımcı olmak için 24/7 hazır. Aşağıdan bir konu seçin.', topicsTitle: 'Destek Konuları', topicsHint: 'Başlamak için bir konu seçin', closeChat: 'Sohbeti Kapat', conversationId: 'Sohbet Kimliği:', online: 'Çevrimiçi', connected: 'Bağlandı', closeModalTitle: 'Sohbeti Kapat', closeModalText: 'Bu sohbeti kapatmak istediğinizden emin misiniz?', cancel: 'İptal', confirm: 'Evet, kapat', adminView: 'İnsan Desteği', adminRole: 'Zenix Yöneticisi', inputDefault: 'Mesajınızı yazın...', inputAbout: 'Sorunuzu şu konuda yazın:', inputAboutSuffix: '...', mustSelectTopic: 'Lütfen önce bir konu seçin.', activeChatError: '⚠️ Zaten aktif bir sohbetiniz var. Önce onu kapatın.', noInfoFound: 'Üzgünüm, sorunuzu tam anlamadım. 🌸 Farklı şekilde sorabilir veya sizi insan desteğe bağlayabilirim.', switchingToAdmin: 'İnsan desteğe bağlıyorum...', sendError: 'Mesaj gönderme hatası:', noMessages: 'Henüz mesaj yok.', copySuccess: 'Kod kopyalandı, dönülüyor...', switchToAdminBtn: '💬 Yöneticiyle İletişim', userInfoHeader: 'Kullanıcı Bilgileri', userIdLabel: 'Kullanıcı ID', userNameLabel: 'Ad', userEmailLabel: 'E-posta' },
                 roles: { dashboard: 'Panel Uzmanı', quantification: 'İşlem Botu Uzmanı', deposit: 'Yatırım Uzmanı', withdraw: 'Çekim Uzmanı', team: 'Ekip Uzmanı', transactions: 'İşlemler Uzmanı', profile: 'Güvenlik Uzmanı', login: 'Giriş Uzmanı', register: 'Kayıt Uzmanı' },
                 smallTalk: {
                     greeting: { kw: ['merhaba', 'selam', 'hi', 'hello'], r: 'Merhaba! 🌸 Seni görmek güzel. Ben {name}, {role}. Nasıl yardımcı olabilirim?' },
@@ -566,7 +637,7 @@
             },
             ru: {
                 dir: 'ltr',
-                ui: { back: 'Назад', backToTopics: 'К темам', welcomeTitle: 'Добро пожаловать в поддержку Zenix 🌹', welcomeText: 'Наша команда экспертов доступна 24/7. Выберите тему ниже.', topicsTitle: 'Темы поддержки', topicsHint: 'Выберите тему', closeChat: 'Закрыть чат', conversationId: 'ID беседы:', online: 'Онлайн', connected: 'Подключено', closeModalTitle: 'Закрыть беседу', closeModalText: 'Вы уверены, что хотите закрыть эту беседу?', cancel: 'Отмена', confirm: 'Да, закрыть', adminView: 'Живая поддержка', adminRole: 'Админ Zenix', inputDefault: 'Введите сообщение...', inputAbout: 'Введите вопрос о', inputAboutSuffix: '...', mustSelectTopic: 'Пожалуйста, выберите тему.', activeChatError: '⚠️ У вас есть активная беседа. Сначала закройте её.', noInfoFound: 'Извините, у меня нет информации об этом.', switchingToAdmin: 'Подключаю к живой поддержке...', sendError: 'Ошибка отправки:', noMessages: 'Пока нет сообщений.', copySuccess: 'Код скопирован, возврат...', switchToAdminBtn: '💬 Связаться с админом', userInfoHeader: 'Информация о пользователе', userIdLabel: 'ID пользователя', userNameLabel: 'Имя', userEmailLabel: 'Email' },
+                ui: { back: 'Назад', backToTopics: 'К темам', welcomeTitle: 'Добро пожаловать в поддержку Zenix 🌹', welcomeText: 'Наша команда экспертов доступна 24/7. Выберите тему ниже.', topicsTitle: 'Темы поддержки', topicsHint: 'Выберите тему', closeChat: 'Закрыть чат', conversationId: 'ID беседы:', online: 'Онлайн', connected: 'Подключено', closeModalTitle: 'Закрыть беседу', closeModalText: 'Вы уверены, что хотите закрыть эту беседу?', cancel: 'Отмена', confirm: 'Да, закрыть', adminView: 'Живая поддержка', adminRole: 'Админ Zenix', inputDefault: 'Введите сообщение...', inputAbout: 'Введите вопрос о', inputAboutSuffix: '...', mustSelectTopic: 'Пожалуйста, выберите тему.', activeChatError: '⚠️ У вас есть активная беседа. Сначала закройте её.', noInfoFound: 'Извините, я не совсем понял(а). 🌸 Не могли бы вы переформулировать, или я соединю вас с живой поддержкой?', switchingToAdmin: 'Подключаю к живой поддержке...', sendError: 'Ошибка отправки:', noMessages: 'Пока нет сообщений.', copySuccess: 'Код скопирован, возврат...', switchToAdminBtn: '💬 Связаться с админом', userInfoHeader: 'Информация о пользователе', userIdLabel: 'ID пользователя', userNameLabel: 'Имя', userEmailLabel: 'Email' },
                 roles: { dashboard: 'Специалист панели', quantification: 'Специалист бота', deposit: 'Специалист депозитов', withdraw: 'Специалист выводов', team: 'Специалист команды', transactions: 'Специалист транзакций', profile: 'Специалист безопасности', login: 'Специалист входа', register: 'Специалист регистрации' },
                 smallTalk: {
                     greeting: { kw: ['привет', 'здравствуйте', 'здравствуй', 'hi', 'hello'], r: 'Привет! 🌸 Рада тебя видеть. Я {name}, {role}. Чем могу помочь?' },
@@ -624,7 +695,7 @@
             },
             es: {
                 dir: 'ltr',
-                ui: { back: 'Atrás', backToTopics: 'Volver a temas', welcomeTitle: 'Bienvenido a Soporte Zenix 🌹', welcomeText: 'Nuestro equipo de expertos está disponible 24/7. Selecciona un tema abajo.', topicsTitle: 'Temas de Soporte', topicsHint: 'Selecciona un tema', closeChat: 'Cerrar Chat', conversationId: 'ID de conversación:', online: 'En línea', connected: 'Conectado', closeModalTitle: 'Cerrar Conversación', closeModalText: '¿Seguro que quieres cerrar esta conversación?', cancel: 'Cancelar', confirm: 'Sí, cerrar', adminView: 'Soporte Humano', adminRole: 'Admin Zenix', inputDefault: 'Escribe tu mensaje...', inputAbout: 'Escribe tu pregunta sobre', inputAboutSuffix: '...', mustSelectTopic: 'Por favor, selecciona un tema primero.', activeChatError: '⚠️ Ya tienes una conversación activa. Ciérrala primero.', noInfoFound: 'Lo siento, no tengo información sobre eso.', switchingToAdmin: 'Conectándote con soporte humano...', sendError: 'Error al enviar:', noMessages: 'Aún no hay mensajes.', copySuccess: 'Código copiado, volviendo...', switchToAdminBtn: '💬 Contactar Admin', userInfoHeader: 'Información del Usuario', userIdLabel: 'ID de Usuario', userNameLabel: 'Nombre', userEmailLabel: 'Email' },
+                ui: { back: 'Atrás', backToTopics: 'Volver a temas', welcomeTitle: 'Bienvenido a Soporte Zenix 🌹', welcomeText: 'Nuestro equipo de expertos está disponible 24/7. Selecciona un tema abajo.', topicsTitle: 'Temas de Soporte', topicsHint: 'Selecciona un tema', closeChat: 'Cerrar Chat', conversationId: 'ID de conversación:', online: 'En línea', connected: 'Conectado', closeModalTitle: 'Cerrar Conversación', closeModalText: '¿Seguro que quieres cerrar esta conversación?', cancel: 'Cancelar', confirm: 'Sí, cerrar', adminView: 'Soporte Humano', adminRole: 'Admin Zenix', inputDefault: 'Escribe tu mensaje...', inputAbout: 'Escribe tu pregunta sobre', inputAboutSuffix: '...', mustSelectTopic: 'Por favor, selecciona un tema primero.', activeChatError: '⚠️ Ya tienes una conversación activa. Ciérrala primero.', noInfoFound: 'Lo siento, no entendí bien. 🌸 ¿Puedes reformular, o quieres que te conecte con un agente humano?', switchingToAdmin: 'Conectándote con soporte humano...', sendError: 'Error al enviar:', noMessages: 'Aún no hay mensajes.', copySuccess: 'Código copiado, volviendo...', switchToAdminBtn: '💬 Contactar Admin', userInfoHeader: 'Información del Usuario', userIdLabel: 'ID de Usuario', userNameLabel: 'Nombre', userEmailLabel: 'Email' },
                 roles: { dashboard: 'Especialista del Panel', quantification: 'Especialista del Bot', deposit: 'Especialista de Depósitos', withdraw: 'Especialista de Retiros', team: 'Especialista de Equipo', transactions: 'Especialista de Transacciones', profile: 'Especialista de Seguridad', login: 'Especialista de Acceso', register: 'Especialista de Registro' },
                 smallTalk: {
                     greeting: { kw: ['hola', 'hi', 'hello'], r: '¡Hola! 🌸 Qué gusto verte. Soy {name}, {role}. ¿Cómo puedo ayudarte?' },
@@ -682,7 +753,7 @@
             },
             fr: {
                 dir: 'ltr',
-                ui: { back: 'Retour', backToTopics: 'Retour aux sujets', welcomeTitle: 'Bienvenue au Support Zenix 🌹', welcomeText: 'Notre équipe est disponible 24/7. Sélectionnez un sujet ci-dessous.', topicsTitle: 'Sujets de Support', topicsHint: 'Sélectionnez un sujet', closeChat: 'Fermer le Chat', conversationId: 'ID de conversation:', online: 'En ligne', connected: 'Connecté', closeModalTitle: 'Fermer la Conversation', closeModalText: 'Voulez-vous vraiment fermer cette conversation ?', cancel: 'Annuler', confirm: 'Oui, fermer', adminView: 'Support Humain', adminRole: 'Admin Zenix', inputDefault: 'Écrivez votre message...', inputAbout: 'Écrivez votre question sur', inputAboutSuffix: '...', mustSelectTopic: 'Veuillez sélectionner un sujet.', activeChatError: '⚠️ Vous avez déjà une conversation active. Fermez-la d\'abord.', noInfoFound: 'Désolé, je n\'ai pas d\'information là-dessus.', switchingToAdmin: 'Connexion au support humain...', sendError: 'Erreur d\'envoi:', noMessages: 'Aucun message pour le moment.', copySuccess: 'Code copié, retour...', switchToAdminBtn: '💬 Contacter Admin', userInfoHeader: 'Informations Utilisateur', userIdLabel: 'ID Utilisateur', userNameLabel: 'Nom', userEmailLabel: 'Email' },
+                ui: { back: 'Retour', backToTopics: 'Retour aux sujets', welcomeTitle: 'Bienvenue au Support Zenix 🌹', welcomeText: 'Notre équipe est disponible 24/7. Sélectionnez un sujet ci-dessous.', topicsTitle: 'Sujets de Support', topicsHint: 'Sélectionnez un sujet', closeChat: 'Fermer le Chat', conversationId: 'ID de conversation:', online: 'En ligne', connected: 'Connecté', closeModalTitle: 'Fermer la Conversation', closeModalText: 'Voulez-vous vraiment fermer cette conversation ?', cancel: 'Annuler', confirm: 'Oui, fermer', adminView: 'Support Humain', adminRole: 'Admin Zenix', inputDefault: 'Écrivez votre message...', inputAbout: 'Écrivez votre question sur', inputAboutSuffix: '...', mustSelectTopic: 'Veuillez sélectionner un sujet.', activeChatError: '⚠️ Vous avez déjà une conversation active. Fermez-la d\'abord.', noInfoFound: 'Désolé, je n\'ai pas bien compris. 🌸 Pouvez-vous reformuler, ou souhaitez-vous que je vous connecte à un agent humain ?', switchingToAdmin: 'Connexion au support humain...', sendError: 'Erreur d\'envoi:', noMessages: 'Aucun message pour le moment.', copySuccess: 'Code copié, retour...', switchToAdminBtn: '💬 Contacter Admin', userInfoHeader: 'Informations Utilisateur', userIdLabel: 'ID Utilisateur', userNameLabel: 'Nom', userEmailLabel: 'Email' },
                 roles: { dashboard: 'Spécialiste du Tableau', quantification: 'Spécialiste du Bot', deposit: 'Spécialiste des Dépôts', withdraw: 'Spécialiste des Retraits', team: 'Spécialiste d\'Équipe', transactions: 'Spécialiste des Transactions', profile: 'Spécialiste de Sécurité', login: 'Spécialiste de Connexion', register: 'Spécialiste d\'Inscription' },
                 smallTalk: {
                     greeting: { kw: ['bonjour', 'salut', 'hi', 'hello'], r: 'Bonjour ! 🌸 Ravi de te voir. Je suis {name}, {role}. Comment puis-je t\'aider ?' },
@@ -740,7 +811,7 @@
             },
             de: {
                 dir: 'ltr',
-                ui: { back: 'Zurück', backToTopics: 'Zurück zu Themen', welcomeTitle: 'Willkommen beim Zenix Support 🌹', welcomeText: 'Unser Expertenteam ist rund um die Uhr verfügbar. Wählen Sie unten ein Thema.', topicsTitle: 'Support-Themen', topicsHint: 'Wählen Sie ein Thema', closeChat: 'Chat schließen', conversationId: 'Konversations-ID:', online: 'Online', connected: 'Verbunden', closeModalTitle: 'Konversation schließen', closeModalText: 'Sind Sie sicher, dass Sie diese Konversation schließen möchten?', cancel: 'Abbrechen', confirm: 'Ja, schließen', adminView: 'Menschlicher Support', adminRole: 'Zenix Admin', inputDefault: 'Nachricht eingeben...', inputAbout: 'Frage zu', inputAboutSuffix: 'eingeben...', mustSelectTopic: 'Bitte wählen Sie zuerst ein Thema.', activeChatError: '⚠️ Sie haben bereits eine aktive Konversation. Schließen Sie diese zuerst.', noInfoFound: 'Entschuldigung, dazu habe ich keine Informationen.', switchingToAdmin: 'Verbinde mit menschlichem Support...', sendError: 'Sendefehler:', noMessages: 'Noch keine Nachrichten.', copySuccess: 'Code kopiert, zurück...', switchToAdminBtn: '💬 Admin kontaktieren', userInfoHeader: 'Benutzerinformationen', userIdLabel: 'Benutzer-ID', userNameLabel: 'Name', userEmailLabel: 'E-Mail' },
+                ui: { back: 'Zurück', backToTopics: 'Zurück zu Themen', welcomeTitle: 'Willkommen beim Zenix Support 🌹', welcomeText: 'Unser Expertenteam ist rund um die Uhr verfügbar. Wählen Sie unten ein Thema.', topicsTitle: 'Support-Themen', topicsHint: 'Wählen Sie ein Thema', closeChat: 'Chat schließen', conversationId: 'Konversations-ID:', online: 'Online', connected: 'Verbunden', closeModalTitle: 'Konversation schließen', closeModalText: 'Sind Sie sicher, dass Sie diese Konversation schließen möchten?', cancel: 'Abbrechen', confirm: 'Ja, schließen', adminView: 'Menschlicher Support', adminRole: 'Zenix Admin', inputDefault: 'Nachricht eingeben...', inputAbout: 'Frage zu', inputAboutSuffix: 'eingeben...', mustSelectTopic: 'Bitte wählen Sie zuerst ein Thema.', activeChatError: '⚠️ Sie haben bereits eine aktive Konversation. Schließen Sie diese zuerst.', noInfoFound: 'Entschuldigung, ich habe das nicht ganz verstanden. 🌸 Können Sie es umformulieren oder soll ich Sie mit einem menschlichen Agenten verbinden?', switchingToAdmin: 'Verbinde mit menschlichem Support...', sendError: 'Sendefehler:', noMessages: 'Noch keine Nachrichten.', copySuccess: 'Code kopiert, zurück...', switchToAdminBtn: '💬 Admin kontaktieren', userInfoHeader: 'Benutzerinformationen', userIdLabel: 'Benutzer-ID', userNameLabel: 'Name', userEmailLabel: 'E-Mail' },
                 roles: { dashboard: 'Dashboard-Spezialist', quantification: 'Trading-Bot-Spezialist', deposit: 'Einzahlungs-Spezialist', withdraw: 'Auszahlungs-Spezialist', team: 'Team-Spezialist', transactions: 'Transaktions-Spezialist', profile: 'Sicherheits-Spezialist', login: 'Login-Spezialist', register: 'Registrierungs-Spezialist' },
                 smallTalk: {
                     greeting: { kw: ['hallo', 'hi', 'hello', 'servus'], r: 'Hallo! 🌸 Schön dich zu sehen. Ich bin {name}, {role}. Wie kann ich helfen?' },
@@ -800,15 +871,12 @@
 
         function t(key) { return (LD[currentLang]?.ui && LD[currentLang].ui[key]) || LD.fa.ui[key] || key; }
 
-        // ★★ تطبیق کلیدواژه‌های small-talk با مرز واژه (برای کلمات کوتاه مثل "hi")
         function kwMatchSmallTalk(text, keywords) {
-            const clean = ' ' + String(text).toLowerCase().replace(/[.,!?؟،؛:\-_/\\()\[\]{}"'']/g, ' ').replace(/\s+/g, ' ').trim() + ' ';
+            const clean = ' ' + normalizeFa(text).replace(/[.,!?؟،؛:\-_/\\()\[\]{}"']/g, ' ').replace(/\s+/g, ' ').trim() + ' ';
             return keywords.some(k => {
-                const kk = String(k).toLowerCase().trim();
+                const kk = normalizeFa(k);
                 if (!kk) return false;
-                if (kk.length <= 3) {
-                    return clean.includes(' ' + kk + ' ');
-                }
+                if (kk.length <= 3) return clean.includes(' ' + kk + ' ');
                 return clean.includes(kk);
             });
         }
@@ -903,8 +971,7 @@
             currentConversationId = generateConversationId(currentUser?.id, topicKey);
             conversationIdEl.textContent = currentConversationId;
 
-            // انتخاب کارشناس از استخر (توزیع یکنواخت بر اساس user + topic)
-            currentExpert = pickExpertForTopic(topicKey, currentUser?.id || 'guest');
+            currentExpert = pickExpertForTopic(topicKey, currentUser?.id || getGuestId());
 
             lockTopicsView();
             showChatView();
@@ -922,7 +989,6 @@
             userInput.value = '';
             chatBody.innerHTML = '';
 
-            // جایگزینی نام پیش‌فرض داخل پیام welcome با نام کارشناس انتخابی
             const primaryName = (EXPERT_POOL[topicKey] && EXPERT_POOL[topicKey][0] && EXPERT_POOL[topicKey][0].name) || 'Sophia';
             const welcomeText = (primaryName === currentExpert.name)
                 ? topic.welcome
@@ -930,6 +996,7 @@
 
             renderMessage(welcomeText, 'bot', new Date().toISOString(), `${currentExpert.name} (${data.roles[topicKey]})`);
 
+            pushChatState();
             window.scrollTo({ top: 0, behavior: 'smooth' });
             setTimeout(() => {
                 if (!IS_MOBILE) { try { userInput.focus(); } catch(e) {} }
@@ -959,6 +1026,10 @@
             sendBtn.disabled = true;
             chatBody.innerHTML = '';
             conversationIdEl.textContent = 'ZE-000000';
+            // اگر روی state چت هستیم، یک قدم عقب برمی‌گردیم (popstate گیر نمی‌اندازد چون chatIsOpen=false)
+            if (isOnChatState()) {
+                try { history.back(); } catch(e) {}
+            }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -1011,6 +1082,7 @@
             userInput.value = '';
             await loadMessagesFromSupabase();
             subscribeRealtime();
+            pushChatState();
         }
 
         window.goBack = function(event) {
@@ -1025,22 +1097,20 @@
             if (!currentTopic) return { handled: false, text: t('mustSelectTopic') };
             const data = LD[currentLang];
             const topic = data.topics[currentTopic];
-            const q = String(question || '').toLowerCase().trim();
+            const q = normalizeFa(question);
 
-            const adminKeywords = ['ادمین', 'پشتیبان', 'مدیر', 'admin', 'support', 'human', 'yönetici', 'destek', 'админ', 'поддержка', 'soporte', 'administrateur'];
-            if (adminKeywords.some(k => q.includes(k.toLowerCase()))) return { handled: 'switch_to_admin' };
+            const adminKw = ['ادمین','پشتیبان','مدیر','admin','support','human','yönetici','destek','админ','поддержка','soporte','administrateur'];
+            if (adminKw.some(k => q.includes(normalizeFa(k)))) return { handled: 'switch_to_admin' };
 
-            for (const item of (topic.knowledge || [])) {
-                if (item.kw.some(k => q.includes(k.toLowerCase()))) return { handled: true, text: item.r };
-            }
+            const bestMatch = scoreKnowledge(question, topic.knowledge);
+            if (bestMatch) return { handled: true, text: bestMatch.r };
 
             const smallTalk = data.smallTalk || LD.fa.smallTalk;
             if (smallTalk) {
                 const order = ['greeting', 'howAreYou', 'goodMorning', 'goodNight', 'thanks', 'bye', 'whoAreYou', 'whatCanYouDo'];
                 for (const key of order) {
                     const item = smallTalk[key];
-                    if (item && item.kw && kwMatchSmallTalk(q, item.kw)) {
-                        // ★★ اگر اولین پیام کاربر سلام است، معرفی مجدد نکن
+                    if (item && item.kw && kwMatchSmallTalk(question, item.kw)) {
                         if (key === 'greeting' && isFirstMessage) {
                             const briefGreetings = {
                                 fa: 'سلام دوباره! 🌸 بله من اینجام، چطور می‌تونم کمکت کنم؟',
@@ -1054,7 +1124,6 @@
                             };
                             return { handled: true, text: briefGreetings[currentLang] || briefGreetings.fa };
                         }
-
                         const name = (currentExpert && currentExpert.name) || 'Sophia';
                         const role = data.roles[currentTopic] || '';
                         const reply = String(item.r).replace(/\{name\}/g, name).replace(/\{role\}/g, role);
@@ -1275,7 +1344,6 @@
             if (currentView === 'topics') { showError(t('mustSelectTopic')); return; }
             if (!currentUser && currentView === 'admin') { showError('Please login first.'); return; }
 
-            // ★★ تشخیص اولین پیام کاربر قبل از افزودن پیام فعلی
             const isFirstUserMessage = !chatBody.querySelector('.msg.user');
 
             isSending = true; sendBtn.disabled = true;
@@ -1368,10 +1436,9 @@
 
                     setTimeout(() => {
                         try {
+                            // ابتدا URL را تمیز کن، بعد چت را باز کن
+                            try { window.history.replaceState({}, document.title, window.location.pathname); } catch (e) {}
                             window.selectTopic(urlTopic);
-                            try {
-                                window.history.replaceState({}, document.title, window.location.pathname);
-                            } catch (e) {}
                         } catch (err) {
                             console.error('[Zenix Support] selectTopic failed:', err);
                             showError('Unable to open the chat. Please select a topic below.');
