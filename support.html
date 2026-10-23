@@ -256,7 +256,6 @@
             return (Math.abs(hash % 900000) + 100000).toString();
         }
 
-        // ★★ تاخیر انسانی: طول پاسخ تعیین می‌کند چقدر صبر کنیم (۱.۲ تا ۳ ثانیه)
         function humanDelay(text) {
             const len = String(text || '').length;
             return Math.min(3000, Math.max(1200, 1000 + len * 20));
@@ -1241,43 +1240,60 @@
             else { window.location.href = 'dashboard.html'; }
         };
 
-        // ★★ نسخه بهبودیافته: AI با فکر کردن و تمرکز
+        // ★★★ تابع ترجمه (فراخوانی از دکمه روی پیام AI)
+        async function translateAIText(originalText, targetLang, btn, container) {
+            btn.disabled = true;
+            btn.style.opacity = '0.6';
+            const langLabelMap = { fa:'فارسی', ar:'عربی', tr:'ترکی', ru:'روسی', es:'اسپانیایی', fr:'فرانسوی', de:'آلمانی' };
+            btn.innerHTML = `⏳ در حال ترجمه به ${langLabelMap[targetLang] || targetLang}...`;
+
+            try {
+                const res = await fetch(`${SUPABASE_URL}/functions/v1/zenix-ai`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    },
+                    body: JSON.stringify({ action: 'translate', text: originalText, targetLang })
+                });
+                if (!res.ok) throw new Error('Translation failed');
+                const j = await res.json();
+                if (!j.text) throw new Error('Empty translation');
+
+                let translationEl = container.querySelector('.ai-translation');
+                if (!translationEl) {
+                    translationEl = document.createElement('div');
+                    translationEl.className = 'ai-translation';
+                    const dir = (targetLang === 'fa' || targetLang === 'ar') ? 'rtl' : 'ltr';
+                    translationEl.style.cssText = `margin-top:8px;padding:9px 12px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.35);border-radius:8px;font-size:11.5px;color:#bbf7d0;line-height:1.7;direction:${dir};`;
+                    container.insertBefore(translationEl, btn);
+                }
+                translationEl.textContent = j.text;
+                btn.remove();
+            } catch (e) {
+                console.error('[translate] error:', e);
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.innerHTML = `⚠️ تلاش دوباره`;
+            }
+        }
+
+        // ★★★ AI (همیشه انگلیسی، از Edge Function)
         async function askAI(userPrompt) {
             const data = LD[currentLang];
             const topic = currentTopic ? data.topics[currentTopic] : null;
 
             let knowledgeContext = '';
             if (topic?.knowledge?.length) {
-                knowledgeContext = '\nدانش تخصصی تو:\n';
                 topic.knowledge.forEach(k => { knowledgeContext += `- ${k.r}\n`; });
             }
-
-            const langMap = { fa: 'فارسی', en: 'English', ar: 'العربية', tr: 'Türkçe', ru: 'Русский', es: 'Español', fr: 'Français', de: 'Deutsch' };
-            const langName = langMap[currentLang] || 'فارسی';
-            const expertName = currentExpert?.name || 'Sophia';
-            const expertRole = currentTopic ? data.roles[currentTopic] : 'کارشناس پشتیبانی';
-            const topicLabel = topic?.label || '';
-
-            const systemInstruction = `تو ${expertName} هستی، ${expertRole} در تیم پشتیبانی پلتفرم زنیکس (Zenix).
-زنیکس یک پلتفرم معاملات کریپتوکارنسی است.
-تخصص تو فقط «${topicLabel}» است.
-
-⚠️ قواعد مهم:
-۱. قبل از پاسخ، با دقت به سوال کاربر فکر کن. پاسخ‌ها باید دقیق و با تامل باشند.
-۲. اگر اطلاعات دقیق نداری، صادق باش و بگو با ادمین در ارتباط باشه. هرگز حدس نزن.
-۳. فقط در مورد تخصص خودت (${topicLabel}) جواب بده. اگر سوال مربوط به بخش دیگه‌ای بود (مثلاً تغییر رمز/ایمیل → پروفایل، واریز → واریز، برداشت → برداشت، تیم/رفرال → تیم، تاریخچه → تراکنش‌ها، ثبت‌نام → ثبت‌نام)، به هیچ وجه جواب مستقیم نده.
-۴. به جای جواب دادن به سوالات خارج از تخصص، مودبانه بگو: «این سوال مربوط به بخش X است. لطفاً از موضوع X در صفحه پشتیبانی سوال کنید یا به صفحه مربوطه در داشبورد مراجعه کنید.»
-۵. هرگز اطلاعات ساختگی تولید نکن.
-
-لحن: صمیمی، کوتاه (۲-۴ خط)، با ۱-۲ ایموجی.
-${knowledgeContext}
-پاسخ را به زبان ${langName} بده.`;
 
             const history = [];
             const msgs = chatBody.querySelectorAll('.msg.user, .msg.bot');
             const lastMsgs = Array.from(msgs).slice(-11);
             lastMsgs.forEach(m => {
-                const txt = m.textContent.trim();
+                const contentEl = m.querySelector('.msg-content') || m;
+                const txt = contentEl.textContent.trim();
                 if (!txt) return;
                 history.push({ role: m.classList.contains('msg.user') ? 'user' : 'assistant', text: txt });
             });
@@ -1290,7 +1306,7 @@ ${knowledgeContext}
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
                     },
-                    body: JSON.stringify({ prompt: userPrompt, systemInstruction, history })
+                    body: JSON.stringify({ prompt: userPrompt, systemInstruction: knowledgeContext, history })
                 });
                 if (!res.ok) throw new Error('AI request failed');
                 const j = await res.json();
@@ -1407,12 +1423,35 @@ ${knowledgeContext}
             }
         };
 
-        function renderMessage(text, sender, timeIso, senderLabel) {
+        // ★★★ renderMessage با پشتیبانی از دکمه ترجمه
+        function renderMessage(text, sender, timeIso, senderLabel, options = {}) {
             const div = document.createElement('div');
             div.className = `msg ${sender}`;
-            const safeContent = (sender === 'bot' || sender === 'system') ? text : escapeHtml(text);
+
+            let safeContent;
+            if (options.escapeContent) {
+                safeContent = escapeHtml(text);
+            } else {
+                safeContent = (sender === 'bot' || sender === 'system') ? text : escapeHtml(text);
+            }
+
             const label = senderLabel ? `<span class="msg-sender">${escapeHtml(senderLabel)}</span>` : '';
-            div.innerHTML = `${label}${safeContent}<span class="msg-meta">${formatTime(timeIso)}</span>`;
+            div.innerHTML = `${label}<div class="msg-content">${safeContent}</div><span class="msg-meta">${formatTime(timeIso)}</span>`;
+
+            if (options.showTranslate && currentLang !== 'en') {
+                const langLabelMap = { fa:'فارسی', ar:'عربی', tr:'ترکی', ru:'روسی', es:'اسپانیایی', fr:'فرانسوی', de:'آلمانی' };
+                const targetLabel = langLabelMap[currentLang] || currentLang;
+
+                const transBtn = document.createElement('button');
+                transBtn.type = 'button';
+                transBtn.style.cssText = 'margin-top:8px;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.35);color:#38bdf8;padding:6px 10px;border-radius:6px;font-size:10.5px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;transition:all .2s;';
+                transBtn.innerHTML = `🌐 ترجمه به ${targetLabel}`;
+                transBtn.onmouseover = () => { transBtn.style.background = 'rgba(56,189,248,.2)'; };
+                transBtn.onmouseout = () => { transBtn.style.background = 'rgba(56,189,248,.1)'; };
+                transBtn.onclick = () => translateAIText(text, currentLang, transBtn, div);
+                div.appendChild(transBtn);
+            }
+
             chatBody.appendChild(div);
             chatBody.scrollTop = chatBody.scrollHeight;
             return div;
@@ -1560,7 +1599,7 @@ ${knowledgeContext}
             const text = userInput.value.trim();
             if (!text || isSending) return;
             if (currentView === 'topics') { showError(t('mustSelectTopic')); return; }
-            if (!currentUser && currentView === 'admin') { showError('Please login first.'); return; }
+            if (!currentUser && currentView === 'admin') { showError('Please log in first.'); return; }
 
             const isFirstUserMessage = !chatBody.querySelector('.msg.user');
             isSending = true; sendBtn.disabled = true;
@@ -1578,19 +1617,16 @@ ${knowledgeContext}
                             await switchToHumanMode();
                         }, 700);
                     } else if (reply.handled === 'ai') {
-                        // ★★ AI با حداقل زمان ۱.۵ ثانیه برای typing
                         const typing = renderTyping();
                         const startTime = Date.now();
                         let aiText = null;
                         try { aiText = await askAI(text); } catch(e) { console.error(e); }
                         const elapsed = Date.now() - startTime;
-                        const minWait = 1500;
-                        if (elapsed < minWait) {
-                            await new Promise(r => setTimeout(r, minWait - elapsed));
-                        }
+                        if (elapsed < 1500) await new Promise(r => setTimeout(r, 1500 - elapsed));
                         typing.remove();
                         if (aiText) {
-                            renderMessage(aiText, 'bot', new Date().toISOString(), expertLabel);
+                            // ★ پاسخ AI انگلیسی + دکمه ترجمه
+                            renderMessage(aiText, 'bot', new Date().toISOString(), expertLabel, { showTranslate: true, escapeContent: true });
                         } else {
                             renderMessage(t('noInfoFound'), 'bot', new Date().toISOString(), expertLabel);
                             const div = document.createElement('div');
@@ -1600,7 +1636,6 @@ ${knowledgeContext}
                             chatBody.scrollTop = chatBody.scrollHeight;
                         }
                     } else if (reply.handled === true) {
-                        // ★★ تاخیر انسانی برای پاسخ‌های دانشنامه
                         const typing = renderTyping();
                         setTimeout(() => {
                             typing.remove();
