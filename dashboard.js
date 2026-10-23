@@ -49,7 +49,6 @@ function generateUIDDigits(userId) {
 
 // ==========================================
 // ★★ اصلاح موبایل: غیرفعال‌سازی انیمیشن آکاردئون راهنما در گوشی
-// (grid-template-rows روی موبایل نرم انیمیت نمی‌شود و پله‌پله باز می‌شود)
 // ==========================================
 (function injectHelpAccordionMobileFix() {
     if (document.getElementById('zenix-help-accordion-fix')) return;
@@ -64,6 +63,16 @@ function generateUIDDigits(userId) {
             .help-acc-arrow {
                 transition: transform .15s ease !important;
             }
+        }
+        /* کوچک‌سازی کادر پیام‌ها و حذف margin-bottom پیش‌فرض کلاس */
+        .msg-body-box {
+            margin-bottom: 0 !important;
+            padding: 8px 10px !important;
+        }
+        /* جلوگیری از تغییر رنگ حاشیه در حالت hover روی پیام خوانده‌شده */
+        .msg-body-box.is-read:hover {
+            border-color: rgba(255,255,255,.05) !important;
+            opacity: .75 !important;
         }
     `;
     document.head.appendChild(style);
@@ -110,15 +119,12 @@ window.closeCasinoModal = function() {
     unlockBody();
 };
 
-// ★ آکاردئون راهنما — نسخه ساده و سریع
-// در موبایل بدون انیمیشن (باز شدن فوری) و در دسکتاپ با انیمیشن نرم قبلی
 window.toggleHelpAccordion = function(btn) {
     const item = btn.closest('.help-accordion');
     if (!item) return;
     item.classList.toggle('open');
 };
 
-// ★ متن معرفی جمع‌شونده
 window.toggleAboutBox = function() {
     const box = document.getElementById('platformInfoBox');
     if (!box) return;
@@ -260,7 +266,7 @@ window.openMessageModal = async () => {
     lockBody();
 };
 
-// ★ لیست پیام‌ها: فقط موضوع نمایش داده می‌شود؛ متن کامل در مدال جداگانه با کلیک باز می‌شود
+// ★ لیست پیام‌ها: فقط موضوع + تفکیک واضح خوانده/نخوانده + کادر کوچک‌تر
 function renderMessageList() {
     let c = document.getElementById('modal-msg-container');
     if (!c) return;
@@ -275,7 +281,7 @@ function renderMessageList() {
         return;
     }
 
-    let html = '<div style="display:flex;flex-direction:column;gap:10px;">';
+    let html = '<div style="display:flex;flex-direction:column;gap:6px;">';
     list.forEach((m) => {
         let realIdx = allMessages.indexOf(m);
         let dTime = m.time || '';
@@ -291,12 +297,20 @@ function renderMessageList() {
         const safeSubject = escapeHtml(m.subject);
         const safeTime = escapeHtml(dTime);
 
-        html += `<div class="msg-body-box" style="cursor:pointer;border-right:${unread ? '3px solid #38bdf8' : '1px solid rgba(255,255,255,.08)'};" onclick="window.readAdminMessage(${realIdx})">
+        const boxStyle = unread
+            ? 'cursor:pointer;padding:8px 10px;margin-bottom:0;background:rgba(56,189,248,.09);border:1px solid rgba(56,189,248,.35);border-right:3px solid #38bdf8;border-radius:8px;'
+            : 'cursor:pointer;padding:8px 10px;margin-bottom:0;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:8px;opacity:.65;';
+
+        const titleStyle = unread
+            ? 'color:#fff;font-weight:800;font-size:12px;'
+            : 'color:#cbd5e1;font-weight:500;font-size:12px;';
+
+        html += `<div class="msg-body-box ${unread ? 'is-unread' : 'is-read'}" style="${boxStyle}" onclick="window.readAdminMessage(${realIdx})">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-                <div class="msg-title-text" style="${unread ? 'color:#fff;font-weight:800;' : ''}"><i class="fas ${iconClass}" style="color:${iconColor};margin-left:5px;"></i> ${safeSubject}</div>
+                <div class="msg-title-text" style="${titleStyle}"><i class="fas ${iconClass}" style="color:${iconColor};margin-left:5px;${unread ? '' : 'opacity:.7;'}"></i> ${safeSubject}</div>
                 ${unread ? `<span style="font-size:9px;background:#38bdf8;color:#0f172a;padding:2px 6px;border-radius:4px;font-weight:700;flex-shrink:0;">${t.newBadge || 'جدید'}</span>` : ''}
             </div>
-            <div style="font-size:10px;color:#64748b;margin-top:6px;text-align:left" dir="ltr">${safeTime}</div>
+            <div style="font-size:9.5px;color:#64748b;margin-top:3px;text-align:left" dir="ltr">${safeTime}</div>
         </div>`;
     });
     c.innerHTML = html + '</div>';
