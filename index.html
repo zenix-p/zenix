@@ -290,11 +290,19 @@
     </div>
 
     <script>
-        function togglePassword(id,btn){
-            const input=document.getElementById(id);
-            if(input.type==='password'){input.type='text';btn.innerHTML='<i class="fas fa-eye-slash"></i>';}
-            else{input.type='password';btn.innerHTML='<i class="fas fa-eye"></i>';}
-        }
+       function togglePassword(id,btn){
+    const input=document.getElementById(id);
+    btn.textContent='';
+    const icon=document.createElement('i');
+    if(input.type==='password'){
+        input.type='text';
+        icon.className='fas fa-eye-slash';
+    } else {
+        input.type='password';
+        icon.className='fas fa-eye';
+    }
+    btn.appendChild(icon);
+}
     </script>
 
     <script type="module">
