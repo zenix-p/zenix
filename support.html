@@ -258,74 +258,32 @@
             const len = String(text || '').length;
             return Math.min(3000, Math.max(1200, 1000 + len * 20));
         }
-
         function cleanEnglishText(text) {
             if (!text) return text;
             return String(text)
                 .replace(/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/g, '')
-                .replace(/[\u0400-\u04FF]/g, '')
-                .replace(/[\u0590-\u05FF]/g, '')
+                .replace(/[\u0400-\u04FF]/g, '').replace(/[\u0590-\u05FF]/g, '')
                 .replace(/[\u4E00-\u9FFF\u3040-\u309F\u30A0-\u30FF\uAC00-\uD7AF]/g, '')
-                .replace(/[\u0370-\u03FF]/g, '')
-                .replace(/[\u0E00-\u0E7F]/g, '')
-                .replace(/[\u0900-\u097F]/g, '')
-                .replace(/[\u0980-\u09FF]/g, '')
-                .replace(/\s{2,}/g, ' ')
-                .trim();
+                .replace(/[\u0370-\u03FF]/g, '').replace(/[\u0E00-\u0E7F]/g, '')
+                .replace(/[\u0900-\u097F]/g, '').replace(/[\u0980-\u09FF]/g, '')
+                .replace(/\s{2,}/g, ' ').trim();
         }
-
         function isAISayingNoInfo(text) {
             if (!text) return true;
             const t = String(text).toLowerCase();
-            return t.includes("don't have precise") || t.includes("don't know") || t.includes('contact the admin') || t.includes("i don't have") || t.includes('no information');
+            return t.includes("don't have precise") || t.includes("don't know") || t.includes('contact the admin') || t.includes("i don't have") || t.includes('no information') || t.includes("don't understand") || t.includes("sorry, i");
         }
 
         const EXPERT_POOL = {
-            dashboard: [
-                { name: 'Sophia', img: 'https://randomuser.me/api/portraits/women/44.jpg' },
-                { name: 'Emma',   img: 'https://randomuser.me/api/portraits/women/21.jpg' },
-                { name: 'Olivia', img: 'https://randomuser.me/api/portraits/women/45.jpg' }
-            ],
-            quantification: [
-                { name: 'Isabella', img: 'https://randomuser.me/api/portraits/women/68.jpg' },
-                { name: 'Mia',      img: 'https://randomuser.me/api/portraits/women/33.jpg' },
-                { name: 'Ava',      img: 'https://randomuser.me/api/portraits/women/79.jpg' }
-            ],
-            deposit: [
-                { name: 'Emma',  img: 'https://randomuser.me/api/portraits/women/21.jpg' },
-                { name: 'Chloe', img: 'https://randomuser.me/api/portraits/women/90.jpg' },
-                { name: 'Grace', img: 'https://randomuser.me/api/portraits/women/56.jpg' }
-            ],
-            withdraw: [
-                { name: 'Olivia', img: 'https://randomuser.me/api/portraits/women/45.jpg' },
-                { name: 'Lily',   img: 'https://randomuser.me/api/portraits/women/65.jpg' },
-                { name: 'Emma',   img: 'https://randomuser.me/api/portraits/women/21.jpg' }
-            ],
-            team: [
-                { name: 'Mia',      img: 'https://randomuser.me/api/portraits/women/33.jpg' },
-                { name: 'Ava',      img: 'https://randomuser.me/api/portraits/women/79.jpg' },
-                { name: 'Isabella', img: 'https://randomuser.me/api/portraits/women/68.jpg' }
-            ],
-            transactions: [
-                { name: 'Ava',   img: 'https://randomuser.me/api/portraits/women/79.jpg' },
-                { name: 'Chloe', img: 'https://randomuser.me/api/portraits/women/90.jpg' },
-                { name: 'Lily',  img: 'https://randomuser.me/api/portraits/women/65.jpg' }
-            ],
-            profile: [
-                { name: 'Chloe', img: 'https://randomuser.me/api/portraits/women/90.jpg' },
-                { name: 'Lily',  img: 'https://randomuser.me/api/portraits/women/65.jpg' },
-                { name: 'Grace', img: 'https://randomuser.me/api/portraits/women/56.jpg' }
-            ],
-            login: [
-                { name: 'Lily',  img: 'https://randomuser.me/api/portraits/women/65.jpg' },
-                { name: 'Grace', img: 'https://randomuser.me/api/portraits/women/56.jpg' },
-                { name: 'Emma',  img: 'https://randomuser.me/api/portraits/women/21.jpg' }
-            ],
-            register: [
-                { name: 'Grace',  img: 'https://randomuser.me/api/portraits/women/56.jpg' },
-                { name: 'Emma',   img: 'https://randomuser.me/api/portraits/women/21.jpg' },
-                { name: 'Olivia', img: 'https://randomuser.me/api/portraits/women/45.jpg' }
-            ]
+            dashboard: [ { name: 'Sophia', img: 'https://randomuser.me/api/portraits/women/44.jpg' }, { name: 'Emma', img: 'https://randomuser.me/api/portraits/women/21.jpg' }, { name: 'Olivia', img: 'https://randomuser.me/api/portraits/women/45.jpg' } ],
+            quantification: [ { name: 'Isabella', img: 'https://randomuser.me/api/portraits/women/68.jpg' }, { name: 'Mia', img: 'https://randomuser.me/api/portraits/women/33.jpg' }, { name: 'Ava', img: 'https://randomuser.me/api/portraits/women/79.jpg' } ],
+            deposit: [ { name: 'Emma', img: 'https://randomuser.me/api/portraits/women/21.jpg' }, { name: 'Chloe', img: 'https://randomuser.me/api/portraits/women/90.jpg' }, { name: 'Grace', img: 'https://randomuser.me/api/portraits/women/56.jpg' } ],
+            withdraw: [ { name: 'Olivia', img: 'https://randomuser.me/api/portraits/women/45.jpg' }, { name: 'Lily', img: 'https://randomuser.me/api/portraits/women/65.jpg' }, { name: 'Emma', img: 'https://randomuser.me/api/portraits/women/21.jpg' } ],
+            team: [ { name: 'Mia', img: 'https://randomuser.me/api/portraits/women/33.jpg' }, { name: 'Ava', img: 'https://randomuser.me/api/portraits/women/79.jpg' }, { name: 'Isabella', img: 'https://randomuser.me/api/portraits/women/68.jpg' } ],
+            transactions: [ { name: 'Ava', img: 'https://randomuser.me/api/portraits/women/79.jpg' }, { name: 'Chloe', img: 'https://randomuser.me/api/portraits/women/90.jpg' }, { name: 'Lily', img: 'https://randomuser.me/api/portraits/women/65.jpg' } ],
+            profile: [ { name: 'Chloe', img: 'https://randomuser.me/api/portraits/women/90.jpg' }, { name: 'Lily', img: 'https://randomuser.me/api/portraits/women/65.jpg' }, { name: 'Grace', img: 'https://randomuser.me/api/portraits/women/56.jpg' } ],
+            login: [ { name: 'Lily', img: 'https://randomuser.me/api/portraits/women/65.jpg' }, { name: 'Grace', img: 'https://randomuser.me/api/portraits/women/56.jpg' }, { name: 'Emma', img: 'https://randomuser.me/api/portraits/women/21.jpg' } ],
+            register: [ { name: 'Grace', img: 'https://randomuser.me/api/portraits/women/56.jpg' }, { name: 'Emma', img: 'https://randomuser.me/api/portraits/women/21.jpg' }, { name: 'Olivia', img: 'https://randomuser.me/api/portraits/women/45.jpg' } ]
         };
         function pickExpertForTopic(topicKey, userSeed) {
             const pool = EXPERT_POOL[topicKey];
@@ -336,21 +294,14 @@
             return pool[Math.abs(hash) % pool.length];
         }
         function getGuestId() {
-            let id = null;
-            try { id = sessionStorage.getItem('zenix_guest_id'); } catch(e) {}
-            if (!id) {
-                id = 'guest-' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
-                try { sessionStorage.setItem('zenix_guest_id', id); } catch(e) {}
-            }
+            let id = null; try { id = sessionStorage.getItem('zenix_guest_id'); } catch(e) {}
+            if (!id) { id = 'guest-' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36); try { sessionStorage.setItem('zenix_guest_id', id); } catch(e) {} }
             return id;
         }
-        function normalizeFa(text) {
-            return String(text == null ? '' : text).toLowerCase().replace(/ي/g,'ی').replace(/ى/g,'ی').replace(/ك/g,'ک').trim();
-        }
+        function normalizeFa(text) { return String(text == null ? '' : text).toLowerCase().replace(/ي/g,'ی').replace(/ى/g,'ی').replace(/ك/g,'ک').trim(); }
         function keywordMatches(text, keyword) {
             if (!keyword) return false;
-            const t = normalizeFa(text);
-            const k = normalizeFa(keyword);
+            const t = normalizeFa(text); const k = normalizeFa(keyword);
             if (!k) return false;
             if (k.length >= 4) return t.includes(k);
             if (k.length < 2) return false;
@@ -358,166 +309,117 @@
             const re = new RegExp('(^|[\\s,.:;!?؟،؛\\-()\\[\\]{}"\'])' + esc, 'i');
             return re.test(t);
         }
-
         function isOnChatState() { const s = history.state; return !!(s && s.zenixChat); }
         function pushChatState() { if (isOnChatState()) return; try { history.pushState({ zenixChat: true }, '', location.href); } catch(e) {} }
         window.addEventListener('popstate', function() { if (chatIsOpen) { pushChatState(); requestCloseChat(); } });
 
-        const TOPIC_ICONS = {
-            dashboard: { icon: 'fa-home', color: 'ni-blue' },
-            quantification: { icon: 'fa-robot', color: 'ni-purple' },
-            deposit: { icon: 'fa-arrow-down', color: 'ni-green' },
-            withdraw: { icon: 'fa-arrow-up', color: 'ni-yellow' },
-            team: { icon: 'fa-users', color: 'ni-pink' },
-            transactions: { icon: 'fa-history', color: 'ni-cyan' },
-            profile: { icon: 'fa-user-cog', color: 'ni-rose' },
-            login: { icon: 'fa-sign-in-alt', color: 'ni-emerald' },
-            register: { icon: 'fa-user-plus', color: 'ni-amber' }
-        };
+        const TOPIC_ICONS = { dashboard: { icon: 'fa-home', color: 'ni-blue' }, quantification: { icon: 'fa-robot', color: 'ni-purple' }, deposit: { icon: 'fa-arrow-down', color: 'ni-green' }, withdraw: { icon: 'fa-arrow-up', color: 'ni-yellow' }, team: { icon: 'fa-users', color: 'ni-pink' }, transactions: { icon: 'fa-history', color: 'ni-cyan' }, profile: { icon: 'fa-user-cog', color: 'ni-rose' }, login: { icon: 'fa-sign-in-alt', color: 'ni-emerald' }, register: { icon: 'fa-user-plus', color: 'ni-amber' } };
 
         const UI = {
-            fa: {
-                dir: 'rtl',
-                ui: { back:'بازگشت', backToTopics:'بازگشت به موضوعات', welcomeTitle:'به پشتیبانی زنیکس خوش آمدید 🌹', welcomeText:'تیم کارشناسان متخصص ما به صورت ۲۴ ساعته آماده کمک به شما هستند. کافیست موضوع سوال خود را از بین گزینه‌های زیر انتخاب کنید.', topicsTitle:'موضوعات پشتیبانی', topicsHint:'برای شروع، یک موضوع انتخاب کنید', closeChat:'بستن گفتگو', conversationId:'شناسه گفتگو:', online:'آنلاین', connected:'متصل', closeModalTitle:'بستن گفتگو', closeModalText:'آیا از بستن این گفتگو مطمئن هستید؟', cancel:'انصراف', confirm:'بله، بستن', adminView:'پشتیبانی انسانی', adminRole:'ادمین زنیکس', inputDefault:'سوال خود را بنویسید...', inputAbout:'سوال خود را درباره', inputAboutSuffix:'بنویسید...', mustSelectTopic:'لطفاً ابتدا یک موضوع انتخاب کنید.', activeChatError:'⚠️ شما در حال حاضر یک گفتگوی فعال دارید. ابتدا آن را ببندید.', noInfoFound:'Sorry, I did not understand your question. 🌸 Could you rephrase, or would you like me to connect you to a human agent?', switchingToAdmin:'Connecting you to human support...', sendError:'خطا در ارسال پیام:', noMessages:'هنوز پیامی در این گفتگو وجود ندارد.', copySuccess:'کد کپی شد، در حال بازگشت...', switchToAdminBtn:'💬 اتصال به ادمین', userInfoHeader:'اطلاعات کاربر', userIdLabel:'شناسه کاربر', userNameLabel:'نام', userEmailLabel:'ایمیل', translate:'ترجمه به فارسی', translating:'در حال ترجمه...', retryTranslate:'تلاش دوباره' },
-                roles: { dashboard:'کارشناس داشبورد', quantification:'کارشناس ربات معامله‌گر', deposit:'کارشناس واریز', withdraw:'کارشناس برداشت', team:'کارشناس تیم و رفرال', transactions:'کارشناس تراکنش‌ها', profile:'کارشناس امنیت حساب', login:'کارشناس ورود', register:'کارشناس ثبت‌نام' },
-                labels: { dashboard:'داشبورد', quantification:'کوانتیفیکیشن', deposit:'واریز', withdraw:'برداشت', team:'تیم', transactions:'تراکنش', profile:'پروفایل', login:'ورود', register:'ثبت‌نام' },
-                descs: { dashboard:'موجودی و آمار', quantification:'ربات و سود', deposit:'شارژ حساب', withdraw:'تسویه', team:'زیرمجموعه', transactions:'تاریخچه مالی', profile:'تنظیمات امنیتی', login:'مشکل ورود', register:'حساب جدید' }
-            },
-            en: {
-                dir: 'ltr',
-                ui: { back:'Back', backToTopics:'Back to topics', welcomeTitle:'Welcome to Zenix Support 🌹', welcomeText:'Our team of expert specialists is available 24/7 to help you. Just select a topic below to get started.', topicsTitle:'Support Topics', topicsHint:'Select a topic to begin', closeChat:'Close Chat', conversationId:'Conversation ID:', online:'Online', connected:'Connected', closeModalTitle:'Close Conversation', closeModalText:'Are you sure you want to close this conversation?', cancel:'Cancel', confirm:'Yes, close', adminView:'Human Support', adminRole:'Zenix Admin', inputDefault:'Type your message...', inputAbout:'Type your question about', inputAboutSuffix:'...', mustSelectTopic:'Please select a topic first.', activeChatError:'⚠️ You already have an active conversation. Please close it first.', noInfoFound:'Sorry, I did not understand your question. 🌸 Could you rephrase, or would you like me to connect you to a human agent?', switchingToAdmin:'Connecting you to human support...', sendError:'Error sending message:', noMessages:'No messages yet.', copySuccess:'Code copied, returning...', switchToAdminBtn:'💬 Contact Admin', userInfoHeader:'User Information', userIdLabel:'User ID', userNameLabel:'Name', userEmailLabel:'Email', translate:'Translate to English', translating:'Translating...', retryTranslate:'Retry' },
-                roles: { dashboard:'Dashboard Specialist', quantification:'Trading Bot Specialist', deposit:'Deposit Specialist', withdraw:'Withdrawal Specialist', team:'Team & Referral Specialist', transactions:'Transactions Specialist', profile:'Security Specialist', login:'Login Specialist', register:'Registration Specialist' },
-                labels: { dashboard:'Dashboard', quantification:'Quantification', deposit:'Deposit', withdraw:'Withdraw', team:'Team', transactions:'Transactions', profile:'Profile', login:'Login', register:'Register' },
-                descs: { dashboard:'Balance & Stats', quantification:'Bot & Profits', deposit:'Fund Account', withdraw:'Cash Out', team:'Referrals', transactions:'Financial History', profile:'Security Settings', login:'Login Issues', register:'New Account' }
-            },
-            ar: {
-                dir: 'rtl',
-                ui: { back:'رجوع', backToTopics:'العودة للمواضيع', welcomeTitle:'مرحباً بك في دعم زينيكس 🌹', welcomeText:'فريق خبرائنا متاح 24/7 لمساعدتك. اختر موضوعاً من الأسفل.', topicsTitle:'مواضيع الدعم', topicsHint:'اختر موضوعاً للبدء', closeChat:'إغلاق المحادثة', conversationId:'معرف المحادثة:', online:'متصل', connected:'متصل', closeModalTitle:'إغلاق المحادثة', closeModalText:'هل أنت متأكد من إغلاق هذه المحادثة؟', cancel:'إلغاء', confirm:'نعم، إغلاق', adminView:'الدعم البشري', adminRole:'مدير زينيكس', inputDefault:'اكتب رسالتك...', inputAbout:'اكتب سؤالك حول', inputAboutSuffix:'...', mustSelectTopic:'يرجى اختيار موضوع أولاً.', activeChatError:'⚠️ لديك محادثة نشطة. أغلقها أولاً.', noInfoFound:'Sorry, I did not understand your question. 🌸 Could you rephrase, or would you like me to connect you to a human agent?', switchingToAdmin:'Connecting you to human support...', sendError:'خطأ في الإرسال:', noMessages:'لا رسائل بعد.', copySuccess:'تم نسخ الرمز، جارٍ العودة...', switchToAdminBtn:'💬 تواصل مع الإدارة', userInfoHeader:'معلومات المستخدم', userIdLabel:'معرف المستخدم', userNameLabel:'الاسم', userEmailLabel:'البريد', translate:'ترجم إلى العربية', translating:'جارٍ الترجمة...', retryTranslate:'إعادة المحاولة' },
-                roles: { dashboard:'أخصائي لوحة التحكم', quantification:'أخصائي بوت التداول', deposit:'أخصائي الإيداع', withdraw:'أخصائي السحب', team:'أخصائي الفريق', transactions:'أخصائي المعاملات', profile:'أخصائي الأمان', login:'أخصائي تسجيل الدخول', register:'أخصائي التسجيل' },
-                labels: { dashboard:'لوحة التحكم', quantification:'التداول الكمي', deposit:'إيداع', withdraw:'سحب', team:'الفريق', transactions:'المعاملات', profile:'الملف الشخصي', login:'تسجيل الدخول', register:'التسجيل' },
-                descs: { dashboard:'الرصيد والإحصاءات', quantification:'البوت والأرباح', deposit:'شحن الحساب', withdraw:'الدفع', team:'الإحالات', transactions:'السجل المالي', profile:'إعدادات الأمان', login:'مشاكل الدخول', register:'حساب جديد' }
-            },
-            tr: {
-                dir: 'ltr',
-                ui: { back:'Geri', backToTopics:'Konulara dön', welcomeTitle:"Zenix Desteğe Hoş Geldiniz 🌹", welcomeText:'Uzman ekibimiz size yardımcı olmak için 24/7 hazır. Aşağıdan bir konu seçin.', topicsTitle:'Destek Konuları', topicsHint:'Başlamak için bir konu seçin', closeChat:'Sohbeti Kapat', conversationId:'Sohbet Kimliği:', online:'Çevrimiçi', connected:'Bağlandı', closeModalTitle:'Sohbeti Kapat', closeModalText:'Bu sohbeti kapatmak istediğinizden emin misiniz?', cancel:'İptal', confirm:'Evet, kapat', adminView:'İnsan Desteği', adminRole:'Zenix Yöneticisi', inputDefault:'Mesajınızı yazın...', inputAbout:'Sorunuzu şu konuda yazın:', inputAboutSuffix:'...', mustSelectTopic:'Lütfen önce bir konu seçin.', activeChatError:'⚠️ Zaten aktif bir sohbetiniz var. Önce onu kapatın.', noInfoFound:'Sorry, I did not understand your question. 🌸 Could you rephrase, or would you like me to connect you to a human agent?', switchingToAdmin:'Connecting you to human support...', sendError:'Mesaj gönderme hatası:', noMessages:'Henüz mesaj yok.', copySuccess:'Kod kopyalandı, dönülüyor...', switchToAdminBtn:'💬 Yöneticiyle İletişim', userInfoHeader:'Kullanıcı Bilgileri', userIdLabel:'Kullanıcı ID', userNameLabel:'Ad', userEmailLabel:'E-posta', translate:"Türkçe'ye çevir", translating:'Çevriliyor...', retryTranslate:'Tekrar dene' },
-                roles: { dashboard:'Panel Uzmanı', quantification:'İşlem Botu Uzmanı', deposit:'Yatırım Uzmanı', withdraw:'Çekim Uzmanı', team:'Ekip Uzmanı', transactions:'İşlemler Uzmanı', profile:'Güvenlik Uzmanı', login:'Giriş Uzmanı', register:'Kayıt Uzmanı' },
-                labels: { dashboard:'Panel', quantification:'Kuantifikasyon', deposit:'Yatırım', withdraw:'Çekim', team:'Ekip', transactions:'İşlemler', profile:'Profil', login:'Giriş', register:'Kayıt' },
-                descs: { dashboard:'Bakiye ve İstatistikler', quantification:'Bot ve Kâr', deposit:'Hesap Yükleme', withdraw:'Para Çekme', team:'Referanslar', transactions:'Finansal Geçmiş', profile:'Güvenlik Ayarları', login:'Giriş Sorunları', register:'Yeni Hesap' }
-            },
-            ru: {
-                dir: 'ltr',
-                ui: { back:'Назад', backToTopics:'К темам', welcomeTitle:'Добро пожаловать в поддержку Zenix 🌹', welcomeText:'Наша команда экспертов доступна 24/7. Выберите тему ниже.', topicsTitle:'Темы поддержки', topicsHint:'Выберите тему', closeChat:'Закрыть чат', conversationId:'ID беседы:', online:'Онлайн', connected:'Подключено', closeModalTitle:'Закрыть беседу', closeModalText:'Вы уверены, что хотите закрыть эту беседу?', cancel:'Отмена', confirm:'Да, закрыть', adminView:'Живая поддержка', adminRole:'Админ Zenix', inputDefault:'Введите сообщение...', inputAbout:'Введите вопрос о', inputAboutSuffix:'...', mustSelectTopic:'Пожалуйста, выберите тему.', activeChatError:'⚠️ У вас есть активная беседа. Сначала закройте её.', noInfoFound:'Sorry, I did not understand your question. 🌸 Could you rephrase, or would you like me to connect you to a human agent?', switchingToAdmin:'Connecting you to human support...', sendError:'Ошибка отправки:', noMessages:'Пока нет сообщений.', copySuccess:'Код скопирован, возврат...', switchToAdminBtn:'💬 Связаться с админом', userInfoHeader:'Информация о пользователе', userIdLabel:'ID пользователя', userNameLabel:'Имя', userEmailLabel:'Email', translate:'Перевести на русский', translating:'Перевод...', retryTranslate:'Повторить' },
-                roles: { dashboard:'Специалист панели', quantification:'Специалист бота', deposit:'Специалист депозитов', withdraw:'Специалист выводов', team:'Специалист команды', transactions:'Специалист транзакций', profile:'Специалист безопасности', login:'Специалист входа', register:'Специалист регистрации' },
-                labels: { dashboard:'Панель', quantification:'Квантификация', deposit:'Депозит', withdraw:'Вывод', team:'Команда', transactions:'Транзакции', profile:'Профиль', login:'Вход', register:'Регистрация' },
-                descs: { dashboard:'Баланс и статистика', quantification:'Бот и прибыль', deposit:'Пополнение', withdraw:'Обналичивание', team:'Рефералы', transactions:'История', profile:'Безопасность', login:'Проблемы со входом', register:'Новый аккаунт' }
-            },
-            es: {
-                dir: 'ltr',
-                ui: { back:'Atrás', backToTopics:'Volver a temas', welcomeTitle:'Bienvenido a Soporte Zenix 🌹', welcomeText:'Nuestro equipo de expertos está disponible 24/7. Selecciona un tema abajo.', topicsTitle:'Temas de Soporte', topicsHint:'Selecciona un tema', closeChat:'Cerrar Chat', conversationId:'ID de conversación:', online:'En línea', connected:'Conectado', closeModalTitle:'Cerrar Conversación', closeModalText:'¿Seguro que quieres cerrar esta conversación?', cancel:'Cancelar', confirm:'Sí, cerrar', adminView:'Soporte Humano', adminRole:'Admin Zenix', inputDefault:'Escribe tu mensaje...', inputAbout:'Escribe tu pregunta sobre', inputAboutSuffix:'...', mustSelectTopic:'Por favor, selecciona un tema primero.', activeChatError:'⚠️ Ya tienes una conversación activa. Ciérrala primero.', noInfoFound:'Sorry, I did not understand your question. 🌸 Could you rephrase, or would you like me to connect you to a human agent?', switchingToAdmin:'Connecting you to human support...', sendError:'Error al enviar:', noMessages:'Aún no hay mensajes.', copySuccess:'Código copiado, volviendo...', switchToAdminBtn:'💬 Contactar Admin', userInfoHeader:'Información del Usuario', userIdLabel:'ID de Usuario', userNameLabel:'Nombre', userEmailLabel:'Email', translate:'Traducir al español', translating:'Traduciendo...', retryTranslate:'Reintentar' },
-                roles: { dashboard:'Especialista del Panel', quantification:'Especialista del Bot', deposit:'Especialista de Depósitos', withdraw:'Especialista de Retiros', team:'Especialista de Equipo', transactions:'Especialista de Transacciones', profile:'Especialista de Seguridad', login:'Especialista de Acceso', register:'Especialista de Registro' },
-                labels: { dashboard:'Panel', quantification:'Cuantificación', deposit:'Depósito', withdraw:'Retiro', team:'Equipo', transactions:'Transacciones', profile:'Perfil', login:'Acceso', register:'Registro' },
-                descs: { dashboard:'Saldo y Estadísticas', quantification:'Bot y Ganancias', deposit:'Recargar Cuenta', withdraw:'Retirar Efectivo', team:'Referidos', transactions:'Historial', profile:'Seguridad', login:'Problemas de Acceso', register:'Nueva Cuenta' }
-            },
-            fr: {
-                dir: 'ltr',
-                ui: { back:'Retour', backToTopics:'Retour aux sujets', welcomeTitle:'Bienvenue au Support Zenix 🌹', welcomeText:'Notre équipe est disponible 24/7. Sélectionnez un sujet ci-dessous.', topicsTitle:'Sujets de Support', topicsHint:'Sélectionnez un sujet', closeChat:'Fermer le Chat', conversationId:'ID de conversation:', online:'En ligne', connected:'Connecté', closeModalTitle:'Fermer la Conversation', closeModalText:'Voulez-vous vraiment fermer cette conversation ?', cancel:'Annuler', confirm:'Oui, fermer', adminView:'Support Humain', adminRole:'Admin Zenix', inputDefault:'Écrivez votre message...', inputAbout:'Écrivez votre question sur', inputAboutSuffix:'...', mustSelectTopic:'Veuillez sélectionner un sujet.', activeChatError:'⚠️ Vous avez déjà une conversation active. Fermez-la d\'abord.', noInfoFound:'Sorry, I did not understand your question. 🌸 Could you rephrase, or would you like me to connect you to a human agent?', switchingToAdmin:'Connecting you to human support...', sendError:'Erreur d\'envoi:', noMessages:'Aucun message pour le moment.', copySuccess:'Code copié, retour...', switchToAdminBtn:'💬 Contacter Admin', userInfoHeader:'Informations Utilisateur', userIdLabel:'ID Utilisateur', userNameLabel:'Nom', userEmailLabel:'Email', translate:'Traduire en français', translating:'Traduction...', retryTranslate:'Réessayer' },
-                roles: { dashboard:'Spécialiste du Tableau', quantification:'Spécialiste du Bot', deposit:'Spécialiste des Dépôts', withdraw:'Spécialiste des Retraits', team:'Spécialiste d\'Équipe', transactions:'Spécialiste des Transactions', profile:'Spécialiste de Sécurité', login:'Spécialiste de Connexion', register:'Spécialiste d\'Inscription' },
-                labels: { dashboard:'Tableau', quantification:'Quantification', deposit:'Dépôt', withdraw:'Retrait', team:'Équipe', transactions:'Transactions', profile:'Profil', login:'Connexion', register:'Inscription' },
-                descs: { dashboard:'Solde et Stats', quantification:'Bot et Profits', deposit:'Recharger', withdraw:'Retirer', team:'Parrainages', transactions:'Historique', profile:'Sécurité', login:'Problèmes', register:'Nouveau Compte' }
-            },
-            de: {
-                dir: 'ltr',
-                ui: { back:'Zurück', backToTopics:'Zurück zu Themen', welcomeTitle:'Willkommen beim Zenix Support 🌹', welcomeText:'Unser Expertenteam ist rund um die Uhr verfügbar. Wählen Sie unten ein Thema.', topicsTitle:'Support-Themen', topicsHint:'Wählen Sie ein Thema', closeChat:'Chat schließen', conversationId:'Konversations-ID:', online:'Online', connected:'Verbunden', closeModalTitle:'Konversation schließen', closeModalText:'Sind Sie sicher, dass Sie diese Konversation schließen möchten?', cancel:'Abbrechen', confirm:'Ja, schließen', adminView:'Menschlicher Support', adminRole:'Zenix Admin', inputDefault:'Nachricht eingeben...', inputAbout:'Frage zu', inputAboutSuffix:'eingeben...', mustSelectTopic:'Bitte wählen Sie zuerst ein Thema.', activeChatError:'⚠️ Sie haben bereits eine aktive Konversation. Schließen Sie diese zuerst.', noInfoFound:'Sorry, I did not understand your question. 🌸 Could you rephrase, or would you like me to connect you to a human agent?', switchingToAdmin:'Connecting you to human support...', sendError:'Sendefehler:', noMessages:'Noch keine Nachrichten.', copySuccess:'Code kopiert, zurück...', switchToAdminBtn:'💬 Admin kontaktieren', userInfoHeader:'Benutzerinformationen', userIdLabel:'Benutzer-ID', userNameLabel:'Name', userEmailLabel:'E-Mail', translate:'Ins Deutsche übersetzen', translating:'Übersetze...', retryTranslate:'Erneut versuchen' },
-                roles: { dashboard:'Dashboard-Spezialist', quantification:'Trading-Bot-Spezialist', deposit:'Einzahlungs-Spezialist', withdraw:'Auszahlungs-Spezialist', team:'Team-Spezialist', transactions:'Transaktions-Spezialist', profile:'Sicherheits-Spezialist', login:'Login-Spezialist', register:'Registrierungs-Spezialist' },
-                labels: { dashboard:'Dashboard', quantification:'Quantifizierung', deposit:'Einzahlung', withdraw:'Auszahlung', team:'Team', transactions:'Transaktionen', profile:'Profil', login:'Login', register:'Registrierung' },
-                descs: { dashboard:'Guthaben & Statistiken', quantification:'Bot & Gewinn', deposit:'Konto aufladen', withdraw:'Geld abheben', team:'Empfehlungen', transactions:'Finanzhistorie', profile:'Sicherheit', login:'Login-Probleme', register:'Neues Konto' }
-            }
+            fa: { dir: 'rtl', ui: { back:'بازگشت', backToTopics:'بازگشت به موضوعات', welcomeTitle:'به پشتیبانی زنیکس خوش آمدید 🌹', welcomeText:'تیم کارشناسان متخصص ما به صورت ۲۴ ساعته آماده کمک به شما هستند. کافیست موضوع سوال خود را از بین گزینه‌های زیر انتخاب کنید.', topicsTitle:'موضوعات پشتیبانی', topicsHint:'برای شروع، یک موضوع انتخاب کنید', closeChat:'بستن گفتگو', conversationId:'شناسه گفتگو:', online:'آنلاین', connected:'متصل', closeModalTitle:'بستن گفتگو', closeModalText:'آیا از بستن این گفتگو مطمئن هستید؟', cancel:'انصراف', confirm:'بله، بستن', adminView:'پشتیبانی انسانی', adminRole:'ادمین زنیکس', inputDefault:'سوال خود را بنویسید...', inputAbout:'سوال خود را درباره', inputAboutSuffix:'بنویسید...', mustSelectTopic:'لطفاً ابتدا یک موضوع انتخاب کنید.', activeChatError:'⚠️ شما در حال حاضر یک گفتگوی فعال دارید. ابتدا آن را ببندید.', noInfoFound:'Sorry, I did not understand your question. 🌸 Could you rephrase, or would you like me to connect you to a human agent?', switchingToAdmin:'Connecting you to human support...', sendError:'خطا در ارسال پیام:', noMessages:'هنوز پیامی در این گفتگو وجود ندارد.', copySuccess:'کد کپی شد، در حال بازگشت...', switchToAdminBtn:'💬 اتصال به ادمین', userInfoHeader:'اطلاعات کاربر', userIdLabel:'شناسه کاربر', userNameLabel:'نام', userEmailLabel:'ایمیل', translate:'ترجمه به فارسی', translating:'در حال ترجمه...', retryTranslate:'تلاش دوباره' }, roles: { dashboard:'کارشناس داشبورد', quantification:'کارشناس ربات معامله‌گر', deposit:'کارشناس واریز', withdraw:'کارشناس برداشت', team:'کارشناس تیم و رفرال', transactions:'کارشناس تراکنش‌ها', profile:'کارشناس امنیت حساب', login:'کارشناس ورود', register:'کارشناس ثبت‌نام' }, labels: { dashboard:'داشبورد', quantification:'کوانتیفیکیشن', deposit:'واریز', withdraw:'برداشت', team:'تیم', transactions:'تراکنش', profile:'پروفایل', login:'ورود', register:'ثبت‌نام' }, descs: { dashboard:'موجودی و آمار', quantification:'ربات و سود', deposit:'شارژ حساب', withdraw:'تسویه', team:'زیرمجموعه', transactions:'تاریخچه مالی', profile:'تنظیمات امنیتی', login:'مشکل ورود', register:'حساب جدید' } },
+            en: { dir: 'ltr', ui: { back:'Back', backToTopics:'Back to topics', welcomeTitle:'Welcome to Zenix Support 🌹', welcomeText:'Our team of expert specialists is available 24/7 to help you. Just select a topic below to get started.', topicsTitle:'Support Topics', topicsHint:'Select a topic to begin', closeChat:'Close Chat', conversationId:'Conversation ID:', online:'Online', connected:'Connected', closeModalTitle:'Close Conversation', closeModalText:'Are you sure you want to close this conversation?', cancel:'Cancel', confirm:'Yes, close', adminView:'Human Support', adminRole:'Zenix Admin', inputDefault:'Type your message...', inputAbout:'Type your question about', inputAboutSuffix:'...', mustSelectTopic:'Please select a topic first.', activeChatError:'⚠️ You already have an active conversation. Please close it first.', noInfoFound:'Sorry, I did not understand your question. 🌸 Could you rephrase, or would you like me to connect you to a human agent?', switchingToAdmin:'Connecting you to human support...', sendError:'Error sending message:', noMessages:'No messages yet.', copySuccess:'Code copied, returning...', switchToAdminBtn:'💬 Contact Admin', userInfoHeader:'User Information', userIdLabel:'User ID', userNameLabel:'Name', userEmailLabel:'Email', translate:'Translate to English', translating:'Translating...', retryTranslate:'Retry' }, roles: { dashboard:'Dashboard Specialist', quantification:'Trading Bot Specialist', deposit:'Deposit Specialist', withdraw:'Withdrawal Specialist', team:'Team & Referral Specialist', transactions:'Transactions Specialist', profile:'Security Specialist', login:'Login Specialist', register:'Registration Specialist' }, labels: { dashboard:'Dashboard', quantification:'Quantification', deposit:'Deposit', withdraw:'Withdraw', team:'Team', transactions:'Transactions', profile:'Profile', login:'Login', register:'Register' }, descs: { dashboard:'Balance & Stats', quantification:'Bot & Profits', deposit:'Fund Account', withdraw:'Cash Out', team:'Referrals', transactions:'Financial History', profile:'Security Settings', login:'Login Issues', register:'New Account' } },
+            ar: { dir: 'rtl', ui: { back:'رجوع', backToTopics:'العودة للمواضيع', welcomeTitle:'مرحباً بك في دعم زينيكس 🌹', welcomeText:'فريق خبرائنا متاح 24/7 لمساعدتك. اختر موضوعاً من الأسفل.', topicsTitle:'مواضيع الدعم', topicsHint:'اختر موضوعاً للبدء', closeChat:'إغلاق المحادثة', conversationId:'معرف المحادثة:', online:'متصل', connected:'متصل', closeModalTitle:'إغلاق المحادثة', closeModalText:'هل أنت متأكد من إغلاق هذه المحادثة؟', cancel:'إلغاء', confirm:'نعم، إغلاق', adminView:'الدعم البشري', adminRole:'مدير زينيكس', inputDefault:'اكتب رسالتك...', inputAbout:'اكتب سؤالك حول', inputAboutSuffix:'...', mustSelectTopic:'يرجى اختيار موضوع أولاً.', activeChatError:'⚠️ لديك محادثة نشطة. أغلقها أولاً.', noInfoFound:'Sorry, I did not understand your question. 🌸 Could you rephrase, or would you like me to connect you to a human agent?', switchingToAdmin:'Connecting you to human support...', sendError:'خطأ في الإرسال:', noMessages:'لا رسائل بعد.', copySuccess:'تم نسخ الرمز، جارٍ العودة...', switchToAdminBtn:'💬 تواصل مع الإدارة', userInfoHeader:'معلومات المستخدم', userIdLabel:'معرف المستخدم', userNameLabel:'الاسم', userEmailLabel:'البريد', translate:'ترجم إلى العربية', translating:'جارٍ الترجمة...', retryTranslate:'إعادة المحاولة' }, roles: { dashboard:'أخصائي لوحة التحكم', quantification:'أخصائي بوت التداول', deposit:'أخصائي الإيداع', withdraw:'أخصائي السحب', team:'أخصائي الفريق', transactions:'أخصائي المعاملات', profile:'أخصائي الأمان', login:'أخصائي تسجيل الدخول', register:'أخصائي التسجيل' }, labels: { dashboard:'لوحة التحكم', quantification:'التداول الكمي', deposit:'إيداع', withdraw:'سحب', team:'الفريق', transactions:'المعاملات', profile:'الملف الشخصي', login:'تسجيل الدخول', register:'التسجيل' }, descs: { dashboard:'الرصيد والإحصاءات', quantification:'البوت والأرباح', deposit:'شحن الحساب', withdraw:'الدفع', team:'الإحالات', transactions:'السجل المالي', profile:'إعدادات الأمان', login:'مشاكل الدخول', register:'حساب جديد' } },
+            tr: { dir: 'ltr', ui: { back:'Geri', backToTopics:'Konulara dön', welcomeTitle:"Zenix Desteğe Hoş Geldiniz 🌹", welcomeText:'Uzman ekibimiz size yardımcı olmak için 24/7 hazır. Aşağıdan bir konu seçin.', topicsTitle:'Destek Konuları', topicsHint:'Başlamak için bir konu seçin', closeChat:'Sohbeti Kapat', conversationId:'Sohbet Kimliği:', online:'Çevrimiçi', connected:'Bağlandı', closeModalTitle:'Sohbeti Kapat', closeModalText:'Bu sohbeti kapatmak istediğinizden emin misiniz?', cancel:'İptal', confirm:'Evet, kapat', adminView:'İnsan Desteği', adminRole:'Zenix Yöneticisi', inputDefault:'Mesajınızı yazın...', inputAbout:'Sorunuzu şu konuda yazın:', inputAboutSuffix:'...', mustSelectTopic:'Lütfen önce bir konu seçin.', activeChatError:'⚠️ Zaten aktif bir sohbetiniz var. Önce onu kapatın.', noInfoFound:'Sorry, I did not understand your question. 🌸 Could you rephrase, or would you like me to connect you to a human agent?', switchingToAdmin:'Connecting you to human support...', sendError:'Mesaj gönderme hatası:', noMessages:'Henüz mesaj yok.', copySuccess:'Kod kopyalandı, dönülüyor...', switchToAdminBtn:'💬 Yöneticiyle İletişim', userInfoHeader:'Kullanıcı Bilgileri', userIdLabel:'Kullanıcı ID', userNameLabel:'Ad', userEmailLabel:'E-posta', translate:"Türkçe'ye çevir", translating:'Çevriliyor...', retryTranslate:'Tekrar dene' }, roles: { dashboard:'Panel Uzmanı', quantification:'İşlem Botu Uzmanı', deposit:'Yatırım Uzmanı', withdraw:'Çekim Uzmanı', team:'Ekip Uzmanı', transactions:'İşlemler Uzmanı', profile:'Güvenlik Uzmanı', login:'Giriş Uzmanı', register:'Kayıt Uzmanı' }, labels: { dashboard:'Panel', quantification:'Kuantifikasyon', deposit:'Yatırım', withdraw:'Çekim', team:'Ekip', transactions:'İşlemler', profile:'Profil', login:'Giriş', register:'Kayıt' }, descs: { dashboard:'Bakiye ve İstatistikler', quantification:'Bot ve Kâr', deposit:'Hesap Yükleme', withdraw:'Para Çekme', team:'Referanslar', transactions:'Finansal Geçmiş', profile:'Güvenlik Ayarları', login:'Giriş Sorunları', register:'Yeni Hesap' } },
+            ru: { dir: 'ltr', ui: { back:'Назад', backToTopics:'К темам', welcomeTitle:'Добро пожаловать в поддержку Zenix 🌹', welcomeText:'Наша команда экспертов доступна 24/7. Выберите тему ниже.', topicsTitle:'Темы поддержки', topicsHint:'Выберите тему', closeChat:'Закрыть чат', conversationId:'ID беседы:', online:'Онлайн', connected:'Подключено', closeModalTitle:'Закрыть беседу', closeModalText:'Вы уверены, что хотите закрыть эту беседу?', cancel:'Отмена', confirm:'Да, закрыть', adminView:'Живая поддержка', adminRole:'Админ Zenix', inputDefault:'Введите сообщение...', inputAbout:'Введите вопрос о', inputAboutSuffix:'...', mustSelectTopic:'Пожалуйста, выберите тему.', activeChatError:'⚠️ У вас есть активная беседа. Сначала закройте её.', noInfoFound:'Sorry, I did not understand your question. 🌸 Could you rephrase, or would you like me to connect you to a human agent?', switchingToAdmin:'Connecting you to human support...', sendError:'Ошибка отправки:', noMessages:'Пока нет сообщений.', copySuccess:'Код скопирован, возврат...', switchToAdminBtn:'💬 Связаться с админом', userInfoHeader:'Информация о пользователе', userIdLabel:'ID пользователя', userNameLabel:'Имя', userEmailLabel:'Email', translate:'Перевести на русский', translating:'Перевод...', retryTranslate:'Повторить' }, roles: { dashboard:'Специалист панели', quantification:'Специалист бота', deposit:'Специалист депозитов', withdraw:'Специалист выводов', team:'Специалист команды', transactions:'Специалист транзакций', profile:'Специалист безопасности', login:'Специалист входа', register:'Специалист регистрации' }, labels: { dashboard:'Панель', quantification:'Квантификация', deposit:'Депозит', withdraw:'Вывод', team:'Команда', transactions:'Транзакции', profile:'Профиль', login:'Вход', register:'Регистрация' }, descs: { dashboard:'Баланс и статистика', quantification:'Бот и прибыль', deposit:'Пополнение', withdraw:'Обналичивание', team:'Рефералы', transactions:'История', profile:'Безопасность', login:'Проблемы со входом', register:'Новый аккаунт' } },
+            es: { dir: 'ltr', ui: { back:'Atrás', backToTopics:'Volver a temas', welcomeTitle:'Bienvenido a Soporte Zenix 🌹', welcomeText:'Nuestro equipo de expertos está disponible 24/7. Selecciona un tema abajo.', topicsTitle:'Temas de Soporte', topicsHint:'Selecciona un tema', closeChat:'Cerrar Chat', conversationId:'ID de conversación:', online:'En línea', connected:'Conectado', closeModalTitle:'Cerrar Conversación', closeModalText:'¿Seguro que quieres cerrar esta conversación?', cancel:'Cancelar', confirm:'Sí, cerrar', adminView:'Soporte Humano', adminRole:'Admin Zenix', inputDefault:'Escribe tu mensaje...', inputAbout:'Escribe tu pregunta sobre', inputAboutSuffix:'...', mustSelectTopic:'Por favor, selecciona un tema primero.', activeChatError:'⚠️ Ya tienes una conversación activa. Ciérrala primero.', noInfoFound:'Sorry, I did not understand your question. 🌸 Could you rephrase, or would you like me to connect you to a human agent?', switchingToAdmin:'Connecting you to human support...', sendError:'Error al enviar:', noMessages:'Aún no hay mensajes.', copySuccess:'Código copiado, volviendo...', switchToAdminBtn:'💬 Contactar Admin', userInfoHeader:'Información del Usuario', userIdLabel:'ID de Usuario', userNameLabel:'Nombre', userEmailLabel:'Email', translate:'Traducir al español', translating:'Traduciendo...', retryTranslate:'Reintentar' }, roles: { dashboard:'Especialista del Panel', quantification:'Especialista del Bot', deposit:'Especialista de Depósitos', withdraw:'Especialista de Retiros', team:'Especialista de Equipo', transactions:'Especialista de Transacciones', profile:'Especialista de Seguridad', login:'Especialista de Acceso', register:'Especialista de Registro' }, labels: { dashboard:'Panel', quantification:'Cuantificación', deposit:'Depósito', withdraw:'Retiro', team:'Equipo', transactions:'Transacciones', profile:'Perfil', login:'Acceso', register:'Registro' }, descs: { dashboard:'Saldo y Estadísticas', quantification:'Bot y Ganancias', deposit:'Recargar Cuenta', withdraw:'Retirar Efectivo', team:'Referidos', transactions:'Historial', profile:'Seguridad', login:'Problemas de Acceso', register:'Nueva Cuenta' } },
+            fr: { dir: 'ltr', ui: { back:'Retour', backToTopics:'Retour aux sujets', welcomeTitle:'Bienvenue au Support Zenix 🌹', welcomeText:'Notre équipe est disponible 24/7. Sélectionnez un sujet ci-dessous.', topicsTitle:'Sujets de Support', topicsHint:'Sélectionnez un sujet', closeChat:'Fermer le Chat', conversationId:'ID de conversation:', online:'En ligne', connected:'Connecté', closeModalTitle:'Fermer la Conversation', closeModalText:'Voulez-vous vraiment fermer cette conversation ?', cancel:'Annuler', confirm:'Oui, fermer', adminView:'Support Humain', adminRole:'Admin Zenix', inputDefault:'Écrivez votre message...', inputAbout:'Écrivez votre question sur', inputAboutSuffix:'...', mustSelectTopic:'Veuillez sélectionner un sujet.', activeChatError:'⚠️ Vous avez déjà une conversation active. Fermez-la d\'abord.', noInfoFound:'Sorry, I did not understand your question. 🌸 Could you rephrase, or would you like me to connect you to a human agent?', switchingToAdmin:'Connecting you to human support...', sendError:'Erreur d\'envoi:', noMessages:'Aucun message pour le moment.', copySuccess:'Code copié, retour...', switchToAdminBtn:'💬 Contacter Admin', userInfoHeader:'Informations Utilisateur', userIdLabel:'ID Utilisateur', userNameLabel:'Nom', userEmailLabel:'Email', translate:'Traduire en français', translating:'Traduction...', retryTranslate:'Réessayer' }, roles: { dashboard:'Spécialiste du Tableau', quantification:'Spécialiste du Bot', deposit:'Spécialiste des Dépôts', withdraw:'Spécialiste des Retraits', team:'Spécialiste d\'Équipe', transactions:'Spécialiste des Transactions', profile:'Spécialiste de Sécurité', login:'Spécialiste de Connexion', register:'Spécialiste d\'Inscription' }, labels: { dashboard:'Tableau', quantification:'Quantification', deposit:'Dépôt', withdraw:'Retrait', team:'Équipe', transactions:'Transactions', profile:'Profil', login:'Connexion', register:'Inscription' }, descs: { dashboard:'Solde et Stats', quantification:'Bot et Profits', deposit:'Recharger', withdraw:'Retirer', team:'Parrainages', transactions:'Historique', profile:'Sécurité', login:'Problèmes', register:'Nouveau Compte' } },
+            de: { dir: 'ltr', ui: { back:'Zurück', backToTopics:'Zurück zu Themen', welcomeTitle:'Willkommen beim Zenix Support 🌹', welcomeText:'Unser Expertenteam ist rund um die Uhr verfügbar. Wählen Sie unten ein Thema.', topicsTitle:'Support-Themen', topicsHint:'Wählen Sie ein Thema', closeChat:'Chat schließen', conversationId:'Konversations-ID:', online:'Online', connected:'Verbunden', closeModalTitle:'Konversation schließen', closeModalText:'Sind Sie sicher, dass Sie diese Konversation schließen möchten?', cancel:'Abbrechen', confirm:'Ja, schließen', adminView:'Menschlicher Support', adminRole:'Zenix Admin', inputDefault:'Nachricht eingeben...', inputAbout:'Frage zu', inputAboutSuffix:'eingeben...', mustSelectTopic:'Bitte wählen Sie zuerst ein Thema.', activeChatError:'⚠️ Sie haben bereits eine aktive Konversation. Schließen Sie diese zuerst.', noInfoFound:'Sorry, I did not understand your question. 🌸 Could you rephrase, or would you like me to connect you to a human agent?', switchingToAdmin:'Connecting you to human support...', sendError:'Sendefehler:', noMessages:'Noch keine Nachrichten.', copySuccess:'Code kopiert, zurück...', switchToAdminBtn:'💬 Admin kontaktieren', userInfoHeader:'Benutzerinformationen', userIdLabel:'Benutzer-ID', userNameLabel:'Name', userEmailLabel:'E-Mail', translate:'Ins Deutsche übersetzen', translating:'Übersetze...', retryTranslate:'Erneut versuchen' }, roles: { dashboard:'Dashboard-Spezialist', quantification:'Trading-Bot-Spezialist', deposit:'Einzahlungs-Spezialist', withdraw:'Auszahlungs-Spezialist', team:'Team-Spezialist', transactions:'Transaktions-Spezialist', profile:'Sicherheits-Spezialist', login:'Login-Spezialist', register:'Registrierungs-Spezialist' }, labels: { dashboard:'Dashboard', quantification:'Quantifizierung', deposit:'Einzahlung', withdraw:'Auszahlung', team:'Team', transactions:'Transaktionen', profile:'Profil', login:'Login', register:'Registrierung' }, descs: { dashboard:'Guthaben & Statistiken', quantification:'Bot & Gewinn', deposit:'Konto aufladen', withdraw:'Geld abheben', team:'Empfehlungen', transactions:'Finanzhistorie', profile:'Sicherheit', login:'Login-Probleme', register:'Neues Konto' } }
         };
 
-        // ★★★ دانشنامه اختصاصی هر بخش (برای پاسخ سریع و دقیق محلی)
+        const TOPIC_SUMMARIES = {
+            dashboard: "The Dashboard shows your total USDT balance, team size, live crypto prices, and shortcuts to all features. You can access notifications and settings here. 🌸",
+            quantification: "Quantification is our AI trading bot. It requires a minimum balance of $20. It runs 4 trades per day. Daily profits range from 1.5% (VIP1) to 4% (VIP6) and reset at New York Time. 🤖",
+            deposit: "To deposit, go to the Deposit page, choose TRC20 or BEP20, enter the amount, copy the address, send the funds, and submit the TxID. The minimum deposit is $10. Funds arrive in 5-15 minutes. 💰",
+            withdraw: "To withdraw, go to the Withdrawal page, choose the network, enter your address, amount, and your 6-digit transaction password. The fee is $0.90. Minimum is $10-$500 based on VIP level. Approval takes 1-24 hours. 💸",
+            team: "Our referral system has 3 levels of commission. You can find your personal referral link on the 'My Team' page and share it to earn commissions from your downline. 👥",
+            transactions: "The Transactions page shows your full financial history (deposits, withdrawals, rewards). You can filter by type and check the status (Green=Approved, Yellow=Pending, Red=Rejected). 📊",
+            profile: "In the Profile section, you can change your password, email, and transaction password. Wallet addresses are locked after the first save for security. 🔒",
+            login: "If you can't log in, check your email/password, ensure Caps Lock is off, and enter the captcha correctly. Accounts lock for 15 minutes after 5 failed attempts. 🔑",
+            register: "To register, you need to provide your name, email, password, captcha, and verify your email and phone number. The minimum age is 18. ✍️"
+        };
+
         const EN_TOPICS_KNOWLEDGE = {
             dashboard: [
-                { kw: ['balance','money','how much','account','wallet','usdt','موجودی','بالانس'], r: 'Your total balance in USDT is shown at the top of the dashboard in the blue "Balance" card. It updates automatically with each transaction.' },
-                { kw: ['referral','team','count','downline','invite','زیرمجموعه'], r: 'Total referrals (levels 1-3) are shown in the purple "Referrals" card next to your balance.' },
+                { kw: ['balance','money','how much','account','wallet','usdt','موجودی','بالانس','چقدر پول'], r: 'Your total balance in USDT is shown at the top of the dashboard in the blue "Balance" card. It updates automatically with each transaction.' },
+                { kw: ['referral','team','count','downline','invite','زیرمجموعه','تعداد تیم'], r: 'Total referrals (levels 1-3) are shown in the purple "Referrals" card next to your balance.' },
                 { kw: ['market','price','crypto','bitcoin','btc','eth','ethereum','coin','tether','بازار','قیمت','ارز'], r: 'The "Crypto Market" section shows the top 3 coins (usually BTC, ETH and USDT) live, updated every 30 seconds. Green = growth, red = 24h decline.' },
                 { kw: ['shortcut','access','quick','card','link','میانبر','دسترسی'], r: 'Six main shortcuts at the center: Quantification, Deposit, Withdraw, Team, Transactions, Profile.' },
-                { kw: ['notification','bell','alert','message','badge','اعلان','زنگوله'], r: 'Click the bell icon in the header to open the message box. Unread count appears as a red badge on the bell.' },
-                { kw: ['inbox','message list','tab','filter','صندوق پیام'], r: 'The message box has 4 tabs: All, Approved, Rejected, Admin Msg. Click any message to view its full content.' },
-                { kw: ['read','unread','new','mark','نخوانده'], r: 'Unread messages have a blue background, side bar and "NEW" badge. Opening a message marks it as read automatically.' },
-                { kw: ['approved','success','confirmed','تایید'], r: 'Approved requests (deposit/withdraw) have a green icon and appear under the "Approved" tab.' },
-                { kw: ['rejected','cancel','failed','declined','لغو'], r: 'Rejected requests appear with a red icon under the "Rejected" tab. For withdrawal rejections, a "Contact Support" button appears at the bottom.' },
-                { kw: ['admin','management','announcement','bullhorn','اطلاعیه'], r: 'Admin messages (announcements, news) appear in the "Admin Msg" tab with a blue icon.' },
-                { kw: ['help','guide','tutorial','question','راهنما'], r: 'Click the question mark (?) icon in the header to open the full dashboard guide with 6 sections.' },
+                { kw: ['notification','bell','alert','message','badge','اعلان','زنگوله','پیام'], r: 'Click the bell icon in the header to open the message box. Unread count appears as a red badge on the bell.' },
+                { kw: ['inbox','message list','tab','filter','صندوق پیام','تب'], r: 'The message box has 4 tabs: All, Approved, Rejected, Admin Msg. Click any message to view its full content.' },
+                { kw: ['read','unread','new','mark','نخوانده','جدید'], r: 'Unread messages have a blue background, side bar and "NEW" badge. Opening a message marks it as read automatically.' },
+                { kw: ['approved','success','confirmed','تایید','موفق'], r: 'Approved requests (deposit/withdraw) have a green icon and appear under the "Approved" tab.' },
+                { kw: ['rejected','cancel','failed','declined','لغو','رد'], r: 'Rejected requests appear with a red icon under the "Rejected" tab. For withdrawal rejections, a "Contact Support" button appears at the bottom.' },
+                { kw: ['admin','management','announcement','bullhorn','اطلاعیه','مدیریت'], r: 'Admin messages (announcements, news) appear in the "Admin Msg" tab with a blue icon.' },
+                { kw: ['help','guide','tutorial','question','راهنما','آموزش','سوال'], r: 'Click the question mark (?) icon in the header to open the full dashboard guide with 6 sections.' },
                 { kw: ['language','change language','translate','زبان','ترجمه'], r: 'Click the globe icon (🌐) in the header and pick a language to switch between 8 options.' },
-                { kw: ['menu','hamburger','nav','navigation','منو'], r: 'Click the three-line icon (≡) in the header to open the navigation menu: Home, Quantification, Deposit, Withdraw, My Team, Transactions, Profile, Support, About, Logout.' },
-                { kw: ['casino','game','roulette','plinko','bet','dice','کازینو','رولت'], r: 'The floating dice button in the corner opens casino games: online roulette and plinko. These are demo games with separate balance.' },
-                { kw: ['about','platform','zenix','who','what is','درباره پلتفرم'], r: 'The "About Platform" section at the bottom of the dashboard explains Zenix, its goals and strategy.' },
-                { kw: ['support','contact','headset','help me','پشتیبانی'], r: 'Use the headset icon in the header or the Support option in the menu to reach the support section and chat with the relevant expert.' },
-                { kw: ['logout','sign out','exit','خروج'], r: 'To log out, select "Logout" from the navigation menu.' },
-                { kw: ['verified','confirmed','badge','تایید شده'], r: 'The green "Verified" badge at the top of the dashboard means your account is active.' },
-                { kw: ['banner','image','ad','promotion','بنر'], r: 'A promotional banner is shown in the middle of the dashboard and updates periodically.' },
-                { kw: ['panel','user panel','management panel','پنل'], r: 'Under the welcome message at the top of the dashboard, the text "User Management Panel" is displayed.' },
-                { kw: ['name','my name','welcome','نام من'], r: 'Your full name is displayed in the "Welcome" section at the top of the dashboard.' },
-                { kw: ['referral code','invite code','ms-','کد رفرال'], r: 'Your personal referral code has the format MS-XXXXXX and can be copied from the "My Team" page (team.html).' },
-                { kw: ['not opening','load','login','dashboard','باز نمیشه'], r: 'If the dashboard does not open, first make sure you are logged in.' },
-                { kw: ['withdraw rejection','why rejected','cancel reason','رد برداشت'], r: 'If your withdrawal was cancelled, open the related message in the "Rejected" tab of the message box.' }
+                { kw: ['menu','hamburger','nav','navigation','منو','همبرگر'], r: 'Click the three-line icon (≡) in the header to open the navigation menu: Home, Quantification, Deposit, Withdraw, My Team, Transactions, Profile, Support, About, Logout.' },
+                { kw: ['casino','game','roulette','plinko','bet','dice','کازینو','رولت','بازی'], r: 'The floating dice button in the corner opens casino games: online roulette and plinko. These are demo games with separate balance.' },
+                { kw: ['about','platform','zenix','who','what is','درباره پلتفرم','زنیکس'], r: 'The "About Platform" section at the bottom of the dashboard explains Zenix, its goals and strategy.' },
+                { kw: ['support','contact','headset','help me','پشتیبانی','تماس'], r: 'Use the headset icon in the header or the Support option in the menu to reach the support section and chat with the relevant expert.' },
+                { kw: ['logout','sign out','exit','خروج','بیرون'], r: 'To log out, select "Logout" from the navigation menu.' },
+                { kw: ['verified','confirmed','badge','تایید شده','فعال'], r: 'The green "Verified" badge at the top of the dashboard means your account is active.' },
+                { kw: ['banner','image','ad','promotion','بنر','تبلیغ'], r: 'A promotional banner is shown in the middle of the dashboard and updates periodically.' },
+                { kw: ['panel','user panel','management panel','پنل','مدیریت کاربری'], r: 'Under the welcome message at the top of the dashboard, the text "User Management Panel" is displayed.' },
+                { kw: ['name','my name','welcome','نام من','اسم من'], r: 'Your full name is displayed in the "Welcome" section at the top of the dashboard.' },
+                { kw: ['referral code','invite code','ms-','کد رفرال','کد دعوت'], r: 'Your personal referral code has the format MS-XXXXXX and can be copied from the "My Team" page (team.html).' },
+                { kw: ['not opening','load','login','dashboard','باز نمیشه','لود'], r: 'If the dashboard does not open, first make sure you are logged in.' },
+                { kw: ['withdraw rejection','why rejected','cancel reason','رد برداشت','لغو برداشت'], r: 'If your withdrawal was cancelled, open the related message in the "Rejected" tab of the message box.' }
             ],
             quantification: [
-                { kw: ['what','how','bot','ربات'], r: 'A smart trading bot that uses arbitrage and AI to generate daily profits.' },
-                { kw: ['activate','start','enable','فعال'], r: 'To activate the bot, go to the Quantification page (quantification.html). The minimum required balance is displayed there.' },
-                { kw: ['how many','daily','limit','چند'], r: 'Daily trade count and details are displayed on the Quantification page.' },
-                { kw: ['profit','percent','rate','سود','درصد'], r: 'The daily profit rate depends on your VIP level. VIP1=1.5%, VIP2=2%, VIP3=2.5%, VIP4=3%, VIP5=3.5%, VIP6=4%.' },
-                { kw: ['reset','new york','time','ریست'], r: 'Daily reset follows New York Time.' }
+                { kw: ['what','how','bot','ربات','چیه','چیست','کار'], r: 'A smart trading bot that uses arbitrage and AI to generate daily profits.' },
+                { kw: ['activate','start','enable','فعال','شروع','روشن'], r: 'To activate the bot, go to the Quantification page (quantification.html). The minimum required balance is $20.' },
+                { kw: ['how many','daily','limit','چند','روزانه'], r: 'Daily trade count is 4 trades per day, each 10 seconds.' },
+                { kw: ['profit','percent','rate','سود','درصد','چقدر'], r: 'The daily profit rate depends on your VIP level. VIP1=1.5%, VIP2=2%, VIP3=2.5%, VIP4=3%, VIP5=3.5%, VIP6=4%.' },
+                { kw: ['reset','new york','time','ریست','ساعت'], r: 'Daily reset follows New York Time.' }
             ],
             deposit: [
-                { kw: ['how','steps','process','چطور','مراحل'], r: 'Steps: 1) Open deposit.html 2) Choose network (TRC20 or BEP20) 3) Enter amount 4) Copy address 5) Send crypto 6) Submit TxID.' },
-                { kw: ['minimum','amount','حداقل'], r: 'Minimum deposit is $10. Maximum is $100,000.' },
-                { kw: ['network','trc20','bep20','شبکه'], r: 'Two networks are supported: TRC20 and BEP20. Make sure to choose the correct one.' },
-                { kw: ['time','when','confirm','زمان'], r: 'Deposit is confirmed 5 to 15 minutes after TxID submission.' },
-                { kw: ['txid','hash','هش'], r: 'TxID is a long string (usually 64 chars) you receive after sending the crypto.' }
+                { kw: ['how','steps','process','چطور','مراحل','چجوری','چگونه','توضیح'], r: 'Steps: 1) Open deposit.html 2) Choose network (TRC20 or BEP20) 3) Enter amount 4) Copy address 5) Send crypto 6) Submit TxID.' },
+                { kw: ['minimum','amount','حداقل','مبلغ','کمترین'], r: 'Minimum deposit is $10. Maximum is $100,000.' },
+                { kw: ['network','trc20','bep20','شبکه','ترون'], r: 'Two networks are supported: TRC20 and BEP20. Make sure to choose the correct one.' },
+                { kw: ['time','when','confirm','زمان','کی','چقدر طول'], r: 'Deposit is confirmed 5 to 15 minutes after TxID submission.' },
+                { kw: ['txid','hash','هش','کد تراکنش'], r: 'TxID is a long string (usually 64 chars) you receive after sending the crypto.' }
             ],
             withdraw: [
-                { kw: ['how','steps','process','چطور','مراحل','شرایط','condition'], r: 'Withdrawal steps: 1) Open receive.html 2) Choose network 3) Enter destination address 4) Confirm amount 5) Enter 6-digit transaction password 6) Submit.' },
-                { kw: ['minimum','amount','حداقل','شرایط'], r: 'Minimum withdrawal depends on your VIP level: VIP1=$10, VIP2=$50, VIP3=$100, VIP4=$200, VIP5=$300, VIP6=$500.' },
-                { kw: ['fee','commission','کارمزد'], r: 'The withdrawal fee is $0.90 per transaction.' },
-                { kw: ['time','when','confirm','approval','زمان'], r: 'Withdrawal approval takes 1 to 24 business hours.' },
+                { kw: ['how','steps','process','چطور','مراحل','چجوری','چگونه','توضیح'], r: 'Withdrawal steps: 1) Open receive.html 2) Choose network 3) Enter destination address 4) Confirm amount 5) Enter 6-digit transaction password 6) Submit.' },
+                { kw: ['minimum','amount','حداقل','مبلغ','کمترین'], r: 'Minimum withdrawal depends on your VIP level: VIP1=$10, VIP2=$50, VIP3=$100, VIP4=$200, VIP5=$300, VIP6=$500.' },
+                { kw: ['fee','commission','کارمزد','هزینه'], r: 'The withdrawal fee is $0.90 per transaction.' },
+                { kw: ['time','when','confirm','approval','زمان','کی','چقدر طول'], r: 'Withdrawal approval takes 1 to 24 business hours.' },
                 { kw: ['password','رمز','transaction password'], r: 'A 6-digit transaction password is required. If you forget it, you can recover it via support.' },
-                { kw: ['rejected','cancel','why','رد'], r: 'If your withdrawal was cancelled, open the message in the "Rejected" tab of the message box first.' },
+                { kw: ['rejected','cancel','why','رد','لغو'], r: 'If your withdrawal was cancelled, open the message in the "Rejected" tab of the message box first.' },
                 { kw: ['condition','requirement','شرایط'], r: 'To withdraw: minimum balance depends on your level ($10-$500), fee is $0.90, requires 6-digit transaction password, and approval takes 1-24 hours.' }
             ],
             team: [
                 { kw: ['invite','link','دعوت','لینک'], r: 'Copy your personal link from the "My Team" page (team.html) and send it to friends.' },
-                { kw: ['commission','percent','کمیسیون'], r: 'Commission is calculated in 3 levels: Level 1 gives the highest, Level 2 lower, Level 3 lowest.' },
-                { kw: ['stats','count','آمار'], r: 'Full team stats (levels 1-3) are shown on the "My Team" page (team.html).' },
+                { kw: ['commission','percent','کمیسیون','درصد'], r: 'Commission is calculated in 3 levels: Level 1 gives the highest, Level 2 lower, Level 3 lowest.' },
+                { kw: ['stats','count','آمار','تعداد'], r: 'Full team stats (levels 1-3) are shown on the "My Team" page (team.html).' },
                 { kw: ['referral code','ms-','کد رفرال'], r: 'Your referral code has the format MS-XXXXXX and can be copied from the "My Team" page.' }
             ],
             transactions: [
-                { kw: ['filter','type','فیلتر'], r: 'The Transactions page (transactions.html) allows filtering by: All, Deposits, Withdrawals, Rewards.' },
-                { kw: ['status','color','وضعیت'], r: 'Transaction status colors: Approved (green), Pending (yellow), Rejected (red).' },
-                { kw: ['rejected','why','رد'], r: 'Rejected transaction details are in the "Rejected" tab of the message box.' }
+                { kw: ['filter','type','فیلتر','نوع'], r: 'The Transactions page (transactions.html) allows filtering by: All, Deposits, Withdrawals, Rewards.' },
+                { kw: ['status','color','وضعیت','رنگ'], r: 'Transaction status colors: Approved (green), Pending (yellow), Rejected (red).' },
+                { kw: ['rejected','why','رد','لغو'], r: 'Rejected transaction details are in the "Rejected" tab of the message box.' }
             ],
             profile: [
-                { kw: ['change','password','تغییر رمز','پسورد'], r: 'Open the Profile page (profile.html) and click the relevant card. A verification code is sent via support.' },
+                { kw: ['change','password','تغییر رمز','پسورد','عوض کردن رمز'], r: 'Open the Profile page (profile.html) and click the relevant card. A verification code is sent via support.' },
                 { kw: ['transaction password','رمز تراکنش'], r: 'Open the "Change Transaction Password" card in the Profile page.' },
                 { kw: ['email','ایمیل'], r: 'Open the "Change Email" card. Requires a selfie and support approval (1-72 hours).' },
                 { kw: ['address','wallet','آدرس','کیف پول'], r: 'Wallet addresses are locked after first save. To change, get a verification code from support.' },
-                { kw: ['code','تایید'], r: 'All verification codes come through the support chat.' }
+                { kw: ['code','تایید','کد'], r: 'All verification codes come through the support chat.' }
             ],
             login: [
-                { kw: ['login','sign in','error','وارد','لاگین'], r: 'Check: 1) correct email/password 2) Caps Lock off 3) captcha entered correctly.' },
-                { kw: ['forgot','reset','فراموش'], r: 'Click "Forgot Password" on the login page.' },
-                { kw: ['locked','blocked','قفل'], r: 'Your account may be locked for 15 minutes after 5 failed attempts.' },
+                { kw: ['login','sign in','error','وارد','لاگین','ورود','مشکل'], r: 'Check: 1) correct email/password 2) Caps Lock off 3) captcha entered correctly.' },
+                { kw: ['forgot','reset','فراموش','یادم رفته'], r: 'Click "Forgot Password" on the login page.' },
+                { kw: ['locked','blocked','قفل','بلاک'], r: 'Your account may be locked for 15 minutes after 5 failed attempts.' },
                 { kw: ['captcha','کپچا'], r: 'Click the refresh button next to the image to get a new captcha.' }
             ],
             register: [
-                { kw: ['how','steps','مراحل'], r: 'Registration: name, email, password, captcha, email verification, phone number.' },
-                { kw: ['email','verify','ایمیل'], r: 'Check the Spam/Junk folder if you did not receive the verification email.' },
-                { kw: ['phone','mobile','موبایل'], r: 'Enter the phone with country code (e.g., +98 for Iran) and without leading zero.' },
+                { kw: ['how','steps','مراحل','چجوری','چگونه','ثبت نام'], r: 'Registration: name, email, password, captcha, email verification, phone number.' },
+                { kw: ['email','verify','ایمیل','تایید'], r: 'Check the Spam/Junk folder if you did not receive the verification email.' },
+                { kw: ['phone','mobile','موبایل','شماره'], r: 'Enter the phone with country code (e.g., +98 for Iran) and without leading zero.' },
                 { kw: ['age','سن'], r: 'Minimum age is 18 years old.' }
             ]
         };
 
-        // دانشنامه جامع برای AI
         const EN_PLATFORM_KNOWLEDGE = `
 PLATFORM KNOWLEDGE:
 - DEPOSIT: Steps: choose network (TRC20/BEP20), enter amount, copy address, send crypto, submit TxID. Min $10, Max $100,000. Confirmation 5-15 min.
@@ -533,13 +435,13 @@ PLATFORM KNOWLEDGE:
 
         const EN_SMALLTALK = {
             greeting: { kw: ['hi','hello','hey','greetings','salam','سلام','hola','merhaba','привет','salut','hallo','مرحبا'], r: 'Hi there! 🌸 Great to see you. I am {name}, {role}. How can I help you today?' },
-            howAreYou: { kw: ['how are you',"how's it going",'how are you doing'], r: 'I am doing great, thanks for asking! 😊 How about you?' },
-            goodMorning: { kw: ['good morning'], r: 'Good morning! ☀️ How can I help?' },
-            goodNight: { kw: ['good night','goodnight'], r: 'Good night! 🌙 Hope you had a good day.' },
-            thanks: { kw: ['thank','thanks','thx'], r: "You're welcome! 🌷 Glad I could help. Anything else?" },
-            bye: { kw: ['bye','goodbye','farewell'], r: 'Goodbye! 🌸 Come back anytime.' },
-            whoAreYou: { kw: ['who are you','what is your name'], r: 'I am {name}, {role} on the Zenix support team 🌸' },
-            whatCanYouDo: { kw: ['what can you do','how can you help'], r: 'I am a {role}. I know the whole Zenix platform and can answer any question. 🌸' }
+            howAreYou: { kw: ['how are you',"how's it going",'how are you doing','چطوری','خوبی'], r: 'I am doing great, thanks for asking! 😊 How about you?' },
+            goodMorning: { kw: ['good morning','صبح بخیر'], r: 'Good morning! ☀️ How can I help?' },
+            goodNight: { kw: ['good night','goodnight','شب بخیر'], r: 'Good night! 🌙 Hope you had a good day.' },
+            thanks: { kw: ['thank','thanks','thx','ممنون','مرسی','تشکر'], r: "You're welcome! 🌷 Glad I could help. Anything else?" },
+            bye: { kw: ['bye','goodbye','farewell','خداحافظ','خدافظ'], r: 'Goodbye! 🌸 Come back anytime.' },
+            whoAreYou: { kw: ['who are you','what is your name','تو کی هستی','اسمت چیه'], r: 'I am {name}, {role} on the Zenix support team 🌸' },
+            whatCanYouDo: { kw: ['what can you do','how can you help','چیکار میتونی'], r: 'I am a {role}. I know the whole Zenix platform and can answer any question. 🌸' }
         };
 
         function t(key) { return (UI[currentLang]?.ui && UI[currentLang].ui[key]) || UI.fa.ui[key] || key; }
@@ -784,7 +686,6 @@ PLATFORM KNOWLEDGE:
             }
         }
 
-        // ★★★ askAI: دانشنامه جامع + دانشنامه topic + تشخیص "نمی‌دونم"
         async function askAI(userPrompt) {
             const roleEn = (UI.en.roles && UI.en.roles[currentTopic]) || 'Support Specialist';
             const expertName = currentExpert?.name || 'Sophia';
@@ -856,12 +757,6 @@ INSTRUCTIONS:
             const adminKw = ['admin','support','human','ادمین','پشتیبان','مدیر','yönetici','destek','админ','поддержка','soporte','administrateur'];
             if (adminKw.some(k => q.includes(normalizeFa(k)))) return { handled: 'switch_to_admin' };
 
-            // ★★★ اول دانشنامه topic محلی (سریع و دقیق)
-            const topicKb = EN_TOPICS_KNOWLEDGE[currentTopic] || [];
-            const kb = scoreKnowledge(question, topicKb);
-            if (kb.item && kb.score >= 4) return { handled: true, text: kb.item.r };
-
-            // small talk
             const order = ['greeting','howAreYou','goodMorning','goodNight','thanks','bye','whoAreYou','whatCanYouDo'];
             for (const key of order) {
                 const item = EN_SMALLTALK[key];
@@ -873,7 +768,21 @@ INSTRUCTIONS:
                 }
             }
 
-            // ★★★ اگه محلی پیدا نشد، برو AI
+            const topicKb = EN_TOPICS_KNOWLEDGE[currentTopic] || [];
+            const kb = scoreKnowledge(question, topicKb);
+            if (kb.item && kb.score >= 4) return { handled: true, text: kb.item.r };
+
+            const explainWords = ['explain', 'summary', 'tell me about', 'what is', 'how does', 'توضیح', 'بگو', 'چیه', 'چیست', 'شرح', 'خلاصه', 'اطلاعات', 'بهم بگو'];
+            const currentLabelEn = (UI.en.labels && UI.en.labels[currentTopic]) || currentTopic;
+            const currentLabelFa = (UI.fa.labels && UI.fa.labels[currentTopic]) || currentTopic;
+            
+            const asksForExplain = explainWords.some(w => q.includes(normalizeFa(w)));
+            const mentionsTopic = q.includes(normalizeFa(currentLabelEn)) || q.includes(normalizeFa(currentLabelFa));
+
+            if ((asksForExplain || mentionsTopic) && TOPIC_SUMMARIES[currentTopic]) {
+                return { handled: true, text: TOPIC_SUMMARIES[currentTopic] };
+            }
+
             return { handled: 'ai' };
         }
 
@@ -1069,20 +978,13 @@ INSTRUCTIONS:
                         if (elapsed < 1500) await new Promise(r => setTimeout(r, 1500 - elapsed));
                         typing.remove();
                         
-                        // ★★★ اگه AI گفت نمی‌دونم، از دانشنامه محلی با آستانه پایین‌تر استفاده کن
                         if (!aiText || isAISayingNoInfo(aiText)) {
                             const topicKb = EN_TOPICS_KNOWLEDGE[currentTopic] || [];
                             const kb = scoreKnowledge(text, topicKb);
                             if (kb.item && kb.score >= 2) {
                                 renderBotMessage(kb.item.r, expertLabel);
-                            } else if (aiText) {
-                                renderBotMessage(aiText, expertLabel);
                             } else {
-                                renderBotMessage(t('noInfoFound'), expertLabel);
-                                const div = document.createElement('div'); div.className = 'quick-replies';
-                                div.innerHTML = `<button class="quick-reply-btn admin-link" onclick="window.__switchAdmin()">${t('switchToAdminBtn')}</button>`;
-                                chatBody.appendChild(div);
-                                chatBody.scrollTop = chatBody.scrollHeight;
+                                renderBotMessage(TOPIC_SUMMARIES[currentTopic] || t('noInfoFound'), expertLabel);
                             }
                         } else {
                             renderBotMessage(aiText, expertLabel);
