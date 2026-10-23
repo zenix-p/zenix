@@ -215,7 +215,7 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // ========= DOM refs =========
+        // ===== DOM =====
         const chatBody = document.getElementById('chat-body');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-msg-btn');
@@ -234,7 +234,7 @@
         const langBtn = document.getElementById('lang-btn');
         const langMenu = document.getElementById('lang-menu');
 
-        // ========= state =========
+        // ===== state =====
         let currentUser = null;
         let currentChatId = null;
         let currentView = 'topics';
@@ -256,13 +256,12 @@
             for (let i = 0; i < userId.length; i++) hash = ((hash << 5) + hash) + userId.charCodeAt(i);
             return (Math.abs(hash % 900000) + 100000).toString();
         }
-
         function humanDelay(text) {
             const len = String(text || '').length;
             return Math.min(3000, Math.max(1200, 1000 + len * 20));
         }
 
-        // ========= expert pool =========
+        // ===== experts =====
         const EXPERT_POOL = {
             dashboard: [
                 { name: 'Sophia', img: 'https://randomuser.me/api/portraits/women/44.jpg' },
@@ -310,7 +309,6 @@
                 { name: 'Olivia', img: 'https://randomuser.me/api/portraits/women/45.jpg' }
             ]
         };
-
         function pickExpertForTopic(topicKey, userSeed) {
             const pool = EXPERT_POOL[topicKey];
             if (!pool || !pool.length) return { name: 'Sophia', img: '' };
@@ -319,7 +317,6 @@
             for (let i = 0; i < seed.length; i++) { hash = ((hash << 5) - hash) + seed.charCodeAt(i); hash |= 0; }
             return pool[Math.abs(hash) % pool.length];
         }
-
         function getGuestId() {
             let id = null;
             try { id = sessionStorage.getItem('zenix_guest_id'); } catch(e) {}
@@ -329,7 +326,6 @@
             }
             return id;
         }
-
         function normalizeFa(text) {
             return String(text == null ? '' : text).toLowerCase().replace(/ي/g,'ی').replace(/ى/g,'ی').replace(/ك/g,'ک').trim();
         }
@@ -361,9 +357,7 @@
             register: { icon: 'fa-user-plus', color: 'ni-amber' }
         };
 
-        // ═══════════════════════════════════════════════════════════
-        //  UI TRANSLATIONS (8 languages) — فقط متن‌های رابط کاربری
-        // ═══════════════════════════════════════════════════════════
+        // ===== UI TRANSLATIONS =====
         const UI = {
             fa: {
                 dir: 'rtl',
@@ -423,9 +417,7 @@
             }
         };
 
-        // ═══════════════════════════════════════════════════════════
-        //  ENGLISH KNOWLEDGE — همیشه انگلیسی (مشترک بین همه زبان‌ها)
-        // ═══════════════════════════════════════════════════════════
+        // ===== ENGLISH KNOWLEDGE (always English) =====
         const EN_SMALLTALK = {
             greeting: { kw: ['hi','hello','hey','greetings','salam','سلام','hola','merhaba','привет','salut','hallo','مرحبا'], r: 'Hi there! 🌸 Great to see you. I am {name}, {role}. How can I help you today?' },
             howAreYou: { kw: ['how are you',"how's it going",'how are you doing'], r: 'I am doing great, thanks for asking! 😊 How about you?' },
@@ -556,11 +548,11 @@
             }
         };
 
-        // ========= small helpers =========
+        // ===== helpers =====
         function t(key) { return (UI[currentLang]?.ui && UI[currentLang].ui[key]) || UI.fa.ui[key] || key; }
-        function roleOf(topicKey) { return (UI[currentLang]?.roles && UI[currentLang].roles[topicKey]) || UI.en.roles[topicKey] || topicKey; }
-        function labelOf(topicKey) { return (UI[currentLang]?.labels && UI[currentLang].labels[topicKey]) || UI.en.labels[topicKey] || topicKey; }
-        function descOf(topicKey) { return (UI[currentLang]?.descs && UI[currentLang].descs[topicKey]) || UI.en.descs[topicKey] || ''; }
+        function roleOf(k) { return (UI[currentLang]?.roles && UI[currentLang].roles[k]) || UI.en.roles[k] || k; }
+        function labelOf(k) { return (UI[currentLang]?.labels && UI[currentLang].labels[k]) || UI.en.labels[k] || k; }
+        function descOf(k) { return (UI[currentLang]?.descs && UI[currentLang].descs[k]) || UI.en.descs[k] || ''; }
 
         function kwMatchSmallTalk(text, keywords) {
             const clean = ' ' + normalizeFa(text).replace(/[.,!?؟،؛:\-_/\\()\[\]{}"']/g, ' ').replace(/\s+/g, ' ').trim() + ' ';
@@ -572,8 +564,8 @@
             });
         }
 
-        function getRedirectMessage(toTopicKey) {
-            const label = labelOf(toTopicKey);
+        function getRedirectMessage(toKey) {
+            const label = labelOf(toKey);
             return `🌸 This question belongs to the "${label}" section. Please select the "${label}" topic on the support page or visit the related page in the dashboard.`;
         }
 
@@ -595,11 +587,8 @@
             document.getElementById('close-modal-text').textContent = data.ui.closeModalText;
             document.getElementById('close-cancel').textContent = data.ui.cancel;
             document.getElementById('close-confirm').textContent = data.ui.confirm;
-            if (currentTopic && currentView === 'expert') {
-                userInput.placeholder = `${data.ui.inputAbout} ${labelOf(currentTopic)} ${data.ui.inputAboutSuffix}`;
-            } else {
-                userInput.placeholder = data.ui.inputDefault;
-            }
+            if (currentTopic && currentView === 'expert') userInput.placeholder = `${data.ui.inputAbout} ${labelOf(currentTopic)} ${data.ui.inputAboutSuffix}`;
+            else userInput.placeholder = data.ui.inputDefault;
             document.querySelectorAll('.lang-item').forEach(el => el.classList.toggle('active', el.dataset.lang === lang));
             buildTopicsGrid();
             if ((currentView === 'expert' || currentView === 'admin') && chatIsOpen) refreshChatHeader();
@@ -626,8 +615,7 @@
             let hash = 0;
             const str = (userId || 'guest') + '-' + (topicKey || 'new') + '-' + Date.now().toString().slice(-4);
             for (let i = 0; i < str.length; i++) { hash = ((hash << 5) - hash) + str.charCodeAt(i); hash = hash & hash; }
-            const num = Math.abs(hash % 900000) + 100000;
-            return 'ZE-' + num;
+            return 'ZE-' + (Math.abs(hash % 900000) + 100000);
         }
 
         function buildTopicsGrid() {
@@ -675,7 +663,6 @@
             userInput.placeholder = `${UI[currentLang].ui.inputAbout} ${labelOf(topicKey)} ${UI[currentLang].ui.inputAboutSuffix}`;
             userInput.value = '';
             chatBody.innerHTML = '';
-            // ★ welcome همیشه انگلیسی + دکمه ترجمه
             const welcomeEn = EN_TOPICS[topicKey].welcome;
             const welcomeText = welcomeEn.split('Sophia').join(currentExpert.name)
                 .split('Isabella').join(currentExpert.name)
@@ -759,7 +746,7 @@
             if (currentChatId) {
                 currentConversationId = 'ZE-' + currentChatId.replace(/-/g, '').slice(0, 6).toUpperCase();
                 await ensureUserIdentityMessage();
-            } else { currentConversationId = 'ZE-NEW'; }
+            } else currentConversationId = 'ZE-NEW';
             conversationIdEl.textContent = currentConversationId;
             userInput.disabled = false;
             sendBtn.disabled = false;
@@ -778,17 +765,23 @@
             else { window.location.href = 'dashboard.html'; }
         };
 
-        // ========= translate =========
+        // ===== translate (با timeout ۲۵ ثانیه) =====
         async function translateAIText(originalText, targetLang, btn, container) {
             btn.disabled = true;
             btn.style.opacity = '0.6';
             btn.innerHTML = `⏳ ${t('translating')}`;
             try {
-                const res = await fetch(`${SUPABASE_URL}/functions/v1/zenix-ai`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
-                    body: JSON.stringify({ action: 'translate', text: originalText, targetLang })
-                });
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 25000);
+                let res;
+                try {
+                    res = await fetch(`${SUPABASE_URL}/functions/v1/zenix-ai`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+                        body: JSON.stringify({ action: 'translate', text: originalText, targetLang }),
+                        signal: controller.signal
+                    });
+                } finally { clearTimeout(timeoutId); }
                 if (!res.ok) throw new Error('fail');
                 const j = await res.json();
                 if (!j.text) throw new Error('empty');
@@ -810,7 +803,7 @@
             }
         }
 
-        // ========= AI =========
+        // ===== askAI (با prompt انگلیسی + timeout) =====
         async function askAI(userPrompt) {
             const topic = currentTopic ? EN_TOPICS[currentTopic] : null;
             let knowledgeContext = '';
@@ -828,11 +821,21 @@
             if (history.length && history[history.length - 1].role === 'user') history.pop();
 
             try {
-                const res = await fetch(`${SUPABASE_URL}/functions/v1/zenix-ai`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
-                    body: JSON.stringify({ prompt: userPrompt, systemInstruction: knowledgeContext, history })
-                });
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 25000);
+                let res;
+                try {
+                    res = await fetch(`${SUPABASE_URL}/functions/v1/zenix-ai`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+                        body: JSON.stringify({
+                            prompt: `[User message — may be in any language; understand it but respond ONLY in English]:\n${userPrompt}`,
+                            systemInstruction: knowledgeContext,
+                            history
+                        }),
+                        signal: controller.signal
+                    });
+                } finally { clearTimeout(timeoutId); }
                 if (!res.ok) throw new Error('fail');
                 const j = await res.json();
                 return j.text || null;
@@ -858,17 +861,14 @@
             const adminKw = ['admin','support','human','ادمین','پشتیبان','مدیر','yönetici','destek','админ','поддержка','soporte','administrateur'];
             if (adminKw.some(k => q.includes(normalizeFa(k)))) return { handled: 'switch_to_admin' };
 
-            // cross-redirects اول
             for (const r of EN_CROSS_REDIRECTS) {
                 if (r.to === currentTopic) continue;
                 if (r.kw.some(k => keywordMatches(question, k))) return { handled: true, text: getRedirectMessage(r.to) };
             }
 
-            // دانشنامه
             const kb = scoreKnowledge(question, topic.knowledge || []);
             if (kb.item && kb.score >= 4) return { handled: true, text: kb.item.r };
 
-            // small talk
             const order = ['greeting','howAreYou','goodMorning','goodNight','thanks','bye','whoAreYou','whatCanYouDo'];
             for (const key of order) {
                 const item = EN_SMALLTALK[key];
@@ -883,7 +883,6 @@
             return { handled: 'ai' };
         }
 
-        // ========= utils =========
         function escapeHtml(v) { return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
         function formatTime(iso) { if (!iso) return ''; const d = new Date(iso); if (isNaN(d.getTime())) return ''; return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }
         function showError(msg) { errorBanner.textContent = msg; errorBanner.classList.add('show'); window.scrollTo({top:0,behavior:'smooth'}); setTimeout(() => errorBanner.classList.remove('show'), 4000); }
@@ -907,13 +906,11 @@
             }
         };
 
-        // ========= render: پاسخ bot = انگلیسی + دکمه ترجمه =========
         function renderBotMessage(text, senderLabel) {
             const div = document.createElement('div');
             div.className = 'msg bot';
             const label = senderLabel ? `<span class="msg-sender">${escapeHtml(senderLabel)}</span>` : '';
             div.innerHTML = `${label}<div class="msg-content">${text}</div><span class="msg-meta">${formatTime(new Date().toISOString())}</span>`;
-
             if (currentLang !== 'en') {
                 const transBtn = document.createElement('button');
                 transBtn.type = 'button';
@@ -1057,7 +1054,6 @@
             if (!text || isSending) return;
             if (currentView === 'topics') { showError(t('mustSelectTopic')); return; }
             if (!currentUser && currentView === 'admin') { showError('Please log in first.'); return; }
-
             const isFirstUserMessage = !chatBody.querySelector('.msg.user');
             isSending = true; sendBtn.disabled = true;
             renderUserMessage(text);
@@ -1066,7 +1062,6 @@
                 if (currentView === 'expert') {
                     const reply = generateTopicReply(text, isFirstUserMessage);
                     const expertLabel = (currentExpert && currentTopic) ? `${currentExpert.name} (${roleOf(currentTopic)})` : null;
-
                     if (reply.handled === 'switch_to_admin') {
                         setTimeout(async () => { renderSystemMessage(t('switchingToAdmin')); await switchToHumanMode(); }, 700);
                     } else if (reply.handled === 'ai') {
@@ -1116,12 +1111,10 @@
                     urlTopic = new URLSearchParams(hs).get('topic');
                 }
             } catch(e) {}
-
             try {
                 try { const sl = localStorage.getItem('zenix_lang') || 'fa'; applyLang(sl); } catch(e) {}
                 try { const { data: sd } = await supabase.auth.getSession(); if (sd?.session?.user) currentUser = sd.session.user; } catch(e) {}
                 try { supabase.auth.onAuthStateChange((ev, s) => { if (s?.user && !currentUser) currentUser = s.user; }); } catch(e) {}
-
                 const validTopics = Object.keys(EN_TOPICS);
                 if (urlTopic && validTopics.includes(urlTopic)) {
                     chatIsOpen = false; currentView = 'topics';
@@ -1133,7 +1126,6 @@
                     }, 100);
                     return;
                 }
-
                 if (sessionStorage.getItem('zenix_return_focus')) { await showAdminChatView(); return; }
                 chatIsOpen = false; currentView = 'topics';
                 unlockTopicsView(); hideChatView();
