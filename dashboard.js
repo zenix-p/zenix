@@ -260,6 +260,7 @@ window.openMessageModal = async () => {
     lockBody();
 };
 
+// ★ لیست پیام‌ها: فقط موضوع نمایش داده می‌شود؛ متن کامل در مدال جداگانه با کلیک باز می‌شود
 function renderMessageList() {
     let c = document.getElementById('modal-msg-container');
     if (!c) return;
@@ -288,15 +289,13 @@ function renderMessageList() {
         else { iconClass = 'fa-bullhorn'; iconColor = '#38bdf8'; }
 
         const safeSubject = escapeHtml(m.subject);
-        const safeBody = escapeHtml(m.body);
         const safeTime = escapeHtml(dTime);
 
         html += `<div class="msg-body-box" style="cursor:pointer;border-right:${unread ? '3px solid #38bdf8' : '1px solid rgba(255,255,255,.08)'};" onclick="window.readAdminMessage(${realIdx})">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
                 <div class="msg-title-text" style="${unread ? 'color:#fff;font-weight:800;' : ''}"><i class="fas ${iconClass}" style="color:${iconColor};margin-left:5px;"></i> ${safeSubject}</div>
-                ${unread ? `<span style="font-size:9px;background:#38bdf8;color:#0f172a;padding:2px 6px;border-radius:4px;font-weight:700;">${t.newBadge || 'جدید'}</span>` : ''}
+                ${unread ? `<span style="font-size:9px;background:#38bdf8;color:#0f172a;padding:2px 6px;border-radius:4px;font-weight:700;flex-shrink:0;">${t.newBadge || 'جدید'}</span>` : ''}
             </div>
-            <div class="msg-desc-text" style="margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${safeBody}</div>
             <div style="font-size:10px;color:#64748b;margin-top:6px;text-align:left" dir="ltr">${safeTime}</div>
         </div>`;
     });
