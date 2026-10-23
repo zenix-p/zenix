@@ -443,13 +443,18 @@
     checkInputs();
 }
 
-        function showBanned() {
-            const t = langData[currentLang] || langData.en;
-            msg.innerHTML = `<div><i class="fas fa-ban" style="margin-inline-end:6px;"></i>${t.errDisabled}</div>`;
-            msg.className = 'err show';
-            submitBtn.disabled = false;
-            isSubmitting = false;
-        }
+  function showBanned() {
+    const t = langData[currentLang] || langData.en;
+    msg.textContent = '';
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-ban';
+    icon.style.marginInlineEnd = '6px';
+    msg.appendChild(icon);
+    msg.appendChild(document.createTextNode(t.errDisabled));
+    msg.className = 'err show';
+    submitBtn.disabled = false;
+    isSubmitting = false;
+}
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
