@@ -33,6 +33,7 @@ const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 });
 
 let currentUserId = null;
+let currentUserName = '';  // ★ جدید: نام کاربر برای کادر خوش‌آمدگویی
 let allMessages = [];
 let currentNotifFilter = 'all';
 
@@ -281,7 +282,7 @@ document.getElementById('bell-btn')?.addEventListener('click', e => {
 
 
 // ==========================================
-// 5. سیستم ترجمه کامل ۸ زبانه (متن‌های معرفی جدید)
+// 5. سیستم ترجمه کامل ۸ زبانه
 // ==========================================
 const SUPPORTED_LANGUAGES = ['en', 'fa', 'ar', 'tr', 'ru', 'es', 'fr', 'de'];
 const savedLang = safeGetItem('zenix_lang');
@@ -623,7 +624,9 @@ function setLang(l) {
         if (el && html) el.innerHTML = html;
     };
 
-    setTxt('t-wel', t.wel);
+    // ★ نمایش خوش‌آمد + نام کاربر
+    const welEl = document.getElementById('t-wel');
+    if (welEl) welEl.textContent = currentUserName ? `${t.wel} ${currentUserName}` : t.wel;
     setTxt('t-sub', t.sub);
     setTxt('t-st', t.st);
     setTxt('ts1', t.ts1);
@@ -698,6 +701,22 @@ async function loadDashboardUserData(uid, sessionUser) {
         const { data: dbUser } = await supabaseClient.from('users').select('*').eq('id', uid).maybeSingle();
         const { data: dbProfile } = await supabaseClient.from('profiles').select('*').eq('id', uid).maybeSingle();
         const meta = sessionUser.user_metadata || {};
+
+        // ★ استخراج نام کاربر برای کادر خوش‌آمدگویی
+        const userFullName =
+            dbUser?.fullname ||
+            dbUser?.full_name ||
+            dbProfile?.fullname ||
+            dbProfile?.full_name ||
+            meta.fullname ||
+            meta.full_name ||
+            '';
+        if (userFullName) {
+            currentUserName = userFullName;
+            const t = ld[currLang] || ld.en;
+            const welEl = document.getElementById('t-wel');
+            if (welEl) welEl.textContent = `${t.wel} ${currentUserName}`;
+        }
 
         const balance = parseFloat(dbUser?.balance ?? dbProfile?.balance ?? meta.balance ?? 0);
         const valBalance = document.getElementById('val-balance');
