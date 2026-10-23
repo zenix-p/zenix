@@ -8,6 +8,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.cn">
     <link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin>
+    <link rel="preconnect" href="https://challenges.cloudflare.com">
     <link href="https://fonts.googleapis.cn/css2?family=Orbitron:wght@700;900&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -32,7 +33,7 @@
         };
     </script>
 
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <!-- ★ اسکریپت Turnstile حذف شد — به صورت lazy در JS بارگذاری می‌شود -->
 
     <script>(function(){var s=localStorage.getItem('zenix_lang')||'en',r=['fa','ar'];document.documentElement.setAttribute('dir',r.includes(s)?'rtl':'ltr');document.documentElement.setAttribute('lang',s);})();</script>
     <style>
@@ -132,7 +133,7 @@
         }
 
         /* ============================================================
-           ★ Cloudflare Turnstile — بدون کادر اضافی، فقط وسط‌چین
+           ★ Cloudflare Turnstile — Lazy Loaded
            ============================================================ */
         .captcha-wrap{
             display:flex;
@@ -140,9 +141,43 @@
             align-items:center;
             margin-bottom:14px;
         }
-        /* فشرده‌سازی روی موبایل تا دقیقاً به عرض کارت جا بشه */
+        #turnstile-container{
+            min-height:65px;
+            min-width:300px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+        .captcha-loading{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
+            min-height:65px;
+            min-width:300px;
+            color:#94a3b8;
+            font-size:12px;
+            border:1px solid rgba(255,255,255,.08);
+            border-radius:8px;
+            background:rgba(10,15,30,.4);
+            animation:captchaPulse 1.5s ease-in-out infinite;
+        }
+        @keyframes captchaPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        .captcha-error{
+            color:#f87171 !important;
+            border-color:rgba(239,68,68,.3) !important;
+            background:rgba(239,68,68,.08) !important;
+            animation:none !important;
+            padding:10px;
+            text-align:center;
+            font-size:11px;
+            line-height:1.4;
+        }
         @media (max-width: 400px) {
-            .captcha-wrap .cf-turnstile{
+            #turnstile-container{
                 transform: scale(0.92);
                 transform-origin: center center;
             }
@@ -263,14 +298,11 @@
                 </div>
             </div>
             
-            <!-- ★ Turnstile: بدون کادر اضافی، فقط وسط‌چین -->
+            <!-- ★ Turnstile: رندر دستی (Lazy) -->
             <div class="captcha-wrap">
-                <div class="cf-turnstile"
-                     data-sitekey="0x4AAAAAAFaU1RVZfnTURKOc"
-                     data-theme="dark"
-                     data-callback="onCaptchaSuccess"
-                     data-expired-callback="onCaptchaExpired"
-                     data-error-callback="onCaptchaError"></div>
+                <div id="turnstile-container">
+                    <div class="captcha-loading">⏳ Loading security check...</div>
+                </div>
             </div>
 
             <div class="extra-links">
@@ -313,14 +345,14 @@
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const langData = {
-            en:{dir:'ltr',wel:'Login to Your Account',user:'Email',userP:'Email address',pass:'Password',passP:'Password',forgot:'Forgot password?',remember:'Remember me',btn:'Login',noAcc:"Don't have an account?",reg:'Register',supTitle:'Support',langTitle:'Change Language',errEmail:'Please enter a valid email address!',errNoUser:'Invalid credentials or account does not exist.',errTooMany:'Too many failed attempts. Account temporarily locked.',errDisabled:'Your account has been disabled by administrator.',errNet:'Please check your internet connection!',errCaptcha:'Please complete the security check.',succ:'Successfully logged in! Redirecting...'},
-            fa:{dir:'rtl',wel:'ورود به حساب کاربری',user:'ایمیل',userP:'آدرس ایمیل',pass:'رمز عبور',passP:'رمز عبور',forgot:'فراموشی رمز عبور؟',remember:'مرا به خاطر بسپار',btn:'ورود به حساب',noAcc:'حساب کاربری ندارید؟',reg:'ثبت‌نام کنید',supTitle:'پشتیبانی',langTitle:'تغییر زبان',errEmail:'لطفاً یک آدرس ایمیل معتبر وارد کنید!',errNoUser:'اطلاعات ورود نادرست است یا حساب کاربری وجود ندارد.',errTooMany:'به دلیل تلاش‌های ناموفق متعدد، حساب شما موقتاً قفل شده است.',errDisabled:'حساب کاربری شما توسط مدیریت مسدود شده است.',errNet:'اتصال اینترنت خود را بررسی کنید!',errCaptcha:'لطفاً بررسی امنیتی را کامل کنید.',succ:'با موفقیت وارد شدید! در حال انتقال...'},
-            ar:{dir:'rtl',wel:'تسجيل الدخول إلى حسابك',user:'البريد الإلكتروني',userP:'عنوان البريد الإلكتروني',pass:'كلمة المرور',passP:'كلمة المرور',forgot:'نسيت كلمة المرور؟',remember:'تذكرني',btn:'تسجيل الدخول',noAcc:'ليس لديك حساب؟',reg:'سجل الآن',supTitle:'الدعم الفني',langTitle:'تغيير اللغة',errEmail:'يرجى إدخال بريد إلكتروني صالح!',errNoUser:'بيانات الدخول غير صحيحة أو الحساب غير موجود.',errTooMany:'محاولات كثيرة خاطئة. تم قفل الحساب مؤقتاً.',errDisabled:'تم تعطيل حسابك من قبل الإدارة.',errNet:'يرجى التحقق من اتصالك بالإنترنت!',errCaptcha:'يرجى إكمال التحقق الأمني.',succ:'تم تسجيل الدخول بنجاح! جاري التوجيه...'},
-            tr:{dir:'ltr',wel:'Hesabınıza Giriş Yapın',user:'E-posta',userP:'E-posta adresi',pass:'Şifre',passP:'Şifre',forgot:'Şifrenizi mi unuttunuz?',remember:'Beni hatırla',btn:'Giriş Yap',noAcc:'Hesabınız yok mu?',reg:'Kayıt Olun',supTitle:'Destek',langTitle:'Dil Değiştir',errEmail:'Lütfen geçerli bir e-posta adresi girin!',errNoUser:'Hatalı e-posta/şifre veya hesap bulunamadı.',errTooMany:'Çok fazla hatalı deneme. Hesap geçici olarak kilitlendi.',errDisabled:'Hesabınız yönetici tarafından askıya alındı.',errNet:'Lütfen internet bağlantınızı kontrol edin!',errCaptcha:'Lütfen güvenlik kontrolünü tamamlayın.',succ:'Giriş başarılı! Yönlendiriliyorsunuz...'},
-            ru:{dir:'ltr',wel:'Вход в аккаунт',user:'Email',userP:'Адрес Email',pass:'Пароль',passP:'Пароль',forgot:'Забыли пароль?',remember:'Запомнить меня',btn:'Войти',noAcc:'Нет аккаунта?',reg:'Зарегистрироваться',supTitle:'Поддержка',langTitle:'Сменить язык',errEmail:'Пожалуйста, введите правильный адрес электронной почты!',errNoUser:'Неверные данные для входа или аккаунт не существует.',errTooMany:'Слишком много неудачных попыток. Аккаунт заблокирован.',errDisabled:'Ваш аккаунт заблокирован администратором.',errNet:'Пожалуйста, проверьте интернет-соединение!',errCaptcha:'Пожалуйста, пройдите проверку безопасности.',succ:'Успешный вход! Перенаправление...'},
-            es:{dir:'ltr',wel:'Iniciar sesión en su cuenta',user:'Correo electrónico',userP:'Dirección de correo',pass:'Contraseña',passP:'Contraseña',forgot:'¿Olvidaste tu contraseña?',remember:'Recordarme',btn:'Iniciar sesión',noAcc:'¿No tienes una cuenta?',reg:'Regístrate',supTitle:'Soporte',langTitle:'Cambiar idioma',errEmail:'¡Por favor ingrese un correo electrónico válido!',errNoUser:'Credenciales inválidas o cuenta inexistente.',errTooMany:'Demasiados intentos fallidos. Cuenta bloqueada temporalmente.',errDisabled:'Su cuenta ha sido deshabilitada por el administrador.',errNet:'¡Por favor verifique su conexión a internet!',errCaptcha:'Por favor complete la verificación de seguridad.',succ:'¡Inicio de sesión exitoso! Redirigiendo...'},
-            fr:{dir:'ltr',wel:'Connexion à votre compte',user:'E-mail',userP:'Adresse e-mail',pass:'Mot de passe',passP:'Mot de passe',forgot:'Mot de passe oublié ?',remember:'Se souvenir de moi',btn:'Se connecter',noAcc:"Vous n'avez pas de compte ?",reg:'Inscrivez-vous',supTitle:'Support',langTitle:'Changer de langue',errEmail:'Veuillez entrer une adresse e-mail valide !',errNoUser:'Identifiants invalides ou compte inexistant.',errTooMany:'Trop de tentatives échouées. Compte verrouillé.',errDisabled:'Votre compte a été désactivé par l\'administrateur.',errNet:'Veuillez vérifier votre connexion Internet !',errCaptcha:'Veuillez compléter la vérification de sécurité.',succ:'Connexion réussie ! Redirection...'},
-            de:{dir:'ltr',wel:'Anmeldung bei Ihrem Konto',user:'E-Mail',userP:'E-Mail-Adresse',pass:'Passwort',passP:'Passwort',forgot:'Passwort vergessen?',remember:'Angemeldet bleiben',btn:'Anmelden',noAcc:'Noch kein Konto?',reg:'Registrieren',supTitle:'Support',langTitle:'Sprache ändern',errEmail:'Bitte geben Sie eine gültige E-Mail-Adresse ein!',errNoUser:'Ungültige Anmeldedaten oder Konto existiert nicht.',errTooMany:'Zu viele fehlgeschlagene Versuche. Konto temporär gesperrt.',errDisabled:'Ihr Konto wurde vom Administrator deaktiviert.',errNet:'Bitte überprüfen Sie Ihre Internetverbindung!',errCaptcha:'Bitte schließen Sie die Sicherheitsüberprüfung ab.',succ:'Erfolgreich angemeldet! Weiterleitung...'}
+            en:{dir:'ltr',wel:'Login to Your Account',user:'Email',userP:'Email address',pass:'Password',passP:'Password',forgot:'Forgot password?',remember:'Remember me',btn:'Login',noAcc:"Don't have an account?",reg:'Register',supTitle:'Support',langTitle:'Change Language',errEmail:'Please enter a valid email address!',errNoUser:'Invalid credentials or account does not exist.',errTooMany:'Too many failed attempts. Account temporarily locked.',errDisabled:'Your account has been disabled by administrator.',errNet:'Please check your internet connection!',errCaptcha:'Please complete the security check.',errCaptchaLoad:'Security check failed to load. Please refresh or disable ad blockers.',succ:'Successfully logged in! Redirecting...'},
+            fa:{dir:'rtl',wel:'ورود به حساب کاربری',user:'ایمیل',userP:'آدرس ایمیل',pass:'رمز عبور',passP:'رمز عبور',forgot:'فراموشی رمز عبور؟',remember:'مرا به خاطر بسپار',btn:'ورود به حساب',noAcc:'حساب کاربری ندارید؟',reg:'ثبت‌نام کنید',supTitle:'پشتیبانی',langTitle:'تغییر زبان',errEmail:'لطفاً یک آدرس ایمیل معتبر وارد کنید!',errNoUser:'اطلاعات ورود نادرست است یا حساب کاربری وجود ندارد.',errTooMany:'به دلیل تلاش‌های ناموفق متعدد، حساب شما موقتاً قفل شده است.',errDisabled:'حساب کاربری شما توسط مدیریت مسدود شده است.',errNet:'اتصال اینترنت خود را بررسی کنید!',errCaptcha:'لطفاً بررسی امنیتی را کامل کنید.',errCaptchaLoad:'بررسی امنیتی بارگذاری نشد. لطفاً صفحه را رفرش کنید یا مسدودکننده تبلیغات را غیرفعال کنید.',succ:'با موفقیت وارد شدید! در حال انتقال...'},
+            ar:{dir:'rtl',wel:'تسجيل الدخول إلى حسابك',user:'البريد الإلكتروني',userP:'عنوان البريد الإلكتروني',pass:'كلمة المرور',passP:'كلمة المرور',forgot:'نسيت كلمة المرور؟',remember:'تذكرني',btn:'تسجيل الدخول',noAcc:'ليس لديك حساب؟',reg:'سجل الآن',supTitle:'الدعم الفني',langTitle:'تغيير اللغة',errEmail:'يرجى إدخال بريد إلكتروني صالح!',errNoUser:'بيانات الدخول غير صحيحة أو الحساب غير موجود.',errTooMany:'محاولات كثيرة خاطئة. تم قفل الحساب مؤقتاً.',errDisabled:'تم تعطيل حسابك من قبل الإدارة.',errNet:'يرجى التحقق من اتصالك بالإنترنت!',errCaptcha:'يرجى إكمال التحقق الأمني.',errCaptchaLoad:'فشل تحميل التحقق الأمني. يرجى تحديث الصفحة أو تعطيل مانع الإعلانات.',succ:'تم تسجيل الدخول بنجاح! جاري التوجيه...'},
+            tr:{dir:'ltr',wel:'Hesabınıza Giriş Yapın',user:'E-posta',userP:'E-posta adresi',pass:'Şifre',passP:'Şifre',forgot:'Şifrenizi mi unuttunuz?',remember:'Beni hatırla',btn:'Giriş Yap',noAcc:'Hesabınız yok mu?',reg:'Kayıt Olun',supTitle:'Destek',langTitle:'Dil Değiştir',errEmail:'Lütfen geçerli bir e-posta adresi girin!',errNoUser:'Hatalı e-posta/şifre veya hesap bulunamadı.',errTooMany:'Çok fazla hatalı deneme. Hesap geçici olarak kilitlendi.',errDisabled:'Hesabınız yönetici tarafından askıya alındı.',errNet:'Lütfen internet bağlantınızı kontrol edin!',errCaptcha:'Lütfen güvenlik kontrolünü tamamlayın.',errCaptchaLoad:'Güvenlik kontrolü yüklenemedi. Lütfen sayfayı yenileyin veya reklam engelleyiciyi kapatın.',succ:'Giriş başarılı! Yönlendiriliyorsunuz...'},
+            ru:{dir:'ltr',wel:'Вход в аккаунт',user:'Email',userP:'Адрес Email',pass:'Пароль',passP:'Пароль',forgot:'Забыли пароль?',remember:'Запомнить меня',btn:'Войти',noAcc:'Нет аккаунта?',reg:'Зарегистрироваться',supTitle:'Поддержка',langTitle:'Сменить язык',errEmail:'Пожалуйста, введите правильный адрес электронной почты!',errNoUser:'Неверные данные для входа или аккаунт не существует.',errTooMany:'Слишком много неудачных попыток. Аккаунт заблокирован.',errDisabled:'Ваш аккаунт заблокирован администратором.',errNet:'Пожалуйста, проверьте интернет-соединение!',errCaptcha:'Пожалуйста, пройдите проверку безопасности.',errCaptchaLoad:'Не удалось загрузить проверку безопасности. Обновите страницу или отключите блокировщик рекламы.',succ:'Успешный вход! Перенаправление...'},
+            es:{dir:'ltr',wel:'Iniciar sesión en su cuenta',user:'Correo electrónico',userP:'Dirección de correo',pass:'Contraseña',passP:'Contraseña',forgot:'¿Olvidaste tu contraseña?',remember:'Recordarme',btn:'Iniciar sesión',noAcc:'¿No tienes una cuenta?',reg:'Regístrate',supTitle:'Soporte',langTitle:'Cambiar idioma',errEmail:'¡Por favor ingrese un correo electrónico válido!',errNoUser:'Credenciales inválidas o cuenta inexistente.',errTooMany:'Demasiados intentos fallidos. Cuenta bloqueada temporalmente.',errDisabled:'Su cuenta ha sido deshabilitada por el administrador.',errNet:'¡Por favor verifique su conexión a internet!',errCaptcha:'Por favor complete la verificación de seguridad.',errCaptchaLoad:'No se pudo cargar la verificación de seguridad. Actualice la página o desactive el bloqueador de anuncios.',succ:'¡Inicio de sesión exitoso! Redirigiendo...'},
+            fr:{dir:'ltr',wel:'Connexion à votre compte',user:'E-mail',userP:'Adresse e-mail',pass:'Mot de passe',passP:'Mot de passe',forgot:'Mot de passe oublié ?',remember:'Se souvenir de moi',btn:'Se connecter',noAcc:"Vous n'avez pas de compte ?",reg:'Inscrivez-vous',supTitle:'Support',langTitle:'Changer de langue',errEmail:'Veuillez entrer une adresse e-mail valide !',errNoUser:'Identifiants invalides ou compte inexistant.',errTooMany:'Trop de tentatives échouées. Compte verrouillé.',errDisabled:'Votre compte a été désactivé par l\'administrateur.',errNet:'Veuillez vérifier votre connexion Internet !',errCaptcha:'Veuillez compléter la vérification de sécurité.',errCaptchaLoad:'Échec du chargement de la vérification de sécurité. Actualisez la page ou désactivez le bloqueur de publicités.',succ:'Connexion réussie ! Redirection...'},
+            de:{dir:'ltr',wel:'Anmeldung bei Ihrem Konto',user:'E-Mail',userP:'E-Mail-Adresse',pass:'Passwort',passP:'Passwort',forgot:'Passwort vergessen?',remember:'Angemeldet bleiben',btn:'Anmelden',noAcc:'Noch kein Konto?',reg:'Registrieren',supTitle:'Support',langTitle:'Sprache ändern',errEmail:'Bitte geben Sie eine gültige E-Mail-Adresse ein!',errNoUser:'Ungültige Anmeldedaten oder Konto existiert nicht.',errTooMany:'Zu viele fehlgeschlagene Versuche. Konto temporär gesperrt.',errDisabled:'Ihr Konto wurde vom Administrator deaktiviert.',errNet:'Bitte überprüfen Sie Ihre Internetverbindung!',errCaptcha:'Bitte schließen Sie die Sicherheitsüberprüfung ab.',errCaptchaLoad:'Sicherheitsüberprüfung konnte nicht geladen werden. Seite neu laden oder Werbeblocker deaktivieren.',succ:'Erfolgreich angemeldet! Weiterleitung...'}
         };
 
         let currentLang = localStorage.getItem('zenix_lang') || 'en';
@@ -334,6 +366,11 @@
         let lockoutUntil = parseInt(localStorage.getItem('zenix_lockout_until') || '0', 10);
         let countdownTimer = null;
 
+        // ── Turnstile Lazy Load ──
+        let turnstileInitStarted = false;
+        let turnstileWidgetId = null;
+        let turnstileLoadFailed = false;
+
         const langBtn = document.getElementById('lang-btn'),
               langMenu = document.getElementById('lang-menu'),
               userIn = document.getElementById('user'),
@@ -341,7 +378,8 @@
               submitBtn = document.getElementById('t-btn'),
               msg = document.getElementById('msg'),
               form = document.getElementById('form'),
-              authCard = document.getElementById('auth-card');
+              authCard = document.getElementById('auth-card'),
+              turnstileContainer = document.getElementById('turnstile-container');
 
         function hardDisableSpellcheck(el) {
             if (!el) return;
@@ -372,12 +410,69 @@
             return domToken || window.__cfToken || null;
         }
 
+        // ── Turnstile Load & Render ──
+        function loadTurnstileScript() {
+            return new Promise((resolve, reject) => {
+                if (window.turnstile) { resolve(); return; }
+                const script = document.createElement('script');
+                script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+                script.async = true;
+                script.defer = true;
+                script.onload = () => resolve();
+                script.onerror = () => reject(new Error('Failed to load Turnstile script'));
+                document.head.appendChild(script);
+            });
+        }
+
+        function renderTurnstileWidget() {
+            if (!turnstileContainer || turnstileWidgetId !== null || turnstileLoadFailed) return;
+            try {
+                turnstileContainer.textContent = '';
+                turnstileWidgetId = window.turnstile.render(turnstileContainer, {
+                    sitekey: '0x4AAAAAAFaU1RVZfnTURKOc',
+                    theme: 'dark',
+                    callback: window.onCaptchaSuccess,
+                    'expired-callback': window.onCaptchaExpired,
+                    'error-callback': window.onCaptchaError
+                });
+            } catch (e) {
+                console.error('Turnstile render error:', e);
+                showTurnstileLoadError();
+            }
+        }
+
+        function showTurnstileLoadError() {
+            turnstileLoadFailed = true;
+            if (!turnstileContainer) return;
+            turnstileContainer.textContent = '';
+            const errDiv = document.createElement('div');
+            errDiv.className = 'captcha-loading captcha-error';
+            const t = langData[currentLang] || langData.en;
+            errDiv.textContent = t.errCaptchaLoad || 'Security check failed to load. Please refresh.';
+            turnstileContainer.appendChild(errDiv);
+        }
+
+        async function initTurnstile() {
+            try {
+                await loadTurnstileScript();
+                renderTurnstileWidget();
+            } catch (e) {
+                console.error('Turnstile init failed:', e);
+                showTurnstileLoadError();
+            }
+        }
+
+        function startTurnstileLoad() {
+            if (turnstileInitStarted) return;
+            turnstileInitStarted = true;
+            initTurnstile();
+        }
+
         // ── Rate Limit helpers ──
         function getRemainingLockoutSec() {
             const now = Date.now();
             if (lockoutUntil > now) return Math.ceil((lockoutUntil - now) / 1000);
             if (lockoutUntil > 0 && lockoutUntil <= now) {
-                // قفل منقضی شده → پاکسازی
                 attemptCount = 0;
                 lockoutUntil = 0;
                 localStorage.removeItem('zenix_attempts');
@@ -479,13 +574,25 @@
             document.getElementById('t-remember').textContent = t.remember;
             document.getElementById('t-forgot').textContent = t.forgot;
             submitBtn.textContent = t.btn;
-            document.getElementById('t-foot').innerHTML = `${t.noAcc} <a href="register.html">${t.reg}</a>`;
+            // ── ساخت ایمن footer ──
+            const footEl = document.getElementById('t-foot');
+            footEl.textContent = '';
+            footEl.appendChild(document.createTextNode(t.noAcc + ' '));
+            const link = document.createElement('a');
+            link.href = 'register.html';
+            link.textContent = t.reg;
+            footEl.appendChild(link);
             document.getElementById('btn-support').setAttribute('title', t.supTitle);
             langBtn.setAttribute('title', t.langTitle);
             document.querySelectorAll('#lang-menu .mi').forEach(i => i.classList.toggle('active', i.dataset.lang === l));
             authCard.classList.add('ready');
             hardDisableSpellcheck(userIn);
             hardDisableSpellcheck(passIn);
+            // اگر خطای کپچا نمایش داده شده، متنش را به‌روز کن
+            if (turnstileLoadFailed) {
+                const errDiv = turnstileContainer?.querySelector('.captcha-error');
+                if (errDiv) errDiv.textContent = t.errCaptchaLoad;
+            }
         }
 
         document.querySelectorAll('#lang-menu .mi').forEach(i => i.addEventListener('click', () => { setLang(i.dataset.lang); clearError(); }));
@@ -546,12 +653,24 @@
                 return;
             }
 
+            // اگر Turnstile هنوز شروع نشده، همین حالا شروع کن
+            if (!turnstileInitStarted) {
+                startTurnstileLoad();
+            }
+
             const emailVal = userIn.value.trim().toLowerCase();
             const passVal = passIn.value.trim();
 
             if (!isValidEmail(emailVal)) return showError('errEmail');
+
             const captchaToken = getCaptchaToken();
-            if (!captchaToken) return showError('errCaptcha');
+            if (!captchaToken) {
+                // اگر کپچا هنوز آماده نیست، پیام مناسب بده
+                if (turnstileLoadFailed) {
+                    return showError('errCaptchaLoad');
+                }
+                return showError('errCaptcha');
+            }
 
             const currentSubmit = ++submitCounter;
             isSubmitting = true;
@@ -573,12 +692,11 @@
 
                 if (targetPage === 'BANNED') {
                     try { await supabaseClient.auth.signOut(); } catch (_) {}
-                    try { if (window.turnstile) window.turnstile.reset(); } catch(e) {}
+                    try { if (window.turnstile && turnstileWidgetId !== null) window.turnstile.reset(turnstileWidgetId); } catch(e) {}
                     showBanned();
                     return;
                 }
 
-                // ورود موفق → پاکسازی شمارنده
                 resetAttempts();
 
                 const t = langData[currentLang] || langData.en;
@@ -591,15 +709,13 @@
                 isSubmitting = false;
                 submitBtn.disabled = false;
 
-                try { if (window.turnstile) window.turnstile.reset(); } catch(e) {}
+                try { if (window.turnstile && turnstileWidgetId !== null) window.turnstile.reset(turnstileWidgetId); } catch(e) {}
 
                 if (error.status === 429 || (error.message && error.message.toLowerCase().includes('too many requests'))) {
-                    // محدودیت سمت سرور
                     const t = langData[currentLang] || langData.en;
                     msg.textContent = t.errTooMany;
                     msg.className = 'err show';
                 } else {
-                    // اعتبارنامه غلط → شمارنده کلاینت
                     const locked = registerFailedAttempt();
                     if (locked) {
                         startCountdownIfNeeded();
@@ -616,6 +732,19 @@
             startCountdownIfNeeded();
             checkInputs();
         });
+
+        // ── Turnstile: شروع بارگذاری هوشمند ──
+        // ۱. با اولین تعامل کاربر با فرم
+        userIn.addEventListener('focus', startTurnstileLoad, { once: true });
+        passIn.addEventListener('focus', startTurnstileLoad, { once: true });
+
+        // ۲. یا بعد از لود کامل صفحه (fallback)
+        if (document.readyState === 'complete') {
+            setTimeout(startTurnstileLoad, 500);
+        } else {
+            window.addEventListener('load', () => setTimeout(startTurnstileLoad, 500));
+        }
+
         setLang(currentLang);
     </script>
 </body>
