@@ -427,17 +427,7 @@
             submitBtn.disabled = !(emailOk && passOk && capOk);
         }
 
-        document.addEventListener('cf-token-ready', () => { checkInputs(); });
-
-        let lastKnownToken = null;
-        setInterval(() => {
-            if (isSubmitting) return;
-            const token = getCaptchaToken();
-            if (token !== lastKnownToken) {
-                lastKnownToken = token;
-                checkInputs();
-            }
-        }, 400);
+document.addEventListener('cf-token-ready', checkInputs);
 
         userIn.addEventListener('focus', clearError);
         userIn.addEventListener('input', () => { clearError(); checkInputs(); });
