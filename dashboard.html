@@ -1,914 +1,437 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>رولت آنلاین - Zenix Casino</title>
+    <script>
+        (function () {
+            var supported = ['en', 'fa', 'ar', 'tr', 'ru', 'es', 'fr', 'de'];
+            var language = 'en';
+            try {
+                var saved = localStorage.getItem('zenix_lang');
+                if (supported.indexOf(saved) !== -1) language = saved;
+            } catch (e) {}
+            document.documentElement.setAttribute('lang', language);
+            document.documentElement.setAttribute('dir', language === 'fa' || language === 'ar' ? 'rtl' : 'ltr');
+        })();
+    </script>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Zenix - Dashboard</title>
     <link rel="icon" href="data:image/x-icon;base64,=">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.cn">
+    <link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin>
+    <link href="https://fonts.googleapis.cn/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    
     <style>
-        :root {
-            --primary-glow: #22c55e;
-            --accent-blue: #38bdf8;
-            --gold-accent: #facc15;
-            --bg-dark: #030712;
-            --felt-green: #064e3b;
-            --felt-border: #022c22;
-            --glass-border: rgba(255, 255, 255, 0.1);
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', 'Vazirmatn', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
+        *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
+        body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
+        header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1);padding:10px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+        .logo{display:flex;align-items:center;gap:10px}
+        .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#0ea5e9,#9333ea);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;font-style:italic;transform:skewX(-6deg);box-shadow:0 0 15px rgba(14,165,233,.4)}
+        .logo-text{font-family:'Orbitron',sans-serif;font-size:19px;font-weight:900;letter-spacing:2px;font-style:italic;transform:skewX(-6deg);background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 20px rgba(56,189,248,0.4)}
+        .hr{display:flex;align-items:center;gap:8px}
+        .wrap{position:relative}
+        .lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none}
+        .badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;font-weight:700}
+        .badge.show{display:flex}
+        .menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;min-width:max-content;padding:6px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8)}
+        [dir="rtl"] .wrap .menu{left:0}
+        [dir="ltr"] .wrap .menu{right:0}
+        .menu.show{display:block}
+        .mi{padding:7px 10px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap}
+        .mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}
+        .c{max-width:900px;width:100%;margin:15px auto;padding:0 12px;flex:1}
+        .wel{background:linear-gradient(135deg,rgba(2,132,199,.15),rgba(147,51,234,.15));border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+        .wel h1{font-size:16px;margin-bottom:3px}
+        .wel p{color:#94a3b8;font-size:11px}
+        .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:12px}
+        .sc{border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;min-width:0}
+        .sc-bal{background:linear-gradient(135deg,rgba(15,23,42,.95),rgba(14,165,233,.18));border:1px solid rgba(56,189,248,.4)}
+        .sc-ref{background:linear-gradient(135deg,rgba(15,23,42,.95),rgba(168,85,247,.18));border:1px solid rgba(168,85,247,.4)}
+        .sc-bal .si{width:40px;height:40px;background:rgba(56,189,248,.2);border:1px solid #38bdf8;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#38bdf8;font-size:16px;flex-shrink:0}
+        .sc-ref .si{width:40px;height:40px;background:rgba(168,85,247,.2);border:1px solid #a855f7;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#c084fc;font-size:16px;flex-shrink:0}
+        .sn{min-width:0}
+        .sn span{font-size:11px;color:#94a3b8;display:block;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .sn h3{font-size:16px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .banner-box{width:100%;max-height:150px;margin-bottom:12px;border-radius:12px;overflow:hidden;border:1px solid rgba(56,189,248,.35);box-shadow:0 10px 25px rgba(2,132,199,.15)}
+        .banner-box img{width:100%;height:150px;display:block;object-fit:cover}
+        .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}
+        .nc{background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px;text-decoration:none;color:inherit;display:flex;align-items:center;justify-content:space-between;min-width:0}
+        .nc:hover{border-color:#38bdf8;background:rgba(15,23,42,1)}
+        .ncl{display:flex;align-items:center;gap:10px;min-width:0}
+        .nci{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+        .ninf{min-width:0}
+        .ninf h3{font-size:14px;color:#f8fafc;margin-bottom:2px}
+        .ninf p{font-size:11px;color:#94a3b8}
+        .nca{color:#64748b;font-size:12px;margin-inline-start:4px}
+        .market-box{background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px;margin-bottom:12px}
+        #crypto-ticker-list{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+        @media(max-width:768px){#crypto-ticker-list{grid-template-columns:1fr}}
+        .crypto-row{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid rgba(255,255,255,0.05);font-size:12px;direction:ltr;transition:all .4s ease}
+        .crypto-info{display:flex;align-items:center;gap:8px}
+        .crypto-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;overflow:hidden}
+        .crypto-icon img{width:100%;height:100%;object-fit:cover}
+        .price-up{color:#22c55e!important;font-weight:bold}
+        .price-down{color:#ef4444!important;font-weight:bold}
         
-        /* ★ پس‌زمینه کازینویی با overlay تیره */
-        body {
-            background:
-                radial-gradient(ellipse at center, rgba(3, 7, 18, 0.55) 0%, rgba(3, 7, 18, 0.92) 100%),
-                linear-gradient(180deg, rgba(3, 7, 18, 0.7) 0%, rgba(3, 7, 18, 0.85) 60%, rgba(3, 7, 18, 0.95) 100%),
-                url('https://images.unsplash.com/photo-1596838132731-3301c3fd4317?auto=format&fit=crop&w=1920&q=80') center center / cover no-repeat fixed;
-            background-color: var(--bg-dark);
-            min-height: 100vh;
-            color: #f8fafc;
-            display: flex;
-            flex-direction: column;
-            padding-bottom: 75px;
-            overflow-x: hidden;
-        }
-
-        /* ★ روی موبایل fixed پس‌زمینه درست کار نمی‌کند */
-        @media (max-width: 768px) {
-            body { background-attachment: scroll, scroll, scroll; }
-        }
-
-        header {
-            background: rgba(15, 23, 42, .95);
-            border-bottom: 1px solid rgba(250, 204, 21, .15);
-            padding: 8px 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-            flex-shrink: 0;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-        }
-        .game-header-title { font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 800; color: #facc15; letter-spacing: 0.5px; }
-        .guide-btn {
-            background: rgba(56, 189, 248, 0.15);
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            color: #38bdf8;
-            padding: 4px 9px;
-            border-radius: 6px;
-            font-size: 9px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            transition: background 0.2s;
-        }
-        .guide-btn:hover { background: rgba(56, 189, 248, 0.3); }
-
-        .game-bar {
-            background: rgba(15, 23, 42, 0.85);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 4px 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 5px;
-            flex-shrink: 0;
-            backdrop-filter: blur(8px);
-        }
-
-        .user-welcome-tag {
-            font-size: 9.5px;
-            font-weight: 700;
-            color: #38bdf8;
-            background: rgba(56, 189, 248, 0.1);
-            border: 1px solid rgba(56, 189, 248, 0.25);
-            padding: 2px 8px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            white-space: nowrap;
-        }
-
-        .history-bar { display: flex; align-items: center; gap: 3px; background: rgba(0,0,0,0.4); padding: 2px 5px; border-radius: 12px; border: 1px solid var(--glass-border); overflow-x: auto; max-width: 35%; }
-        .history-title { font-size: 8px; color: #94a3b8; font-weight: 700; white-space: nowrap; }
-        .hist-num { width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 8px; font-weight: 800; font-family: 'Orbitron'; color: #fff; flex-shrink: 0; }
-        .hist-red { background: #dc2626; }
-        .hist-black { background: #1e293b; border: 1px solid #475569; }
-        .hist-green { background: #16a34a; }
-
-        .user-stats { display: flex; align-items: center; gap: 4px; flex-wrap: nowrap; }
-        .stat-pill { background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); padding: 2px 6px; border-radius: 12px; display: flex; align-items: center; gap: 3px; white-space: nowrap; backdrop-filter: blur(4px); }
-        .stat-val { font-family: 'Orbitron', sans-serif; font-weight: 800; color: var(--gold-accent); font-size: 9.5px; }
+        .platform-info-box{background:rgba(15,23,42,.85);border:1px solid rgba(56,189,248,.25);border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
         
-        .casino-deposit-btn {
-            background: linear-gradient(135deg, #facc15, #f97316);
-            color: #0f172a;
-            padding: 3px 7px;
-            border-radius: 12px;
-            border: none;
-            font-size: 8px;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 2px;
-            cursor: pointer;
-            white-space: nowrap;
-            box-shadow: 0 0 10px rgba(250, 204, 21, 0.3);
-        }
-
-        .main-stage {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 10px 8px;
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            gap: 12px;
-        }
-
-        .top-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            gap: 6px;
-        }
-
-        /* ★ چرخ با هاله طلایی-سبز که روی پس‌زمینه می‌درخشد */
-        .wheel-box {
-            position: relative;
-            width: 260px;
-            height: 260px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: radial-gradient(circle, #2d160a 0%, #020617 70%);
-            border-radius: 50%;
-            border: 5px solid #42281d;
-            box-shadow:
-                0 0 40px rgba(250, 204, 21, 0.18),
-                0 0 80px rgba(34, 197, 94, 0.12),
-                0 0 25px rgba(0,0,0,0.95),
-                inset 0 0 30px rgba(0,0,0,0.6);
-            flex-shrink: 0;
-        }
-        canvas#rouletteWheel { 
-            transform: rotate(0deg); 
-            will-change: transform;
-            transform-origin: center center;
-        }
-
-        .wheel-pointer {
-            position: absolute;
-            top: -6px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0; height: 0;
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-top: 13px solid var(--gold-accent);
-            z-index: 10;
-            filter: drop-shadow(0 0 6px rgba(250, 204, 21, 0.8));
-        }
-
-        .status-center {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 6px;
-            justify-content: center;
-            background: rgba(15, 23, 42, 0.6);
-            padding: 4px 12px;
-            border-radius: 20px;
-            border: 1px solid rgba(250, 204, 21, 0.15);
-            backdrop-filter: blur(6px);
-        }
-        .timer-circle {
-            width: 28px; height: 28px; border-radius: 50%;
-            border: 2px solid var(--accent-blue);
-            display: flex; justify-content: center; align-items: center;
-            font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 10px;
-            color: #fff; background: rgba(15, 23, 42, 0.9);
-            box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
-        }
-        .status-text { font-size: 9px; font-weight: 800; color: var(--gold-accent); text-align: center; }
-
-        .table-viewport {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-        }
-
-        /* ★ میز رولت با سایه عمیق‌تر برای برجسته شدن */
-        .roulette-table {
-            background: linear-gradient(180deg, #0a5a45 0%, #064e3b 50%, #042f24 100%);
-            border: 3px solid var(--felt-border);
-            border-radius: 8px;
-            padding: 3px;
-            box-shadow:
-                0 8px 30px rgba(0,0,0,0.95),
-                0 0 25px rgba(34, 197, 94, 0.15),
-                inset 0 0 20px rgba(0,0,0,0.4);
-            display: grid;
-            grid-template-columns: 22px repeat(12, 1fr) 26px;
-            grid-template-rows: repeat(3, 23px) 21px 21px;
-            gap: 1px;
-            width: 100%;
-            max-width: 100%;
-        }
-
-        .cell {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 800;
-            font-size: 8px;
-            color: #fff;
-            cursor: pointer;
-            position: relative;
-            border-radius: 2px;
-        }
-        .cell:hover { background: rgba(250, 204, 21, 0.3); border-color: var(--gold-accent); }
-        .cell.red-num { background: rgba(220, 38, 38, 0.85); }
-        .cell.black-num { background: rgba(15, 23, 42, 0.9); }
-        .cell.zero-num { grid-row: 1 / span 3; background: #16a34a; font-size: 9px; }
-
-        .cell.outside-bet { font-size: 6px; font-weight: 800; background: rgba(15, 23, 42, 0.7); }
-        .cell.outside-red { background: rgba(220, 38, 38, 0.7); }
-        .cell.outside-black { background: rgba(15, 23, 42, 0.9); }
-
-        .chip-on-table {
-            position: absolute;
-            width: 13px; height: 13px;
-            border-radius: 50%;
-            border: 1px dashed #fff;
-            font-family: 'Orbitron';
-            font-size: 4.5px;
-            font-weight: 900;
-            display: flex; justify-content: center; align-items: center;
-            color: #000;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.8);
-            pointer-events: none;
-            z-index: 5;
-        }
-
-        .chip-1 { background: #38bdf8; }
-        .chip-5 { background: #facc15; }
-        .chip-10 { background: #22c55e; }
-        .chip-50 { background: #a855f7; color: #fff; }
-        .chip-100 { background: #ef4444; color: #fff; }
-
-        /* ★ نوار کنترل با خط طلایی و شیشه‌ای‌تر */
-        .control-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: linear-gradient(180deg, rgba(15, 23, 42, 0.92) 0%, rgba(15, 23, 42, 0.99) 100%);
-            border-top: 1px solid rgba(250, 204, 21, 0.35);
-            padding: 8px 12px;
-            backdrop-filter: blur(16px);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 999;
-            gap: 8px;
-            box-shadow: 0 -4px 30px rgba(0,0,0,0.9), 0 -1px 15px rgba(250, 204, 21, 0.08);
-        }
-
-        .chip-rack { display: flex; gap: 8px; align-items: center; flex-shrink: 0; overflow-x: auto; padding: 2px 0; }
-        .chip-select {
-            width: 38px; height: 38px; border-radius: 50%;
-            border: 2px dashed #fff;
-            display: flex; justify-content: center; align-items: center;
-            font-family: 'Orbitron'; font-weight: 900; font-size: 10px; color: #000;
-            cursor: pointer; flex-shrink: 0;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.6);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .chip-select.active { 
-            border-style: solid; 
-            border-color: var(--gold-accent); 
-            transform: scale(1.15); 
-            box-shadow: 0 0 15px var(--gold-accent);
-        }
-        
-        .chip-select.chip-1 { background: #38bdf8; }
-        .chip-select.chip-5 { background: #facc15; }
-        .chip-select.chip-10 { background: #22c55e; }
-        .chip-select.chip-50 { background: #a855f7; color: #fff; }
-        .chip-select.chip-100 { background: #ef4444; color: #fff; }
-
-        .action-btns { display: flex; gap: 5px; flex-shrink: 0; }
-        .btn-act {
-            padding: 6px 10px; border-radius: 6px; border: none; font-weight: 800; font-size: 8.5px; cursor: pointer; color: #fff; white-space: nowrap;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-        }
-        .btn-clear { background: #ef4444; }
-        .btn-double { background: #0ea5e9; }
-        .btn-quadruple { background: #8b5cf6; }
-
-        .winning-cell { animation: winPulse 0.8s infinite alternate; border-color: var(--gold-accent) !important; z-index: 10; }
-        @keyframes winPulse { from { box-shadow: 0 0 3px var(--gold-accent); } to { box-shadow: 0 0 10px var(--gold-accent); background: rgba(250, 204, 21, 0.6); } }
-
-        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px);padding:10px;}
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
         .modal.show{display:flex}
-        .modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(250,204,21,0.3);border-radius:10px;width:100%;max-width:340px;max-height:85vh;display:flex;flex-direction:column;padding:12px;box-shadow:0 15px 35px rgba(0,0,0,.9)}
-        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;color:#facc15;font-weight:800;font-size:10.5px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:4px}
-        .modal-close{background:rgba(255,255,255,.05);border:none;color:#94a3b8;cursor:pointer;font-size:9px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center}
-        .form-input{width:100%;background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.15);border-radius:5px;padding:5px;color:#fff;font-size:9px;outline:none;margin-top:3px;margin-bottom:5px}
-        .btn-submit-deposit{width:100%;background:linear-gradient(135deg,#facc15,#f97316);color:#0f172a;border:none;padding:6px;border-radius:5px;font-weight:800;cursor:pointer;font-size:9px}
+        .modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(56,189,248,.3);border-radius:20px;width:100%;max-width:460px;max-height:85vh;display:flex;flex-direction:column;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.9);overflow:hidden}
+        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;color:#38bdf8;font-weight:800;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;flex-shrink:0}
+        .modal-close{background:rgba(255,255,255,.05);border:none;color:#94a3b8;cursor:pointer;font-size:14px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+        .modal-close:hover{background:rgba(239,68,68,.2);color:#ef4444}
+        
+        .notif-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
+        .notif-tab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#94a3b8;padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;white-space:nowrap;transition:0.2s;display:flex;align-items:center;justify-content:center;gap:5px;flex:1 1 auto}
+        .notif-tab:hover{background:rgba(56,189,248,.15);color:#38bdf8}
+        .notif-tab.active{background:#38bdf8;color:#0f172a;font-weight:bold;border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.3)}
+        .tab-badge{background:rgba(255,255,255,.15);color:inherit;padding:1px 6px;border-radius:10px;font-size:10px;font-weight:700;line-height:1.2;min-width:16px;text-align:center;display:inline-block}
+        .notif-tab.active .tab-badge{background:rgba(15,23,42,.3);color:#0f172a}
+        
+        #modal-msg-container, .modal-content div[style*="overflow-y:auto"]{overflow-y:auto;padding-right:6px}
+        #modal-msg-container::-webkit-scrollbar, .modal-content div::-webkit-scrollbar{width:5px}
+        #modal-msg-container::-webkit-scrollbar-track, .modal-content div::-webkit-scrollbar-track{background:rgba(15,23,42,.6);border-radius:10px}
+        #modal-msg-container::-webkit-scrollbar-thumb, .modal-content div::-webkit-scrollbar-thumb{background:rgba(56,189,248,.35);border-radius:10px}
+        #modal-msg-container::-webkit-scrollbar-thumb:hover, .modal-content div::-webkit-scrollbar-thumb:hover{background:rgba(56,189,248,.7)}
+        
+        .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px;transition:0.2s}
+        .msg-body-box:hover{border-color:rgba(56,189,248,.5)!important;opacity:1!important;}
+        .msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:0}
+        .msg-desc-text{font-size:12px;color:#cbd5e1;line-height:1.5}
+        
+        footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
+        
+        /* ★ دکمه شناور کازینو */
+        .floating-casino-wrap {
+            position: fixed; 
+            right: 24px; 
+            bottom: 28px; 
+            z-index: 9999;
+        }
+        [dir="rtl"] .floating-casino-wrap {
+            right: auto;
+            left: 24px;
+        }
+        
+        .floating-casino {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+
+        .floating-casino::before {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            background: conic-gradient(from 0deg, #f43f5e, #a855f7, #38bdf8, #f43f5e);
+            z-index: -1;
+            border-radius: 50%;
+            animation: spinCasinoBorder 3s linear infinite;
+            opacity: 0.8;
+        }
+
+        .floating-casino::after {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            background: #0f172a;
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .floating-casino:hover {
+            transform: translateY(-5px) scale(1.08);
+            box-shadow: 0 15px 45px rgba(244, 63, 94, 0.5), inset 0 0 20px rgba(168, 85, 247, 0.3);
+        }
+
+        .floating-casino i {
+            font-size: 24px;
+            background: linear-gradient(135deg, #38bdf8, #c084fc, #f43f5e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 3px;
+            transition: transform 0.4s ease;
+        }
+
+        .floating-casino:hover i {
+            transform: rotate(25deg) scale(1.1);
+        }
+
+        .floating-casino span {
+            font-size: 9px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 0.5px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            z-index: 1;
+        }
+
+        @keyframes spinCasinoBorder {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ★ اصلاحات ریسپانسیو برای موبایل */
+        @media (max-width: 480px) {
+            .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+            .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+
+            .hr { gap: 5px; }
+            .lb { width: 32px; height: 32px; font-size: 12px; }
+            .logo-text { font-size: 16px; }
+            .wel { flex-direction: column; align-items: flex-start; }
+
+            .sc { padding: 10px; gap: 8px; }
+            .sc-bal .si, .sc-ref .si { width: 32px; height: 32px; font-size: 13px; }
+            .sn span { font-size: 9.5px; }
+            .sn h3 { font-size: 13px; }
+
+            .nc { padding: 9px; }
+            .ncl { gap: 7px; }
+            .nci { width: 30px; height: 30px; font-size: 12px; }
+            .ninf h3 { font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .ninf p  { font-size: 9.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .nca { font-size: 10px; }
+        }
+
+        @media (max-width: 360px) {
+            .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+            .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+
+            .sc { padding: 8px; gap: 6px; }
+            .sc-bal .si, .sc-ref .si { width: 28px; height: 28px; font-size: 11px; }
+            .sn span { font-size: 9px; }
+            .sn h3 { font-size: 11.5px; }
+
+            .nc  { padding: 7px; }
+            .nci { width: 26px; height: 26px; font-size: 11px; }
+            .ninf h3 { font-size: 10.5px; }
+            .ninf p  { font-size: 9px; }
+            .nca { display: none; }
+        }
     </style>
 </head>
 <body>
-
-    <header>
-        <div class="game-header-title"><i class="fas fa-dice-roulette" style="color:#38bdf8;"></i> رولت آنلاین کازینو</div>
-        <button class="guide-btn" onclick="openHelpModal()"><i class="fas fa-question-circle"></i> راهنمای بازی</button>
-    </header>
-
-    <div class="game-bar">
-        <div id="user-welcome-display" class="user-welcome-tag" style="display: none;">
-            <i class="fas fa-user-circle" style="color:#facc15;"></i>
-            <span id="user-fullname-text">خوش آمدید کاربر</span>
-        </div>
-
-        <div class="history-bar">
-            <span class="history-title">نتایج:</span>
-            <div id="history-list" style="display:flex; gap:2.5px;"></div>
-        </div>
-
-        <div class="user-stats">
-            <div class="stat-pill">
-                <span style="font-size:7px; color:#94a3b8;">شرط:</span>
-                <span class="stat-val" id="total-bet-val" style="color:#38bdf8;">$0.00</span>
-            </div>
-            <div class="stat-pill">
-                <span style="font-size:7px; color:#94a3b8;">موجودی:</span>
-                <span class="stat-val" id="balance-val">$0.00</span>
-            </div>
-            <button class="casino-deposit-btn" onclick="openCasinoDepositModal()"><i class="fas fa-plus-circle"></i> شارژ</button>
-        </div>
+    <div class="floating-casino-wrap">
+        <button type="button" class="floating-casino" id="floating-casino-btn" title="کازینو" onclick="window.openCasinoModal(); return false;">
+            <i class="fas fa-dice"></i>
+            <span id="t-floating-casino">کازینو</span>
+        </button>
     </div>
 
-    <div class="main-stage">
-        <div class="top-section">
-            <div class="wheel-box">
-                <div class="wheel-pointer"></div>
-                <canvas id="rouletteWheel" width="260" height="260"></canvas>
-            </div>
-
-            <div class="status-center">
-                <div class="timer-circle" id="timer-display">10</div>
-                <div class="status-text" id="status-msg">ژتون خود را بگذارید</div>
-            </div>
-        </div>
-
-        <div class="table-viewport">
-            <div class="roulette-table" id="roulette-table">
-                <div class="cell zero-num" data-bet="0">0</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="control-bar">
-        <div class="chip-rack">
-            <div class="chip-select chip-1 active" onclick="selectChip(1, this)">$1</div>
-            <div class="chip-select chip-5" onclick="selectChip(5, this)">$5</div>
-            <div class="chip-select chip-10" onclick="selectChip(10, this)">$10</div>
-            <div class="chip-select chip-50" onclick="selectChip(50, this)">$50</div>
-            <div class="chip-select chip-100" onclick="selectChip(100, this)">$100</div>
-        </div>
-
-        <div class="action-btns">
-            <button class="btn-act btn-clear" onclick="clearUserBets()"><i class="fas fa-trash"></i> پاک</button>
-            <button class="btn-act btn-double" onclick="doubleUserBets()"><i class="fas fa-clone"></i> 2x</button>
-            <button class="btn-act btn-quadruple" onclick="quadrupleUserBets()"><i class="fas fa-layer-group"></i> 4x</button>
-        </div>
-    </div>
-
-    <div class="modal" id="m-casino-deposit">
+    <div class="modal" id="m-casino-modal" style="z-index:1050;">
         <div class="modal-content">
             <div class="modal-header">
-                <span><i class="fas fa-wallet"></i> شارژ موجودی بازی</span>
-                <button class="modal-close" onclick="closeCasinoDepositModal()"><i class="fas fa-times"></i></button>
+                <span id="t-casino-modal-title"><i class="fas fa-dice" style="color:#f43f5e;"></i> انتخاب بازی‌های کازینو</span>
+                <button class="modal-close" onclick="window.closeCasinoModal()"><i class="fas fa-times"></i></button>
             </div>
-            <div style="font-size:9px; color:#cbd5e1; margin-bottom:5px; line-height:1.3;">
-                مبلغ شارژ (USDT):
+            <div style="overflow-y:auto;padding-right:6px;display:flex;flex-direction:column;gap:10px;">
+                <a href="roulette.html" class="nc" style="text-decoration:none;color:inherit;">
+                    <div class="ncl">
+                        <div class="nci" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#ef4444"><i class="fas fa-dice-roulette"></i></div>
+                        <div class="ninf">
+                            <h3 id="t-casino-poker">رولت آنلاین</h3>
+                            <p id="t-casino-poker-desc">بازی هیجان‌انگیز و شانس</p>
+                        </div>
+                    </div>
+                    <div class="nca"><i class="fas fa-chevron-left"></i></div>
+                </a>
+                <a href="plinko.html" class="nc" style="text-decoration:none;color:inherit;">
+                    <div class="ncl">
+                        <div class="nci" style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#22c55e"><i class="fas fa-circle-dot"></i></div>
+                        <div class="ninf">
+                            <h3 id="t-casino-plinko">پلینکو (پاپالان)</h3>
+                            <p id="t-casino-plinko-desc">بازی محبوب ریزش مهره‌ها</p>
+                        </div>
+                    </div>
+                    <div class="nca"><i class="fas fa-chevron-left"></i></div>
+                </a>
             </div>
-            <input type="number" id="casino-deposit-amount" class="form-input" placeholder="مثال: 50" min="1">
-            <button class="btn-submit-deposit" onclick="processCasinoDeposit()"><i class="fas fa-check-circle"></i> تایید و شارژ</button>
         </div>
     </div>
 
-    <div class="modal" id="m-help">
-        <div class="modal-content" style="max-width: 330px;">
-            <div class="modal-header">
-                <span><i class="fas fa-graduation-cap" style="color:#facc15;"></i> راهنمای بازی و استخر جوایز</span>
-                <button class="modal-close" onclick="closeHelpModal()"><i class="fas fa-times"></i></button>
+    <header>
+        <div class="logo"><div class="logo-icon">Z</div><div class="logo-text">ZENIX</div></div>
+        <div class="hr">
+            <div class="wrap"><button type="button" class="lb" id="bell-btn"><i class="fas fa-bell" style="color:#fbbf24"></i><span class="badge" id="bell-badge">0</span></button></div>
+            <div class="wrap"><button type="button" class="lb" id="help-btn" title="راهنمای صفحه داشبورد"><i class="fas fa-circle-question" style="color:#38bdf8"></i></button></div>
+            <a href="support.html" class="lb"><i class="fas fa-headset" style="color:#a855f7"></i></a>
+            <div class="wrap">
+                <button type="button" class="lb" id="lang-btn"><i class="fas fa-globe" style="color:#22c55e"></i></button>
+                <div class="menu" id="lang-menu">
+                    <div class="mi" data-lang="fa">فارسی</div><div class="mi" data-lang="en">English</div><div class="mi" data-lang="ar">العربية</div><div class="mi" data-lang="tr">Türkçe</div><div class="mi" data-lang="ru">Русский</div><div class="mi" data-lang="es">Español</div><div class="mi" data-lang="fr">Français</div><div class="mi" data-lang="de">Deutsch</div>
+                </div>
             </div>
-            <div style="overflow-y:auto; max-height: 65vh; padding-right:4px; font-size:9.5px; color:#cbd5e1; line-height:1.6;">
-                <p style="margin-bottom:8px;"><strong style="color:#facc15;">ماهیت بازی:</strong> این بازی به صورت تک‌نفره و مجزا انجام نمی‌شود؛ جوایز دقیقاً از مجموع کل شرط‌های ثبت‌شده در بازی تأمین و پرداخت می‌گردد.</p>
-                <p style="margin-bottom:8px;"><strong style="color:#facc15;">شرط شروع چرخش:</strong> چرخ شانس زمانی شروع به دوران می‌کند که حتماً دو کاربر یا دو شرط (یا بیشتر) روی میز ثبت شده باشد.</p>
-                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">1. اعداد تکی (0 تا 36):</strong> سهم متناسب از استخر کل</p>
-                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">2. دوازده‌تایی‌ها و ستون‌ها:</strong> تقسیم استخر بر اساس حجم شرط‌ها</p>
-                <p style="margin-bottom:6px;"><strong style="color:#38bdf8;">3. رنگ‌ها، زوج/فرد و نیمه‌ها:</strong> پرداخت سهم برندگان از استخر کل</p>
+            <div class="wrap">
+                <button type="button" class="lb" id="menu-btn"><i class="fas fa-bars" style="color:#f43f5e"></i></button>
+                <div class="menu" id="nav-menu">
+                    <a href="dashboard.html" class="mi active"><i class="fas fa-home" style="color:#38bdf8"></i><span id="m1">صفحه اصلی</span></a>
+                    <a href="quantification.html" class="mi"><i class="fas fa-robot" style="color:#a855f7"></i><span id="m2">کوانتیفیکیشن</span></a>
+                    <a href="deposit.html" class="mi"><i class="fas fa-arrow-down" style="color:#22c55e"></i><span id="m3">واریز</span></a>
+                    <a href="receive.html" class="mi"><i class="fas fa-arrow-up" style="color:#fbbf24"></i><span id="m4">برداشت</span></a>
+                    <a href="team.html" class="mi"><i class="fas fa-users" style="color:#ec4899"></i><span id="m_team">تیم من</span></a>
+                    <a href="transactions.html" class="mi"><i class="fas fa-history" style="color:#06b6d4"></i><span id="m5">تراکنش</span></a>
+                    <a href="profile.html" class="mi"><i class="fas fa-user-cog" style="color:#ec4899"></i><span id="m6">پروفایل</span></a>
+                    <a href="support.html" class="mi"><i class="fas fa-headset" style="color:#a855f7"></i><span id="m7">پشتیبانی</span></a>
+                    <a href="#" class="mi" onclick="window.openAboutModal();return false;"><i class="fas fa-info-circle" style="color:#38bdf8"></i><span id="m_about">درباره پلتفرم</span></a>
+                    <a href="index.html" class="mi" id="logout-btn" style="color:#ef4444"><i class="fas fa-power-off"></i><span id="m8">خروج</span></a>
+                </div>
             </div>
         </div>
-    </div>
+    </header>
 
-    <script>
-        window.openHelpModal = () => document.getElementById('m-help')?.classList.add('show');
-        window.closeHelpModal = () => document.getElementById('m-help')?.classList.remove('show');
-        window.openCasinoDepositModal = () => document.getElementById('m-casino-deposit')?.classList.add('show');
-        window.closeCasinoDepositModal = () => document.getElementById('m-casino-deposit')?.classList.remove('show');
-    </script>
-
-    <script type="module">
-        import { createClient } from 'https://cdn.jsdmirror.com/npm/@supabase/supabase-js@2/+esm';
-
-        const SUPABASE_URL = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        const wheelNumbers = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3];
-        const redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+    <div class="c">
+        <div class="wel"><div><h1 id="t-wel">خوش آمدید</h1><p id="t-sub">پنل مدیریت کاربری</p></div><div style="font-size:11px;background:rgba(56,189,248,.1);border:1px solid #38bdf8;padding:4px 8px;border-radius:6px;color:#38bdf8"><i class="fas fa-shield-check"></i> <span id="t-st">تایید شده</span></div></div>
+        <div class="stats">
+            <div class="sc sc-bal"><div class="si"><i class="fas fa-wallet" style="color:#38bdf8"></i></div><div class="sn"><span id="ts1">موجودی</span><h3 id="val-balance">$0.00</h3></div></div>
+            <div class="sc sc-ref"><div class="si"><i class="fas fa-users" style="color:#c084fc"></i></div><div class="sn"><span id="ts2">زیرمجموعه</span><h3 id="val-ref">0</h3></div></div>
+        </div>
+        <div class="banner-box"><img src="https://i.postimg.cc/XvHYmsLK/Gemini-Generated-Image-d7mieqd7mieqd7mi.jpg" alt="Zenix Banner"></div>
+        <div class="grid">
+            <a href="quantification.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.3);color:#c084fc"><i class="fas fa-robot"></i></div><div class="ninf"><h3 id="c1">کوانتیفیکیشن</h3><p id="d1">معاملات هوشمند</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i1"></i></div></a>
+            <a href="deposit.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#22c55e"><i class="fas fa-arrow-down"></i></div><div class="ninf"><h3 id="c2">واریز</h3><p id="d2">شارژ حساب</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i2"></i></div></a>
+            <a href="receive.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);color:#fbbf24"><i class="fas fa-arrow-up"></i></div><div class="ninf"><h3 id="c3">برداشت</h3><p id="d3">برداشت دارایی</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i3"></i></div></a>
+            <a href="team.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(236,72,153,.15);border:1px solid rgba(236,72,153,.3);color:#ec4899"><i class="fas fa-users"></i></div><div class="ninf"><h3 id="c4">تیم</h3><p id="d4">زیرمجموعه‌ها</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i4"></i></div></a>
+            <a href="transactions.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(6,182,212,.15);border:1px solid rgba(6,182,212,.3);color:#06b6d4"><i class="fas fa-history"></i></div><div class="ninf"><h3 id="c5">تراکنش‌ها</h3><p id="d5">تاریخچه مالی</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i5"></i></div></a>
+            <a href="profile.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);color:#38bdf8"><i class="fas fa-user-cog"></i></div><div class="ninf"><h3 id="c6">پروفایل</h3><p id="d6">تنظیمات امنیت</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i6"></i></div></a>
+        </div>
         
-        let currentUser = null;
-        let uUid = null;
-        let userBalance = 1500.00;
-        let selectedChipVal = 1;
-        let userBets = []; 
-        let gameState = 'BETTING'; 
-        let countdown = 10;
-        let timerInterval;
+        <div class="market-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <h3 style="font-size:13px;color:#38bdf8;" id="t-mkt"><i class="fas fa-chart-line" style="color:#22c55e"></i> بازار ارزهای دیجیتال (۳ ارز برتر از ۳۰ ارز رصد شده)</h3>
+                <span style="font-size:10px;color:#22c55e;background:rgba(34,197,94,0.15);padding:2px 8px;border-radius:10px;font-weight:600;"><i class="fas fa-circle" style="font-size:6px;vertical-align:middle;margin-left:3px;"></i> <span id="t-live">زنده</span></span>
+            </div>
+            <div id="crypto-ticker-list"></div>
+        </div>
 
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSound(freq, type = 'sine', duration = 0.1) {
-            try {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.value = freq;
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
-            } catch(e) { /* Web Audio may be unavailable or blocked; sound is non-critical */ }
-        }
+        <!-- متن معرفی -->
+        <div class="platform-info-box">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;">
+                <div style="width:34px;height:34px;background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#38bdf8;font-size:15px;">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 style="font-size:13px;color:#38bdf8;font-weight:800;" id="t-about-box-title">درباره پلتفرم هوشمند زِنیکس (Zenix)</h3>
+            </div>
+            <div style="font-size:11px;color:#cbd5e1;line-height:1.8;display:flex;flex-direction:column;gap:10px;">
+                <p id="t-about-box-intro">به زِنیکس (Zenix) خوش آمدید؛ جایی که افق‌های مالی دیجیتال و قدرت فناوری مدرن در هم می‌آمیزند تا مسیری به سوی آینده‌ای روشن‌تر را روشن کنند. زِنیکس بر پایه یک باور عمیق بنا شده است: دنیای دارایی‌های دیجیتال نباید یک هزارتوی پیچیده باشد، بلکه باید یک اکوسیستم شفاف، در دسترس و امن برای همه باشد.</p>
+                <p id="t-about-box-desc">در عصری که با شتاب بی‌وقفه تعریف می‌شود، جایی که بازارهای جهانی هرگز نمی‌خوابند و تغییر تنها ثابتِ آن است، داشتن یک همراه مطمئن و هوشمند امری حیاتی است. زِنیکس با تکیه بر معماری ابری پیشرفته، الگوریتم‌های کوانتیفیکیشن نوین و لایه‌های امنیتی چندگانه و نفوذناپذیر، پناهگاهی یکپارچه و یکدست برای مدیریت ثروت شما فراهم کرده است. ما فقط در حال ساختن یک پلتفرم نیستیم؛ ما در حال خلق محیطی هستیم که در آن فناوری در خدمت جاه‌طلبی‌های انسانی قرار می‌گیرد، موانع را از بین می‌برد و آنچه را که در اقتصاد دیجیتال ممکن است، بازتعریف می‌کند.</p>
+                <p id="t-about-box-goal"><strong style="color:#38bdf8;">هدف ما:</strong> دموکراتیزه کردن امور استثنایی است. ما تلاش می‌کنیم همان ابزارهای مالی قدرتمندی که نخبگان نهادی از آن استفاده می‌کنند را در اختیار صاحبان دید روزمره قرار دهیم. چه در حال برداشتن اولین قدم خود باشید و چه یک متخصص کارکشته، زِنیکس به شما قدرت می‌دهد تا با اطمینان در بازارهای جهانی حرکت کنید، بدون نیاز به تخصص پیچیده، و تضمین می‌کند که سرمایه شما در محیطی از امنیت مطلق، شفافیت و پتانسیل پویا رشد کند.</p>
+                <p id="t-about-box-strategy"><strong style="color:#38bdf8;">استراتژی ما:</strong> بر یک سه‌گانه ناگسستنی بنا شده است—امنیت بدون سازش، شفافیت رادیکال و نوآوری بی‌وقفه. با ادغام الگوریتم‌های پردازش داده پیشرفته، یک سیستم پاداش چندلایه پویا و زیرساخت‌های بی‌نهایت مقیاس‌پذیر، ما تجربه‌ای بی‌نقص، فوق‌العاده سریع و بسیار قابل اعتماد را مهندسی می‌کنیم. ما پیچیدگی‌ها را مدیریت می‌کنیم تا تمرکز شما تنها روی مهم‌ترین چیز باقی بماند: رشد و موفقیت شما.</p>
+                <p id="t-about-box-conclusion" style="color:#94a3b8;border-top:1px dashed rgba(255,255,255,.08);padding-top:8px;margin-top:2px;"><i class="fas fa-quote-right" style="color:#38bdf8;margin-left:4px;"></i> زِنیکس فراتر از تعریف یک پلتفرم صرف است؛ این یک اکوسیستم پرجنب‌وجوش است که در آن فناوری، سرمایه و جامعه‌ای از پیشروان اندیشه گرد هم می‌آیند. ما شریک استوار شما در این سفر هستیم و متعهد به هدایت شما به سوی آینده‌ای با آزادی مالی بیشتر، فرصت‌های بی‌کران و دستاوردهای عظیم هستیم. ما با هم نه تنها آینده را پیش‌بینی می‌کنیم—بلکه آن را می‌سازیم.</p>
+            </div>
+        </div>
+    </div>
 
-        async function fetchUserBalance() {
-            if (!uUid) return;
-            try {
-                const { data } = await supabase.from('users').select('casino_balance, fullname, full_name').eq('id', uUid).single();
-                if (data) {
-                    if (data.casino_balance !== undefined && data.casino_balance !== null) {
-                        userBalance = parseFloat(data.casino_balance);
-                        updateStats();
-                    }
-                    const name = data.fullname || data.full_name || currentUser?.user_metadata?.fullname || currentUser?.user_metadata?.full_name;
-                    if (name) {
-                        renderWelcomeName(name);
-                    }
-                }
-            } catch (e) {
-                console.warn('fetchUserBalance failed:', e);
-            }
-        }
+    <div class="modal" id="m-msg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="t-modal-title"><i class="fas fa-bell"></i> صندوق پیام‌ها و اعلان‌ها</span>
+                <button class="modal-close" onclick="window.closeMessageModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="notif-tabs" id="notif-tabs">
+                <button type="button" class="notif-tab active" onclick="window.setNotifFilter('all', this)"><i class="fas fa-list"></i> <span id="t-tab-all">همه</span> <span class="tab-badge" id="cnt-tab-all">0</span></button>
+                <button type="button" class="notif-tab" onclick="window.setNotifFilter('approved', this)"><i class="fas fa-check-circle" style="color:#22c55e"></i> <span id="t-tab-approved">تایید درخواست</span> <span class="tab-badge" id="cnt-tab-approved">0</span></button>
+                <button type="button" class="notif-tab" onclick="window.setNotifFilter('rejected', this)"><i class="fas fa-times-circle" style="color:#ef4444"></i> <span id="t-tab-rejected">لغو درخواست</span> <span class="tab-badge" id="cnt-tab-rejected">0</span></button>
+                <button type="button" class="notif-tab" onclick="window.setNotifFilter('admin_message', this)"><i class="fas fa-bullhorn" style="color:#38bdf8"></i> <span id="t-tab-admin">پیام مدیریت</span> <span class="tab-badge" id="cnt-tab-admin">0</span></button>
+            </div>
+            <div id="modal-msg-container"><div style="text-align:center;padding:20px;color:#94a3b8">هیچ پیام جدیدی وجود ندارد.</div></div>
+        </div>
+    </div>
 
-        function renderWelcomeName(name) {
-            const welcomeDisplay = document.getElementById('user-welcome-display');
-            const welcomeText = document.getElementById('user-fullname-text');
-            if (welcomeDisplay && welcomeText && name) {
-                welcomeText.textContent = `خوش آمدید ${name}`;
-                welcomeDisplay.style.display = 'inline-flex';
-            }
-        }
+    <div class="modal" id="m-msg-detail" style="z-index:1050;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="detail-msg-title"><i class="fas fa-envelope-open"></i> مشاهده پیام</span>
+                <button class="modal-close" onclick="window.closeMsgDetailModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div style="overflow-y:auto;padding-right:6px">
+                <div id="detail-msg-date" style="font-size:11px;color:#94a3b8;direction:ltr;text-align:left;margin-bottom:10px;display:none;"></div>
+                <div id="detail-msg-body" style="font-size:13px;color:#cbd5e1;line-height:1.7;white-space:pre-wrap;margin-bottom:12px;"></div>
+                <div id="detail-msg-support"></div>
+            </div>
+        </div>
+    </div>
 
-        window.processCasinoDeposit = async function() {
-            const amtInput = document.getElementById('casino-deposit-amount');
-            const amt = parseFloat(amtInput?.value || 0);
-            if (amt <= 0) {
-                alert('لطفاً مبلغ معتبری وارد کنید.');
-                return;
-            }
-            userBalance += amt;
-            if (uUid) {
-                await supabase.from('users').update({ casino_balance: userBalance }).eq('id', uUid);
-            }
-            updateStats();
-            alert(`موجودی بازی به مبلغ $${amt.toFixed(2)} شارژ شد.`);
-            if(amtInput) amtInput.value = '';
-            closeCasinoDepositModal();
-        };
+    <div class="modal" id="m-about-modal" style="z-index:1050;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="t-about-modal-title"><i class="fas fa-info-circle"></i> درباره پلتفرم هوشمند زِنیکس</span>
+                <button class="modal-close" onclick="window.closeAboutModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div style="overflow-y:auto;padding-right:6px;font-size:12px;color:#cbd5e1;line-height:1.8;display:flex;flex-direction:column;gap:12px;">
+                <p id="t-about-modal-intro"></p>
+                <p id="t-about-modal-desc"></p>
+                <p id="t-about-modal-goal"></p>
+                <p id="t-about-modal-strategy"></p>
+                <p id="t-about-modal-conclusion" style="color:#94a3b8;border-top:1px dashed rgba(255,255,255,.08);padding-top:10px;margin-top:2px;"></p>
+            </div>
+        </div>
+    </div>
 
-        function drawWheel() {
-            const canvas = document.getElementById('rouletteWheel');
-            if(!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const numSlices = wheelNumbers.length;
-            const radius = canvas.width / 2;
-            const sliceAngle = (2 * Math.PI) / numSlices;
+    <div class="modal" id="m-help-modal" style="z-index:1050;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="t-help-modal-title"><i class="fas fa-circle-question" style="color:#38bdf8;"></i> راهنمای جامع داشبورد زِنیکس</span>
+                <button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div style="overflow-y:auto;padding-right:6px;font-size:12px;color:#cbd5e1;line-height:1.8;display:flex;flex-direction:column;gap:12px;">
+                <div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);border-radius:10px;padding:10px;margin-bottom:4px;">
+                    <p id="t-help-intro" style="color:#f8fafc;font-weight:600;">به بخش مدیریت و داشبورد کاربری پلتفرم زِنیکس خوش آمدید. در این بخش می‌توانید خلاصه‌ای از عملکرد مالی و دسترسی سریع به بخش‌های اصلی داشته باشید.</p>
+                </div>
+                
+                <div>
+                    <h4 style="color:#38bdf8;font-size:13px;margin-bottom:4px;" id="t-help-s1-title"><i class="fas fa-wallet" style="margin-left:5px;"></i> ۱. آمار و موجودی</h4>
+                    <p id="t-help-s1-desc">در بالای صفحه، کل موجودی حساب (USDT) و تعداد کاربران زیرمجموعه شبکه شما به صورت زنده نمایش داده می‌شود.</p>
+                </div>
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+                <div>
+                    <h4 style="color:#38bdf8;font-size:13px;margin-bottom:4px;" id="t-help-s2-title"><i class="fas fa-th-large" style="margin-left:5px;"></i> ۲. دسترسی سریع (میانبرها)</h4>
+                    <ul style="padding-right:18px;display:flex;flex-direction:column;gap:4px;" id="t-help-s2-list">
+                        <li><strong>کوانتیفیکیشن:</strong> ورود به بخش معاملات هوشمند و رباتیک و دریافت سود روزانه.</li>
+                        <li><strong>واریز:</strong> شارژ حساب کاربری از طریق ولت‌های دیجیتال با تأیید شبکه.</li>
+                        <li><strong>برداشت:</strong> ثبت درخواست برداشت درآمدها و دارایی‌ها به کیف پول شخصی.</li>
+                        <li><strong>تیم:</strong> مشاهده آمار کامل اعضا و لینک اختصاصی دعوت زیرمجموعه‌ها (سطوح ۱ تا ۳).</li>
+                        <li><strong>تراکنش‌ها:</strong> بررسی تاریخچه کامل وضیعت ریز تراکنش‌های مالی، واریزی‌ها و برداشت‌ها.</li>
+                        <li><strong>پروفایل:</strong> مدیریت امنیت حساب، رمز عبور و تنظیمات کاربری.</li>
+                    </ul>
+                </div>
 
-            for (let i = 0; i < numSlices; i++) {
-                const angle = i * sliceAngle;
-                const num = wheelNumbers[i];
+                <div>
+                    <h4 style="color:#38bdf8;font-size:13px;margin-bottom:4px;" id="t-help-s3-title"><i class="fas fa-chart-line" style="margin-left:5px;"></i> ۳. بازار ارزهای دیجیتال و اعلان‌ها</h4>
+                    <p id="t-help-s3-desc">قیمت ۳ ارز برتر بازار به صورت زنده به‌روزرسانی می‌شود. همچنین با کلیک روی آیکون زنگوله هدر می‌توانید پیام‌ها و اطلاعیه‌های سیستم را مشاهده کنید.</p>
+                </div>
 
-                if (num === 0) ctx.fillStyle = '#16a34a';
-                else if (redNumbers.includes(num)) ctx.fillStyle = '#dc2626';
-                else ctx.fillStyle = '#0f172a';
+                <div style="border-top:1px dashed rgba(255,255,255,.1);padding-top:8px;color:#94a3b8;font-size:11px;" id="t-help-footer">
+                    <i class="fas fa-headset" style="color:#a855f7;margin-left:4px;"></i> در صورت نیاز به راهنمایی بیشتر می‌توانید با پشتیبانی زِنیکس در ارتباط باشید.
+                </div>
+            </div>
+        </div>
+    </div>
 
-                ctx.beginPath();
-                ctx.moveTo(radius, radius);
-                ctx.arc(radius, radius, radius - 7, angle, angle + sliceAngle);
-                ctx.closePath();
-                ctx.fill();
-                ctx.strokeStyle = '#facc15';
-                ctx.lineWidth = 1;
-                ctx.stroke();
+    <footer>
+        <p>&copy; 2026 Zenix. All rights reserved.</p>
+    </footer>
 
-                ctx.save();
-                ctx.translate(radius, radius);
-                ctx.rotate(angle + sliceAngle / 2);
-                ctx.textAlign = 'right';
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 11px Orbitron';
-                ctx.fillText(num.toString(), radius - 16, 4);
-                ctx.restore();
-            }
-
-            ctx.beginPath();
-            ctx.arc(radius, radius, 38, 0, 2 * Math.PI);
-            ctx.fillStyle = '#2d160a';
-            ctx.fill();
-            ctx.strokeStyle = '#facc15';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-        }
-
-        function buildTable() {
-            const table = document.getElementById('roulette-table');
-            if(!table) return;
-
-            for (let r = 0; r < 3; r++) {
-                for (let c = 1; c <= 12; c++) {
-                    const num = (c - 1) * 3 + (3 - r);
-                    const cell = document.createElement('div');
-                    const isRed = redNumbers.includes(num);
-                    cell.className = `cell ${isRed ? 'red-num' : 'black-num'}`;
-                    cell.style.gridRow = `${r + 1}`;
-                    cell.style.gridColumn = `${c + 1}`;
-                    cell.setAttribute('data-bet', num.toString());
-                    cell.textContent = num;
-                    cell.onclick = () => placeBet(num.toString());
-                    table.appendChild(cell);
-                }
-            }
-
-            for (let r = 0; r < 3; r++) {
-                const cell = document.createElement('div');
-                cell.className = 'cell outside-bet';
-                cell.style.gridRow = `${r + 1}`;
-                cell.style.gridColumn = '14';
-                const colTarget = `COL_${3 - r}`;
-                cell.setAttribute('data-bet', colTarget);
-                cell.textContent = '2:1';
-                cell.onclick = () => placeBet(colTarget);
-                table.appendChild(cell);
-            }
-
-            const dozenBets = [
-                { name: '1st 12', target: 'DOZ_1', colSpan: '2 / span 4' },
-                { name: '2nd 12', target: 'DOZ_2', colSpan: '6 / span 4' },
-                { name: '3rd 12', target: 'DOZ_3', colSpan: '10 / span 4' }
-            ];
-            dozenBets.forEach(d => {
-                const cell = document.createElement('div');
-                cell.className = 'cell outside-bet';
-                cell.style.gridRow = '4';
-                cell.style.gridColumn = d.colSpan;
-                cell.setAttribute('data-bet', d.target);
-                cell.textContent = d.name;
-                cell.onclick = () => placeBet(d.target);
-                table.appendChild(cell);
-            });
-
-            const outsideBets = [
-                { name: '1-18', target: 'LOW', colSpan: '2 / span 2', cls: '' },
-                { name: 'EVEN', target: 'EVEN', colSpan: '4 / span 2', cls: '' },
-                { name: 'RED', target: 'RED', colSpan: '6 / span 2', cls: 'outside-red' },
-                { name: 'BLACK', target: 'BLACK', colSpan: '8 / span 2', cls: 'outside-black' },
-                { name: 'ODD', target: 'ODD', colSpan: '10 / span 2', cls: '' },
-                { name: '19-36', target: 'HIGH', colSpan: '12 / span 2', cls: '' }
-            ];
-            outsideBets.forEach(o => {
-                const cell = document.createElement('div');
-                cell.className = `cell outside-bet ${o.cls}`;
-                cell.style.gridRow = '5';
-                cell.style.gridColumn = o.colSpan;
-                cell.setAttribute('data-bet', o.target);
-                cell.textContent = o.name;
-                cell.onclick = () => placeBet(o.target);
-                table.appendChild(cell);
-            });
-        }
-
-        window.selectChip = function(val, elem) {
-            selectedChipVal = val;
-            document.querySelectorAll('.chip-select').forEach(c => c.classList.remove('active'));
-            elem.classList.add('active');
-            playSound(600, 'sine', 0.05);
-        };
-
-        window.placeBet = async function(target) {
-            if (gameState !== 'BETTING') return;
-            if (userBalance < selectedChipVal) {
-                alert('موجودی کافی نیست!');
-                return;
-            }
-
-            if (uUid) {
-                const { data, error } = await supabase.rpc('place_casino_bet', { p_target: target, p_amount: selectedChipVal });
-                if (error) {
-                    console.error('place_casino_bet RPC error:', error);
-                    alert('خطا در ارتباط با سرور: ' + (error.message || 'نامشخص'));
-                    return;
-                }
-                if (!data || !data.success) {
-                    alert(data?.message || 'خطا در ثبت شرط');
-                    return;
-                }
-                userBalance = data.new_balance;
-            } else {
-                userBalance -= selectedChipVal;
-            }
-
-            userBets.push({ target, amount: selectedChipVal });
-            playSound(800, 'triangle', 0.08);
-            renderChips();
-            updateStats();
-        };
-
-        function renderChips() {
-            document.querySelectorAll('.chip-on-table').forEach(c => c.remove());
-            const betMap = {};
-            userBets.forEach(b => {
-                if (!betMap[b.target]) betMap[b.target] = 0;
-                betMap[b.target] += b.amount;
-            });
-
-            Object.keys(betMap).forEach(target => {
-                const cell = document.querySelector(`[data-bet="${target}"]`);
-                if (cell) {
-                    const total = betMap[target];
-                    const chip = document.createElement('div');
-                    let cls = 'chip-1';
-                    if (total >= 100) cls = 'chip-100';
-                    else if (total >= 50) cls = 'chip-50';
-                    else if (total >= 10) cls = 'chip-10';
-                    else if (total >= 5) cls = 'chip-5';
-
-                    chip.className = `chip-on-table ${cls}`;
-                    chip.textContent = `$${total}`;
-                    cell.appendChild(chip);
-                }
-            });
-        }
-
-        window.clearUserBets = async function() {
-            if (gameState !== 'BETTING') return;
-            const totalRefund = userBets.reduce((sum, b) => sum + b.amount, 0);
-            userBalance += totalRefund;
-            if (uUid && totalRefund > 0) {
-                await supabase.from('users').update({ casino_balance: userBalance }).eq('id', uUid);
-                await supabase.from('casino_bets').delete().eq('user_id', uUid).eq('status', 'PENDING');
-            }
-            userBets = [];
-            renderChips();
-            updateStats();
-            playSound(300, 'sine', 0.1);
-        };
-
-        window.doubleUserBets = async function() {
-            if (gameState !== 'BETTING') return;
-            const totalCurrent = userBets.reduce((sum, b) => sum + b.amount, 0);
-            if (totalCurrent <= 0 || userBalance < totalCurrent) {
-                alert('موجودی کافی نیست!');
-                return;
-            }
-            const currentCopy = [...userBets];
-            for (let b of currentCopy) {
-                await placeBet(b.target);
-            }
-        };
-
-        window.quadrupleUserBets = async function() {
-            if (gameState !== 'BETTING') return;
-            const totalCurrent = userBets.reduce((sum, b) => sum + b.amount, 0);
-            if (totalCurrent <= 0 || userBalance < totalCurrent * 3) {
-                alert('موجودی کافی نیست!');
-                return;
-            }
-            for (let i = 0; i < 3; i++) {
-                const currentCopy = [...userBets];
-                for (let b of currentCopy) {
-                    await placeBet(b.target);
-                }
-            }
-        };
-
-        function updateStats() {
-            const totalBet = userBets.reduce((sum, b) => sum + b.amount, 0);
-            const betEl = document.getElementById('total-bet-val');
-            const balEl = document.getElementById('balance-val');
-            if(betEl) betEl.textContent = `$${totalBet.toFixed(2)}`;
-            if(balEl) balEl.textContent = `$${userBalance.toFixed(2)}`;
-        }
-
-        function startTimer() {
-            countdown = 10;
-            gameState = 'BETTING';
-            const msgEl = document.getElementById('status-msg');
-            if(msgEl) msgEl.textContent = 'ژتون خود را بگذارید';
-            document.querySelectorAll('.cell').forEach(c => c.classList.remove('winning-cell'));
-
-            if (timerInterval) clearInterval(timerInterval);
-
-            timerInterval = setInterval(async () => {
-                countdown--;
-                const timerEl = document.getElementById('timer-display');
-                if(timerEl) timerEl.textContent = countdown;
-
-                if (countdown <= 0) {
-                    clearInterval(timerInterval);
-                    
-                    let totalBetsCount = userBets.length;
-                    if (uUid) {
-                        try {
-                            const { count } = await supabase.from('casino_bets').select('*', { count: 'exact', head: true }).eq('status', 'PENDING');
-                            if (count !== null && count !== undefined) {
-                                totalBetsCount = count;
-                            }
-                        } catch(e) { /* pending-bet count is best-effort; the local count is used as a fallback */ }
-                    }
-
-                    if (totalBetsCount >= 2) {
-                        spinWheel();
-                    } else {
-                        if(msgEl) msgEl.textContent = 'انتظار برای ثبت حداقل ۲ شرط یا کاربر...';
-                        startTimer();
-                    }
-                }
-            }, 1000);
-        }
-
-        function spinWheel() {
-            gameState = 'SPINNING';
-            const msgEl = document.getElementById('status-msg');
-            const timerEl = document.getElementById('timer-display');
-            if(msgEl) msgEl.textContent = 'چرخش چرخ...';
-            if(timerEl) timerEl.textContent = '🌀';
-
-            const winningIndex = Math.floor(Math.random() * wheelNumbers.length);
-            const winningNumber = wheelNumbers[winningIndex];
-
-            const sliceAngleDeg = 360 / wheelNumbers.length;
-            const sliceCenterAngle = winningIndex * sliceAngleDeg + sliceAngleDeg / 2;
-            const baseRotation = 270 - sliceCenterAngle;
-            const targetDegree = 360 * 5 + baseRotation;
-
-            const canvas = document.getElementById('rouletteWheel');
-            if(canvas) {
-                canvas.style.transition = 'transform 3s cubic-bezier(0.15, 0.85, 0.15, 1)';
-                canvas.style.transform = `rotate(${targetDegree}deg)`;
-            }
-
-            let spinSoundInt = setInterval(() => playSound(200 + Math.random() * 100, 'square', 0.03), 100);
-
-            setTimeout(() => {
-                clearInterval(spinSoundInt);
-                evaluateResult(winningNumber);
-            }, 3100);
-        }
-
-        async function evaluateResult(winNum) {
-            gameState = 'RESULT';
-            const isRed = redNumbers.includes(winNum);
-            const winCell = document.querySelector(`[data-bet="${winNum}"]`);
-            if (winCell) winCell.classList.add('winning-cell');
-
-            let totalPayout = 0;
-
-            if (uUid && userBets.length > 0) {
-                const { data, error } = await supabase.rpc('settle_casino_bets', { p_win_num: winNum });
-                if (!error && data && data.success) {
-                    totalPayout = data.payout;
-                }
-            } else {
-                userBets.forEach(b => {
-                    let won = false; let mult = 0;
-                    if (b.target === winNum.toString()) { won = true; mult = 36; }
-                    else if (b.target === 'RED' && isRed) { won = true; mult = 2; }
-                    else if (b.target === 'BLACK' && !isRed && winNum !== 0) { won = true; mult = 2; }
-                    else if (b.target === 'EVEN' && winNum !== 0 && winNum % 2 === 0) { won = true; mult = 2; }
-                    else if (b.target === 'ODD' && winNum !== 0 && winNum % 2 !== 0) { won = true; mult = 2; }
-                    else if (b.target === 'LOW' && winNum >= 1 && winNum <= 18) { won = true; mult = 2; }
-                    else if (b.target === 'HIGH' && winNum >= 19 && winNum <= 36) { won = true; mult = 2; }
-                    else if (b.target === 'DOZ_1' && winNum >= 1 && winNum <= 12) { won = true; mult = 3; }
-                    else if (b.target === 'DOZ_2' && winNum >= 13 && winNum <= 24) { won = true; mult = 3; }
-                    else if (b.target === 'DOZ_3' && winNum >= 25 && winNum <= 36) { won = true; mult = 3; }
-                    if (won) totalPayout += b.amount * mult;
-                });
-                userBalance += totalPayout;
-            }
-
-            await fetchUserBalance();
-
-            const colorName = winNum === 0 ? 'سبز' : (isRed ? 'قرمز' : 'مشکی');
-            const msgEl = document.getElementById('status-msg');
-            if (totalPayout > 0) {
-                if(msgEl) msgEl.textContent = `🎉 عدد ${winNum} - برد $${totalPayout.toFixed(2)}`;
-                playSound(1200, 'sine', 0.4);
-            } else {
-                if(msgEl) msgEl.textContent = `برنده: ${winNum} (${colorName})`;
-            }
-
-            addHistory(winNum);
-
-            setTimeout(() => {
-                const canvas = document.getElementById('rouletteWheel');
-                if(canvas) {
-                    canvas.style.transition = 'none';
-                    canvas.style.transform = 'rotate(0deg)';
-                }
-                userBets = [];
-                renderChips();
-                updateStats();
-                startTimer();
-            }, 3000);
-        }
-
-        function addHistory(num) {
-            const histList = document.getElementById('history-list');
-            if(!histList) return;
-            const elem = document.createElement('div');
-            const isRed = redNumbers.includes(num);
-            const cls = num === 0 ? 'hist-green' : (isRed ? 'hist-red' : 'hist-black');
-            elem.className = `hist-num ${cls}`;
-            elem.textContent = num;
-            histList.insertBefore(elem, histList.firstChild);
-            if (histList.children.length > 5) histList.removeChild(histList.lastChild);
-        }
-
-        async function initSession() {
-            try {
-                const { data: { session } } = await supabase.auth.getSession();
-                if (session && session.user) {
-                    currentUser = session.user;
-                    uUid = session.user.id;
-                    const name = session.user.user_metadata?.fullname || session.user.user_metadata?.full_name;
-                    if (name) renderWelcomeName(name);
-                    await fetchUserBalance();
-                }
-            } catch(e) {
-                console.warn('Session init failed:', e);
-            }
-        }
-
-        supabase.auth.onAuthStateChange(async (event, session) => {
-            if (session && session.user) {
-                currentUser = session.user;
-                uUid = session.user.id;
-                const name = session.user.user_metadata?.fullname || session.user.user_metadata?.full_name;
-                if (name) renderWelcomeName(name);
-                await fetchUserBalance();
-            }
-        });
-
-        // ---- Initialization ----
-        drawWheel();
-        buildTable();
-        updateStats();
-        startTimer();
-        initSession();
-    </script>
+    <script src="https://cdn.jsdmirror.com/npm/@supabase/supabase-js@2" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="module" src="dashboard.js?v=22"></script>
 </body>
 </html>
