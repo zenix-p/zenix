@@ -290,19 +290,19 @@
     </div>
 
     <script>
-       function togglePassword(id,btn){
-    const input=document.getElementById(id);
-    btn.textContent='';
-    const icon=document.createElement('i');
-    if(input.type==='password'){
-        input.type='text';
-        icon.className='fas fa-eye-slash';
-    } else {
-        input.type='password';
-        icon.className='fas fa-eye';
-    }
-    btn.appendChild(icon);
-}
+        function togglePassword(id,btn){
+            const input=document.getElementById(id);
+            btn.textContent='';
+            const icon=document.createElement('i');
+            if(input.type==='password'){
+                input.type='text';
+                icon.className='fas fa-eye-slash';
+            } else {
+                input.type='password';
+                icon.className='fas fa-eye';
+            }
+            btn.appendChild(icon);
+        }
     </script>
 
     <script type="module">
@@ -427,32 +427,32 @@
             submitBtn.disabled = !(emailOk && passOk && capOk);
         }
 
-document.addEventListener('cf-token-ready', checkInputs);
+        document.addEventListener('cf-token-ready', checkInputs);
 
         userIn.addEventListener('focus', clearError);
         userIn.addEventListener('input', () => { clearError(); checkInputs(); });
         passIn.addEventListener('focus', clearError);
         passIn.addEventListener('input', checkInputs);
 
-       function showError(errKey) {
-    const t = langData[currentLang] || langData.en;
-    msg.textContent = t[errKey] || errKey;
-    msg.className = 'err show';
-    checkInputs();
-}
+        function showError(errKey) {
+            const t = langData[currentLang] || langData.en;
+            msg.textContent = t[errKey] || errKey;
+            msg.className = 'err show';
+            checkInputs();
+        }
 
-  function showBanned() {
-    const t = langData[currentLang] || langData.en;
-    msg.textContent = '';
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-ban';
-    icon.style.marginInlineEnd = '6px';
-    msg.appendChild(icon);
-    msg.appendChild(document.createTextNode(t.errDisabled));
-    msg.className = 'err show';
-    submitBtn.disabled = false;
-    isSubmitting = false;
-}
+        function showBanned() {
+            const t = langData[currentLang] || langData.en;
+            msg.textContent = '';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-ban';
+            icon.style.marginInlineEnd = '6px';
+            msg.appendChild(icon);
+            msg.appendChild(document.createTextNode(t.errDisabled));
+            msg.className = 'err show';
+            submitBtn.disabled = false;
+            isSubmitting = false;
+        }
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -490,9 +490,9 @@ document.addEventListener('cf-token-ready', checkInputs);
                 }
 
                 const t = langData[currentLang] || langData.en;
-msg.textContent = t.succ;
-msg.className = 'succ show';
-setTimeout(() => { window.location.href = targetPage; }, 1000);
+                msg.textContent = t.succ;
+                msg.className = 'succ show';
+                setTimeout(() => { window.location.href = targetPage; }, 1000);
             } catch (error) {
                 if (currentSubmit !== submitCounter) { isSubmitting = false; return; }
                 console.error('Login Error:', error);
@@ -502,12 +502,11 @@ setTimeout(() => { window.location.href = targetPage; }, 1000);
                 try { if (window.turnstile) window.turnstile.reset(); } catch(e) {}
 
                 if (error.status === 429 || (error.message && error.message.toLowerCase().includes('too many requests'))) {
-    const t = langData[currentLang] || langData.en;
-    msg.textContent = t.errTooMany;
-    msg.className = 'err show';
-} else {
-    showError('errNoUser');
-}
+                    const t = langData[currentLang] || langData.en;
+                    msg.textContent = t.errTooMany;
+                    msg.className = 'err show';
+                } else {
+                    showError('errNoUser');
                 }
                 checkInputs();
             }
