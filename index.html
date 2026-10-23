@@ -88,7 +88,6 @@
         html[dir="ltr"] .group input{padding-left:40px;padding-right:40px}
         .group input:-webkit-autofill,.group input:-webkit-autofill:hover,.group input:-webkit-autofill:focus,.group input:-webkit-autofill:active{-webkit-box-shadow:0 0 0 30px rgba(10,15,30,.95) inset!important;-webkit-text-fill-color:#fff!important;caret-color:#fff}
 
-        /* ==== پلیس‌هولدر کم‌رنگ و نامحسوس ==== */
         #user::placeholder,
         #pass::placeholder{
             color:#64748b !important;
@@ -131,7 +130,35 @@
             border-bottom: none !important;
             outline: none;
         }
-        
+
+        /* ============================================================
+           ★ کادر Cloudflare Turnstile — هم‌رنگ با پلتفرم
+           ============================================================ */
+        .captcha-wrap{
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            padding:8px 10px;
+            margin-bottom:14px;
+            background:rgba(10,15,30,.7);
+            border:1px solid rgba(255,255,255,.1);
+            border-radius:12px;
+            overflow:hidden;
+            transition:border-color .2s ease, box-shadow .2s ease;
+        }
+        .captcha-wrap:hover{ border-color:rgba(56,189,248,.35); }
+        .captcha-wrap .cf-turnstile{
+            width:100%;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+        /* خود iframe کلودفلر — نمی‌شه داخلش رو تغییر داد، ولی می‌شه ظاهرش رو تیره‌تر کرد تا با کارت یکی بشه */
+        .captcha-wrap .cf-turnstile iframe{
+            border-radius:8px;
+            filter: brightness(0.85) contrast(1.05);
+        }
+
         .extra-links{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;font-size:11px}
         .extra-links a{color:#38bdf8;text-decoration:none}
         .extra-links a:hover{text-decoration:underline}
@@ -144,11 +171,9 @@
         .err{color:#f87171;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3)}
         .succ{color:#4ade80;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3)}
 
-        /* ============ موبایل: تنظیم سایز فونت‌ها ============ */
+        /* ============ موبایل ============ */
         @media (max-width: 768px) {
-            /* فونت داخل input کوچک‌تر از قبل (به‌جای 16px) */
             .group input { font-size: 14px !important; }
-            /* فقط هنگام فوکوس به ۱۶px می‌ره تا iOS زوم خودکار نکنه */
             .group input:focus { font-size: 16px !important; }
             #user::placeholder, #pass::placeholder { font-size: 13px !important; }
 
@@ -177,6 +202,8 @@
             #msg { font-size: 11px; padding: 10px; }
             .lb { height: 34px; width: 34px; font-size: 12px; }
             .mi { font-size: 11px; padding: 6px 10px; }
+
+            .captcha-wrap{ padding:6px 8px; margin-bottom:12px; }
         }
     </style>
 </head>
@@ -247,10 +274,12 @@
                 </div>
             </div>
             
-            <div class="group" style="display:flex; justify-content:center; margin-bottom:14px;">
+            <!-- ★ Turnstile داخل کادر هم‌رنگ با پلتفرم -->
+            <div class="captcha-wrap">
                 <div class="cf-turnstile"
                      data-sitekey="0x4AAAAAAFaU1RVZfnTURKOc"
                      data-theme="dark"
+                     data-size="flexible"
                      data-callback="onCaptchaSuccess"
                      data-expired-callback="onCaptchaExpired"
                      data-error-callback="onCaptchaError"></div>
@@ -326,9 +355,6 @@
         hardDisableSpellcheck(userIn);
         hardDisableSpellcheck(passIn);
 
-        /* ================================================================
-           ★ پاک شدن پلیس‌هولدر هنگام فوکوس + بازگشت هنگام بلور (اگر خالی باشد)
-           ================================================================ */
         function setupPlaceholderClear(inp, getPh) {
             inp.addEventListener('focus', () => { inp.placeholder = ''; });
             inp.addEventListener('blur', () => {
