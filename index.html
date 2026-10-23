@@ -33,8 +33,6 @@
         };
     </script>
 
-    <!-- ★ اسکریپت Turnstile حذف شد — به صورت lazy در JS بارگذاری می‌شود -->
-
     <script>(function(){var s=localStorage.getItem('zenix_lang')||'en',r=['fa','ar'];document.documentElement.setAttribute('dir',r.includes(s)?'rtl':'ltr');document.documentElement.setAttribute('lang',s);})();</script>
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Vazirmatn',system-ui,sans-serif}
@@ -298,7 +296,6 @@
                 </div>
             </div>
             
-            <!-- ★ Turnstile: رندر دستی (Lazy) -->
             <div class="captcha-wrap">
                 <div id="turnstile-container">
                     <div class="captcha-loading">⏳ Loading security check...</div>
@@ -358,12 +355,9 @@
         let currentLang = localStorage.getItem('zenix_lang') || 'en';
         let submitCounter = 0;
         let isSubmitting = false;
-
-        // ── Rate Limiting سمت کلاینت ──
-        const MAX_ATTEMPTS = 5;
-        const LOCKOUT_MS = 60 * 60 * 1000; // ۱ ساعت
-        let attemptCount = parseInt(localStorage.getItem('zenix_attempts') || '0', 10);
-        let lockoutUntil = parseInt(localStorage.getItem('zenix_lockout_until') || '0', 10);
+        
+        // ── Lockout State (In-Memory, authoritative from DB) ──
+        let currentLockoutUntil = 0;
         let countdownTimer = null;
 
         // ── Turnstile Lazy Load ──
@@ -468,37 +462,14 @@
             initTurnstile();
         }
 
-        // ── Rate Limit helpers ──
+        // ── Lockout Helpers (DB-backed) ──
         function getRemainingLockoutSec() {
             const now = Date.now();
-            if (lockoutUntil > now) return Math.ceil((lockoutUntil - now) / 1000);
-            if (lockoutUntil > 0 && lockoutUntil <= now) {
-                attemptCount = 0;
-                lockoutUntil = 0;
-                localStorage.removeItem('zenix_attempts');
-                localStorage.removeItem('zenix_lockout_until');
+            if (currentLockoutUntil > now) return Math.ceil((currentLockoutUntil - now) / 1000);
+            if (currentLockoutUntil > 0 && currentLockoutUntil <= now) {
+                currentLockoutUntil = 0;
             }
             return 0;
-        }
-
-        function registerFailedAttempt() {
-            attemptCount++;
-            localStorage.setItem('zenix_attempts', String(attemptCount));
-            if (attemptCount >= MAX_ATTEMPTS) {
-                lockoutUntil = Date.now() + LOCKOUT_MS;
-                localStorage.setItem('zenix_lockout_until', String(lockoutUntil));
-                attemptCount = 0;
-                localStorage.setItem('zenix_attempts', '0');
-                return true;
-            }
-            return false;
-        }
-
-        function resetAttempts() {
-            attemptCount = 0;
-            lockoutUntil = 0;
-            localStorage.removeItem('zenix_attempts');
-            localStorage.removeItem('zenix_lockout_until');
         }
 
         function formatRemain(sec) {
@@ -574,7 +545,6 @@
             document.getElementById('t-remember').textContent = t.remember;
             document.getElementById('t-forgot').textContent = t.forgot;
             submitBtn.textContent = t.btn;
-            // ── ساخت ایمن footer ──
             const footEl = document.getElementById('t-foot');
             footEl.textContent = '';
             footEl.appendChild(document.createTextNode(t.noAcc + ' '));
@@ -588,7 +558,6 @@
             authCard.classList.add('ready');
             hardDisableSpellcheck(userIn);
             hardDisableSpellcheck(passIn);
-            // اگر خطای کپچا نمایش داده شده، متنش را به‌روز کن
             if (turnstileLoadFailed) {
                 const errDiv = turnstileContainer?.querySelector('.captcha-error');
                 if (errDiv) errDiv.textContent = t.errCaptchaLoad;
@@ -646,14 +615,13 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // بررسی قفل
+            // بررسی قفل محلی (برای جلوگیری از ارسال درخواست در حین قفل)
             if (getRemainingLockoutSec() > 0) {
                 startCountdownIfNeeded();
                 checkInputs();
                 return;
             }
 
-            // اگر Turnstile هنوز شروع نشده، همین حالا شروع کن
             if (!turnstileInitStarted) {
                 startTurnstileLoad();
             }
@@ -665,7 +633,6 @@
 
             const captchaToken = getCaptchaToken();
             if (!captchaToken) {
-                // اگر کپچا هنوز آماده نیست، پیام مناسب بده
                 if (turnstileLoadFailed) {
                     return showError('errCaptchaLoad');
                 }
@@ -678,6 +645,18 @@
             clearError();
 
             try {
+                // ── 1. بررسی قفل از دیتابیس ──
+                const { data: lockoutTime, error: lockError } = await supabaseClient.rpc('check_login_lockout', { user_email: emailVal });
+
+                if (lockError) throw lockError;
+                if (lockoutTime) {
+                    currentLockoutUntil = new Date(lockoutTime).getTime();
+                    isSubmitting = false;
+                    startCountdownIfNeeded();
+                    return;
+                }
+
+                // ── 2. تلاش برای ورود ──
                 const { data, error } = await supabaseClient.auth.signInWithPassword({
                     email: emailVal,
                     password: passVal,
@@ -685,7 +664,28 @@
                 });
 
                 if (currentSubmit !== submitCounter) { isSubmitting = false; return; }
-                if (error) throw error;
+
+                if (error) {
+                    // ── 3. ثبت تلاش ناموفق در دیتابیس ──
+                    await supabaseClient.rpc('record_failed_login', { user_email: emailVal });
+                    
+                    // بررسی اینکه آیا این تلاش باعث قفل شد؟
+                    const { data: newLockout } = await supabaseClient.rpc('check_login_lockout', { user_email: emailVal });
+                    if (newLockout) {
+                        currentLockoutUntil = new Date(newLockout).getTime();
+                        startCountdownIfNeeded();
+                    } else {
+                        showError('errNoUser');
+                    }
+                    isSubmitting = false;
+                    try { if (window.turnstile && turnstileWidgetId !== null) window.turnstile.reset(turnstileWidgetId); } catch(e) {}
+                    checkInputs();
+                    return;
+                }
+
+                // ── 4. ورود موفق ──
+                await supabaseClient.rpc('clear_failed_login', { user_email: emailVal });
+                currentLockoutUntil = 0;
 
                 const targetPage = await getTargetPage(data.user.id);
                 if (currentSubmit !== submitCounter) { isSubmitting = false; return; }
@@ -697,12 +697,11 @@
                     return;
                 }
 
-                resetAttempts();
-
                 const t = langData[currentLang] || langData.en;
                 msg.textContent = t.succ;
                 msg.className = 'succ show';
                 setTimeout(() => { window.location.href = targetPage; }, 1000);
+
             } catch (error) {
                 if (currentSubmit !== submitCounter) { isSubmitting = false; return; }
                 console.error('Login Error:', error);
@@ -716,12 +715,7 @@
                     msg.textContent = t.errTooMany;
                     msg.className = 'err show';
                 } else {
-                    const locked = registerFailedAttempt();
-                    if (locked) {
-                        startCountdownIfNeeded();
-                    } else {
-                        showError('errNoUser');
-                    }
+                    showError('errNoUser');
                 }
                 checkInputs();
             }
@@ -733,12 +727,9 @@
             checkInputs();
         });
 
-        // ── Turnstile: شروع بارگذاری هوشمند ──
-        // ۱. با اولین تعامل کاربر با فرم
         userIn.addEventListener('focus', startTurnstileLoad, { once: true });
         passIn.addEventListener('focus', startTurnstileLoad, { once: true });
 
-        // ۲. یا بعد از لود کامل صفحه (fallback)
         if (document.readyState === 'complete') {
             setTimeout(startTurnstileLoad, 500);
         } else {
