@@ -52,7 +52,6 @@ function generateUIDDigits(userId) {
 // ==========================================
 function lockBody() { document.body.classList.add('modal-open'); }
 function unlockBody() {
-    // اگر هیچ مدال دیگری باز نیست، اسکرول را آزاد کن
     setTimeout(() => {
         const anyOpen = document.querySelector('.modal.show');
         if (!anyOpen) document.body.classList.remove('modal-open');
@@ -89,11 +88,36 @@ window.closeCasinoModal = function() {
     unlockBody();
 };
 
-// ★ آکاردئون راهنما
+// ★ آکاردئون راهنما — نسخه بهبودیافته با اسکرول هوشمند
 window.toggleHelpAccordion = function(btn) {
     const item = btn.closest('.help-accordion');
     if (!item) return;
+    const wasOpen = item.classList.contains('open');
     item.classList.toggle('open');
+
+    // اگر تازه باز شد، بعد از اتمام انیمیشن، کارت را در دید نگه دار
+    if (!wasOpen) {
+        setTimeout(() => {
+            const body = item.closest('.help-modal-body');
+            if (!body) return;
+            const itemTop = item.offsetTop;
+            const itemBottom = itemTop + item.offsetHeight;
+            const bodyScrollTop = body.scrollTop;
+            const bodyHeight = body.clientHeight;
+
+            if (itemBottom > bodyScrollTop + bodyHeight - 20) {
+                body.scrollTo({
+                    top: itemBottom - bodyHeight + 20,
+                    behavior: 'smooth'
+                });
+            } else if (itemTop < bodyScrollTop + 20) {
+                body.scrollTo({
+                    top: itemTop - 20,
+                    behavior: 'smooth'
+                });
+            }
+        }, 420);
+    }
 };
 
 // ★ متن معرفی جمع‌شونده
