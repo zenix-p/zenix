@@ -1,521 +1,884 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-<head>
-    <meta charset="UTF-8">
-    <script>
-        (function () {
-            var supported = ['en', 'fa', 'ar', 'tr', 'ru', 'es', 'fr', 'de'];
-            var language = 'en';
-            try {
-                var saved = localStorage.getItem('zenix_lang');
-                if (supported.indexOf(saved) !== -1) language = saved;
-            } catch (e) {}
-            document.documentElement.setAttribute('lang', language);
-            document.documentElement.setAttribute('dir', language === 'fa' || language === 'ar' ? 'rtl' : 'ltr');
-        })();
-    </script>
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>Zenix - Dashboard</title>
-    <link rel="icon" href="data:image/x-icon;base64,=">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.cn">
-    <link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin>
-    <link href="https://fonts.googleapis.cn/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-    
-    <style>
-        *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
-        html{scroll-behavior:smooth}
-        body{background:#030712;min-height:100vh;min-height:100dvh;color:#f8fafc;display:flex;flex-direction:column;overflow-x:hidden;overscroll-behavior-y:contain}
-        body.modal-open{overflow:hidden;touch-action:none}
-        ::-webkit-scrollbar{width:8px;height:8px}
-        ::-webkit-scrollbar-track{background:rgba(15,23,42,.4)}
-        ::-webkit-scrollbar-thumb{background:rgba(56,189,248,.3);border-radius:10px}
-        ::-webkit-scrollbar-thumb:hover{background:rgba(56,189,248,.6)}
+// ==========================================
+// 1. تنظیمات اولیه و اتصال به سوبابیس
+// ==========================================
+import { createClient } from 'https://cdn.jsdmirror.com/npm/@supabase/supabase-js@2/+esm';
+const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
 
-        header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1);padding:10px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
-        .logo{display:flex;align-items:center;gap:10px}
-        .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#0ea5e9,#9333ea);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;font-style:italic;transform:skewX(-6deg);box-shadow:0 0 15px rgba(14,165,233,.4)}
-        .logo-text{font-family:'Orbitron',sans-serif;font-size:19px;font-weight:900;letter-spacing:2px;font-style:italic;transform:skewX(-6deg);background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 20px rgba(56,189,248,0.4)}
-        .hr{display:flex;align-items:center;gap:8px}
-        .wrap{position:relative}
-        .lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none}
-        .badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;font-weight:700}
-        .badge.show{display:flex}
-        .menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;min-width:max-content;padding:6px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8)}
-        [dir="rtl"] .wrap .menu{left:0}
-        [dir="ltr"] .wrap .menu{right:0}
-        .menu.show{display:block}
-        .mi{padding:7px 10px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap}
-        .mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}
-        .c{max-width:900px;width:100%;margin:15px auto;padding:0 12px;flex:1}
+function escapeHtml(value) {
+    return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
 
-        .wel{background:linear-gradient(135deg,rgba(2,132,199,.15),rgba(147,51,234,.15));border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px;margin-bottom:12px;display:flex;flex-direction:column;gap:3px}
-        .wel-head{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
-        .wel-head h1{font-size:16px;margin:0;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#f8fafc;font-weight:800}
-        .wel p{color:#94a3b8;font-size:11px;margin:0}
-        .wel-verified{font-size:11px;background:rgba(56,189,248,.1);border:1px solid #38bdf8;padding:4px 8px;border-radius:6px;color:#38bdf8;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:4px}
+function safeGetItem(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
+function safeSetItem(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
 
-        .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:12px}
-        .sc{border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;min-width:0}
-        .sc-bal{background:linear-gradient(135deg,rgba(15,23,42,.95),rgba(14,165,233,.18));border:1px solid rgba(56,189,248,.4)}
-        .sc-ref{background:linear-gradient(135deg,rgba(15,23,42,.95),rgba(168,85,247,.18));border:1px solid rgba(168,85,247,.4)}
-        .sc-bal .si{width:40px;height:40px;background:rgba(56,189,248,.2);border:1px solid #38bdf8;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#38bdf8;font-size:16px;flex-shrink:0}
-        .sc-ref .si{width:40px;height:40px;background:rgba(168,85,247,.2);border:1px solid #a855f7;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#c084fc;font-size:16px;flex-shrink:0}
-        .sn{min-width:0}
-        .sn span{font-size:11px;color:#94a3b8;display:block;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .sn h3{font-size:16px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+const customStorage = {
+    getItem: (key) => safeGetItem(key),
+    setItem: (key, value) => safeSetItem(key, value),
+    removeItem: (key) => { try { localStorage.removeItem(key); } catch(e) {} }
+};
 
-        .banner-box{width:100%;max-height:150px;margin-bottom:12px;border-radius:12px;overflow:hidden;border:1px solid rgba(56,189,248,.35);box-shadow:0 10px 25px rgba(2,132,199,.15)}
-        .banner-box img{width:100%;height:150px;display:block;object-fit:cover}
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+        persistSession: true,
+        storage: customStorage,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+    }
+});
 
-        .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}
-        .nc{background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px;text-decoration:none;color:inherit;display:flex;align-items:center;justify-content:space-between;min-width:0}
-        .nc:hover{border-color:#38bdf8;background:rgba(15,23,42,1)}
-        .ncl{display:flex;align-items:center;gap:10px;min-width:0}
-        .nci{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
-        .ninf{min-width:0}
-        .ninf h3{font-size:14px;color:#f8fafc;margin-bottom:2px}
-        .ninf p{font-size:11px;color:#94a3b8}
-        .nca{color:#64748b;font-size:12px;margin-inline-start:4px}
+let currentUserId = null;
+let currentUserName = '';
+let allMessages = [];
+let currentNotifFilter = 'all';
 
-        .market-box{background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px;margin-bottom:12px}
-        #crypto-ticker-list{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-        @media(max-width:768px){#crypto-ticker-list{grid-template-columns:1fr}}
-        .crypto-row{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid rgba(255,255,255,0.05);font-size:12px;direction:ltr;transition:all .4s ease}
-        .crypto-info{display:flex;align-items:center;gap:8px}
-        .crypto-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;overflow:hidden}
-        .crypto-icon img{width:100%;height:100%;object-fit:cover}
-        .price-up{color:#22c55e!important;font-weight:bold}
-        .price-down{color:#ef4444!important;font-weight:bold}
+function generateUIDDigits(userId) {
+    if (!userId) return '000000';
+    let hash = 5381;
+    let str = String(userId);
+    for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) + hash) + str.charCodeAt(i);
+    }
+    return (Math.abs(hash % 900000) + 100000).toString();
+}
 
-        .platform-info-box{background:rgba(15,23,42,.85);border:1px solid rgba(56,189,248,.25);border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 10px 30px rgba(0,0,0,.5);position:relative}
-        .about-box-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px}
-        .about-box-head .about-icon{width:34px;height:34px;background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#38bdf8;font-size:15px;flex-shrink:0}
-        .about-box-head h3{font-size:13px;color:#38bdf8;font-weight:800;margin:0}
-        .about-content{font-size:11px;color:#cbd5e1;line-height:1.8;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden;transition:max-height .4s ease}
-        .about-content p{margin:0}
-        .platform-info-box:not(.expanded) .about-content{max-height:120px}
-        .platform-info-box.expanded .about-content{max-height:4000px}
-        .platform-info-box:not(.expanded) .about-content::after{content:'';position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(180deg,transparent,rgba(15,23,42,.98));pointer-events:none}
-        .about-toggle{background:transparent;border:1px solid rgba(56,189,248,.35);color:#38bdf8;padding:7px 14px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;margin-top:10px;display:inline-flex;align-items:center;gap:6px;transition:.2s}
-        .about-toggle:hover{background:rgba(56,189,248,.15)}
-        .about-toggle i{transition:transform .3s;font-size:9px}
-        .platform-info-box.expanded .about-toggle i{transform:rotate(180deg)}
-        @media(min-width:769px){
-            .platform-info-box:not(.expanded) .about-content{max-height:none}
-            .platform-info-box:not(.expanded) .about-content::after{display:none}
-            .about-toggle{display:none}
-        }
+// ==========================================
+// 2. مدیریت مدال‌ها + قفل اسکرول
+// ==========================================
+function lockBody() { document.body.classList.add('modal-open'); }
+function unlockBody() {
+    setTimeout(() => {
+        const anyOpen = document.querySelector('.modal.show');
+        if (!anyOpen) document.body.classList.remove('modal-open');
+    }, 50);
+}
 
-        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px);padding:10px}
-        .modal.show{display:flex}
-        .modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(56,189,248,.3);border-radius:20px;width:100%;max-width:460px;max-height:85vh;display:flex;flex-direction:column;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.9);overflow:hidden}
-        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;color:#38bdf8;font-weight:800;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;flex-shrink:0}
-        .modal-close{background:rgba(255,255,255,.05);border:none;color:#94a3b8;cursor:pointer;font-size:14px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:.2s}
-        .modal-close:hover{background:rgba(239,68,68,.2);color:#ef4444}
+window.openAboutModal = function() {
+    document.getElementById('m-about-modal')?.classList.add('show');
+    lockBody();
+    closeAllMenus();
+};
+window.closeAboutModal = function() {
+    document.getElementById('m-about-modal')?.classList.remove('show');
+    unlockBody();
+};
 
-        .notif-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
-        .notif-tab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#94a3b8;padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;white-space:nowrap;transition:0.2s;display:flex;align-items:center;justify-content:center;gap:5px;flex:1 1 auto}
-        .notif-tab:hover{background:rgba(56,189,248,.15);color:#38bdf8}
-        .notif-tab.active{background:#38bdf8;color:#0f172a;font-weight:bold;border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.3)}
-        .tab-badge{background:rgba(255,255,255,.15);color:inherit;padding:1px 6px;border-radius:10px;font-size:10px;font-weight:700;line-height:1.2;min-width:16px;text-align:center;display:inline-block}
-        .notif-tab.active .tab-badge{background:rgba(15,23,42,.3);color:#0f172a}
+window.openHelpModal = function() {
+    document.getElementById('m-help-modal')?.classList.add('show');
+    lockBody();
+    closeAllMenus();
+};
+window.closeHelpModal = function() {
+    document.getElementById('m-help-modal')?.classList.remove('show');
+    unlockBody();
+};
 
-        #modal-msg-container, .modal-content div[style*="overflow-y:auto"]{overflow-y:auto;padding-right:6px}
-        #modal-msg-container::-webkit-scrollbar, .modal-content div::-webkit-scrollbar{width:5px}
-        #modal-msg-container::-webkit-scrollbar-track, .modal-content div::-webkit-scrollbar-track{background:rgba(15,23,42,.6);border-radius:10px}
-        #modal-msg-container::-webkit-scrollbar-thumb, .modal-content div::-webkit-scrollbar-thumb{background:rgba(56,189,248,.35);border-radius:10px}
-        #modal-msg-container::-webkit-scrollbar-thumb:hover, .modal-content div::-webkit-scrollbar-thumb:hover{background:rgba(56,189,248,.7)}
+window.openCasinoModal = function() {
+    document.getElementById('m-casino-modal')?.classList.add('show');
+    lockBody();
+    closeAllMenus();
+};
+window.closeCasinoModal = function() {
+    document.getElementById('m-casino-modal')?.classList.remove('show');
+    unlockBody();
+};
 
-        .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px;transition:0.2s}
-        .msg-body-box:hover{border-color:rgba(56,189,248,.5)!important;opacity:1!important;}
-        .msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:0}
-        .msg-desc-text{font-size:12px;color:#cbd5e1;line-height:1.5}
+// آکاردئون راهنما
+window.toggleHelpAccordion = function(btn) {
+    const item = btn.closest('.help-accordion');
+    if (!item) return;
+    const wasOpen = item.classList.contains('open');
+    item.classList.toggle('open');
 
-        /* ★★★ مدال راهنما — نسخه اصلاح‌شده ★★★ */
-        .help-modal-content{max-width:520px;padding:0!important;overflow:hidden;display:flex;flex-direction:column;max-height:88vh;border:1px solid rgba(56,189,248,.4)!important;box-shadow:0 25px 60px rgba(2,132,199,.25),0 0 0 1px rgba(56,189,248,.1)!important}
-        .help-modal-header{background:linear-gradient(135deg,rgba(56,189,248,.25),rgba(168,85,247,.25));padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.12);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-shrink:0;position:relative;overflow:hidden}
-        .help-modal-header::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 0%,rgba(56,189,248,.3),transparent 60%);pointer-events:none}
-        .help-modal-brand{display:flex;align-items:center;gap:12px;flex:1;min-width:0;position:relative;z-index:1}
-        .help-modal-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#38bdf8,#a855f7);display:flex;align-items:center;justify-content:center;color:#fff;font-size:19px;flex-shrink:0;box-shadow:0 8px 20px rgba(56,189,248,.45);position:relative}
-        .help-modal-icon::after{content:'';position:absolute;inset:-3px;border-radius:14px;background:linear-gradient(135deg,#38bdf8,#a855f7);opacity:.3;z-index:-1;filter:blur(8px)}
-        .help-modal-title-wrap{min-width:0;flex:1}
-        .help-modal-title-wrap h2{font-size:14px;color:#f8fafc;font-weight:800;margin:0 0 3px;text-shadow:0 1px 4px rgba(0,0,0,.4)}
-        .help-modal-title-wrap p{font-size:10.5px;color:#cbd5e1;margin:0;font-weight:500}
-        .help-modal-body{overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px;flex:1;min-height:0;scroll-behavior:smooth;overscroll-behavior:contain}
-        .help-hero{background:linear-gradient(135deg,rgba(56,189,248,.12),rgba(168,85,247,.12));border:1px solid rgba(56,189,248,.3);border-radius:10px;padding:12px 14px;flex-shrink:0}
-        .help-hero p{font-size:11.5px;color:#e2e8f0;line-height:1.75;margin:0;font-weight:500}
+    if (!wasOpen) {
+        setTimeout(() => {
+            const body = item.closest('.help-modal-body');
+            if (!body) return;
+            const itemTop = item.offsetTop;
+            const itemBottom = itemTop + item.offsetHeight;
+            const bodyScrollTop = body.scrollTop;
+            const bodyHeight = body.clientHeight;
 
-        /* ★ آکاردئون — نسخه Grid (بدون مشکل ارتفاع) */
-        .help-accordion{border:1px solid rgba(255,255,255,.1);border-radius:10px;overflow:hidden;background:rgba(255,255,255,.025);transition:border-color .25s,background .25s;flex-shrink:0}
-        .help-accordion.open{border-color:rgba(56,189,248,.4);background:rgba(56,189,248,.05)}
-        .help-acc-btn{width:100%;background:transparent;border:none;color:#f8fafc;padding:11px 13px;display:flex;align-items:center;gap:10px;cursor:pointer;text-align:right;transition:.2s;font-family:inherit}
-        .help-acc-btn:hover{background:rgba(56,189,248,.06)}
-        .help-acc-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,.35)}
-        .help-acc-title{flex:1;text-align:right;font-size:12.5px;font-weight:700}
-        .help-acc-arrow{color:#94a3b8;font-size:10px;transition:transform .3s}
-        .help-accordion.open .help-acc-arrow{transform:rotate(180deg);color:#38bdf8}
+            if (itemBottom > bodyScrollTop + bodyHeight - 20) {
+                body.scrollTo({ top: itemBottom - bodyHeight + 20, behavior: 'smooth' });
+            } else if (itemTop < bodyScrollTop + 20) {
+                body.scrollTo({ top: itemTop - 20, behavior: 'smooth' });
+            }
+        }, 320);
+    }
+};
 
-        /* ★ راه‌حل اصلی: grid-template-rows به جای max-height */
-        .help-acc-content{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s cubic-bezier(.4,0,.2,1);overflow:hidden}
-        .help-accordion.open .help-acc-content{grid-template-rows:1fr}
-        .help-acc-inner{overflow:hidden;min-height:0;padding:0 13px;transition:padding .4s cubic-bezier(.4,0,.2,1)}
-        .help-accordion.open .help-acc-inner{padding:0 13px 13px}
-        .help-acc-inner p{font-size:11.5px;color:#cbd5e1;line-height:1.8;margin:0}
-        .help-acc-inner ul{padding-right:18px;margin:0;display:flex;flex-direction:column;gap:5px}
-        .help-acc-inner li{font-size:11.5px;color:#cbd5e1;line-height:1.65}
-        .help-acc-inner li strong{color:#f8fafc;font-weight:700}
+// متن معرفی جمع‌شونده
+window.toggleAboutBox = function() {
+    const box = document.getElementById('platformInfoBox');
+    if (!box) return;
+    box.classList.toggle('expanded');
+    const toggleText = document.getElementById('t-about-toggle');
+    if (toggleText) {
+        const t = ld[currLang] || ld.en;
+        toggleText.textContent = box.classList.contains('expanded')
+            ? (t.aboutToggleClose || 'بستن')
+            : (t.aboutToggleOpen || 'مشاهده بیشتر');
+    }
+};
 
-        .help-footer{background:linear-gradient(135deg,rgba(168,85,247,.12),rgba(236,72,153,.12));border:1px solid rgba(168,85,247,.35);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:11px;color:#cbd5e1;line-height:1.65;flex-shrink:0}
-        .help-footer i{color:#a855f7;font-size:16px;flex-shrink:0}
+// ==========================================
+// 3. بازار ارزهای دیجیتال — با توقف در تب مخفی
+// ==========================================
+let cryptoInterval = null;
+let cryptoAbortController = null;
 
-        footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
+async function fetchCryptoPrices() {
+    const tickerContainer = document.getElementById('crypto-ticker-list');
+    if (!tickerContainer) return;
 
-        .floating-casino-wrap{position:fixed;right:24px;bottom:28px;z-index:9999}
-        [dir="rtl"] .floating-casino-wrap{right:auto;left:24px}
-        .floating-casino{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;background:rgba(15,23,42,0.75);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.1);box-shadow:0 8px 32px 0 rgba(0,0,0,0.6),inset 0 0 0 1px rgba(255,255,255,0.05);cursor:pointer;transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);overflow:hidden}
-        .floating-casino::before{content:'';position:absolute;inset:-3px;background:conic-gradient(from 0deg,#f43f5e,#a855f7,#38bdf8,#f43f5e);z-index:-1;border-radius:50%;animation:spinCasinoBorder 3s linear infinite;opacity:0.8}
-        .floating-casino::after{content:'';position:absolute;inset:2px;background:#0f172a;border-radius:50%;z-index:-1}
-        .floating-casino:hover{transform:translateY(-5px) scale(1.08);box-shadow:0 15px 45px rgba(244,63,94,0.5),inset 0 0 20px rgba(168,85,247,0.3)}
-        .floating-casino i{font-size:24px;background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:3px;transition:transform 0.4s ease}
-        .floating-casino:hover i{transform:rotate(25deg) scale(1.1)}
-        .floating-casino span{font-size:9px;font-weight:800;color:#fff;letter-spacing:0.5px;text-shadow:0 1px 3px rgba(0,0,0,0.8);z-index:1}
-        @keyframes spinCasinoBorder{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+    // اگر تب مخفی است، درخواست نزن
+    if (document.hidden) return;
 
-        @media (max-width:480px){
-            .stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-            .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-            .hr{gap:5px}
-            .lb{width:32px;height:32px;font-size:12px}
-            .logo-text{font-size:16px}
-            .wel{padding:12px}
-            .wel-head{gap:6px}
-            .wel-head h1{font-size:14px}
-            .wel-verified{font-size:9.5px;padding:3px 6px}
-            .sc{padding:10px;gap:8px}
-            .sc-bal .si,.sc-ref .si{width:32px;height:32px;font-size:13px}
-            .sn span{font-size:9.5px}
-            .sn h3{font-size:13px}
-            .nc{padding:9px}
-            .ncl{gap:7px}
-            .nci{width:30px;height:30px;font-size:12px}
-            .ninf h3{font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-            .ninf p{font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-            .nca{font-size:10px}
-            .help-modal-content{max-width:100%!important;max-height:92vh!important;border-radius:16px!important}
-            .help-modal-header{padding:12px 14px!important}
-            .help-modal-icon{width:38px!important;height:38px!important;font-size:16px!important}
-            .help-modal-title-wrap h2{font-size:13px!important}
-            .help-modal-title-wrap p{font-size:9.5px!important}
-            .help-modal-body{padding:11px!important;gap:8px!important}
-            .help-hero p{font-size:11px!important}
-            .help-acc-btn{padding:10px 11px!important}
-            .help-acc-icon{width:30px!important;height:30px!important;font-size:13px!important}
-            .help-acc-title{font-size:11.5px!important}
-            .help-acc-inner p,.help-acc-inner li{font-size:11px!important}
-            .help-footer{font-size:10px!important}
-        }
-        @media (max-width:360px){
-            .stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
-            .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
-            .sc{padding:8px;gap:6px}
-            .sc-bal .si,.sc-ref .si{width:28px;height:28px;font-size:11px}
-            .sn span{font-size:9px}
-            .sn h3{font-size:11.5px}
-            .nc{padding:7px}
-            .nci{width:26px;height:26px;font-size:11px}
-            .ninf h3{font-size:10.5px}
-            .ninf p{font-size:9px}
-            .nca{display:none}
-            .wel-head h1{font-size:13px}
-            .wel-verified{font-size:9px;padding:2px 5px}
-        }
-    </style>
-</head>
-<body>
-    <div class="floating-casino-wrap">
-        <button type="button" class="floating-casino" id="floating-casino-btn" title="کازینو" onclick="window.openCasinoModal(); return false;">
-            <i class="fas fa-dice"></i>
-            <span id="t-floating-casino">کازینو</span>
-        </button>
-    </div>
+    // لغو درخواست قبلی اگر هنوز در جریان است
+    if (cryptoAbortController) cryptoAbortController.abort();
+    cryptoAbortController = new AbortController();
 
-    <div class="modal" id="m-casino-modal" style="z-index:1050;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span id="t-casino-modal-title"><i class="fas fa-dice" style="color:#f43f5e;"></i> انتخاب بازی‌های کازینو</span>
-                <button class="modal-close" onclick="window.closeCasinoModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <div style="overflow-y:auto;padding-right:6px;display:flex;flex-direction:column;gap:10px;">
-                <a href="roulette.html" class="nc" style="text-decoration:none;color:inherit;">
-                    <div class="ncl">
-                        <div class="nci" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#ef4444"><i class="fas fa-dice-roulette"></i></div>
-                        <div class="ninf">
-                            <h3 id="t-casino-poker">رولت آنلاین</h3>
-                            <p id="t-casino-poker-desc">بازی هیجان‌انگیز و شانس</p>
-                        </div>
-                    </div>
-                    <div class="nca"><i class="fas fa-chevron-left"></i></div>
-                </a>
-                <a href="plinko.html" class="nc" style="text-decoration:none;color:inherit;">
-                    <div class="ncl">
-                        <div class="nci" style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#22c55e"><i class="fas fa-circle-dot"></i></div>
-                        <div class="ninf">
-                            <h3 id="t-casino-plinko">پلینکو (پاپالان)</h3>
-                            <p id="t-casino-plinko-desc">بازی محبوب ریزش مهره‌ها</p>
-                        </div>
-                    </div>
-                    <div class="nca"><i class="fas fa-chevron-left"></i></div>
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <header>
-        <div class="logo"><div class="logo-icon">Z</div><div class="logo-text">ZENIX</div></div>
-        <div class="hr">
-            <div class="wrap"><button type="button" class="lb" id="bell-btn"><i class="fas fa-bell" style="color:#fbbf24"></i><span class="badge" id="bell-badge">0</span></button></div>
-            <div class="wrap"><button type="button" class="lb" id="help-btn" title="راهنمای صفحه داشبورد"><i class="fas fa-circle-question" style="color:#38bdf8"></i></button></div>
-            <a href="support.html" class="lb"><i class="fas fa-headset" style="color:#a855f7"></i></a>
-            <div class="wrap">
-                <button type="button" class="lb" id="lang-btn"><i class="fas fa-globe" style="color:#22c55e"></i></button>
-                <div class="menu" id="lang-menu">
-                    <div class="mi" data-lang="fa">فارسی</div><div class="mi" data-lang="en">English</div><div class="mi" data-lang="ar">العربية</div><div class="mi" data-lang="tr">Türkçe</div><div class="mi" data-lang="ru">Русский</div><div class="mi" data-lang="es">Español</div><div class="mi" data-lang="fr">Français</div><div class="mi" data-lang="de">Deutsch</div>
-                </div>
-            </div>
-            <div class="wrap">
-                <button type="button" class="lb" id="menu-btn"><i class="fas fa-bars" style="color:#f43f5e"></i></button>
-                <div class="menu" id="nav-menu">
-                    <a href="dashboard.html" class="mi active"><i class="fas fa-home" style="color:#38bdf8"></i><span id="m1">صفحه اصلی</span></a>
-                    <a href="quantification.html" class="mi"><i class="fas fa-robot" style="color:#a855f7"></i><span id="m2">کوانتیفیکیشن</span></a>
-                    <a href="deposit.html" class="mi"><i class="fas fa-arrow-down" style="color:#22c55e"></i><span id="m3">واریز</span></a>
-                    <a href="receive.html" class="mi"><i class="fas fa-arrow-up" style="color:#fbbf24"></i><span id="m4">برداشت</span></a>
-                    <a href="team.html" class="mi"><i class="fas fa-users" style="color:#ec4899"></i><span id="m_team">تیم من</span></a>
-                    <a href="transactions.html" class="mi"><i class="fas fa-history" style="color:#06b6d4"></i><span id="m5">تراکنش</span></a>
-                    <a href="profile.html" class="mi"><i class="fas fa-user-cog" style="color:#ec4899"></i><span id="m6">پروفایل</span></a>
-                    <a href="support.html" class="mi"><i class="fas fa-headset" style="color:#a855f7"></i><span id="m7">پشتیبانی</span></a>
-                    <a href="#" class="mi" onclick="window.openAboutModal();return false;"><i class="fas fa-info-circle" style="color:#38bdf8"></i><span id="m_about">درباره پلتفرم</span></a>
-                    <a href="index.html" class="mi" id="logout-btn" style="color:#ef4444"><i class="fas fa-power-off"></i><span id="m8">خروج</span></a>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <div class="c">
-        <div class="wel">
-            <div class="wel-head">
-                <h1 id="t-wel">خوش آمدید</h1>
-                <div class="wel-verified"><i class="fas fa-shield-check"></i> <span id="t-st">تایید شده</span></div>
-            </div>
-            <p id="t-sub">پنل مدیریت کاربری</p>
-        </div>
-        <div class="stats">
-            <div class="sc sc-bal"><div class="si"><i class="fas fa-wallet" style="color:#38bdf8"></i></div><div class="sn"><span id="ts1">موجودی</span><h3 id="val-balance">$0.00</h3></div></div>
-            <div class="sc sc-ref"><div class="si"><i class="fas fa-users" style="color:#c084fc"></i></div><div class="sn"><span id="ts2">زیرمجموعه</span><h3 id="val-ref">0</h3></div></div>
-        </div>
-        <div class="banner-box"><img src="https://i.postimg.cc/XvHYmsLK/Gemini-Generated-Image-d7mieqd7mieqd7mi.jpg" alt="Zenix Banner"></div>
-        <div class="grid">
-            <a href="quantification.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.3);color:#c084fc"><i class="fas fa-robot"></i></div><div class="ninf"><h3 id="c1">کوانتیفیکیشن</h3><p id="d1">معاملات هوشمند</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i1"></i></div></a>
-            <a href="deposit.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#22c55e"><i class="fas fa-arrow-down"></i></div><div class="ninf"><h3 id="c2">واریز</h3><p id="d2">شارژ حساب</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i2"></i></div></a>
-            <a href="receive.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);color:#fbbf24"><i class="fas fa-arrow-up"></i></div><div class="ninf"><h3 id="c3">برداشت</h3><p id="d3">برداشت دارایی</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i3"></i></div></a>
-            <a href="team.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(236,72,153,.15);border:1px solid rgba(236,72,153,.3);color:#ec4899"><i class="fas fa-users"></i></div><div class="ninf"><h3 id="c4">تیم</h3><p id="d4">زیرمجموعه‌ها</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i4"></i></div></a>
-            <a href="transactions.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(6,182,212,.15);border:1px solid rgba(6,182,212,.3);color:#06b6d4"><i class="fas fa-history"></i></div><div class="ninf"><h3 id="c5">تراکنش‌ها</h3><p id="d5">تاریخچه مالی</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i5"></i></div></a>
-            <a href="profile.html" class="nc"><div class="ncl"><div class="nci" style="background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.3);color:#38bdf8"><i class="fas fa-user-cog"></i></div><div class="ninf"><h3 id="c6">پروفایل</h3><p id="d6">تنظیمات امنیت</p></div></div><div class="nca"><i class="fas fa-chevron-left" id="i6"></i></div></a>
-        </div>
+    try {
+        const response = await fetch(
+            'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=30&page=1&sparkline=false',
+            { signal: cryptoAbortController.signal }
+        );
+        if (!response.ok) throw new Error('خطا در دریافت قیمت');
         
-        <div class="market-box">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-                <h3 style="font-size:13px;color:#38bdf8;" id="t-mkt"><i class="fas fa-chart-line" style="color:#22c55e"></i> بازار ارزهای دیجیتال (۳ ارز برتر از ۳۰ ارز رصد شده)</h3>
-                <span style="font-size:10px;color:#22c55e;background:rgba(34,197,94,0.15);padding:2px 8px;border-radius:10px;font-weight:600;"><i class="fas fa-circle" style="font-size:6px;vertical-align:middle;margin-left:3px;"></i> <span id="t-live">زنده</span></span>
-            </div>
-            <div id="crypto-ticker-list"></div>
-        </div>
+        const data = await response.json();
+        const top3 = data.slice(0, 3);
 
-        <div class="platform-info-box" id="platformInfoBox">
-            <div class="about-box-head">
-                <div class="about-icon"><i class="fas fa-shield-alt"></i></div>
-                <h3 id="t-about-box-title">درباره پلتفرم هوشمند زِنیکس (Zenix)</h3>
-            </div>
-            <div class="about-content">
-                <p id="t-about-box-intro">به زِنیکس (Zenix) خوش آمدید؛ جایی که افق‌های مالی دیجیتال و قدرت فناوری مدرن در هم می‌آمیزند تا مسیری به سوی آینده‌ای روشن‌تر را روشن کنند. زِنیکس بر پایه یک باور عمیق بنا شده است: دنیای دارایی‌های دیجیتال نباید یک هزارتوی پیچیده باشد، بلکه باید یک اکوسیستم شفاف، در دسترس و امن برای همه باشد.</p>
-                <p id="t-about-box-desc">در عصری که با شتاب بی‌وقفه تعریف می‌شود، جایی که بازارهای جهانی هرگز نمی‌خوابند و تغییر تنها ثابتِ آن است، داشتن یک همراه مطمئن و هوشمند امری حیاتی است. زِنیکس با تکیه بر معماری ابری پیشرفته، الگوریتم‌های کوانتیفیکیشن نوین و لایه‌های امنیتی چندگانه و نفوذناپذیر، پناهگاهی یکپارچه و یکدست برای مدیریت ثروت شما فراهم کرده است. ما فقط در حال ساختن یک پلتفرم نیستیم؛ ما در حال خلق محیطی هستیم که در آن فناوری در خدمت جاه‌طلبی‌های انسانی قرار می‌گیرد، موانع را از بین می‌برد و آنچه را که در اقتصاد دیجیتال ممکن است، بازتعریف می‌کند.</p>
-                <p id="t-about-box-goal"><strong style="color:#38bdf8;">هدف ما:</strong> دموکراتیزه کردن امور استثنایی است. ما تلاش می‌کنیم همان ابزارهای مالی قدرتمندی که نخبگان نهادی از آن استفاده می‌کنند را در اختیار صاحبان دید روزمره قرار دهیم. چه در حال برداشتن اولین قدم خود باشید و چه یک متخصص کارکشته، زِنیکس به شما قدرت می‌دهد تا با اطمینان در بازارهای جهانی حرکت کنید، بدون نیاز به تخصص پیچیده، و تضمین می‌کند که سرمایه شما در محیطی از امنیت مطلق، شفافیت و پتانسیل پویا رشد کند.</p>
-                <p id="t-about-box-strategy"><strong style="color:#38bdf8;">استراتژی ما:</strong> بر یک سه‌گانه ناگسستنی بنا شده است—امنیت بدون سازش، شفافیت رادیکال و نوآوری بی‌وقفه. با ادغام الگوریتم‌های پردازش داده پیشرفته، یک سیستم پاداش چندلایه پویا و زیرساخت‌های بی‌نهایت مقیاس‌پذیر، ما تجربه‌ای بی‌نقص، فوق‌العاده سریع و بسیار قابل اعتماد را مهندسی می‌کنیم. ما پیچیدگی‌ها را مدیریت می‌کنیم تا تمرکز شما تنها روی مهم‌ترین چیز باقی بماند: رشد و موفقیت شما.</p>
-                <p id="t-about-box-conclusion" style="color:#94a3b8;border-top:1px dashed rgba(255,255,255,.08);padding-top:8px;margin-top:2px;"><i class="fas fa-quote-right" style="color:#38bdf8;margin-left:4px;"></i> زِنیکس فراتر از تعریف یک پلتفرم صرف است؛ این یک اکوسیستم پرجنب‌وجوش است که در آن فناوری، سرمایه و جامعه‌ای از پیشروان اندیشه گرد هم می‌آیند. ما شریک استوار شما در این سفر هستیم و متعهد به هدایت شما به سوی آینده‌ای با آزادی مالی بیشتر، فرصت‌های بی‌کران و دستاوردهای عظیم هستیم. ما با هم نه تنها آینده را پیش‌بینی می‌کنیم—بلکه آن را می‌سازیم.</p>
-            </div>
-            <button class="about-toggle" onclick="window.toggleAboutBox()">
-                <i class="fas fa-chevron-down"></i>
-                <span id="t-about-toggle">مشاهده بیشتر</span>
-            </button>
-        </div>
-    </div>
+        let html = '';
+        top3.forEach(coin => {
+            const price = coin.current_price >= 1 ? coin.current_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : coin.current_price.toFixed(4);
+            const change = coin.price_change_percentage_24h || 0;
+            const changeClass = change >= 0 ? 'price-up' : 'price-down';
+            const changeSign = change >= 0 ? '+' : '';
+            const safeSymbol = escapeHtml(coin.symbol.toUpperCase());
+            const safeName = escapeHtml(coin.name);
+            const safeImage = escapeHtml(coin.image);
 
-    <div class="modal" id="m-msg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span id="t-modal-title"><i class="fas fa-bell"></i> صندوق پیام‌ها و اعلان‌ها</span>
-                <button class="modal-close" onclick="window.closeMessageModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="notif-tabs" id="notif-tabs">
-                <button type="button" class="notif-tab active" onclick="window.setNotifFilter('all', this)"><i class="fas fa-list"></i> <span id="t-tab-all">همه</span> <span class="tab-badge" id="cnt-tab-all">0</span></button>
-                <button type="button" class="notif-tab" onclick="window.setNotifFilter('approved', this)"><i class="fas fa-check-circle" style="color:#22c55e"></i> <span id="t-tab-approved">تایید درخواست</span> <span class="tab-badge" id="cnt-tab-approved">0</span></button>
-                <button type="button" class="notif-tab" onclick="window.setNotifFilter('rejected', this)"><i class="fas fa-times-circle" style="color:#ef4444"></i> <span id="t-tab-rejected">لغو درخواست</span> <span class="tab-badge" id="cnt-tab-rejected">0</span></button>
-                <button type="button" class="notif-tab" onclick="window.setNotifFilter('admin_message', this)"><i class="fas fa-bullhorn" style="color:#38bdf8"></i> <span id="t-tab-admin">پیام مدیریت</span> <span class="tab-badge" id="cnt-tab-admin">0</span></button>
-            </div>
-            <div id="modal-msg-container"><div style="text-align:center;padding:20px;color:#94a3b8">هیچ پیام جدیدی وجود ندارد.</div></div>
-        </div>
-    </div>
-
-    <div class="modal" id="m-msg-detail" style="z-index:1050;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span id="detail-msg-title"><i class="fas fa-envelope-open"></i> مشاهده پیام</span>
-                <button class="modal-close" onclick="window.closeMsgDetailModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <div style="overflow-y:auto;padding-right:6px">
-                <div id="detail-msg-date" style="font-size:11px;color:#94a3b8;direction:ltr;text-align:left;margin-bottom:10px;display:none;"></div>
-                <div id="detail-msg-body" style="font-size:13px;color:#cbd5e1;line-height:1.7;white-space:pre-wrap;margin-bottom:12px;"></div>
-                <div id="detail-msg-support"></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="m-about-modal" style="z-index:1050;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span id="t-about-modal-title"><i class="fas fa-info-circle"></i> درباره پلتفرم هوشمند زِنیکس</span>
-                <button class="modal-close" onclick="window.closeAboutModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <div style="overflow-y:auto;padding-right:6px;font-size:12px;color:#cbd5e1;line-height:1.8;display:flex;flex-direction:column;gap:12px;">
-                <p id="t-about-modal-intro"></p>
-                <p id="t-about-modal-desc"></p>
-                <p id="t-about-modal-goal"></p>
-                <p id="t-about-modal-strategy"></p>
-                <p id="t-about-modal-conclusion" style="color:#94a3b8;border-top:1px dashed rgba(255,255,255,.08);padding-top:10px;margin-top:2px;"></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- ★★★ مدال راهنما — با ساختار صحیح آکاردئون ★★★ -->
-    <div class="modal" id="m-help-modal" style="z-index:1050;">
-        <div class="modal-content help-modal-content">
-            <div class="help-modal-header">
-                <div class="help-modal-brand">
-                    <div class="help-modal-icon"><i class="fas fa-graduation-cap"></i></div>
-                    <div class="help-modal-title-wrap">
-                        <h2 id="t-help-modal-title">راهنمای جامع داشبورد زِنیکس</h2>
-                        <p id="t-help-modal-subtitle">راهنمای کامل استفاده از پنل</p>
-                    </div>
-                </div>
-                <button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="help-modal-body">
-                <div class="help-hero">
-                    <p id="t-help-intro">به بخش مدیریت و داشبورد کاربری پلتفرم زِنیکس خوش آمدید. در این بخش می‌توانید خلاصه‌ای از عملکرد مالی و دسترسی سریع به بخش‌های اصلی داشته باشید.</p>
-                </div>
-
-                <div class="help-accordion open">
-                    <button class="help-acc-btn" onclick="window.toggleHelpAccordion(this)">
-                        <div class="help-acc-icon" style="background:linear-gradient(135deg,#38bdf8,#0ea5e9)"><i class="fas fa-wallet"></i></div>
-                        <span class="help-acc-title" id="t-help-s1-title">آمار و موجودی</span>
-                        <i class="fas fa-chevron-down help-acc-arrow"></i>
-                    </button>
-                    <div class="help-acc-content">
-                        <div class="help-acc-inner">
-                            <p id="t-help-s1-desc">در بالای صفحه، موجودی کل حساب (USDT) و تعداد اعضای زیرمجموعه به‌صورت زنده نمایش داده می‌شود. با هر تراکنش، موجودی به‌روز می‌شود.</p>
+            html += `
+                <div class="crypto-row">
+                    <div class="crypto-info">
+                        <div class="crypto-icon"><img src="${safeImage}" alt="${safeSymbol}" loading="lazy" decoding="async"></div>
+                        <div>
+                            <strong style="color:#fff;font-size:12px;">${safeSymbol}</strong>
+                            <span style="font-size:10px;color:#94a3b8;display:block;">${safeName}</span>
                         </div>
                     </div>
-                </div>
-
-                <div class="help-accordion">
-                    <button class="help-acc-btn" onclick="window.toggleHelpAccordion(this)">
-                        <div class="help-acc-icon" style="background:linear-gradient(135deg,#a855f7,#c084fc)"><i class="fas fa-th-large"></i></div>
-                        <span class="help-acc-title" id="t-help-s2-title">دسترسی سریع (میانبرها)</span>
-                        <i class="fas fa-chevron-down help-acc-arrow"></i>
-                    </button>
-                    <div class="help-acc-content">
-                        <div class="help-acc-inner">
-                            <ul id="t-help-s2-list">
-                                <li><strong>کوانتیفیکیشن:</strong> ورود به معاملات هوشمند و رباتیک و دریافت سود روزانه.</li>
-                                <li><strong>واریز:</strong> شارژ حساب با ولت‌های دیجیتال و تأیید شبکه.</li>
-                                <li><strong>برداشت:</strong> ثبت درخواست برداشت به کیف پول شخصی.</li>
-                                <li><strong>تیم:</strong> مشاهده اعضای زیرمجموعه (سطوح ۱ تا ۳) و لینک دعوت اختصاصی.</li>
-                                <li><strong>تراکنش‌ها:</strong> تاریخچه کامل واریز، برداشت و سود.</li>
-                                <li><strong>پروفایل:</strong> مدیریت امنیت، رمز عبور و تنظیمات.</li>
-                            </ul>
-                        </div>
+                    <div style="text-align:right;">
+                        <div style="color:#fff;font-weight:bold;font-size:12px;">$${price}</div>
+                        <div class="${changeClass}" style="font-size:10px;">${changeSign}${change.toFixed(2)}%</div>
                     </div>
                 </div>
+            `;
+        });
 
-                <div class="help-accordion">
-                    <button class="help-acc-btn" onclick="window.toggleHelpAccordion(this)">
-                        <div class="help-acc-icon" style="background:linear-gradient(135deg,#22c55e,#13a66a)"><i class="fas fa-chart-line"></i></div>
-                        <span class="help-acc-title" id="t-help-s3-title">بازار ارزهای دیجیتال</span>
-                        <i class="fas fa-chevron-down help-acc-arrow"></i>
-                    </button>
-                    <div class="help-acc-content">
-                        <div class="help-acc-inner">
-                            <p id="t-help-s3-desc">قیمت ۳ ارز برتر بازار به‌صورت زنده هر ۳۰ ثانیه به‌روزرسانی می‌شود. رنگ سبز نشان‌دهنده رشد و رنگ قرمز کاهش قیمت در ۲۴ ساعت گذشته است.</p>
-                        </div>
-                    </div>
-                </div>
+        tickerContainer.innerHTML = html;
+    } catch (err) {
+        if (err.name === 'AbortError') return; // لغو شده، نادیده بگیر
+        console.error('خطای دریافت قیمت:', err);
+        tickerContainer.innerHTML = `
+            <div class="crypto-row"><div class="crypto-info"><strong style="color:#fff;">BTC</strong></div><div style="text-align:right;"><span style="color:#fff;">$96,500.00</span><div class="price-up">+2.15%</div></div></div>
+            <div class="crypto-row"><div class="crypto-info"><strong style="color:#fff;">ETH</strong></div><div style="text-align:right;"><span style="color:#fff;">$2,780.50</span><div class="price-up">+1.84%</div></div></div>
+            <div class="crypto-row"><div class="crypto-info"><strong style="color:#fff;">SOL</strong></div><div style="text-align:right;"><span style="color:#fff;">$198.20</span><div class="price-down">-0.65%</div></div></div>
+        `;
+    }
+}
 
-                <div class="help-accordion">
-                    <button class="help-acc-btn" onclick="window.toggleHelpAccordion(this)">
-                        <div class="help-acc-icon" style="background:linear-gradient(135deg,#fbbf24,#f59e0b)"><i class="fas fa-bell"></i></div>
-                        <span class="help-acc-title" id="t-help-s4-title">اعلان‌ها و پیام‌ها</span>
-                        <i class="fas fa-chevron-down help-acc-arrow"></i>
-                    </button>
-                    <div class="help-acc-content">
-                        <div class="help-acc-inner">
-                            <p id="t-help-s4-desc">با کلیک روی آیکون زنگوله در هدر، پیام‌های مدیریت، تأیید یا لغو درخواست‌ها را ببینید. تعداد پیام‌های جدید روی آیکون زنگوله نمایش داده می‌شود.</p>
-                        </div>
-                    </div>
-                </div>
+function startCryptoTicker() {
+    if (cryptoInterval) return;
+    fetchCryptoPrices();
+    cryptoInterval = setInterval(fetchCryptoPrices, 30000);
+}
+function stopCryptoTicker() {
+    if (cryptoInterval) { clearInterval(cryptoInterval); cryptoInterval = null; }
+}
 
-                <div class="help-accordion">
-                    <button class="help-acc-btn" onclick="window.toggleHelpAccordion(this)">
-                        <div class="help-acc-icon" style="background:linear-gradient(135deg,#f43f5e,#ec4899)"><i class="fas fa-dice"></i></div>
-                        <span class="help-acc-title" id="t-help-s5-title">بازی‌های کازینو</span>
-                        <i class="fas fa-chevron-down help-acc-arrow"></i>
-                    </button>
-                    <div class="help-acc-content">
-                        <div class="help-acc-inner">
-                            <p id="t-help-s5-desc">با کلیک روی دکمه شناور گوشه صفحه، وارد بخش بازی‌های کازینو می‌شوید. رولت آنلاین و پلینکو در دسترس هستند و بازی‌ها با موجودی مجزا و به‌صورت دمو اجرا می‌شوند.</p>
-                        </div>
-                    </div>
-                </div>
+// ★ توقف کامل وقتی تب مخفی است (ذخیره باتری و CPU)
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopCryptoTicker();
+    else startCryptoTicker();
+});
 
-                <div class="help-accordion">
-                    <button class="help-acc-btn" onclick="window.toggleHelpAccordion(this)">
-                        <div class="help-acc-icon" style="background:linear-gradient(135deg,#ec4899,#be185d)"><i class="fas fa-shield-alt"></i></div>
-                        <span class="help-acc-title" id="t-help-s6-title">نکات امنیتی مهم</span>
-                        <i class="fas fa-chevron-down help-acc-arrow"></i>
-                    </button>
-                    <div class="help-acc-content">
-                        <div class="help-acc-inner">
-                            <p id="t-help-s6-desc">هرگز رمز عبور خود را با کسی به اشتراک نگذارید. زِنیکس هرگز از شما رمز، کد تأیید یا کلید خصوصی نمی‌خواهد. برای برداشت، تأیید دو مرحله‌ای فعال کنید و از لینک‌های ناشناس وارد نشوید.</p>
-                        </div>
-                    </div>
-                </div>
+startCryptoTicker();
 
-                <div class="help-footer">
-                    <i class="fas fa-headset"></i>
-                    <span id="t-help-footer">در صورت نیاز به راهنمایی بیشتر، با پشتیبانی زِنیکس از طریق صفحه پشتیبانی در ارتباط باشید.</span>
-                </div>
+// ==========================================
+// 4. سیستم اعلان‌ها
+// ==========================================
+function getNotifCategory(m) {
+    let t = (m.type || '').toLowerCase();
+    let title = (m.subject || '').toLowerCase();
+    if (t.includes('approved') || title.includes('تایید') || title.includes('approved')) return 'approved';
+    if (t.includes('rejected') || title.includes('لغو') || title.includes('رد') || title.includes('rejected')) return 'rejected';
+    return 'admin_message';
+}
+
+async function fetchUserMessages(uid) {
+    try {
+        const { data } = await supabaseClient.from('notifications').select('*').eq('user_id', uid).order('created_at', { ascending: false });
+        return (data || []).map(dt => ({
+            id: dt.id,
+            subject: dt.title || dt.subject || 'اطلاعیه',
+            body: dt.message || dt.text || dt.body || '',
+            time: dt.created_at ? new Date(dt.created_at).toLocaleString() : '',
+            read: dt.read === true || dt.is_read === true,
+            type: dt.type || dt.category || 'admin_message'
+        }));
+    } catch (e) {
+        return [];
+    }
+}
+
+function updateNotifBadges() {
+    let unread = allMessages.filter(m => !m.read).length;
+    let b = document.getElementById('bell-badge');
+    if (b) { b.textContent = unread; b.classList.toggle('show', unread > 0); }
+    let cntAll = document.getElementById('cnt-tab-all');
+    let cntApp = document.getElementById('cnt-tab-approved');
+    let cntRej = document.getElementById('cnt-tab-rejected');
+    let cntAdm = document.getElementById('cnt-tab-admin');
+    if (cntAll) cntAll.textContent = allMessages.length;
+    if (cntApp) cntApp.textContent = allMessages.filter(m => getNotifCategory(m) === 'approved').length;
+    if (cntRej) cntRej.textContent = allMessages.filter(m => getNotifCategory(m) === 'rejected').length;
+    if (cntAdm) cntAdm.textContent = allMessages.filter(m => getNotifCategory(m) === 'admin_message').length;
+}
+
+window.setNotifFilter = function(filter, el) {
+    currentNotifFilter = filter;
+    document.querySelectorAll('.notif-tab').forEach(b => b.classList.remove('active'));
+    if (el) el.classList.add('active');
+    renderMessageList();
+};
+
+window.openMessageModal = async () => {
+    if (currentUserId) {
+        allMessages = await fetchUserMessages(currentUserId);
+        updateNotifBadges();
+    }
+    renderMessageList();
+    document.getElementById('m-msg')?.classList.add('show');
+    lockBody();
+};
+
+function renderMessageList() {
+    let c = document.getElementById('modal-msg-container');
+    if (!c) return;
+    let t = ld[currLang] || ld.fa;
+    let list = allMessages;
+    if (currentNotifFilter !== 'all') {
+        list = allMessages.filter(m => getNotifCategory(m) === currentNotifFilter);
+    }
+
+    if (!list || list.length === 0) {
+        c.innerHTML = `<div style="text-align:center;padding:20px;color:#94a3b8">${t.noMsg || 'هیچ پیام جدیدی وجود ندارد.'}</div>`;
+        return;
+    }
+
+    let html = '<div style="display:flex;flex-direction:column;gap:10px;">';
+    list.forEach((m) => {
+        let realIdx = allMessages.indexOf(m);
+        let dTime = m.time || '';
+        let unread = !m.read;
+        let iconClass = 'fa-envelope-open-text';
+        let iconColor = '#38bdf8';
+        let cat = getNotifCategory(m);
+
+        if (cat === 'approved') { iconClass = 'fa-check-circle'; iconColor = '#22c55e'; }
+        else if (cat === 'rejected') { iconClass = 'fa-times-circle'; iconColor = '#ef4444'; }
+        else { iconClass = 'fa-bullhorn'; iconColor = '#38bdf8'; }
+
+        const safeSubject = escapeHtml(m.subject);
+        const safeBody = escapeHtml(m.body);
+        const safeTime = escapeHtml(dTime);
+
+        html += `<div class="msg-body-box" style="cursor:pointer;border-right:${unread ? '3px solid #38bdf8' : '1px solid rgba(255,255,255,.08)'};" onclick="window.readAdminMessage(${realIdx})">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div class="msg-title-text" style="${unread ? 'color:#fff;font-weight:800;' : ''}"><i class="fas ${iconClass}" style="color:${iconColor};margin-left:5px;"></i> ${safeSubject}</div>
+                ${unread ? `<span style="font-size:9px;background:#38bdf8;color:#0f172a;padding:2px 6px;border-radius:4px;font-weight:700;">${t.newBadge || 'جدید'}</span>` : ''}
             </div>
-        </div>
-    </div>
+            <div class="msg-desc-text" style="margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${safeBody}</div>
+            <div style="font-size:10px;color:#64748b;margin-top:6px;text-align:left" dir="ltr">${safeTime}</div>
+        </div>`;
+    });
+    c.innerHTML = html + '</div>';
+}
 
-    <footer>
-        <p>&copy; 2026 Zenix. All rights reserved.</p>
-    </footer>
+window.readAdminMessage = async idx => {
+    let m = allMessages[idx]; if (!m) return;
+    allMessages[idx].read = true;
+    if (currentUserId && m.id) {
+        try { await supabaseClient.from('notifications').update({ read: true, is_read: true }).eq('id', m.id); } catch(e) {}
+    }
+    updateNotifBadges();
+    renderMessageList();
 
-    <script src="https://cdn.jsdmirror.com/npm/@supabase/supabase-js@2" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script type="module" src="dashboard.js?v=25"></script>
-</body>
-</html>
+    let titleEl = document.getElementById('detail-msg-title');
+    let dateEl = document.getElementById('detail-msg-date');
+    let bodyEl = document.getElementById('detail-msg-body');
+
+    if (titleEl) titleEl.innerHTML = `<i class="fas fa-envelope-open"></i> ${escapeHtml(m.subject)}`;
+    if (dateEl) { dateEl.textContent = m.time || ''; dateEl.style.display = m.time ? 'block' : 'none'; }
+    if (bodyEl) bodyEl.textContent = m.body || '';
+
+    document.getElementById('m-msg-detail')?.classList.add('show');
+};
+
+window.closeMessageModal = () => {
+    document.getElementById('m-msg')?.classList.remove('show');
+    unlockBody();
+};
+window.closeMsgDetailModal = () => {
+    document.getElementById('m-msg-detail')?.classList.remove('show');
+    unlockBody();
+};
+
+document.getElementById('bell-btn')?.addEventListener('click', e => { 
+    e.stopPropagation(); 
+    window.openMessageModal(); 
+});
+
+// ==========================================
+// 5. سیستم ترجمه کامل ۸ زبانه
+// ==========================================
+const SUPPORTED_LANGUAGES = ['en', 'fa', 'ar', 'tr', 'ru', 'es', 'fr', 'de'];
+const savedLang = safeGetItem('zenix_lang');
+let currLang = SUPPORTED_LANGUAGES.includes(savedLang) ? savedLang : 'en';
+
+const ld = {
+    fa: {
+        m1: 'صفحه اصلی', m2: 'کوانتیفیکیشن', m3: 'واریز', m4: 'برداشت', m_team: 'تیم من', m5: 'تراکنش', m6: 'پروفایل', m7: 'پشتیبانی', m_about: 'درباره پلتفرم', m8: 'خروج',
+        wel: 'خوش آمدید', sub: 'پنل مدیریت کاربری', st: 'تایید شده',
+        ts1: 'موجودی', ts2: 'زیرمجموعه',
+        c1: 'کوانتیفیکیشن', d1: 'معاملات هوشمند',
+        c2: 'واریز', d2: 'شارژ حساب',
+        c3: 'برداشت', d3: 'برداشت دارایی',
+        c4: 'تیم', d4: 'زیرمجموعه‌ها',
+        c5: 'تراکنش‌ها', d5: 'تاریخچه مالی',
+        c6: 'پروفایل', d6: 'تنظیمات امنیت',
+        tmkt: 'بازار ارزهای دیجیتال (۳ ارز برتر از ۳۰ ارز رصد شده)', tlive: 'زنده',
+        aboutToggleOpen: 'مشاهده بیشتر', aboutToggleClose: 'بستن متن',
+        aboutTitle: 'درباره پلتفرم هوشمند زِنیکس (Zenix)',
+        aboutIntro: 'به زِنیکس (Zenix) خوش آمدید؛ جایی که افق‌های مالی دیجیتال و قدرت فناوری مدرن در هم می‌آمیزند تا مسیری به سوی آینده‌ای روشن‌تر را روشن کنند. زِنیکس بر پایه یک باور عمیق بنا شده است: دنیای دارایی‌های دیجیتال نباید یک هزارتوی پیچیده باشد، بلکه باید یک اکوسیستم شفاف، در دسترس و امن برای همه باشد.',
+        aboutDesc: 'در عصری که با شتاب بی‌وقفه تعریف می‌شود، جایی که بازارهای جهانی هرگز نمی‌خوابند و تغییر تنها ثابتِ آن است، داشتن یک همراه مطمئن و هوشمند امری حیاتی است. زِنیکس با تکیه بر معماری ابری پیشرفته، الگوریتم‌های کوانتیفیکیشن نوین و لایه‌های امنیتی چندگانه و نفوذناپذیر، پناهگاهی یکپارچه و یکدست برای مدیریت ثروت شما فراهم کرده است. ما فقط در حال ساختن یک پلتفرم نیستیم؛ ما در حال خلق محیطی هستیم که در آن فناوری در خدمت جاه‌طلبی‌های انسانی قرار می‌گیرد، موانع را از بین می‌برد و آنچه را که در اقتصاد دیجیتال ممکن است، بازتعریف می‌کند.',
+        aboutGoal: '<strong style="color:#38bdf8;">هدف ما:</strong> دموکراتیزه کردن امور استثنایی است. ما تلاش می‌کنیم همان ابزارهای مالی قدرتمندی که نخبگان نهادی از آن استفاده می‌کنند را در اختیار صاحبان دید روزمره قرار دهیم. چه در حال برداشتن اولین قدم خود باشید و چه یک متخصص کارکشته، زِنیکس به شما قدرت می‌دهد تا با اطمینان در بازارهای جهانی حرکت کنید، بدون نیاز به تخصص پیچیده، و تضمین می‌کند که سرمایه شما در محیطی از امنیت مطلق، شفافیت و پتانسیل پویا رشد کند.',
+        aboutStrategy: '<strong style="color:#38bdf8;">استراتژی ما:</strong> بر یک سه‌گانه ناگسستنی بنا شده است—امنیت بدون سازش، شفافیت رادیکال و نوآوری بی‌وقفه. با ادغام الگوریتم‌های پردازش داده پیشرفته، یک سیستم پاداش چندلایه پویا و زیرساخت‌های بی‌نهایت مقیاس‌پذیر، ما تجربه‌ای بی‌نقص، فوق‌العاده سریع و بسیار قابل اعتماد را مهندسی می‌کنیم. ما پیچیدگی‌ها را مدیریت می‌کنیم تا تمرکز شما تنها روی مهم‌ترین چیز باقی بماند: رشد و موفقیت شما.',
+        aboutConclusion: '<i class="fas fa-quote-right" style="color:#38bdf8;margin-left:4px;"></i> زِنیکس فراتر از تعریف یک پلتفرم صرف است؛ این یک اکوسیستم پرجنب‌وجوش است که در آن فناوری، سرمایه و جامعه‌ای از پیشروان اندیشه گرد هم می‌آیند. ما شریک استوار شما در این سفر هستیم و متعهد به هدایت شما به سوی آینده‌ای با آزادی مالی بیشتر، فرصت‌های بی‌کران و دستاوردهای عظیم هستیم. ما با هم نه تنها آینده را پیش‌بینی می‌کنیم—بلکه آن را می‌سازیم.',
+        floatingCasino: 'کازینو', floatingCasinoTitle: 'بازی‌های کازینو',
+        helpBtnTitle: 'راهنمای صفحه داشبورد',
+        detailMsgTitle: 'مشاهده پیام',
+        aboutModalTitle: '<i class="fas fa-info-circle"></i> درباره پلتفرم هوشمند زِنیکس',
+        modalTitle: 'صندوق پیام‌ها و اعلان‌ها', noMsg: 'هیچ پیام جدیدی وجود ندارد.', newBadge: 'جدید',
+        tabAll: 'همه', tabApproved: 'تایید درخواست', tabRejected: 'لغو درخواست', tabAdmin: 'پیام مدیریت',
+        helpTitle: 'راهنمای جامع داشبورد زِنیکس',
+        helpSubtitle: 'راهنمای کامل استفاده از پنل',
+        helpIntro: 'به بخش مدیریت و داشبورد کاربری پلتفرم زِنیکس خوش آمدید. در این بخش می‌توانید خلاصه‌ای از عملکرد مالی و دسترسی سریع به بخش‌های اصلی داشته باشید.',
+        helpS1Title: 'آمار و موجودی',
+        helpS1Desc: 'در بالای صفحه، موجودی کل حساب (USDT) و تعداد اعضای زیرمجموعه به‌صورت زنده نمایش داده می‌شود. با هر تراکنش، موجودی به‌روز می‌شود.',
+        helpS2Title: 'دسترسی سریع (میانبرها)',
+        helpS2List: '<li><strong>کوانتیفیکیشن:</strong> ورود به معاملات هوشمند و رباتیک و دریافت سود روزانه.</li><li><strong>واریز:</strong> شارژ حساب با ولت‌های دیجیتال و تأیید شبکه.</li><li><strong>برداشت:</strong> ثبت درخواست برداشت به کیف پول شخصی.</li><li><strong>تیم:</strong> مشاهده اعضای زیرمجموعه (سطوح ۱ تا ۳) و لینک دعوت اختصاصی.</li><li><strong>تراکنش‌ها:</strong> تاریخچه کامل واریز، برداشت و سود.</li><li><strong>پروفایل:</strong> مدیریت امنیت، رمز عبور و تنظیمات.</li>',
+        helpS3Title: 'بازار ارزهای دیجیتال',
+        helpS3Desc: 'قیمت ۳ ارز برتر بازار به‌صورت زنده هر ۳۰ ثانیه به‌روزرسانی می‌شود. رنگ سبز نشان‌دهنده رشد و رنگ قرمز کاهش قیمت در ۲۴ ساعت گذشته است.',
+        helpS4Title: 'اعلان‌ها و پیام‌ها',
+        helpS4Desc: 'با کلیک روی آیکون زنگوله در هدر، پیام‌های مدیریت، تأیید یا لغو درخواست‌ها را ببینید. تعداد پیام‌های جدید روی آیکون زنگوله نمایش داده می‌شود.',
+        helpS5Title: 'بازی‌های کازینو',
+        helpS5Desc: 'با کلیک روی دکمه شناور گوشه صفحه، وارد بخش بازی‌های کازینو می‌شوید. رولت آنلاین و پلینکو در دسترس هستند و بازی‌ها با موجودی مجزا و به‌صورت دمو اجرا می‌شوند.',
+        helpS6Title: 'نکات امنیتی مهم',
+        helpS6Desc: 'هرگز رمز عبور خود را با کسی به اشتراک نگذارید. زِنیکس هرگز از شما رمز، کد تأیید یا کلید خصوصی نمی‌خواهد. برای برداشت، تأیید دو مرحله‌ای فعال کنید و از لینک‌های ناشناس وارد نشوید.',
+        helpFooter: 'در صورت نیاز به راهنمایی بیشتر، با پشتیبانی زِنیکس از طریق صفحه پشتیبانی در ارتباط باشید.',
+        casinoModalTitle: 'انتخاب بازی‌های کازینو',
+        casinoPoker: 'رولت آنلاین', casinoPokerDesc: 'بازی هیجان‌انگیز و شانس',
+        casinoPlinko: 'پلینکو (پاپالان)', casinoPlinkoDesc: 'بازی محبوب ریزش مهره‌ها'
+    },
+    en: {
+        m1: 'Home', m2: 'Quantification', m3: 'Deposit', m4: 'Withdraw', m_team: 'My Team', m5: 'Transactions', m6: 'Profile', m7: 'Support', m_about: 'About Platform', m8: 'Logout',
+        wel: 'Welcome', sub: 'User Management Panel', st: 'Verified',
+        ts1: 'Balance', ts2: 'Referrals',
+        c1: 'Quantification', d1: 'Smart Trading',
+        c2: 'Deposit', d2: 'Account Top-up',
+        c3: 'Withdraw', d3: 'Asset Withdrawal',
+        c4: 'Team', d4: 'Sub-accounts',
+        c5: 'Transactions', d5: 'Financial History',
+        c6: 'Profile', d6: 'Security Settings',
+        tmkt: 'Cryptocurrency Market (Top 3 of 30 tracked coins)', tlive: 'Live',
+        aboutToggleOpen: 'Show more', aboutToggleClose: 'Show less',
+        aboutTitle: 'About Zenix Smart Platform',
+        aboutIntro: 'Welcome to Zenix, where the horizons of digital finance and the power of modern technology intertwine to illuminate a path toward a brighter future. Zenix was founded on a profound belief: the world of digital assets should not be a labyrinth of complexity, but a transparent, accessible, and secure ecosystem for everyone.',
+        aboutDesc: 'In an era defined by relentless momentum, where global markets never sleep and change is the only constant, having a reliable and intelligent companion is paramount. Zenix, leveraging cutting-edge cloud architecture, advanced quantification algorithms, and impenetrable multi-layered security, provides you with a unified, seamless sanctuary for wealth management.',
+        aboutGoal: '<strong style="color:#38bdf8;">Our Goal:</strong> To democratize the extraordinary. We strive to place the same powerful financial tools used by institutional elites into the hands of everyday visionaries.',
+        aboutStrategy: '<strong style="color:#38bdf8;">Our Strategy:</strong> Built upon an unbreakable triad—uncompromising security, radical transparency, and relentless innovation.',
+        aboutConclusion: '<i class="fas fa-quote-right" style="color:#38bdf8;margin-left:4px;"></i> Zenix transcends the definition of a mere platform; it is a vibrant ecosystem where technology, capital, and a community of forward-thinkers converge.',
+        floatingCasino: 'Casino', floatingCasinoTitle: 'Casino Games',
+        helpBtnTitle: 'Dashboard Help',
+        detailMsgTitle: 'View Message',
+        aboutModalTitle: '<i class="fas fa-info-circle"></i> About Zenix Smart Platform',
+        modalTitle: 'Notifications & Messages', noMsg: 'No new messages.', newBadge: 'NEW',
+        tabAll: 'All', tabApproved: 'Approved', tabRejected: 'Rejected', tabAdmin: 'Admin Msg',
+        helpTitle: 'Zenix Dashboard Comprehensive Guide',
+        helpSubtitle: 'Complete guide to the panel',
+        helpIntro: 'Welcome to the Zenix user management dashboard. Here you can find a summary of your financial performance and quick access to core sections.',
+        helpS1Title: 'Stats & Balance',
+        helpS1Desc: 'At the top of the page, your total balance (USDT) and network referral count are displayed live. Balance updates with each transaction.',
+        helpS2Title: 'Quick Shortcuts',
+        helpS2List: '<li><strong>Quantification:</strong> Automated robotic trading.</li><li><strong>Deposit:</strong> Top up via digital wallets.</li><li><strong>Withdraw:</strong> Request asset withdrawals.</li><li><strong>Team:</strong> View members and referral link.</li><li><strong>Transactions:</strong> Full financial history.</li><li><strong>Profile:</strong> Security and settings.</li>',
+        helpS3Title: 'Crypto Market',
+        helpS3Desc: 'Top 3 crypto prices update every 30 seconds. Green = growth, red = 24h decline.',
+        helpS4Title: 'Notifications & Messages',
+        helpS4Desc: 'Click the bell icon in the header to view admin messages, approvals, or rejections.',
+        helpS5Title: 'Casino Games',
+        helpS5Desc: 'Click the floating button on the corner to enter casino games. Roulette and plinko available as demo.',
+        helpS6Title: 'Important Security Notes',
+        helpS6Desc: 'Never share your password. Zenix will never ask for your password, verification code, or private key.',
+        helpFooter: 'For further assistance, contact Zenix Support.',
+        casinoModalTitle: 'Select Casino Games',
+        casinoPoker: 'Online Roulette', casinoPokerDesc: 'Exciting game of chance',
+        casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Popular dropping ball game'
+    },
+    ar: {
+        m1: 'الرئيسية', m2: 'التكميم', m3: 'إيداع', m4: 'سحب', m_team: 'فريقي', m5: 'المعاملات', m6: 'الملف الشخصي', m7: 'الدعم', m_about: 'حول المنصة', m8: 'تسجيل الخروج',
+        wel: 'أهلاً بك', sub: 'لوحة إدارة المستخدم', st: 'موثق',
+        ts1: 'الرصيد', ts2: 'الإحالات',
+        c1: 'التكميم', d1: 'التداول الذكي', c2: 'إيداع', d2: 'شحن الحساب', c3: 'سحب', d3: 'سحب الأصول',
+        c4: 'الفريق', d4: 'الإحالات', c5: 'المعاملات', d5: 'السجل المالي', c6: 'الملف الشخصي', d6: 'إعدادات الأمان',
+        tmkt: 'سوق العملات الرقمية', tlive: 'مباشر',
+        aboutToggleOpen: 'عرض المزيد', aboutToggleClose: 'إظهار أقل',
+        aboutTitle: 'حول منصة Zenix الذكية',
+        aboutIntro: 'مرحباً بك في Zenix، حيث تتشابك آفاق التمويل الرقمي وقوة التكنولوجيا الحديثة.',
+        aboutDesc: 'في عصر يتسم بالزخم الذي لا يلين، وجود رفيق موثوق وذكي أمر بالغ الأهمية.',
+        aboutGoal: '<strong style="color:#38bdf8;">هدفنا:</strong> إضفاء الطابع الديمقراطي على الاستثنائي.',
+        aboutStrategy: '<strong style="color:#38bdf8;">استراتيجيتنا:</strong> مبنية على ثلاثية غير قابلة للكسر.',
+        aboutConclusion: '<i class="fas fa-quote-right" style="color:#38bdf8;margin-left:4px;"></i> تتجاوز Zenix تعريف مجرد منصة.',
+        floatingCasino: 'كازينو', floatingCasinoTitle: 'ألعاب الكازينو',
+        helpBtnTitle: 'مساعدة', detailMsgTitle: 'عرض الرسالة',
+        aboutModalTitle: '<i class="fas fa-info-circle"></i> حول منصة Zenix الذكية',
+        modalTitle: 'الرسائل والإشعارات', noMsg: 'لا توجد رسائل جديدة.', newBadge: 'جديد',
+        tabAll: 'الكل', tabApproved: 'مقبولة', tabRejected: 'مرفوضة', tabAdmin: 'الإدارة',
+        helpTitle: 'دليل لوحة التحكم', helpSubtitle: 'دليل شامل',
+        helpIntro: 'مرحباً بك في لوحة تحكم Zenix.',
+        helpS1Title: 'الإحصائيات والرصيد', helpS1Desc: 'في أعلى الصفحة عرض رصيدك وعدد إحالاتك.',
+        helpS2Title: 'الاختصارات', helpS2List: '<li>التكميم</li><li>إيداع</li><li>سحب</li><li>الفريق</li><li>المعاملات</li><li>الملف الشخصي</li>',
+        helpS3Title: 'سوق العملات', helpS3Desc: 'يتم تحديث الأسعار كل 30 ثانية.',
+        helpS4Title: 'الإشعارات', helpS4Desc: 'انقر على الجرس لعرض الرسائل.',
+        helpS5Title: 'ألعاب الكازينو', helpS5Desc: 'انقر على الزر العائم.',
+        helpS6Title: 'الأمان', helpS6Desc: 'لا تشارك كلمة المرور.',
+        helpFooter: 'للمزيد تواصل مع الدعم.',
+        casinoModalTitle: 'اختر اللعبة', casinoPoker: 'رولت', casinoPokerDesc: 'لعبة حظ', casinoPlinko: 'بلينكو', casinoPlinkoDesc: 'لعبة كرات'
+    },
+    tr: {
+        m1: 'Ana Sayfa', m2: 'Kuantifikasyon', m3: 'Yatırım', m4: 'Çekim', m_team: 'Ekibim', m5: 'İşlemler', m6: 'Profil', m7: 'Destek', m_about: 'Platform', m8: 'Çıkış',
+        wel: 'Hoş Geldiniz', sub: 'Kullanıcı Paneli', st: 'Onaylandı',
+        ts1: 'Bakiye', ts2: 'Referanslar',
+        c1: 'Kuantifikasyon', d1: 'Akıllı İşlem', c2: 'Yatırım', d2: 'Hesap Yükleme', c3: 'Çekim', d3: 'Varlık Çekimi',
+        c4: 'Ekip', d4: 'Alt Hesaplar', c5: 'İşlemler', d5: 'Finansal Geçmiş', c6: 'Profil', d6: 'Güvenlik',
+        tmkt: 'Kripto Para Piyasası', tlive: 'Canlı',
+        aboutToggleOpen: 'Daha fazla', aboutToggleClose: 'Daha az',
+        aboutTitle: 'Zenix Platform Hakkında', aboutIntro: 'Zenix\'e hoş geldiniz.', aboutDesc: 'Dijital varlıklar dünyası.',
+        aboutGoal: '<strong>Hedefimiz:</strong> Demokratikleştirmek.', aboutStrategy: '<strong>Stratejimiz:</strong> Güvenlik, şeffaflık, inovasyon.',
+        aboutConclusion: '<i class="fas fa-quote-right"></i> Zenix bir ekosistemdir.',
+        floatingCasino: 'Casino', floatingCasinoTitle: 'Casino',
+        helpBtnTitle: 'Yardım', detailMsgTitle: 'Mesaj',
+        aboutModalTitle: 'Zenix Hakkında', modalTitle: 'Bildirimler', noMsg: 'Yeni mesaj yok.', newBadge: 'YENİ',
+        tabAll: 'Tümü', tabApproved: 'Onaylı', tabRejected: 'Red', tabAdmin: 'Yönetici',
+        helpTitle: 'Zenix Rehberi', helpSubtitle: 'Kapsamlı rehber',
+        helpIntro: 'Zenix paneline hoş geldiniz.',
+        helpS1Title: 'Bakiye', helpS1Desc: 'Bakiyeniz ve referans sayınız üstte gösterilir.',
+        helpS2Title: 'Kısayollar', helpS2List: '<li>Kuantifikasyon</li><li>Yatırım</li><li>Çekim</li><li>Ekip</li><li>İşlemler</li><li>Profil</li>',
+        helpS3Title: 'Kripto', helpS3Desc: 'Her 30 saniyede güncellenir.',
+        helpS4Title: 'Bildirimler', helpS4Desc: 'Zil simgesine tıklayın.',
+        helpS5Title: 'Casino', helpS5Desc: 'Yüzen butona tıklayın.',
+        helpS6Title: 'Güvenlik', helpS6Desc: 'Şifrenizi paylaşmayın.',
+        helpFooter: 'Zenix Desteği ile iletişime geçin.',
+        casinoModalTitle: 'Oyun Seç', casinoPoker: 'Rulet', casinoPokerDesc: 'Şans oyunu', casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Top oyunu'
+    },
+    ru: {
+        m1: 'Главная', m2: 'Квантификация', m3: 'Депозит', m4: 'Вывод', m_team: 'Команда', m5: 'Транзакции', m6: 'Профиль', m7: 'Поддержка', m_about: 'О платформе', m8: 'Выход',
+        wel: 'Добро пожаловать', sub: 'Панель', st: 'Подтверждено',
+        ts1: 'Баланс', ts2: 'Рефералы',
+        c1: 'Квантификация', d1: 'Торговля', c2: 'Депозит', d2: 'Пополнение', c3: 'Вывод', d3: 'Вывод',
+        c4: 'Команда', d4: 'Рефералы', c5: 'Транзакции', d5: 'История', c6: 'Профиль', d6: 'Безопасность',
+        tmkt: 'Крипторынок', tlive: 'Онлайн',
+        aboutToggleOpen: 'Больше', aboutToggleClose: 'Меньше',
+        aboutTitle: 'О Zenix', aboutIntro: 'Добро пожаловать в Zenix.', aboutDesc: 'Цифровые финансы.',
+        aboutGoal: '<strong>Цель:</strong> Демократизация.', aboutStrategy: '<strong>Стратегия:</strong> Безопасность.',
+        aboutConclusion: '<i class="fas fa-quote-right"></i> Zenix — экосистема.',
+        floatingCasino: 'Казино', floatingCasinoTitle: 'Казино',
+        helpBtnTitle: 'Помощь', detailMsgTitle: 'Сообщение',
+        aboutModalTitle: 'О Zenix', modalTitle: 'Уведомления', noMsg: 'Нет сообщений.', newBadge: 'НОВОЕ',
+        tabAll: 'Все', tabApproved: 'Одобрено', tabRejected: 'Отклонено', tabAdmin: 'Админ',
+        helpTitle: 'Zenix', helpSubtitle: 'Полное руководство',
+        helpIntro: 'Добро пожаловать.',
+        helpS1Title: 'Баланс', helpS1Desc: 'Баланс и рефералы.',
+        helpS2Title: 'Ярлыки', helpS2List: '<li>Квантификация</li><li>Депозит</li><li>Вывод</li><li>Команда</li><li>Транзакции</li><li>Профиль</li>',
+        helpS3Title: 'Рынок', helpS3Desc: 'Обновление каждые 30с.',
+        helpS4Title: 'Уведомления', helpS4Desc: 'Нажмите на колокольчик.',
+        helpS5Title: 'Казино', helpS5Desc: 'Нажмите на кнопку.',
+        helpS6Title: 'Безопасность', helpS6Desc: 'Не делитесь паролем.',
+        helpFooter: 'Поддержка Zenix.',
+        casinoModalTitle: 'Выбор игры', casinoPoker: 'Рулетка', casinoPokerDesc: 'Шанс', casinoPlinko: 'Плинко', casinoPlinkoDesc: 'Шарики'
+    },
+    es: {
+        m1: 'Inicio', m2: 'Cuantificación', m3: 'Depósito', m4: 'Retiro', m_team: 'Equipo', m5: 'Transacciones', m6: 'Perfil', m7: 'Soporte', m_about: 'Plataforma', m8: 'Salir',
+        wel: 'Bienvenido', sub: 'Panel', st: 'Verificado',
+        ts1: 'Saldo', ts2: 'Referidos',
+        c1: 'Cuantificación', d1: 'Trading', c2: 'Depósito', d2: 'Recarga', c3: 'Retiro', d3: 'Retiro',
+        c4: 'Equipo', d4: 'Subcuentas', c5: 'Transacciones', d5: 'Historial', c6: 'Perfil', d6: 'Seguridad',
+        tmkt: 'Mercado cripto', tlive: 'En vivo',
+        aboutToggleOpen: 'Ver más', aboutToggleClose: 'Ver menos',
+        aboutTitle: 'Sobre Zenix', aboutIntro: 'Bienvenido a Zenix.', aboutDesc: 'Finanzas digitales.',
+        aboutGoal: '<strong>Objetivo:</strong> Democratizar.', aboutStrategy: '<strong>Estrategia:</strong> Seguridad.',
+        aboutConclusion: '<i class="fas fa-quote-right"></i> Zenix es un ecosistema.',
+        floatingCasino: 'Casino', floatingCasinoTitle: 'Casino',
+        helpBtnTitle: 'Ayuda', detailMsgTitle: 'Mensaje',
+        aboutModalTitle: 'Sobre Zenix', modalTitle: 'Notificaciones', noMsg: 'Sin mensajes.', newBadge: 'NUEVO',
+        tabAll: 'Todo', tabApproved: 'Aprobado', tabRejected: 'Rechazado', tabAdmin: 'Admin',
+        helpTitle: 'Guía Zenix', helpSubtitle: 'Guía completa',
+        helpIntro: 'Bienvenido.',
+        helpS1Title: 'Saldo', helpS1Desc: 'Saldo y referidos.',
+        helpS2Title: 'Accesos', helpS2List: '<li>Cuantificación</li><li>Depósito</li><li>Retiro</li><li>Equipo</li><li>Transacciones</li><li>Perfil</li>',
+        helpS3Title: 'Mercado', helpS3Desc: 'Actualización cada 30s.',
+        helpS4Title: 'Notificaciones', helpS4Desc: 'Clic en la campana.',
+        helpS5Title: 'Casino', helpS5Desc: 'Clic en el botón flotante.',
+        helpS6Title: 'Seguridad', helpS6Desc: 'No comparta contraseña.',
+        helpFooter: 'Soporte Zenix.',
+        casinoModalTitle: 'Elegir juego', casinoPoker: 'Ruleta', casinoPokerDesc: 'Azar', casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Bolas'
+    },
+    fr: {
+        m1: 'Accueil', m2: 'Quantification', m3: 'Dépôt', m4: 'Retrait', m_team: 'Équipe', m5: 'Transactions', m6: 'Profil', m7: 'Support', m_about: 'Plateforme', m8: 'Déconnexion',
+        wel: 'Bienvenue', sub: 'Panneau', st: 'Vérifié',
+        ts1: 'Solde', ts2: 'Parrainages',
+        c1: 'Quantification', d1: 'Trading', c2: 'Dépôt', d2: 'Recharge', c3: 'Retrait', d3: 'Retrait',
+        c4: 'Équipe', d4: 'Sous-comptes', c5: 'Transactions', d5: 'Historique', c6: 'Profil', d6: 'Sécurité',
+        tmkt: 'Marché crypto', tlive: 'Direct',
+        aboutToggleOpen: 'Voir plus', aboutToggleClose: 'Voir moins',
+        aboutTitle: 'À propos de Zenix', aboutIntro: 'Bienvenue sur Zenix.', aboutDesc: 'Finance numérique.',
+        aboutGoal: '<strong>Objectif:</strong> Démocratiser.', aboutStrategy: '<strong>Stratégie:</strong> Sécurité.',
+        aboutConclusion: '<i class="fas fa-quote-right"></i> Zenix est un écosystème.',
+        floatingCasino: 'Casino', floatingCasinoTitle: 'Casino',
+        helpBtnTitle: 'Aide', detailMsgTitle: 'Message',
+        aboutModalTitle: 'À propos', modalTitle: 'Notifications', noMsg: 'Aucun message.', newBadge: 'NOUVEAU',
+        tabAll: 'Tout', tabApproved: 'Approuvé', tabRejected: 'Rejeté', tabAdmin: 'Admin',
+        helpTitle: 'Guide Zenix', helpSubtitle: 'Guide complet',
+        helpIntro: 'Bienvenue.',
+        helpS1Title: 'Solde', helpS1Desc: 'Solde et parrainages.',
+        helpS2Title: 'Raccourcis', helpS2List: '<li>Quantification</li><li>Dépôt</li><li>Retrait</li><li>Équipe</li><li>Transactions</li><li>Profil</li>',
+        helpS3Title: 'Marché', helpS3Desc: 'Mise à jour toutes les 30s.',
+        helpS4Title: 'Notifications', helpS4Desc: 'Cliquez sur la cloche.',
+        helpS5Title: 'Casino', helpS5Desc: 'Cliquez sur le bouton flottant.',
+        helpS6Title: 'Sécurité', helpS6Desc: 'Ne partagez pas votre mot de passe.',
+        helpFooter: 'Support Zenix.',
+        casinoModalTitle: 'Choisir un jeu', casinoPoker: 'Roulette', casinoPokerDesc: 'Hasard', casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Balles'
+    },
+    de: {
+        m1: 'Startseite', m2: 'Quantifizierung', m3: 'Einzahlung', m4: 'Auszahlung', m_team: 'Team', m5: 'Transaktionen', m6: 'Profil', m7: 'Hilfe', m_about: 'Plattform', m8: 'Abmelden',
+        wel: 'Willkommen', sub: 'Benutzer-Panel', st: 'Verifiziert',
+        ts1: 'Guthaben', ts2: 'Empfehlungen',
+        c1: 'Quantifizierung', d1: 'Trading', c2: 'Einzahlung', d2: 'Aufladen', c3: 'Auszahlung', d3: 'Auszahlung',
+        c4: 'Team', d4: 'Unterkonten', c5: 'Transaktionen', d5: 'Verlauf', c6: 'Profil', d6: 'Sicherheit',
+        tmkt: 'Krypto-Markt', tlive: 'Live',
+        aboutToggleOpen: 'Mehr', aboutToggleClose: 'Weniger',
+        aboutTitle: 'Über Zenix', aboutIntro: 'Willkommen bei Zenix.', aboutDesc: 'Digitale Finanzen.',
+        aboutGoal: '<strong>Ziel:</strong> Demokratisieren.', aboutStrategy: '<strong>Strategie:</strong> Sicherheit.',
+        aboutConclusion: '<i class="fas fa-quote-right"></i> Zenix ist ein Ökosystem.',
+        floatingCasino: 'Casino', floatingCasinoTitle: 'Casino',
+        helpBtnTitle: 'Hilfe', detailMsgTitle: 'Nachricht',
+        aboutModalTitle: 'Über Zenix', modalTitle: 'Benachrichtigungen', noMsg: 'Keine Nachrichten.', newBadge: 'NEU',
+        tabAll: 'Alle', tabApproved: 'Genehmigt', tabRejected: 'Abgelehnt', tabAdmin: 'Admin',
+        helpTitle: 'Zenix Handbuch', helpSubtitle: 'Vollständiges Handbuch',
+        helpIntro: 'Willkommen.',
+        helpS1Title: 'Guthaben', helpS1Desc: 'Guthaben und Empfehlungen.',
+        helpS2Title: 'Schnellzugriff', helpS2List: '<li>Quantifizierung</li><li>Einzahlung</li><li>Auszahlung</li><li>Team</li><li>Transaktionen</li><li>Profil</li>',
+        helpS3Title: 'Markt', helpS3Desc: 'Update alle 30s.',
+        helpS4Title: 'Benachrichtigungen', helpS4Desc: 'Auf Glocke klicken.',
+        helpS5Title: 'Casino', helpS5Desc: 'Auf schwebenden Button klicken.',
+        helpS6Title: 'Sicherheit', helpS6Desc: 'Passwort nicht teilen.',
+        helpFooter: 'Zenix Support.',
+        casinoModalTitle: 'Spiel wählen', casinoPoker: 'Roulette', casinoPokerDesc: 'Glück', casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Bälle'
+    }
+};
+
+function setLang(l) {
+    if (!SUPPORTED_LANGUAGES.includes(l)) l = 'en';
+    currLang = l;
+    safeSetItem('zenix_lang', l);
+    let t = ld[l] || ld.en;
+    let r = l === 'fa' || l === 'ar';
+    
+    document.documentElement.setAttribute('dir', r ? 'rtl' : 'ltr');
+    document.documentElement.setAttribute('lang', l);
+
+    document.querySelectorAll('#lang-menu .mi').forEach(item => {
+        if (item.dataset.lang === l) item.classList.add('active');
+        else item.classList.remove('active');
+    });
+
+    for (let i = 1; i <= 8; i++) {
+        let m = document.getElementById('m' + i);
+        if (m) m.textContent = t['m' + i] || '';
+    }
+
+    let mTeam = document.getElementById('m_team');
+    if (mTeam) mTeam.textContent = t.m_team;
+    let mAbout = document.getElementById('m_about');
+    if (mAbout) mAbout.textContent = t.m_about;
+
+    document.getElementById('help-btn')?.setAttribute('title', t.helpBtnTitle);
+    document.getElementById('floating-casino-btn')?.setAttribute('title', t.floatingCasinoTitle);
+
+    let detailMsgTitle = document.getElementById('detail-msg-title');
+    if (detailMsgTitle) detailMsgTitle.innerHTML = `<i class="fas fa-envelope-open"></i> ${t.detailMsgTitle}`;
+
+    const setTxt = (id, text) => {
+        const el = document.getElementById(id);
+        if (el && text) el.textContent = text;
+    };
+    const setHtml = (id, html) => {
+        const el = document.getElementById(id);
+        if (el && html) el.innerHTML = html;
+    };
+
+    const welEl = document.getElementById('t-wel');
+    if (welEl) welEl.textContent = currentUserName ? `${t.wel} ${currentUserName}` : t.wel;
+    setTxt('t-sub', t.sub);
+    setTxt('t-st', t.st);
+    setTxt('ts1', t.ts1); setTxt('ts2', t.ts2);
+    setTxt('c1', t.c1); setTxt('d1', t.d1);
+    setTxt('c2', t.c2); setTxt('d2', t.d2);
+    setTxt('c3', t.c3); setTxt('d3', t.d3);
+    setTxt('c4', t.c4); setTxt('d4', t.d4);
+    setTxt('c5', t.c5); setTxt('d5', t.d5);
+    setTxt('c6', t.c6); setTxt('d6', t.d6);
+    setTxt('t-mkt', t.tmkt);
+    setTxt('t-live', t.tlive);
+    
+    setTxt('t-about-box-title', t.aboutTitle);
+    setTxt('t-about-box-intro', t.aboutIntro);
+    setTxt('t-about-box-desc', t.aboutDesc);
+    setHtml('t-about-box-goal', t.aboutGoal);
+    setHtml('t-about-box-strategy', t.aboutStrategy);
+    setHtml('t-about-box-conclusion', t.aboutConclusion);
+    setTxt('t-about-toggle', t.aboutToggleOpen);
+
+    setHtml('t-about-modal-title', t.aboutModalTitle);
+    setTxt('t-about-modal-intro', t.aboutIntro);
+    setTxt('t-about-modal-desc', t.aboutDesc);
+    setHtml('t-about-modal-goal', t.aboutGoal);
+    setHtml('t-about-modal-strategy', t.aboutStrategy);
+    setHtml('t-about-modal-conclusion', t.aboutConclusion);
+
+    setHtml('t-help-modal-title', t.helpTitle);
+    setTxt('t-help-modal-subtitle', t.helpSubtitle);
+    setTxt('t-help-intro', t.helpIntro);
+    setTxt('t-help-s1-title', t.helpS1Title); setTxt('t-help-s1-desc', t.helpS1Desc);
+    setTxt('t-help-s2-title', t.helpS2Title); setHtml('t-help-s2-list', t.helpS2List);
+    setTxt('t-help-s3-title', t.helpS3Title); setTxt('t-help-s3-desc', t.helpS3Desc);
+    setTxt('t-help-s4-title', t.helpS4Title); setTxt('t-help-s4-desc', t.helpS4Desc);
+    setTxt('t-help-s5-title', t.helpS5Title); setTxt('t-help-s5-desc', t.helpS5Desc);
+    setTxt('t-help-s6-title', t.helpS6Title); setTxt('t-help-s6-desc', t.helpS6Desc);
+    setTxt('t-help-footer', t.helpFooter);
+
+    setHtml('t-casino-modal-title', `<i class="fas fa-dice" style="color:#f43f5e;"></i> ${t.casinoModalTitle}`);
+    setTxt('t-casino-poker', t.casinoPoker);
+    setTxt('t-casino-poker-desc', t.casinoPokerDesc);
+    setTxt('t-casino-plinko', t.casinoPlinko);
+    setTxt('t-casino-plinko-desc', t.casinoPlinkoDesc);
+    setTxt('t-floating-casino', t.floatingCasino);
+
+    let elModalTitle = document.getElementById('t-modal-title');
+    if (elModalTitle) elModalTitle.innerHTML = `<i class="fas fa-bell"></i> ${t.modalTitle}`;
+
+    setTxt('t-tab-all', t.tabAll);
+    setTxt('t-tab-approved', t.tabApproved);
+    setTxt('t-tab-rejected', t.tabRejected);
+    setTxt('t-tab-admin', t.tabAdmin);
+}
+
+document.querySelectorAll('#lang-menu .mi').forEach(i => {
+    i.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setLang(i.dataset.lang);
+        document.getElementById('lang-menu')?.classList.remove('show');
+    });
+});
+
+setLang(currLang);
+
+// ==========================================
+// 6. دریافت اطلاعات کاربر
+// ==========================================
+async function loadDashboardUserData(uid, sessionUser) {
+    try {
+        currentUserId = uid;
+        const { data: dbUser } = await supabaseClient.from('users').select('*').eq('id', uid).maybeSingle();
+        const { data: dbProfile } = await supabaseClient.from('profiles').select('*').eq('id', uid).maybeSingle();
+        const meta = sessionUser.user_metadata || {};
+
+        const userFullName =
+            dbUser?.fullname || dbUser?.full_name ||
+            dbProfile?.fullname || dbProfile?.full_name ||
+            meta.fullname || meta.full_name || '';
+        if (userFullName) {
+            currentUserName = userFullName;
+            const t = ld[currLang] || ld.en;
+            const welEl = document.getElementById('t-wel');
+            if (welEl) welEl.textContent = `${t.wel} ${currentUserName}`;
+        }
+
+        const balance = parseFloat(dbUser?.balance ?? dbProfile?.balance ?? meta.balance ?? 0);
+        const valBalance = document.getElementById('val-balance');
+        if (valBalance) valBalance.textContent = `$${balance.toFixed(2)}`;
+
+        let codeDigits = generateUIDDigits(uid);
+        let myRefCode = dbProfile?.referral_code || ('MS-' + codeDigits);
+
+        let rawList = [];
+        try {
+            const { data: dbProfiles } = await supabaseClient.from('profiles').select('*');
+            if (dbProfiles && Array.isArray(dbProfiles)) rawList.push(...dbProfiles);
+        } catch(e) {}
+
+        if (meta.team_members || meta.referrals || meta.invited_users) {
+            let metaTeam = meta.team_members || meta.referrals || meta.invited_users;
+            if (Array.isArray(metaTeam)) rawList.push(...metaTeam);
+        }
+
+        ['zenix_registered_users', 'zenix_users', 'zenix_referrals', 'zenix_team_' + uid, 'zenix_all_users'].forEach(k => {
+            try {
+                let item = safeGetItem(k);
+                if (item) {
+                    let parsed = JSON.parse(item);
+                    if (Array.isArray(parsed)) rawList.push(...parsed);
+                    else if (parsed && typeof parsed === 'object') rawList.push(parsed);
+                }
+            } catch(e) {}
+        });
+
+        let uniqueMap = new Map();
+        rawList.forEach(u => {
+            if (u) {
+                let key = u.user_id || u.id || u.email || u.username || JSON.stringify(u);
+                uniqueMap.set(key, u);
+            }
+        });
+        let allProfiles = Array.from(uniqueMap.values());
+
+        function isReferredBy(u, refUid, refCodeVal) {
+            if (!u) return false;
+            let uUid = u.user_id || u.id;
+            if (uUid === refUid) return false;
+            let digits = generateUIDDigits(refUid);
+            let targetCodes = [
+                String(refUid).toUpperCase(),
+                ('MS-' + digits).toUpperCase(),
+                ('SM-' + digits).toUpperCase(),
+                digits.toUpperCase()
+            ];
+            if (refCodeVal) targetCodes.push(String(refCodeVal).toUpperCase());
+            let refs = [u.referred_by, u.referrer_id, u.invitation_code, u.ref_code, u.inviter, u.referral_code, u.ref]
+                .map(x => x ? String(x).trim().toUpperCase() : '');
+            return refs.some(r => r && targetCodes.includes(r));
+        }
+
+        let lvl1Users = allProfiles.filter(u => isReferredBy(u, uid, myRefCode));
+        let lvl2Users = [], lvl3Users = [];
+        if (lvl1Users.length > 0) {
+            lvl2Users = allProfiles.filter(u => {
+                let uUid = u.user_id || u.id;
+                if (uUid === uid || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid)) return false;
+                return lvl1Users.some(l1 => isReferredBy(u, l1.user_id || l1.id, l1.referral_code));
+            });
+        }
+        if (lvl2Users.length > 0) {
+            lvl3Users = allProfiles.filter(u => {
+                let uUid = u.user_id || u.id;
+                if (uUid === uid || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid) || lvl2Users.some(l2 => (l2.user_id || l2.id) === uUid)) return false;
+                return lvl2Users.some(l2 => isReferredBy(u, l2.user_id || l2.id, l2.referral_code));
+            });
+        }
+
+        let l1Count = lvl1Users.length;
+        if (l1Count === 0 && (meta.referral_count || meta.invited_count)) {
+            l1Count = Number(meta.referral_count || meta.invited_count || 0);
+        }
+        let totalTeamCount = l1Count + lvl2Users.length + lvl3Users.length;
+        const valRef = document.getElementById('val-ref');
+        if (valRef) valRef.textContent = totalTeamCount;
+
+        allMessages = await fetchUserMessages(uid);
+        updateNotifBadges();
+    } catch (err) {
+        console.error("خطا در دریافت اطلاعات:", err);
+    }
+}
+
+supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    if (session && session.user) {
+        currentUserId = session.user.id;
+        loadDashboardUserData(session.user.id, session.user);
+        fetchUserMessages(session.user.id).then(msgs => {
+            allMessages = msgs;
+            updateNotifBadges();
+        });
+    } else {
+        window.location.href = 'index.html';
+    }
+});
+
+// ==========================================
+// 7. مدیریت منوها
+// ==========================================
+const menuBtn = document.getElementById('menu-btn');
+const navMenu = document.getElementById('nav-menu');
+const langBtn = document.getElementById('lang-btn');
+const langMenu = document.getElementById('lang-menu');
+const helpBtn = document.getElementById('help-btn');
+
+function closeAllMenus(except = '') {
+    if (except !== 'nav' && navMenu) navMenu.classList.remove('show');
+    if (except !== 'lang' && langMenu) langMenu.classList.remove('show');
+}
+
+if (menuBtn && navMenu) {
+    menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        navMenu.classList.toggle('show');
+        closeAllMenus('nav');
+    });
+}
+if (langBtn && langMenu) {
+    langBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        langMenu.classList.toggle('show');
+        closeAllMenus('lang');
+    });
+}
+if (helpBtn) {
+    helpBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeAllMenus();
+        window.openHelpModal();
+    });
+}
+
+document.addEventListener('click', (e) => {
+    if (navMenu && !navMenu.contains(e.target) && e.target !== menuBtn) navMenu.classList.remove('show');
+    if (langMenu && !langMenu.contains(e.target) && e.target !== langBtn) langMenu.classList.remove('show');
+});
+
+document.querySelectorAll('.modal').forEach(m => {
+    m.addEventListener('click', (e) => {
+        if (e.target === m) { m.classList.remove('show'); unlockBody(); }
+    });
+});
+
+document.getElementById('logout-btn')?.addEventListener('click', async e => {
+    e.preventDefault();
+    try { await supabaseClient.auth.signOut(); } catch(e) {}
+    window.location.href = 'index.html';
+});
