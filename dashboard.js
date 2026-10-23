@@ -48,7 +48,7 @@ function generateUIDDigits(userId) {
 }
 
 // ==========================================
-// ★★ اصلاح موبایل: غیرفعال‌سازی انیمیشن آکاردئون راهنما در گوشی
+// ★★ اصلاح موبایل + استایل کادر پیام
 // ==========================================
 (function injectHelpAccordionMobileFix() {
     if (document.getElementById('zenix-help-accordion-fix')) return;
@@ -64,12 +64,10 @@ function generateUIDDigits(userId) {
                 transition: transform .15s ease !important;
             }
         }
-        /* کوچک‌سازی کادر پیام‌ها و حذف margin-bottom پیش‌فرض کلاس */
         .msg-body-box {
             margin-bottom: 0 !important;
             padding: 8px 10px !important;
         }
-        /* جلوگیری از تغییر رنگ حاشیه در حالت hover روی پیام خوانده‌شده */
         .msg-body-box.is-read:hover {
             border-color: rgba(255,255,255,.05) !important;
             opacity: .75 !important;
@@ -79,7 +77,7 @@ function generateUIDDigits(userId) {
 })();
 
 // ==========================================
-// 2. مدیریت مدال‌های پلتفرم + قفل اسکرول
+// 2. مدیریت مدال‌ها
 // ==========================================
 function lockBody() { document.body.classList.add('modal-open'); }
 function unlockBody() {
@@ -98,7 +96,6 @@ window.closeAboutModal = function() {
     document.getElementById('m-about-modal')?.classList.remove('show');
     unlockBody();
 };
-
 window.openHelpModal = function() {
     document.getElementById('m-help-modal')?.classList.add('show');
     lockBody();
@@ -108,7 +105,6 @@ window.closeHelpModal = function() {
     document.getElementById('m-help-modal')?.classList.remove('show');
     unlockBody();
 };
-
 window.openCasinoModal = function() {
     document.getElementById('m-casino-modal')?.classList.add('show');
     lockBody();
@@ -118,13 +114,11 @@ window.closeCasinoModal = function() {
     document.getElementById('m-casino-modal')?.classList.remove('show');
     unlockBody();
 };
-
 window.toggleHelpAccordion = function(btn) {
     const item = btn.closest('.help-accordion');
     if (!item) return;
     item.classList.toggle('open');
 };
-
 window.toggleAboutBox = function() {
     const box = document.getElementById('platformInfoBox');
     if (!box) return;
@@ -139,7 +133,7 @@ window.toggleAboutBox = function() {
 };
 
 // ==========================================
-// 3. سیستم دریافت و نمایش بازار ارزهای دیجیتال
+// 3. بازار ارزهای دیجیتال
 // ==========================================
 async function fetchCryptoPrices() {
     const tickerContainer = document.getElementById('crypto-ticker-list');
@@ -215,6 +209,14 @@ function getNotifCategory(m) {
     return 'admin_message';
 }
 
+// ★ تشخیص پیام مربوط به برداشت
+function isWithdrawalMessage(m) {
+    if (!m) return false;
+    const combined = (((m.type || '') + ' ' + (m.subject || '')).toLowerCase());
+    const keywords = ['withdraw', 'برداشت', 'سحب', 'çekim', 'вывод', 'retiro', 'retrait', 'auszahlung', 'payout'];
+    return keywords.some(k => combined.includes(k));
+}
+
 async function fetchUserMessages(uid) {
     try {
         const { data } = await supabaseClient.from('notifications').select('*').eq('user_id', uid).order('created_at', { ascending: false });
@@ -266,7 +268,7 @@ window.openMessageModal = async () => {
     lockBody();
 };
 
-// ★ لیست پیام‌ها: فقط موضوع + تفکیک واضح خوانده/نخوانده + کادر کوچک‌تر
+// ★ لیست پیام‌ها: فقط موضوع + تفکیک خوانده/نخوانده
 function renderMessageList() {
     let c = document.getElementById('modal-msg-container');
     if (!c) return;
@@ -316,6 +318,7 @@ function renderMessageList() {
     c.innerHTML = html + '</div>';
 }
 
+// ★★ نمایش پیام: متن زیبای رد برداشت + دکمه ارتباط با پشتیبانی
 window.readAdminMessage = async idx => {
     let m = allMessages[idx]; if (!m) return;
     allMessages[idx].read = true;
@@ -327,16 +330,49 @@ window.readAdminMessage = async idx => {
     updateNotifBadges();
     renderMessageList();
 
+    const t = ld[currLang] || ld.en;
+    const cat = getNotifCategory(m);
+    const isWithdrawalReject = (cat === 'rejected') && isWithdrawalMessage(m);
+
     let titleEl = document.getElementById('detail-msg-title');
     let dateEl = document.getElementById('detail-msg-date');
     let bodyEl = document.getElementById('detail-msg-body');
+    let supportEl = document.getElementById('detail-msg-support');
 
     if (titleEl) titleEl.innerHTML = `<i class="fas fa-envelope-open"></i> ${escapeHtml(m.subject)}`;
     if (dateEl) {
         dateEl.textContent = m.time || '';
         dateEl.style.display = m.time ? 'block' : 'none';
     }
-    if (bodyEl) bodyEl.textContent = m.body || '';
+
+    // ★ متن پیام
+    let bodyText = '';
+    if (isWithdrawalReject) {
+        const defaultText = t.rejectWithdrawDefault || '';
+        const adminText = (m.body || '').trim();
+        bodyText = defaultText;
+        // اگر مدیر دلیل مشخصی نوشته بود، زیر متن اصلی حفظ شود
+        if (adminText && adminText.length > 15 && adminText !== defaultText) {
+            bodyText += '\n\n———\n\n' + adminText;
+        }
+    } else {
+        bodyText = m.body || '';
+    }
+    if (bodyEl) bodyEl.textContent = bodyText;
+
+    // ★ دکمه ارتباط با پشتیبانی برای پیام‌های رد‌شده
+    if (supportEl) {
+        if (cat === 'rejected') {
+            const supportLabel = escapeHtml(t.contactSupport || 'Contact Support');
+            supportEl.innerHTML = `
+                <a href="support.html" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;padding:11px 16px;background:linear-gradient(135deg,#a855f7,#ec4899);color:#fff;text-decoration:none;border-radius:10px;font-size:12.5px;font-weight:700;box-shadow:0 6px 20px rgba(168,85,247,.35);transition:transform .15s, box-shadow .2s;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 26px rgba(168,85,247,.5)';" onmouseout="this.style.transform='';this.style.boxShadow='0 6px 20px rgba(168,85,247,.35)';">
+                    <i class="fas fa-headset" style="font-size:13px;"></i>
+                    <span>${supportLabel}</span>
+                </a>`;
+        } else {
+            supportEl.innerHTML = '';
+        }
+    }
 
     document.getElementById('m-msg-detail')?.classList.add('show');
 };
@@ -356,7 +392,7 @@ document.getElementById('bell-btn')?.addEventListener('click', e => {
 });
 
 // ==========================================
-// 5. سیستم ترجمه کامل ۸ زبانه
+// 5. سیستم ترجمه ۸ زبانه
 // ==========================================
 const SUPPORTED_LANGUAGES = ['en', 'fa', 'ar', 'tr', 'ru', 'es', 'fr', 'de'];
 const savedLang = safeGetItem('zenix_lang');
@@ -387,6 +423,8 @@ const ld = {
         aboutModalTitle: '<i class="fas fa-info-circle"></i> درباره پلتفرم هوشمند زِنیکس',
         modalTitle: 'صندوق پیام‌ها و اعلان‌ها', noMsg: 'هیچ پیام جدیدی وجود ندارد.', newBadge: 'جدید',
         tabAll: 'همه', tabApproved: 'تایید درخواست', tabRejected: 'لغو درخواست', tabAdmin: 'پیام مدیریت',
+        rejectWithdrawDefault: 'درخواست برداشت شما توسط مدیریت لغو شد.\n\nاگر نیاز به بررسی مجدد یا کسب اطلاعات بیشتر درباره‌ی دلیل لغو دارید، می‌توانید از طریق دکمه‌ی زیر با تیم پشتیبانی زِنیکس در ارتباط باشید. پشتیبانی ما همواره آماده‌ی راهنمایی و همراهی شماست.',
+        contactSupport: 'ارتباط با پشتیبانی',
         helpTitle: 'راهنمای جامع داشبورد زِنیکس',
         helpSubtitle: 'راهنمای کامل استفاده از پنل',
         helpIntro: 'به بخش مدیریت و داشبورد کاربری پلتفرم زِنیکس خوش آمدید. در این بخش می‌توانید خلاصه‌ای از عملکرد مالی و دسترسی سریع به بخش‌های اصلی داشته باشید.',
@@ -431,6 +469,8 @@ const ld = {
         aboutModalTitle: '<i class="fas fa-info-circle"></i> About Zenix Smart Platform',
         modalTitle: 'Notifications & Messages', noMsg: 'No new messages.', newBadge: 'NEW',
         tabAll: 'All', tabApproved: 'Approved', tabRejected: 'Rejected', tabAdmin: 'Admin Msg',
+        rejectWithdrawDefault: 'Your withdrawal request has been cancelled by the management.\n\nIf you need a review or wish to know more about the reason for cancellation, you can reach out to the Zenix support team using the button below. Our support is always here to assist and guide you.',
+        contactSupport: 'Contact Support',
         helpTitle: 'Zenix Dashboard Comprehensive Guide',
         helpSubtitle: 'Complete guide to the panel',
         helpIntro: 'Welcome to the Zenix user management dashboard. Here you can find a summary of your financial performance and quick access to core sections.',
@@ -475,6 +515,8 @@ const ld = {
         aboutModalTitle: '<i class="fas fa-info-circle"></i> حول منصة Zenix الذكية',
         modalTitle: 'صندوق الرسائل والإشعارات', noMsg: 'لا توجد رسائل جديدة.', newBadge: 'جديد',
         tabAll: 'الكل', tabApproved: 'طلبات مقبولة', tabRejected: 'طلبات مرفوضة', tabAdmin: 'رسائل الإدارة',
+        rejectWithdrawDefault: 'تم إلغاء طلب السحب الخاص بك من قبل الإدارة.\n\nإذا كنت بحاجة إلى إعادة النظر أو ترغب في معرفة المزيد حول سبب الإلغاء، يمكنك التواصل مع فريق دعم Zenix باستخدام الزر أدناه. فريق الدعم لدينا مستعد دائمًا لمساعدتك ومرافقتك.',
+        contactSupport: 'تواصل مع الدعم',
         helpTitle: 'دليل لوحة تحكم Zenix الشامل',
         helpSubtitle: 'دليل شامل للوحة التحكم',
         helpIntro: 'مرحباً بك في لوحة تحكم إدارة المستخدمين في Zenix. يمكنك هنا العثور على ملخص لأدائك المالي والوصول السريع للأقسام الأساسية.',
@@ -519,6 +561,8 @@ const ld = {
         aboutModalTitle: '<i class="fas fa-info-circle"></i> Zenix Akıllı Platform Hakkında',
         modalTitle: 'Bildirimler ve Mesajlar', noMsg: 'Yeni mesaj yok.', newBadge: 'YENİ',
         tabAll: 'Tümü', tabApproved: 'Onaylanan', tabRejected: 'Reddedilen', tabAdmin: 'Yönetici',
+        rejectWithdrawDefault: 'Para çekme talebiniz yönetim tarafından iptal edildi.\n\nYeniden inceleme yapılmasına veya iptal nedenini öğrenmek istiyorsanız, aşağıdaki düğmeyi kullanarak Zenix destek ekibiyle iletişime geçebilirsiniz. Desteğimiz size yardımcı olmak ve sizinle birlikte olmak için her zaman hazırdır.',
+        contactSupport: 'Destek ile İletişim',
         helpTitle: 'Zenix Kontrol Paneli Kapsamlı Rehberi',
         helpSubtitle: 'Panel için kapsamlı rehber',
         helpIntro: 'Zenix kullanıcı yönetim paneline hoş geldiniz. Burada finansal performansınızın bir özetini bulabilirsiniz.',
@@ -563,6 +607,8 @@ const ld = {
         aboutModalTitle: '<i class="fas fa-info-circle"></i> О смарт-платформе Zenix',
         modalTitle: 'Уведомления', noMsg: 'Нет новых сообщений.', newBadge: 'НОВОЕ',
         tabAll: 'Все', tabApproved: 'Одобрено', tabRejected: 'Отклонено', tabAdmin: 'Админ',
+        rejectWithdrawDefault: 'Ваш запрос на вывод средств был отменён администрацией.\n\nЕсли вам нужна дополнительная проверка или вы хотите узнать причину отмены, вы можете связаться со службой поддержки Zenix с помощью кнопки ниже. Наша поддержка всегда готова помочь и сопровождать вас.',
+        contactSupport: 'Связаться с поддержкой',
         helpTitle: 'Руководство панели управления Zenix',
         helpSubtitle: 'Полное руководство по панели',
         helpIntro: 'Добро пожаловать в панель управления Zenix.',
@@ -607,6 +653,8 @@ const ld = {
         aboutModalTitle: '<i class="fas fa-info-circle"></i> Sobre la plataforma inteligente Zenix',
         modalTitle: 'Notificaciones', noMsg: 'No hay mensajes nuevos.', newBadge: 'NUEVO',
         tabAll: 'Todo', tabApproved: 'Aprobado', tabRejected: 'Rechazado', tabAdmin: 'Admin',
+        rejectWithdrawDefault: 'Su solicitud de retiro ha sido cancelada por la administración.\n\nSi necesita una revisión o desea saber más sobre el motivo de la cancelación, puede ponerse en contacto con el equipo de soporte de Zenix mediante el botón a continuación. Nuestro soporte siempre está listo para ayudarle y acompañarle.',
+        contactSupport: 'Contactar con soporte',
         helpTitle: 'Guía de Zenix',
         helpSubtitle: 'Guía completa del panel',
         helpIntro: 'Bienvenido al panel de Zenix.',
@@ -651,6 +699,8 @@ const ld = {
         aboutModalTitle: '<i class="fas fa-info-circle"></i> À propos de la plateforme intelligente Zenix',
         modalTitle: 'Notifications', noMsg: 'Aucun nouveau message.', newBadge: 'NOUVEAU',
         tabAll: 'Tout', tabApproved: 'Approuvé', tabRejected: 'Rejeté', tabAdmin: 'Admin',
+        rejectWithdrawDefault: 'Votre demande de retrait a été annulée par l\'administration.\n\nSi vous avez besoin d\'un réexamen ou si vous souhaitez en savoir plus sur le motif de l\'annulation, vous pouvez contacter l\'équipe d\'assistance Zenix à l\'aide du bouton ci-dessous. Notre support est toujours prêt à vous aider et à vous accompagner.',
+        contactSupport: 'Contacter le support',
         helpTitle: 'Guide Zenix',
         helpSubtitle: 'Guide complet du panneau',
         helpIntro: 'Bienvenue sur le tableau de bord Zenix.',
@@ -695,6 +745,8 @@ const ld = {
         aboutModalTitle: '<i class="fas fa-info-circle"></i> Über die intelligente Zenix-Plattform',
         modalTitle: 'Benachrichtigungen', noMsg: 'Keine neuen Nachrichten.', newBadge: 'NEU',
         tabAll: 'Alle', tabApproved: 'Genehmigt', tabRejected: 'Abgelehnt', tabAdmin: 'Admin',
+        rejectWithdrawDefault: 'Ihre Auszahlungsanfrage wurde von der Verwaltung storniert.\n\nWenn Sie eine Überprüfung benötigen oder mehr über den Grund der Stornierung erfahren möchten, können Sie unser Zenix-Support-Team über die untenstehende Schaltfläche kontaktieren. Unser Support ist jederzeit bereit, Ihnen zu helfen und Sie zu begleiten.',
+        contactSupport: 'Support kontaktieren',
         helpTitle: 'Zenix Leitfaden',
         helpSubtitle: 'Vollständiger Leitfaden zum Panel',
         helpIntro: 'Willkommen beim Zenix-Dashboard.',
@@ -837,7 +889,7 @@ document.querySelectorAll('#lang-menu .mi').forEach(i => {
 setLang(currLang);
 
 // ==========================================
-// 6. دریافت اطلاعات کاربر و محاسبه زیرمجموعه‌ها
+// 6. دریافت اطلاعات کاربر
 // ==========================================
 async function loadDashboardUserData(uid, sessionUser) {
     try {
@@ -984,7 +1036,7 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 });
 
 // ==========================================
-// 7. مدیریت منوهای هدر
+// 7. منوهای هدر
 // ==========================================
 const menuBtn = document.getElementById('menu-btn');
 const navMenu = document.getElementById('nav-menu');
@@ -1026,7 +1078,6 @@ document.addEventListener('click', (e) => {
     if (langMenu && !langMenu.contains(e.target) && e.target !== langBtn) langMenu.classList.remove('show');
 });
 
-// بستن مدال با کلیک روی backdrop
 document.querySelectorAll('.modal').forEach(m => {
     m.addEventListener('click', (e) => {
         if (e.target === m) {
