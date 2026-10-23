@@ -37,7 +37,20 @@
     <script>(function(){var s=localStorage.getItem('zenix_lang')||'en',r=['fa','ar'];document.documentElement.setAttribute('dir',r.includes(s)?'rtl':'ltr');document.documentElement.setAttribute('lang',s);})();</script>
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Vazirmatn',system-ui,sans-serif}
-        body{background:#030712;min-height:100vh;display:flex;justify-content:center;align-items:center;color:#f8fafc;padding:15px;position:relative;overflow-x:hidden}
+        body{
+            background:#030712;
+            min-height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            color:#f8fafc;
+            padding:15px;
+            position:relative;
+            overflow-x:hidden;
+            -webkit-text-size-adjust:100%;
+            -moz-text-size-adjust:100%;
+            text-size-adjust:100%;
+        }
         .glow-1,.glow-2{position:absolute;border-radius:50%;filter:blur(80px);opacity:.35;pointer-events:none;z-index:1}
         .glow-1{width:250px;height:250px;background:#0ea5e9;top:10%;left:10%}
         .glow-2{width:250px;height:250px;background:#a855f7;bottom:10%;right:10%}
@@ -123,7 +136,37 @@
         #msg.show{display:block}
         .err{color:#f87171;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3)}
         .succ{color:#4ade80;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3)}
-        @media (max-width: 768px) { input { font-size: 16px !important; } }
+
+        /* ============ موبایل: جلوگیری از بزرگ شدن فونت‌ها + تنظیم سایزها ============ */
+        @media (max-width: 768px) {
+            /* فقط input ها 16px باشن تا iOS هنگام فوکوس زوم نکنه */
+            .group input { font-size: 16px !important; }
+            .auth-card { padding: 22px 20px; }
+            .logo-text { font-size: 24px; letter-spacing: 2px; }
+            .logo-icon { width: 42px; height: 42px; font-size: 22px; }
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .auth-card { padding: 18px 16px; border-radius: 20px; }
+            .header-actions { margin-bottom: 10px; }
+            .logo { margin-bottom: 16px; }
+            .logo-header { gap: 8px; margin-bottom: 6px; }
+            .logo-text { font-size: 22px; letter-spacing: 2px; }
+            .logo-icon { width: 38px; height: 38px; font-size: 20px; border-radius: 10px; }
+            .logo p { font-size: 11px; }
+            .group { margin-bottom: 12px; }
+            .group label { font-size: 11px; }
+            .group input { padding: 10px 14px; }
+            html[dir="rtl"] .group input { padding-right: 36px; padding-left: 36px; }
+            html[dir="ltr"] .group input { padding-left: 36px; padding-right: 36px; }
+            .extra-links { font-size: 10px; margin-bottom: 14px; }
+            .btn { font-size: 12px; padding: 11px; }
+            .footer { font-size: 11px; margin-top: 14px; }
+            #msg { font-size: 11px; padding: 10px; }
+            .lb { height: 34px; width: 34px; font-size: 12px; }
+            .mi { font-size: 11px; padding: 6px 10px; }
+        }
     </style>
 </head>
 <body>
@@ -277,7 +320,6 @@
             return domToken || window.__cfToken || null;
         }
 
-        // ★★★ اصلاح شده: چک status + بازگشت 'BANNED' برای کاربران مسدود
         async function getTargetPage(userId) {
             try {
                 const { data } = await supabaseClient
@@ -286,7 +328,6 @@
                     .eq('id', userId)
                     .maybeSingle();
 
-                // اگر کاربر مسدود است، علامت BANNED برگردان
                 if (data && (data.status === 'cancelled' || data.status === 'banned')) {
                     return 'BANNED';
                 }
@@ -365,7 +406,6 @@
             checkInputs();
         }
 
-        // ★★★ نمایش پیام مسدود بودن با آیکون واضح
         function showBanned() {
             const t = langData[currentLang] || langData.en;
             msg.innerHTML = `<div><i class="fas fa-ban" style="margin-inline-end:6px;"></i>${t.errDisabled}</div>`;
@@ -402,7 +442,6 @@
                 const targetPage = await getTargetPage(data.user.id);
                 if (currentSubmit !== submitCounter) { isSubmitting = false; return; }
 
-                // ★★★ چک مسدود بودن: اگر BANNED بود، خارج شو + پیام بده
                 if (targetPage === 'BANNED') {
                     try { await supabaseClient.auth.signOut(); } catch (_) {}
                     try { if (window.turnstile) window.turnstile.reset(); } catch(e) {}
