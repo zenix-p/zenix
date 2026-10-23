@@ -436,12 +436,12 @@
         passIn.addEventListener('focus', clearError);
         passIn.addEventListener('input', checkInputs);
 
-        function showError(errKey) {
-            const t = langData[currentLang] || langData.en;
-            msg.innerHTML = `<div>${t[errKey] || errKey}</div>`;
-            msg.className = 'err show';
-            checkInputs();
-        }
+       function showError(errKey) {
+    const t = langData[currentLang] || langData.en;
+    msg.textContent = t[errKey] || errKey;
+    msg.className = 'err show';
+    checkInputs();
+}
 
         function showBanned() {
             const t = langData[currentLang] || langData.en;
