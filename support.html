@@ -811,6 +811,14 @@
         });
         document.addEventListener('click', (e) => { if (!e.target.closest('.wrap')) langMenu.classList.remove('show'); });
 
+        function generateConversationId(userId, topicKey) {
+            let hash = 0;
+            const str = (userId || 'guest') + '-' + (topicKey || 'new') + '-' + Date.now().toString().slice(-4);
+            for (let i = 0; i < str.length; i++) { hash = ((hash << 5) - hash) + str.charCodeAt(i); hash = hash & hash; }
+            const num = Math.abs(hash % 900000) + 100000;
+            return 'ZE-' + num;
+        }
+
         function buildTopicsGrid() {
             topicsGrid.innerHTML = '';
             const data = LD[currentLang];
@@ -894,6 +902,14 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        async function ensureUserIdentityMessage() {
+            if (!currentUser || !currentChatId) return;
+            try {
+                const userCode = 'SM-' + generateUIDDigits(currentUser.id);
+                await supabase.rpc('insert_chat_identity_message', { p_user_code: userCode });
+            } catch (e) { console.error('identity msg error:', e); }
+        }
+
         async function ensureChatExists() {
             if (currentChatId || !currentUser || !currentUser.email) return;
             const { data: existing } = await supabase.from('support_chats').select('*').eq('user_email', currentUser.email).maybeSingle();
@@ -924,6 +940,7 @@
             await ensureChatExists();
             if (currentChatId) {
                 currentConversationId = 'ZE-' + currentChatId.replace(/-/g, '').slice(0, 6).toUpperCase();
+                await ensureUserIdentityMessage();
             } else {
                 currentConversationId = 'ZE-NEW';
             }
@@ -944,6 +961,36 @@
             else { window.location.href = 'dashboard.html'; }
         };
 
+        function generateTopicReply(question) {
+            if (!currentTopic) return { handled: false, text: t('mustSelectTopic') };
+            const data = LD[currentLang];
+            const topic = data.topics[currentTopic];
+            const q = String(question || '').toLowerCase().trim();
+
+            const adminKeywords = ['ادمین', 'پشتیبان', 'مدیر', 'admin', 'support', 'human', 'yönetici', 'destek', 'админ', 'поддержка', 'soporte', 'administrateur'];
+            if (adminKeywords.some(k => q.includes(k.toLowerCase()))) return { handled: 'switch_to_admin' };
+
+            for (const item of (topic.knowledge || [])) {
+                if (item.kw.some(k => q.includes(k.toLowerCase()))) return { handled: true, text: item.r };
+            }
+
+            const smallTalk = data.smallTalk || LD.fa.smallTalk;
+            if (smallTalk) {
+                const order = ['greeting', 'howAreYou', 'goodMorning', 'goodNight', 'thanks', 'bye', 'whoAreYou', 'whatCanYouDo'];
+                for (const key of order) {
+                    const item = smallTalk[key];
+                    if (item && item.kw && kwMatchSmallTalk(q, item.kw)) {
+                        const name = EXPERT_NAMES[currentTopic] || 'Sophia';
+                        const role = data.roles[currentTopic] || '';
+                        const reply = String(item.r).replace(/\{name\}/g, name).replace(/\{role\}/g, role);
+                        return { handled: true, text: reply };
+                    }
+                }
+            }
+
+            return { handled: true, text: t('noInfoFound'), showAdminBtn: true };
+        }
+
         function escapeHtml(value) {
             return String(value == null ? '' : value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
@@ -959,6 +1006,152 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
             setTimeout(() => errorBanner.classList.remove('show'), 4000);
         }
+        function isCodeExpired(createdAt) {
+            if (!createdAt) return false;
+            const createdMs = new Date(createdAt).getTime();
+            if (isNaN(createdMs)) return false;
+            return (Date.now() - createdMs) >= OTP_EXPIRY_MS;
+        }
+
+        window.copyOtp = async function(code, btn) {
+            try { await navigator.clipboard.writeText(code); } catch (e) {
+                const ta = document.createElement('textarea'); ta.value = code; ta.style.position='fixed'; ta.style.opacity='0';
+                document.body.appendChild(ta); ta.select();
+                try { document.execCommand('copy'); } catch(_) {}
+                document.body.removeChild(ta);
+            }
+            if (btn) { btn.classList.add('copied'); btn.innerHTML = '<i class="fas fa-check"></i>'; }
+            const returnPage = sessionStorage.getItem('zenix_return_page');
+            if (returnPage) {
+                const toast = document.createElement('div');
+                toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:rgba(34,197,94,.95);color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:700;z-index:99999;box-shadow:0 8px 25px rgba(34,197,94,.5);display:flex;align-items:center;gap:8px;';
+                toast.innerHTML = `<i class="fas fa-check-circle"></i> ${t('copySuccess')}`;
+                document.body.appendChild(toast);
+                setTimeout(() => { sessionStorage.removeItem('zenix_return_page'); window.location.href = returnPage; }, 1200);
+            } else {
+                setTimeout(() => { if (btn) { btn.classList.remove('copied'); btn.innerHTML = '<i class="fas fa-copy"></i>'; } }, 1500);
+            }
+        };
+
+        function renderMessage(text, sender, timeIso, senderLabel) {
+            const div = document.createElement('div');
+            div.className = `msg ${sender}`;
+            const safeContent = (sender === 'bot' || sender === 'system') ? text : escapeHtml(text);
+            const label = senderLabel ? `<span class="msg-sender">${escapeHtml(senderLabel)}</span>` : '';
+            div.innerHTML = `${label}${safeContent}<span class="msg-meta">${formatTime(timeIso)}</span>`;
+            chatBody.appendChild(div);
+            chatBody.scrollTop = chatBody.scrollHeight;
+            return div;
+        }
+
+        function renderIdentityMessage(text, timeIso) {
+            const parts = text.replace('[CHAT_IDENTITY]|', '').split('|');
+            const code = parts[0] || '';
+            const name = parts[1] || '';
+            const email = parts[2] || '';
+            const div = document.createElement('div');
+            div.className = 'msg system identity-msg';
+            div.innerHTML = `
+                <div class="identity-header">
+                    <i class="fas fa-user-shield"></i>
+                    <span>${escapeHtml(t('userInfoHeader'))}</span>
+                </div>
+                <div class="identity-row">
+                    <strong>${escapeHtml(t('userIdLabel'))}:</strong>
+                    <span class="code-val">${escapeHtml(code)}</span>
+                </div>
+                <div class="identity-row">
+                    <strong>${escapeHtml(t('userNameLabel'))}:</strong>
+                    <span class="val">${escapeHtml(name)}</span>
+                </div>
+                <div class="identity-row">
+                    <strong>${escapeHtml(t('userEmailLabel'))}:</strong>
+                    <span class="email-val">${escapeHtml(email)}</span>
+                </div>
+                <span class="msg-meta">${formatTime(timeIso)}</span>
+            `;
+            chatBody.appendChild(div);
+            chatBody.scrollTop = chatBody.scrollHeight;
+            return div;
+        }
+
+        function renderCodeMessage(text, timeIso, createdAt) {
+            const match = text.match(/کد شما:\s*(\d{6})/);
+            const otpCode = match ? match[1] : null;
+            if (!otpCode) {
+                const div = document.createElement('div');
+                div.className = 'msg system';
+                div.innerHTML = text + `<span class="msg-meta">${formatTime(timeIso)}</span>`;
+                chatBody.appendChild(div);
+                return div;
+            }
+            const createdMs = createdAt ? new Date(createdAt).getTime() : Date.now();
+            const expiresAt = createdMs + OTP_EXPIRY_MS;
+            if (Date.now() >= expiresAt) return null;
+            const div = document.createElement('div');
+            div.className = 'msg system code-msg';
+            const render = () => {
+                if (!div.isConnected) return false;
+                const remaining = expiresAt - Date.now();
+                if (remaining <= 0) { div.remove(); return false; }
+                const mins = Math.floor(remaining / 60000);
+                const secs = Math.floor((remaining % 60000) / 1000);
+                const timerText = `${mins}:${String(secs).padStart(2, '0')}`;
+                div.innerHTML = `<span class="msg-sender" style="opacity:.85;color:#c084fc;">🛡️ Zenix</span><div class="otp-code-display"><span class="otp-code-text">${otpCode}</span><button class="copy-otp-btn" data-code="${otpCode}" title="copy"><i class="fas fa-copy"></i></button></div><div class="otp-timer-row"><span>⏱</span><span class="otp-timer-val">${timerText}</span></div><span class="msg-meta">${formatTime(timeIso)}</span>`;
+                const cpBtn = div.querySelector('.copy-otp-btn');
+                if (cpBtn) cpBtn.onclick = () => window.copyOtp(otpCode, cpBtn);
+                return true;
+            };
+            chatBody.appendChild(div);
+            render();
+            const timer = setInterval(() => { if (!render()) clearInterval(timer); }, 1000);
+            chatBody.scrollTop = chatBody.scrollHeight;
+            return div;
+        }
+
+        function renderTyping() {
+            const div = document.createElement('div');
+            div.className = 'msg bot';
+            div.innerHTML = `<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+            chatBody.appendChild(div);
+            chatBody.scrollTop = chatBody.scrollHeight;
+            return div;
+        }
+
+        async function switchToHumanMode() {
+            if (!currentUser) {
+                renderMessage('Please log in first.', 'system', new Date().toISOString());
+                setTimeout(() => { window.location.href = 'index.html'; }, 2500);
+                return;
+            }
+            if (aiMode === false) return;
+            aiMode = false;
+            currentView = 'admin';
+            currentTopic = null;
+            chatIsOpen = true;
+            chatAvatarIcon.style.display = 'none';
+            chatAvatarImg.style.display = 'block';
+            chatAvatarImg.src = 'https://randomuser.me/api/portraits/women/50.jpg';
+            chatAvatarEl.classList.add('expert');
+            chatTitleH3.innerHTML = `<span class="expert-name">${t('adminView')}</span><span class="expert-role">— ${t('adminRole')}</span>`;
+            chatTitleP.innerHTML = `<i class="fas fa-circle" style="font-size:6px;color:#22c55e;"></i><span style="color:#22c55e;">${t('connected')}</span>`;
+            await ensureChatExists();
+            if (currentChatId) {
+                const { data: existingMsgs } = await supabase.from('support_messages').select('id').eq('chat_id', currentChatId).eq('sender', 'user').limit(1);
+                if (!existingMsgs || existingMsgs.length === 0) {
+                    await supabase.from('support_messages').insert([{
+                        chat_id: currentChatId, sender: 'user', text: '🙋 User requests human support', created_at: new Date().toISOString()
+                    }]);
+                }
+                await ensureUserIdentityMessage();
+                currentConversationId = 'ZE-' + currentChatId.replace(/-/g, '').slice(0, 6).toUpperCase();
+            } else {
+                currentConversationId = 'ZE-NEW';
+            }
+            conversationIdEl.textContent = currentConversationId;
+            await loadMessagesFromSupabase();
+            subscribeRealtime();
+        }
 
         async function loadMessagesFromSupabase() {
             if (!currentChatId) return;
@@ -971,8 +1164,10 @@
                     messages.forEach(msg => {
                         const msgText = msg.text || '';
                         if (msg.sender === 'system' && msgText.startsWith('[CHAT_IDENTITY]')) {
-                            return; // کادر قرمز نادیده گرفته می‌شود
-                        } else if (msg.sender === 'system' && (msgText.includes('کد محافظ') || msgText.includes('کد شما'))) {
+                            renderIdentityMessage(msgText, msg.created_at);
+                            visibleCount++;
+                        } else if (msg.sender === 'system' && msgText.includes('کد محافظ')) {
+                            if (isCodeExpired(msg.created_at)) return;
                             const el = renderCodeMessage(msgText, msg.created_at, msg.created_at);
                             if (el) visibleCount++;
                         } else {
@@ -999,104 +1194,128 @@
                 }).subscribe();
         }
 
-        function renderMessage(text, sender, timeIso, senderLabel) {
-            const div = document.createElement('div');
-            div.className = `msg ${sender}`;
-            const safeContent = (sender === 'bot' || sender === 'system') ? text : escapeHtml(text);
-            const label = senderLabel ? `<span class="msg-sender">${escapeHtml(senderLabel)}</span>` : '';
-            div.innerHTML = `${label}${safeContent}<span class="msg-meta">${formatTime(timeIso)}</span>`;
-            chatBody.appendChild(div);
-            chatBody.scrollTop = chatBody.scrollHeight;
-            return div;
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text || isSending) return;
+            if (currentView === 'topics') { showError(t('mustSelectTopic')); return; }
+            if (!currentUser && currentView === 'admin') { showError('Please login first.'); return; }
+            isSending = true; sendBtn.disabled = true;
+            renderMessage(text, 'user', new Date().toISOString(), 'You');
+            userInput.value = '';
+            try {
+                if (currentView === 'expert') {
+                    const reply = generateTopicReply(text);
+                    const data = LD[currentLang];
+                    const expertLabel = currentTopic ? `${EXPERT_NAMES[currentTopic]} (${data.roles[currentTopic]})` : null;
+                    if (reply.handled === 'switch_to_admin') {
+                        setTimeout(async () => {
+                            renderMessage(t('switchingToAdmin'), 'system', new Date().toISOString());
+                            await switchToHumanMode();
+                        }, 700);
+                    } else if (reply.handled === true) {
+                        const typing = renderTyping();
+                        setTimeout(() => {
+                            typing.remove();
+                            renderMessage(reply.text, 'bot', new Date().toISOString(), expertLabel);
+                            if (reply.showAdminBtn) {
+                                const div = document.createElement('div');
+                                div.className = 'quick-replies';
+                                div.innerHTML = `<button class="quick-reply-btn admin-link" onclick="window.__switchAdmin()">${t('switchToAdminBtn')}</button>`;
+                                chatBody.appendChild(div);
+                                chatBody.scrollTop = chatBody.scrollHeight;
+                            }
+                        }, 700);
+                    }
+                } else if (currentView === 'admin') {
+                    if (!currentChatId) await switchToHumanMode();
+                    const now = new Date().toISOString();
+                    const { error: msgError } = await supabase.from('support_messages').insert([{ chat_id: currentChatId, sender: 'user', text: text, created_at: now }]);
+                    if (msgError) throw msgError;
+                    await supabase.from('support_chats').update({ last_message: text, updated_at: now, unread_by_admin: true, status: 'waiting_admin' }).eq('id', currentChatId);
+                }
+            } catch (err) { showError(t('sendError') + ' ' + (err.message || '')); }
+            finally { isSending = false; sendBtn.disabled = false; if (!IS_MOBILE) { try { userInput.focus(); } catch(e) {} } }
         }
 
-        function renderCodeMessage(text, timeIso, createdAt) {
-            const match = text.match(/(\d{6})/);
-            const otpCode = match ? match[1] : null;
-            if (!otpCode) return null;
-            
-            const div = document.createElement('div');
-            div.className = 'msg system code-msg';
-            div.innerHTML = `<span class="msg-sender" style="opacity:.85;color:#c084fc;">🛡️ Zenix</span><div class="otp-code-display"><span class="otp-code-text">${otpCode}</span><button class="copy-otp-btn" data-code="${otpCode}" title="copy"><i class="fas fa-copy"></i></button></div><span class="msg-meta">${formatTime(timeIso)}</span>`;
-            
-            const cpBtn = div.querySelector('.copy-otp-btn');
-            if (cpBtn) cpBtn.onclick = () => {
-                navigator.clipboard.writeText(otpCode);
-                cpBtn.innerHTML = '<i class="fas fa-check"></i>';
-            };
-            chatBody.appendChild(div);
-            chatBody.scrollTop = chatBody.scrollHeight;
-            return div;
-        }
+        window.__switchAdmin = async function() {
+            const q = document.querySelector('.quick-replies'); if (q) q.remove();
+            renderMessage(t('switchingToAdmin'), 'system', new Date().toISOString());
+            await switchToHumanMode();
+        };
 
         async function init() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const isOtpMode = urlParams.get('otp') === '1';
-            const resetOtp = sessionStorage.getItem('zenix_reset_otp');
-            const resetEmail = sessionStorage.getItem('zenix_reset_email');
+            let urlTopic = null;
+            try {
+                const params = new URLSearchParams(window.location.search);
+                urlTopic = params.get('topic');
+                if (!urlTopic && window.location.hash) {
+                    const hashStr = window.location.hash.startsWith('#') ? window.location.hash.slice(1) : window.location.hash;
+                    const hashParams = new URLSearchParams(hashStr);
+                    urlTopic = hashParams.get('topic');
+                }
+            } catch (e) { console.error('[Zenix Support] URL parse error:', e); }
+
+            console.log('[Zenix Support] URL topic:', urlTopic);
 
             try {
-                const savedLang = localStorage.getItem('zenix_lang') || 'fa';
-                applyLang(savedLang);
-            } catch (e) {}
+                try {
+                    const savedLang = localStorage.getItem('zenix_lang') || 'fa';
+                    applyLang(savedLang);
+                } catch (e) { console.error('[Zenix Support] applyLang error:', e); }
 
-            try {
-                const { data: sessionData } = await supabase.auth.getSession();
-                if (sessionData?.session?.user) currentUser = sessionData.session.user;
-            } catch (e) {}
+                try {
+                    const { data: sessionData } = await supabase.auth.getSession();
+                    if (sessionData?.session?.user) currentUser = sessionData.session.user;
+                } catch (e) { console.error('[Zenix Support] getSession error:', e); }
 
-            // ★★★ حالت فراموشی رمز عبور ★★★
-            if (isOtpMode && resetOtp && resetEmail) {
-                document.querySelector('header').style.display = 'none';
-                document.querySelector('footer').style.display = 'none';
-                document.getElementById('view-topics').style.display = 'none';
-                document.getElementById('view-chat').style.display = 'none';
+                try {
+                    supabase.auth.onAuthStateChange((event, session) => {
+                        if (session?.user && !currentUser) currentUser = session.user;
+                    });
+                } catch (e) {}
 
-                const cContainer = document.querySelector('.c');
-                cContainer.innerHTML = `
-                    <div style="max-width: 420px; margin: 60px auto; background: linear-gradient(135deg, rgba(34,197,94,.15), rgba(56,189,248,.15)); border: 2px solid rgba(34,197,94,.5); border-radius: 20px; padding: 35px 25px; text-align: center; box-shadow: 0 15px 50px rgba(34,197,94,.2);">
-                        <div style="font-size: 60px; margin-bottom: 15px;">🔐</div>
-                        <h2 style="color: #22c55e; font-size: 20px; margin-bottom: 8px; font-weight: 800;">کد تأیید شما</h2>
-                        <p style="color: #94a3b8; font-size: 13px; margin-bottom: 20px;">برای ایمیل: <strong style="color:#38bdf8;">${resetEmail}</strong></p>
-                        
-                        <div style="font-family: 'Orbitron', 'Courier New', monospace; font-size: 42px; font-weight: 900; color: #22c55e; letter-spacing: 12px; text-shadow: 0 0 30px rgba(34,197,94,.6); margin: 25px 0; direction: ltr;">
-                            ${resetOtp}
-                        </div>
-                        
-                        <button onclick="navigator.clipboard.writeText('${resetOtp}'); this.innerHTML='✅ کپی شد!'; setTimeout(()=>this.innerHTML='📋 کپی کد', 2000);" 
-                                style="background: rgba(34,197,94,.2); border: 1px solid rgba(34,197,94,.6); color: #22c55e; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: 800; font-size: 14px; font-family: inherit; transition: 0.2s;">
-                            📋 کپی کد
-                        </button>
-                        
-                        <div style="margin-top: 30px; border-top: 1px dashed rgba(255,255,255,.1); padding-top: 20px;">
-                            <a href="forgot-password.html" style="color: #38bdf8; text-decoration: none; font-size: 14px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;">
-                                <i class="fas fa-arrow-right"></i> بازگشت به صفحه بازیابی رمز
-                            </a>
-                        </div>
-                    </div>
-                `;
-                return;
+                console.log('[Zenix Support] currentUser:', currentUser ? currentUser.email : 'null');
+
+                const validTopics = Object.keys(LD.fa.topics);
+                if (urlTopic && validTopics.includes(urlTopic)) {
+                    console.log('[Zenix Support] Auto-opening chat for topic:', urlTopic);
+                    chatIsOpen = false;
+                    currentView = 'topics';
+                    try { unlockTopicsView(); } catch (e) {}
+                    try { hideChatView(); } catch (e) {}
+                    try { backBtnText.textContent = t('back'); } catch (e) {}
+
+                    setTimeout(() => {
+                        try {
+                            window.selectTopic(urlTopic);
+                            try {
+                                window.history.replaceState({}, document.title, window.location.pathname);
+                            } catch (e) {}
+                        } catch (err) {
+                            console.error('[Zenix Support] selectTopic failed:', err);
+                            showError('Unable to open the chat. Please select a topic below.');
+                        }
+                    }, 100);
+                    return;
+                }
+
+                const fromProfile = !!sessionStorage.getItem('zenix_return_focus');
+                if (fromProfile) {
+                    await showAdminChatView();
+                    return;
+                }
+                chatIsOpen = false;
+                currentView = 'topics';
+                unlockTopicsView();
+                hideChatView();
+                backBtnText.textContent = t('back');
+            } catch (err) {
+                console.error('[Zenix Support] init error:', err);
             }
-
-            // ★★★ حالت پروفایل ★★★
-            if (isOtpMode) {
-                await showAdminChatView();
-                return;
-            }
-
-            // ★★★ حالت عادی ★★★
-            sessionStorage.removeItem('zenix_return_focus');
-            sessionStorage.removeItem('zenix_return_page');
-            sessionStorage.removeItem('zenix_reset_otp');
-            sessionStorage.removeItem('zenix_reset_email');
-
-            chatIsOpen = false;
-            currentView = 'topics';
-            unlockTopicsView();
-            hideChatView();
-            backBtnText.textContent = t('back');
         }
 
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); sendMessage(); } });
         init();
     </script>
 </body>
