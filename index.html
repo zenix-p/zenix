@@ -29,6 +29,9 @@
     </script>
 
     <script>(function(){var s=localStorage.getItem('zenix_lang')||'en',r=['fa','ar'];document.documentElement.setAttribute('dir',r.includes(s)?'rtl':'ltr');document.documentElement.setAttribute('lang',s);})();</script>
+
+    <script src="device.js"></script>
+
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Vazirmatn',system-ui,sans-serif}
         body{background:#030712;min-height:100vh;display:flex;justify-content:center;align-items:center;color:#f8fafc;padding:15px;position:relative;overflow-x:hidden;-webkit-text-size-adjust:100%;-moz-text-size-adjust:100%;text-size-adjust:100%;}
@@ -218,13 +221,11 @@
         let currentLang = localStorage.getItem('zenix_lang') || 'en';
         let submitCounter = 0;
         let isSubmitting = false;
-        
-        // ── Lockout State (از دیتابیس، گره‌خورده به ایمیل) ──
+
         let currentLockoutUntil = 0;
         let lockedEmail = '';
         let countdownTimer = null;
 
-        // ── Turnstile Lazy Load ──
         let turnstileInitStarted = false;
         let turnstileWidgetId = null;
         let turnstileLoadFailed = false;
@@ -268,7 +269,6 @@
             return domToken || window.__cfToken || null;
         }
 
-        // ── Turnstile Load & Render ──
         function loadTurnstileScript() {
             return new Promise((resolve, reject) => {
                 if (window.turnstile) { resolve(); return; }
@@ -326,7 +326,6 @@
             initTurnstile();
         }
 
-        // ── Lockout Helpers (DB-backed) ──
         function getRemainingLockoutSec() {
             const now = Date.now();
             if (currentLockoutUntil > now) return Math.ceil((currentLockoutUntil - now) / 1000);
@@ -357,7 +356,6 @@
         function startCountdownIfNeeded() {
             if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
             if (getRemainingLockoutSec() <= 0) return;
-            // فقط اگر ایمیل فعلی همان ایمیل قفل‌شده باشد
             if (lockedEmail && lockedEmail !== userIn.value.trim().toLowerCase()) return;
 
             showLockoutMessage();
@@ -459,7 +457,6 @@
         userIn.addEventListener('focus', clearError);
         userIn.addEventListener('input', () => {
             clearError();
-            // اگر ایمیل تغییر کرده و با ایمیل قفل‌شده فرق دارد → قفل محلی را پاک کن
             const currentEmail = userIn.value.trim().toLowerCase();
             if (lockedEmail && lockedEmail !== currentEmail) {
                 stopCountdownAndClear();
@@ -501,7 +498,6 @@
 
             if (!isValidEmail(emailVal)) return showError('errEmail');
 
-            // اگر همان ایمیل قفل‌شده و هنوز قفل است → بدون درخواست، تایمر را نشان بده
             if (lockedEmail === emailVal && getRemainingLockoutSec() > 0) {
                 startCountdownIfNeeded();
                 return;
@@ -521,7 +517,6 @@
             clearError();
 
             try {
-                // ── 1. بررسی قفل از دیتابیس ──
                 const { data: lockoutTime, error: lockError } = await supabaseClient.rpc('check_login_lockout', { user_email: emailVal });
 
                 if (lockError) throw lockError;
@@ -533,7 +528,6 @@
                     return;
                 }
 
-                // ── 2. تلاش برای ورود ──
                 const { data, error } = await supabaseClient.auth.signInWithPassword({
                     email: emailVal,
                     password: passVal,
@@ -543,9 +537,8 @@
                 if (currentSubmit !== submitCounter) { isSubmitting = false; return; }
 
                 if (error) {
-                    // ── 3. ثبت تلاش ناموفق ──
                     await supabaseClient.rpc('record_failed_login', { user_email: emailVal });
-                    
+
                     const { data: newLockout } = await supabaseClient.rpc('check_login_lockout', { user_email: emailVal });
                     if (newLockout) {
                         currentLockoutUntil = new Date(newLockout).getTime();
@@ -563,6 +556,17 @@
                 // ── 4. ورود موفق ──
                 await supabaseClient.rpc('clear_failed_login', { user_email: emailVal });
                 stopCountdownAndClear();
+
+                // ★★★ ثبت اطلاعات دستگاه در دیتابیس (لاگین) ★★★
+                try {
+                    if (window.ZenixDevice) {
+                        await window.ZenixDevice.logActivity(supabaseClient, emailVal, 'login');
+                    } else {
+                        console.warn('[Device] ZenixDevice not loaded — device.js missing?');
+                    }
+                } catch (devErr) {
+                    console.warn('[Device] log failed (non-blocking):', devErr);
+                }
 
                 const targetPage = await getTargetPage(data.user.id);
                 if (currentSubmit !== submitCounter) { isSubmitting = false; return; }
