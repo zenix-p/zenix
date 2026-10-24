@@ -1,15 +1,10 @@
 /* ============================================
    Zenix - Device Fingerprinting
-   برای تشخیص دستگاه کاربر در لاگین و تغییر رمز
    ============================================ */
 
 (function(global) {
     'use strict';
 
-    /**
-     * محاسبه hash ساده از رشته (djb2)
-     * نتیجه: ۱۶ کاراکتر hex
-     */
     function hashString(str) {
         let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
         for (let i = 0; i < str.length; i++) {
@@ -19,22 +14,15 @@
         }
         h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
         h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
-        const lo = (h2 >>> 0).toString(16).padStart(8, '0');
-        const hi = (h1 >>> 0).toString(16).padStart(8, '0');
-        return lo + hi;
+        return (h2 >>> 0).toString(16).padStart(8, '0') + (h1 >>> 0).toString(16).padStart(8, '0');
     }
 
-    /**
-     * جمع‌آوری اطلاعات دستگاه
-     * این تابع اطلاعاتی رو جمع می‌کنه که روی دستگاه ثابت می‌مونن
-     */
     function collectDeviceInfo() {
         const nav = navigator;
         const scr = screen;
-
-        // استخراج برند از userAgent (برای اندروید)
-        let brand = 'unknown';
         const ua = nav.userAgent || '';
+
+        let brand = 'unknown';
         if (/iPhone/i.test(ua))          brand = 'Apple iPhone';
         else if (/iPad/i.test(ua))        brand = 'Apple iPad';
         else if (/Samsung|SM-|GT-/i.test(ua)) brand = 'Samsung';
@@ -49,13 +37,11 @@
         else if (/Macintosh|Mac OS X/i.test(ua)) brand = 'Mac';
         else if (/Linux/i.test(ua))       brand = 'Linux';
 
-        // نوع دستگاه
         let deviceType = 'desktop';
         if (/iPad|Tablet/i.test(ua))          deviceType = 'tablet';
         else if (/iPhone|Android.*Mobile/i.test(ua)) deviceType = 'mobile';
         else if (/Android/i.test(ua))         deviceType = 'tablet';
 
-        // سیستم‌عامل
         let os = 'unknown';
         const iOSMatch = ua.match(/OS (\d+[._]\d+)/);
         const androidMatch = ua.match(/Android (\d+(\.\d+)?)/);
@@ -66,7 +52,6 @@
         else if (/Mac OS X/.test(ua)) os = 'macOS';
         else if (/Linux/.test(ua)) os = 'Linux';
 
-        // مرورگر
         let browser = 'unknown';
         if (/Edg\//i.test(ua))             browser = 'Edge';
         else if (/OPR|Opera/i.test(ua))    browser = 'Opera';
@@ -80,7 +65,7 @@
             language:    nav.language || 'unknown',
             languages:   (nav.languages || []).join(','),
             timezone:    (Intl.DateTimeFormat().resolvedOptions().timeZone) || 'unknown',
-            screen:      `${scr.width}x${scr.height}`,
+            screen:      scr.width + 'x' + scr.height,
             color_depth: scr.colorDepth || 0,
             pixel_ratio: window.devicePixelRatio || 1,
             cpu_cores:   nav.hardwareConcurrency || 0,
@@ -93,56 +78,26 @@
         };
     }
 
-    /**
-     * محاسبه fingerprint از اطلاعات دستگاه
-     * فقط فیلدهایی که روی یک دستگاه ثابت می‌مونن استفاده می‌شن
-     * (نسخه مرورگر رو عمداً حذف کردیم چون با آپدیت تغییر می‌کنه)
-     */
     function computeFingerprint(info) {
-        // فقط ویژگی‌های سخت‌افزاری/پلتفرمی
         const stable = [
-            info.platform,
-            info.screen,
-            info.color_depth,
-            info.pixel_ratio,
-            info.cpu_cores,
-            info.memory,
-            info.touch,
-            info.timezone,
-            info.device_type,
-            info.brand,
-            info.os
+            info.platform, info.screen, info.color_depth, info.pixel_ratio,
+            info.cpu_cores, info.memory, info.touch, info.timezone,
+            info.device_type, info.brand, info.os
         ].join('|');
         return hashString(stable);
     }
 
-    /**
-     * تابع اصلی: گرفتن اطلاعات کامل + fingerprint
-     */
     function getDeviceFingerprint() {
         const info = collectDeviceInfo();
-        const fp = computeFingerprint(info);
         return {
-            fingerprint: fp,
+            fingerprint: computeFingerprint(info),
             info: info
         };
     }
 
-    /**
-     * ثبت فعالیت در دیتابیس Supabase
-     * @param {object} supabaseClient - کلاینت Supabase
-     * @param {string} email          - ایمیل کاربر
-     * @param {string} action         - نوع فعالیت ('login' | 'password_change' | 'password_reset' | 'register')
-     */
     async function logDeviceActivity(supabaseClient, email, action) {
-        if (!supabaseClient) {
-            console.error('[Device] supabase client missing');
-            return null;
-        }
-        if (!email) {
-            console.warn('[Device] email missing, skipping log');
-            return null;
-        }
+        if (!supabaseClient) { console.error('[Device] supabase client missing'); return null; }
+        if (!email) { console.warn('[Device] email missing'); return null; }
         try {
             const { fingerprint, info } = getDeviceFingerprint();
             const { data, error } = await supabaseClient.rpc('log_device_activity', {
@@ -153,11 +108,8 @@
                 p_platform:    info.platform,
                 p_device_info: info
             });
-            if (error) {
-                console.error('[Device] RPC error:', error);
-                return null;
-            }
-            console.log(`[Device] logged ${action} | fp=${fingerprint} | ${info.brand} / ${info.os} / ${info.browser}`);
+            if (error) { console.error('[Device] RPC error:', error); return null; }
+            console.log(`[Device] ✅ ${action} | fp=${fingerprint} | ${info.brand} / ${info.os} / ${info.browser}`);
             return data;
         } catch (e) {
             console.error('[Device] logDeviceActivity error:', e);
@@ -165,9 +117,6 @@
         }
     }
 
-    /**
-     * توضیح خوانا از دستگاه (برای نمایش به ادمین)
-     */
     function describeDevice(info) {
         if (!info) return 'نامشخص';
         const parts = [];
@@ -178,12 +127,11 @@
         return parts.join(' • ') || 'نامشخص';
     }
 
-    // اکسپورت به window
     global.ZenixDevice = {
-        getFingerprint:    getDeviceFingerprint,
-        logActivity:       logDeviceActivity,
-        describe:          describeDevice,
-        collectInfo:       collectDeviceInfo
+        getFingerprint: getDeviceFingerprint,
+        logActivity:    logDeviceActivity,
+        describe:       describeDevice,
+        collectInfo:    collectDeviceInfo
     };
 
     console.log('[Zenix Device] loaded ✅');
