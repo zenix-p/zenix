@@ -1044,17 +1044,62 @@ async function loadDashboardUserData(uid, sessionUser) {
     }
 }
 
-supabaseClient.auth.onAuthStateChange(async (event, session) => {
-    if (session && session.user) {
+// ==========================================
+// 6.b. احراز هویت — نسخه اصلاح‌شده (رفع باگ فلش داشبورد)
+// ==========================================
+
+// بررسی سریع و همزمان وجود توکن در localStorage
+function hasStoredAuthToken() {
+    try {
+        const keys = Object.keys(localStorage);
+        for (let i = 0; i < keys.length; i++) {
+            const k = keys[i];
+            if (k.indexOf('sb-') === 0 && k.indexOf('-auth-token') !== -1) {
+                const val = safeGetItem(k);
+                if (val && val.length > 20) return true;
+            }
+        }
+    } catch (e) {}
+    return false;
+}
+
+(async function initAuth() {
+    // اگر هیچ توکنی در localStorage نیست، بلافاصله بدون نیاز به Supabase redirect کن
+    if (!hasStoredAuthToken()) {
+        window.location.replace('index.html');
+        return;
+    }
+
+    try {
+        // خواندن سریع session از localStorage (+ تلاش برای refresh اگر منقضی شده)
+        const { data: { session }, error } = await supabaseClient.auth.getSession();
+
+        if (error || !session || !session.user) {
+            window.location.replace('index.html');
+            return;
+        }
+
+        // ✅ احراز هویت معتبر است — داشبورد را نمایش بده
+        document.body.classList.remove('zenix-auth-checking');
         currentUserId = session.user.id;
         loadDashboardUserData(session.user.id, session.user);
 
-        fetchUserMessages(session.user.id).then(msgs => {
-            allMessages = msgs;
-            updateNotifBadges();
-        });
+    } catch (e) {
+        console.error('Auth check failed:', e);
+        window.location.replace('index.html');
+    }
+})();
+
+// گوش دادن به تغییرات احراز هویت در آینده (logout، انقضای توکن و ...)
+supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === 'INITIAL_SESSION') return;    // قبلاً در initAuth مدیریت شد
+    if (event === 'TOKEN_REFRESHED') return;    // فقط refresh است، کاری لازم نیست
+
+    if (!session || !session.user) {
+        window.location.replace('index.html');
     } else {
-        window.location.href = 'index.html';
+        currentUserId = session.user.id;
+        loadDashboardUserData(session.user.id, session.user);
     }
 });
 
