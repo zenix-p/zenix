@@ -22,7 +22,6 @@
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Vazirmatn',system-ui,sans-serif}
         
-        /* ── Fix: کل صفحه دقیقاً اندازه‌ی گوشی ── */
         html{
             background:#030712;
             height:100vh;
@@ -33,16 +32,75 @@
             background:#030712;
             height:100vh;
             height:100dvh;
-            display:flex;
-            justify-content:center;
-            align-items:center;
             color:#f8fafc;
-            padding:15px;
+            display:flex;
+            flex-direction:column;
             overflow:hidden;
             box-sizing:border-box;
             -webkit-text-size-adjust:100%;
             -moz-text-size-adjust:100%;
             text-size-adjust:100%;
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           هدر (دقیقاً مثل forgot-password.html)
+           ═══════════════════════════════════════════════════════ */
+        header{
+            background:rgba(15,23,42,.9);
+            border-bottom:1px solid rgba(255,255,255,.1);
+            padding:10px 18px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            position:relative;
+            z-index:100;
+            backdrop-filter:blur(10px);
+            flex-shrink:0;
+        }
+        .hr{display:flex;align-items:center;gap:8px}
+        .wrap{position:relative}
+        .lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none}
+        .menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;width:max-content;min-width:max-content;white-space:nowrap;padding:6px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8)}
+        [dir="rtl"] .wrap .menu{left:0}
+        [dir="ltr"] .wrap .menu{right:0}
+        .menu.show{display:block}
+        .mi{padding:7px 12px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap;transition:all 0.2s ease}
+        .mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}
+
+        /* ═══════════════════════════════════════════════════════
+           ★ لوگوی طلایی هدر (نسخه افقی)
+           ═══════════════════════════════════════════════════════ */
+        .logo{display:flex;align-items:center;gap:6px}
+        .logo-mark{position:relative;width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        
+        .logo-glow{position:absolute;inset:-6px;border-radius:50%;background:radial-gradient(circle,rgba(251,191,36,.5),transparent 65%);filter:blur(8px);animation:logoGlowPulse 3s ease-in-out infinite;pointer-events:none}
+        @keyframes logoGlowPulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:.9;transform:scale(1.08)}}
+
+        .logo-crown{position:relative;width:38px;height:38px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 4px 10px rgba(251,191,36,.5)) drop-shadow(0 2px 4px rgba(245,158,11,.35));z-index:2}
+        .logo-crown svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+        
+        .logo-z{position:relative;z-index:2;font-family:'Cinzel',serif;font-weight:900;font-size:16px;line-height:1;padding-top:7px;background:linear-gradient(180deg,#fef9c3 0%,#fbbf24 30%,#f59e0b 55%,#ffffff 60%,#d97706 70%,#b45309 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 1px 0 #78350f) drop-shadow(0 0 6px rgba(251,191,36,.5))}
+        
+        .logo-orbit{position:absolute;top:50%;left:50%;border-radius:50%;border:1px solid transparent;pointer-events:none;z-index:3}
+        .logo-orbit.orbit-a{width:48px;height:48px;margin:-24px 0 0 -24px;border-top-color:rgba(251,191,36,.85);border-right-color:rgba(251,191,36,.2);animation:logoOrbitA 3.5s linear infinite}
+        .logo-orbit.orbit-b{width:54px;height:54px;margin:-27px 0 0 -27px;border-bottom-color:rgba(245,158,11,.65);border-left-color:rgba(245,158,11,.15);animation:logoOrbitB 4.5s linear infinite reverse}
+        @keyframes logoOrbitA{to{transform:rotate(360deg)}}
+        @keyframes logoOrbitB{to{transform:rotate(-360deg)}}
+        
+        .logo-text{font-family:'Italianno',cursive;font-weight:700;font-size:44px;line-height:.8;margin-top:-10px;background:linear-gradient(180deg,#fef9c3 0%,#fde68a 20%,#fbbf24 40%,#ffffff 50%,#f59e0b 62%,#b45309 85%,#78350f 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 1px 0 rgba(120,53,15,.9)) drop-shadow(0 2px 10px rgba(251,191,36,.45));padding-inline-start:2px}
+
+        /* ═══════════════════════════════════════════════════════
+           Wrapper اصلی
+           ═══════════════════════════════════════════════════════ */
+        .c{
+            flex:1;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:20px 15px;
+            width:100%;
+            overflow-y:auto;
+            -webkit-overflow-scrolling:touch;
         }
 
         .card{
@@ -54,8 +112,8 @@
             padding:24px;
             box-shadow:0 20px 40px rgba(0,0,0,.6);
             position:relative;
-            overflow-y:auto;
             max-height:100%;
+            overflow-y:auto;
             scrollbar-width:thin;
             scrollbar-color:rgba(56,189,248,.3) transparent;
         }
@@ -63,90 +121,9 @@
         .card::-webkit-scrollbar-track{background:transparent}
         .card::-webkit-scrollbar-thumb{background:rgba(56,189,248,.3);border-radius:2px}
 
-        .header-actions{position:relative;z-index:20;display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-bottom:12px}
-        .wrap{position:relative}
-        .lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none;transition:.2s}
-        .lb:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.3)}
-        .menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;width:max-content;padding:5px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8)}
-        [dir="rtl"] .wrap .menu{left:0}[dir="ltr"] .wrap .menu{right:0}
-        .menu.show{display:block!important}
-        .mi{padding:6px 12px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap;transition:.2s}
-        .mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}
+        .card-title{text-align:center;margin-bottom:20px;color:#38bdf8;font-size:18px;font-weight:800}
+        .card-title i{margin-left:8px}
 
-        /* ═══════════════════════════════════════════════════════
-           ★ لوگوی طلایی
-           ═══════════════════════════════════════════════════════ */
-        .logo{display:flex;flex-direction:column;align-items:center;gap:2px;margin-bottom:20px}
-        .logo .wm{margin-top:-6px;line-height:.85}
-
-        .mark-wrap{position:relative;display:flex;align-items:center;justify-content:center;width:72px;height:72px}
-
-        .mark-glow{
-            position:absolute;inset:-14px;border-radius:50%;
-            background:radial-gradient(circle,rgba(251,191,36,.55),transparent 65%);
-            filter:blur(16px);
-            animation:glowPulse 3s ease-in-out infinite;
-            pointer-events:none;
-        }
-        @keyframes glowPulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:.9;transform:scale(1.05)}}
-
-        .mark-shape{position:relative;z-index:2;width:72px;height:72px;filter:drop-shadow(0 8px 20px rgba(251,191,36,.45)) drop-shadow(0 4px 10px rgba(245,158,11,.3))}
-        .mark-shape svg{position:absolute;inset:0;width:72px;height:72px;display:block;overflow:visible}
-
-        .z-layer{
-            position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;
-            padding-top:14px;padding-bottom:2px;
-        }
-
-        .mark-orbit{position:absolute;top:50%;left:50%;border-radius:50%;border:1.5px solid transparent;pointer-events:none;z-index:3}
-        .orbit-a{width:86px;height:86px;margin:-43px 0 0 -43px;border-top-color:rgba(251,191,36,.9);border-right-color:rgba(251,191,36,.2);animation:orbitA 3.5s linear infinite}
-        .orbit-b{width:96px;height:96px;margin:-48px 0 0 -48px;border-bottom-color:rgba(245,158,11,.7);border-left-color:rgba(245,158,11,.15);animation:orbitB 4.5s linear infinite reverse}
-        @keyframes orbitA{to{transform:rotate(360deg)}}
-        @keyframes orbitB{to{transform:rotate(-360deg)}}
-
-        .z-char{
-            font-family:'Cinzel',serif;
-            font-weight:900;
-            font-size:32px;
-            line-height:1;
-            display:inline-block;
-        }
-
-        .z-gold{
-            background:linear-gradient(180deg,#fef9c3 0%,#fbbf24 30%,#f59e0b 55%,#ffffff 60%,#d97706 70%,#b45309 100%);
-            -webkit-background-clip:text;
-            background-clip:text;
-            -webkit-text-fill-color:transparent;
-            filter:
-                drop-shadow(0 1px 0 #78350f)
-                drop-shadow(0 2px 0 #78350f)
-                drop-shadow(0 3px 6px rgba(0,0,0,.5))
-                drop-shadow(0 0 14px rgba(251,191,36,.6));
-        }
-
-        .wm-sapphire{
-            font-family:'Italianno',cursive;
-            font-weight:700;
-            font-size:96px;
-            letter-spacing:1px;
-            background:linear-gradient(180deg,
-                #fef9c3 0%,
-                #fde68a 20%,
-                #fbbf24 40%,
-                #ffffff 50%,
-                #f59e0b 62%,
-                #b45309 85%,
-                #78350f 100%);
-            -webkit-background-clip:text;
-            background-clip:text;
-            -webkit-text-fill-color:transparent;
-            filter:
-                drop-shadow(0 2px 0 rgba(120,53,15,.9))
-                drop-shadow(0 4px 16px rgba(251,191,36,.5));
-        }
-
-        .logo p{color:#94a3b8;font-size:11.5px;margin-top:4px;letter-spacing:.5px;font-weight:500}
-        
         .group{margin-bottom:12px}
         .group label{display:block;margin-bottom:5px;font-size:12px;color:#cbd5e1}
         .req{color:#ef4444}
@@ -168,15 +145,14 @@
         .btn:disabled{background:rgba(255,255,255,.1);color:#64748b;cursor:not-allowed}
         .footer{text-align:center;margin-top:14px;font-size:12px;color:#94a3b8}
         .footer a{color:#38bdf8;text-decoration:none}
-        #msg{margin-top:8px;font-size:12px;text-align:center;font-weight:bold;padding:6px;border-radius:6px}
+        #msg{margin-top:8px;font-size:12px;text-align:center;font-weight:bold;padding:6px;border-radius:6px;display:none}
+        #msg.show{display:block}
         .err{color:#f87171;background:rgba(239,68,68,.15)}
         .succ{color:#22c55e;background:rgba(34,197,94,.1)}
         #invite-required{display:none;margin-top:10px;padding:10px 12px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);border-radius:10px;color:#fca5a5;font-size:12px;line-height:1.6;}
         #invite-required.show{display:block}
 
-        /* ═══════════════════════════════════════════════
-           Turnstile — فضای ثابت (بدون پرش)
-           ═══════════════════════════════════════════════ */
+        /* Turnstile */
         .captcha-wrap{
             display:flex;
             justify-content:center;
@@ -204,11 +180,19 @@
         }
 
         /* ═══════════════════════════════════════════════
-           موبایل: کارت تمام‌صفحه
+           موبایل: تمام‌صفحه (هدر و کارت یکدست)
            ═══════════════════════════════════════════════ */
         @media (max-width: 480px) {
-            body { padding: 0; }
-            .card {
+            header{
+                background:#0b1120;
+                border-bottom:none;
+                padding:max(10px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 10px max(16px, env(safe-area-inset-left));
+            }
+            .c{
+                padding: 0;
+                overflow: hidden;
+            }
+            .card{
                 max-width: 100%;
                 width: 100%;
                 height: 100%;
@@ -216,19 +200,21 @@
                 border: none;
                 box-shadow: none;
                 background: #0b1120;
-                padding: 20px 18px;
+                padding: max(20px, env(safe-area-inset-bottom)) 18px 20px 18px;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
                 overflow-y: auto;
             }
-            .logo { margin-bottom: 14px; }
-            .mark-wrap,.mark-shape,.mark-shape svg{width:58px;height:58px}
-            .orbit-a{width:70px;height:70px;margin:-35px 0 0 -35px}
-            .orbit-b{width:80px;height:80px;margin:-40px 0 0 -40px}
-            .z-char{font-size:26px}
-            .wm-sapphire{font-size:72px}
-            .logo p { font-size: 10.5px; }
+            .card-title { font-size: 16px; margin-bottom: 16px; }
+            
+            .logo-mark{width:34px;height:34px}
+            .logo-crown{width:34px;height:34px}
+            .logo-z{font-size:14px;padding-top:6px}
+            .logo-orbit.orbit-a{width:42px;height:42px;margin:-21px 0 0 -21px}
+            .logo-orbit.orbit-b{width:48px;height:48px;margin:-24px 0 0 -24px}
+            .logo-text{font-size:38px;margin-top:-8px}
+
             .captcha-wrap { height: 78px; min-height: 78px; max-height: 78px; margin-bottom: 10px; }
             #turnstile-container { width: 100%; max-width: 300px; height: 70px; min-height: 70px; }
         }
@@ -247,8 +233,33 @@
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="header-actions">
+    <header>
+        <div class="logo">
+            <div class="logo-mark">
+                <div class="logo-glow"></div>
+                <div class="logo-crown">
+                    <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="crown-gold-header" x1="50%" y1="0%" x2="50%" y2="100%">
+                                <stop offset="0%" stop-color="#fbbf24"/>
+                                <stop offset="50%" stop-color="#f59e0b"/>
+                                <stop offset="100%" stop-color="#b45309"/>
+                            </linearGradient>
+                        </defs>
+                        <path d="M8 48 L8 18 L18 30 L30 10 L42 30 L52 18 L52 48 Z" fill="url(#crown-gold-header)"/>
+                        <path d="M8 48 L8 18 L18 30 L30 10 L42 30 L52 18 L52 48 Z" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="0.8"/>
+                        <circle cx="30" cy="13" r="1.8" fill="#fef9c3"/>
+                        <circle cx="18" cy="32" r="1.4" fill="#fef9c3" opacity=".9"/>
+                        <circle cx="42" cy="32" r="1.4" fill="#fef9c3" opacity=".9"/>
+                    </svg>
+                    <span class="logo-z">Z</span>
+                </div>
+                <div class="logo-orbit orbit-a"></div>
+                <div class="logo-orbit orbit-b"></div>
+            </div>
+            <div class="logo-text">Zenix</div>
+        </div>
+        <div class="hr">
             <a href="support.html" onclick="window.location.href='support.html';return false;" class="lb" id="btn-support"><i class="fas fa-headset" style="color:#a855f7"></i></a>
             <div class="wrap">
                 <button type="button" class="lb" id="lang-btn"><i class="fas fa-globe" style="color:#22c55e"></i></button>
@@ -264,89 +275,68 @@
                 </div>
             </div>
         </div>
+    </header>
 
-        <div class="logo">
-            <div class="mark-wrap">
-                <div class="mark-glow"></div>
-                <div class="mark-shape">
-                    <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <defs>
-                            <linearGradient id="crown-gold" x1="50%" y1="0%" x2="50%" y2="100%">
-                                <stop offset="0%" stop-color="#fbbf24"/>
-                                <stop offset="50%" stop-color="#f59e0b"/>
-                                <stop offset="100%" stop-color="#b45309"/>
-                            </linearGradient>
-                        </defs>
-                        <path d="M8 48 L8 18 L18 30 L30 10 L42 30 L52 18 L52 48 Z" fill="url(#crown-gold)"/>
-                        <path d="M8 48 L8 18 L18 30 L30 10 L42 30 L52 18 L52 48 Z" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="0.8"/>
-                        <circle cx="30" cy="13" r="1.8" fill="#fef9c3"/>
-                        <circle cx="18" cy="32" r="1.4" fill="#fef9c3" opacity=".9"/>
-                        <circle cx="42" cy="32" r="1.4" fill="#fef9c3" opacity=".9"/>
-                    </svg>
-                    <div class="z-layer"><span class="z-char z-gold">Z</span></div>
-                </div>
-                <div class="mark-orbit orbit-a"></div>
-                <div class="mark-orbit orbit-b"></div>
-            </div>
-            <div class="wm wm-sapphire">Zenix</div>
-            <p id="t-wel">Register New Account</p>
-        </div>
+    <div class="c">
+        <div class="card">
+            <div class="card-title" id="t-wel">Register New Account</div>
 
-        <form id="form">
-            <div class="group">
-                <label id="l-email" for="email"><i class="fas fa-envelope"></i> Email <span class="req">*</span></label>
-                <div class="wrap-input">
-                    <i class="fas fa-at"></i>
-                    <input type="email" id="email" placeholder="Email" aria-label="Email" required>
+            <form id="form">
+                <div class="group">
+                    <label id="l-email" for="email"><i class="fas fa-envelope"></i> Email <span class="req">*</span></label>
+                    <div class="wrap-input">
+                        <i class="fas fa-at"></i>
+                        <input type="email" id="email" placeholder="Email" aria-label="Email" required>
+                    </div>
                 </div>
-            </div>
-            <div class="group">
-                <label id="l-name" for="fullname"><i class="fas fa-id-card"></i> Full Name <span class="req">*</span></label>
-                <div class="wrap-input">
-                    <i class="fas fa-user"></i>
-                    <input type="text" id="fullname" placeholder="Full Name" aria-label="Full Name" required>
+                <div class="group">
+                    <label id="l-name" for="fullname"><i class="fas fa-id-card"></i> Full Name <span class="req">*</span></label>
+                    <div class="wrap-input">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="fullname" placeholder="Full Name" aria-label="Full Name" required>
+                    </div>
                 </div>
-            </div>
-            <div class="group">
-                <label id="l-pass" for="pass"><i class="fas fa-lock"></i> Password <span class="req">*</span></label>
-                <div class="wrap-input">
-                    <i class="fas fa-key"></i>
-                    <input type="password" id="pass" placeholder="Password" aria-label="Password" required>
-                    <button type="button" class="eye-btn" aria-label="Show password" onclick="togglePassword('pass',this)"><i class="fas fa-eye eye-icon"></i></button>
+                <div class="group">
+                    <label id="l-pass" for="pass"><i class="fas fa-lock"></i> Password <span class="req">*</span></label>
+                    <div class="wrap-input">
+                        <i class="fas fa-key"></i>
+                        <input type="password" id="pass" placeholder="Password" aria-label="Password" required>
+                        <button type="button" class="eye-btn" aria-label="Show password" onclick="togglePassword('pass',this)"><i class="fas fa-eye eye-icon"></i></button>
+                    </div>
                 </div>
-            </div>
-            <div class="group">
-                <label id="l-confirm-pass" for="confirm-pass"><i class="fas fa-lock"></i> Confirm Password <span class="req">*</span></label>
-                <div class="wrap-input">
-                    <i class="fas fa-key"></i>
-                    <input type="password" id="confirm-pass" placeholder="Confirm Password" aria-label="Confirm Password" required>
-                    <button type="button" class="eye-btn" aria-label="Show password" onclick="togglePassword('confirm-pass',this)"><i class="fas fa-eye eye-icon"></i></button>
+                <div class="group">
+                    <label id="l-confirm-pass" for="confirm-pass"><i class="fas fa-lock"></i> Confirm Password <span class="req">*</span></label>
+                    <div class="wrap-input">
+                        <i class="fas fa-key"></i>
+                        <input type="password" id="confirm-pass" placeholder="Confirm Password" aria-label="Confirm Password" required>
+                        <button type="button" class="eye-btn" aria-label="Show password" onclick="togglePassword('confirm-pass',this)"><i class="fas fa-eye eye-icon"></i></button>
+                    </div>
                 </div>
-            </div>
-            <div class="group">
-                <label id="l-ref" for="ref-in"><i class="fas fa-ticket"></i> Referral Code <span class="req">*</span></label>
-                <div class="wrap-input">
-                    <i class="fas fa-lock" id="ref-icon"></i>
-                    <input type="text" id="ref-in" placeholder="Referral Code" aria-label="Referral Code" readonly required tabindex="-1">
+                <div class="group">
+                    <label id="l-ref" for="ref-in"><i class="fas fa-ticket"></i> Referral Code <span class="req">*</span></label>
+                    <div class="wrap-input">
+                        <i class="fas fa-lock" id="ref-icon"></i>
+                        <input type="text" id="ref-in" placeholder="Referral Code" aria-label="Referral Code" readonly required tabindex="-1">
+                    </div>
                 </div>
-            </div>
 
-            <div class="captcha-wrap">
-                <div id="turnstile-container">
-                    <div class="cf-turnstile" data-sitekey="0x4AAAAAAFaU1RVZfnTURKOc" data-theme="dark" data-callback="onloadTurnstileCallback"></div>
+                <div class="captcha-wrap">
+                    <div id="turnstile-container">
+                        <div class="cf-turnstile" data-sitekey="0x4AAAAAAFaU1RVZfnTURKOc" data-theme="dark" data-callback="onloadTurnstileCallback"></div>
+                    </div>
                 </div>
-            </div>
 
-            <button type="submit" id="t-btn" class="btn" disabled>Sign Up</button>
-            <div id="msg"></div>
-            <div id="invite-required">
-                <strong id="t-invite-title">Invitation required.</strong><br>
-                <span id="t-invite-desc">A referral code is required for every new account. Please open the registration page through an invitation link. If you already have one, ask the person who invited you to resend it.</span>
-            </div>
-        </form>
+                <button type="submit" id="t-btn" class="btn" disabled>Sign Up</button>
+                <div id="msg"></div>
+                <div id="invite-required">
+                    <strong id="t-invite-title">Invitation required.</strong><br>
+                    <span id="t-invite-desc">A referral code is required for every new account. Please open the registration page through an invitation link. If you already have one, ask the person who invited you to resend it.</span>
+                </div>
+            </form>
 
-        <div class="footer">
-            <p><a href="index.html" id="t-back"><i class="fas fa-arrow-left"></i> Back to Main Page</a></p>
+            <div class="footer">
+                <p><a href="index.html" id="t-back"><i class="fas fa-arrow-left"></i> Back to Main Page</a></p>
+            </div>
         </div>
     </div>
 
@@ -526,14 +516,14 @@
         form.onsubmit = async (e) => {
             e.preventDefault();
             const t = langData[currentLang] || langData.en;
-            if (passIn.value.length < 6) { msg.textContent = t.lenErr; msg.className = 'err'; return; }
-            if (passIn.value !== confirmPassIn.value) { msg.textContent = t.passErr; msg.className = 'err'; return; }
+            if (passIn.value.length < 6) { msg.textContent = t.lenErr; msg.className = 'err show'; return; }
+            if (passIn.value !== confirmPassIn.value) { msg.textContent = t.passErr; msg.className = 'err show'; return; }
             
             const refCodeValue = refIn.value.trim().toUpperCase();
-            if (!refCodeValue) { msg.textContent = t.refErr; msg.className = 'err'; return; }
+            if (!refCodeValue) { msg.textContent = t.refErr; msg.className = 'err show'; return; }
 
             const turnstileToken = document.querySelector('[name="cf-turnstile-response"]')?.value;
-            if (!turnstileToken) { msg.textContent = t.errCaptcha; msg.className = 'err'; return; }
+            if (!turnstileToken) { msg.textContent = t.errCaptcha; msg.className = 'err show'; return; }
 
             btn.disabled = true;
             const emailValue = emailIn.value.trim().toLowerCase();
@@ -544,7 +534,7 @@
                     const { data: refData, error: refError } = await supabaseClient.from('profiles').select('id').eq('referral_code', refCodeValue).maybeSingle();
                     if (refError || !refData) {
                         msg.textContent = t.refErr;
-                        msg.className = 'err';
+                        msg.className = 'err show';
                         btn.disabled = false;
                         if (window.turnstile) window.turnstile.reset();
                         chk();
@@ -554,7 +544,7 @@
                     const { data: isAllowed, error: rpcError } = await supabaseClient.rpc('can_register_with_admin');
                     if (rpcError || isAllowed !== true) {
                         msg.textContent = t.refErr;
-                        msg.className = 'err';
+                        msg.className = 'err show';
                         btn.disabled = false;
                         if (window.turnstile) window.turnstile.reset();
                         chk();
@@ -596,7 +586,7 @@
                 await supabaseClient.auth.signOut();
 
                 msg.textContent = t.succ;
-                msg.className = 'succ';
+                msg.className = 'succ show';
                 setTimeout(() => window.location.href = 'index.html', 1500);
 
             } catch (error) {
@@ -612,7 +602,7 @@
                 } else {
                     msg.textContent = error.message || t.errGeneral;
                 }
-                msg.className = 'err';
+                msg.className = 'err show';
                 chk();
             }
         };
@@ -626,7 +616,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {
-                navigator.serviceWorker.register('sw.js?v=2.1').then(function (reg) {
+                navigator.serviceWorker.register('sw.js?v=2.2').then(function (reg) {
                     setInterval(function () {
                         reg.update().catch(function () {});
                     }, 60000);
