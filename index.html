@@ -50,37 +50,39 @@
         .mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}
 
         /* ═══════════════════════════════════════════════════════
-           لوگوی جدید ZENIX — Glass Morphism + Rotating Gradient
+           Zenix Premium Logo — Hexagonal Crystal + Orbit Rings
            ═══════════════════════════════════════════════════════ */
-        .logo{text-align:center;margin-bottom:22px;display:flex;flex-direction:column;align-items:center}
+        .logo{display:flex;flex-direction:column;align-items:center;margin-bottom:24px}
 
-        /* ── جعبه‌ی لوگو ── */
-        .logo-mark{position:relative;width:72px;height:72px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;transform:skewX(-6deg)}
+        .logo-lockup{display:flex;align-items:center;gap:14px;margin-bottom:14px}
 
-        /* حلقه‌ی گرادیان چرخان در پس‌زمینه */
-        .logo-mark::before{content:'';position:absolute;inset:-8px;border-radius:26px;background:conic-gradient(from 0deg,#38bdf8,#a855f7,#f43f5e,#38bdf8);opacity:.55;animation:zenixLogoRotate 5s linear infinite;filter:blur(8px);pointer-events:none}
+        /* ── کریستال هگزاگونال ── */
+        .logo-mark{position:relative;width:56px;height:56px;display:flex;align-items:center;justify-content:center}
 
-        /* جعبه‌ی شیشه‌ای (Glass Morphism) */
-        .logo-mark::after{content:'';position:absolute;inset:0;border-radius:20px;background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(168,85,247,.22));border:1px solid rgba(255,255,255,.2);box-shadow:0 8px 32px rgba(56,189,248,.35),inset 0 1px 0 rgba(255,255,255,.25),inset 0 -1px 0 rgba(0,0,0,.3)}
+        /* درخشش محیطی */
+        .mark-glow{position:absolute;inset:-12px;border-radius:50%;background:radial-gradient(circle,rgba(99,102,241,.5),transparent 65%);filter:blur(14px);animation:zenixGlow 3s ease-in-out infinite;z-index:0;pointer-events:none}
 
-        /* Z هندسی */
-        .logo-z{position:relative;z-index:2;width:40px;height:40px;filter:drop-shadow(0 0 8px rgba(56,189,248,.9))}
+        @keyframes zenixGlow{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
 
-        @keyframes zenixLogoRotate{to{transform:rotate(360deg)}}
+        /* کریستال */
+        .mark-crystal{position:relative;width:100%;height:100%;z-index:2;filter:drop-shadow(0 8px 20px rgba(99,102,241,.45)) drop-shadow(0 4px 10px rgba(56,189,248,.3))}
 
-        /* متن ZENIX */
-        .logo-text{display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;transform:skewX(-6deg);margin-bottom:2px}
+        .mark-hex{width:100%;height:100%;display:block}
 
-        .logo-word{font-size:30px;font-weight:900;letter-spacing:6px;font-style:italic;background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:zenixLogoGradient 6s ease infinite;filter:drop-shadow(0 0 10px rgba(56,189,248,.4))}
+        /* حلقه‌های مداری */
+        .mark-orbit{position:absolute;top:50%;left:50%;border-radius:50%;border:1.5px solid transparent;pointer-events:none;z-index:3}
 
-        @keyframes zenixLogoGradient{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+        .orbit-a{width:66px;height:66px;margin:-33px 0 0 -33px;border-top-color:rgba(56,189,248,.9);border-right-color:rgba(56,189,248,.2);animation:zenixOrbitA 3.5s linear infinite}
 
-        /* نقطه الماسی پالس‌دار */
-        .logo-dot{width:6px;height:6px;background:#38bdf8;box-shadow:0 0 10px #38bdf8,0 0 20px rgba(56,189,248,.6);border-radius:1px;margin-left:4px;animation:zenixDotPulse 2s ease-in-out infinite}
+        .orbit-b{width:74px;height:74px;margin:-37px 0 0 -37px;border-bottom-color:rgba(168,85,247,.7);border-left-color:rgba(168,85,247,.15);animation:zenixOrbitB 4.5s linear infinite reverse}
 
-        @keyframes zenixDotPulse{0%,100%{transform:rotate(45deg) scale(1);opacity:1}50%{transform:rotate(45deg) scale(1.4);opacity:.6}}
+        @keyframes zenixOrbitA{to{transform:rotate(360deg)}}
+        @keyframes zenixOrbitB{to{transform:rotate(-360deg)}}
 
-        .logo p{color:#94a3b8;font-size:11px;margin-top:8px;letter-spacing:1px;font-weight:500}
+        /* wordmark کروم */
+        .logo-word{font-family:'Orbitron',sans-serif;font-size:28px;font-weight:900;letter-spacing:5px;background:linear-gradient(135deg,#ffffff 0%,#e0e7ff 40%,#a5b4fc 75%,#818cf8 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 1px 1px rgba(0,0,0,.4)) drop-shadow(0 2px 8px rgba(99,102,241,.35));padding-left:5px;line-height:1}
+
+        .logo p{color:#94a3b8;font-size:11.5px;letter-spacing:.5px;font-weight:500;margin:0}
         /* ═══════════════════════════════════════════════════════ */
 
         .group{margin-bottom:14px}
@@ -119,30 +121,22 @@
         #msg.show{display:block}
         .err{color:#f87171;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3)}
         .succ{color:#4ade80;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3)}
-        @media (max-width: 768px) {
-            .group input { font-size: 14px !important; }
-            .group input:focus { font-size: 16px !important; }
-            #user::placeholder, #pass::placeholder { font-size: 13px !important; }
-            .auth-card { padding: 22px 20px; }
-            .logo-mark { width: 64px; height: 64px; margin-bottom: 12px; }
-            .logo-z { width: 36px; height: 36px; }
-            .logo-word { font-size: 26px; letter-spacing: 5px; }
-            .logo-dot { width: 5px; height: 5px; }
-        }
+
         @media (max-width: 480px) {
             body { padding: 10px; }
             .auth-card { padding: 18px 16px; border-radius: 20px; }
             .header-actions { margin-bottom: 10px; }
-            .logo { margin-bottom: 18px; }
-            .logo-mark { width: 58px; height: 58px; margin-bottom: 10px; }
-            .logo-mark::after { border-radius: 16px; }
-            .logo-z { width: 32px; height: 32px; }
-            .logo-word { font-size: 22px; letter-spacing: 4px; }
-            .logo-dot { width: 4px; height: 4px; margin-left: 3px; }
+            .logo { margin-bottom: 20px; }
+            .logo-lockup { gap: 11px; margin-bottom: 12px; }
+            .logo-mark { width: 48px; height: 48px; }
+            .orbit-a { width: 58px; height: 58px; margin: -29px 0 0 -29px; }
+            .orbit-b { width: 64px; height: 64px; margin: -32px 0 0 -32px; }
+            .logo-word { font-size: 23px; letter-spacing: 4px; padding-left: 4px; }
             .logo p { font-size: 10.5px; }
             .group { margin-bottom: 12px; }
             .group label { font-size: 11px; }
-            .group input { padding: 10px 14px; }
+            .group input { padding: 10px 14px; font-size: 14px !important; }
+            .group input:focus { font-size: 16px !important; }
             html[dir="rtl"] .group input { padding-right: 36px; padding-left: 36px; }
             html[dir="ltr"] .group input { padding-left: 36px; padding-right: 36px; }
             .extra-links { font-size: 10px; margin-bottom: 14px; }
@@ -175,26 +169,50 @@
                 </div>
             </div>
         </div>
+
         <div class="logo">
-            <div class="logo-mark">
-                <svg class="logo-z" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <defs>
-                        <linearGradient id="zenix-login-z-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#ffffff"/>
-                            <stop offset="100%" stop-color="#7dd3fc"/>
-                        </linearGradient>
-                    </defs>
-                    <rect x="10" y="12" width="40" height="8" rx="2" fill="url(#zenix-login-z-grad)"/>
-                    <polygon points="40,20 50,20 20,40 10,40" fill="url(#zenix-login-z-grad)"/>
-                    <rect x="10" y="40" width="40" height="8" rx="2" fill="url(#zenix-login-z-grad)"/>
-                </svg>
-            </div>
-            <div class="logo-text">
-                <span class="logo-word">ZENIX</span>
-                <span class="logo-dot" aria-hidden="true"></span>
+            <div class="logo-lockup">
+                <div class="logo-mark">
+                    <div class="mark-glow"></div>
+                    <div class="mark-crystal">
+                        <svg class="mark-hex" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <defs>
+                                <linearGradient id="zenix-hex-bg" x1="50%" y1="0%" x2="50%" y2="100%">
+                                    <stop offset="0%" stop-color="#818cf8"/>
+                                    <stop offset="50%" stop-color="#38bdf8"/>
+                                    <stop offset="100%" stop-color="#a855f7"/>
+                                </linearGradient>
+                                <linearGradient id="zenix-hex-shine" x1="50%" y1="0%" x2="50%" y2="100%">
+                                    <stop offset="0%" stop-color="rgba(255,255,255,.45)"/>
+                                    <stop offset="45%" stop-color="rgba(255,255,255,0)"/>
+                                    <stop offset="100%" stop-color="rgba(0,0,0,.35)"/>
+                                </linearGradient>
+                                <linearGradient id="zenix-z-grad" x1="50%" y1="15" x2="50%" y2="45" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#ffffff"/>
+                                    <stop offset="55%" stop-color="#f0f0ff"/>
+                                    <stop offset="100%" stop-color="#c7d2fe"/>
+                                </linearGradient>
+                            </defs>
+                            <!-- بدنه هگزاگونال -->
+                            <path d="M30 3 L54 17 L54 43 L30 57 L6 43 L6 17 Z" fill="url(#zenix-hex-bg)"/>
+                            <!-- شاین سه‌بعدی -->
+                            <path d="M30 3 L54 17 L54 43 L30 57 L6 43 L6 17 Z" fill="url(#zenix-hex-shine)"/>
+                            <!-- حرف Z -->
+                            <g fill="url(#zenix-z-grad)">
+                                <rect x="17" y="15" width="26" height="5.5" rx="1"/>
+                                <polygon points="43,20.5 43,26 17,39.5 17,34"/>
+                                <rect x="17" y="39.5" width="26" height="5.5" rx="1"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="mark-orbit orbit-a"></div>
+                    <div class="mark-orbit orbit-b"></div>
+                </div>
+                <div class="logo-word">ZENIX</div>
             </div>
             <p id="t-wel"></p>
         </div>
+
         <form id="form" novalidate spellcheck="false" autocomplete="off">
             <div class="group">
                 <label id="l-user"><i class="fas fa-envelope"></i> <span id="txt-user"></span> <span class="req">*</span></label>
@@ -671,7 +689,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {
-                navigator.serviceWorker.register('sw.js?v=1').then(function (reg) {
+                navigator.serviceWorker.register('sw.js?v=1.1').then(function (reg) {
                     setInterval(function () {
                         reg.update().catch(function () {});
                     }, 60000);
