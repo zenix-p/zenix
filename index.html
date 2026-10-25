@@ -553,11 +553,9 @@
                     return;
                 }
 
-                // ── 4. ورود موفق ──
                 await supabaseClient.rpc('clear_failed_login', { user_email: emailVal });
                 stopCountdownAndClear();
 
-                // ★★★ ثبت اطلاعات دستگاه در دیتابیس (لاگین) ★★★
                 try {
                     if (window.ZenixDevice) {
                         await window.ZenixDevice.logActivity(supabaseClient, emailVal, 'login');
@@ -620,6 +618,34 @@
         }
 
         setLang(currentLang);
+    </script>
+
+    <!-- ── Zenix Service Worker Registration ── -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('sw.js').then(function (reg) {
+                    setInterval(function () {
+                        reg.update().catch(function () {});
+                    }, 60000);
+                    document.addEventListener('visibilitychange', function () {
+                        if (document.visibilityState === 'visible') {
+                            reg.update().catch(function () {});
+                        }
+                    });
+                }).catch(function (e) {
+                    console.warn('[Zenix SW] register failed:', e);
+                });
+            });
+
+            var hadController = !!navigator.serviceWorker.controller;
+            var refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', function () {
+                if (!hadController || refreshing) return;
+                refreshing = true;
+                window.location.reload();
+            });
+        }
     </script>
 </body>
 </html>
