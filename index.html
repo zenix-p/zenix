@@ -35,12 +35,7 @@
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Vazirmatn',system-ui,sans-serif}
 
-        /* ═══════════════════════════════════════════════════════════
-           ★ Fix صفحه‌ی دوم مشکی:
-             - html و body دقیقاً به اندازه‌ی viewport
-             - overflow: hidden → اسکرول غیرفعال
-             - auth-card اگه بلندتر بود، خودش اسکرول می‌شه
-           ═══════════════════════════════════════════════════════════ */
+        /* ── Fix اصلی: حذف اسکرول و فضاهای خالی ── */
         html{
             background:#030712;
             height:100vh;
@@ -68,7 +63,6 @@
         .glow-1{width:250px;height:250px;background:#f59e0b;top:10%;left:10%}
         .glow-2{width:250px;height:250px;background:#fbbf24;bottom:10%;right:10%}
 
-        /* ★ auth-card با max-height و overflow-y:auto */
         .auth-card{
             width:100%;
             max-width:400px;
@@ -101,9 +95,7 @@
         .mi{padding:6px 12px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap;transition:.2s}
         .mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}
 
-        /* ═══════════════════════════════════════════════════════
-           Gold Crown + Z — Logo
-           ═══════════════════════════════════════════════════════ */
+        /* ── Logo ── */
         .logo{display:flex;flex-direction:column;align-items:center;gap:2px;margin-bottom:20px}
         .logo .wm{margin-top:-6px;line-height:.85}
 
@@ -211,17 +203,37 @@
         #msg.show{display:block}
         .err{color:#f87171;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3)}
         .succ{color:#4ade80;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3)}
+
         @media (max-width: 768px) {
             .group input { font-size: 14px !important; }
             .group input:focus { font-size: 16px !important; }
             #user::placeholder, #pass::placeholder { font-size: 13px !important; }
-            .auth-card { padding: 22px 20px; }
         }
+
+        /* ═══════════════════════════════════════════════════
+           ★★★ موبایل: کارت تمام‌صفحه می‌شود ★★★
+           ═══════════════════════════════════════════════════ */
         @media (max-width: 480px) {
-            body { padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left)); }
-            .auth-card { padding: 16px 14px; border-radius: 20px; }
+            body { padding: 0; }
+            .auth-card {
+                max-width: 100%;
+                max-height: 100%;
+                height: 100%;
+                border-radius: 0;
+                border: none;
+                box-shadow: none;
+                backdrop-filter: none;
+                background: #0b1120;
+                padding: 24px 20px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+            /* پنهان کردن هاله‌های پس‌زمینه در موبایل چون کارت کاملاً همه‌جا رو پوشونده */
+            .glow-1, .glow-2 { display: none; }
+
             .header-actions { margin-bottom: 8px; }
-            .logo { margin-bottom: 12px; }
+            .logo { margin-bottom: 14px; }
             .mark-wrap,.mark-shape,.mark-shape svg{width:58px;height:58px}
             .orbit-a{width:70px;height:70px;margin:-35px 0 0 -35px}
             .orbit-b{width:80px;height:80px;margin:-40px 0 0 -40px}
@@ -768,7 +780,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {
-                navigator.serviceWorker.register('sw.js?v=1.4').then(function (reg) {
+                navigator.serviceWorker.register('sw.js?v=1.5').then(function (reg) {
                     setInterval(function () {
                         reg.update().catch(function () {});
                     }, 60000);
