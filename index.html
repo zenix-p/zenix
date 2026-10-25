@@ -185,32 +185,28 @@
         ::grammar-error {text-decoration: none !important;-webkit-text-decoration: none !important;text-decoration-line: none !important;-webkit-text-decoration-line: none !important;background: transparent !important;}
         #user,#pass,.group input,.group input:hover,.group input:focus,.group input:active,.group input:valid,.group input:invalid,.group input:placeholder-shown,.group input:-webkit-autofill {text-decoration: none !important;-webkit-text-decoration: none !important;text-decoration-line: none !important;-webkit-text-decoration-line: none !important;text-decoration-style: none !important;text-decoration-color: transparent !important;-webkit-text-decorations-in-effect: none !important;border-bottom: none !important;outline: none;}
 
-        /* ═══════════════════════════════════════════════════════
-           ★ Turnstile — فضای کافی + بدون برش
-           ═══════════════════════════════════════════════════════ */
         .captcha-wrap{
             display:flex;
             justify-content:center;
             align-items:center;
             margin-bottom:14px;
-            height:78px;        /* فضای بیشتر برای Turnstile */
+            height:78px;
             min-height:78px;
             max-height:78px;
-            overflow:visible;   /* اجازه به Turnstile که کامل دیده شود */
+            overflow:visible;
         }
         #turnstile-container{
             position:relative;
             width:300px;
             max-width:100%;
-            height:70px;        /* بلندتر از Turnstile واقعی */
+            height:70px;
             min-height:70px;
             display:flex;
             align-items:center;
             justify-content:center;
-            overflow:visible;   /* ★ کلید حل مشکل: نه hidden */
+            overflow:visible;
         }
 
-        /* Placeholder نامرئی — فقط spinner */
         .captcha-loading{
             position:absolute;
             inset:0;
@@ -252,7 +248,6 @@
         }
         .captcha-error::before{display:none}
 
-        /* اطمینان از تراز بودن Turnstile */
         #turnstile-container > div,
         #turnstile-container > iframe {
             display: block !important;
@@ -315,7 +310,6 @@
             .lb { height: 34px; width: 34px; font-size: 12px; }
             .mi { font-size: 11px; padding: 6px 10px; }
 
-            /* موبایل: بدون scale، فضای کافی */
             .captcha-wrap { height: 78px; min-height: 78px; max-height: 78px; margin-bottom: 10px; }
             #turnstile-container { width: 100%; max-width: 300px; height: 70px; min-height: 70px; }
         }
@@ -842,7 +836,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {
-                navigator.serviceWorker.register('sw.js?v=1.7').then(function (reg) {
+                navigator.serviceWorker.register('sw.js?v=1.8').then(function (reg) {
                     setInterval(function () {
                         reg.update().catch(function () {});
                     }, 60000);
@@ -854,14 +848,6 @@
                 }).catch(function (e) {
                     console.warn('[Zenix SW] register failed:', e);
                 });
-            });
-
-            var hadController = !!navigator.serviceWorker.controller;
-            var refreshing = false;
-            navigator.serviceWorker.addEventListener('controllerchange', function () {
-                if (!hadController || refreshing) return;
-                refreshing = true;
-                window.location.reload();
             });
         }
     </script>
