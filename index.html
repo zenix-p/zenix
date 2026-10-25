@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
     <title>Zenix Platform - Login</title>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <link rel="manifest" href="manifest.json">
@@ -34,7 +34,11 @@
 
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Vazirmatn',system-ui,sans-serif}
-        body{background:#030712;min-height:100vh;display:flex;justify-content:center;align-items:center;color:#f8fafc;padding:15px;position:relative;overflow-x:hidden;-webkit-text-size-adjust:100%;-moz-text-size-adjust:100%;text-size-adjust:100%;}
+
+        /* ★ Fix 2: html و body با پس‌زمینه‌ی یکدست + safe area */
+        html{background:#030712;height:100%;min-height:100%}
+        body{background:#030712;min-height:100vh;min-height:100dvh;display:flex;justify-content:center;align-items:center;color:#f8fafc;padding:max(15px, env(safe-area-inset-top)) max(15px, env(safe-area-inset-right)) max(15px, env(safe-area-inset-bottom)) max(15px, env(safe-area-inset-left));position:relative;overflow-x:hidden;-webkit-text-size-adjust:100%;-moz-text-size-adjust:100%;text-size-adjust:100%;}
+
         .glow-1,.glow-2{position:absolute;border-radius:50%;filter:blur(80px);opacity:.35;pointer-events:none;z-index:1}
         .glow-1{width:250px;height:250px;background:#f59e0b;top:10%;left:10%}
         .glow-2{width:250px;height:250px;background:#fbbf24;bottom:10%;right:10%}
@@ -57,7 +61,6 @@
 
         .mark-wrap{position:relative;display:flex;align-items:center;justify-content:center;width:72px;height:72px}
 
-        /* درخشش طلایی */
         .mark-glow{
             position:absolute;inset:-14px;border-radius:50%;
             background:radial-gradient(circle,rgba(251,191,36,.55),transparent 65%);
@@ -75,14 +78,12 @@
             padding-top:14px;padding-bottom:2px;
         }
 
-        /* حلقه‌های مداری طلایی */
         .mark-orbit{position:absolute;top:50%;left:50%;border-radius:50%;border:1.5px solid transparent;pointer-events:none;z-index:3}
         .orbit-a{width:86px;height:86px;margin:-43px 0 0 -43px;border-top-color:rgba(251,191,36,.9);border-right-color:rgba(251,191,36,.2);animation:orbitA 3.5s linear infinite}
         .orbit-b{width:96px;height:96px;margin:-48px 0 0 -48px;border-bottom-color:rgba(245,158,11,.7);border-left-color:rgba(245,158,11,.15);animation:orbitB 4.5s linear infinite reverse}
         @keyframes orbitA{to{transform:rotate(360deg)}}
         @keyframes orbitB{to{transform:rotate(-360deg)}}
 
-        /* Z با گرادیان طلا */
         .z-char{
             font-family:'Cinzel',serif;
             font-weight:900;
@@ -103,7 +104,6 @@
                 drop-shadow(0 0 14px rgba(251,191,36,.6));
         }
 
-        /* متن Zenix با گرادیان طلا */
         .wm-sapphire{
             font-family:'Italianno',cursive;
             font-weight:700;
@@ -126,7 +126,6 @@
         }
 
         .logo p{color:#94a3b8;font-size:11.5px;margin-top:4px;letter-spacing:.5px;font-weight:500}
-        /* ═══════════════════════════════════════════════════════ */
 
         .group{margin-bottom:14px}
         .group label{display:block;margin-bottom:6px;font-size:12px;color:#cbd5e1}
@@ -171,7 +170,7 @@
             .auth-card { padding: 22px 20px; }
         }
         @media (max-width: 480px) {
-            body { padding: 10px; }
+            body { padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left)); }
             .auth-card { padding: 18px 16px; border-radius: 20px; }
             .header-actions { margin-bottom: 10px; }
             .logo { margin-bottom: 16px; }
@@ -720,7 +719,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {
-                navigator.serviceWorker.register('sw.js?v=1.2').then(function (reg) {
+                navigator.serviceWorker.register('sw.js?v=1.3').then(function (reg) {
                     setInterval(function () {
                         reg.update().catch(function () {});
                     }, 60000);
