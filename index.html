@@ -48,11 +48,41 @@
         .menu.show{display:block!important}
         .mi{padding:6px 12px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap;transition:.2s}
         .mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}
-        .logo{text-align:center;margin-bottom:20px}
-        .logo-header{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;margin-bottom:8px}
-        .logo-icon{width:46px;height:46px;background:linear-gradient(135deg,#0ea5e9,#9333ea);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:24px;font-weight:900;font-style:italic;transform:skewX(-6deg);box-shadow:0 0 18px rgba(14,165,233,.45)}
-        .logo-text{font-family:'Orbitron',sans-serif;font-size:26px;font-weight:900;letter-spacing:3px;font-style:italic;transform:skewX(-6deg);background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 20px rgba(56,189,248,.4)}
-        .logo p{color:#94a3b8;font-size:12px;margin-top:4px}
+
+        /* ═══════════════════════════════════════════════════════
+           لوگوی جدید ZENIX — Glass Morphism + Rotating Gradient
+           ═══════════════════════════════════════════════════════ */
+        .logo{text-align:center;margin-bottom:22px;display:flex;flex-direction:column;align-items:center}
+
+        /* ── جعبه‌ی لوگو ── */
+        .logo-mark{position:relative;width:72px;height:72px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;transform:skewX(-6deg)}
+
+        /* حلقه‌ی گرادیان چرخان در پس‌زمینه */
+        .logo-mark::before{content:'';position:absolute;inset:-8px;border-radius:26px;background:conic-gradient(from 0deg,#38bdf8,#a855f7,#f43f5e,#38bdf8);opacity:.55;animation:zenixLogoRotate 5s linear infinite;filter:blur(8px);pointer-events:none}
+
+        /* جعبه‌ی شیشه‌ای (Glass Morphism) */
+        .logo-mark::after{content:'';position:absolute;inset:0;border-radius:20px;background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(168,85,247,.22));border:1px solid rgba(255,255,255,.2);box-shadow:0 8px 32px rgba(56,189,248,.35),inset 0 1px 0 rgba(255,255,255,.25),inset 0 -1px 0 rgba(0,0,0,.3)}
+
+        /* Z هندسی */
+        .logo-z{position:relative;z-index:2;width:40px;height:40px;filter:drop-shadow(0 0 8px rgba(56,189,248,.9))}
+
+        @keyframes zenixLogoRotate{to{transform:rotate(360deg)}}
+
+        /* متن ZENIX */
+        .logo-text{display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;transform:skewX(-6deg);margin-bottom:2px}
+
+        .logo-word{font-size:30px;font-weight:900;letter-spacing:6px;font-style:italic;background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:zenixLogoGradient 6s ease infinite;filter:drop-shadow(0 0 10px rgba(56,189,248,.4))}
+
+        @keyframes zenixLogoGradient{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+
+        /* نقطه الماسی پالس‌دار */
+        .logo-dot{width:6px;height:6px;background:#38bdf8;box-shadow:0 0 10px #38bdf8,0 0 20px rgba(56,189,248,.6);border-radius:1px;margin-left:4px;animation:zenixDotPulse 2s ease-in-out infinite}
+
+        @keyframes zenixDotPulse{0%,100%{transform:rotate(45deg) scale(1);opacity:1}50%{transform:rotate(45deg) scale(1.4);opacity:.6}}
+
+        .logo p{color:#94a3b8;font-size:11px;margin-top:8px;letter-spacing:1px;font-weight:500}
+        /* ═══════════════════════════════════════════════════════ */
+
         .group{margin-bottom:14px}
         .group label{display:block;margin-bottom:6px;font-size:12px;color:#cbd5e1}
         .req{color:#ef4444;font-weight:700;margin-inline-start:3px}
@@ -94,18 +124,22 @@
             .group input:focus { font-size: 16px !important; }
             #user::placeholder, #pass::placeholder { font-size: 13px !important; }
             .auth-card { padding: 22px 20px; }
-            .logo-text { font-size: 24px; letter-spacing: 2px; }
-            .logo-icon { width: 42px; height: 42px; font-size: 22px; }
+            .logo-mark { width: 64px; height: 64px; margin-bottom: 12px; }
+            .logo-z { width: 36px; height: 36px; }
+            .logo-word { font-size: 26px; letter-spacing: 5px; }
+            .logo-dot { width: 5px; height: 5px; }
         }
         @media (max-width: 480px) {
             body { padding: 10px; }
             .auth-card { padding: 18px 16px; border-radius: 20px; }
             .header-actions { margin-bottom: 10px; }
-            .logo { margin-bottom: 16px; }
-            .logo-header { gap: 8px; margin-bottom: 6px; }
-            .logo-text { font-size: 22px; letter-spacing: 2px; }
-            .logo-icon { width: 38px; height: 38px; font-size: 20px; border-radius: 10px; }
-            .logo p { font-size: 11px; }
+            .logo { margin-bottom: 18px; }
+            .logo-mark { width: 58px; height: 58px; margin-bottom: 10px; }
+            .logo-mark::after { border-radius: 16px; }
+            .logo-z { width: 32px; height: 32px; }
+            .logo-word { font-size: 22px; letter-spacing: 4px; }
+            .logo-dot { width: 4px; height: 4px; margin-left: 3px; }
+            .logo p { font-size: 10.5px; }
             .group { margin-bottom: 12px; }
             .group label { font-size: 11px; }
             .group input { padding: 10px 14px; }
@@ -142,9 +176,22 @@
             </div>
         </div>
         <div class="logo">
-            <div class="logo-header">
-                <div class="logo-icon">Z</div>
-                <div class="logo-text">ZENIX</div>
+            <div class="logo-mark">
+                <svg class="logo-z" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="zenix-login-z-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#ffffff"/>
+                            <stop offset="100%" stop-color="#7dd3fc"/>
+                        </linearGradient>
+                    </defs>
+                    <rect x="10" y="12" width="40" height="8" rx="2" fill="url(#zenix-login-z-grad)"/>
+                    <polygon points="40,20 50,20 20,40 10,40" fill="url(#zenix-login-z-grad)"/>
+                    <rect x="10" y="40" width="40" height="8" rx="2" fill="url(#zenix-login-z-grad)"/>
+                </svg>
+            </div>
+            <div class="logo-text">
+                <span class="logo-word">ZENIX</span>
+                <span class="logo-dot" aria-hidden="true"></span>
             </div>
             <p id="t-wel"></p>
         </div>
@@ -624,7 +671,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {
-                navigator.serviceWorker.register('sw.js').then(function (reg) {
+                navigator.serviceWorker.register('sw.js?v=1').then(function (reg) {
                     setInterval(function () {
                         reg.update().catch(function () {});
                     }, 60000);
