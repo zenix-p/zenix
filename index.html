@@ -186,56 +186,78 @@
         #user,#pass,.group input,.group input:hover,.group input:focus,.group input:active,.group input:valid,.group input:invalid,.group input:placeholder-shown,.group input:-webkit-autofill {text-decoration: none !important;-webkit-text-decoration: none !important;text-decoration-line: none !important;-webkit-text-decoration-line: none !important;text-decoration-style: none !important;text-decoration-color: transparent !important;-webkit-text-decorations-in-effect: none !important;border-bottom: none !important;outline: none;}
 
         /* ═══════════════════════════════════════════════════════
-           ★ Fix Layout Shift — Turnstile فضای ثابت دارد
+           ★ Turnstile — فضای کافی + بدون برش
            ═══════════════════════════════════════════════════════ */
         .captcha-wrap{
             display:flex;
             justify-content:center;
             align-items:center;
             margin-bottom:14px;
-            height:65px; /* ارتفاع ثابت و دقیق */
+            height:78px;        /* فضای بیشتر برای Turnstile */
+            min-height:78px;
+            max-height:78px;
+            overflow:visible;   /* اجازه به Turnstile که کامل دیده شود */
         }
         #turnstile-container{
             position:relative;
             width:300px;
-            height:65px;
+            max-width:100%;
+            height:70px;        /* بلندتر از Turnstile واقعی */
+            min-height:70px;
             display:flex;
             align-items:center;
             justify-content:center;
-            overflow:hidden;
+            overflow:visible;   /* ★ کلید حل مشکل: نه hidden */
         }
+
+        /* Placeholder نامرئی — فقط spinner */
         .captcha-loading{
             position:absolute;
             inset:0;
             display:flex;
             align-items:center;
             justify-content:center;
-            gap:8px;
-            color:#94a3b8;
-            font-size:12px;
-            border:1px solid rgba(255,255,255,.08);
-            border-radius:8px;
-            background:rgba(10,15,30,.4);
-            animation:captchaPulse 1.5s ease-in-out infinite;
-            box-sizing:border-box;
+            color:transparent;
+            font-size:0;
+            background:transparent;
+            border:none;
+            pointer-events:none;
+            transition:opacity .3s ease;
         }
-        @keyframes captchaPulse {0%, 100% { opacity: 0.5; }50% { opacity: 1; }}
+        .captcha-loading::before{
+            content:'';
+            width:22px;
+            height:22px;
+            border:2.5px solid rgba(148,163,184,.2);
+            border-top-color:#94a3b8;
+            border-radius:50%;
+            animation:captchaSpin .8s linear infinite;
+        }
+        @keyframes captchaSpin{to{transform:rotate(360deg)}}
+
+        #turnstile-container.has-widget .captcha-loading{
+            opacity:0;
+        }
+
         .captcha-error{
             color:#f87171 !important;
-            border-color:rgba(239,68,68,.3) !important;
+            border:1px solid rgba(239,68,68,.3) !important;
             background:rgba(239,68,68,.08) !important;
-            animation:none !important;
             padding:10px;
             text-align:center;
             font-size:11px;
             line-height:1.4;
+            border-radius:8px;
+            pointer-events:auto;
         }
+        .captcha-error::before{display:none}
 
-        /* اگر Turnstile داخل iframe رندر شد، دقیقاً وسط قرار می‌گیرد */
+        /* اطمینان از تراز بودن Turnstile */
         #turnstile-container > div,
         #turnstile-container > iframe {
             display: block !important;
             margin: 0 !important;
+            max-width: 100%;
         }
 
         .extra-links{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;font-size:11px}
@@ -267,7 +289,7 @@
                 box-shadow: none;
                 backdrop-filter: none;
                 background: #0b1120;
-                padding: 24px 20px;
+                padding: 20px 18px;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
@@ -292,8 +314,10 @@
             #msg { font-size: 11px; padding: 10px; }
             .lb { height: 34px; width: 34px; font-size: 12px; }
             .mi { font-size: 11px; padding: 6px 10px; }
-            .captcha-wrap{ margin-bottom:10px; height:60px; }
-            #turnstile-container{ height:60px; transform: scale(0.92); transform-origin: center center; }
+
+            /* موبایل: بدون scale، فضای کافی */
+            .captcha-wrap { height: 78px; min-height: 78px; max-height: 78px; margin-bottom: 10px; }
+            #turnstile-container { width: 100%; max-width: 300px; height: 70px; min-height: 70px; }
         }
     </style>
 </head>
@@ -363,7 +387,7 @@
             </div>
             <div class="captcha-wrap">
                 <div id="turnstile-container">
-                    <div class="captcha-loading">⏳ Loading security check...</div>
+                    <div class="captcha-loading"></div>
                 </div>
             </div>
             <div class="extra-links">
@@ -483,6 +507,7 @@
             if (!turnstileContainer || turnstileWidgetId !== null || turnstileLoadFailed) return;
             try {
                 turnstileContainer.textContent = '';
+                turnstileContainer.classList.add('has-widget');
                 turnstileWidgetId = window.turnstile.render(turnstileContainer, {
                     sitekey: '0x4AAAAAAFaU1RVZfnTURKOc',
                     theme: 'dark',
@@ -501,7 +526,7 @@
             if (!turnstileContainer) return;
             turnstileContainer.textContent = '';
             const errDiv = document.createElement('div');
-            errDiv.className = 'captcha-loading captcha-error';
+            errDiv.className = 'captcha-error';
             const t = langData[currentLang] || langData.en;
             errDiv.textContent = t.errCaptchaLoad || 'Security check failed to load. Please refresh.';
             turnstileContainer.appendChild(errDiv);
@@ -626,10 +651,6 @@
             authCard.classList.add('ready');
             hardDisableSpellcheck(userIn);
             hardDisableSpellcheck(passIn);
-            if (turnstileLoadFailed) {
-                const errDiv = turnstileContainer?.querySelector('.captcha-error');
-                if (errDiv) errDiv.textContent = t.errCaptchaLoad;
-            }
         }
 
         document.querySelectorAll('#lang-menu .mi').forEach(i => i.addEventListener('click', () => { setLang(i.dataset.lang); clearError(); }));
@@ -821,7 +842,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {
-                navigator.serviceWorker.register('sw.js?v=1.6').then(function (reg) {
+                navigator.serviceWorker.register('sw.js?v=1.7').then(function (reg) {
                     setInterval(function () {
                         reg.update().catch(function () {});
                     }, 60000);
