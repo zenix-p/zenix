@@ -6,7 +6,7 @@
 // نسخه: zenix-v1
 // ==========================================
 
-const CACHE_VERSION = 'zenix-v2';
+const CACHE_VERSION = 'zenix-v2.1';
 const STATIC_CACHE  = CACHE_VERSION + '-static';
 const HTML_CACHE    = CACHE_VERSION + '-html';
 
