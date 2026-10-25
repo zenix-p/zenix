@@ -35,14 +35,62 @@
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Vazirmatn',system-ui,sans-serif}
 
-        /* ★ Fix 2: html و body با پس‌زمینه‌ی یکدست + safe area */
-        html{background:#030712;height:100%;min-height:100%}
-        body{background:#030712;min-height:100vh;min-height:100dvh;display:flex;justify-content:center;align-items:center;color:#f8fafc;padding:max(15px, env(safe-area-inset-top)) max(15px, env(safe-area-inset-right)) max(15px, env(safe-area-inset-bottom)) max(15px, env(safe-area-inset-left));position:relative;overflow-x:hidden;-webkit-text-size-adjust:100%;-moz-text-size-adjust:100%;text-size-adjust:100%;}
+        /* ═══════════════════════════════════════════════════════════
+           ★ Fix صفحه‌ی دوم مشکی:
+             - html و body دقیقاً به اندازه‌ی viewport
+             - overflow: hidden → اسکرول غیرفعال
+             - auth-card اگه بلندتر بود، خودش اسکرول می‌شه
+           ═══════════════════════════════════════════════════════════ */
+        html{
+            background:#030712;
+            height:100vh;
+            height:100dvh;
+            overflow:hidden;
+        }
+        body{
+            background:#030712;
+            height:100vh;
+            height:100dvh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            color:#f8fafc;
+            padding:max(15px, env(safe-area-inset-top)) max(15px, env(safe-area-inset-right)) max(15px, env(safe-area-inset-bottom)) max(15px, env(safe-area-inset-left));
+            position:relative;
+            overflow:hidden;
+            box-sizing:border-box;
+            -webkit-text-size-adjust:100%;
+            -moz-text-size-adjust:100%;
+            text-size-adjust:100%;
+        }
 
         .glow-1,.glow-2{position:absolute;border-radius:50%;filter:blur(80px);opacity:.35;pointer-events:none;z-index:1}
         .glow-1{width:250px;height:250px;background:#f59e0b;top:10%;left:10%}
         .glow-2{width:250px;height:250px;background:#fbbf24;bottom:10%;right:10%}
-        .auth-card{width:100%;max-width:400px;background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:24px 22px;box-shadow:0 20px 50px rgba(0,0,0,.7);position:relative;z-index:10;backdrop-filter:blur(10px);opacity:1;transition:opacity .2s ease-in-out}
+
+        /* ★ auth-card با max-height و overflow-y:auto */
+        .auth-card{
+            width:100%;
+            max-width:400px;
+            background:rgba(15,23,42,.85);
+            border:1px solid rgba(255,255,255,.12);
+            border-radius:24px;
+            padding:24px 22px;
+            box-shadow:0 20px 50px rgba(0,0,0,.7);
+            position:relative;
+            z-index:10;
+            backdrop-filter:blur(10px);
+            opacity:1;
+            transition:opacity .2s ease-in-out;
+            max-height:100%;
+            overflow-y:auto;
+            scrollbar-width:thin;
+            scrollbar-color:rgba(56,189,248,.3) transparent;
+        }
+        .auth-card::-webkit-scrollbar{width:4px}
+        .auth-card::-webkit-scrollbar-track{background:transparent}
+        .auth-card::-webkit-scrollbar-thumb{background:rgba(56,189,248,.3);border-radius:2px}
+
         .header-actions{position:relative;z-index:20;display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-bottom:12px}
         .wrap{position:relative}
         .lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none;transition:.2s}
@@ -170,28 +218,29 @@
             .auth-card { padding: 22px 20px; }
         }
         @media (max-width: 480px) {
-            body { padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left)); }
-            .auth-card { padding: 18px 16px; border-radius: 20px; }
-            .header-actions { margin-bottom: 10px; }
-            .logo { margin-bottom: 16px; }
+            body { padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left)); }
+            .auth-card { padding: 16px 14px; border-radius: 20px; }
+            .header-actions { margin-bottom: 8px; }
+            .logo { margin-bottom: 12px; }
             .mark-wrap,.mark-shape,.mark-shape svg{width:58px;height:58px}
             .orbit-a{width:70px;height:70px;margin:-35px 0 0 -35px}
             .orbit-b{width:80px;height:80px;margin:-40px 0 0 -40px}
             .z-char{font-size:26px}
-            .wm-sapphire{font-size:78px}
+            .wm-sapphire{font-size:72px}
             .logo p { font-size: 10.5px; }
-            .group { margin-bottom: 12px; }
+            .group { margin-bottom: 10px; }
             .group label { font-size: 11px; }
             .group input { padding: 10px 14px; }
             html[dir="rtl"] .group input { padding-right: 36px; padding-left: 36px; }
             html[dir="ltr"] .group input { padding-left: 36px; padding-right: 36px; }
-            .extra-links { font-size: 10px; margin-bottom: 14px; }
+            .extra-links { font-size: 10px; margin-bottom: 12px; }
             .btn { font-size: 12px; padding: 11px; }
-            .footer { font-size: 11px; margin-top: 14px; }
+            .footer { font-size: 11px; margin-top: 12px; }
             #msg { font-size: 11px; padding: 10px; }
             .lb { height: 34px; width: 34px; font-size: 12px; }
             .mi { font-size: 11px; padding: 6px 10px; }
-            .captcha-wrap{ margin-bottom:12px; }
+            .captcha-wrap{ margin-bottom:10px; }
+            #turnstile-container{min-height:60px;}
         }
     </style>
 </head>
