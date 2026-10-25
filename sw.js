@@ -3,10 +3,10 @@
 // استراتژی:
 //   - HTML (navigate): Network-First → همیشه آخرین نسخه‌ی صفحه‌ها
 //   - Assets (JS/CSS/تصاویر): Cache-First → سرعت بالا
-// نسخه: zenix-v2.6
+// نسخه: zenix-v2.7
 // ==========================================
 
-const CACHE_VERSION = 'zenix-v2.6';
+const CACHE_VERSION = 'zenix-v2.7';
 const STATIC_CACHE  = CACHE_VERSION + '-static';
 const HTML_CACHE    = CACHE_VERSION + '-html';
 
