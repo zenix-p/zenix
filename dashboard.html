@@ -554,6 +554,34 @@
     </footer>
 
     <script src="https://cdn.jsdmirror.com/npm/@supabase/supabase-js@2" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script type="module" src="dashboard.js?v=26"></script>
+    <script type="module" src="dashboard.js?v=27"></script>
+
+    <!-- ── Zenix Service Worker Registration ── -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('sw.js').then(function (reg) {
+                    setInterval(function () {
+                        reg.update().catch(function () {});
+                    }, 60000);
+                    document.addEventListener('visibilitychange', function () {
+                        if (document.visibilityState === 'visible') {
+                            reg.update().catch(function () {});
+                        }
+                    });
+                }).catch(function (e) {
+                    console.warn('[Zenix SW] register failed:', e);
+                });
+            });
+
+            var hadController = !!navigator.serviceWorker.controller;
+            var refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', function () {
+                if (!hadController || refreshing) return;
+                refreshing = true;
+                window.location.reload();
+            });
+        }
+    </script>
 </body>
 </html>
