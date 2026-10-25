@@ -43,9 +43,7 @@
             text-size-adjust:100%;
         }
 
-        /* ═══════════════════════════════════════════════════════
-           هدر
-           ═══════════════════════════════════════════════════════ */
+        /* هدر */
         header{
             background:rgba(15,23,42,.9);
             border-bottom:1px solid rgba(255,255,255,.1);
@@ -83,9 +81,7 @@
         @keyframes logoOrbitB{to{transform:rotate(-360deg)}}
         .logo-text{font-family:'Italianno',cursive;font-weight:700;font-size:44px;line-height:.8;margin-top:-10px;background:linear-gradient(180deg,#fef9c3 0%,#fde68a 20%,#fbbf24 40%,#ffffff 50%,#f59e0b 62%,#b45309 85%,#78350f 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 1px 0 rgba(120,53,15,.9)) drop-shadow(0 2px 10px rgba(251,191,36,.45));padding-inline-start:2px}
 
-        /* ═══════════════════════════════════════════════════════
-           ★ Wrapper اصلی — اسکرول اینجا مدیریت می‌شود
-           ═══════════════════════════════════════════════════════ */
+        /* Wrapper */
         .c{
             flex:1;
             display:flex;
@@ -125,7 +121,9 @@
         .eye-btn{position:absolute;background:none;border:none;color:#64748b;cursor:pointer;font-size:13px;padding:4px}
         [dir="rtl"] .eye-btn{left:10px}
         [dir="ltr"] .eye-btn{right:10px}
-        input{width:100%;padding:10px 12px;background:rgba(10,15,30,.7);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:13px;outline:none;transition:all .2s}
+
+        /* ★ فونت فیلدها کوچیک‌تر شد (از 13 به 12) */
+        input{width:100%;padding:10px 12px;background:rgba(10,15,30,.7);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:12px;outline:none;transition:all .2s}
         [dir="rtl"] input{padding-right:36px;padding-left:36px}
         [dir="ltr"] input{padding-left:36px;padding-right:36px}
         input:focus{border-color:#38bdf8}
@@ -143,7 +141,7 @@
         #invite-required{display:none;margin-top:10px;padding:10px 12px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);border-radius:10px;color:#fca5a5;font-size:12px;line-height:1.6;}
         #invite-required.show{display:block}
 
-        /* Turnstile — فضای ثابت */
+        /* Turnstile */
         .captcha-wrap{
             display:flex;
             justify-content:center;
@@ -166,15 +164,13 @@
             overflow:visible;
         }
 
+        /* ★ فونت موبایل: 13px (از 15) */
         @media (max-width: 768px) {
-            input, select, textarea { font-size: 15px !important; }
-            .group label { font-size: 11.5px; }
+            input, select, textarea { font-size: 13px !important; }
+            .group label { font-size: 11px; }
             .btn { font-size: 13px; padding: 11px; }
         }
 
-        /* ═══════════════════════════════════════════════
-           ★ موبایل: اسکرول روی .c، کارت از بالا شروع
-           ═══════════════════════════════════════════════ */
         @media (max-width: 480px) {
             header{
                 background:#0b1120;
@@ -230,14 +226,14 @@
         #confirm-pass::placeholder,
         #ref-in::placeholder {
             color: #64748b !important;
-            opacity: 0.8 !important;
+            opacity: 0.75 !important;
             -webkit-text-fill-color: #64748b !important;
             font-weight: 400 !important;
-            font-size: 0.95em !important;
+            font-size: 0.92em !important;
         }
-        input::-webkit-input-placeholder { color: #64748b !important; opacity: 0.8 !important; -webkit-text-fill-color: #64748b !important; font-weight: 400 !important; }
-        input::-moz-placeholder { color: #64748b !important; opacity: 0.8 !important; font-weight: 400 !important; }
-        input:-ms-input-placeholder { color: #64748b !important; opacity: 0.8 !important; }
+        input::-webkit-input-placeholder { color: #64748b !important; opacity: 0.75 !important; -webkit-text-fill-color: #64748b !important; font-weight: 400 !important; }
+        input::-moz-placeholder { color: #64748b !important; opacity: 0.75 !important; font-weight: 400 !important; }
+        input:-ms-input-placeholder { color: #64748b !important; opacity: 0.75 !important; }
     </style>
 </head>
 <body>
@@ -624,7 +620,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {
-                navigator.serviceWorker.register('sw.js?v=2.5').then(function (reg) {
+                navigator.serviceWorker.register('sw.js?v=2.6').then(function (reg) {
                     setInterval(function () {
                         reg.update().catch(function () {});
                     }, 60000);
