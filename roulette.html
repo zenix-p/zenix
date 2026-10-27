@@ -26,9 +26,8 @@ body{display:flex;justify-content:center;align-items:flex-start;overflow-x:hidde
 .header-round-clock[data-phase="spinning"] strong{color:#f0bd64}
 @media(max-width:390px){.game-header{gap:6px;padding:5px 7px}.header-round-clock{gap:3px;padding:5px 5px}.header-round-clock span{font-size:8px}.online-pill{gap:5px;padding:6px 7px}.game-brand{gap:6px}}
 
-.scene-wrap{position:relative;width:100%;line-height:0;isolation:isolate;-webkit-user-select:none;user-select:none}
+.scene-wrap{position:relative;width:100%;line-height:0;isolation:isolate}
 canvas{display:block;width:100%;height:auto;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
-
 .scene-base{position:relative;z-index:0;pointer-events:none}
 canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;background:transparent;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 #spinHitbox{position:absolute;left:43.8%;top:89.8%;width:12.3%;height:8.2%;z-index:4;cursor:pointer;pointer-events:none;border:0;border-radius:28px;background:rgba(0,0,0,0);padding:0;outline:none;-webkit-tap-highlight-color:transparent}
@@ -122,7 +121,11 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
 .user-round-summary .sim-modal-stat strong.negative{color:#ff9a9a}
 @media(max-width:480px){.user-round-summary .sim-modal-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.user-round-summary .sim-modal-stat{padding:7px 6px}.user-round-summary .sim-modal-stat span{font-size:11px}.user-round-summary .sim-modal-stat strong{font-size:15px}}
 
-@media(max-width:600px){.result-backdrop{backdrop-filter:none;-webkit-backdrop-filter:none}}
+@media(max-width:600px){
+  .scene-wrap{contain:layout paint}
+  .scene-base,.scene-overlay{backface-visibility:hidden;-webkit-backface-visibility:hidden}
+  .result-backdrop{backdrop-filter:none;-webkit-backdrop-filter:none}
+}
 </style>
 </head>
 <body>
@@ -144,7 +147,7 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
     </div>
   </header>
   <div class="scene-wrap" id="sceneWrap">
-<canvas id="sceneBase" class="scene-base" width="941" height="1671" aria-hidden="true"></canvas>
+    <canvas id="sceneBase" class="scene-base" width="941" height="1671" aria-hidden="true"></canvas>
     <canvas id="scene" class="scene-overlay" width="941" height="1671" aria-label="میز رولت تعاملی"></canvas>
     <button id="spinHitbox" type="button" aria-label="چرخش رولت"><span class="sr-only">چرخش</span></button>
   </div>
@@ -232,30 +235,15 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
 (()=>{
 'use strict';
 const W=941,H=1671;
-// The base photograph remains at full resolution. Dynamic canvases use a viewport-aware
-// backing resolution on phones to reduce pixel work while staying sharp at mobile display size.
-const viewportWidth=document.documentElement.clientWidth||window.innerWidth||W;
-const RENDER_SCALE=Math.min(1,Math.max(.68,viewportWidth/W));
 const backgroundCanvas=document.getElementById('sceneBase');
 const backgroundCtx=backgroundCanvas.getContext('2d',{alpha:false});
 const canvas=document.getElementById('scene');
-canvas.width=Math.round(W*RENDER_SCALE);canvas.height=Math.round(H*RENDER_SCALE);
-let ctx=canvas.getContext('2d',{alpha:true,desynchronized:true});
-if(ctx)ctx.setTransform(RENDER_SCALE,0,0,RENDER_SCALE,0,0);
-// The fixed photograph and rotating wheel use separate, lower-cost layers. The original
-// photograph is never re-rasterized during the animation.
+let ctx=canvas.getContext('2d',{alpha:true});
+// The fixed photograph and the rotating wheel are drawn on separate layers.
+// This prevents mobile taps from forcing the full high-resolution photograph to redraw.
 const wheelLayerCanvas=document.createElement('canvas');
-wheelLayerCanvas.width=Math.round(W*RENDER_SCALE);wheelLayerCanvas.height=Math.round(H*RENDER_SCALE);
-const wheelLayerCtx=wheelLayerCanvas.getContext('2d',{alpha:true,desynchronized:true});
-if(wheelLayerCtx)wheelLayerCtx.setTransform(RENDER_SCALE,0,0,RENDER_SCALE,0,0);
-// Betting chips and labels are static throughout a spin, so composite a cached layer rather
-// than redrawing every chip, radial gradient, glow and text on each animation frame.
-const bettingOverlayCanvas=document.createElement('canvas');
-bettingOverlayCanvas.width=Math.round(W*RENDER_SCALE);bettingOverlayCanvas.height=Math.round(H*RENDER_SCALE);
-const bettingOverlayCtx=bettingOverlayCanvas.getContext('2d',{alpha:true,desynchronized:true});
-if(bettingOverlayCtx)bettingOverlayCtx.setTransform(RENDER_SCALE,0,0,RENDER_SCALE,0,0);
-let bettingOverlayDirty=true;
-let wheelGradientCache=null;
+wheelLayerCanvas.width=W;wheelLayerCanvas.height=H;
+const wheelLayerCtx=wheelLayerCanvas.getContext('2d',{alpha:true});
 let backgroundReady=false;
 let wheelCacheRotation=NaN;
 const spinButton=document.getElementById('spinHitbox');
@@ -422,31 +410,14 @@ function paintFixedRails(){
   ctx.strokeStyle='rgba(0,0,0,.9)';ctx.lineWidth=1.5;ctx.stroke();
   ctx.restore();
 }
-function wheelPaints(){
-  if(wheelGradientCache)return wheelGradientCache;
-  const make=(y0,y1,stops)=>{
-    const g=wheelLayerCtx.createLinearGradient(0,y0,0,y1);
-    for(const [at,color] of stops)g.addColorStop(at,color);
-    return g;
-  };
-  wheelGradientCache={
-    labelWall:make(C.y-C.outerY,C.y+C.outerY,[[0,'#565955'],[.16,'#101313'],[.55,'#343735'],[1,'#0a0b0b']]),
-    labelSheen:make(C.y-C.outerY,C.y+C.outerY,[[0,'rgba(255,244,221,.24)'],[.28,'rgba(255,255,255,.045)'],[.7,'rgba(0,0,0,.03)'],[1,'rgba(0,0,0,.38)']]),
-    wall:make(C.y-C.pocketOuterY,C.y+C.pocketOuterY,[[0,'#333735'],[.18,'#090c0c'],[.52,'#494a45'],[1,'#111414']]),
-    slotSheen:make(C.y-C.pocketOuterY,C.y+C.pocketOuterY,[[0,'rgba(255,236,196,.2)'],[.22,'rgba(255,255,255,.065)'],[.55,'rgba(255,255,255,0)'],[.82,'rgba(0,0,0,.08)'],[1,'rgba(0,0,0,.42)']]),
-    green:make(C.y-C.outerY,C.y+C.outerY,[[0,'#00452f'],[.37,'#087b50'],[.63,'#087b50'],[1,'#002b20']]),
-    red:make(C.y-C.outerY,C.y+C.outerY,[[0,'#500509'],[.37,'#ac171d'],[.63,'#ac171d'],[1,'#330306']]),
-    black:make(C.y-C.outerY,C.y+C.outerY,[[0,'#030607'],[.37,'#1d2324'],[.63,'#1d2324'],[1,'#030506']]),
-    outerMetal:make(C.y-C.trackOuterY,C.y+C.trackOuterY,[[0,'#b7b6af'],[.12,'#555753'],[.34,'#282b29'],[.53,'#a5a29a'],[.73,'#3b3e3b'],[1,'#77746d']]),
-    dividerRail:make(C.y-C.labelInnerY,C.y+C.labelInnerY,[[0,'#b7b2a7'],[.18,'#353835'],[.46,'#c5c0b2'],[.68,'#4b4c47'],[1,'#8f8a80']])
-  };
-  return wheelGradientCache;
-}
 function drawPhotographicLips(){
   // Keep the genuine inner chrome edge. The outer steel lip is redrawn as a narrow metal rail
   // so the original static number printing can never show through below the spinning ring.
   ctx.save();
-  const outerMetal=wheelPaints().outerMetal;
+  const outerMetal=ctx.createLinearGradient(0,C.y-C.trackOuterY,0,C.y+C.trackOuterY);
+  outerMetal.addColorStop(0,'#b7b6af');outerMetal.addColorStop(.12,'#555753');
+  outerMetal.addColorStop(.34,'#282b29');outerMetal.addColorStop(.53,'#a5a29a');
+  outerMetal.addColorStop(.73,'#3b3e3b');outerMetal.addColorStop(1,'#77746d');
   ctx.beginPath();ctx.ellipse(C.x,C.y,(C.outerX+C.trackOuterX)/2,(C.outerY+C.trackOuterY)/2,0,0,Math.PI*2);
   ctx.strokeStyle=outerMetal;ctx.lineWidth=Math.max(3,C.trackOuterX-C.outerX+1.4);ctx.stroke();
   ctx.beginPath();ctx.ellipse(C.x,C.y,C.trackOuterX,C.trackOuterY,0,0,Math.PI*2);
@@ -457,8 +428,12 @@ function drawPhotographicLips(){
   ctx.drawImage(image,0,0,W,H);ctx.restore();
 }
 function pocketGradient(number){
-  const paints=wheelPaints();
-  return number===0?paints.green:(reds.has(number)?paints.red:paints.black);
+  let top,mid,bottom;
+  if(number===0){top='#00452f';mid='#087b50';bottom='#002b20'}
+  else if(reds.has(number)){top='#500509';mid='#ac171d';bottom='#330306'}
+  else{top='#030607';mid='#1d2324';bottom='#030506'}
+  const g=ctx.createLinearGradient(0,C.y-C.outerY,0,C.y+C.outerY);
+  g.addColorStop(0,top);g.addColorStop(.37,mid);g.addColorStop(.63,mid);g.addColorStop(1,bottom);return g;
 }
 function drawPockets(rot){
   for(let i=0;i<N;i++){
@@ -469,22 +444,37 @@ function drawPockets(rot){
 
     // Outer number tile: the label band is separate from the deeper pocket track, as on a real wheel.
     sectorPath(a0,a1,C.outerX,C.outerY,C.labelInnerX,C.labelInnerY);
-    ctx.fillStyle=wheelPaints().labelWall;ctx.fill();ctx.strokeStyle='rgba(0,0,0,.92)';ctx.lineWidth=1;ctx.stroke();
+    const labelWall=ctx.createLinearGradient(0,C.y-C.outerY,0,C.y+C.outerY);
+    labelWall.addColorStop(0,'#565955');labelWall.addColorStop(.16,'#101313');labelWall.addColorStop(.55,'#343735');labelWall.addColorStop(1,'#0a0b0b');
+    ctx.fillStyle=labelWall;ctx.fill();ctx.strokeStyle='rgba(0,0,0,.92)';ctx.lineWidth=1;ctx.stroke();
     sectorPath(a0+.003,a1-.003,C.outerX,C.outerY,C.labelInnerX,C.labelInnerY,1.8,1.5);
     ctx.fillStyle=pocketGradient(n);ctx.fill();
     ctx.strokeStyle='rgba(156,160,151,.58)';ctx.lineWidth=.65;ctx.stroke();
     ctx.save();ctx.clip();
-    ctx.fillStyle=wheelPaints().labelSheen;ctx.fillRect(C.x-C.outerX-3,C.y-C.outerY-3,C.outerX*2+6,C.outerY*2+6);
+    const labelSheen=ctx.createLinearGradient(0,C.y-C.outerY,0,C.y+C.outerY);
+    labelSheen.addColorStop(0,'rgba(255,244,221,.24)');
+    labelSheen.addColorStop(.28,'rgba(255,255,255,.045)');
+    labelSheen.addColorStop(.7,'rgba(0,0,0,.03)');
+    labelSheen.addColorStop(1,'rgba(0,0,0,.38)');
+    ctx.fillStyle=labelSheen;ctx.fillRect(C.x-C.outerX-3,C.y-C.outerY-3,C.outerX*2+6,C.outerY*2+6);
     ctx.restore();
 
     // Inner pocket compartment, aligned to the same number but separated by a steel divider.
     sectorPath(a0+.002,a1-.002,C.pocketOuterX,C.pocketOuterY,C.innerX,C.innerY);
-    ctx.fillStyle=wheelPaints().wall;ctx.fill();ctx.strokeStyle='rgba(0,0,0,.96)';ctx.lineWidth=1.1;ctx.stroke();
+    const wall=ctx.createLinearGradient(0,C.y-C.pocketOuterY,0,C.y+C.pocketOuterY);
+    wall.addColorStop(0,'#333735');wall.addColorStop(.18,'#090c0c');wall.addColorStop(.52,'#494a45');wall.addColorStop(1,'#111414');
+    ctx.fillStyle=wall;ctx.fill();ctx.strokeStyle='rgba(0,0,0,.96)';ctx.lineWidth=1.1;ctx.stroke();
     sectorPath(a0+.006,a1-.006,C.pocketOuterX,C.pocketOuterY,C.innerX,C.innerY,2.3,2.0);
     ctx.fillStyle=pocketGradient(n);ctx.fill();
     ctx.strokeStyle='rgba(160,164,155,.7)';ctx.lineWidth=.65;ctx.stroke();
     ctx.save();ctx.clip();
-    ctx.fillStyle=wheelPaints().slotSheen;ctx.fillRect(C.x-C.pocketOuterX-3,C.y-C.pocketOuterY-3,C.pocketOuterX*2+6,C.pocketOuterY*2+6);
+    const slotSheen=ctx.createLinearGradient(0,C.y-C.pocketOuterY,0,C.y+C.pocketOuterY);
+    slotSheen.addColorStop(0,'rgba(255,236,196,.2)');
+    slotSheen.addColorStop(.22,'rgba(255,255,255,.065)');
+    slotSheen.addColorStop(.55,'rgba(255,255,255,0)');
+    slotSheen.addColorStop(.82,'rgba(0,0,0,.08)');
+    slotSheen.addColorStop(1,'rgba(0,0,0,.42)');
+    ctx.fillStyle=slotSheen;ctx.fillRect(C.x-C.pocketOuterX-3,C.y-C.pocketOuterY-3,C.pocketOuterX*2+6,C.pocketOuterY*2+6);
     ctx.restore();
 
     // Small metal divider bars continue naturally through both rings.
@@ -510,8 +500,9 @@ function drawPockets(rot){
   }
 }
 function drawPhotoDividerRail(){
-  // A narrow machined-steel separator; reuse the cached rail gradient between frames.
-  const g=wheelPaints().dividerRail;
+  // A narrow machined-steel separator; drawing it from gradients avoids restoring static source numbers.
+  const g=ctx.createLinearGradient(0,C.y-C.labelInnerY,0,C.y+C.labelInnerY);
+  g.addColorStop(0,'#b7b2a7');g.addColorStop(.18,'#353835');g.addColorStop(.46,'#c5c0b2');g.addColorStop(.68,'#4b4c47');g.addColorStop(1,'#8f8a80');
   ctx.beginPath();ctx.ellipse(C.x,C.y,(C.labelInnerX+C.pocketOuterX)/2,(C.labelInnerY+C.pocketOuterY)/2,0,0,Math.PI*2);
   ctx.strokeStyle=g;ctx.lineWidth=3.3;ctx.stroke();
   ctx.beginPath();ctx.ellipse(C.x,C.y,C.labelInnerX,C.labelInnerY,0,0,Math.PI*2);
@@ -979,7 +970,6 @@ function placeBet(target){
   if(balance<selectedChip){status.textContent='موجودی برای این سکه کافی نیست';return;}
   balance-=selectedChip;
   bets.push({id:nextBetId++,type:target.type,value:target.value,amount:selectedChip});
-  bettingOverlayDirty=true;
   const label=target.type==='straight'?'عدد '+target.value:target.type==='dozen'?'دوجین '+target.value:target.type==='column'?'ستون '+(target.value+1):({low:'۱ تا ۱۸',high:'۱۹ تا ۳۶',even:'زوج',odd:'فرد',red:'قرمز',black:'مشکی'}[target.value]||target.value);
   status.textContent='شرط '+selectedChip+' روی '+label;
   render(1,performance.now());
@@ -990,7 +980,7 @@ function undoBet(){
   if(roundPhase!=='betting'||animating)return;
   const bet=bets.pop();
   if(!bet){status.textContent='شرطی برای بازگشت وجود ندارد';return;}
-  balance+=bet.amount;bettingOverlayDirty=true;status.textContent='آخرین شرط برگشت داده شد';render(1,performance.now());renderSimulationPanel();updateSimControls();
+  balance+=bet.amount;status.textContent='آخرین شرط برگشت داده شد';render(1,performance.now());renderSimulationPanel();updateSimControls();
 }
 function payoutFor(bet,n){
   if(bet.type==='straight')return n===bet.value?bet.amount*36:0;
@@ -1009,7 +999,7 @@ function settleBets(n){
   let stake=0,returned=0;
   const betCount=bets.length;
   for(const bet of bets){stake+=bet.amount;returned+=payoutFor(bet,n)}
-  balance+=returned;bets=[];bettingOverlayDirty=true;
+  balance+=returned;bets=[];
   return {stake,returned,net:returned-stake,betCount};
 }
 const SIM_AMOUNTS=[5,25,100,500];
@@ -1171,7 +1161,7 @@ function handleCanvasClick(event){
   // Select a denomination by tapping one of the five original chips.
   if(y>=1525&&y<=1605){
     const chip=chipTray.find(c=>Math.hypot(x-c.x,y-1572)<=30);
-    if(chip){selectedChip=chip.value;bettingOverlayDirty=true;status.textContent='سکهٔ انتخاب‌شده: '+selectedChip;render(1,performance.now());return;}
+    if(chip){selectedChip=chip.value;status.textContent='سکهٔ انتخاب‌شده: '+selectedChip;render(1,performance.now());return;}
   }
   const target=findBetTarget(x,y);
   if(target){placeBet(target);return;}
@@ -1234,21 +1224,16 @@ function hideResultModal(){
 }
 
 function buildStaticBackground(){
-  if(!image.complete||!image.naturalWidth||!backgroundCtx)return;
+  if(!image.complete||!image.naturalWidth)return;
   const previousCtx=ctx;
-  try{
-    ctx=backgroundCtx;
-    ctx.clearRect(0,0,W,H);
-    ctx.drawImage(image,0,0,W,H);
-    coverOriginalPrintedNumberRing();
-    paintFixedRails();
-    backgroundReady=true;
-    wheelCacheRotation=NaN;
-  }catch(err){
-    // On mobile, preserve the native photo underneath if a canvas operation fails.
-    backgroundReady=false;
-    status.textContent='تصویر اصلی بارگذاری شد؛ در حال آماده‌سازی لایهٔ رولت';
-  }finally{ctx=previousCtx;}
+  ctx=backgroundCtx;
+  ctx.clearRect(0,0,W,H);
+  ctx.drawImage(image,0,0,W,H);
+  coverOriginalPrintedNumberRing();
+  paintFixedRails();
+  ctx=previousCtx;
+  backgroundReady=true;
+  wheelCacheRotation=NaN;
 }
 function buildWheelLayer(rot){
   const previousCtx=ctx;
@@ -1261,29 +1246,19 @@ function buildWheelLayer(rot){
   ctx=previousCtx;
   wheelCacheRotation=rot;
 }
-function rebuildBettingOverlayCache(){
-  const previousCtx=ctx;
-  ctx=bettingOverlayCtx;
-  ctx.clearRect(0,0,W,H);
-  drawBettingOverlay();
-  ctx=previousCtx;
-  bettingOverlayDirty=false;
-}
 function render(t=1,now=performance.now()){
-  if(!Number.isFinite(t))t=1;
-  if(!Number.isFinite(now))now=performance.now();
-  if(!Number.isFinite(rotation))rotation=0;
+  if(!Number.isFinite(t)) t=1;
+  if(!Number.isFinite(now)) now=performance.now();
+  if(!Number.isFinite(rotation)) rotation=0;
   if(!backgroundReady)buildStaticBackground();
   if(!backgroundReady)return;
-  // Betting UI is immutable during a spin. Build it when the player changes a bet,
-  // then reuse the bitmap rather than redrawing many chips/text glows at 60 fps.
-  if(!animating||bettingOverlayDirty)rebuildBettingOverlayCache();
-  // Only rebuild the rotating ring when its angle changed; all repeated gradients are cached.
+  // When the wheel is not moving, betting taps reuse the exact same wheel pixels.
+  // During a spin only the wheel layer is refreshed; the original photo stays untouched.
   if(!Number.isFinite(wheelCacheRotation)||Math.abs(wheelCacheRotation-rotation)>1e-9)buildWheelLayer(rotation);
   ctx.clearRect(0,0,W,H);
   ctx.drawImage(wheelLayerCanvas,0,0,W,H);
   drawDealerBall(now);
-  ctx.drawImage(bettingOverlayCanvas,0,0,W,H);
+  drawBettingOverlay();
 }
 function spin(automatic=false){
   if(!image.complete||!image.naturalWidth||animating||!resultModal.hidden)return;
@@ -1309,10 +1284,10 @@ function spin(automatic=false){
   landingAngle=RESULT_ANGLE+landingSlot*step;
   ballState='launching';
   const desired=landingAngle-START-index*step;
-  const turns=9+Math.floor(Math.random()*3);
-  // Faster numbered-ring rotation, retaining gradual deceleration.
+  const turns=6+Math.floor(Math.random()*3);
+  // The numbered ring rotates counter-clockwise and stops before the ball's final lap.
   targetRotation=fromRotation-(turns*Math.PI*2+normalize(fromRotation-desired));
-  spinDuration=6800+Math.random()*550;
+  spinDuration=7600+Math.random()*850;
 
   // The ring runs counter-clockwise while the ball travels in the opposite direction.
   // The ball keeps moving through the ring's stopping point, then eases to a winning pocket.
@@ -1334,8 +1309,9 @@ function spin(automatic=false){
     // Keep the ring stationary during release; after its duration, lock it at the result.
     rotation=fromRotation+(targetRotation-fromRotation)*easedWheel;
 
-    const phaseMessage=elapsed<BALL_LAUNCH_MS?'توپ در حال رها شدن است':(wheelElapsed<spinDuration?'چرخ در حال چرخش است':'توپ پس از توقف چرخ در حال حرکت است');
-    if(status.textContent!==phaseMessage)status.textContent=phaseMessage;
+    if(elapsed<BALL_LAUNCH_MS)status.textContent='توپ در حال رها شدن است';
+    else if(wheelElapsed<spinDuration)status.textContent='چرخ در حال چرخش است';
+    else status.textContent='توپ پس از توقف چرخ در حال حرکت است';
 
     render(easedWheel,now);
     const totalDuration=BALL_LAUNCH_MS+spinDuration+ballExtraDuration;
@@ -1367,7 +1343,7 @@ resultClose.addEventListener('click',hideResultModal);
 resultModal.addEventListener('click',event=>{if(event.target && event.target.hasAttribute('data-close-result'))hideResultModal();});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!resultModal.hidden)hideResultModal();});
 image.onload=()=>{ballState='held';buildStaticBackground();render(1,performance.now());if(roundPhase==='loading')startBettingPhase(false);};
-image.onerror=()=>{status.textContent='بارگذاری تصویر دیلر ناموفق بود؛ فایل را دوباره با Chrome یا Edge باز کنید';};
+image.onerror=()=>{status.textContent='تصویر پس‌زمینه بارگذاری نشد';};
 spinButton.addEventListener('click',spin);
 simSpinButton.addEventListener('click',spin);
 simUndoButton.addEventListener('click',undoBet);
