@@ -214,9 +214,18 @@ async function initOnlineUsers(){
         // اگر لاگین نیست، به صفحه ورود پلتفرم هدایت کن
         window.location.href = PLATFORM_URL;
         return;
-      }
-
-      const user = session.user;
+      } 
+const hashParams = new URLSearchParams(window.location.hash.substring(1));
+const accessToken = hashParams.get('access_token');
+const refreshToken = hashParams.get('refresh_token');
+if(accessToken && refreshToken){
+  try{
+    await supabaseClient.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    session = (await supabaseClient.auth.getSession()).data.session;
+  }catch(e){ console.error('Session restore failed', e); }
+}   
+  const user = session.user;
       const userId = user.id;
       const displayName = user.email || user.phone || 'کاربر';
 
