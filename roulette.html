@@ -27,7 +27,9 @@ body{display:flex;justify-content:center;align-items:flex-start;overflow-x:hidde
 @media(max-width:390px){.game-header{gap:6px;padding:5px 7px}.header-round-clock{gap:3px;padding:5px 5px}.header-round-clock span{font-size:8px}.online-pill{gap:5px;padding:6px 7px}.game-brand{gap:6px}}
 
 .scene-wrap{position:relative;width:100%;line-height:0;isolation:isolate}
-canvas{display:block;width:100%;height:auto;touch-action:manipulation}
+canvas{display:block;width:100%;height:auto;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+.scene-base{position:relative;z-index:0;pointer-events:none}
+canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;background:transparent;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 #spinHitbox{position:absolute;left:43.8%;top:89.8%;width:12.3%;height:8.2%;z-index:4;cursor:pointer;pointer-events:none;border:0;border-radius:28px;background:rgba(0,0,0,0);padding:0;outline:none;-webkit-tap-highlight-color:transparent}
 #spinHitbox:focus-visible{outline:2px solid rgba(255,200,93,.8);outline-offset:2px}
 #spinHitbox[disabled]{cursor:wait}
@@ -118,6 +120,12 @@ canvas{display:block;width:100%;height:auto;touch-action:manipulation}
 .user-round-summary .sim-modal-stat strong.positive{color:#80e3a2}
 .user-round-summary .sim-modal-stat strong.negative{color:#ff9a9a}
 @media(max-width:480px){.user-round-summary .sim-modal-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.user-round-summary .sim-modal-stat{padding:7px 6px}.user-round-summary .sim-modal-stat span{font-size:11px}.user-round-summary .sim-modal-stat strong{font-size:15px}}
+
+@media(max-width:600px){
+  .scene-wrap{contain:layout paint}
+  .scene-base,.scene-overlay{backface-visibility:hidden;-webkit-backface-visibility:hidden}
+  .result-backdrop{backdrop-filter:none;-webkit-backdrop-filter:none}
+}
 </style>
 </head>
 <body>
@@ -139,7 +147,8 @@ canvas{display:block;width:100%;height:auto;touch-action:manipulation}
     </div>
   </header>
   <div class="scene-wrap" id="sceneWrap">
-    <canvas id="scene" width="941" height="1671" aria-label="میز رولت تعاملی"></canvas>
+    <canvas id="sceneBase" class="scene-base" width="941" height="1671" aria-hidden="true"></canvas>
+    <canvas id="scene" class="scene-overlay" width="941" height="1671" aria-label="میز رولت تعاملی"></canvas>
     <button id="spinHitbox" type="button" aria-label="چرخش رولت"><span class="sr-only">چرخش</span></button>
   </div>
 
@@ -226,8 +235,17 @@ canvas{display:block;width:100%;height:auto;touch-action:manipulation}
 (()=>{
 'use strict';
 const W=941,H=1671;
+const backgroundCanvas=document.getElementById('sceneBase');
+const backgroundCtx=backgroundCanvas.getContext('2d',{alpha:false});
 const canvas=document.getElementById('scene');
-const ctx=canvas.getContext('2d',{alpha:false});
+let ctx=canvas.getContext('2d',{alpha:true});
+// The fixed photograph and the rotating wheel are drawn on separate layers.
+// This prevents mobile taps from forcing the full high-resolution photograph to redraw.
+const wheelLayerCanvas=document.createElement('canvas');
+wheelLayerCanvas.width=W;wheelLayerCanvas.height=H;
+const wheelLayerCtx=wheelLayerCanvas.getContext('2d',{alpha:true});
+let backgroundReady=false;
+let wheelCacheRotation=NaN;
 const spinButton=document.getElementById('spinHitbox');
 const status=document.getElementById('status');
 const resultModal=document.getElementById('resultModal');
@@ -1205,14 +1223,42 @@ function hideResultModal(){
   if(!animating&&spinButton)spinButton.focus({preventScroll:true});
 }
 
+function buildStaticBackground(){
+  if(!image.complete||!image.naturalWidth)return;
+  const previousCtx=ctx;
+  ctx=backgroundCtx;
+  ctx.clearRect(0,0,W,H);
+  ctx.drawImage(image,0,0,W,H);
+  coverOriginalPrintedNumberRing();
+  paintFixedRails();
+  ctx=previousCtx;
+  backgroundReady=true;
+  wheelCacheRotation=NaN;
+}
+function buildWheelLayer(rot){
+  const previousCtx=ctx;
+  ctx=wheelLayerCtx;
+  ctx.clearRect(0,0,W,H);
+  drawPockets(rot);
+  drawPhotographicLips();
+  drawPhotoDividerRail();
+  drawSpindleForeground();
+  ctx=previousCtx;
+  wheelCacheRotation=rot;
+}
 function render(t=1,now=performance.now()){
   if(!Number.isFinite(t)) t=1;
   if(!Number.isFinite(now)) now=performance.now();
   if(!Number.isFinite(rotation)) rotation=0;
-  ctx.clearRect(0,0,W,H);ctx.drawImage(image,0,0,W,H);
-  coverOriginalPrintedNumberRing();
-  paintFixedRails();drawPockets(rotation);drawPhotographicLips();drawPhotoDividerRail();drawSpindleForeground();
-  drawDealerBall(now);drawBettingOverlay();
+  if(!backgroundReady)buildStaticBackground();
+  if(!backgroundReady)return;
+  // When the wheel is not moving, betting taps reuse the exact same wheel pixels.
+  // During a spin only the wheel layer is refreshed; the original photo stays untouched.
+  if(!Number.isFinite(wheelCacheRotation)||Math.abs(wheelCacheRotation-rotation)>1e-9)buildWheelLayer(rotation);
+  ctx.clearRect(0,0,W,H);
+  ctx.drawImage(wheelLayerCanvas,0,0,W,H);
+  drawDealerBall(now);
+  drawBettingOverlay();
 }
 function spin(automatic=false){
   if(!image.complete||!image.naturalWidth||animating||!resultModal.hidden)return;
@@ -1241,7 +1287,7 @@ function spin(automatic=false){
   const turns=6+Math.floor(Math.random()*3);
   // The numbered ring rotates counter-clockwise and stops before the ball's final lap.
   targetRotation=fromRotation-(turns*Math.PI*2+normalize(fromRotation-desired));
-  spinDuration=10800+Math.random()*1000;
+  spinDuration=7600+Math.random()*850;
 
   // The ring runs counter-clockwise while the ball travels in the opposite direction.
   // The ball keeps moving through the ring's stopping point, then eases to a winning pocket.
@@ -1296,7 +1342,7 @@ resultContinue.addEventListener('click',hideResultModal);
 resultClose.addEventListener('click',hideResultModal);
 resultModal.addEventListener('click',event=>{if(event.target && event.target.hasAttribute('data-close-result'))hideResultModal();});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!resultModal.hidden)hideResultModal();});
-image.onload=()=>{ballState='held';render(1,performance.now());if(roundPhase==='loading')startBettingPhase(false);};
+image.onload=()=>{ballState='held';buildStaticBackground();render(1,performance.now());if(roundPhase==='loading')startBettingPhase(false);};
 image.onerror=()=>{status.textContent='تصویر پس‌زمینه بارگذاری نشد';};
 spinButton.addEventListener('click',spin);
 simSpinButton.addEventListener('click',spin);
