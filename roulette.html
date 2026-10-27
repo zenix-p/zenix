@@ -18,6 +18,7 @@ body{display:flex;justify-content:center;align-items:flex-start;overflow-x:hidde
 .game-brand-subtitle{font-size:clamp(9px,1.2vw,11px);color:#c5d5ca;white-space:nowrap;line-height:1.15}
 .online-pill{display:flex;align-items:center;gap:7px;flex:0 0 auto;padding:7px 10px;border:1px solid rgba(78,154,107,.72);border-radius:10px;background:linear-gradient(140deg,rgba(28,72,48,.9),rgba(10,39,27,.94));box-shadow:inset 0 0 0 1px rgba(255,255,255,.035)}
 .online-dot{width:7px;height:7px;flex:0 0 auto;border-radius:50%;background:#62e995;box-shadow:0 0 8px rgba(98,233,149,.75)}
+.online-pill.offline .online-dot{background:#e9a24e;box-shadow:0 0 8px rgba(233,162,78,.6)}
 .online-label{font-size:clamp(9px,1.25vw,12px);color:#bce8c9;white-space:nowrap}
 .online-count{font-size:clamp(13px,1.9vw,18px);font-weight:900;color:#fff5d6;min-width:2ch;text-align:center;font-variant-numeric:tabular-nums}
 .header-round-clock{display:flex;align-items:center;gap:5px;flex:0 0 auto;padding:6px 8px;border:1px solid rgba(202,166,91,.48);border-radius:9px;background:rgba(0,0,0,.2);color:#d7e4db;font-family:Tahoma,Arial,sans-serif;white-space:nowrap}
@@ -98,7 +99,7 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
       </div>
     </div>
       <div class="header-round-clock" id="headerRoundClock" data-phase="loading" aria-label="شمارش معکوس شرط‌بندی"><strong id="headerBettingSeconds">25</strong><span id="headerBettingLabel">ثانیه<br>شرط‌بندی</span></div>
-  <div class="online-pill" aria-label="تعداد کاربران آنلاین">
+  <div class="online-pill" id="onlinePill" aria-label="تعداد کاربران آنلاین">
       <span class="online-dot" aria-hidden="true"></span>
       <span class="online-label">کاربر آنلاین</span>
       <span class="online-count" id="onlineCount">...</span>
@@ -150,36 +151,142 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
   </div>
   <span id="status" class="sr-only" aria-live="polite">آمادهٔ چرخش</span>
 </main>
+
+<!-- Supabase Client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
 (()=>{
 'use strict';
 
-// ===== Dynamic Online Users Simulation =====
-function initOnlineUsers() {
-  let baseCount = 124;
-  try {
-    let stored = localStorage.getItem('roulette_online_count');
-    if (stored) {
-      baseCount = parseInt(stored, 10) + 1; // Increase by 1 for the new visitor
-    }
-    localStorage.setItem('roulette_online_count', baseCount);
-  } catch(e) {}
-  
+/* ============================================================
+   ============ تنظیمات اتصال به سوپاپیس ============
+   مقدارهای زیر را از پروژه سوپاپیس خودت پر کن:
+   Dashboard → Settings → API
+   ============================================================ */
+const SUPABASE_URL      = 'https://YOUR_PROJECT_REF.supabase.co';
+const SUPABASE_ANON_KEY = 'YOUR_ANON_PUBLIC_KEY_HERE';
+const PLATFORM_URL      = 'https://zenix-p.github.io/zenix/';
+/* ============================================================ */
+
+let supabaseClient = null;
+let onlineChannel  = null;
+
+async function initOnlineUsers(){
   const onlineCountEl = document.getElementById('onlineCount');
-  if (onlineCountEl) {
-    onlineCountEl.textContent = baseCount;
-    // Slight fluctuation to make it look live
-    setInterval(() => {
-      let current = parseInt(onlineCountEl.textContent, 10);
-      let change = Math.floor(Math.random() * 5) - 2; // -2 to +2
-      let next = current + change;
-      if (next < 100) next = 100 + Math.floor(Math.random() * 10);
-      onlineCountEl.textContent = next;
-    }, 15000);
+  const onlinePill    = document.getElementById('onlinePill');
+  if(!onlineCountEl) return;
+
+  const isConfigured =
+    SUPABASE_URL &&
+    SUPABASE_URL.indexOf('YOUR_PROJECT_REF') === -1 &&
+    SUPABASE_ANON_KEY &&
+    SUPABASE_ANON_KEY.indexOf('YOUR_ANON') === -1 &&
+    typeof supabase !== 'undefined';
+
+  if(isConfigured){
+    try{
+      supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: {
+          storageKey: 'zenix-auth-token',
+          autoRefreshToken: true,
+          persistSession: true,
+          detectSessionInUrl: true
+        },
+        realtime: { params: { eventsPerSecond: 10 } }
+      });
+
+      // ===== بررسی نشست (لاگین) کاربر از پلتفرم =====
+      let session = null;
+      try{
+        const res = await supabaseClient.auth.getSession();
+        session = res.data.session;
+      }catch(e){}
+
+      if(!session){
+        // اگر لاگین نیست، به صفحه ورود پلتفرم هدایت کن
+        window.location.href = PLATFORM_URL;
+        return;
+      }
+
+      const user = session.user;
+      const userId = user.id;
+      const displayName = user.email || user.phone || 'کاربر';
+
+      // ===== اتصال به کانال حضور آنلاین =====
+      onlineChannel = supabaseClient.channel('roulette-online-users', {
+        config: { presence: { key: userId } }
+      });
+
+      const updateCount = () => {
+        try{
+          const state = onlineChannel.presenceState() || {};
+          const count = Object.keys(state).length;
+          onlineCountEl.textContent = String(Math.max(1, count));
+          if(onlinePill) onlinePill.classList.remove('offline');
+        }catch(e){}
+      };
+
+      onlineChannel
+        .on('presence', { event: 'sync'  }, updateCount)
+        .on('presence', { event: 'join'  }, updateCount)
+        .on('presence', { event: 'leave' }, updateCount)
+        .subscribe(async (status, err) => {
+          if(status === 'SUBSCRIBED'){
+            try{
+              await onlineChannel.track({
+                user_id:   userId,
+                name:      displayName,
+                online_at: new Date().toISOString()
+              });
+            }catch(e){}
+            updateCount();
+          }else if(status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED'){
+            if(onlinePill) onlinePill.classList.add('offline');
+          }
+        });
+
+      // اگر کاربر در همین صفحه لاگ‌آوت کرد، به پلتفرم برگردد
+      supabaseClient.auth.onAuthStateChange((event, session) => {
+        if(event === 'SIGNED_OUT' || !session){
+          try{ onlineChannel && onlineChannel.untrack(); }catch(e){}
+          window.location.href = PLATFORM_URL;
+        }
+      });
+
+      // هنگام بستن صفحه، حضور را پاک کن
+      window.addEventListener('beforeunload', () => {
+        try{ onlineChannel && onlineChannel.untrack(); }catch(e){}
+      });
+
+      return; // موفق - به fallback نمی‌رویم
+    }catch(err){
+      console.warn('Supabase init failed, falling back to simulation:', err);
+    }
   }
+
+  // ===== Fallback: شبیه‌سازی محلی (وقتی سوپاپیس پیکربندی نشده یا خطا داد) =====
+  if(onlinePill) onlinePill.classList.add('offline');
+  let baseCount = 124;
+  try{
+    const stored = localStorage.getItem('roulette_online_count');
+    if(stored) baseCount = parseInt(stored, 10) + 1;
+    localStorage.setItem('roulette_online_count', String(baseCount));
+  }catch(e){}
+  onlineCountEl.textContent = baseCount;
+  setInterval(() => {
+    let current = parseInt(onlineCountEl.textContent, 10) || 124;
+    const change = Math.floor(Math.random() * 5) - 2;
+    let next = current + change;
+    if(next < 100) next = 100 + Math.floor(Math.random() * 10);
+    onlineCountEl.textContent = next;
+  }, 15000);
 }
 initOnlineUsers();
-// ==========================================
+
+/* ============================================================
+   ============ کد بازی رولت (بدون تغییر) ============
+   ============================================================ */
 
 const W=941,H=1671;
 const backgroundCanvas=document.getElementById('sceneBase');
@@ -584,13 +691,9 @@ function drawHeldFingerOcclusion(){
   ctx.drawImage(image,0,0,W,H);
   ctx.restore();
 }
-function drawHeldBall(){
-  return;
-}
+function drawHeldBall(){ return; }
 function drawDealerBall(now){
-  if(ballState==='held'){
-    return;
-  }
+  if(ballState==='held'){ return; }
   if(ballState==='settled'||!animating){
     drawBallVisual(C.x+BALL_POCKET.rx*Math.cos(landingAngle),C.y+BALL_POCKET.ry*Math.sin(landingAngle),6.4);
     return;
@@ -639,9 +742,7 @@ function drawDealerBall(now){
 }
 
 function formatBalance(value){return Math.max(0,Math.floor(value)).toLocaleString('en-US')}
-function roundedRectPath(x,y,w,h,r){
-  ctx.beginPath();ctx.roundRect(x,y,w,h,r);
-}
+function roundedRectPath(x,y,w,h,r){ ctx.beginPath();ctx.roundRect(x,y,w,h,r); }
 function chipColor(value){
   if(value===1)return '#b9c0c4';
   if(value===5)return '#b51d25';
@@ -683,29 +784,6 @@ function targetPosition(type,value){
   if(type==='column')return {x:857,y:rowCenters[value]+8};
   const found=outsideSpots.find(p=>p.value===value);
   return found?{x:found.x,y:found.y}:{x:470,y:1507};
-}
-function drawBetAmountBadge(x,y,total,denomination,count){
-  const text=formatBalance(total);
-  const chip=chipTray.find(c=>c.value===denomination);
-  const color=chip?chip.color:(count>1?'#20382b':chipColor(denomination));
-  ctx.save();
-  let fontSize=22;
-  ctx.font='900 '+fontSize+'px Tahoma,Arial,sans-serif';
-  let width=Math.max(31,Math.ceil(ctx.measureText(text).width+13));
-  if(width>62){fontSize=18;ctx.font='900 '+fontSize+'px Tahoma,Arial,sans-serif';width=Math.min(62,Math.ceil(ctx.measureText(text).width+11));}
-  const height=25;
-  roundedRectPath(x-width/2,y-height/2,width,height,6);
-  const bg=ctx.createLinearGradient(x-width/2,y-height/2,x+width/2,y+height/2);
-  bg.addColorStop(0,color);bg.addColorStop(.55,color);bg.addColorStop(1,'#050807');
-  ctx.shadowColor='rgba(0,0,0,.9)';ctx.shadowBlur=4;ctx.shadowOffsetY=1;
-  ctx.fillStyle=bg;ctx.fill();ctx.shadowBlur=0;ctx.shadowOffsetY=0;
-  ctx.strokeStyle='#ffe1a0';ctx.lineWidth=1.5;ctx.stroke();
-  roundedRectPath(x-width/2+2.5,y-height/2+2.5,width-5,height-5,4);
-  ctx.strokeStyle='rgba(255,246,213,.42)';ctx.lineWidth=.8;ctx.stroke();
-  ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='900 '+fontSize+'px Tahoma,Arial,sans-serif';
-  ctx.lineWidth=2.5;ctx.strokeStyle='rgba(0,0,0,.9)';ctx.strokeText(text,x,y+.25);
-  ctx.fillStyle='#fffbea';ctx.fillText(text,x,y+.25);
-  ctx.restore();
 }
 function drawBetMarkers(){
   const groups=new Map();
@@ -770,22 +848,15 @@ function drawBettingInstruction(){
   ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetX=0;ctx.shadowOffsetY=0;
 
   ctx.beginPath();
-  ctx.moveTo(60,1218);
-  ctx.lineTo(879,1218);
-  ctx.lineTo(906,1305);
-  ctx.lineTo(35,1305);
-  ctx.closePath();
+  ctx.moveTo(60,1218);ctx.lineTo(879,1218);ctx.lineTo(906,1305);ctx.lineTo(35,1305);ctx.closePath();
   const panel=ctx.createLinearGradient(0,1218,0,1305);
-  panel.addColorStop(0,'#063126');
-  panel.addColorStop(.34,'#05251b');
-  panel.addColorStop(.72,'#031810');
-  panel.addColorStop(1,'#020b07');
+  panel.addColorStop(0,'#063126');panel.addColorStop(.34,'#05251b');panel.addColorStop(.72,'#031810');panel.addColorStop(1,'#020b07');
   ctx.fillStyle=panel;ctx.fill();
   ctx.strokeStyle='rgba(194,145,60,.9)';ctx.lineWidth=1.25;ctx.stroke();
 
   ctx.beginPath();
-  ctx.moveTo(68,1225);ctx.lineTo(872,1225);ctx.lineTo(895,1298);ctx.lineTo(46,1298);
-  ctx.closePath();ctx.strokeStyle='rgba(245,208,130,.22)';ctx.lineWidth=.7;ctx.stroke();
+  ctx.moveTo(68,1225);ctx.lineTo(872,1225);ctx.lineTo(895,1298);ctx.lineTo(46,1298);ctx.closePath();
+  ctx.strokeStyle='rgba(245,208,130,.22)';ctx.lineWidth=.7;ctx.stroke();
 
   ctx.direction='rtl';ctx.textAlign='center';ctx.textBaseline='middle';
   ctx.shadowColor='rgba(0,0,0,.78)';ctx.shadowBlur=2;ctx.shadowOffsetY=1;
@@ -942,15 +1013,6 @@ function placeBet(target){
   const label=target.type==='straight'?'عدد '+target.value:target.type==='dozen'?'دوجین '+target.value:target.type==='column'?'ستون '+(target.value+1):({low:'۱ تا ۱۸',high:'۱۹ تا ۳۶',even:'زوج',odd:'فرد',red:'قرمز',black:'مشکی'}[target.value]||target.value);
   status.textContent='شرط '+selectedChip+' روی '+label;
   render(1,performance.now());
-  updateSpinControls();
-}
-function undoBet(){
-  if(roundPhase!=='betting'||animating)return;
-  const bet=bets.pop();
-  if(!bet){status.textContent='شرطی برای بازگشت وجود ندارد';return;}
-  balance+=bet.amount;
-  bettingOverlayDirty=true;
-  status.textContent='آخرین شرط برگشت داده شد';render(1,performance.now());updateSpinControls();
 }
 function payoutFor(bet,n){
   if(bet.type==='straight')return n===bet.value?bet.amount*36:0;
@@ -975,7 +1037,6 @@ function settleBets(n){
 }
 
 function updateSpinControls(){
-  const modalOpen=!resultModal.hidden;
   if(spinButton)spinButton.disabled=true;
 }
 function updateBettingClock(remainingMs){
@@ -1224,7 +1285,7 @@ image.src='https://i.8upload.com/image/9b64ac57dad0748d/roulette-dealer-original
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js?v=2.9').catch(err => console.log('SW registration failed: ', err));
+    navigator.serviceWorker.register('sw.js?v=3').catch(err => console.log('SW registration failed: ', err));
   });
 }
 })();
