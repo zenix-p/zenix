@@ -188,7 +188,14 @@ async function initOnlineUsers(){
     try{
       supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
         auth: {
-          storageKey: 'zenix-auth-token',
+         supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  },
+  realtime: { params: { eventsPerSecond: 10 } }
+});
           autoRefreshToken: true,
           persistSession: true,
           detectSessionInUrl: true
