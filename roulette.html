@@ -94,15 +94,14 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
       <div class="game-brand-mark" aria-hidden="true">♠</div>
       <div class="game-brand-copy">
         <div class="game-brand-title">ROYAL ROULETTE</div>
-        <div class="game-brand-subtitle">شبیه‌سازی میز ۱۰۰ نفره</div>
+        <div class="game-brand-subtitle">میز شرط‌بندی زنده</div>
       </div>
     </div>
       <div class="header-round-clock" id="headerRoundClock" data-phase="loading" aria-label="شمارش معکوس شرط‌بندی"><strong id="headerBettingSeconds">25</strong><span id="headerBettingLabel">ثانیه<br>شرط‌بندی</span></div>
-  <div class="online-pill" aria-label="تعداد بازیکنان شبیه‌سازی‌شده">
+  <div class="online-pill" aria-label="تعداد کاربران آنلاین">
       <span class="online-dot" aria-hidden="true"></span>
-      <span class="online-label">شبیه‌سازی</span>
-      <span class="online-count" id="onlineCount">100</span>
-      <span class="online-label">بازیکن</span>
+      <span class="online-label">کاربر آنلاین</span>
+      <span class="online-count" id="onlineCount">...</span>
     </div>
   </header>
   <div class="scene-wrap" id="sceneWrap">
@@ -131,7 +130,7 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
         <div class="result-cell" style="grid-column:1/-1"><dt>ستون</dt><dd id="resultColumn">ندارد</dd></div>
       </dl>
 
-      <section class="sim-modal-summary user-round-summary" aria-label="نتیجهٔ شرط‌های شما">
+      <section class="user-round-summary" aria-label="نتیجهٔ شرط‌های شما">
         <div class="sim-modal-title">نتیجهٔ شرط‌های شما</div>
         <div class="sim-modal-stats">
           <div class="sim-modal-stat"><span>مبلغ شرط شما</span><strong id="userResultStake">0</strong></div>
@@ -154,6 +153,34 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
 <script>
 (()=>{
 'use strict';
+
+// ===== Dynamic Online Users Simulation =====
+function initOnlineUsers() {
+  let baseCount = 124;
+  try {
+    let stored = localStorage.getItem('roulette_online_count');
+    if (stored) {
+      baseCount = parseInt(stored, 10) + 1; // Increase by 1 for the new visitor
+    }
+    localStorage.setItem('roulette_online_count', baseCount);
+  } catch(e) {}
+  
+  const onlineCountEl = document.getElementById('onlineCount');
+  if (onlineCountEl) {
+    onlineCountEl.textContent = baseCount;
+    // Slight fluctuation to make it look live
+    setInterval(() => {
+      let current = parseInt(onlineCountEl.textContent, 10);
+      let change = Math.floor(Math.random() * 5) - 2; // -2 to +2
+      let next = current + change;
+      if (next < 100) next = 100 + Math.floor(Math.random() * 10);
+      onlineCountEl.textContent = next;
+    }, 15000);
+  }
+}
+initOnlineUsers();
+// ==========================================
+
 const W=941,H=1671;
 const backgroundCanvas=document.getElementById('sceneBase');
 const backgroundCtx=backgroundCanvas.getContext('2d',{alpha:false});
@@ -1197,7 +1224,7 @@ image.src='https://i.8upload.com/image/9b64ac57dad0748d/roulette-dealer-original
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js?v=2.8').catch(err => console.log('SW registration failed: ', err));
+    navigator.serviceWorker.register('sw.js?v=2.9').catch(err => console.log('SW registration failed: ', err));
   });
 }
 })();
