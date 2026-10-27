@@ -10,29 +10,33 @@
 html,body{margin:0;min-height:100%;background:#020403}
 body{display:flex;justify-content:center;align-items:flex-start;overflow-x:hidden}
 .game{position:relative;width:min(100vw,941px);margin:0 auto;line-height:normal;isolation:isolate}
-.game-header{position:relative;z-index:6;display:flex;align-items:center;justify-content:space-between;gap:10px;width:calc(100% - 18px);min-height:clamp(44px,5.5vw,56px);margin:7px auto 8px;padding:6px 11px;border:1px solid rgba(202,166,91,.88);border-radius:13px;background:linear-gradient(112deg,rgba(6,18,13,.97),rgba(19,48,36,.97) 58%,rgba(7,20,15,.98));box-shadow:0 5px 18px rgba(0,0,0,.34),inset 0 0 0 2px rgba(215,181,105,.06);color:#f7f0dc;direction:rtl;font-family:Tahoma,Arial,sans-serif;line-height:1.15}
+.game-header{position:relative;z-index:6;display:flex;align-items:center;justify-content:space-between;gap:10px;width:calc(100% - 18px);min-height:clamp(44px,5.5vw,56px);margin:7px auto 8px;padding:6px 11px;border:1px solid rgba(202,166,91,.88);border-radius:13px;background:linear-gradient(112deg,rgba(6,18,13,.97),rgba(19,48,36,.97) 58%,rgba(7,20,15,.98));box-shadow:0 5px 18px rgba(0,0,0,.34);color:#f7f0dc;direction:rtl;font-family:Tahoma,Arial,sans-serif;line-height:1.15}
 .game-brand{display:flex;align-items:center;gap:9px;min-width:0}
-.game-brand-mark{display:flex;flex:0 0 auto;align-items:center;justify-content:center;width:clamp(30px,4.1vw,42px);height:clamp(30px,4.1vw,42px);border:1px solid #d6b66d;border-radius:10px;background:linear-gradient(145deg,#e1c37d,#997132);color:#10251c;font-size:clamp(18px,2.6vw,25px);font-weight:900;box-shadow:inset 0 0 0 2px rgba(255,255,255,.18)}
+.game-brand-mark{display:flex;flex:0 0 auto;align-items:center;justify-content:center;width:clamp(30px,4.1vw,42px);height:clamp(30px,4.1vw,42px);border:1px solid #d6b66d;border-radius:10px;background:linear-gradient(145deg,#e1c37d,#997132);color:#10251c;font-size:clamp(18px,2.6vw,25px);font-weight:900}
 .game-brand-copy{min-width:0;display:flex;flex-direction:column;gap:3px}
-.game-brand-title{font-family:Georgia,serif;font-size:clamp(12px,1.9vw,18px);font-weight:800;color:#f4d99b;white-space:nowrap;line-height:1.05}
+.game-brand-title{font-family:Georgia,serif;font-size:clamp(12px,1.9vw,18px);font-weight:800;color:#f4d99b;white-space:nowrap}
 .game-brand-subtitle{font-size:clamp(9px,1.2vw,11px);color:#c5d5ca;white-space:nowrap}
 .online-pill{display:flex;align-items:center;gap:7px;flex:0 0 auto;padding:7px 10px;border:1px solid rgba(78,154,107,.72);border-radius:10px;background:linear-gradient(140deg,rgba(28,72,48,.9),rgba(10,39,27,.94))}
 .online-dot{width:7px;height:7px;border-radius:50%;background:#62e995;box-shadow:0 0 8px rgba(98,233,149,.75)}
-.online-pill.offline .online-dot{background:#e9a24e;box-shadow:0 0 8px rgba(233,162,78,.6)}
+.online-pill.offline .online-dot{background:#e9a24e}
 .online-label{font-size:clamp(9px,1.25vw,12px);color:#bce8c9;white-space:nowrap}
 .online-count{font-size:clamp(13px,1.9vw,18px);font-weight:900;color:#fff5d6;min-width:2ch;text-align:center;font-variant-numeric:tabular-nums}
-.header-round-clock{display:flex;align-items:center;gap:5px;flex:0 0 auto;padding:6px 8px;border:1px solid rgba(202,166,91,.48);border-radius:9px;background:rgba(0,0,0,.2);color:#d7e4db;font-family:Tahoma,Arial,sans-serif;white-space:nowrap}
+.header-round-clock{display:flex;align-items:center;gap:5px;flex:0 0 auto;padding:6px 8px;border:1px solid rgba(202,166,91,.48);border-radius:9px;background:rgba(0,0,0,.2);color:#d7e4db;white-space:nowrap}
 .header-round-clock strong{font-size:clamp(13px,1.9vw,18px);color:#ffe2a0;min-width:2ch;text-align:center}
 .header-round-clock span{font-size:clamp(8px,1.1vw,10px);color:#c4d4c9}
 .header-round-clock[data-phase="spinning"] strong{color:#f0bd64}
 @media(max-width:390px){.game-header{gap:6px;padding:5px 7px}.header-round-clock{gap:3px;padding:5px 5px}.header-round-clock span{font-size:8px}.online-pill{gap:5px;padding:6px 7px}.game-brand{gap:6px}}
 
 .scene-wrap{position:relative;width:100%;line-height:0}
-canvas{display:block;width:100%;height:auto;touch-action:manipulation;user-select:none}
+canvas{display:block;width:100%;height:auto;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;outline:none}
 .scene-base{position:relative;z-index:0;pointer-events:none}
 canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;background:transparent}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media(min-width:942px){.game{width:min(941px,calc(100vh * 941 / 1671));}}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:99999;padding:12px 20px;border-radius:12px;background:rgba(220,60,60,.95);color:#fff;font-family:Tahoma,sans-serif;font-size:14px;font-weight:700;box-shadow:0 8px 30px rgba(0,0,0,.5);opacity:0;transition:opacity .3s;pointer-events:none;max-width:90vw;text-align:center}
+.toast.show{opacity:1}
+.toast.ok{background:rgba(60,180,100,.95)}
 
 .result-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px;font-family:Tahoma,Arial,sans-serif;color:#f8f4e9}
 .result-modal[hidden]{display:none!important}
@@ -41,7 +45,7 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
 .result-close{position:absolute;top:10px;left:10px;width:34px;height:34px;border:1px solid rgba(226,197,133,.45);border-radius:50%;background:rgba(0,0,0,.25);color:#f3dfac;font-size:24px;cursor:pointer}
 .result-title{margin:0 24px 17px;text-align:center;font-size:22px;font-weight:800;color:#f2d99d}
 .result-main{display:flex;align-items:center;justify-content:center;gap:15px;margin:0 auto 18px;padding:14px 12px;border:1px solid rgba(207,175,102,.35);border-radius:15px;background:rgba(0,0,0,.18)}
-.result-number{display:flex;align-items:center;justify-content:center;width:76px;height:76px;flex:0 0 76px;border:3px solid #e7d19a;border-radius:13px;color:#fff;font-size:37px;font-weight:900;box-shadow:0 5px 15px rgba(0,0,0,.4)}
+.result-number{display:flex;align-items:center;justify-content:center;width:76px;height:76px;flex:0 0 76px;border:3px solid #e7d19a;border-radius:13px;color:#fff;font-size:37px;font-weight:900}
 .result-number.red{background:linear-gradient(145deg,#d8323f,#92111a)}
 .result-number.black{background:linear-gradient(145deg,#34393b,#090b0c)}
 .result-number.green{background:linear-gradient(145deg,#13956a,#075137)}
@@ -130,6 +134,7 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
       <button class="result-continue" id="resultContinue" type="button">ادامهٔ بازی</button>
     </section>
   </div>
+  <div id="toast" class="toast"></div>
   <span id="status" class="sr-only" aria-live="polite"></span>
 </main>
 
@@ -142,7 +147,7 @@ const SUPABASE_URL = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
 const PLATFORM_URL = 'https://zenix-p.github.io/zenix/';
 const IMAGE_URL = 'https://i.8upload.com/image/9b64ac57dad0748d/roulette-dealer-original-quality.jpg';
-const CHIP_TRAY = [{value:1,x:66,color:'#b9c0c4'},{value:5,x:137,color:'#b51720'},{value:25,x:208,color:'#087b56'},{value:100,x:279,color:'#17191b'},{value:500,x:351,color:'#7429a9'}];
+const CHIP_TRAY = [{value:1,x:66},{value:5,x:137},{value:25,x:208},{value:100,x:279},{value:500,x:351}];
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: { autoRefreshToken:true, persistSession:true, detectSessionInUrl:true },
@@ -159,6 +164,17 @@ const resultDozenEl = $('resultDozen'), resultColumnEl = $('resultColumn'), resu
 const resultSecondsEl = $('resultSeconds'), resultTimerFill = $('resultTimerFill');
 const resultContinue = $('resultContinue'), resultClose = $('resultClose');
 const userStakeEl = $('userResultStake'), userPayoutEl = $('userResultPayout'), userNetEl = $('userResultNet'), userBalanceEl = $('userResultBalance');
+
+const toastEl = $('toast');
+let toastTimer = null;
+function showToast(msg, ok=false){
+  if(!toastEl) return;
+  toastEl.textContent = msg;
+  toastEl.classList.toggle('ok', ok);
+  toastEl.classList.add('show');
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>toastEl.classList.remove('show'), 2800);
+}
 
 const W=941, H=1671;
 const bgCanvas = $('sceneBase'), bgCtx = bgCanvas.getContext('2d',{alpha:false});
@@ -480,21 +496,33 @@ function findTarget(x,y){
   return null;
 }
 async function placeBet(target){
-  if(roundPhase!=='betting' || !currentRound) return; if(balance < selectedChip){statusEl.textContent='موجودی کافی نیست'; return;}
+  if(roundPhase!=='betting'){ showToast('شرط‌بندی بسته است، صبر کنید'); return; }
+  if(!currentRound){ showToast('راند بازی آماده نیست'); return; }
+  if(balance < selectedChip){ showToast('موجودی کافی نیست (نیاز: '+selectedChip+')'); return; }
   try{
     const { data, error } = await supabaseClient.rpc('place_bet', { p_round_id: currentRound.id, p_type: target.type, p_value: String(target.value), p_amount: selectedChip });
-    if(error) throw error; balance = Number(data); await refreshMyBets(); betDirty=true; render();
-  }catch(err){ console.warn('place_bet failed:', err); statusEl.textContent = 'خطا: '+(err.message||err); }
+    if(error) throw error;
+    balance = Number(data); await refreshMyBets(); betDirty=true; render();
+    showToast('شرط ثبت شد ✓', true);
+  }catch(err){
+    console.warn('place_bet failed:', err);
+    showToast('خطای شرط‌بندی: ' + (err?.message || String(err)));
+  }
 }
 async function undoBet(){
   if(roundPhase!=='betting' || !currentRound) return;
-  try{ const { data, error } = await supabaseClient.rpc('undo_last_bet', { p_round_id: currentRound.id }); if(error) throw error; balance = Number(data); await refreshMyBets(); betDirty=true; render(); }catch(err){ console.warn('undo failed:', err); }
+  try{ const { data, error } = await supabaseClient.rpc('undo_last_bet', { p_round_id: currentRound.id }); if(error) throw error; balance = Number(data); await refreshMyBets(); betDirty=true; render(); showToast('آخرین شرط برگشت داده شد', true); }catch(err){ console.warn('undo failed:', err); showToast('خطا: '+(err?.message||err)); }
 }
 async function refreshMyBets(){
-  if(!currentRound) {myBets=[]; return;} const { data } = await supabaseClient.from('bets').select('*').eq('round_id', currentRound.id).eq('user_id', userId).eq('settled', false); myBets = data || [];
+  if(!currentRound) {myBets=[]; return;}
+  const { data, error } = await supabaseClient.from('bets').select('*').eq('round_id', currentRound.id).eq('user_id', userId).eq('settled', false);
+  if(error){ console.warn('refreshMyBets error:', error); return; }
+  myBets = data || [];
 }
 async function refreshBalance(){
-  const { data } = await supabaseClient.from('profiles').select('balance').eq('id', userId).single(); if(data) balance = data.balance; betDirty=true; render();
+  const { data, error } = await supabaseClient.from('profiles').select('balance').eq('id', userId).single();
+  if(error){ console.error('balance error:', error); return; }
+  if(data) balance = data.balance; betDirty=true; render();
 }
 function applyRound(round){
   if(!round || !round.id) return; const key = round.id + ':' + round.status; if(key === lastRoundKey) return; lastRoundKey = key; currentRound = round;
@@ -550,8 +578,10 @@ async function pollRound(){
 }
 
 canvas.addEventListener('click', e=>{
-  if(roundPhase!=='betting') return; const r = canvas.getBoundingClientRect(); const x = (e.clientX - r.left) * W / r.width, y = (e.clientY - r.top) * H / r.height;
-  if(y>=1525&&y<=1605){ const chip=pickChip(x,y); if(chip){selectedChip=chip.value; betDirty=true; render(); return;} } const t = findTarget(x,y); if(t) placeBet(t);
+  if(roundPhase!=='betting'){ showToast('الان شرط‌بندی باز نیست'); return; }
+  const r = canvas.getBoundingClientRect(); const x = (e.clientX - r.left) * W / r.width, y = (e.clientY - r.top) * H / r.height;
+  if(y>=1525&&y<=1605){ const chip=pickChip(x,y); if(chip){selectedChip=chip.value; betDirty=true; render(); return;} }
+  const t = findTarget(x,y); if(t) placeBet(t);
 });
 canvas.addEventListener('pointermove', e=>{
   const r = canvas.getBoundingClientRect(); const x = (e.clientX - r.left) * W / r.width, y = (e.clientY - r.top) * H / r.height; canvas.style.cursor = (pickChip(x,y)||findTarget(x,y)) ? 'pointer' : 'default';
@@ -577,12 +607,11 @@ image.onload = () => { buildBG(); render(); }; image.src = IMAGE_URL;
   if(await initUser()){ await initOnline(); await refreshBalance(); await pollRound(); setInterval(pollRound, 1000); }
 })();
 
-/* ==== Service Worker Registration (v3.2) ==== */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js?v=3.2', { scope: './' })
       .then((reg) => {
-        console.log('SW v3.2 registered successfully:', reg.scope);
+        console.log('SW v3.2 registered:', reg.scope);
         reg.addEventListener('updatefound', () => {
           const newWorker = reg.installing;
           newWorker?.addEventListener('statechange', () => {
