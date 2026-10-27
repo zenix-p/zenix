@@ -161,8 +161,6 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
 
 /* ============================================================
    ============ تنظیمات اتصال به سوپاپیس ============
-   مقدارهای زیر را از پروژه سوپاپیس خودت پر کن:
-   Dashboard → Settings → API
    ============================================================ */
 const SUPABASE_URL      = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
@@ -177,25 +175,11 @@ async function initOnlineUsers(){
   const onlinePill    = document.getElementById('onlinePill');
   if(!onlineCountEl) return;
 
-  const isConfigured =
-    SUPABASE_URL &&
-    SUPABASE_URL.indexOf('YOUR_PROJECT_REF') === -1 &&
-    SUPABASE_ANON_KEY &&
-    SUPABASE_ANON_KEY.indexOf('YOUR_ANON') === -1 &&
-    typeof supabase !== 'undefined';
-
-  if(isConfigured){
+  if(typeof supabase !== 'undefined'){
     try{
       supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
         auth: {
-         supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true
-  },
-  realtime: { params: { eventsPerSecond: 10 } }
-});
+          // برای هماهنگی کامل با پلتفرم، از کلید ذخیره‌سازی پیش‌فرض سوپاپیس استفاده می‌کنیم
           autoRefreshToken: true,
           persistSession: true,
           detectSessionInUrl: true
@@ -203,7 +187,25 @@ async function initOnlineUsers(){
         realtime: { params: { eventsPerSecond: 10 } }
       });
 
-      // ===== بررسی نشست (لاگین) کاربر از پلتفرم =====
+      // 1. بررسی توکن‌های ارسال شده از پلتفرم در URL Hash
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const accessToken = hashParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token');
+      
+      if(accessToken && refreshToken){
+        try{
+          await supabaseClient.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken
+          });
+          // پاک کردن توکن‌ها از URL برای امنیت بیشتر
+          window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        }catch(e){
+          console.error('Session restore from URL failed:', e);
+        }
+      }
+
+      // 2. بررسی نشست فعلی (اگر از قبل لاگین بوده)
       let session = null;
       try{
         const res = await supabaseClient.auth.getSession();
@@ -214,22 +216,13 @@ async function initOnlineUsers(){
         // اگر لاگین نیست، به صفحه ورود پلتفرم هدایت کن
         window.location.href = PLATFORM_URL;
         return;
-      } 
-const hashParams = new URLSearchParams(window.location.hash.substring(1));
-const accessToken = hashParams.get('access_token');
-const refreshToken = hashParams.get('refresh_token');
-if(accessToken && refreshToken){
-  try{
-    await supabaseClient.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
-    window.history.replaceState(null, '', window.location.pathname + window.location.search);
-    session = (await supabaseClient.auth.getSession()).data.session;
-  }catch(e){ console.error('Session restore failed', e); }
-}   
-  const user = session.user;
+      }
+
+      const user = session.user;
       const userId = user.id;
       const displayName = user.email || user.phone || 'کاربر';
 
-      // ===== اتصال به کانال حضور آنلاین =====
+      // 3. اتصال به کانال حضور آنلاین
       onlineChannel = supabaseClient.channel('roulette-online-users', {
         config: { presence: { key: userId } }
       });
@@ -262,7 +255,7 @@ if(accessToken && refreshToken){
           }
         });
 
-      // اگر کاربر در همین صفحه لاگ‌آوت کرد، به پلتفرم برگردد
+      // اگر کاربر لاگ‌آوت کرد، به پلتفرم برگردد
       supabaseClient.auth.onAuthStateChange((event, session) => {
         if(event === 'SIGNED_OUT' || !session){
           try{ onlineChannel && onlineChannel.untrack(); }catch(e){}
@@ -270,25 +263,20 @@ if(accessToken && refreshToken){
         }
       });
 
-      // هنگام بستن صفحه، حضور را پاک کن
       window.addEventListener('beforeunload', () => {
         try{ onlineChannel && onlineChannel.untrack(); }catch(e){}
       });
 
       return; // موفق - به fallback نمی‌رویم
+
     }catch(err){
       console.warn('Supabase init failed, falling back to simulation:', err);
     }
   }
 
-  // ===== Fallback: شبیه‌سازی محلی (وقتی سوپاپیس پیکربندی نشده یا خطا داد) =====
+  // ===== Fallback: شبیه‌سازی محلی (اگر سوپاپیس خطا داد) =====
   if(onlinePill) onlinePill.classList.add('offline');
   let baseCount = 124;
-  try{
-    const stored = localStorage.getItem('roulette_online_count');
-    if(stored) baseCount = parseInt(stored, 10) + 1;
-    localStorage.setItem('roulette_online_count', String(baseCount));
-  }catch(e){}
   onlineCountEl.textContent = baseCount;
   setInterval(() => {
     let current = parseInt(onlineCountEl.textContent, 10) || 124;
@@ -301,7 +289,7 @@ if(accessToken && refreshToken){
 initOnlineUsers();
 
 /* ============================================================
-   ============ کد بازی رولت (بدون تغییر) ============
+   ============ کد بازی رولت ============
    ============================================================ */
 
 const W=941,H=1671;
@@ -1301,7 +1289,7 @@ image.src='https://i.8upload.com/image/9b64ac57dad0748d/roulette-dealer-original
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js?v=3').catch(err => console.log('SW registration failed: ', err));
+    navigator.serviceWorker.register('sw.js?v=3.1').catch(err => console.log('SW registration failed: ', err));
   });
 }
 })();
