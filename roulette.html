@@ -37,7 +37,6 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
 @media(min-width:942px){.game{width:min(941px,calc(100vh * 941 / 1671));}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
 
-/* Result dialog: shown only after the ball has fully settled. */
 .result-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px;line-height:normal;direction:rtl;font-family:Tahoma,Arial,sans-serif;color:#f8f4e9}
 .result-modal[hidden]{display:none!important}
 .result-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.76);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
@@ -66,8 +65,6 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
 .result-continue:focus-visible,.result-close:focus-visible{outline:2px solid #fff3ca;outline-offset:3px}
 @media(max-width:420px){.result-card{padding:20px 15px 15px;border-radius:17px}.result-title{font-size:20px}.result-cell{padding:10px}.result-cell dd{font-size:15px}.result-number{width:68px;height:68px;flex-basis:68px;font-size:33px}}
 
-
-/* 25-second betting window for each shared roulette round. */
 .betting-clock{margin:0 0 11px;padding:10px 12px 11px;border:1px solid rgba(202,166,91,.42);border-radius:11px;background:linear-gradient(110deg,rgba(3,15,10,.68),rgba(26,60,43,.66));color:#d9e5dc}
 .betting-clock-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;font-size:12px;line-height:1.5}
 .betting-clock-top strong{display:inline-flex;align-items:baseline;gap:5px;color:#ffe3a0;font-size:21px;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -78,7 +75,6 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
 .betting-clock[data-phase="result"] .betting-clock-track span{width:0!important}
 @media(max-width:420px){.betting-clock{padding:9px 10px}.betting-clock-top{font-size:11px}.betting-clock-top strong{font-size:20px}}
 
-/* Local 100-player simulation dashboard; does not alter the original roulette canvas. */
 .simulation-panel{width:calc(100% - 18px);margin:10px auto 18px;padding:14px;border:1px solid rgba(202,166,91,.78);border-radius:15px;background:linear-gradient(145deg,#10281e,#07150f 74%);color:#f6f0df;font-family:Tahoma,Arial,sans-serif;direction:rtl;box-shadow:0 8px 25px rgba(0,0,0,.32),inset 0 0 0 2px rgba(215,181,105,.04)}
 .simulation-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
 .simulation-head h2{font-size:clamp(14px,2.5vw,19px);line-height:1.45;color:#f4d99b;margin:0 0 3px;font-weight:900}
@@ -122,8 +118,6 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
 @media(max-width:480px){.user-round-summary .sim-modal-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.user-round-summary .sim-modal-stat{padding:7px 6px}.user-round-summary .sim-modal-stat span{font-size:11px}.user-round-summary .sim-modal-stat strong{font-size:15px}}
 
 @media(max-width:600px){
-  /* Keep the photo canvas in normal compositing flow on mobile. Forcing paint
-     containment/backface layers can cause a brief flash on touch in some browsers. */
   .result-backdrop{backdrop-filter:none;-webkit-backdrop-filter:none}
 }
 </style>
@@ -240,12 +234,10 @@ const backgroundCtx=backgroundCanvas.getContext('2d',{alpha:false});
 const canvas=document.getElementById('scene');
 let ctx=canvas.getContext('2d',{alpha:true});
 // The fixed photograph and the rotating wheel are drawn on separate layers.
-// This prevents mobile taps from forcing the full high-resolution photograph to redraw.
 const wheelLayerCanvas=document.createElement('canvas');
 wheelLayerCanvas.width=W;wheelLayerCanvas.height=H;
 const wheelLayerCtx=wheelLayerCanvas.getContext('2d',{alpha:true});
 // Betting UI overlay is cached and only rebuilt when its state changes.
-// During the spin it is fully static, so per-frame cost drops dramatically on mobile.
 const bettingOverlayCanvas=document.createElement('canvas');
 bettingOverlayCanvas.width=W;bettingOverlayCanvas.height=H;
 const bettingOverlayCtx=bettingOverlayCanvas.getContext('2d',{alpha:true});
@@ -307,18 +299,14 @@ let userRoundResult={stake:0,returned:0,net:0};
 const simPlayers=Array.from({length:SIM_PLAYER_COUNT},(_,i)=>({id:i+1,name:'بازیکن '+String(i+1).padStart(3,'0'),balance:10000,bets:[],lastStake:0,lastPayout:0,lastNet:0}));
 let simRound={prepared:false,settled:false,activePlayers:SIM_PLAYER_COUNT,betCount:0,totalStake:0,totalPayout:0,winners:0,losers:0,net:0};
 const image=new Image();
-// Image loading begins after event handlers are attached.
 
-
-// Roulette geometry is authored in the original image's pixel coordinates.
-// The two elliptical rails stay fixed; only the numbered pockets rotate around them.
 const C={x:469,y:936,trackOuterX:296,trackOuterY:159,outerX:294,outerY:158,labelInnerX:239,labelInnerY:130,pocketOuterX:236,pocketOuterY:127,innerX:193,innerY:109,trackInnerX:182,trackInnerY:100};
 const order=[0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
 const reds=new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
 const N=order.length,step=Math.PI*2/N;
-const START=-80*Math.PI/180; // aligns the green zero to the upper-right side of the spindle
+const START=-80*Math.PI/180;
 const RESULT_ANGLE=0.48;
-let landingAngle=RESULT_ANGLE; // Screen angle for this round's randomly selected winning pocket.
+let landingAngle=RESULT_ANGLE;
 let rotation=0,animating=false,raf=0,spinStart=0,fromRotation=0,targetRotation=0,spinDuration=6900,winningNumber=null;
 let winningIndex=0,ballState='held',winningResultVisible=false;
 let ballWheelStopAngle=0,ballPostDelta=0,ballExtraDuration=0;
@@ -331,11 +319,8 @@ const BALL_POCKET={rx:214.5,ry:118};
 const BALL_LAUNCH_MS=300;
 const BALL_RELEASE_TANGENT_PX=64;
 const BALL_EXTRA_MS_PER_LAP=2850;
-// The ball accelerates on its own profile; the numbered ring does not control its angular speed.
 const BALL_PRE_END_SLOPE=.95;
 
-// Pre-rendered number sprites (one small canvas per pocket number). Blitting a
-// pre-rendered sprite is far cheaper than `fillText` with a shadow on mobile.
 const NUM_IMG_SIZE=32,NUM_IMG_HALF=NUM_IMG_SIZE/2;
 const numberImages={};
 (function buildNumberSprites(){
@@ -353,8 +338,6 @@ const numberImages={};
   }
 })();
 
-// Lightweight interactive betting layer over the original artwork. All coordinates use
-// the original 941x1671 design grid, so hit targets scale with the page on phones.
 let balance=1000;
 let selectedChip=5;
 let bets=[];
@@ -396,8 +379,6 @@ function sectorPath(a0,a1,outerX,outerY,innerX,innerY,outerInset=0,innerInset=0)
   }
   ctx.closePath();
 }
-// Path2D variant of sectorPath. Appends an elliptical pocket sector to an
-// existing Path2D so all same-colour sectors can be filled with a single op.
 function addSectorToPath(path,a0,a1,outerX,outerY,innerX,innerY,outerInset=0,innerInset=0){
   const samples=6;
   const ox=outerX-outerInset,oy=outerY-outerInset*.5;
@@ -485,10 +466,6 @@ function pocketGradient(number){
   const paints=wheelPaints();
   return number===0?paints.green:(reds.has(number)?paints.red:paints.black);
 }
-// Batched pocket renderer. Instead of building/painting 37 independent sector
-// paths (each with fill/stroke/clip/fillText) every animation frame, we accumulate
-// paths per color using Path2D and flush them in ~15 batch operations. Numbers use
-// pre-rendered sprites. Visual output is identical to the original per-pocket loop.
 function drawPockets(rot){
   const paints=wheelPaints();
   const labelBase=new Path2D();
@@ -540,50 +517,40 @@ function drawPockets(rot){
     numberPlaces.push({x:p.x,y:p.y,tangent,n});
   }
 
-  // 1. Label band base fill + border
   ctx.fillStyle=paints.labelWall;ctx.fill(labelBase);
   ctx.strokeStyle='rgba(0,0,0,.92)';ctx.lineWidth=1;ctx.stroke(labelBase);
 
-  // 2. Label band color fills (batched by color)
   ctx.fillStyle=paints.green;ctx.fill(labelGreen);
   ctx.fillStyle=paints.red;ctx.fill(labelRed);
   ctx.fillStyle=paints.black;ctx.fill(labelBlack);
 
-  // 3. Label band inset stroke
   ctx.strokeStyle='rgba(156,160,151,.58)';ctx.lineWidth=.65;ctx.stroke(labelColorStroke);
 
-  // 4. Pocket compartment base fill + border
   ctx.fillStyle=paints.wall;ctx.fill(pocketBase);
   ctx.strokeStyle='rgba(0,0,0,.96)';ctx.lineWidth=1.1;ctx.stroke(pocketBase);
 
-  // 5. Pocket compartment color fills (batched by color)
   ctx.fillStyle=paints.green;ctx.fill(pocketGreen);
   ctx.fillStyle=paints.red;ctx.fill(pocketRed);
   ctx.fillStyle=paints.black;ctx.fill(pocketBlack);
 
-  // 6. Pocket compartment inset stroke
   ctx.strokeStyle='rgba(160,164,155,.7)';ctx.lineWidth=.65;ctx.stroke(pocketColorStroke);
 
-  // 7. Label band sheen - single clipped fill over the whole ring
   ctx.save();
   ctx.clip(labelSheenClip,'nonzero');
   ctx.fillStyle=paints.labelSheen;
   ctx.fillRect(C.x-C.outerX-3,C.y-C.outerY-3,C.outerX*2+6,C.outerY*2+6);
   ctx.restore();
 
-  // 8. Pocket compartment sheen - single clipped fill
   ctx.save();
   ctx.clip(pocketSheenClip,'nonzero');
   ctx.fillStyle=paints.slotSheen;
   ctx.fillRect(C.x-C.pocketOuterX-3,C.y-C.pocketOuterY-3,C.pocketOuterX*2+6,C.pocketOuterY*2+6);
   ctx.restore();
 
-  // 9. Divider bars
   ctx.strokeStyle='rgba(0,0,0,.7)';ctx.lineWidth=1;ctx.stroke(dividerDarkLabel);
   ctx.strokeStyle='rgba(0,0,0,.78)';ctx.lineWidth=1;ctx.stroke(dividerDarkPocket);
   ctx.strokeStyle='rgba(224,216,195,.26)';ctx.lineWidth=.5;ctx.stroke(dividerLight);
 
-  // 10. Pre-rendered number sprites
   for(let k=0;k<numberPlaces.length;k++){
     const np=numberPlaces[k];
     const img=numberImages[np.n];
@@ -998,9 +965,6 @@ function drawBettingInstruction(){
 }
 function drawBettingOverlay(){drawBetMarkers();drawSelectedChip();drawBalancePanel();drawBettingInstruction()}
 
-// Betting overlay is cached onto its own transparent canvas. During a spin the
-// overlay content (bet markers, chip selection, balance, instruction panel) never
-// changes; blitting the cached bitmap replaces hundreds of per-frame draw calls.
 function rebuildBettingOverlay(){
   const prevCtx=ctx;
   ctx=bettingOverlayCtx;
@@ -1435,7 +1399,7 @@ prepareSimulationRound();
 renderSimulationPanel();
 updateBettingClock(BETTING_ROUND_MS);
 updateSimControls();
-image.src='data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAEBAQEBAQEBAQEBAQECAgMCAgICAgQDAwIDBQQFBQUEBAQFBgcGBQUHBgQEBgkGBwgICAgIBQYJCgkICgcICAj/2wBDAQEBAQICAgQCAgQIBQQFCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAj/wAARCAaHA60DASIAAhEBAxEB/8QAHwAAAAYDAQEBAAAAAAAAAAAABAgMEBQYHAAEICQoL/8QAexAAAQMCBAMDCAUGCAYMBgIjAgEDBAUGAAcREgAhIggxMkETFSMzUWFiFkJScoGRoQkUJENTsWOCkqLB0fAlNHOy4fEmNTY3RFRjc4OTorLDRVRkdMLS8BgmNzhFVWZ1hIWWs8PT4icKGRpGR0hIV1dXZ2h2h5S0tdX/2gAIAQEAAz8D/V/5f/9k=';
+image.src='https://i.8upload.com/image/bd95e8b1dd092bc8/luxury-roulette-dealer-experience.png';
 })();
 </script>
 </body>
