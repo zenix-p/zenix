@@ -6,9 +6,10 @@
 <meta name="theme-color" content="#050807">
 <title>رولت</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#020403}body{display:flex;justify-content:center;align-items:flex-start;overflow-x:hidden}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#020403}
+body{display:flex;justify-content:center;align-items:flex-start;overflow-x:clip}
 .game{position:relative;width:min(100vw,941px);margin:0 auto;isolation:isolate}
-.game-header{position:relative;z-index:6;display:flex;align-items:center;justify-content:space-between;gap:10px;width:calc(100% - 18px);min-height:clamp(44px,5.5vw,56px);margin:7px auto 8px;padding:6px 11px;border:1px solid rgba(202,166,91,.88);border-radius:13px;background:linear-gradient(112deg,rgba(6,18,13,.97),rgba(19,48,36,.97) 58%,rgba(7,20,15,.98));color:#f7f0dc;font-family:Tahoma,Arial,sans-serif}
+.game-header{position:sticky;top:7px;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:10px;width:calc(100% - 18px);min-height:clamp(44px,5.5vw,56px);margin:7px auto 8px;padding:6px 11px;border:1px solid rgba(202,166,91,.88);border-radius:13px;background:linear-gradient(112deg,rgba(6,18,13,.97),rgba(19,48,36,.97) 58%,rgba(7,20,15,.98));color:#f7f0dc;font-family:Tahoma,Arial,sans-serif;box-shadow:0 4px 20px rgba(0,0,0,.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .game-brand{display:flex;align-items:center;gap:9px;min-width:0}
 .game-brand-mark{display:flex;flex:0 0 auto;align-items:center;justify-content:center;width:clamp(30px,4.1vw,42px);height:clamp(30px,4.1vw,42px);border:1px solid #d6b66d;border-radius:10px;background:linear-gradient(145deg,#e1c37d,#997132);color:#10251c;font-size:clamp(18px,2.6vw,25px);font-weight:900}
 .game-brand-copy{min-width:0;display:flex;flex-direction:column;gap:3px}
@@ -24,15 +25,35 @@
 .header-round-clock span{font-size:clamp(8px,1.1vw,10px);color:#c4d4c9}
 .header-round-clock[data-phase="spinning"] strong{color:#f0bd64}
 
-/* Header action buttons (language + sound) */
+/* Header action buttons (help + language + sound) */
 .header-actions{display:flex;align-items:center;gap:6px;flex:0 0 auto}
 .hdr-btn{display:flex;align-items:center;justify-content:center;width:clamp(30px,3.8vw,38px);height:clamp(30px,3.8vw,38px);border:1px solid rgba(202,166,91,.55);border-radius:9px;background:linear-gradient(145deg,rgba(23,53,41,.92),rgba(8,19,15,.92));color:#f4d99b;font-size:clamp(14px,1.9vw,18px);font-family:Georgia,'Segoe UI Emoji','Apple Color Emoji',serif;line-height:1;cursor:pointer;padding:0;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
 .hdr-btn:hover{border-color:rgba(226,188,106,.85)}
 .hdr-btn:active{transform:scale(.93)}
 .hdr-btn.playing{background:linear-gradient(145deg,rgba(202,166,91,.92),rgba(153,113,50,.92));color:#0a1b14;box-shadow:0 0 12px rgba(255,211,111,.55);border-color:rgba(226,188,106,.95)}
+.hdr-btn.help-btn{font-size:clamp(13px,1.8vw,17px)}
 
 @media(max-width:560px){.game-brand-subtitle{display:none}.online-label{display:none}}
-@media(max-width:390px){.game-header{gap:6px;padding:5px 7px}.online-pill{gap:5px;padding:6px 7px}.game-brand{gap:6px}.header-actions{gap:4px}.hdr-btn{width:30px;height:30px;font-size:14px}}
+@media(max-width:440px){
+  .hdr-btn{width:28px;height:28px;font-size:13px}
+  .hdr-btn.help-btn{font-size:12px}
+  .header-actions{gap:3px}
+  .game-header{padding:5px 7px;gap:5px}
+  .game-brand-mark{width:26px;height:26px;font-size:15px}
+  .game-brand-title{font-size:11px}
+  .online-pill{padding:5px 6px;gap:4px}
+  .header-round-clock{padding:4px 6px}
+  .header-round-clock strong{font-size:13px}
+  .header-round-clock span{font-size:8px}
+}
+@media(max-width:360px){
+  .hdr-btn{width:26px;height:26px;font-size:12px}
+  .hdr-btn.help-btn{font-size:11px}
+  .game-header{gap:4px;padding:4px 6px}
+  .game-brand-title{font-size:10px}
+  .game-brand-mark{width:24px;height:24px;font-size:13px}
+  .online-count{font-size:12px}
+}
 
 .scene-wrap{position:relative;width:100%;line-height:0}
 canvas{display:block;width:100%;height:auto;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;outline:none}
@@ -70,6 +91,17 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
 .result-timer-track span{display:block;width:100%;height:100%;border-radius:inherit;background:linear-gradient(90deg,#d8bc7a,#b3833a);transition:width .15s linear}
 .result-continue{display:block;width:100%;min-height:44px;border:1px solid #dcbd7a;border-radius:11px;background:linear-gradient(180deg,#d9b96e,#ad7e34);color:#152318;font-size:14px;font-weight:900;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.25);font-family:inherit}
 .result-continue:active{transform:translateY(1px)}
+
+/* Help modal content */
+.help-section{margin:0 0 14px}
+.help-section h3{margin:0 0 8px;font-size:13px;color:#f4d99b;font-weight:800;letter-spacing:.3px}
+.help-section ol{margin:0;padding:0 20px 0 0;color:#d7e4db;font-size:12px;line-height:1.9}
+.help-section ol li{margin-bottom:5px}
+.help-pay{display:grid;gap:5px}
+.help-pay>div{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(0,0,0,.25);border:1px solid rgba(210,183,115,.13);border-radius:8px;font-size:12px}
+.help-pay>div span{color:#c1d2c7}
+.help-pay>div strong{color:#ffe3a0;font-size:13px;font-variant-numeric:tabular-nums;font-weight:800}
+.help-note{margin:0 0 14px;padding:8px 10px;border-radius:8px;background:rgba(9,112,75,.2);border:1px solid rgba(94,192,143,.25);color:#b8dfc8;font-size:10px;line-height:1.6;text-align:center}
 </style>
 </head>
 <body>
@@ -78,6 +110,7 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
     <div class="game-brand"><div class="game-brand-mark">♠</div><div class="game-brand-copy"><div class="game-brand-title">ROYAL ROULETTE</div><div class="game-brand-subtitle">میز شرط‌بندی زنده</div></div></div>
     <div class="header-round-clock" id="headerRoundClock" data-phase="loading"><strong id="headerBettingSeconds">--</strong><span id="headerBettingLabel">آماده‌سازی</span></div>
     <div class="header-actions">
+      <button class="hdr-btn help-btn" id="helpBtn" type="button" aria-label="راهنمای بازی" title="راهنمای بازی">❓</button>
       <button class="hdr-btn" id="langBtn" type="button" aria-label="زبان" title="زبان">🌐</button>
       <button class="hdr-btn" id="musicBtn" type="button" aria-label="قطع یا وصل صدا" title="قطع یا وصل صدا">♪</button>
     </div>
@@ -102,6 +135,33 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
       <button class="result-continue" id="resultContinue" type="button">ادامهٔ بازی</button>
     </section>
   </div>
+  <div id="helpModal" class="result-modal" hidden>
+    <div class="result-backdrop"></div>
+    <section class="result-card">
+      <button class="result-close" id="helpClose" type="button" aria-label="بستن">×</button>
+      <h2 class="result-title">راهنمای بازی</h2>
+      <div class="help-section">
+        <h3>چطور بازی کنیم؟</h3>
+        <ol>
+          <li>از نوار پایین یک سکه انتخاب کن</li>
+          <li>روی خانهٔ دلخواه روی میز بزن</li>
+          <li>منتظر بمان تا چرخ بچرخد و توپ بیفتد</li>
+        </ol>
+      </div>
+      <div class="help-section">
+        <h3>جدول پرداخت‌ها</h3>
+        <div class="help-pay">
+          <div><span>تک‌نمره</span><strong>×۳۶</strong></div>
+          <div><span>دوجین / ستون</span><strong>×۳</strong></div>
+          <div><span>قرمز / مشکی</span><strong>×۲</strong></div>
+          <div><span>زوج / فرد</span><strong>×۲</strong></div>
+          <div><span>۱-۱۸ / ۱۹-۳۶</span><strong>×۲</strong></div>
+        </div>
+      </div>
+      <p class="help-note">در صورت آمدن صفر، تمام شرط‌های بیرونی (غیر از تک‌نمره) می‌بازند.</p>
+      <button class="result-continue" id="helpContinue" type="button">فهمیدم</button>
+    </section>
+  </div>
   <div id="toast" class="toast"></div>
   <span id="status" class="sr-only" aria-live="polite"></span>
 </main>
@@ -112,7 +172,7 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
 
 /* ============ Audio: Casino Lounge Music ============ */
 let audioCtx=null, masterGain=null, musicPlaying=false, musicTimeout=null, nextNoteTime=0, musicStep=0;
-let userMuted=false;
+let userMuted=false, musicAutoStarted=false;
 const MUSIC_BPM=118, STEP_DUR=60/MUSIC_BPM/4; // 16th-note steps
 const PROG=[
   {bass:[130.81,196.00,164.81], chord:[261.63,329.63,392.00,493.88], arp:[523.25,659.25,783.99,1046.50]},
@@ -122,6 +182,7 @@ const PROG=[
 ];
 const musicBtn=document.getElementById('musicBtn');
 const langBtn=document.getElementById('langBtn');
+const helpBtn=document.getElementById('helpBtn');
 
 function initAudio(){
   if(audioCtx) return;
@@ -299,11 +360,13 @@ musicBtn.addEventListener('click',e=>{
   updateMusicBtn();
 });
 document.addEventListener('pointerdown',function(e){
+  if(musicAutoStarted) return;
   if(musicBtn&&musicBtn.contains(e.target)) return;
   if(langBtn&&langBtn.contains(e.target)) return;
+  if(helpBtn&&helpBtn.contains(e.target)) return;
   if(userMuted||musicPlaying) return;
-  startMusic(); updateMusicBtn();
-},{once:true});
+  startMusic(); updateMusicBtn(); musicAutoStarted=true;
+});
 
 /* ============ Game Core ============ */
 const SUPABASE_URL='https://ujyenmqdgivuxvxptwyl.supabase.co';
@@ -318,16 +381,24 @@ const $=id=>document.getElementById(id);
 const statusEl=$('status'),onlineCountEl=$('onlineCount'),onlinePill=$('onlinePill'),headerSecondsEl=$('headerBettingSeconds'),headerLabelEl=$('headerBettingLabel'),headerClockEl=$('headerRoundClock');
 const resultModal=$('resultModal'),resultNumberEl=$('resultNumber'),resultColorLabelEl=$('resultColorLabel'),resultParityEl=$('resultParity'),resultRangeEl=$('resultRange'),resultDozenEl=$('resultDozen'),resultColumnEl=$('resultColumn'),resultZeroNote=$('resultZeroNote'),resultSecondsEl=$('resultSeconds'),resultTimerFill=$('resultTimerFill'),resultContinue=$('resultContinue'),resultClose=$('resultClose');
 const userStakeEl=$('userResultStake'),userPayoutEl=$('userResultPayout'),userNetEl=$('userResultNet'),userBalanceEl=$('userResultBalance');
+const helpModal=$('helpModal'),helpClose=$('helpClose'),helpContinue=$('helpContinue');
 const toastEl=$('toast');let toastTimer=null;
 function showToast(msg,ok=false){if(!toastEl)return;toastEl.textContent=msg;toastEl.classList.toggle('ok',ok);toastEl.classList.add('show');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastEl.classList.remove('show'),2800);}
 function flashBetPanel(){betFlashUntil=performance.now()+1100;betDirty=true;render();if(betFlashTimeout)clearTimeout(betFlashTimeout);betFlashTimeout=setTimeout(()=>{betDirty=true;render();},1150);}
 
-/* Language button */
+/* Header buttons */
 if(langBtn){
   langBtn.addEventListener('click',e=>{
     e.stopPropagation();
     showToast('زبان فعلی: فارسی',true);
   });
+}
+if(helpBtn&&helpModal){
+  helpBtn.addEventListener('click',e=>{ e.stopPropagation(); helpModal.hidden=false; });
+  const closeHelp=()=>{ helpModal.hidden=true; };
+  if(helpClose) helpClose.addEventListener('click',closeHelp);
+  if(helpContinue) helpContinue.addEventListener('click',closeHelp);
+  helpModal.addEventListener('click',e=>{ if(e.target.classList.contains('result-backdrop')) closeHelp(); });
 }
 
 const W=941,H=1671;
@@ -581,7 +652,7 @@ async function initOnline(){
 }
 image.onload=()=>{buildBG();render();};image.src=IMAGE_URL;
 (async function boot(){if(await initUser()){await initOnline();await refreshBalance();await pollRound();setInterval(pollRound,1000);}})();
-if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=4',{scope:'./'}).then(reg=>{console.log('SW v3.3:',reg.scope);}).catch(err=>console.warn('SW:',err));});}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=4.1',{scope:'./'}).then(reg=>{console.log('SW v3.3:',reg.scope);}).catch(err=>console.warn('SW:',err));});}
 })();
 </script>
 </body>
