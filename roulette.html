@@ -93,7 +93,7 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
       <button class="result-continue" id="resultContinue" type="button">ادامهٔ بازی</button>
     </section>
   </div>
-  <button id="musicBtn" class="music-btn" type="button" aria-label="موسیقی پس‌زمینه">♪</button>
+  <button id="musicBtn" class="music-btn" type="button" aria-label="صدا">♪</button>
   <div id="toast" class="toast"></div>
   <span id="status" class="sr-only" aria-live="polite"></span>
 </main>
@@ -199,27 +199,20 @@ function chordStab(freqs,start,dur,gain){
 
 function musicStepFn(step,time){
   const bar=Math.floor(step/16)%4, beat=step%16, p=PROG[bar];
-  // Four-on-the-floor kick
   if(beat%4===0) kick(time);
-  // Snare on 2 & 4
   if(beat===4||beat===12) snare(time);
-  // Hi-hat 8ths with accent on offbeats
   if(beat%2===0) hat(time, beat===2||beat===6||beat===10||beat===14);
-  // Bass groove
   if(beat===0) tone(p.bass[0],time,0.4,0.24,'sine');
   if(beat===6) tone(p.bass[1],time,0.25,0.18,'sine');
   if(beat===10) tone(p.bass[2],time,0.22,0.16,'sine');
   if(beat===14) tone(p.bass[1],time,0.18,0.15,'sine');
-  // Chord stabs on syncopated beats
   if(beat===3||beat===7) chordStab(p.chord,time,0.16,0.06);
   if(beat===11||beat===15) chordStab(p.chord,time,0.12,0.045);
-  // Melody arpeggio flourishes at end of each half-bar
   if(beat===4||beat===12){
     const dir = beat===4 ? 1 : -1;
     const arr = dir===1 ? p.arp : [...p.arp].reverse();
     arr.forEach((f,i)=>tone(f,time+i*0.055,0.28,0.075,'triangle'));
   }
-  // Sparkle accent on bar start
   if(beat===0) tone(p.arp[3],time,0.45,0.08,'triangle');
 }
 
@@ -228,7 +221,7 @@ function scheduleMusic(){
   while(nextNoteTime<audioCtx.currentTime+0.15){
     musicStepFn(musicStep,nextNoteTime);
     nextNoteTime+=STEP_DUR;
-    musicStep=(musicStep+1)%64; // 4 bars * 16 steps
+    musicStep=(musicStep+1)%64;
   }
   musicTimeout=setTimeout(scheduleMusic,30);
 }
@@ -238,7 +231,64 @@ function updateMusicBtn(){ if(!musicBtn) return; if(musicPlaying){ musicBtn.clas
 function playClick(){ initAudio(); if(!audioCtx) return; if(audioCtx.state==='suspended') audioCtx.resume(); const t=audioCtx.currentTime; tone(880,t,0.06,0.15,'square'); tone(1320,t+0.008,0.05,0.10,'square'); }
 function playWin(){ initAudio(); if(!audioCtx) return; if(audioCtx.state==='suspended') audioCtx.resume(); const t=audioCtx.currentTime; [523.25,659.25,783.99,1046.50,1318.51].forEach((f,i)=>tone(f,t+i*0.09,0.4,0.15,'triangle')); }
 function playLose(){ initAudio(); if(!audioCtx) return; if(audioCtx.state==='suspended') audioCtx.resume(); const t=audioCtx.currentTime; tone(392,t,0.18,0.12,'sine'); tone(311,t+0.09,0.28,0.12,'sine'); }
-musicBtn.addEventListener('click',e=>{ e.stopPropagation(); if(musicPlaying){ stopMusic(); userMuted=true; } else { startMusic(); userMuted=false; } updateMusicBtn(); });
+
+/* ============ Persian Female Voice Announcements (TTS) ============ */
+let ttsVoice=null, ttsReady=false;
+function initTTS(){
+  if(!('speechSynthesis' in window)) return;
+  const loadVoice=()=>{
+    try{
+      const voices=speechSynthesis.getVoices();
+      if(!voices.length) return;
+      const persian=voices.filter(v=>v.lang&&(v.lang==='fa-IR'||v.lang.toLowerCase().startsWith('fa')));
+      const femaleHints=['female','woman','sara','maryam','leila','zari','dilara','zahra','fatemeh','naomi','zira','hoda','shirin','parisa','ava','samantha','karen','moira','tessa','veena','lekha','salma','hazel'];
+      ttsVoice=
+        persian.find(v=>femaleHints.some(n=>v.name.toLowerCase().includes(n)))||
+        persian.find(v=>!v.name.toLowerCase().includes('male'))||
+        persian[0]||
+        voices.find(v=>femaleHints.some(n=>v.name.toLowerCase().includes(n))&&v.lang&&v.lang.startsWith('en'))||
+        null;
+      ttsReady=true;
+    }catch(e){}
+  };
+  loadVoice();
+  try{ speechSynthesis.onvoiceschanged=loadVoice; }catch(e){}
+}
+function doSpeak(text,opts){
+  try{
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='fa-IR';
+    if(ttsVoice) u.voice=ttsVoice;
+    u.pitch=opts&&opts.pitch!=null?opts.pitch:1.18;
+    u.rate=opts&&opts.rate!=null?opts.rate:0.94;
+    u.volume=opts&&opts.volume!=null?opts.volume:0.98;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+function speak(text,opts){
+  if(!('speechSynthesis' in window)) return;
+  if(!ttsReady) initTTS();
+  try{
+    if(speechSynthesis.speaking||speechSynthesis.pending){
+      speechSynthesis.cancel();
+      setTimeout(()=>doSpeak(text,opts),60);
+    }else{
+      doSpeak(text,opts);
+    }
+  }catch(e){}
+}
+initTTS();
+
+musicBtn.addEventListener('click',e=>{
+  e.stopPropagation();
+  if(musicPlaying){
+    stopMusic(); userMuted=true;
+    if('speechSynthesis' in window){ try{ speechSynthesis.cancel(); }catch(_){} }
+  }else{
+    startMusic(); userMuted=false;
+  }
+  updateMusicBtn();
+});
 document.addEventListener('pointerdown',function(e){ if(musicBtn&&musicBtn.contains(e.target)) return; if(userMuted||musicPlaying) return; startMusic(); updateMusicBtn(); },{once:true});
 
 /* ============ Game Core ============ */
@@ -431,13 +481,15 @@ function showResultClientSide(round,wn,pendingBets){
   renderResultUI(wn,stake,returned,net);myBets=[];betDirty=true;
   const winIdx=order.indexOf(wn);landingAngle=RESULT_ANGLE;rotation=landingAngle-START-winIdx*step;render();
   resultModal.hidden=false;startResultTimer();
-  if(net>0)playWin(); else if(net<0)playLose();
+  if(net>0){playWin();speak('شما برنده شدید');}
+  else if(net<0){playLose();speak('شما باختید');}
   trySettle(round.id).then(ok=>{if(ok)setTimeout(refreshBalance,300);});
 }
 function applyRound(round){if(!round||!round.id)return;const key=round.id+':'+round.status;if(key===lastRoundKey)return;lastRoundKey=key;currentRound=round;if(round.status==='betting')startBetting(round);else if(round.status==='spinning')startSpinning(round);else if(round.status==='result')showResult(round);}
 function startBetting(round){
   roundPhase='betting';ballState='held';animating=false;cancelAnimationFrame(raf);render();
   refreshMyBets().then(()=>{betDirty=true;render();});
+  speak('لطفاً شرط خود را بگذارید');
   updateHeaderClock(new Date(round.betting_ends_at).getTime()-Date.now());
   if(bettingTickInterval)clearInterval(bettingTickInterval);
   bettingTickInterval=setInterval(async()=>{
@@ -454,6 +506,7 @@ function startBetting(round){
 function updateHeaderClock(remainMs){const secs=Math.ceil(Math.max(0,remainMs)/1000);headerSecondsEl.textContent=String(secs);headerLabelEl.innerHTML=roundPhase==='betting'?'ثانیه<br>شرط‌بندی':roundPhase==='spinning'?'چرخش<br>درجریان':roundPhase==='result'?'نتیجه':'آماده‌سازی';headerClockEl.dataset.phase=roundPhase;}
 function startSpinning(round){
   roundPhase='spinning';if(bettingTickInterval){clearInterval(bettingTickInterval);bettingTickInterval=null;}updateHeaderClock(0);ballState='launching';
+  speak('شرط‌بندی به پایان رسید');
   const winningNumber=round.winning_number,winIdx=order.indexOf(winningNumber);landingAngle=RESULT_ANGLE;const desired=landingAngle-START-winIdx*step;
   fromRotation=rotation;const turns=6+Math.floor(Math.random()*3);targetRotation=fromRotation-(turns*Math.PI*2+normalize(fromRotation-desired));
   spinDuration=7600+Math.random()*850;ballWheelStopAngle=BALL_START_ANGLE+Math.PI*2*6.5;const finalPocketAngle=START+winIdx*step+targetRotation;
@@ -475,7 +528,8 @@ async function showResult(round){
   renderResultUI(round.winning_number,stake,returned,net);
   const winIdx=order.indexOf(round.winning_number);landingAngle=RESULT_ANGLE;rotation=landingAngle-START-winIdx*step;render();
   resultModal.hidden=false;startResultTimer();
-  if(net>0)playWin(); else if(net<0)playLose();
+  if(net>0){playWin();speak('شما برنده شدید');}
+  else if(net<0){playLose();speak('شما باختید');}
 }
 function closeResultModal(){if(resultTickInterval){clearInterval(resultTickInterval);resultTickInterval=null;}resultModal.hidden=true;lastRoundKey='';pollRound();}
 async function pollRound(){try{const {data,error}=await supabaseClient.rpc('get_or_create_round');if(error)return;if(data)applyRound(data);}catch(e){}}
@@ -504,7 +558,7 @@ async function initOnline(){
 }
 image.onload=()=>{buildBG();render();};image.src=IMAGE_URL;
 (async function boot(){if(await initUser()){await initOnline();await refreshBalance();await pollRound();setInterval(pollRound,1000);}})();
-if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=3.9',{scope:'./'}).then(reg=>{console.log('SW v3.3:',reg.scope);}).catch(err=>console.warn('SW:',err));});}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=4',{scope:'./'}).then(reg=>{console.log('SW v3.3:',reg.scope);}).catch(err=>console.warn('SW:',err));});}
 })();
 </script>
 </body>
