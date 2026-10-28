@@ -102,12 +102,23 @@ const IMAGE_URL = 'https://i.8upload.com/image/9b64ac57dad0748d/roulette-dealer-
 const CHIP_TRAY = [{value:1,x:66},{value:5,x:137},{value:25,x:208},{value:100,x:279},{value:500,x:351}];
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {auth:{autoRefreshToken:true,persistSession:true,detectSessionInUrl:true},realtime:{params:{eventsPerSecond:10}}});
 let userId=null, balance=0, myBets=[], currentRound=null, lastRoundKey='', myChannel=null, completedRoundId=null;
+let betFlashUntil=0, betFlashTimeout=null;
 const $=id=>document.getElementById(id);
 const statusEl=$('status'), onlineCountEl=$('onlineCount'), onlinePill=$('onlinePill'), headerSecondsEl=$('headerBettingSeconds'), headerLabelEl=$('headerBettingLabel'), headerClockEl=$('headerRoundClock');
 const resultModal=$('resultModal'), resultNumberEl=$('resultNumber'), resultColorLabelEl=$('resultColorLabel'), resultParityEl=$('resultParity'), resultRangeEl=$('resultRange'), resultDozenEl=$('resultDozen'), resultColumnEl=$('resultColumn'), resultZeroNote=$('resultZeroNote'), resultSecondsEl=$('resultSeconds'), resultTimerFill=$('resultTimerFill'), resultContinue=$('resultContinue'), resultClose=$('resultClose');
 const userStakeEl=$('userResultStake'), userPayoutEl=$('userResultPayout'), userNetEl=$('userResultNet'), userBalanceEl=$('userResultBalance');
 const toastEl=$('toast'); let toastTimer=null;
 function showToast(msg,ok=false){if(!toastEl)return;toastEl.textContent=msg;toastEl.classList.toggle('ok',ok);toastEl.classList.add('show');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastEl.classList.remove('show'),2800);}
+function flashBetPanel(){
+  betFlashUntil = performance.now() + 1100;
+  betDirty = true;
+  render();
+  if(betFlashTimeout) clearTimeout(betFlashTimeout);
+  betFlashTimeout = setTimeout(() => {
+    betDirty = true;
+    render();
+  }, 1150);
+}
 const W=941,H=1671;
 const bgCanvas=$('sceneBase'),bgCtx=bgCanvas.getContext('2d',{alpha:false});
 const canvas=$('scene');let ctx=canvas.getContext('2d',{alpha:true});
@@ -211,8 +222,29 @@ function drawInstruction(){
       else{const gr=ctx.createLinearGradient(0,y,0,y+ph);gr.addColorStop(0,item.isOverflow?'rgba(54,44,23,.99)':'rgba(4,38,27,.99)');gr.addColorStop(1,'rgba(1,15,10,.99)');ctx.fillStyle=gr;ctx.fill();ctx.strokeStyle='rgba(230,184,91,.92)';ctx.lineWidth=1;ctx.stroke();ctx.fillStyle='#ffe6a4';ctx.font='bold '+fs+'px Tahoma,Arial,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.direction='rtl';ctx.fillText(item.label,cur,cy,item.width-6);ctx.direction='ltr';}
       cur-=item.width/2+gap;}}
   ctx.direction='rtl';ctx.textAlign='center';ctx.textBaseline='middle';roundRect(335,1274,270,23,9);
-  const tg=ctx.createLinearGradient(335,1274,605,1297);tg.addColorStop(0,'rgba(1,14,9,.98)');tg.addColorStop(.5,'rgba(12,45,31,.98)');tg.addColorStop(1,'rgba(1,14,9,.98)');ctx.fillStyle=tg;ctx.fill();ctx.strokeStyle='rgba(239,193,91,.95)';ctx.lineWidth=1.1;ctx.stroke();
-  ctx.fillStyle='#ffe1a0';ctx.font='bold 19px Tahoma,Arial,sans-serif';ctx.fillText('مجموع شرط‌ها: '+fmt(totalStake),470,1286,255);ctx.restore();
+  const flashActive = performance.now() < betFlashUntil;
+  const tg=ctx.createLinearGradient(335,1274,605,1297);
+  if(flashActive){
+    tg.addColorStop(0,'rgba(6,42,24,.98)');tg.addColorStop(.5,'rgba(18,80,48,.98)');tg.addColorStop(1,'rgba(6,42,24,.98)');
+  } else {
+    tg.addColorStop(0,'rgba(1,14,9,.98)');tg.addColorStop(.5,'rgba(12,45,31,.98)');tg.addColorStop(1,'rgba(1,14,9,.98)');
+  }
+  ctx.fillStyle=tg;ctx.fill();
+  if(flashActive){
+    ctx.strokeStyle='#4ee88b';ctx.lineWidth=2;ctx.shadowColor='rgba(78,232,139,.85)';ctx.shadowBlur=8;
+  } else {
+    ctx.strokeStyle='rgba(239,193,91,.95)';ctx.lineWidth=1.1;ctx.shadowBlur=0;
+  }
+  ctx.stroke();
+  ctx.font='bold 19px Tahoma,Arial,sans-serif';
+  if(flashActive){
+    ctx.fillStyle='#7bf0a8';
+    ctx.fillText('✓ شرط ثبت شد',470,1286,255);
+  } else {
+    ctx.fillStyle='#ffe1a0';
+    ctx.fillText('مجموع شرط‌ها: '+fmt(totalStake),470,1286,255);
+  }
+  ctx.restore();
 }
 function drawBetOverlay(){drawBets();drawChipSel();drawBalance();drawInstruction();}
 function rebuildBetOverlay(){const prev=ctx;ctx=betCtx;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,W,H);drawBetOverlay();ctx=prev;}
@@ -230,10 +262,31 @@ async function placeBet(target){
   if(roundPhase!=='betting'){showToast('شرط‌بندی بسته است');return;}
   if(!currentRound){showToast('راند آماده نیست');return;}
   if(balance<selectedChip){showToast('موجودی کافی نیست');return;}
-  try{const {data,error}=await supabaseClient.rpc('place_bet',{p_round_id:currentRound.id,p_type:target.type,p_value:String(target.value),p_amount:selectedChip});if(error)throw error;balance=Number(data);await refreshMyBets();betDirty=true;render();showToast('شرط ثبت شد ✓',true);}
-  catch(err){console.warn('place_bet failed:',err);showToast('خطا: '+(err?.message||String(err)));}
+  try{
+    const {data,error}=await supabaseClient.rpc('place_bet',{p_round_id:currentRound.id,p_type:target.type,p_value:String(target.value),p_amount:selectedChip});
+    if(error)throw error;
+    balance=Number(data);
+    await refreshMyBets();
+    betDirty=true;
+    flashBetPanel();
+  }catch(err){
+    console.warn('place_bet failed:',err);
+    showToast('خطا: '+(err?.message||String(err)));
+  }
 }
-async function undoBet(){if(roundPhase!=='betting'||!currentRound)return;try{const {data,error}=await supabaseClient.rpc('undo_last_bet',{p_round_id:currentRound.id});if(error)throw error;balance=Number(data);await refreshMyBets();betDirty=true;render();showToast('برگشت داده شد',true);}catch(err){showToast('خطا: '+(err?.message||err));}}
+async function undoBet(){
+  if(roundPhase!=='betting'||!currentRound)return;
+  try{
+    const {data,error}=await supabaseClient.rpc('undo_last_bet',{p_round_id:currentRound.id});
+    if(error)throw error;
+    balance=Number(data);
+    await refreshMyBets();
+    betDirty=true;
+    flashBetPanel();
+  }catch(err){
+    showToast('خطا: '+(err?.message||err));
+  }
+}
 async function refreshMyBets(){if(!currentRound){myBets=[];return;}const {data}=await supabaseClient.from('bets').select('*').eq('round_id',currentRound.id).eq('user_id',userId).eq('settled',false);myBets=data||[];}
 async function refreshBalance(){const {data,error}=await supabaseClient.from('profiles').select('balance').eq('id',userId).single();if(error){console.error(error);return;}if(data)balance=data.balance;betDirty=true;render();}
 function computePayout(bet,wn){
@@ -287,8 +340,6 @@ function showResultClientSide(round,wn,pendingBets){
   trySettle(round.id).then(ok=>{if(ok)setTimeout(refreshBalance,300);});
 }
 function applyRound(round){if(!round||!round.id)return;const key=round.id+':'+round.status;if(key===lastRoundKey)return;lastRoundKey=key;currentRound=round;if(round.status==='betting')startBetting(round);else if(round.status==='spinning')startSpinning(round);else if(round.status==='result')showResult(round);}
-
-/* ===== startBetting: چرخش فقط اگر شرطی وجود داشته باشد ===== */
 function startBetting(round){
   roundPhase='betting';
   ballState='held';
@@ -305,19 +356,16 @@ function startBetting(round){
     if(rem<=0){
       clearInterval(bettingTickInterval);
       bettingTickInterval=null;
-      // ۱) تلاش برای لغو راند (اتمیک — فقط اگر هیچ شرطی نباشد)
       let cancelled=false;
       try{
         const {data}=await supabaseClient.rpc('cancel_round',{p_round_id:round.id});
         cancelled=data===true;
       }catch(e){console.warn('cancel check:',e);}
       if(cancelled){
-        // هیچ شرطی نبود — چرخ نمی‌چرخد
         lastRoundKey='';
         setTimeout(pollRound,300);
         return;
       }
-      // ۲) شرط وجود دارد — چرخ بچرخد
       try{await supabaseClient.rpc('spin_round',{p_round_id:round.id});}catch(e){}
       pollRound();
     }
@@ -375,7 +423,7 @@ async function initOnline(){
 }
 image.onload=()=>{buildBG();render();};image.src=IMAGE_URL;
 (async function boot(){if(await initUser()){await initOnline();await refreshBalance();await pollRound();setInterval(pollRound,1000);}})();
-if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=3.6',{scope:'./'}).then(reg=>{console.log('SW v3.3:',reg.scope);}).catch(err=>console.warn('SW:',err));});}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=3.7',{scope:'./'}).then(reg=>{console.log('SW v3.3:',reg.scope);}).catch(err=>console.warn('SW:',err));});}
 })();
 </script>
 </body>
