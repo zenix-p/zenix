@@ -32,39 +32,36 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
 @media(min-width:942px){.game{width:min(941px,calc(100vh * 941 / 1671))}}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:99999;padding:12px 20px;border-radius:12px;background:rgba(220,60,60,.95);color:#fff;font-family:Tahoma,sans-serif;font-size:14px;font-weight:700;box-shadow:0 8px 30px rgba(0,0,0,.5);opacity:0;transition:opacity .3s;pointer-events:none;max-width:90vw;text-align:center}
 .toast.show{opacity:1}.toast.ok{background:rgba(60,180,100,.95)}
-.result-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px;font-family:Tahoma,Arial,sans-serif;color:#f8f4e9}
+
+/* ===== Result Modal (redesigned) ===== */
+.result-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;font-family:Tahoma,Arial,sans-serif;color:#f8f4e9}
 .result-modal[hidden]{display:none!important}
-.result-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.76);backdrop-filter:blur(4px)}
-.result-card{position:relative;z-index:1;width:min(100%,390px);max-height:min(90vh,760px);overflow:auto;padding:22px 20px 18px;border:1px solid #c6a35a;border-radius:20px;background:linear-gradient(155deg,#173529 0%,#0d2119 55%,#08130f 100%);box-shadow:0 22px 70px rgba(0,0,0,.68)}
-.result-close{position:absolute;top:10px;left:10px;width:34px;height:34px;border:1px solid rgba(226,197,133,.45);border-radius:50%;background:rgba(0,0,0,.25);color:#f3dfac;font-size:24px;cursor:pointer}
-.result-title{margin:0 24px 17px;text-align:center;font-size:22px;font-weight:800;color:#f2d99d}
-.result-main{display:flex;align-items:center;justify-content:center;gap:15px;margin:0 auto 18px;padding:14px 12px;border:1px solid rgba(207,175,102,.35);border-radius:15px;background:rgba(0,0,0,.18)}
-.result-number{display:flex;align-items:center;justify-content:center;width:76px;height:76px;flex:0 0 76px;border:3px solid #e7d19a;border-radius:13px;color:#fff;font-size:37px;font-weight:900}
-.result-number.red{background:linear-gradient(145deg,#d8323f,#92111a)}
-.result-number.black{background:linear-gradient(145deg,#34393b,#090b0c)}
-.result-number.green{background:linear-gradient(145deg,#13956a,#075137)}
-.result-main-copy{text-align:right}.result-main-label{font-size:14px;color:#c9d9ce;margin-bottom:5px}
-.result-color-label{font-size:21px;font-weight:800;color:#fff}
-.result-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin:0 0 14px}
-.result-cell{padding:11px 12px;border:1px solid rgba(194,166,103,.25);border-radius:11px;background:rgba(255,255,255,.035)}
-.result-cell dt{font-size:12px;color:#b9cdbf;margin:0 0 6px}
-.result-cell dd{margin:0;color:#fff2d0;font-size:16px;font-weight:800}
-.result-zero-note{margin:0 0 14px;padding:10px 12px;border-radius:10px;background:rgba(9,112,75,.23);border:1px solid rgba(94,192,143,.28);color:#c7e6d3;font-size:12px;text-align:center}
-.result-continue{display:block;width:100%;min-height:48px;border:1px solid #f0d18a;border-radius:12px;background:linear-gradient(180deg,#e5c47b,#b98a3d);color:#18261c;font-size:16px;font-weight:900;cursor:pointer}
-.result-timer{margin:0 0 13px;padding:10px 12px;border:1px solid rgba(194,166,103,.24);border-radius:11px;background:rgba(0,0,0,.16);color:#c8d8ce;font-size:13px}
-.result-timer-copy{display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:9px}
-.result-timer-copy strong{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:30px;border-radius:9px;background:#c7a45a;color:#14251b;font-size:17px}
-.result-timer-track{height:5px;border-radius:99px;background:rgba(255,255,255,.13);direction:rtl}
-.result-timer-track span{display:block;width:100%;height:100%;border-radius:inherit;background:linear-gradient(90deg,#e9d08f,#a87b34);transition:width .2s linear}
-.user-round-summary{margin-top:10px;border-color:rgba(104,183,137,.48)}
-.user-round-summary .sim-modal-title{color:#a8e8bf}
-.sim-modal-title{margin:0 0 9px;color:#d8e9dc;font-size:13px;font-weight:900;text-align:center}
-.sim-modal-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
-.sim-modal-stat{padding:8px;border-radius:9px;background:rgba(0,0,0,.2);border:1px solid rgba(210,183,115,.16);text-align:center}
-.sim-modal-stat span{display:block;font-size:10px;color:#b9cdbf;margin-bottom:4px}
-.sim-modal-stat strong{display:block;font-size:15px;color:#ffe0a0}
-.sim-modal-stat strong.positive{color:#80e3a2}.sim-modal-stat strong.negative{color:#ff9a9a}
-.sim-modal-summary{margin:0 0 13px;padding:12px;border:1px solid rgba(89,164,113,.32);border-radius:12px;background:rgba(11,68,42,.2)}
+.result-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.result-card{position:relative;z-index:1;width:min(100%,340px);max-height:min(88vh,620px);overflow:auto;padding:18px 16px 16px;border:1px solid rgba(198,163,90,.65);border-radius:18px;background:linear-gradient(155deg,#16322a 0%,#0c1f18 55%,#07120e 100%);box-shadow:0 20px 60px rgba(0,0,0,.7),inset 0 0 0 1px rgba(215,180,103,.08)}
+.result-close{position:absolute;top:10px;left:10px;width:26px;height:26px;border:1px solid rgba(226,197,133,.28);border-radius:50%;background:rgba(0,0,0,.3);color:#d4c39a;font-size:15px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.result-title{margin:2px 0 12px;text-align:center;font-size:11px;font-weight:700;color:#93a89a;letter-spacing:1.5px;text-transform:uppercase}
+.result-hero{display:flex;align-items:center;justify-content:center;gap:14px;margin:0 0 12px;padding:12px 10px;border:1px solid rgba(207,175,102,.2);border-radius:12px;background:rgba(0,0,0,.24)}
+.result-number{display:flex;align-items:center;justify-content:center;width:64px;height:64px;flex:0 0 64px;border:2px solid rgba(231,209,154,.5);border-radius:12px;color:#fff;font-size:29px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.result-number.red{background:linear-gradient(145deg,#c42d39,#7a0d15)}
+.result-number.black{background:linear-gradient(145deg,#2c3133,#080b0c)}
+.result-number.green{background:linear-gradient(145deg,#0f8a60,#054830)}
+.result-color-label{font-size:20px;font-weight:800;line-height:1;letter-spacing:.3px}
+.result-tags{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 12px}
+.rtag{display:inline-flex;align-items:center;justify-content:center;flex:1 1 auto;padding:5px 8px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(210,183,115,.15);color:#d7e4db;font-size:11px;font-weight:700;line-height:1.2;white-space:nowrap;text-align:center;min-width:0}
+.result-money{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:0 0 12px}
+.money-item{padding:9px 8px;border:1px solid rgba(210,183,115,.13);border-radius:9px;background:rgba(0,0,0,.25);text-align:center;min-width:0}
+.money-value{font-size:15px;font-weight:800;color:#ffe0a0;margin-bottom:3px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;line-height:1.15}
+.money-value.positive{color:#7ee6a5}
+.money-value.negative{color:#ff9696}
+.money-label{font-size:10px;color:#9eb1a4;line-height:1.2}
+.result-zero-note{margin:0 0 10px;padding:8px 10px;border-radius:8px;background:rgba(9,112,75,.2);border:1px solid rgba(94,192,143,.25);color:#b8dfc8;font-size:10px;line-height:1.6;text-align:center}
+.result-timer{margin:0 0 12px;padding:9px 10px;border:1px solid rgba(194,166,103,.18);border-radius:9px;background:rgba(0,0,0,.18)}
+.result-timer-copy{display:flex;align-items:center;justify-content:center;gap:5px;font-size:11px;color:#c1d2c7;margin-bottom:7px;line-height:1.3}
+.result-timer-copy strong{color:#ffe3a0;font-size:13px;font-weight:800;min-width:1.5ch;text-align:center;font-variant-numeric:tabular-nums}
+.result-timer-track{height:4px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden;direction:rtl}
+.result-timer-track span{display:block;width:100%;height:100%;border-radius:inherit;background:linear-gradient(90deg,#d8bc7a,#b3833a);transition:width .15s linear}
+.result-continue{display:block;width:100%;min-height:44px;border:1px solid #dcbd7a;border-radius:11px;background:linear-gradient(180deg,#d9b96e,#ad7e34);color:#152318;font-size:14px;font-weight:900;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.25);font-family:inherit}
+.result-continue:active{transform:translateY(1px)}
 </style>
 </head>
 <body>
@@ -78,26 +75,29 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
   <div id="resultModal" class="result-modal" hidden>
     <div class="result-backdrop"></div>
     <section class="result-card">
-      <button class="result-close" id="resultClose" type="button">×</button>
+      <button class="result-close" id="resultClose" type="button" aria-label="بستن">×</button>
       <h2 class="result-title">نتیجهٔ رولت</h2>
-      <div class="result-main"><div id="resultNumber" class="result-number green">0</div><div class="result-main-copy"><div class="result-main-label">شمارهٔ برنده</div><div id="resultColorLabel" class="result-color-label">سبز</div></div></div>
-      <dl class="result-grid">
-        <div class="result-cell"><dt>رنگ خانه</dt><dd id="resultColor">سبز</dd></div>
-        <div class="result-cell"><dt>زوج یا فرد</dt><dd id="resultParity">ندارد</dd></div>
-        <div class="result-cell"><dt>محدوده</dt><dd id="resultRange">ندارد</dd></div>
-        <div class="result-cell"><dt>دوجین</dt><dd id="resultDozen">ندارد</dd></div>
-        <div class="result-cell" style="grid-column:1/-1"><dt>ستون</dt><dd id="resultColumn">ندارد</dd></div>
-      </dl>
-      <section class="sim-modal-summary user-round-summary"><div class="sim-modal-title">نتیجهٔ شرط‌های شما</div>
-        <div class="sim-modal-stats">
-          <div class="sim-modal-stat"><span>مبلغ شرط</span><strong id="userResultStake">0</strong></div>
-          <div class="sim-modal-stat"><span>بازگشت</span><strong id="userResultPayout">0</strong></div>
-          <div class="sim-modal-stat"><span>سود/زیان</span><strong id="userResultNet">0</strong></div>
-          <div class="sim-modal-stat"><span>موجودی فعلی</span><strong id="userResultBalance">0</strong></div>
-        </div>
-      </section>
-      <p class="result-zero-note" id="resultZeroNote" hidden>صفر سبز است و در محدوده‌های 1-18 / 19-36، دوجین، ستون، زوج یا فرد نیست.</p>
-      <div class="result-timer"><div class="result-timer-copy"><span>دور بعدی در</span><strong id="resultSeconds">15</strong><span>ثانیه</span></div><div class="result-timer-track"><span id="resultTimerFill"></span></div></div>
+      <div class="result-hero">
+        <div id="resultNumber" class="result-number green">0</div>
+        <div id="resultColorLabel" class="result-color-label">سبز</div>
+      </div>
+      <div class="result-tags">
+        <span class="rtag" id="resultParity">—</span>
+        <span class="rtag" id="resultRange">—</span>
+        <span class="rtag" id="resultDozen">—</span>
+        <span class="rtag" id="resultColumn">—</span>
+      </div>
+      <div class="result-money">
+        <div class="money-item"><div class="money-value" id="userResultStake">0</div><div class="money-label">شرط</div></div>
+        <div class="money-item"><div class="money-value" id="userResultPayout">0</div><div class="money-label">بازگشت</div></div>
+        <div class="money-item"><div class="money-value" id="userResultNet">0</div><div class="money-label">خالص</div></div>
+        <div class="money-item"><div class="money-value" id="userResultBalance">0</div><div class="money-label">موجودی</div></div>
+      </div>
+      <p class="result-zero-note" id="resultZeroNote" hidden>صفر در هیچ‌کدام از دسته‌ها نیست.</p>
+      <div class="result-timer">
+        <div class="result-timer-copy">دور بعدی در <strong id="resultSeconds">15</strong> ثانیه</div>
+        <div class="result-timer-track"><span id="resultTimerFill"></span></div>
+      </div>
       <button class="result-continue" id="resultContinue" type="button">ادامهٔ بازی</button>
     </section>
   </div>
@@ -117,7 +117,7 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {a
 let userId=null, balance=0, myBets=[], currentRound=null, lastRoundKey='', myChannel=null, completedRoundId=null;
 const $=id=>document.getElementById(id);
 const statusEl=$('status'), onlineCountEl=$('onlineCount'), onlinePill=$('onlinePill'), headerSecondsEl=$('headerBettingSeconds'), headerLabelEl=$('headerBettingLabel'), headerClockEl=$('headerRoundClock');
-const resultModal=$('resultModal'), resultNumberEl=$('resultNumber'), resultColorLabelEl=$('resultColorLabel'), resultColorEl=$('resultColor'), resultParityEl=$('resultParity'), resultRangeEl=$('resultRange'), resultDozenEl=$('resultDozen'), resultColumnEl=$('resultColumn'), resultZeroNote=$('resultZeroNote'), resultSecondsEl=$('resultSeconds'), resultTimerFill=$('resultTimerFill'), resultContinue=$('resultContinue'), resultClose=$('resultClose');
+const resultModal=$('resultModal'), resultNumberEl=$('resultNumber'), resultColorLabelEl=$('resultColorLabel'), resultParityEl=$('resultParity'), resultRangeEl=$('resultRange'), resultDozenEl=$('resultDozen'), resultColumnEl=$('resultColumn'), resultZeroNote=$('resultZeroNote'), resultSecondsEl=$('resultSeconds'), resultTimerFill=$('resultTimerFill'), resultContinue=$('resultContinue'), resultClose=$('resultClose');
 const userStakeEl=$('userResultStake'), userPayoutEl=$('userResultPayout'), userNetEl=$('userResultNet'), userBalanceEl=$('userResultBalance');
 const toastEl=$('toast'); let toastTimer=null;
 function showToast(msg,ok=false){if(!toastEl)return;toastEl.textContent=msg;toastEl.classList.toggle('ok',ok);toastEl.classList.add('show');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastEl.classList.remove('show'),2800);}
@@ -187,13 +187,7 @@ function drawBallAt(now){
   if(ballState==='held')return;
   if(ballState==='settled'||!animating){drawBall(C.x+BALL_POCKET.rx*Math.cos(landingAngle),C.y+BALL_POCKET.ry*Math.sin(landingAngle),6.4);return;}
   const el=Math.max(0,now-spinStart);
-  if(el<BALL_LAUNCH_MS){
-    const u=clamp01(el/BALL_LAUNCH_MS),inv=1-u;const end=eP(BALL_START_ANGLE,BALL_TRACK.rx,BALL_TRACK.ry);
-    const tx=-Math.sin(BALL_START_ANGLE)*BALL_TRACK.rx,ty=Math.cos(BALL_START_ANGLE)*BALL_TRACK.ry;const tl=Math.hypot(tx,ty)||1;
-    const p0=BALL_HOME,p1={x:BALL_HOME.x+34,y:BALL_HOME.y-10},p2={x:end.x-BALL_RELEASE_TANGENT_PX*tx/tl,y:end.y-BALL_RELEASE_TANGENT_PX*ty/tl},p3=end;
-    const x=inv**3*p0.x+3*inv*inv*u*p1.x+3*inv*u*u*p2.x+u**3*p3.x,y=inv**3*p0.y+3*inv*inv*u*p1.y+3*inv*u*u*p2.y+u**3*p3.y;
-    drawBall(x,y,5.8+u);if(el<24)drawFinger();return;
-  }
+  if(el<BALL_LAUNCH_MS){const u=clamp01(el/BALL_LAUNCH_MS),inv=1-u;const end=eP(BALL_START_ANGLE,BALL_TRACK.rx,BALL_TRACK.ry);const tx=-Math.sin(BALL_START_ANGLE)*BALL_TRACK.rx,ty=Math.cos(BALL_START_ANGLE)*BALL_TRACK.ry;const tl=Math.hypot(tx,ty)||1;const p0=BALL_HOME,p1={x:BALL_HOME.x+34,y:BALL_HOME.y-10},p2={x:end.x-BALL_RELEASE_TANGENT_PX*tx/tl,y:end.y-BALL_RELEASE_TANGENT_PX*ty/tl},p3=end;const x=inv**3*p0.x+3*inv*inv*u*p1.x+3*inv*u*u*p2.x+u**3*p3.x,y=inv**3*p0.y+3*inv*inv*u*p1.y+3*inv*u*u*p2.y+u**3*p3.y;drawBall(x,y,5.8+u);if(el<24)drawFinger();return;}
   const wEl=Math.max(0,el-BALL_LAUNCH_MS);const wU=clamp01(wEl/spinDuration),wP=rouletteProgress(wU);let ang,rx,ry,rp;
   if(wEl<spinDuration){const bp=ballPreProgress(wU);ang=BALL_START_ANGLE+(ballWheelStopAngle-BALL_START_ANGLE)*bp;rx=BALL_TRACK.rx+(BALL_AFTER_WHEEL.rx-BALL_TRACK.rx)*wP;ry=BALL_TRACK.ry+(BALL_AFTER_WHEEL.ry-BALL_TRACK.ry)*wP;rp=wP;}
   else{const pU=clamp01((wEl-spinDuration)/Math.max(1,ballExtraDuration));const pp=ballPostProgress(pU);const pe=pU*pU*(3-2*pU);ang=ballWheelStopAngle+ballPostDelta*pp;rx=BALL_AFTER_WHEEL.rx+(BALL_POCKET.rx-BALL_AFTER_WHEEL.rx)*pe;ry=BALL_AFTER_WHEEL.ry+(BALL_POCKET.ry-BALL_AFTER_WHEEL.ry)*pe;rp=pe;}
@@ -246,15 +240,15 @@ function findTarget(x,y){
   return null;
 }
 async function placeBet(target){
-  if(roundPhase!=='betting'){showToast('شرط‌بندی بسته است، صبر کنید');return;}
+  if(roundPhase!=='betting'){showToast('شرط‌بندی بسته است');return;}
   if(!currentRound){showToast('راند آماده نیست');return;}
   if(balance<selectedChip){showToast('موجودی کافی نیست');return;}
   try{const {data,error}=await supabaseClient.rpc('place_bet',{p_round_id:currentRound.id,p_type:target.type,p_value:String(target.value),p_amount:selectedChip});if(error)throw error;balance=Number(data);await refreshMyBets();betDirty=true;render();showToast('شرط ثبت شد ✓',true);}
   catch(err){console.warn('place_bet failed:',err);showToast('خطا: '+(err?.message||String(err)));}
 }
-async function undoBet(){if(roundPhase!=='betting'||!currentRound)return;try{const {data,error}=await supabaseClient.rpc('undo_last_bet',{p_round_id:currentRound.id});if(error)throw error;balance=Number(data);await refreshMyBets();betDirty=true;render();showToast('شرط برگشت داده شد',true);}catch(err){showToast('خطا: '+(err?.message||err));}}
+async function undoBet(){if(roundPhase!=='betting'||!currentRound)return;try{const {data,error}=await supabaseClient.rpc('undo_last_bet',{p_round_id:currentRound.id});if(error)throw error;balance=Number(data);await refreshMyBets();betDirty=true;render();showToast('برگشت داده شد',true);}catch(err){showToast('خطا: '+(err?.message||err));}}
 async function refreshMyBets(){if(!currentRound){myBets=[];return;}const {data}=await supabaseClient.from('bets').select('*').eq('round_id',currentRound.id).eq('user_id',userId).eq('settled',false);myBets=data||[];}
-async function refreshBalance(){const {data,error}=await supabaseClient.from('profiles').select('balance').eq('id',userId).single();if(error){console.error('balance error:',error);return;}if(data)balance=data.balance;betDirty=true;render();}
+async function refreshBalance(){const {data,error}=await supabaseClient.from('profiles').select('balance').eq('id',userId).single();if(error){console.error(error);return;}if(data)balance=data.balance;betDirty=true;render();}
 function computePayout(bet,wn){
   if(bet.bet_type==='straight')return +bet.bet_value===wn?bet.amount*36:0;
   if(wn===0)return 0;
@@ -266,12 +260,22 @@ function computePayout(bet,wn){
 }
 function renderResultUI(wn,stake,returned,net){
   const isZero=wn===0,isRed=reds.has(wn),color=isZero?'سبز':(isRed?'قرمز':'مشکی');
-  resultNumberEl.textContent=String(wn);resultNumberEl.classList.remove('red','black','green');resultNumberEl.classList.add(isZero?'green':isRed?'red':'black');
-  resultColorLabelEl.textContent=color;resultColorLabelEl.style.color=isZero?'#65d7a5':isRed?'#ff8b92':'#f4f1e8';resultColorEl.textContent=color;
-  resultParityEl.textContent=isZero?'ندارد':(wn%2===0?'زوج':'فرد');resultRangeEl.textContent=isZero?'ندارد':(wn<=18?'1-18':'19-36');
-  resultDozenEl.textContent=isZero?'ندارد':(wn<=12?'1st':wn<=24?'2nd':'3rd');resultColumnEl.textContent=isZero?'ندارد':(wn%3===1?'اول':wn%3===2?'دوم':'سوم');resultZeroNote.hidden=!isZero;
-  userStakeEl.textContent=fmt(stake);userPayoutEl.textContent=fmt(returned);userNetEl.textContent=(net>0?'+':net<0?'−':'')+fmt(Math.abs(net));
-  userNetEl.classList.toggle('positive',net>0);userNetEl.classList.toggle('negative',net<0);userBalanceEl.textContent=fmt(balance);
+  resultNumberEl.textContent=String(wn);
+  resultNumberEl.classList.remove('red','black','green');
+  resultNumberEl.classList.add(isZero?'green':isRed?'red':'black');
+  resultColorLabelEl.textContent=color;
+  resultColorLabelEl.style.color=isZero?'#7ee6a5':isRed?'#ff8b92':'#f4f1e8';
+  resultParityEl.textContent=isZero?'—':(wn%2===0?'زوج':'فرد');
+  resultRangeEl.textContent=isZero?'—':(wn<=18?'1-18':'19-36');
+  resultDozenEl.textContent=isZero?'—':(wn<=12?'1st 12':wn<=24?'2nd 12':'3rd 12');
+  resultColumnEl.textContent=isZero?'—':(wn%3===1?'ستون ۱':wn%3===2?'ستون ۲':'ستون ۳');
+  resultZeroNote.hidden=!isZero;
+  userStakeEl.textContent=fmt(stake);
+  userPayoutEl.textContent=fmt(returned);
+  userNetEl.textContent=(net>0?'+':net<0?'−':'')+fmt(Math.abs(net));
+  userNetEl.classList.toggle('positive',net>0);
+  userNetEl.classList.toggle('negative',net<0);
+  userBalanceEl.textContent=fmt(balance);
 }
 function startResultTimer(){
   if(resultTickInterval)clearInterval(resultTickInterval);
@@ -296,7 +300,8 @@ function showResultClientSide(round,wn,pendingBets){
   trySettle(round.id).then(ok=>{if(ok)setTimeout(refreshBalance,300);});
 }
 function applyRound(round){if(!round||!round.id)return;const key=round.id+':'+round.status;if(key===lastRoundKey)return;lastRoundKey=key;currentRound=round;if(round.status==='betting')startBetting(round);else if(round.status==='spinning')startSpinning(round);else if(round.status==='result')showResult(round);}
-function startBetting(round){roundPhase='betting';ballState='held';animating=false;cancelAnimationFrame(raf);refreshMyBets().then(()=>{betDirty=true;render();});updateHeaderClock(new Date(round.betting_ends_at).getTime()-Date.now());
+function startBetting(round){
+  roundPhase='betting';ballState='held';animating=false;cancelAnimationFrame(raf);refreshMyBets().then(()=>{betDirty=true;render();});updateHeaderClock(new Date(round.betting_ends_at).getTime()-Date.now());
   if(bettingTickInterval)clearInterval(bettingTickInterval);
   bettingTickInterval=setInterval(async()=>{const ends=new Date(round.betting_ends_at).getTime();const rem=Math.max(0,ends-Date.now());updateHeaderClock(rem);if(rem<=0){clearInterval(bettingTickInterval);bettingTickInterval=null;try{await supabaseClient.rpc('spin_round',{p_round_id:round.id});}catch(e){}pollRound();}},100);
 }
@@ -312,12 +317,7 @@ function startSpinning(round){
   const pendingBets=myBets.slice();
   if(elapsedServer>=totalDur){rotation=targetRotation;ballState='settled';animating=false;render();showResultClientSide(round,winningNumber,pendingBets);return;}
   animating=true;const skip=Math.max(0,elapsedServer);spinStart=performance.now()-skip;cancelAnimationFrame(raf);
-  const frame=(now)=>{
-    const el=Math.max(0,now-spinStart);const wEl=Math.max(0,el-BALL_LAUNCH_MS);const raw=clamp01(wEl/spinDuration);rotation=fromRotation+(targetRotation-fromRotation)*rouletteProgress(raw);
-    render(now);
-    if(el<totalDur){raf=requestAnimationFrame(frame);}
-    else{rotation=targetRotation;animating=false;ballState='settled';render();showResultClientSide(round,winningNumber,pendingBets);setTimeout(pollRound,1000);}
-  };raf=requestAnimationFrame(frame);
+  const frame=(now)=>{const el=Math.max(0,now-spinStart);const wEl=Math.max(0,el-BALL_LAUNCH_MS);const raw=clamp01(wEl/spinDuration);rotation=fromRotation+(targetRotation-fromRotation)*rouletteProgress(raw);render(now);if(el<totalDur){raf=requestAnimationFrame(frame);}else{rotation=targetRotation;animating=false;ballState='settled';render();showResultClientSide(round,winningNumber,pendingBets);setTimeout(pollRound,1000);}};raf=requestAnimationFrame(frame);
 }
 async function showResult(round){
   if(completedRoundId===round.id)return;completedRoundId=round.id;roundPhase='result';ballState='settled';
@@ -357,7 +357,7 @@ async function initOnline(){
 }
 image.onload=()=>{buildBG();render();};image.src=IMAGE_URL;
 (async function boot(){if(await initUser()){await initOnline();await refreshBalance();await pollRound();setInterval(pollRound,1000);}})();
-if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=3.4',{scope:'./'}).then(reg=>{console.log('SW v3.3 registered:',reg.scope);reg.addEventListener('updatefound',()=>{const nw=reg.installing;nw?.addEventListener('statechange',()=>{if(nw.state==='installed'&&navigator.serviceWorker.controller){console.log('New SW available');}});});}).catch(err=>console.warn('SW failed:',err));});}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=3.5',{scope:'./'}).then(reg=>{console.log('SW v3.3:',reg.scope);}).catch(err=>console.warn('SW:',err));});}
 })();
 </script>
 </body>
