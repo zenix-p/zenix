@@ -32,8 +32,6 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
 @media(min-width:942px){.game{width:min(941px,calc(100vh * 941 / 1671))}}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:99999;padding:12px 20px;border-radius:12px;background:rgba(220,60,60,.95);color:#fff;font-family:Tahoma,sans-serif;font-size:14px;font-weight:700;box-shadow:0 8px 30px rgba(0,0,0,.5);opacity:0;transition:opacity .3s;pointer-events:none;max-width:90vw;text-align:center}
 .toast.show{opacity:1}.toast.ok{background:rgba(60,180,100,.95)}
-
-/* ===== Result Modal (redesigned) ===== */
 .result-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;font-family:Tahoma,Arial,sans-serif;color:#f8f4e9}
 .result-modal[hidden]{display:none!important}
 .result-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
@@ -77,16 +75,8 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
     <section class="result-card">
       <button class="result-close" id="resultClose" type="button" aria-label="بستن">×</button>
       <h2 class="result-title">نتیجهٔ رولت</h2>
-      <div class="result-hero">
-        <div id="resultNumber" class="result-number green">0</div>
-        <div id="resultColorLabel" class="result-color-label">سبز</div>
-      </div>
-      <div class="result-tags">
-        <span class="rtag" id="resultParity">—</span>
-        <span class="rtag" id="resultRange">—</span>
-        <span class="rtag" id="resultDozen">—</span>
-        <span class="rtag" id="resultColumn">—</span>
-      </div>
+      <div class="result-hero"><div id="resultNumber" class="result-number green">0</div><div id="resultColorLabel" class="result-color-label">سبز</div></div>
+      <div class="result-tags"><span class="rtag" id="resultParity">—</span><span class="rtag" id="resultRange">—</span><span class="rtag" id="resultDozen">—</span><span class="rtag" id="resultColumn">—</span></div>
       <div class="result-money">
         <div class="money-item"><div class="money-value" id="userResultStake">0</div><div class="money-label">شرط</div></div>
         <div class="money-item"><div class="money-value" id="userResultPayout">0</div><div class="money-label">بازگشت</div></div>
@@ -94,10 +84,7 @@ canvas.scene-overlay{position:absolute;inset:0;z-index:2;width:100%;height:100%;
         <div class="money-item"><div class="money-value" id="userResultBalance">0</div><div class="money-label">موجودی</div></div>
       </div>
       <p class="result-zero-note" id="resultZeroNote" hidden>صفر در هیچ‌کدام از دسته‌ها نیست.</p>
-      <div class="result-timer">
-        <div class="result-timer-copy">دور بعدی در <strong id="resultSeconds">15</strong> ثانیه</div>
-        <div class="result-timer-track"><span id="resultTimerFill"></span></div>
-      </div>
+      <div class="result-timer"><div class="result-timer-copy">دور بعدی در <strong id="resultSeconds">15</strong> ثانیه</div><div class="result-timer-track"><span id="resultTimerFill"></span></div></div>
       <button class="result-continue" id="resultContinue" type="button">ادامهٔ بازی</button>
     </section>
   </div>
@@ -300,10 +287,41 @@ function showResultClientSide(round,wn,pendingBets){
   trySettle(round.id).then(ok=>{if(ok)setTimeout(refreshBalance,300);});
 }
 function applyRound(round){if(!round||!round.id)return;const key=round.id+':'+round.status;if(key===lastRoundKey)return;lastRoundKey=key;currentRound=round;if(round.status==='betting')startBetting(round);else if(round.status==='spinning')startSpinning(round);else if(round.status==='result')showResult(round);}
+
+/* ===== startBetting: چرخش فقط اگر شرطی وجود داشته باشد ===== */
 function startBetting(round){
-  roundPhase='betting';ballState='held';animating=false;cancelAnimationFrame(raf);refreshMyBets().then(()=>{betDirty=true;render();});updateHeaderClock(new Date(round.betting_ends_at).getTime()-Date.now());
+  roundPhase='betting';
+  ballState='held';
+  animating=false;
+  cancelAnimationFrame(raf);
+  render();
+  refreshMyBets().then(()=>{betDirty=true;render();});
+  updateHeaderClock(new Date(round.betting_ends_at).getTime()-Date.now());
   if(bettingTickInterval)clearInterval(bettingTickInterval);
-  bettingTickInterval=setInterval(async()=>{const ends=new Date(round.betting_ends_at).getTime();const rem=Math.max(0,ends-Date.now());updateHeaderClock(rem);if(rem<=0){clearInterval(bettingTickInterval);bettingTickInterval=null;try{await supabaseClient.rpc('spin_round',{p_round_id:round.id});}catch(e){}pollRound();}},100);
+  bettingTickInterval=setInterval(async()=>{
+    const ends=new Date(round.betting_ends_at).getTime();
+    const rem=Math.max(0,ends-Date.now());
+    updateHeaderClock(rem);
+    if(rem<=0){
+      clearInterval(bettingTickInterval);
+      bettingTickInterval=null;
+      // ۱) تلاش برای لغو راند (اتمیک — فقط اگر هیچ شرطی نباشد)
+      let cancelled=false;
+      try{
+        const {data}=await supabaseClient.rpc('cancel_round',{p_round_id:round.id});
+        cancelled=data===true;
+      }catch(e){console.warn('cancel check:',e);}
+      if(cancelled){
+        // هیچ شرطی نبود — چرخ نمی‌چرخد
+        lastRoundKey='';
+        setTimeout(pollRound,300);
+        return;
+      }
+      // ۲) شرط وجود دارد — چرخ بچرخد
+      try{await supabaseClient.rpc('spin_round',{p_round_id:round.id});}catch(e){}
+      pollRound();
+    }
+  },100);
 }
 function updateHeaderClock(remainMs){const secs=Math.ceil(Math.max(0,remainMs)/1000);headerSecondsEl.textContent=String(secs);headerLabelEl.innerHTML=roundPhase==='betting'?'ثانیه<br>شرط‌بندی':roundPhase==='spinning'?'چرخش<br>درجریان':roundPhase==='result'?'نتیجه':'آماده‌سازی';headerClockEl.dataset.phase=roundPhase;}
 function startSpinning(round){
@@ -357,7 +375,7 @@ async function initOnline(){
 }
 image.onload=()=>{buildBG();render();};image.src=IMAGE_URL;
 (async function boot(){if(await initUser()){await initOnline();await refreshBalance();await pollRound();setInterval(pollRound,1000);}})();
-if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=3.5',{scope:'./'}).then(reg=>{console.log('SW v3.3:',reg.scope);}).catch(err=>console.warn('SW:',err));});}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=3.6',{scope:'./'}).then(reg=>{console.log('SW v3.3:',reg.scope);}).catch(err=>console.warn('SW:',err));});}
 })();
 </script>
 </body>
