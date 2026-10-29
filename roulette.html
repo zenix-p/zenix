@@ -374,7 +374,7 @@ const SUPABASE_ANON_KEY='sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
 const PLATFORM_URL='https://zenix-p.github.io/zenix/';
 const IMAGE_URL='https://i.8upload.com/image/9b64ac57dad0748d/roulette-dealer-original-quality.jpg';
 const CHIP_TRAY=[{value:1,x:66},{value:5,x:137},{value:25,x:208},{value:100,x:279},{value:500,x:351}];
-const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{autoRefreshToken:true,persistSession:true,detectSessionInUrl:true},realtime:{params:{eventsPerSecond:10}}});
+const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{autoRefreshToken:true,persistSession:true,detectSessionInUrl:false,flowType:'pkce'},realtime:{params:{eventsPerSecond:10}}});
 let userId=null,balance=0,myBets=[],currentRound=null,lastRoundKey='',myChannel=null,completedRoundId=null;
 let betFlashUntil=0,betFlashTimeout=null;
 const $=id=>document.getElementById(id);
@@ -535,7 +535,13 @@ async function placeBet(target){
 }
 async function undoBet(){if(roundPhase!=='betting'||!currentRound)return;try{const {data,error}=await supabaseClient.rpc('undo_last_bet',{p_round_id:currentRound.id});if(error)throw error;balance=Number(data);await refreshMyBets();betDirty=true;flashBetPanel();playClick();}catch(err){showToast('خطا: '+(err?.message||err));}}
 async function refreshMyBets(){if(!currentRound){myBets=[];return;}const {data}=await supabaseClient.from('bets').select('*').eq('round_id',currentRound.id).eq('user_id',userId).eq('settled',false);myBets=data||[];}
-async function refreshBalance(){const {data,error}=await supabaseClient.from('profiles').select('balance').eq('id',userId).single();if(error){console.error(error);return;}if(data)balance=data.balance;betDirty=true;render();}
+async function refreshBalance(){
+  if(!userId)return;
+  const {data,error}=await supabaseClient.from('profiles').select('balance').eq('id',userId).single();
+  if(error){console.warn('refreshBalance failed:',error.message);return;}
+  if(data&&Number.isFinite(Number(data.balance)))balance=Number(data.balance);
+  betDirty=true;render();
+}
 function computePayout(bet,wn){
   if(bet.bet_type==='straight')return +bet.bet_value===wn?bet.amount*36:0;
   if(wn===0)return 0;
@@ -635,24 +641,76 @@ canvas.addEventListener('click',e=>{
 });
 canvas.addEventListener('pointermove',e=>{const r=canvas.getBoundingClientRect();const x=(e.clientX-r.left)*W/r.width,y=(e.clientY-r.top)*H/r.height;canvas.style.cursor=(pickChip(x,y)||findTarget(x,y))?'pointer':'default';});
 resultClose.addEventListener('click',closeResultModal);resultContinue.addEventListener('click',closeResultModal);resultModal.addEventListener('click',e=>{if(e.target.classList.contains('result-backdrop'))closeResultModal();});
+
+/* ============ Auth & Session (Stage 1) ============ */
+let initUserDone=false;
 async function initUser(){
-  const hp=new URLSearchParams(window.location.hash.substring(1));const at=hp.get('access_token'),rt=hp.get('refresh_token');
-  if(at&&rt){try{await supabaseClient.auth.setSession({access_token:at,refresh_token:rt});window.history.replaceState(null,'',window.location.pathname+window.location.search);}catch(e){}}
-  const {data:{session}}=await supabaseClient.auth.getSession();
-  if(!session){window.location.href=PLATFORM_URL;return false;}
-  userId=session.user.id;return true;
+  if(initUserDone)return !!userId;
+  initUserDone=true;
+
+  // 1) خواندن و پاک‌سازی فوری hash قبل از هر await
+  const hp=new URLSearchParams(window.location.hash.substring(1));
+  const at=hp.get('access_token'),rt=hp.get('refresh_token');
+  if(at||rt){
+    window.history.replaceState(null,'',window.location.pathname+window.location.search);
+  }
+
+  // 2) ست کردن session
+  if(at&&rt){
+    const {error}=await supabaseClient.auth.setSession({access_token:at,refresh_token:rt});
+    if(error){
+      console.warn('setSession failed:',error.message);
+      window.location.replace(PLATFORM_URL);
+      return false;
+    }
+  }
+
+  // 3) خواندن session جاری
+  const {data:{session},error:getErr}=await supabaseClient.auth.getSession();
+  if(getErr||!session){
+    window.location.replace(PLATFORM_URL);
+    return false;
+  }
+
+  // 4) بررسی انقضا (با ۶۰ ثانیه حاشیه)
+  const expMs=(session.expires_at||0)*1000;
+  if(expMs&&expMs<Date.now()-60000){
+    try{await supabaseClient.auth.signOut();}catch(_){}
+    window.location.replace(PLATFORM_URL);
+    return false;
+  }
+
+  // 5) ثبت userId
+  userId=session.user.id;
+  if(!userId){
+    window.location.replace(PLATFORM_URL);
+    return false;
+  }
+
+  // 6) logout فوری از هر جای دیگر
+  supabaseClient.auth.onAuthStateChange((evt,s)=>{
+    if(evt==='SIGNED_OUT'||!s)window.location.replace(PLATFORM_URL);
+  });
+
+  return true;
 }
+
 async function initOnline(){
   try{myChannel=supabaseClient.channel('roulette-online',{config:{presence:{key:userId}}});
     const upd=()=>{try{const st=myChannel.presenceState()||{};const n=Object.keys(st).length;onlineCountEl.textContent=String(Math.max(1,n));onlinePill.classList.remove('offline');}catch(e){}};
     myChannel.on('presence',{event:'sync'},upd).on('presence',{event:'join'},upd).on('presence',{event:'leave'},upd).subscribe(async st=>{if(st==='SUBSCRIBED'){await myChannel.track({user_id:userId,online_at:new Date().toISOString()});upd();}});
     window.addEventListener('beforeunload',()=>{try{myChannel&&myChannel.untrack();}catch(e){}});
-    supabaseClient.auth.onAuthStateChange((ev,s)=>{if(ev==='SIGNED_OUT'||!s){window.location.href=PLATFORM_URL;}});
   }catch(e){onlinePill.classList.add('offline');}
 }
 image.onload=()=>{buildBG();render();};image.src=IMAGE_URL;
-(async function boot(){if(await initUser()){await initOnline();await refreshBalance();await pollRound();setInterval(pollRound,1000);}})();
-if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=4.1',{scope:'./'}).then(reg=>{console.log('SW v3.3:',reg.scope);}).catch(err=>console.warn('SW:',err));});}
+(async function boot(){
+  const ok=await initUser();
+  if(!ok||!userId)return;
+  await initOnline();
+  await Promise.allSettled([refreshBalance(),pollRound()]);
+  setInterval(()=>{if(userId)pollRound();},1000);
+})();
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js?v=4.2',{scope:'./'}).then(reg=>{console.log('SW v3.3:',reg.scope);}).catch(err=>console.warn('SW:',err));});}
 })();
 </script>
 </body>
