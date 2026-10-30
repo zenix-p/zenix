@@ -1,13 +1,12 @@
 // ==========================================
-// Zenix Service Worker
+// Zenix Service Worker — نسخه‌ی Aggressive Update
+// نسخه: zenix-v4.4
 // استراتژی:
-//   - HTML (navigate): Network-First → همیشه آخرین نسخه‌ی صفحه‌ها
-//   - JS اصلی داشبورد: Network-First → تضمین اجرای آخرین نسخه
-//   - Assets (JS/CSS/تصاویر): Cache-First → سرعت بالا
-// نسخه: zenix-v4.3
+//   - HTML و dashboard.js و sw.js: Network-First + no-store
+//   - بقیه assets: Stale-While-Revalidate
 // ==========================================
 
-const CACHE_VERSION = 'zenix-v4.3';
+const CACHE_VERSION = 'zenix-v4.4';
 const STATIC_CACHE  = CACHE_VERSION + '-static';
 const HTML_CACHE    = CACHE_VERSION + '-html';
 
@@ -17,7 +16,7 @@ const PRECACHE_URLS = [
     './dashboard.html'
 ];
 
-// ── INSTALL ──
+// ── INSTALL: skipWaiting فوری ──
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(STATIC_CACHE)
@@ -26,20 +25,20 @@ self.addEventListener('install', (event) => {
     );
 });
 
-// ── ACTIVATE: پاک‌سازی کش‌های نسخه‌های قدیمی ──
+// ── ACTIVATE: پاک‌سازی کامل کش‌های قدیمی + claim فوری ──
 self.addEventListener('activate', (event) => {
     event.waitUntil(
-        caches.keys().then((keys) =>
-            Promise.all(
+        caches.keys()
+            .then((keys) => Promise.all(
                 keys
                     .filter((k) => k.indexOf(CACHE_VERSION) !== 0)
                     .map((k) => caches.delete(k))
-            )
-        ).then(() => self.clients.claim())
+            ))
+            .then(() => self.clients.claim())
     );
 });
 
-// ── پیام skipWaiting از سمت کلاینت (اختیاری) ──
+// ── پیام skipWaiting از سمت کلاینت ──
 self.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'SKIP_WAITING') {
         self.skipWaiting();
@@ -49,19 +48,18 @@ self.addEventListener('message', (event) => {
 // ── FETCH ──
 self.addEventListener('fetch', (event) => {
     const req = event.request;
-
-    // فقط GET و فقط هم‌مبدأ (same-origin)
     if (req.method !== 'GET') return;
+
     const url = new URL(req.url);
     if (url.origin !== self.location.origin) return;
 
     const accept = req.headers.get('accept') || '';
     const isHTML = req.mode === 'navigate' || accept.indexOf('text/html') !== -1;
 
-    // ── HTML: Network-First (همیشه آخرین نسخه) ──
+    // ★★ HTML: همیشه از شبکه، بدون HTTP Cache ★★
     if (isHTML) {
         event.respondWith(
-            fetch(req)
+            fetch(req, { cache: 'no-store' })
                 .then((res) => {
                     const copy = res.clone();
                     caches.open(HTML_CACHE).then((c) => c.put(req, copy));
@@ -76,10 +74,14 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // ── JS اصلی داشبورد: Network-First برای تضمین اجرای آخرین نسخه ──
-    if (url.pathname.endsWith('/dashboard.js')) {
+    // ★★ فایل‌های حیاتی: Network-First + no-store ★★
+    const isCriticalJS =
+        url.pathname.endsWith('/dashboard.js') ||
+        url.pathname.endsWith('/dashboard.html');
+
+    if (isCriticalJS) {
         event.respondWith(
-            fetch(req)
+            fetch(req, { cache: 'no-store' })
                 .then((res) => {
                     if (res && res.ok && res.status === 200) {
                         const copy = res.clone();
@@ -92,17 +94,19 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // ── بقیه assets: Cache-First ──
+    // ── بقیه assets: Stale-While-Revalidate ──
     event.respondWith(
         caches.match(req).then((cached) => {
-            if (cached) return cached;
-            return fetch(req).then((res) => {
-                if (res && res.ok && res.status === 200) {
-                    const copy = res.clone();
-                    caches.open(STATIC_CACHE).then((c) => c.put(req, copy));
-                }
-                return res;
-            }).catch(() => cached);
+            const networkFetch = fetch(req)
+                .then((res) => {
+                    if (res && res.ok && res.status === 200) {
+                        const copy = res.clone();
+                        caches.open(STATIC_CACHE).then((c) => c.put(req, copy));
+                    }
+                    return res;
+                })
+                .catch(() => cached);
+            return cached || networkFetch;
         })
     );
 });
