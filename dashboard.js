@@ -1161,3 +1161,22 @@ document.getElementById('logout-btn')?.addEventListener('click', async e => {
     try { await supabaseClient.auth.signOut(); } catch(e) {}
     window.location.href = 'index.html';
 });
+// ==========================================
+// اعمال فوری SW جدید (در صورت وجود)
+// ==========================================
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistration().then(reg => {
+        if (reg && reg.waiting) {
+            reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        }
+        // هر ۶۰ ثانیه بررسی آپدیت
+        setInterval(() => reg && reg.update().catch(() => {}), 60000);
+    });
+
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+    });
+}
