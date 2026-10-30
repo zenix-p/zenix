@@ -2,6 +2,7 @@
 // Zenix Service Worker
 // استراتژی:
 //   - HTML (navigate): Network-First → همیشه آخرین نسخه‌ی صفحه‌ها
+//   - JS اصلی داشبورد: Network-First → تضمین اجرای آخرین نسخه
 //   - Assets (JS/CSS/تصاویر): Cache-First → سرعت بالا
 // نسخه: zenix-v4.3
 // ==========================================
@@ -76,7 +77,6 @@ self.addEventListener('fetch', (event) => {
     }
 
     // ── JS اصلی داشبورد: Network-First برای تضمین اجرای آخرین نسخه ──
-    // (فقط فایل اصلی dashboard.js — بقیه assets همچنان Cache-First)
     if (url.pathname.endsWith('/dashboard.js')) {
         event.respondWith(
             fetch(req)
