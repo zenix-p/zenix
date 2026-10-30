@@ -136,7 +136,7 @@ window.closeCasinoModal = function() {
     unlockBody();
 };
 
-// ═══ NEW: کیف پول کازینو — مودال مستقل ═══
+// ═══ کیف پول کازینو — مودال مستقل ═══
 window.openCasinoWalletModal = function() {
     document.getElementById('m-casino-wallet-modal')?.classList.add('show');
     lockBody();
@@ -175,7 +175,6 @@ window.toggleCasinoWalletGames = function() {
         if (hint) hint.style.display = 'none';
     }
 };
-// ═══ END NEW ═══
 
 window.toggleHelpAccordion = function(btn) {
     const item = btn.closest('.help-accordion');
@@ -507,8 +506,24 @@ const ld = {
         convertBtn: 'تبدیل',
         casinoWalletModalTitle: 'کیف پول کازینو',
         casinoWalletSub: 'تبدیل تتر به ژتون بازی',
-        casinoUsdtLabel: 'موجودی تتر',
-        openWalletBtn: 'ورود به کیف پول کازینو'
+        casinoUsdtLabel: 'موجودی تتر کازینو',
+        openWalletBtn: 'ورود به کیف پول کازینو',
+        casinoChargeLabel: 'شارژ کیف پول کازینو',
+        casinoChargeBtn: 'شارژ',
+        tradeBtn: 'تبدیل',
+        buyLabel: 'خرید ژتون با تتر',
+        sellLabel: 'فروش ژتون و دریافت تتر',
+        sellBtn: 'فروش',
+        orText: 'یا',
+        casinoRateText: 'نرخ: ۱ تتر = ۱۰ ژتون (خرید و فروش)',
+        casinoChargeSuccess: 'کیف پول کازینو شارژ شد!',
+        casinoChargeInvalid: 'مبلغ نامعتبر است (حداقل ۱ تتر).',
+        casinoBuySuccess: 'ژتون به بازی اضافه شد!',
+        casinoBuyInvalid: 'مقدار نامعتبر (حداقل ۱ تتر).',
+        casinoBuyInsufficient: 'موجودی تتر کازینو کافی نیست.',
+        casinoSellSuccess: 'ژتون فروخته شد و تتر به موجودی اضافه گردید!',
+        casinoSellInvalid: 'تعداد ژتون نامعتبر (حداقل ۱۰ ژتون).',
+        casinoSellInsufficient: 'ژتون کافی در این بازی ندارید.'
     },
     en: {
         m1: 'Home', m2: 'Quantification', m3: 'Deposit', m4: 'Withdraw', m_team: 'My Team', m5: 'Transactions', m6: 'Profile', m7: 'Support', m_about: 'About Platform', m8: 'Logout',
@@ -561,8 +576,24 @@ const ld = {
         convertBtn: 'Convert',
         casinoWalletModalTitle: 'Casino Wallet',
         casinoWalletSub: 'Convert USDT to game chips',
-        casinoUsdtLabel: 'USDT Balance',
-        openWalletBtn: 'Open Casino Wallet'
+        casinoUsdtLabel: 'Casino USDT Balance',
+        openWalletBtn: 'Open Casino Wallet',
+        casinoChargeLabel: 'Charge Casino Wallet',
+        casinoChargeBtn: 'Charge',
+        tradeBtn: 'Trade',
+        buyLabel: 'Buy Chips with USDT',
+        sellLabel: 'Sell Chips for USDT',
+        sellBtn: 'Sell',
+        orText: 'or',
+        casinoRateText: 'Rate: 1 USDT = 10 chips (buy & sell)',
+        casinoChargeSuccess: 'Casino wallet charged!',
+        casinoChargeInvalid: 'Invalid amount (minimum 1 USDT).',
+        casinoBuySuccess: 'Chips added to game!',
+        casinoBuyInvalid: 'Invalid amount (minimum 1 USDT).',
+        casinoBuyInsufficient: 'Insufficient casino USDT balance.',
+        casinoSellSuccess: 'Chips sold and USDT added to balance!',
+        casinoSellInvalid: 'Invalid chip amount (minimum 10 chips).',
+        casinoSellInsufficient: 'Not enough chips in this game.'
     },
     ar: {
         m1: 'الرئيسية', m2: 'التكميم', m3: 'إيداع', m4: 'سحب', m_team: 'فريقي', m5: 'المعاملات', m6: 'الملف الشخصي', m7: 'الدعم', m_about: 'حول المنصة', m8: 'تسجيل الخروج',
@@ -615,8 +646,24 @@ const ld = {
         convertBtn: 'تحويل',
         casinoWalletModalTitle: 'محفظة الكازينو',
         casinoWalletSub: 'تحويل USDT إلى شرائح اللعب',
-        casinoUsdtLabel: 'رصيد USDT',
-        openWalletBtn: 'فتح محفظة الكازينو'
+        casinoUsdtLabel: 'رصيد USDT الكازينو',
+        openWalletBtn: 'فتح محفظة الكازينو',
+        casinoChargeLabel: 'شحن محفظة الكازينو',
+        casinoChargeBtn: 'شحن',
+        tradeBtn: 'تبديل',
+        buyLabel: 'شراء شرائح بـ USDT',
+        sellLabel: 'بيع الشرائح واستلام USDT',
+        sellBtn: 'بيع',
+        orText: 'أو',
+        casinoRateText: 'السعر: 1 USDT = 10 شرائح (شراء وبيع)',
+        casinoChargeSuccess: 'تم شحن محفظة الكازينو!',
+        casinoChargeInvalid: 'المبلغ غير صالح (الحد الأدنى 1 USDT).',
+        casinoBuySuccess: 'تمت إضافة الشرائح للعبة!',
+        casinoBuyInvalid: 'المبلغ غير صالح (الحد الأدنى 1 USDT).',
+        casinoBuyInsufficient: 'رصيد USDT الكازينو غير كافٍ.',
+        casinoSellSuccess: 'تم بيع الشرائح وإضافة USDT للرصيد!',
+        casinoSellInvalid: 'عدد الشرائح غير صالح (الحد الأدنى 10).',
+        casinoSellInsufficient: 'لا تملك شرائح كافية في هذه اللعبة.'
     },
     tr: {
         m1: 'Ana Sayfa', m2: 'Kuantifikasyon', m3: 'Yatırım', m4: 'Çekim', m_team: 'Ekibim', m5: 'İşlemler', m6: 'Profil', m7: 'Destek', m_about: 'Platform Hakkında', m8: 'Çıkış',
@@ -669,8 +716,24 @@ const ld = {
         convertBtn: 'Dönüştür',
         casinoWalletModalTitle: 'Casino Cüzdanı',
         casinoWalletSub: 'USDT\'yi oyun jetonlarına dönüştür',
-        casinoUsdtLabel: 'USDT Bakiyesi',
-        openWalletBtn: 'Casino Cüzdanını Aç'
+        casinoUsdtLabel: 'Casino USDT Bakiyesi',
+        openWalletBtn: 'Casino Cüzdanını Aç',
+        casinoChargeLabel: 'Casino Cüzdanını Yükle',
+        casinoChargeBtn: 'Yükle',
+        tradeBtn: 'İşlem',
+        buyLabel: 'USDT ile Jeton Al',
+        sellLabel: 'Jeton Sat ve USDT Al',
+        sellBtn: 'Sat',
+        orText: 'veya',
+        casinoRateText: 'Kur: 1 USDT = 10 jeton (al & sat)',
+        casinoChargeSuccess: 'Casino cüzdanı yüklendi!',
+        casinoChargeInvalid: 'Geçersiz miktar (min 1 USDT).',
+        casinoBuySuccess: 'Jetoun oyuna eklendi!',
+        casinoBuyInvalid: 'Geçersiz miktar (min 1 USDT).',
+        casinoBuyInsufficient: 'Casino USDT bakiyesi yetersiz.',
+        casinoSellSuccess: 'Jeton satıldı ve USDT bakiyeye eklendi!',
+        casinoSellInvalid: 'Geçersiz jeton sayısı (min 10).',
+        casinoSellInsufficient: 'Bu oyunda yeterli jeton yok.'
     },
     ru: {
         m1: 'Главная', m2: 'Квантификация', m3: 'Депозит', m4: 'Вывод', m_team: 'Команда', m5: 'Транзакции', m6: 'Профиль', m7: 'Поддержка', m_about: 'О платформе', m8: 'Выход',
@@ -723,8 +786,24 @@ const ld = {
         convertBtn: 'Обмен',
         casinoWalletModalTitle: 'Кошелек казино',
         casinoWalletSub: 'Обмен USDT на игровые фишки',
-        casinoUsdtLabel: 'Баланс USDT',
-        openWalletBtn: 'Открыть кошелек казино'
+        casinoUsdtLabel: 'Баланс USDT казино',
+        openWalletBtn: 'Открыть кошелек казино',
+        casinoChargeLabel: 'Пополнить кошелек казино',
+        casinoChargeBtn: 'Пополнить',
+        tradeBtn: 'Обмен',
+        buyLabel: 'Купить фишки за USDT',
+        sellLabel: 'Продать фишки за USDT',
+        sellBtn: 'Продать',
+        orText: 'или',
+        casinoRateText: 'Курс: 1 USDT = 10 фишек (покупка и продажа)',
+        casinoChargeSuccess: 'Кошелек казино пополнен!',
+        casinoChargeInvalid: 'Неверная сумма (минимум 1 USDT).',
+        casinoBuySuccess: 'Фишки добавлены в игру!',
+        casinoBuyInvalid: 'Неверная сумма (минимум 1 USDT).',
+        casinoBuyInsufficient: 'Недостаточно USDT в кошельке казино.',
+        casinoSellSuccess: 'Фишки проданы, USDT добавлен на баланс!',
+        casinoSellInvalid: 'Неверное количество фишек (минимум 10).',
+        casinoSellInsufficient: 'Недостаточно фишек в этой игре.'
     },
     es: {
         m1: 'Inicio', m2: 'Cuantificación', m3: 'Depósito', m4: 'Retiro', m_team: 'Equipo', m5: 'Transacciones', m6: 'Perfil', m7: 'Soporte', m_about: 'Sobre la plataforma', m8: 'Cerrar sesión',
@@ -777,8 +856,24 @@ const ld = {
         convertBtn: 'Convertir',
         casinoWalletModalTitle: 'Monedero Casino',
         casinoWalletSub: 'Convierte USDT en fichas de juego',
-        casinoUsdtLabel: 'Saldo USDT',
-        openWalletBtn: 'Abrir Monedero Casino'
+        casinoUsdtLabel: 'Saldo USDT Casino',
+        openWalletBtn: 'Abrir Monedero Casino',
+        casinoChargeLabel: 'Cargar Monedero Casino',
+        casinoChargeBtn: 'Cargar',
+        tradeBtn: 'Cambiar',
+        buyLabel: 'Comprar fichas con USDT',
+        sellLabel: 'Vender fichas por USDT',
+        sellBtn: 'Vender',
+        orText: 'o',
+        casinoRateText: 'Tasa: 1 USDT = 10 fichas (compra y venta)',
+        casinoChargeSuccess: '¡Monedero casino cargado!',
+        casinoChargeInvalid: 'Cantidad inválida (mínimo 1 USDT).',
+        casinoBuySuccess: '¡Fichas añadidas al juego!',
+        casinoBuyInvalid: 'Cantidad inválida (mínimo 1 USDT).',
+        casinoBuyInsufficient: 'Saldo USDT casino insuficiente.',
+        casinoSellSuccess: '¡Fichas vendidas y USDT añadido al saldo!',
+        casinoSellInvalid: 'Cantidad de fichas inválida (mínimo 10).',
+        casinoSellInsufficient: 'No tienes suficientes fichas en este juego.'
     },
     fr: {
         m1: 'Accueil', m2: 'Quantification', m3: 'Dépôt', m4: 'Retrait', m_team: 'Équipe', m5: 'Transactions', m6: 'Profil', m7: 'Support', m_about: 'À propos', m8: 'Déconnexion',
@@ -831,8 +926,24 @@ const ld = {
         convertBtn: 'Convertir',
         casinoWalletModalTitle: 'Portefeuille Casino',
         casinoWalletSub: 'Convertir USDT en jetons de jeu',
-        casinoUsdtLabel: 'Solde USDT',
-        openWalletBtn: 'Ouvrir le portefeuille Casino'
+        casinoUsdtLabel: 'Solde USDT Casino',
+        openWalletBtn: 'Ouvrir le portefeuille Casino',
+        casinoChargeLabel: 'Recharger le portefeuille Casino',
+        casinoChargeBtn: 'Recharger',
+        tradeBtn: 'Échanger',
+        buyLabel: 'Acheter jetons avec USDT',
+        sellLabel: 'Vendre jetons pour USDT',
+        sellBtn: 'Vendre',
+        orText: 'ou',
+        casinoRateText: 'Taux : 1 USDT = 10 jetons (achat et vente)',
+        casinoChargeSuccess: 'Portefeuille casino rechargé !',
+        casinoChargeInvalid: 'Montant invalide (min 1 USDT).',
+        casinoBuySuccess: 'Jetons ajoutés au jeu !',
+        casinoBuyInvalid: 'Montant invalide (min 1 USDT).',
+        casinoBuyInsufficient: 'Solde USDT casino insuffisant.',
+        casinoSellSuccess: 'Jetons vendus, USDT ajouté au solde !',
+        casinoSellInvalid: 'Nombre de jetons invalide (min 10).',
+        casinoSellInsufficient: 'Pas assez de jetons dans ce jeu.'
     },
     de: {
         m1: 'Startseite', m2: 'Quantifizierung', m3: 'Einzahlung', m4: 'Auszahlung', m_team: 'Team', m5: 'Transaktionen', m6: 'Profil', m7: 'Unterstützung', m_about: 'Über die Plattform', m8: 'Abmelden',
@@ -885,13 +996,29 @@ const ld = {
         convertBtn: 'Umtauschen',
         casinoWalletModalTitle: 'Casino-Wallet',
         casinoWalletSub: 'USDT in Spiel-Chips umwandeln',
-        casinoUsdtLabel: 'USDT-Guthaben',
-        openWalletBtn: 'Casino-Wallet öffnen'
+        casinoUsdtLabel: 'Casino USDT-Guthaben',
+        openWalletBtn: 'Casino-Wallet öffnen',
+        casinoChargeLabel: 'Casino-Wallet aufladen',
+        casinoChargeBtn: 'Aufladen',
+        tradeBtn: 'Tauschen',
+        buyLabel: 'Chips mit USDT kaufen',
+        sellLabel: 'Chips für USDT verkaufen',
+        sellBtn: 'Verkaufen',
+        orText: 'oder',
+        casinoRateText: 'Kurs: 1 USDT = 10 Chips (Kauf & Verkauf)',
+        casinoChargeSuccess: 'Casino-Wallet aufgeladen!',
+        casinoChargeInvalid: 'Ungültiger Betrag (min. 1 USDT).',
+        casinoBuySuccess: 'Chips zum Spiel hinzugefügt!',
+        casinoBuyInvalid: 'Ungültiger Betrag (min. 1 USDT).',
+        casinoBuyInsufficient: 'Nicht genügend USDT im Casino-Wallet.',
+        casinoSellSuccess: 'Chips verkauft und USDT zum Guthaben hinzugefügt!',
+        casinoSellInvalid: 'Ungültige Chip-Anzahl (min. 10).',
+        casinoSellInsufficient: 'Nicht genug Chips in diesem Spiel.'
     }
 };
 
 // ==========================================
-// ★ تابع setLang — با پشتیبانی از کلیدهای کیف پول کازینو
+// ★ تابع setLang — با پشتیبانی از کلیدهای شارژ و تبدیل دوطرفه
 // ==========================================
 function setLang(l) {
     if (!SUPPORTED_LANGUAGES.includes(l)) l = 'en';
@@ -922,7 +1049,6 @@ function setLang(l) {
     let mAbout = document.getElementById('m_about');
     if (mAbout) mAbout.textContent = t.m_about;
 
-    // منوی کیف پول کازینو
     let mCasinoWallet = document.getElementById('m_casino_wallet');
     if (mCasinoWallet) mCasinoWallet.textContent = t.mCasinoWallet || 'کیف پول کازینو';
 
@@ -1006,7 +1132,6 @@ function setLang(l) {
     setTxt('t-tab-admin', t.tabAdmin);
 
     // ═══ کلیدهای کیف پول کازینو ═══
-    // عنوان مودال (با آیکون)
     const walletModalTitle = document.getElementById('t-casino-wallet-modal-title');
     if (walletModalTitle) {
         walletModalTitle.innerHTML = `<i class="fas fa-wallet" style="color:#fbbf24;"></i> ${t.casinoWalletModalTitle || 'کیف پول کازینو'}`;
@@ -1017,11 +1142,25 @@ function setLang(l) {
     setTxt('t-casino-usdt-label', t.casinoUsdtLabel);
     setTxt('t-open-casino-wallet-btn', t.openWalletBtn);
 
+    // شارژ
+    setTxt('t-casino-charge-label', t.casinoChargeLabel);
+    setTxt('t-casino-charge-btn', t.casinoChargeBtn);
+
     setTxt('t-game-roulette', t.casinoPoker);
     setTxt('t-game-plinko', t.casinoPlinko);
 
-    setTxt('t-buy-1', t.buyBtn); setTxt('t-buy-2', t.buyBtn);
-    setTxt('t-convert-1', t.convertBtn); setTxt('t-convert-2', t.convertBtn);
+    // دکمه تبدیل هر بازی
+    setTxt('t-trade-1', t.tradeBtn); setTxt('t-trade-2', t.tradeBtn);
+
+    // برچسب خرید/فروش هر بازی
+    setTxt('t-buy-label-1', t.buyLabel); setTxt('t-buy-label-2', t.buyLabel);
+    setTxt('t-sell-label-1', t.sellLabel); setTxt('t-sell-label-2', t.sellLabel);
+    setTxt('t-buy-btn-1', t.buyBtn); setTxt('t-buy-btn-2', t.buyBtn);
+    setTxt('t-sell-btn-1', t.sellBtn); setTxt('t-sell-btn-2', t.sellBtn);
+    setTxt('t-or-1', t.orText); setTxt('t-or-2', t.orText);
+
+    // نرخ
+    setTxt('casino-rate-text', t.casinoRateText);
 
     // به‌روزرسانی نمایش ژتون‌ها با واحد زبان جدید
     if (typeof updateCasinoWalletDisplay === 'function') {
@@ -1169,7 +1308,7 @@ async function loadDashboardUserData(uid, sessionUser) {
         allMessages = await fetchUserMessages(uid);
         updateNotifBadges();
 
-        // به‌روزرسانی موجودی تتر در کیف پول کازینو پس از دریافت اطلاعات
+        // به‌روزرسانی نمایش کیف پول کازینو (موجودی تتر کازینو + ژتون هر بازی)
         if (typeof updateCasinoWalletDisplay === 'function') {
             updateCasinoWalletDisplay();
         }
@@ -1219,7 +1358,7 @@ function hasStoredAuthToken() {
         currentUserId = session.user.id;
         loadDashboardUserData(session.user.id, session.user);
 
-        // بعد از لود شدن، نمایش موجودی کازینو را به‌روز کن
+        // بعد از لود شدن، نمایش کیف پول کازینو را به‌روز کن
         setTimeout(() => {
             if (typeof updateCasinoWalletDisplay === 'function') {
                 updateCasinoWalletDisplay();
@@ -1304,39 +1443,51 @@ document.getElementById('logout-btn')?.addEventListener('click', async e => {
     window.location.href = 'index.html';
 });
 // ═══════════════════════════════════════════════════════════════
-// 8. CASINO WALLET — سیستم کیف پول کازینو با دو بازی مستقل
-//    (رولت / پلینکو) — هر بازی ژتون جداگانه دارد
+// 8. CASINO WALLET — کیف پول کازینو با موجودی تتر مستقل
+//    - موجودی تتر کازینو جدا از موجودی پلتفرم ذخیره می‌شود
+//    - هر بازی ژتون مستقل دارد
+//    - تبدیل دوطرفه: تتر ↔ ژتون
 // ═══════════════════════════════════════════════════════════════
 
-// کلید localStorage برای هر بازی
+// ─── کلیدهای localStorage ───
+const CASINO_USDT_KEY = 'zenix_casino_usdt_balance';
 function getChipsKey(game) { return 'zenix_casino_chips_' + game; }
 
-// گرفتن موجودی کل USDT از داشبورد (همان عددی که در val-balance نمایش داده می‌شود)
-function getUserUSDTBalance() {
+// ─── خواندن/نوشتن موجودی تتر کازینو (مستقل از پلتفرم) ───
+function getCasinoUSDT() {
+    try {
+        const v = localStorage.getItem(CASINO_USDT_KEY);
+        return parseFloat(v) || 0;
+    } catch(e) { return 0; }
+}
+function setCasinoUSDT(amount) {
+    try { localStorage.setItem(CASINO_USDT_KEY, String(Math.max(0, amount))); } catch(e) {}
+}
+
+// ─── خواندن موجودی USDT پلتفرم (از داشبورد) ───
+function getPlatformUSDT() {
     const el = document.getElementById('val-balance');
     if (!el) return 0;
     const txt = el.textContent.replace(/[^0-9.]/g, '');
     return parseFloat(txt) || 0;
 }
 
-// گرفتن تعداد ژتون یک بازی خاص از localStorage
+// ─── خواندن/نوشتن ژتون هر بازی ───
 function getGameChips(game) {
     try {
         const v = localStorage.getItem(getChipsKey(game));
         return parseFloat(v) || 0;
     } catch(e) { return 0; }
 }
-
-// ذخیره تعداد ژتون یک بازی در localStorage
 function setGameChips(game, chips) {
-    try { localStorage.setItem(getChipsKey(game), String(chips)); } catch(e) {}
+    try { localStorage.setItem(getChipsKey(game), String(Math.max(0, chips))); } catch(e) {}
 }
 
-// به‌روزرسانی نمایش موجودی USDT + ژتون هر دو بازی در کیف پول
+// ─── به‌روزرسانی نمایش کیف پول کازینو ───
 function updateCasinoWalletDisplay() {
-    // موجودی تتر
+    // موجودی تتر کازینو
     const usdtEl = document.getElementById('casino-usdt-balance');
-    if (usdtEl) usdtEl.textContent = '$' + getUserUSDTBalance().toFixed(2);
+    if (usdtEl) usdtEl.textContent = '$' + getCasinoUSDT().toFixed(2);
 
     // واحد ژتون بر اساس زبان فعلی
     const chipUnit = (ld[currLang] && ld[currLang].chipUnit) || 'ژتون';
@@ -1351,7 +1502,7 @@ function updateCasinoWalletDisplay() {
     });
 }
 
-// نمایش Toast (پیام موفقیت یا خطا)
+// ─── نمایش Toast ───
 function casinoToast(msg, isError) {
     const t = document.getElementById('casino-toast');
     if (!t) return;
@@ -1361,7 +1512,7 @@ function casinoToast(msg, isError) {
     window.__casinoToastTimer = setTimeout(function() { t.className = 'casino-toast'; }, 3200);
 }
 
-// باز/بسته کردن پنل خرید هر بازی (فقط یکی در آن واحد باز می‌شود)
+// ─── باز/بسته کردن پنل تبدیل هر بازی ───
 window.selectCasinoGame = function(game) {
     CASINO_GAMES.forEach(function(g) {
         const panel = document.getElementById('buy-panel-' + g);
@@ -1382,78 +1533,202 @@ window.selectCasinoGame = function(game) {
     });
 };
 
-// تبدیل تتر به ژتون برای یک بازی خاص
-window.convertForGame = function(game) {
+// ═══════════════════════════════════════════════════════════════
+// شارژ کیف پول کازینو (از موجودی پلتفرم به کیف پول کازینو)
+// ═══════════════════════════════════════════════════════════════
+window.chargeCasinoWallet = function() {
+    const t = ld[currLang] || ld.en;
+    const input = document.getElementById('casino-charge-amount');
+    if (!input) return;
+
+    const amount = parseFloat(input.value);
+    if (!amount || amount < 1 || isNaN(amount)) {
+        casinoToast(t.casinoChargeInvalid || 'مبلغ نامعتبر است (حداقل ۱ تتر).', true);
+        return;
+    }
+
+    const platformBalance = getPlatformUSDT();
+    if (amount > platformBalance) {
+        casinoToast(
+            (currLang === 'fa'
+                ? 'موجودی پلتفرم کافی نیست. موجودی: $'
+                : 'Insufficient platform balance: $') + platformBalance.toFixed(2),
+            true
+        );
+        return;
+    }
+
+    // ← در صورت نیاز به کسر واقعی از حساب پلتفرم در Supabase، این خط را فعال کنید:
+    // await supabaseClient.from('users').update({ balance: platformBalance - amount }).eq('id', currentUserId);
+
+    // کاهش موجودی پلتفرم (فقط در UI — چون backend نداریم)
+    const valBalance = document.getElementById('val-balance');
+    if (valBalance) valBalance.textContent = '$' + (platformBalance - amount).toFixed(2);
+
+    // افزایش موجودی تتر کازینو
+    setCasinoUSDT(getCasinoUSDT() + amount);
+
+    input.value = '';
+    updateCasinoWalletDisplay();
+
+    const successMsg = (currLang === 'fa'
+        ? 'کیف پول کازینو به مبلغ $' + amount.toFixed(2) + ' شارژ شد!'
+        : 'Casino wallet charged with $' + amount.toFixed(2) + '!');
+    casinoToast(successMsg);
+};
+
+// ═══════════════════════════════════════════════════════════════
+// تبدیل دوطرفه:
+//   - buyChips:  تتر کازینو → ژتون بازی
+//   - sellChips: ژتون بازی   → تتر کازینو
+// ═══════════════════════════════════════════════════════════════
+window.buyChips = function(game) {
+    const t = ld[currLang] || ld.en;
     const input = document.getElementById('convert-amount-' + game);
     if (!input) return;
 
     const amount = parseFloat(input.value);
     const gameNames = { roulette: 'رولت', plinko: 'پلینکو' };
 
-    // اعتبارسنجی مقدار
     if (!amount || amount < 1 || isNaN(amount)) {
-        casinoToast('مقدار وارد شده نامعتبر است (حداقل ۱ تتر).', true);
+        casinoToast(t.casinoBuyInvalid || 'مقدار نامعتبر (حداقل ۱ تتر).', true);
         return;
     }
 
-    // بررسی موجودی کافی
-    const usdtBalance = getUserUSDTBalance();
-    if (amount > usdtBalance) {
-        casinoToast('موجودی تتر کافی نیست. موجودی شما: $' + usdtBalance.toFixed(2), true);
+    const casinoBalance = getCasinoUSDT();
+    if (amount > casinoBalance) {
+        casinoToast(
+            (currLang === 'fa'
+                ? 'موجودی تتر کازینو کافی نیست. موجودی: $'
+                : 'Insufficient casino USDT: $') + casinoBalance.toFixed(2),
+            true
+        );
         return;
     }
 
-    // محاسبه ژتون
     const chipsToAdd = Math.floor(amount * CASINO_CHIPS_RATE);
     if (chipsToAdd <= 0) {
-        casinoToast('مقدار وارد شده برای تبدیل کافی نیست.', true);
+        casinoToast(t.casinoBuyInvalid || 'مقدار نامعتبر.', true);
         return;
     }
 
-    // ← در صورت نیاز به کسر USDT از حساب، این خط را فعال کنید (نیاز به backend):
-    // await supabaseClient.from('users').update({ balance: usdtBalance - amount }).eq('id', currentUserId);
-
-    // افزودن ژتون به بازی مورد نظر
+    // کاهش تتر کازینو + افزودن ژتون به بازی
+    setCasinoUSDT(casinoBalance - amount);
     setGameChips(game, getGameChips(game) + chipsToAdd);
     input.value = '';
     updateCasinoWalletDisplay();
 
     const gameName = gameNames[game] || game;
-    casinoToast(chipsToAdd.toLocaleString('en-US') + ' ژتون به ' + gameName + ' اضافه شد!');
+    const msg = (currLang === 'fa'
+        ? chipsToAdd.toLocaleString('en-US') + ' ژتون به ' + gameName + ' اضافه شد!'
+        : chipsToAdd.toLocaleString('en-US') + ' chips added to ' + gameName + '!');
+    casinoToast(msg);
 };
 
-// ─── اتصال رویدادهای کلیک برای دکمه‌های خرید و تبدیل ───
+window.sellChips = function(game) {
+    const t = ld[currLang] || ld.en;
+    const input = document.getElementById('sell-amount-' + game);
+    if (!input) return;
+
+    const chipsToSell = parseFloat(input.value);
+    const gameNames = { roulette: 'رولت', plinko: 'پلینکو' };
+
+    if (!chipsToSell || chipsToSell < 10 || isNaN(chipsToSell)) {
+        casinoToast(t.casinoSellInvalid || 'تعداد ژتون نامعتبر (حداقل ۱۰).', true);
+        return;
+    }
+
+    const gameChips = getGameChips(game);
+    if (chipsToSell > gameChips) {
+        casinoToast(
+            (currLang === 'fa'
+                ? 'ژتون کافی در این بازی ندارید. موجودی: '
+                : 'Not enough chips. Balance: ') + gameChips.toLocaleString('en-US'),
+            true
+        );
+        return;
+    }
+
+    const usdtToGet = chipsToSell / CASINO_CHIPS_RATE;
+    if (usdtToGet <= 0) {
+        casinoToast(t.casinoSellInvalid || 'مقدار نامعتبر.', true);
+        return;
+    }
+
+    // کاهش ژتون بازی + افزایش تتر کازینو
+    setGameChips(game, gameChips - chipsToSell);
+    setCasinoUSDT(getCasinoUSDT() + usdtToGet);
+    input.value = '';
+    updateCasinoWalletDisplay();
+
+    const gameName = gameNames[game] || game;
+    const msg = (currLang === 'fa'
+        ? chipsToSell.toLocaleString('en-US') + ' ژتون ' + gameName + ' فروخته شد و $' + usdtToGet.toFixed(2) + ' به کیف پول اضافه شد!'
+        : chipsToSell.toLocaleString('en-US') + ' chips from ' + gameName + ' sold for $' + usdtToGet.toFixed(2) + '!');
+    casinoToast(msg);
+};
+
+// ─── اتصال رویدادهای کلیک ───
 document.addEventListener('click', function(e) {
-    // دکمه «خرید» هر بازی
+    // دکمه «تبدیل» هر بازی (باز/بسته پنل)
     const buyBtn = e.target.closest('.casino-game-buy-btn');
     if (buyBtn) {
         e.preventDefault();
         window.selectCasinoGame(buyBtn.dataset.game);
         return;
     }
-    // دکمه «تبدیل» هر بازی
-    const convBtn = e.target.closest('.casino-convert-btn');
+    // دکمه «خرید» (تتر → ژتون)
+    const convBtn = e.target.closest('.casino-convert-btn[data-dir="buy"]');
     if (convBtn) {
         e.preventDefault();
-        window.convertForGame(convBtn.dataset.game);
+        window.buyChips(convBtn.dataset.game);
+        return;
+    }
+    // دکمه «فروش» (ژتون → تتر)
+    const sellBtn = e.target.closest('.casino-convert-btn[data-dir="sell"]');
+    if (sellBtn) {
+        e.preventDefault();
+        window.sellChips(sellBtn.dataset.game);
         return;
     }
 });
 
-// ─── پشتیبانی از کلید Enter در input برای تبدیل سریع ───
+// ─── پشتیبانی از کلید Enter در inputها ───
 CASINO_GAMES.forEach(function(game) {
-    const inp = document.getElementById('convert-amount-' + game);
-    if (inp) {
-        inp.addEventListener('keydown', function(e) {
+    const buyInp = document.getElementById('convert-amount-' + game);
+    if (buyInp) {
+        buyInp.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                window.convertForGame(game);
+                window.buyChips(game);
+            }
+        });
+    }
+    const sellInp = document.getElementById('sell-amount-' + game);
+    if (sellInp) {
+        sellInp.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                window.sellChips(game);
             }
         });
     }
 });
 
-// ─── اولین بار که صفحه لود شد، نمایش کیف پول را به‌روز کن ───
+// ─── Enter برای فیلد شارژ ───
+(function attachChargeEnter() {
+    const chargeInp = document.getElementById('casino-charge-amount');
+    if (chargeInp) {
+        chargeInp.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                window.chargeCasinoWallet();
+            }
+        });
+    }
+})();
+
+// ─── به‌روزرسانی اولیه در زمان لود صفحه ───
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
         updateCasinoWalletDisplay();
