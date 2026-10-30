@@ -48,13 +48,20 @@ function generateUIDDigits(userId) {
 }
 
 // ==========================================
-// 2. اصلاح مشکل دکمه‌های هدر روی موبایل
+// ★★ اصلاح ریشه‌ای مشکل دکمه‌های هدر روی موبایل
+// touch-action:none روی body.modal-open باعث می‌شود رویداد click در بسیاری
+// از مرورگرهای موبایل حتی روی دکمه‌های داخل مودال (از جمله دکمه بستن) تولید
+// نشود. در نتیجه کاربر نمی‌تواند مودال را ببندد و همه‌ی دکمه‌های صفحه، از جمله
+// دکمه‌های هدر، غیرفعال می‌مانند. اینجا touch-action را روی manipulation
+// می‌گذاریم (لمس را آزاد می‌کند، zoom دوتایی را می‌بندد) و pointer-events
+// هدر را هم برای اطمینان تقویت می‌کنیم.
 // ==========================================
 (function injectMobileInteractionFix() {
     if (document.getElementById('zenix-mobile-fix')) return;
     const style = document.createElement('style');
     style.id = 'zenix-mobile-fix';
     style.textContent = `
+        /* آکاردئون راهنما: انیمیشن grid-template-rows روی موبایل پله‌پله می‌شود */
         @media (max-width: 768px) {
             .help-acc-content,
             .help-acc-inner {
@@ -64,6 +71,7 @@ function generateUIDDigits(userId) {
                 transition: transform .15s ease !important;
             }
         }
+        /* کوچک‌تر شدن کادر پیام‌ها در صندوق اعلان‌ها */
         .msg-body-box {
             margin-bottom: 0 !important;
             padding: 8px 10px !important;
@@ -72,13 +80,16 @@ function generateUIDDigits(userId) {
             border-color: rgba(255,255,255,.05) !important;
             opacity: .75 !important;
         }
+        /* ★★ کلید رفع مشکل: جایگزینی touch-action:none با manipulation */
         body.modal-open {
             touch-action: manipulation !important;
         }
+        /* ★★ تقویت کلیک‌پذیری هدر و دکمه‌های داخل آن */
         header, header .hr, header .hr .wrap, header .hr .lb,
         header .hr a.lb, header .hr button.lb {
             pointer-events: auto !important;
         }
+        /* اطمینان از اینکه پس‌زمینه مودال قابل لمس است */
         .modal.show {
             pointer-events: auto !important;
         }
@@ -87,7 +98,7 @@ function generateUIDDigits(userId) {
 })();
 
 // ==========================================
-// 3. مدیریت مدال‌ها + قفل اسکرول
+// 2. مدیریت مدال‌ها + قفل اسکرول
 // ==========================================
 function lockBody() { document.body.classList.add('modal-open'); }
 function unlockBody() {
@@ -97,6 +108,7 @@ function unlockBody() {
     }, 50);
 }
 
+// ★★ پاک‌سازی دفاعی: اگر در هر لحظه هیچ مودالی باز نیست ولی کلاس گیر کرده، حذفش کن
 setInterval(() => {
     if (document.body.classList.contains('modal-open') && !document.querySelector('.modal.show')) {
         document.body.classList.remove('modal-open');
@@ -125,12 +137,9 @@ window.openCasinoModal = function() {
     document.getElementById('m-casino-modal')?.classList.add('show');
     lockBody();
     closeAllMenus();
-    setTimeout(function() { if (typeof updateCasinoWalletUI === 'function') updateCasinoWalletUI(); }, 0);
 };
 window.closeCasinoModal = function() {
     document.getElementById('m-casino-modal')?.classList.remove('show');
-    var cwm = document.getElementById('casino-wallet-menu');
-    if (cwm) cwm.classList.remove('show');
     unlockBody();
 };
 window.toggleHelpAccordion = function(btn) {
@@ -152,7 +161,7 @@ window.toggleAboutBox = function() {
 };
 
 // ==========================================
-// 4. بازار ارزهای دیجیتال
+// 3. بازار ارزهای دیجیتال
 // ==========================================
 async function fetchCryptoPrices() {
     const tickerContainer = document.getElementById('crypto-ticker-list');
@@ -216,8 +225,9 @@ async function fetchCryptoPrices() {
 
 fetchCryptoPrices();
 setInterval(fetchCryptoPrices, 30000);
+
 // ==========================================
-// 5. سیستم اعلان‌ها
+// 4. اعلان‌ها
 // ==========================================
 function getNotifCategory(m) {
     let t = (m.type || '').toLowerCase();
@@ -236,11 +246,7 @@ function isWithdrawalMessage(m) {
 
 async function fetchUserMessages(uid) {
     try {
-        const { data } = await supabaseClient
-            .from('notifications')
-            .select('*')
-            .eq('user_id', uid)
-            .order('created_at', { ascending: false });
+        const { data } = await supabaseClient.from('notifications').select('*').eq('user_id', uid).order('created_at', { ascending: false });
         return (data || []).map(dt => ({
             id: dt.id,
             subject: dt.title || dt.subject || 'اطلاعیه',
@@ -407,8 +413,9 @@ document.getElementById('bell-btn')?.addEventListener('click', e => {
     e.stopPropagation();
     window.openMessageModal();
 });
+
 // ==========================================
-// 6. سیستم ترجمه
+// 5. سیستم ترجمه
 // ==========================================
 const SUPPORTED_LANGUAGES = ['en', 'fa', 'ar', 'tr', 'ru', 'es', 'fr', 'de'];
 const savedLang = safeGetItem('zenix_lang');
@@ -459,11 +466,7 @@ const ld = {
         helpFooter: 'در صورت نیاز به راهنمایی بیشتر، با پشتیبانی زِنیکس از طریق صفحه پشتیبانی در ارتباط باشید.',
         casinoModalTitle: 'انتخاب بازی‌های کازینو',
         casinoPoker: 'رولت آنلاین', casinoPokerDesc: 'بازی هیجان‌انگیز و شانس',
-        casinoPlinko: 'پلینکو (پاپالان)', casinoPlinkoDesc: 'بازی محبوب ریزش مهره‌ها',
-        casinoWalletTitle: 'کیف پول کازینو', casinoWalletSub: 'تبدیل تتر به ژتون بازی',
-        casinoUsdtLabel: 'موجودی تتر', casinoChipsLabel: 'ژتون بازی', casinoConvertBtn: 'تبدیل',
-        casinoGameRoulette: 'رولت آنلاین', casinoGamePlinko: 'پلینکو',
-        casinoConvertSuccess: '{chips} ژتون {game} اضافه شد', casinoInsufficientUsdt: 'موجودی تتر کافی نیست', casinoInvalidAmount: 'مقدار معتبر وارد کنید'
+        casinoPlinko: 'پلینکو (پاپالان)', casinoPlinkoDesc: 'بازی محبوب ریزش مهره‌ها'
     },
     en: {
         m1: 'Home', m2: 'Quantification', m3: 'Deposit', m4: 'Withdraw', m_team: 'My Team', m5: 'Transactions', m6: 'Profile', m7: 'Support', m_about: 'About Platform', m8: 'Logout',
@@ -509,11 +512,7 @@ const ld = {
         helpFooter: 'For further assistance, contact Zenix Support through the support page.',
         casinoModalTitle: 'Select Casino Games',
         casinoPoker: 'Online Roulette', casinoPokerDesc: 'Exciting game of chance',
-        casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Popular dropping ball game',
-        casinoWalletTitle: 'Casino Wallet', casinoWalletSub: 'Convert USDT to game chips',
-        casinoUsdtLabel: 'USDT Balance', casinoChipsLabel: 'Game Chips', casinoConvertBtn: 'Convert',
-        casinoGameRoulette: 'Online Roulette', casinoGamePlinko: 'Plinko',
-                casinoConvertSuccess: '{chips} {game} chips added', casinoInsufficientUsdt: 'Insufficient USDT balance', casinoInvalidAmount: 'Please enter a valid amount'
+        casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Popular dropping ball game'
     },
     ar: {
         m1: 'الرئيسية', m2: 'التكميم', m3: 'إيداع', m4: 'سحب', m_team: 'فريقي', m5: 'المعاملات', m6: 'الملف الشخصي', m7: 'الدعم', m_about: 'حول المنصة', m8: 'تسجيل الخروج',
@@ -559,11 +558,7 @@ const ld = {
         helpFooter: 'للمزيد من المساعدة، تواصل مع دعم Zenix.',
         casinoModalTitle: 'اختر ألعاب الكازينو',
         casinoPoker: 'رولت مباشر', casinoPokerDesc: 'لعبة حظ مثيرة',
-        casinoPlinko: 'بلينكو', casinoPlinkoDesc: 'لعبة سقوط الكرات الشهيرة',
-        casinoWalletTitle: 'محفظة الكازينو', casinoWalletSub: 'تحويل USDT إلى رموز اللعبة',
-        casinoUsdtLabel: 'رصيد USDT', casinoChipsLabel: 'رموز اللعبة', casinoConvertBtn: 'تحويل',
-        casinoGameRoulette: 'رولت مباشر', casinoGamePlinko: 'بلينكو',
-        casinoConvertSuccess: 'تمت إضافة {chips} رمز {game}', casinoInsufficientUsdt: 'رصيد USDT غير كافٍ', casinoInvalidAmount: 'أدخل مبلغًا صالحًا'
+        casinoPlinko: 'بلينكو', casinoPlinkoDesc: 'لعبة سقوط الكرات الشهيرة'
     },
     tr: {
         m1: 'Ana Sayfa', m2: 'Kuantifikasyon', m3: 'Yatırım', m4: 'Çekim', m_team: 'Ekibim', m5: 'İşlemler', m6: 'Profil', m7: 'Destek', m_about: 'Platform Hakkında', m8: 'Çıkış',
@@ -609,11 +604,7 @@ const ld = {
         helpFooter: 'Daha fazla yardım için Zenix Desteği ile iletişime geçin.',
         casinoModalTitle: 'Casino Oyunları Seçimi',
         casinoPoker: 'Canlı Rulet', casinoPokerDesc: 'Heyecan verici şans oyunu',
-        casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Popüler top bırakma oyunu',
-        casinoWalletTitle: 'Casino Cüzdanı', casinoWalletSub: 'USDT\'yi oyun jetona çevir',
-        casinoUsdtLabel: 'USDT Bakiye', casinoChipsLabel: 'Oyun Jetonları', casinoConvertBtn: 'Çevir',
-        casinoGameRoulette: 'Rulet', casinoGamePlinko: 'Plinko',
-        casinoConvertSuccess: '{chips} {game} jetonu eklendi', casinoInsufficientUsdt: 'Yetersiz USDT bakiyesi', casinoInvalidAmount: 'Geçerli bir miktar girin'
+        casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Popüler top bırakma oyunu'
     },
     ru: {
         m1: 'Главная', m2: 'Квантификация', m3: 'Депозит', m4: 'Вывод', m_team: 'Команда', m5: 'Транзакции', m6: 'Профиль', m7: 'Поддержка', m_about: 'О платформе', m8: 'Выход',
@@ -659,11 +650,7 @@ const ld = {
         helpFooter: 'За дополнительной помощью обращайтесь в поддержку Zenix.',
         casinoModalTitle: 'Выбор игр казино',
         casinoPoker: 'Онлайн Рулетка', casinoPokerDesc: 'Захватывающая игра',
-        casinoPlinko: 'Плинко', casinoPlinkoDesc: 'Популярная игра с шариками',
-        casinoWalletTitle: 'Кошелёк казино', casinoWalletSub: 'Конвертировать USDT в жетоны',
-        casinoUsdtLabel: 'Баланс USDT', casinoChipsLabel: 'Жетоны игры', casinoConvertBtn: 'Конвертировать',
-        casinoGameRoulette: 'Рулетка', casinoGamePlinko: 'Плинко',
-        casinoConvertSuccess: 'Добавлено {chips} жетонов {game}', casinoInsufficientUsdt: 'Недостаточно USDT', casinoInvalidAmount: 'Введите сумму'
+        casinoPlinko: 'Плинко', casinoPlinkoDesc: 'Популярная игра с шариками'
     },
     es: {
         m1: 'Inicio', m2: 'Cuantificación', m3: 'Depósito', m4: 'Retiro', m_team: 'Equipo', m5: 'Transacciones', m6: 'Perfil', m7: 'Soporte', m_about: 'Sobre la plataforma', m8: 'Cerrar sesión',
@@ -709,11 +696,7 @@ const ld = {
         helpFooter: 'Para más ayuda, contacte con Zenix Support.',
         casinoModalTitle: 'Selección de Juegos de Casino',
         casinoPoker: 'Ruleta Online', casinoPokerDesc: 'Emocionante juego de azar',
-        casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Popular juego de caída',
-        casinoWalletTitle: 'Cartera Casino', casinoWalletSub: 'Convertir USDT en fichas',
-        casinoUsdtLabel: 'Saldo USDT', casinoChipsLabel: 'Fichas de Juego', casinoConvertBtn: 'Convertir',
-        casinoGameRoulette: 'Ruleta', casinoGamePlinko: 'Plinko',
-        casinoConvertSuccess: '{chips} fichas de {game} añadidas', casinoInsufficientUsdt: 'Saldo USDT insuficiente', casinoInvalidAmount: 'Ingrese cantidad válida'
+        casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Popular juego de caída'
     },
     fr: {
         m1: 'Accueil', m2: 'Quantification', m3: 'Dépôt', m4: 'Retrait', m_team: 'Équipe', m5: 'Transactions', m6: 'Profil', m7: 'Support', m_about: 'À propos', m8: 'Déconnexion',
@@ -759,11 +742,7 @@ const ld = {
         helpFooter: 'Pour plus d\'aide, contactez Zenix Support.',
         casinoModalTitle: 'Sélection des Jeux de Casino',
         casinoPoker: 'Roulette en ligne', casinoPokerDesc: 'Jeu de hasard excitant',
-        casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Jeu populaire de balles',
-        casinoWalletTitle: 'Portefeuille Casino', casinoWalletSub: 'Convertir USDT en jetons',
-        casinoUsdtLabel: 'Solde USDT', casinoChipsLabel: 'Jetons de Jeu', casinoConvertBtn: 'Convertir',
-        casinoGameRoulette: 'Roulette', casinoGamePlinko: 'Plinko',
-        casinoConvertSuccess: '{chips} jetons {game} ajoutés', casinoInsufficientUsdt: 'Solde USDT insuffisant', casinoInvalidAmount: 'Entrez un montant valide'
+        casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Jeu populaire de balles'
     },
     de: {
         m1: 'Startseite', m2: 'Quantifizierung', m3: 'Einzahlung', m4: 'Auszahlung', m_team: 'Team', m5: 'Transaktionen', m6: 'Profil', m7: 'Unterstützung', m_about: 'Über die Plattform', m8: 'Abmelden',
@@ -809,13 +788,10 @@ const ld = {
         helpFooter: 'Für weitere Hilfe wenden Sie sich an den Zenix-Support.',
         casinoModalTitle: 'Casino-Spiele Auswahl',
         casinoPoker: 'Online Roulette', casinoPokerDesc: 'Spannendes Glücksspiel',
-        casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Beliebtes Ballspiel',
-        casinoWalletTitle: 'Casino-Guthaben', casinoWalletSub: 'USDT in Jetons umwandeln',
-        casinoUsdtLabel: 'USDT-Guthaben', casinoChipsLabel: 'Spiel-Jetons', casinoConvertBtn: 'Umwandeln',
-        casinoGameRoulette: 'Roulette', casinoGamePlinko: 'Plinko',
-        casinoConvertSuccess: '{chips} {game}-Jetons hinzugefügt', casinoInsufficientUsdt: 'Unzureichendes USDT-Guthaben', casinoInvalidAmount: 'Gültigen Betrag eingeben'
+        casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Beliebtes Ballspiel'
     }
 };
+
 function setLang(l) {
     if (!SUPPORTED_LANGUAGES.includes(l)) l = 'en';
     currLang = l;
@@ -923,19 +899,6 @@ function setLang(l) {
     setTxt('t-tab-approved', t.tabApproved);
     setTxt('t-tab-rejected', t.tabRejected);
     setTxt('t-tab-admin', t.tabAdmin);
-
-    // کلیدهای کیف پول کازینو
-    setTxt('t-casino-wallet-title', t.casinoWalletTitle);
-    setTxt('t-casino-wallet-sub', t.casinoWalletSub);
-    setTxt('t-casino-usdt-label', t.casinoUsdtLabel);
-    setTxt('t-casino-chips-label', t.casinoChipsLabel);
-    setTxt('t-casino-convert-btn', t.casinoConvertBtn);
-    setTxt('t-casino-game-roulette', t.casinoGameRoulette);
-    setTxt('t-casino-game-plinko', t.casinoGamePlinko);
-
-    if (typeof updateCasinoWalletUI === 'function') {
-        try { updateCasinoWalletUI(); } catch(e) {}
-    }
 }
 
 document.querySelectorAll('#lang-menu .mi').forEach(i => {
@@ -949,7 +912,7 @@ document.querySelectorAll('#lang-menu .mi').forEach(i => {
 setLang(currLang);
 
 // ==========================================
-// 7. دریافت اطلاعات کاربر
+// 6. دریافت اطلاعات کاربر
 // ==========================================
 async function loadDashboardUserData(uid, sessionUser) {
     try {
@@ -973,17 +936,11 @@ async function loadDashboardUserData(uid, sessionUser) {
             if (welEl) welEl.textContent = `${t.wel} ${currentUserName}`;
         }
 
-        // ذخیره موجودی در localStorage برای کیف پول کازینو (بدون کم‌کردن از دیتابیس)
-        const dbBalance = parseFloat(dbUser?.balance ?? dbProfile?.balance ?? meta.balance ?? 0);
-        const localUsdt = safeGetItem('zenix_local_usdt');
-        const finalBalance = localUsdt !== null ? Math.min(parseFloat(localUsdt), dbBalance) : dbBalance;
-        if (localUsdt === null) safeSetItem('zenix_local_usdt', String(dbBalance));
-
+        const balance = parseFloat(dbUser?.balance ?? dbProfile?.balance ?? meta.balance ?? 0);
         const valBalance = document.getElementById('val-balance');
-        if (valBalance) valBalance.textContent = `$${finalBalance.toFixed(2)}`;
-
-        const casinoUsdt = document.getElementById('casino-usdt-balance');
-        if (casinoUsdt) casinoUsdt.textContent = `$${finalBalance.toFixed(2)}`;
+        if (valBalance) {
+            valBalance.textContent = `$${balance.toFixed(2)}`;
+        }
 
         let codeDigits = generateUIDDigits(uid);
         let myRefCode = dbProfile?.referral_code || ('MS-' + codeDigits);
@@ -1088,8 +1045,10 @@ async function loadDashboardUserData(uid, sessionUser) {
 }
 
 // ==========================================
-// 7.b. احراز هویت
+// 6.b. احراز هویت — نسخه اصلاح‌شده (رفع باگ فلش داشبورد)
 // ==========================================
+
+// بررسی سریع و همزمان وجود توکن در localStorage
 function hasStoredAuthToken() {
     try {
         const keys = Object.keys(localStorage);
@@ -1105,12 +1064,14 @@ function hasStoredAuthToken() {
 }
 
 (async function initAuth() {
+    // اگر هیچ توکنی در localStorage نیست، بلافاصله بدون نیاز به Supabase redirect کن
     if (!hasStoredAuthToken()) {
         window.location.replace('index.html');
         return;
     }
 
     try {
+        // خواندن سریع session از localStorage (+ تلاش برای refresh اگر منقضی شده)
         const { data: { session }, error } = await supabaseClient.auth.getSession();
 
         if (error || !session || !session.user) {
@@ -1118,6 +1079,7 @@ function hasStoredAuthToken() {
             return;
         }
 
+        // ✅ احراز هویت معتبر است — داشبورد را نمایش بده
         document.body.classList.remove('zenix-auth-checking');
         currentUserId = session.user.id;
         loadDashboardUserData(session.user.id, session.user);
@@ -1128,9 +1090,10 @@ function hasStoredAuthToken() {
     }
 })();
 
+// گوش دادن به تغییرات احراز هویت در آینده (logout، انقضای توکن و ...)
 supabaseClient.auth.onAuthStateChange((event, session) => {
-    if (event === 'INITIAL_SESSION') return;
-    if (event === 'TOKEN_REFRESHED') return;
+    if (event === 'INITIAL_SESSION') return;    // قبلاً در initAuth مدیریت شد
+    if (event === 'TOKEN_REFRESHED') return;    // فقط refresh است، کاری لازم نیست
 
     if (!session || !session.user) {
         window.location.replace('index.html');
@@ -1141,7 +1104,7 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
 });
 
 // ==========================================
-// 7.c. منوهای هدر
+// 7. منوهای هدر
 // ==========================================
 const menuBtn = document.getElementById('menu-btn');
 const navMenu = document.getElementById('nav-menu');
@@ -1183,6 +1146,7 @@ document.addEventListener('click', (e) => {
     if (langMenu && !langMenu.contains(e.target) && e.target !== langBtn) langMenu.classList.remove('show');
 });
 
+// بستن مدال با کلیک روی backdrop
 document.querySelectorAll('.modal').forEach(m => {
     m.addEventListener('click', (e) => {
         if (e.target === m) {
@@ -1198,234 +1162,21 @@ document.getElementById('logout-btn')?.addEventListener('click', async e => {
     window.location.href = 'index.html';
 });
 // ==========================================
-// 8. ★★★ کیف پول کازینو با منوی سه‌نقطه ★★★
-// ==========================================
-var CASINO_GAME_KEYS = ['roulette', 'plinko'];
-var CASINO_CONVERT_RATE = 10;   // 1 USDT = 10 chips
-var CASINO_ACTIVE_GAME_KEY = 'zenix_casino_active_game';
-
-var activeCasinoGame = 'roulette';
-try {
-    var _savedActive = safeGetItem(CASINO_ACTIVE_GAME_KEY);
-    if (CASINO_GAME_KEYS.indexOf(_savedActive) !== -1) activeCasinoGame = _savedActive;
-} catch(e) {}
-
-function getCasinoChips(game) {
-    if (!game) return 0;
-    return parseInt(safeGetItem('zenix_casino_chips_' + game) || '0', 10) || 0;
-}
-function setCasinoChips(game, amount) {
-    if (!game) return;
-    safeSetItem('zenix_casino_chips_' + game, String(Math.max(0, Math.floor(amount))));
-}
-
-function getCurrentUsdtBalance() {
-    const localUsdt = safeGetItem('zenix_local_usdt');
-    if (localUsdt !== null) return parseFloat(localUsdt) || 0;
-    const el = document.getElementById('val-balance');
-    if (el) {
-        const match = el.textContent.match(/[\d.,]+/);
-        if (match) return parseFloat(match[0].replace(/,/g, '')) || 0;
-    }
-    return 0;
-}
-
-function setCurrentUsdtBalance(amount) {
-    const safe = Math.max(0, parseFloat(amount) || 0);
-    safeSetItem('zenix_local_usdt', safe.toFixed(2));
-    const valBalance = document.getElementById('val-balance');
-    if (valBalance) valBalance.textContent = '$' + safe.toFixed(2);
-    const casinoUsdt = document.getElementById('casino-usdt-balance');
-    if (casinoUsdt) casinoUsdt.textContent = '$' + safe.toFixed(2);
-}
-
-function getCasinoGameLabel(game) {
-    const t = ld[currLang] || ld.en;
-    return game === 'roulette'
-        ? (t.casinoGameRoulette || t.casinoPoker || 'Roulette')
-        : (t.casinoGamePlinko || t.casinoPlinko || 'Plinko');
-}
-
-function updateCasinoWalletUI() {
-    if (!activeCasinoGame) activeCasinoGame = 'roulette';
-
-    const balEl = document.getElementById('casino-chips-balance');
-    if (balEl) balEl.textContent = getCasinoChips(activeCasinoGame);
-
-    CASINO_GAME_KEYS.forEach(function(g) {
-        const b = document.getElementById('casino-chips-badge-' + g);
-        if (b) b.textContent = getCasinoChips(g);
-    });
-
-    document.querySelectorAll('.casino-wallet-menu-item').forEach(function(item) {
-        item.classList.toggle('active', item.dataset.game === activeCasinoGame);
-    });
-
-    const activeLabel = document.getElementById('casino-active-game-label');
-    if (activeLabel) activeLabel.textContent = '(' + getCasinoGameLabel(activeCasinoGame) + ')';
-
-    const usdtEl = document.getElementById('casino-usdt-balance');
-    if (usdtEl) usdtEl.textContent = '$' + getCurrentUsdtBalance().toFixed(2);
-
-    const rateText = document.getElementById('casino-rate-text');
-    if (rateText) {
-        const prefix = currLang === 'fa' ? 'نرخ: ' : (currLang === 'ar' ? 'السعر: ' : (currLang === 'tr' ? 'Oran: ' : (currLang === 'ru' ? 'Курс: ' : (currLang === 'es' ? 'Tasa: ' : (currLang === 'fr' ? 'Taux : ' : (currLang === 'de' ? 'Kurs: ' : 'Rate: '))))));
-        const unit = (currLang === 'fa' || currLang === 'ar') ? ' تتر = ' : ' USDT = ';
-        const chipsUnit = currLang === 'fa' ? ' ژتون' : (currLang === 'ar' ? ' رمز' : (currLang === 'tr' ? ' jeton' : (currLang === 'ru' ? ' жетонов' : (currLang === 'es' ? ' fichas' : (currLang === 'fr' ? ' jetons' : (currLang === 'de' ? ' Jetons' : ' chips'))))));
-        rateText.textContent = prefix + '1' + unit + CASINO_CONVERT_RATE + chipsUnit;
-    }
-}
-
-window.toggleCasinoWalletMenu = function(event) {
-    if (event) event.stopPropagation();
-    const menu = document.getElementById('casino-wallet-menu');
-    if (!menu) return;
-
-    if (menu.classList.contains('show')) {
-        menu.classList.remove('show');
-        return;
-    }
-
-    const btn = document.querySelector('.casino-wallet-menu-btn');
-    if (btn) {
-        const rect = btn.getBoundingClientRect();
-        const isRtl = document.documentElement.getAttribute('dir') === 'rtl';
-        menu.style.top = (rect.bottom + 6) + 'px';
-        if (isRtl) {
-            menu.style.right = 'auto';
-            menu.style.left = Math.max(8, rect.left) + 'px';
-        } else {
-            menu.style.left = 'auto';
-            menu.style.right = Math.max(8, window.innerWidth - rect.right) + 'px';
-        }
-    }
-
-    updateCasinoWalletUI();
-    menu.classList.add('show');
-};
-
-window.selectCasinoGame = function(game) {
-    if (CASINO_GAME_KEYS.indexOf(game) === -1) return;
-    activeCasinoGame = game;
-    safeSetItem(CASINO_ACTIVE_GAME_KEY, game);
-    updateCasinoWalletUI();
-    document.getElementById('casino-wallet-menu')?.classList.remove('show');
-};
-
-window.convertUsdtToChips = function() {
-    const t = ld[currLang] || ld.en;
-    const input = document.getElementById('casino-convert-amount');
-    const btn = document.getElementById('casino-convert-btn');
-    if (!input) return;
-
-    const amount = parseFloat(input.value);
-    if (!amount || amount <= 0 || isNaN(amount)) {
-        showCasinoToast(t.casinoInvalidAmount || 'Please enter a valid amount', 'error');
-        return;
-    }
-
-    const currentUsdt = getCurrentUsdtBalance();
-    if (amount > currentUsdt) {
-        showCasinoToast(t.casinoInsufficientUsdt || 'Insufficient USDT balance', 'error');
-        return;
-    }
-
-    const newUsdt = currentUsdt - amount;
-    const chipsToAdd = Math.floor(amount * CASINO_CONVERT_RATE);
-    const newChips = getCasinoChips(activeCasinoGame) + chipsToAdd;
-
-    setCurrentUsdtBalance(newUsdt);
-    setCasinoChips(activeCasinoGame, newChips);
-
-    input.value = '';
-    updateCasinoWalletUI();
-
-    if (btn) {
-        btn.disabled = true;
-        setTimeout(function() { btn.disabled = false; }, 800);
-    }
-
-    const gameName = getCasinoGameLabel(activeCasinoGame);
-    showCasinoToast(
-        (t.casinoConvertSuccess || '{chips} {game} chips added')
-            .replace('{chips}', chipsToAdd)
-            .replace('{game}', gameName),
-        'success'
-    );
-};
-
-function showCasinoToast(msg, type) {
-    let toast = document.getElementById('casino-toast');
-    if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'casino-toast';
-        toast.className = 'casino-toast';
-        document.body.appendChild(toast);
-    }
-    toast.className = 'casino-toast show' + (type === 'error' ? ' error' : '');
-    const icon = type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle';
-    toast.innerHTML = '<i class="fas ' + icon + '"></i>' + escapeHtml(msg);
-    clearTimeout(toast._t);
-    toast._t = setTimeout(function() { toast.classList.remove('show'); }, 3000);
-}
-
-// بستن منو با کلیک بیرون
-document.addEventListener('click', function(e) {
-    const menu = document.getElementById('casino-wallet-menu');
-    const btn = document.querySelector('.casino-wallet-menu-btn');
-    if (menu && menu.classList.contains('show')
-        && !menu.contains(e.target) && !(btn && btn.contains(e.target))) {
-        menu.classList.remove('show');
-    }
-});
-
-// بستن منو هنگام اسکرول (dropdown موقعیت fixed دارد)
-document.addEventListener('scroll', function() {
-    const menu = document.getElementById('casino-wallet-menu');
-    if (menu && menu.classList.contains('show')) menu.classList.remove('show');
-}, true);
-
-// بستن منو هنگام تغییر اندازه پنجره
-window.addEventListener('resize', function() {
-    const menu = document.getElementById('casino-wallet-menu');
-    if (menu && menu.classList.contains('show')) menu.classList.remove('show');
-});
-
-// راه‌اندازی اولیه UI
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', updateCasinoWalletUI);
-} else {
-    updateCasinoWalletUI();
-}
-
-// ==========================================
-// 9. Service Worker — نسخه اصلاح‌شده
+// اعمال فوری SW جدید (در صورت وجود)
 // ==========================================
 if ('serviceWorker' in navigator) {
-    setTimeout(function() {
-        navigator.serviceWorker.getRegistration().then(function(existing) {
-            if (existing) {
-                existing.update().catch(function() {});
-                setInterval(function() { existing.update().catch(function() {}); }, 60000);
-            } else {
-                navigator.serviceWorker.register('sw.js?v=4.5')
-                    updateViaCache: 'none',
-                    scope: './'
-                }).then(function(reg) {
-                    reg.update().catch(function() {});
-                    setInterval(function() { reg.update().catch(function() {}); }, 60000);
-                }).catch(function(e) {
-                    console.warn('[Zenix SW] register failed:', e);
-                });
-            }
-        }).catch(function() {});
-    }, 100);
+    navigator.serviceWorker.getRegistration().then(reg => {
+        if (reg && reg.waiting) {
+            reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        }
+        // هر ۶۰ ثانیه بررسی آپدیت
+        setInterval(() => reg && reg.update().catch(() => {}), 60000);
+    });
 
-    var _swRefreshing = false;
-    navigator.serviceWorker.addEventListener('controllerchange', function() {
-        if (_swRefreshing) return;
-        _swRefreshing = true;
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        refreshing = true;
         window.location.reload();
     });
 }
-    
