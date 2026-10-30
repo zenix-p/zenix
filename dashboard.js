@@ -513,8 +513,9 @@ const ld = {
         casinoWalletTitle: 'Casino Wallet', casinoWalletSub: 'Convert USDT to game chips',
         casinoUsdtLabel: 'USDT Balance', casinoChipsLabel: 'Game Chips', casinoConvertBtn: 'Convert',
         casinoGameRoulette: 'Online Roulette', casinoGamePlinko: 'Plinko',
-        casinoConvertSuccess: '{chips} {game} chips added', casinoInsufficientUsdt: 'Insufficient USDT balance', casinoInvalidAmount: 'Please enter a valid amount'
-        ar: {
+                casinoConvertSuccess: '{chips} {game} chips added', casinoInsufficientUsdt: 'Insufficient USDT balance', casinoInvalidAmount: 'Please enter a valid amount'
+    },
+    ar: {
         m1: 'الرئيسية', m2: 'التكميم', m3: 'إيداع', m4: 'سحب', m_team: 'فريقي', m5: 'المعاملات', m6: 'الملف الشخصي', m7: 'الدعم', m_about: 'حول المنصة', m8: 'تسجيل الخروج',
         wel: 'أهلاً بك', sub: 'لوحة إدارة المستخدم', st: 'موثق',
         ts1: 'الرصيد', ts2: 'الإحالات',
