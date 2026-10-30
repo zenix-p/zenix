@@ -37,10 +37,10 @@ let currentUserName = '';
 let allMessages = [];
 let currentNotifFilter = 'all';
 
-// ═══ NEW: متغیرهای کیف پول کازینو (سه بازی) ═══
-const CASINO_CHIPS_RATE = 10;                            // ۱ تتر = ۱۰ ژتون
-const CASINO_GAMES = ['roulette', 'plinko', 'dice'];      // شناسه‌های سه بازی
-// ═══ END NEW ═══
+// ═══ متغیرهای کیف پول کازینو (دو بازی: رولت / پلینکو) ═══
+const CASINO_CHIPS_RATE = 10;                       // ۱ تتر = ۱۰ ژتون
+const CASINO_GAMES = ['roulette', 'plinko'];        // بازی تاس حذف شد
+// ═══ END ═══
 
 function generateUIDDigits(userId) {
     if (!userId) return '000000';
@@ -54,19 +54,12 @@ function generateUIDDigits(userId) {
 
 // ==========================================
 // ★★ اصلاح ریشه‌ای مشکل دکمه‌های هدر روی موبایل
-// touch-action:none روی body.modal-open باعث می‌شود رویداد click در بسیاری
-// از مرورگرهای موبایل حتی روی دکمه‌های داخل مودال (از جمله دکمه بستن) تولید
-// نشود. در نتیجه کاربر نمی‌تواند مودال را ببندد و همه‌ی دکمه‌های صفحه، از جمله
-// دکمه‌های هدر، غیرفعال می‌مانند. اینجا touch-action را روی manipulation
-// می‌گذاریم (لمس را آزاد می‌کند، zoom دوتایی را می‌بندد) و pointer-events
-// هدر را هم برای اطمینان تقویت می‌کنیم.
 // ==========================================
 (function injectMobileInteractionFix() {
     if (document.getElementById('zenix-mobile-fix')) return;
     const style = document.createElement('style');
     style.id = 'zenix-mobile-fix';
     style.textContent = `
-        /* آکاردئون راهنما: انیمیشن grid-template-rows روی موبایل پله‌پله می‌شود */
         @media (max-width: 768px) {
             .help-acc-content,
             .help-acc-inner {
@@ -76,7 +69,6 @@ function generateUIDDigits(userId) {
                 transition: transform .15s ease !important;
             }
         }
-        /* کوچک‌تر شدن کادر پیام‌ها در صندوق اعلان‌ها */
         .msg-body-box {
             margin-bottom: 0 !important;
             padding: 8px 10px !important;
@@ -85,16 +77,13 @@ function generateUIDDigits(userId) {
             border-color: rgba(255,255,255,.05) !important;
             opacity: .75 !important;
         }
-        /* ★★ کلید رفع مشکل: جایگزینی touch-action:none با manipulation */
         body.modal-open {
             touch-action: manipulation !important;
         }
-        /* ★★ تقویت کلیک‌پذیری هدر و دکمه‌های داخل آن */
         header, header .hr, header .hr .wrap, header .hr .lb,
         header .hr a.lb, header .hr button.lb {
             pointer-events: auto !important;
         }
-        /* اطمینان از اینکه پس‌زمینه مودال قابل لمس است */
         .modal.show {
             pointer-events: auto !important;
         }
@@ -113,7 +102,6 @@ function unlockBody() {
     }, 50);
 }
 
-// ★★ پاک‌سازی دفاعی: اگر در هر لحظه هیچ مودالی باز نیست ولی کلاس گیر کرده، حذفش کن
 setInterval(() => {
     if (document.body.classList.contains('modal-open') && !document.querySelector('.modal.show')) {
         document.body.classList.remove('modal-open');
@@ -142,15 +130,53 @@ window.openCasinoModal = function() {
     document.getElementById('m-casino-modal')?.classList.add('show');
     lockBody();
     closeAllMenus();
-    // ★ NEW: هر بار مودال باز شد، موجودی تتر و ژتون‌ها به‌روز شوند
-    if (typeof updateCasinoWalletDisplay === 'function') {
-        updateCasinoWalletDisplay();
-    }
 };
 window.closeCasinoModal = function() {
     document.getElementById('m-casino-modal')?.classList.remove('show');
     unlockBody();
 };
+
+// ═══ NEW: کیف پول کازینو — مودال مستقل ═══
+window.openCasinoWalletModal = function() {
+    document.getElementById('m-casino-wallet-modal')?.classList.add('show');
+    lockBody();
+    closeAllMenus();
+    if (typeof updateCasinoWalletDisplay === 'function') {
+        updateCasinoWalletDisplay();
+    }
+    // بازنشانی حالت منوی سه خط (بسته باشد)
+    const gamesContainer = document.getElementById('casino-games-container');
+    const hint = document.getElementById('casino-wallet-hint');
+    const hamburger = document.getElementById('casino-wallet-hamburger');
+    if (gamesContainer) gamesContainer.style.display = 'none';
+    if (hint) hint.style.display = 'block';
+    if (hamburger) hamburger.classList.remove('active');
+};
+
+window.closeCasinoWalletModal = function() {
+    document.getElementById('m-casino-wallet-modal')?.classList.remove('show');
+    unlockBody();
+};
+
+window.toggleCasinoWalletGames = function() {
+    const gamesContainer = document.getElementById('casino-games-container');
+    const hamburger = document.getElementById('casino-wallet-hamburger');
+    const hint = document.getElementById('casino-wallet-hint');
+    if (!gamesContainer) return;
+
+    const isOpen = gamesContainer.style.display !== 'none';
+    if (isOpen) {
+        gamesContainer.style.display = 'none';
+        if (hamburger) hamburger.classList.remove('active');
+        if (hint) hint.style.display = 'block';
+    } else {
+        gamesContainer.style.display = 'flex';
+        if (hamburger) hamburger.classList.add('active');
+        if (hint) hint.style.display = 'none';
+    }
+};
+// ═══ END NEW ═══
+
 window.toggleHelpAccordion = function(btn) {
     const item = btn.closest('.help-accordion');
     if (!item) return;
@@ -168,6 +194,7 @@ window.toggleAboutBox = function() {
             : (t.aboutToggleOpen || 'مشاهده بیشتر');
     }
 };
+
 // ==========================================
 // 3. بازار ارزهای دیجیتال
 // ==========================================
@@ -422,7 +449,7 @@ document.getElementById('bell-btn')?.addEventListener('click', e => {
     window.openMessageModal();
 });
 // ==========================================
-// 5. سیستم ترجمه — دیکشنری (بخش ۱: fa/en/ar/tr)
+// 5. سیستم ترجمه — دیکشنری ۸ زبانه
 // ==========================================
 const SUPPORTED_LANGUAGES = ['en', 'fa', 'ar', 'tr', 'ru', 'es', 'fr', 'de'];
 const savedLang = safeGetItem('zenix_lang');
@@ -431,6 +458,7 @@ let currLang = SUPPORTED_LANGUAGES.includes(savedLang) ? savedLang : 'en';
 const ld = {
     fa: {
         m1: 'صفحه اصلی', m2: 'کوانتیفیکیشن', m3: 'واریز', m4: 'برداشت', m_team: 'تیم من', m5: 'تراکنش', m6: 'پروفایل', m7: 'پشتیبانی', m_about: 'درباره پلتفرم', m8: 'خروج',
+        mCasinoWallet: 'کیف پول کازینو',
         wel: 'خوش آمدید', sub: 'پنل مدیریت کاربری', st: 'تایید شده',
         ts1: 'موجودی', ts2: 'زیرمجموعه',
         c1: 'کوانتیفیکیشن', d1: 'معاملات هوشمند',
@@ -474,13 +502,17 @@ const ld = {
         casinoModalTitle: 'انتخاب بازی‌های کازینو',
         casinoPoker: 'رولت آنلاین', casinoPokerDesc: 'بازی هیجان‌انگیز و شانس',
         casinoPlinko: 'پلینکو (پاپالان)', casinoPlinkoDesc: 'بازی محبوب ریزش مهره‌ها',
-        casinoDice: 'تاس آنلاین', casinoDiceDesc: 'حدس عدد و شانس',
         chipUnit: 'ژتون',
         buyBtn: 'خرید',
-        convertBtn: 'تبدیل'
+        convertBtn: 'تبدیل',
+        casinoWalletModalTitle: 'کیف پول کازینو',
+        casinoWalletSub: 'تبدیل تتر به ژتون بازی',
+        casinoUsdtLabel: 'موجودی تتر',
+        openWalletBtn: 'ورود به کیف پول کازینو'
     },
     en: {
         m1: 'Home', m2: 'Quantification', m3: 'Deposit', m4: 'Withdraw', m_team: 'My Team', m5: 'Transactions', m6: 'Profile', m7: 'Support', m_about: 'About Platform', m8: 'Logout',
+        mCasinoWallet: 'Casino Wallet',
         wel: 'Welcome', sub: 'User Management Panel', st: 'Verified',
         ts1: 'Balance', ts2: 'Referrals',
         c1: 'Quantification', d1: 'Smart Trading',
@@ -524,13 +556,17 @@ const ld = {
         casinoModalTitle: 'Select Casino Games',
         casinoPoker: 'Online Roulette', casinoPokerDesc: 'Exciting game of chance',
         casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Popular dropping ball game',
-        casinoDice: 'Online Dice', casinoDiceDesc: 'Guess the number and luck',
         chipUnit: 'chips',
         buyBtn: 'Buy',
-        convertBtn: 'Convert'
+        convertBtn: 'Convert',
+        casinoWalletModalTitle: 'Casino Wallet',
+        casinoWalletSub: 'Convert USDT to game chips',
+        casinoUsdtLabel: 'USDT Balance',
+        openWalletBtn: 'Open Casino Wallet'
     },
     ar: {
         m1: 'الرئيسية', m2: 'التكميم', m3: 'إيداع', m4: 'سحب', m_team: 'فريقي', m5: 'المعاملات', m6: 'الملف الشخصي', m7: 'الدعم', m_about: 'حول المنصة', m8: 'تسجيل الخروج',
+        mCasinoWallet: 'محفظة الكازينو',
         wel: 'أهلاً بك', sub: 'لوحة إدارة المستخدم', st: 'موثق',
         ts1: 'الرصيد', ts2: 'الإحالات',
         c1: 'التكميم', d1: 'التداول الذكي',
@@ -574,13 +610,17 @@ const ld = {
         casinoModalTitle: 'اختر ألعاب الكازينو',
         casinoPoker: 'رولت مباشر', casinoPokerDesc: 'لعبة حظ مثيرة',
         casinoPlinko: 'بلينكو', casinoPlinkoDesc: 'لعبة سقوط الكرات الشهيرة',
-        casinoDice: 'النرد عبر الإنترنت', casinoDiceDesc: 'خمّن الرقم والحظ',
         chipUnit: 'شريحة',
         buyBtn: 'شراء',
-        convertBtn: 'تحويل'
+        convertBtn: 'تحويل',
+        casinoWalletModalTitle: 'محفظة الكازينو',
+        casinoWalletSub: 'تحويل USDT إلى شرائح اللعب',
+        casinoUsdtLabel: 'رصيد USDT',
+        openWalletBtn: 'فتح محفظة الكازينو'
     },
     tr: {
         m1: 'Ana Sayfa', m2: 'Kuantifikasyon', m3: 'Yatırım', m4: 'Çekim', m_team: 'Ekibim', m5: 'İşlemler', m6: 'Profil', m7: 'Destek', m_about: 'Platform Hakkında', m8: 'Çıkış',
+        mCasinoWallet: 'Casino Cüzdanı',
         wel: 'Hoş Geldiniz', sub: 'Kullanıcı Yönetim Paneli', st: 'Onaylandı',
         ts1: 'Bakiye', ts2: 'Referanslar',
         c1: 'Kuantifikasyon', d1: 'Akıllı İşlem',
@@ -624,13 +664,17 @@ const ld = {
         casinoModalTitle: 'Casino Oyunları Seçimi',
         casinoPoker: 'Canlı Rulet', casinoPokerDesc: 'Heyecan verici şans oyunu',
         casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Popüler top bırakma oyunu',
-        casinoDice: 'Online Zar', casinoDiceDesc: 'Sayıyı tahmin et ve şansını dene',
         chipUnit: 'jeton',
         buyBtn: 'Satın Al',
-        convertBtn: 'Dönüştür'
+        convertBtn: 'Dönüştür',
+        casinoWalletModalTitle: 'Casino Cüzdanı',
+        casinoWalletSub: 'USDT\'yi oyun jetonlarına dönüştür',
+        casinoUsdtLabel: 'USDT Bakiyesi',
+        openWalletBtn: 'Casino Cüzdanını Aç'
     },
-        ru: {
+    ru: {
         m1: 'Главная', m2: 'Квантификация', m3: 'Депозит', m4: 'Вывод', m_team: 'Команда', m5: 'Транзакции', m6: 'Профиль', m7: 'Поддержка', m_about: 'О платформе', m8: 'Выход',
+        mCasinoWallet: 'Кошелек казино',
         wel: 'Добро пожаловать', sub: 'Панель управления', st: 'Подтверждено',
         ts1: 'Баланс', ts2: 'Рефералы',
         c1: 'Квантификация', d1: 'Умная торговля',
@@ -674,13 +718,17 @@ const ld = {
         casinoModalTitle: 'Выбор игр казино',
         casinoPoker: 'Онлайн Рулетка', casinoPokerDesc: 'Захватывающая игра',
         casinoPlinko: 'Плинко', casinoPlinkoDesc: 'Популярная игра с шариками',
-        casinoDice: 'Онлайн Кости', casinoDiceDesc: 'Угадай число и испытай удачу',
         chipUnit: 'фишек',
         buyBtn: 'Купить',
-        convertBtn: 'Обмен'
+        convertBtn: 'Обмен',
+        casinoWalletModalTitle: 'Кошелек казино',
+        casinoWalletSub: 'Обмен USDT на игровые фишки',
+        casinoUsdtLabel: 'Баланс USDT',
+        openWalletBtn: 'Открыть кошелек казино'
     },
     es: {
         m1: 'Inicio', m2: 'Cuantificación', m3: 'Depósito', m4: 'Retiro', m_team: 'Equipo', m5: 'Transacciones', m6: 'Perfil', m7: 'Soporte', m_about: 'Sobre la plataforma', m8: 'Cerrar sesión',
+        mCasinoWallet: 'Monedero Casino',
         wel: 'Bienvenido', sub: 'Panel de gestión de usuario', st: 'Verificado',
         ts1: 'Saldo', ts2: 'Referidos',
         c1: 'Cuantificación', d1: 'Comercio inteligente',
@@ -724,13 +772,17 @@ const ld = {
         casinoModalTitle: 'Selección de Juegos de Casino',
         casinoPoker: 'Ruleta Online', casinoPokerDesc: 'Emocionante juego de azar',
         casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Popular juego de caída',
-        casinoDice: 'Dados Online', casinoDiceDesc: 'Adivina el número y la suerte',
         chipUnit: 'fichas',
         buyBtn: 'Comprar',
-        convertBtn: 'Convertir'
+        convertBtn: 'Convertir',
+        casinoWalletModalTitle: 'Monedero Casino',
+        casinoWalletSub: 'Convierte USDT en fichas de juego',
+        casinoUsdtLabel: 'Saldo USDT',
+        openWalletBtn: 'Abrir Monedero Casino'
     },
     fr: {
         m1: 'Accueil', m2: 'Quantification', m3: 'Dépôt', m4: 'Retrait', m_team: 'Équipe', m5: 'Transactions', m6: 'Profil', m7: 'Support', m_about: 'À propos', m8: 'Déconnexion',
+        mCasinoWallet: 'Portefeuille Casino',
         wel: 'Bienvenue', sub: 'Panneau de gestion', st: 'Vérifié',
         ts1: 'Solde', ts2: 'Parrainages',
         c1: 'Quantification', d1: 'Trading intelligent',
@@ -774,13 +826,17 @@ const ld = {
         casinoModalTitle: 'Sélection des Jeux de Casino',
         casinoPoker: 'Roulette en ligne', casinoPokerDesc: 'Jeu de hasard excitant',
         casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Jeu populaire de balles',
-        casinoDice: 'Dés en ligne', casinoDiceDesc: 'Devinez le nombre et la chance',
         chipUnit: 'jetons',
         buyBtn: 'Acheter',
-        convertBtn: 'Convertir'
+        convertBtn: 'Convertir',
+        casinoWalletModalTitle: 'Portefeuille Casino',
+        casinoWalletSub: 'Convertir USDT en jetons de jeu',
+        casinoUsdtLabel: 'Solde USDT',
+        openWalletBtn: 'Ouvrir le portefeuille Casino'
     },
     de: {
         m1: 'Startseite', m2: 'Quantifizierung', m3: 'Einzahlung', m4: 'Auszahlung', m_team: 'Team', m5: 'Transaktionen', m6: 'Profil', m7: 'Unterstützung', m_about: 'Über die Plattform', m8: 'Abmelden',
+        mCasinoWallet: 'Casino-Wallet',
         wel: 'Willkommen', sub: 'Benutzer-Management-Panel', st: 'Verifiziert',
         ts1: 'Guthaben', ts2: 'Empfehlungen',
         c1: 'Quantifizierung', d1: 'Smart Trading',
@@ -824,15 +880,18 @@ const ld = {
         casinoModalTitle: 'Casino-Spiele Auswahl',
         casinoPoker: 'Online Roulette', casinoPokerDesc: 'Spannendes Glücksspiel',
         casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Beliebtes Ballspiel',
-        casinoDice: 'Online Würfel', casinoDiceDesc: 'Errate die Zahl und dein Glück',
         chipUnit: 'Chips',
         buyBtn: 'Kaufen',
-        convertBtn: 'Umtauschen'
+        convertBtn: 'Umtauschen',
+        casinoWalletModalTitle: 'Casino-Wallet',
+        casinoWalletSub: 'USDT in Spiel-Chips umwandeln',
+        casinoUsdtLabel: 'USDT-Guthaben',
+        openWalletBtn: 'Casino-Wallet öffnen'
     }
 };
 
 // ==========================================
-// ★ تابع setLang — با پشتیبانی از کلیدهای جدید کازینو
+// ★ تابع setLang — با پشتیبانی از کلیدهای کیف پول کازینو
 // ==========================================
 function setLang(l) {
     if (!SUPPORTED_LANGUAGES.includes(l)) l = 'en';
@@ -862,6 +921,10 @@ function setLang(l) {
 
     let mAbout = document.getElementById('m_about');
     if (mAbout) mAbout.textContent = t.m_about;
+
+    // منوی کیف پول کازینو
+    let mCasinoWallet = document.getElementById('m_casino_wallet');
+    if (mCasinoWallet) mCasinoWallet.textContent = t.mCasinoWallet || 'کیف پول کازینو';
 
     document.getElementById('help-btn')?.setAttribute('title', t.helpBtnTitle);
     document.getElementById('floating-casino-btn')?.setAttribute('title', t.floatingCasinoTitle);
@@ -931,8 +994,6 @@ function setLang(l) {
     setTxt('t-casino-poker-desc', t.casinoPokerDesc);
     setTxt('t-casino-plinko', t.casinoPlinko);
     setTxt('t-casino-plinko-desc', t.casinoPlinkoDesc);
-    setTxt('t-casino-dice', t.casinoDice);
-    setTxt('t-casino-dice-desc', t.casinoDiceDesc);
 
     setTxt('t-floating-casino', t.floatingCasino);
 
@@ -944,23 +1005,28 @@ function setLang(l) {
     setTxt('t-tab-rejected', t.tabRejected);
     setTxt('t-tab-admin', t.tabAdmin);
 
-    // ═══ NEW: کلیدهای کیف پول کازینو (سه بازی) ═══
-    setTxt('t-casino-wallet-title', t.casinoWalletTitle || (l === 'fa' ? 'کیف پول کازینو' : 'Casino Wallet'));
-    setTxt('t-casino-wallet-sub', t.casinoWalletSub || (l === 'fa' ? 'تبدیل تتر به ژتون بازی' : 'Convert USDT to game chips'));
-    setTxt('t-casino-usdt-label', t.casinoUsdtLabel || (l === 'fa' ? 'موجودی تتر' : 'USDT Balance'));
+    // ═══ کلیدهای کیف پول کازینو ═══
+    // عنوان مودال (با آیکون)
+    const walletModalTitle = document.getElementById('t-casino-wallet-modal-title');
+    if (walletModalTitle) {
+        walletModalTitle.innerHTML = `<i class="fas fa-wallet" style="color:#fbbf24;"></i> ${t.casinoWalletModalTitle || 'کیف پول کازینو'}`;
+    }
+
+    setTxt('t-casino-wallet-title', t.casinoWalletModalTitle);
+    setTxt('t-casino-wallet-sub', t.casinoWalletSub);
+    setTxt('t-casino-usdt-label', t.casinoUsdtLabel);
+    setTxt('t-open-casino-wallet-btn', t.openWalletBtn);
 
     setTxt('t-game-roulette', t.casinoPoker);
     setTxt('t-game-plinko', t.casinoPlinko);
-    setTxt('t-game-dice', t.casinoDice);
 
-    setTxt('t-buy-1', t.buyBtn); setTxt('t-buy-2', t.buyBtn); setTxt('t-buy-3', t.buyBtn);
-    setTxt('t-convert-1', t.convertBtn); setTxt('t-convert-2', t.convertBtn); setTxt('t-convert-3', t.convertBtn);
+    setTxt('t-buy-1', t.buyBtn); setTxt('t-buy-2', t.buyBtn);
+    setTxt('t-convert-1', t.convertBtn); setTxt('t-convert-2', t.convertBtn);
 
     // به‌روزرسانی نمایش ژتون‌ها با واحد زبان جدید
     if (typeof updateCasinoWalletDisplay === 'function') {
         updateCasinoWalletDisplay();
     }
-    // ═══ END NEW ═══
 }
 
 // ==========================================
@@ -1103,7 +1169,7 @@ async function loadDashboardUserData(uid, sessionUser) {
         allMessages = await fetchUserMessages(uid);
         updateNotifBadges();
 
-        // ★ NEW: به‌روزرسانی موجودی تتر در کیف پول کازینو پس از دریافت اطلاعات
+        // به‌روزرسانی موجودی تتر در کیف پول کازینو پس از دریافت اطلاعات
         if (typeof updateCasinoWalletDisplay === 'function') {
             updateCasinoWalletDisplay();
         }
@@ -1153,7 +1219,7 @@ function hasStoredAuthToken() {
         currentUserId = session.user.id;
         loadDashboardUserData(session.user.id, session.user);
 
-        // ★ NEW: بعد از لود شدن، نمایش موجودی کازینو را به‌روز کن
+        // بعد از لود شدن، نمایش موجودی کازینو را به‌روز کن
         setTimeout(() => {
             if (typeof updateCasinoWalletDisplay === 'function') {
                 updateCasinoWalletDisplay();
@@ -1238,8 +1304,8 @@ document.getElementById('logout-btn')?.addEventListener('click', async e => {
     window.location.href = 'index.html';
 });
 // ═══════════════════════════════════════════════════════════════
-// 8. CASINO WALLET — سیستم کیف پول کازینو با سه بازی مستقل
-//    (رولت / پلینکو / تاس) — هر بازی ژتون جداگانه دارد
+// 8. CASINO WALLET — سیستم کیف پول کازینو با دو بازی مستقل
+//    (رولت / پلینکو) — هر بازی ژتون جداگانه دارد
 // ═══════════════════════════════════════════════════════════════
 
 // کلید localStorage برای هر بازی
@@ -1266,7 +1332,7 @@ function setGameChips(game, chips) {
     try { localStorage.setItem(getChipsKey(game), String(chips)); } catch(e) {}
 }
 
-// به‌روزرسانی نمایش موجودی USDT + ژتون هر سه بازی در کیف پول
+// به‌روزرسانی نمایش موجودی USDT + ژتون هر دو بازی در کیف پول
 function updateCasinoWalletDisplay() {
     // موجودی تتر
     const usdtEl = document.getElementById('casino-usdt-balance');
@@ -1322,7 +1388,7 @@ window.convertForGame = function(game) {
     if (!input) return;
 
     const amount = parseFloat(input.value);
-    const gameNames = { roulette: 'رولت', plinko: 'پلینکو', dice: 'تاس' };
+    const gameNames = { roulette: 'رولت', plinko: 'پلینکو' };
 
     // اعتبارسنجی مقدار
     if (!amount || amount < 1 || isNaN(amount)) {
