@@ -1,1365 +1,1197 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<script>
-(function(){
-  var supported=['en','fa','ar','tr','ru','es','fr','de'];
-  var lang='en';
-  try { var saved=localStorage.getItem('zenix_lang'); if(supported.indexOf(saved)!==-1) lang=saved; } catch(e) {}
-  document.documentElement.lang=lang;
-  document.documentElement.dir=(lang==='fa'||lang==='ar')?'rtl':'ltr';
-})();
-</script>
-<title>Zenix - Deposit</title>
-<link rel="icon" href="data:image/x-icon;base64,=">
-<link rel="preconnect" href="https://fonts.googleapis.cn">
-<link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin>
-<link href="https://fonts.googleapis.cn/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<noscript><style>body{visibility:visible !important;}</style></noscript>
-<style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
-body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column;visibility:hidden}
-body.lang-ready{visibility:visible}
-header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1);padding:10px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
-.logo{display:flex;align-items:center;gap:10px}
-.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#0ea5e9,#9333ea);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;font-style:italic;transform:skewX(-6deg);box-shadow:0 0 15px rgba(14,165,233,.4)}
-.logo-text{font-family:'Orbitron',sans-serif;font-size:19px;font-weight:900;letter-spacing:2px;font-style:italic;transform:skewX(-6deg);background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 20px rgba(56,189,248,.4)}
-.hr{display:flex;align-items:center;gap:8px}
-.wrap{position:relative}
-.lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none;transition:all 0.2s}
-.lb:hover{background:rgba(56,189,248,.15);border-color:#38bdf8}
-.badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;font-weight:700}
-.badge.show{display:flex}
-.menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(56,189,248,.3);border-radius:10px;width:max-content !important;width:-webkit-max-content !important;padding:6px;z-index:999;box-shadow:0 10px 30px rgba(0,0,0,.85);white-space:nowrap}
-[dir="rtl"] .wrap .menu{left:0;right:auto}
-[dir="ltr"] .wrap .menu{right:0;left:auto}
-.menu.show{display:block}
-.mi{padding:8px 12px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;transition:all 0.2s ease;white-space:nowrap;width:100%}
-.mi:hover{background:rgba(56,189,248,.15);color:#38bdf8}
-.mi.active{background:rgba(56,189,248,0.15) !important;color:#38bdf8 !important;font-weight:700 !important}
-.c{max-width:800px;width:100%;margin:15px auto;padding:0 12px;flex:1}
-.wel{background:linear-gradient(135deg,rgba(2,132,199,.15),rgba(147,51,234,.15));border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
-.wel h1{font-size:16px;margin-bottom:3px}
-.wel p{color:#94a3b8;font-size:11px}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
-.modal.show{display:flex}
-.modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(56,189,248,.3);border-radius:20px;width:100%;max-width:460px;max-height:85vh;display:flex;flex-direction:column;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.9);overflow:hidden}
-.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;color:#38bdf8;font-weight:800;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;flex-shrink:0}
-.modal-close{background:rgba(255,255,255,.05);border:none;color:#94a3b8;cursor:pointer;font-size:14px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
-.modal-close:hover{background:rgba(239,68,68,.2);color:#ef4444}
-.notif-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
-.notif-tab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#94a3b8;padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;white-space:nowrap;transition:0.2s;display:flex;align-items:center;justify-content:center;gap:5px;flex:1 1 auto}
-.notif-tab:hover{background:rgba(56,189,248,.15);color:#38bdf8}
-.notif-tab.active{background:#38bdf8;color:#0f172a;font-weight:bold;border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.3)}
-.tab-badge{background:rgba(255,255,255,.15);color:inherit;padding:1px 6px;border-radius:10px;font-size:10px;font-weight:700;line-height:1.2;min-width:16px;text-align:center;display:inline-block}
-.notif-tab.active .tab-badge{background:rgba(15,23,42,.3);color:#0f172a}
-#modal-msg-container{overflow-y:auto;padding-right:6px;flex:1;min-height:0}
-.msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px;transition:0.2s}
-.msg-body-box:hover{border-color:rgba(56,189,248,.5)!important;opacity:1!important}
-.msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:0}
-.msg-desc-text{font-size:12px;color:#cbd5e1;line-height:1.5}
-#modal-msg-container::-webkit-scrollbar,.modal-content div::-webkit-scrollbar{width:5px}
-#modal-msg-container::-webkit-scrollbar-track,.modal-content div::-webkit-scrollbar-track{background:rgba(15,23,42,.6);border-radius:10px}
-#modal-msg-container::-webkit-scrollbar-thumb,.modal-content div::-webkit-scrollbar-thumb{background:rgba(56,189,248,.35);border-radius:10px}
-#modal-msg-container::-webkit-scrollbar-thumb:hover,.modal-content div::-webkit-scrollbar-thumb:hover{background:rgba(56,189,248,.7)}
-#modal-msg-container,.modal-content div{scrollbar-width:thin;scrollbar-color:rgba(56,189,248,0.35) rgba(15,23,42,0.6)}
-input[readonly]{background:rgba(15,23,42,0.5) !important;color:#94a3b8 !important;border-color:rgba(255,255,255,0.08) !important;cursor:not-allowed}
-.net-btn{transition:all 0.2s ease}
-.net-btn.net-locked{opacity:0.4 !important;cursor:not-allowed !important;pointer-events:none}
-footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:800px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
-@media (max-width: 480px) {
-    .hr{gap:4px;flex-wrap:nowrap}
-    .lb{width:32px;height:32px;font-size:12px}
-    .logo-text{font-size:16px}
-    .wel{flex-direction:column;align-items:flex-start}
-    input,select,textarea{font-size:16px !important}
-    #net-trc20,#net-bep20{padding:8px 4px;font-size:11px}
-    .group label,.msg-desc-text,.msg-title-text{font-size:13px}
-    .wel h1{font-size:15px}
-    .wel p{font-size:12px}
-}
-@media (max-width: 360px) {
-    header{padding:8px 10px}
-    .logo{gap:6px}
-    .logo-icon{width:30px;height:30px;font-size:15px;border-radius:8px}
-    .logo-text{font-size:14px;letter-spacing:1px}
-    .hr{gap:3px;flex-wrap:nowrap}
-    .lb{width:30px;height:30px;font-size:11px;border-radius:7px}
-    .badge{width:14px;height:14px;font-size:8px;top:-3px;right:-3px}
-}
-</style>
-</head>
-<body>
-<header>
-<div class="logo"><div class="logo-icon">Z</div><div class="logo-text">ZENIX</div></div>
-<div class="hr">
-<div class="wrap"><button type="button" class="lb" id="bell-btn"><i class="fas fa-bell" style="color:#fbbf24"></i><span class="badge" id="bell-badge">0</span></button></div>
-<div class="wrap"><button type="button" class="lb" id="help-btn" title="Deposit page guide" data-i18n-title="helpTitle"><i class="fas fa-circle-question" style="color:#38bdf8"></i></button></div>
-<a href="support.html" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);" class="lb"><i class="fas fa-headset" style="color:#a855f7"></i></a>
-<div class="wrap"><button type="button" class="lb" id="lang-btn"><i class="fas fa-globe" style="color:#22c55e"></i></button>
-<div class="menu" id="lang-menu">
-<div class="mi" data-lang="fa">فارسی</div><div class="mi" data-lang="en">English</div><div class="mi" data-lang="ar">العربية</div><div class="mi" data-lang="tr">Türkçe</div><div class="mi" data-lang="ru">Русский</div><div class="mi" data-lang="es">Español</div><div class="mi" data-lang="fr">Français</div><div class="mi" data-lang="de">Deutsch</div>
-</div></div>
-<div class="wrap"><button type="button" class="lb" id="menu-btn"><i class="fas fa-bars" style="color:#f43f5e"></i></button>
-<div class="menu" id="nav-menu">
-<a href="dashboard.html" class="mi"><i class="fas fa-home" style="color:#38bdf8"></i><span id="m1" data-i18n="home">صفحه اصلی</span></a>
-<a href="quantification.html" class="mi"><i class="fas fa-robot" style="color:#a855f7"></i><span id="m2" data-i18n="quantification">کوانتیفیکیشن</span></a>
-<a href="deposit.html" class="mi active"><i class="fas fa-arrow-down" style="color:#22c55e"></i><span id="m3" data-i18n="deposit">واریز</span></a>
-<a href="receive.html" class="mi"><i class="fas fa-arrow-up" style="color:#fbbf24"></i><span id="m4" data-i18n="receive">برداشت</span></a>
-<a href="transactions.html" class="mi"><i class="fas fa-history" style="color:#06b6d4"></i><span id="m5" data-i18n="transactions">تراکنش</span></a>
-<a href="profile.html" class="mi"><i class="fas fa-user-cog" style="color:#ec4899"></i><span id="m6" data-i18n="profile">پروفایل</span></a>
-<a href="support.html" class="mi" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);"><i class="fas fa-headset" style="color:#a855f7"></i><span id="m7" data-i18n="support">پشتیبانی</span></a>
-<a href="#" class="mi" onclick="window.openAboutModal();return false;"><i class="fas fa-info-circle" style="color:#38bdf8"></i><span id="m_about" data-i18n="m_about">درباره پلتفرم</span></a>
-<a href="#" class="mi" id="logout-btn" style="color:#ef4444"><i class="fas fa-power-off"></i><span id="m8" data-i18n="logout">خروج</span></a>
-</div></div></div>
-</header>
-
-<div class="c">
-<div class="wel">
-<div><h1 data-i18n="depositTitle">واریز</h1><p data-i18n="depositSub">شارژ حساب از شبکه بلاکچین</p></div>
-<div style="font-size:11px;background:rgba(34,197,94,.1);border:1px solid #22c55e;padding:4px 8px;border-radius:6px;color:#22c55e;font-weight:600;"><i class="fas fa-bolt"></i> <span data-i18n="activeStatus">فعال</span></div>
-</div>
-
-<div style="background:rgba(30,41,59,0.8);border:1px solid rgba(56,189,248,0.3);border-radius:12px;padding:16px;margin-top:12px;">
-<div id="status-box" style="display:none;padding:12px;border-radius:8px;font-size:12px;margin-bottom:12px;text-align:center;font-weight:600;"></div>
-
-<div style="font-size:13px;color:#38bdf8;font-weight:bold;margin-bottom:12px;"><i class="fas fa-network-wired"></i> <span data-i18n="selectNetwork">انتخاب شبکه و آدرس</span></div>
-<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
-<div id="net-trc20" class="net-btn" onclick="setNetwork('TRC20')" style="flex:1;min-width:120px;background:rgba(56,189,248,0.15);border:1px solid #38bdf8;padding:10px;border-radius:8px;text-align:center;font-size:12px;color:#f8fafc;font-weight:bold;cursor:pointer;">USDT (TRC20)</div>
-<div id="net-bep20" class="net-btn" onclick="setNetwork('BEP20')" style="flex:1;min-width:120px;background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.1);padding:10px;border-radius:8px;text-align:center;font-size:12px;color:#94a3b8;cursor:pointer;">USDT (BEP20)</div>
-</div>
-<div style="text-align:center;margin:16px 0;">
-<div style="background:#fff;display:inline-block;padding:10px;border-radius:8px;margin-bottom:8px;">
-<img id="qr-code-img" src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=" alt="QR Code" style="display:none;">
-</div>
-<div style="font-size:11px;color:#94a3b8;" data-i18n="scanQr">اسکن جهت واریز مستقیم</div>
-<div id="qr-amount-label" style="display:none;font-size:13px;color:#22c55e;font-weight:800;margin-top:8px;padding:6px 12px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:6px;direction:ltr;text-align:center;"></div>
-</div>
-
-<div style="margin-bottom:16px;">
-<div id="wallet-recent-warning" style="display:none;margin-bottom:8px;"></div>
-<div id="wallet-warning" style="display:none;font-size:10px;color:#fbbf24;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);padding:8px 10px;border-radius:6px;margin-bottom:8px;">
-<i class="fas fa-shield-alt" style="color:#fbbf24;"></i>
-<strong>توجه:</strong> آدرس را با دقت بررسی کنید. فقط USDT در شبکه انتخاب‌شده بفرستید.
-</div>
-<label id="wallet-label" style="font-size:11px;color:#94a3b8;display:block;margin-bottom:4px;">آدرس کیف پول (TRC20):</label>
-<div style="display:flex;background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:8px;overflow:hidden;">
-<input type="text" id="wallet-address" value="" placeholder="Enter the deposit amount first to display the address…" data-i18n-placeholder="walletPlaceholder" readonly style="width:100%;background:transparent;border:none;color:#f8fafc;padding:10px;font-size:12px;outline:none;direction:ltr;text-align:left;user-select:none;-webkit-user-select:none;">
-<button type="button" id="copy-btn" onclick="copyAddress()" disabled style="background:#475569;border:none;color:#94a3b8;padding:0 14px;cursor:not-allowed;font-weight:bold;font-size:12px;transition:0.3s;"><i class="fas fa-copy"></i> <span data-i18n="copyBtn">کپی</span></button>
-</div>
-<div id="copy-warning" style="font-size:10px;color:#ef4444;margin-top:4px;" data-i18n="copyWarning">⚠ برای نمایش و کپی آدرس کیف پول، ابتدا مبلغ واریزی را وارد کنید.</div>
-
-<div id="wallet-last-change" style="font-size:10px;color:#94a3b8;margin-top:6px;display:none;">
-    <i class="fas fa-clock" style="color:#38bdf8;"></i>
-    <span id="wallet-last-change-text"></span>
-</div>
-</div>
-
-<div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;margin-bottom:16px;">
-<div style="font-size:12px;color:#38bdf8;font-weight:bold;margin-bottom:8px;"><i class="fas fa-wallet"></i> <span data-i18n="calcTitle">محاسبه مبلغ واریزی</span> <span style="color:#ef4444;">*</span></div>
-<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-<input type="number" id="calc-input" placeholder="Amount in USDT" data-i18n-placeholder="amountPlaceholder" oninput="calculateDeposit()" min="10" max="100000" step="0.01" style="flex:1;background:rgba(15,23,42,0.9);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#f8fafc;padding:8px 10px;font-size:12px;outline:none;">
-<div style="font-size:11px;color:#94a3b8;white-space:nowrap;">USDT</div>
-</div>
-
-<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#cbd5e1;background:rgba(56,189,248,0.08);padding:8px 10px;border-radius:6px;margin-bottom:12px;">
-<span data-i18n="finalCalcText">مبلغ واریزی نهایی:</span>
-<div style="display:flex;align-items:center;gap:6px;">
-<span id="calc-result" style="color:#22c55e;font-weight:bold;">0.00 USDT</span>
-<button type="button" id="copy-final-btn" onclick="copyFinalAmount()" title="Copy final amount" data-i18n-title="copyFinalTitle" style="background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.3);color:#38bdf8;padding:3px 7px;border-radius:5px;cursor:pointer;font-size:11px;display:inline-flex;align-items:center;gap:4px;transition:0.2s;">
-<i class="fas fa-copy"></i>
-</button>
-</div>
-</div>
-
-<div style="font-size:12px;color:#38bdf8;font-weight:bold;margin-bottom:6px;"><i class="fas fa-receipt"></i> <span data-i18n="txHashTitle">هش تراکنش (TxID)</span> <span style="color:#ef4444;">*</span></div>
-<input type="text" id="tx-hash-input" placeholder="Example: 5f4d11... or transaction hash" data-i18n-placeholder="txHashPlaceholder" oninput="checkInputs()" maxlength="66" style="width:100%;background:rgba(15,23,42,0.9);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#f8fafc;padding:8px 10px;font-size:12px;outline:none;direction:ltr;text-align:left;">
-
-<div style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:11px;color:#38bdf8;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);padding:6px 10px;border-radius:6px;">
-<i class="fas fa-clock" style="color:#38bdf8;"></i>
-<span data-i18n="txTiming">Transaction confirmation and account crediting usually take 5–15 minutes.</span>
-</div>
-
-</div>
-
-<button type="button" id="inquiry-btn" onclick="checkAutoDeposit()" disabled style="width:100%;background:#475569;color:#94a3b8;border:none;padding:12px;border-radius:8px;font-weight:bold;cursor:not-allowed;font-size:13px;transition:0.3s;"><i class="fas fa-sync-alt"></i> <span data-i18n="inquiryBtn">استعلام و واریزی</span></button>
-</div>
-
-<div style="margin-top:16px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:14px;font-size:11px;color:#cbd5e1;line-height:1.6;">
-<div style="color:#ef4444;font-weight:bold;margin-bottom:6px;"><i class="fas fa-exclamation-triangle"></i> <span data-i18n="securityGuide">Important security notice:</span></div>
-<span style="color:#f8fafc;font-weight:bold;" data-i18n="securityWarning">* The deposit amount must exactly match the calculated amount. Otherwise, the entire deposit will be locked and cannot be refunded.</span><br>
-<span data-i18n="sec1">* لطفاً از واریز هرگونه ارزی غیر از USDT خودداری فرمایید.</span><br>
-<span data-i18n="sec2">* تراکنش‌ها به صورت خودکار پس از تایید گره‌های شبکه اعمال می‌شوند.</span>
-</div>
-</div>
-
-<div class="modal" id="m-msg">
-    <div class="modal-content">
-        <div class="modal-header">
-            <span id="t-modal-title"><i class="fas fa-bell"></i> صندوق پیام‌ها و اعلان‌ها</span>
-            <button class="modal-close" onclick="window.closeMessageModal()"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="notif-tabs" id="notif-tabs">
-            <button type="button" class="notif-tab active" onclick="window.setNotifFilter('all', this)"><i class="fas fa-list"></i> <span id="t-tab-all" data-i18n="tabAll">All</span> <span class="tab-badge" id="cnt-tab-all">0</span></button>
-            <button type="button" class="notif-tab" onclick="window.setNotifFilter('approved', this)"><i class="fas fa-check-circle" style="color:#22c55e"></i> <span id="t-tab-approved" data-i18n="tabApproved">Approved</span> <span class="tab-badge" id="cnt-tab-approved">0</span></button>
-            <button type="button" class="notif-tab" onclick="window.setNotifFilter('rejected', this)"><i class="fas fa-times-circle" style="color:#ef4444"></i> <span id="t-tab-rejected" data-i18n="tabRejected">Rejected</span> <span class="tab-badge" id="cnt-tab-rejected">0</span></button>
-            <button type="button" class="notif-tab" onclick="window.setNotifFilter('admin_message', this)"><i class="fas fa-bullhorn" style="color:#38bdf8"></i> <span id="t-tab-admin" data-i18n="tabAdmin">Admin message</span> <span class="tab-badge" id="cnt-tab-admin">0</span></button>
-        </div>
-        <div id="modal-msg-container"><div style="text-align:center;padding:20px;color:#94a3b8" data-i18n="noMsg">No new messages.</div></div>
-    </div>
-</div>
-
-<div class="modal" id="m-msg-detail" style="z-index:1050;">
-    <div class="modal-content">
-        <div class="modal-header">
-            <span id="detail-msg-title"><i class="fas fa-envelope-open"></i> <span data-i18n="detailTitle">View message</span></span>
-            <button class="modal-close" onclick="window.closeMsgDetailModal()"><i class="fas fa-times"></i></button>
-        </div>
-        <div style="overflow-y:auto;padding-right:6px">
-            <div id="detail-msg-date" style="font-size:11px;color:#94a3b8;direction:ltr;text-align:left;margin-bottom:10px;display:none;"></div>
-            <div id="detail-msg-body" style="font-size:13px;color:#cbd5e1;line-height:1.7;white-space:pre-wrap;margin-bottom:12px;"></div>
-            <div id="detail-msg-support"></div>
-        </div>
-    </div>
-</div>
-
-<div class="modal" id="m-help">
-    <div class="modal-content">
-        <div class="modal-header"><span data-i18n="helpTitle">Deposit page guide</span><button class="modal-close" onclick="window.closeHelpModal()"><i class="fas fa-times"></i></button></div>
-        <div style="overflow-y:auto;padding-right:4px">
-            <div class="msg-body-box" style="background:rgba(239,68,68,0.15);border:1px solid #ef4444;">
-                <div class="msg-title-text" style="color:#ef4444;"><i class="fas fa-exclamation-triangle"></i> <span data-i18n="helpSecurityTitle">Important security notice:</span></div>
-                <div class="msg-desc-text" style="color:#f8fafc;font-weight:bold;" data-i18n="helpSecurityText">The deposit amount must exactly match the calculated amount; otherwise it will be locked and cannot be refunded.</div>
-            </div>
-            <div class="msg-body-box">
-                <div class="msg-title-text"><i class="fas fa-network-wired" style="color:#38bdf8"></i> <span data-i18n="helpSelectNetworkTitle">Choose network and address</span></div>
-                <div class="msg-desc-text" data-i18n="helpSelectNetworkText">Choose your transfer network (such as TRC20 or BEP20). The wallet address depends on the selected network.</div>
-            </div>
-            <div class="msg-body-box">
-                <div class="msg-title-text"><i class="fas fa-wallet" style="color:#38bdf8"></i> <span data-i18n="helpCalcTitle">Calculate deposit amount</span></div>
-                <div class="msg-desc-text" data-i18n="helpCalcText">Enter an amount in USDT to enable and copy the wallet address. The final amount including fees is also displayed.</div>
-            </div>
-            <div class="msg-body-box">
-                <div class="msg-title-text"><i class="fas fa-receipt" style="color:#22c55e"></i> <span data-i18n="helpTxTitle">Submit transaction hash (TxID)</span></div>
-                <div class="msg-desc-text" data-i18n="helpTxText">After transferring from your wallet, enter the transaction hash and check the deposit to credit your balance.</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal" id="m-about">
-    <div class="modal-content">
-        <div class="modal-header">
-            <span id="t-about-title" data-i18n="aboutTitle">About Zenix (purpose, nature, and structure)</span>
-            <button class="modal-close" onclick="window.closeAboutModal()"><i class="fas fa-times"></i></button>
-        </div>
-        <div style="overflow-y:auto;padding-right:4px">
-            <p style="font-size:13px;color:#cbd5e1;line-height:1.7;margin-bottom:10px;" id="t-ab-m-desc" data-i18n="aboutDesc">Zenix is a modern financial ecosystem for digital assets and transaction processing, designed to provide secure automated services.</p>
-            <ul style="font-size:12px;color:#94a3b8;padding-right:18px;line-height:1.7;margin-bottom:0;">
-                <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" data-i18n="aboutL1Title">Main purpose:</strong> <span data-i18n="aboutL1Desc">Automate trading processes using AI and quantification algorithms.</span></li>
-                <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" data-i18n="aboutL2Title">Security and infrastructure:</strong> <span data-i18n="aboutL2Desc">Encryption protocols, fast cloud processing nodes, and unified asset management through Supabase.</span></li>
-                <li style="margin-bottom:6px;"><strong style="color:#f8fafc;" data-i18n="aboutL3Title">Multi-level referrals and team:</strong> <span data-i18n="aboutL3Desc">A referral network can provide rewards from referred users' activity across multiple levels.</span></li>
-                <li><strong style="color:#f8fafc;" data-i18n="aboutL4Title">Live platform data:</strong> <span data-i18n="aboutL4Desc">Live crypto markets, volume indicators, network fees, and system notices provide current information.</span></li>
-            </ul>
-        </div>
-    </div>
-</div>
-
-<footer>
-<p>&copy; 2026 Zenix. All rights reserved.</p>
-<p style="color:#22c55e;"><i class="fas fa-circle" style="font-size:6px;"></i> <span id="t-node">سرور فعال (US-East)</span></p>
-</footer>
-
-<script>
-const SUPABASE_URL = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
-
-window.wallets = { TRC20: '', BEP20: '' };
-window.walletLastChange = { TRC20: null, BEP20: null };
-window.currentNetwork = 'TRC20';
-
-const MIN_DEPOSIT = 10;
-const MAX_DEPOSIT = 100000;
-const FEE_RATE = 1.025;
-const TXID_REGEX = /^(?:0x)?[a-fA-F0-9]{64}$/;
-
-window.__statusState = null;
-window.__statusTimerStart = null;
-
-window.loadWallets = async function() {
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/app_settings?key=in.(wallet_trc20,wallet_bep20)&select=key,value`, {
-      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    if (Array.isArray(data)) {
-      data.forEach(row => {
-        if (row.key === 'wallet_trc20') window.wallets.TRC20 = row.value || '';
-        if (row.key === 'wallet_bep20') window.wallets.BEP20 = row.value || '';
-      });
-    }
-    return !!(window.wallets.TRC20 && window.wallets.BEP20);
-  } catch (e) {
-    console.error('loadWallets error:', e);
-    return false;
-  }
-};
-
-window.loadWalletLastChange = async function(key) {
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_last_wallet_change`, {
-      method: 'POST',
-      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ p_key: key })
-    });
-    if (!res.ok) {
-      if (key === 'wallet_trc20') window.walletLastChange.TRC20 = null;
-      if (key === 'wallet_bep20') window.walletLastChange.BEP20 = null;
-      return null;
-    }
-    const data = await res.json();
-    const result = data === null ? null : (Array.isArray(data) ? data[0] : data);
-    if (key === 'wallet_trc20') window.walletLastChange.TRC20 = result;
-    if (key === 'wallet_bep20') window.walletLastChange.BEP20 = result;
-    return result;
-  } catch (e) { return null; }
-};
-
-window.renderWalletLastChange = function() {
-  const box = document.getElementById('wallet-last-change');
-  const txt = document.getElementById('wallet-last-change-text');
-  if (!box || !txt) return;
-  const net = window.currentNetwork || 'TRC20';
-  const lastChange = window.walletLastChange[net];
-  if (!lastChange) { box.style.display = 'none'; return; }
-  try {
-    const d = new Date(lastChange);
-    if (isNaN(d.getTime())) { box.style.display = 'none'; return; }
-    const pad = n => String(n).padStart(2, '0');
-    const dateStr = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-    const diffMin = Math.floor((Date.now() - d.getTime()) / 60000);
-    let ago = '';
-    const t = window.currentLangData || LD.en;
-    if (diffMin < 1) ago = t.lastChangeJustNow || 'همین حالا';
-    else if (diffMin < 60) ago = (t.lastChangeMinAgo || 'X دقیقه پیش').replace('X', diffMin);
-    else if (diffMin < 1440) ago = (t.lastChangeHourAgo || 'X ساعت پیش').replace('X', Math.floor(diffMin/60));
-    else ago = (t.lastChangeDayAgo || 'X روز پیش').replace('X', Math.floor(diffMin/1440));
-    txt.innerHTML = `${t.lastChangeLabel || 'آخرین تغییر آدرس:'} <strong style="color:#38bdf8;direction:ltr;display:inline-block;">${dateStr}</strong> <span style="color:#64748b;">(${ago})</span>`;
-    box.style.display = 'block';
-  } catch (e) { box.style.display = 'none'; }
-};
-
-/* ★★★ بنر هشدار «آدرس اخیراً تغییر کرده» ★★★ */
-window.renderRecentWarning = function() {
-  const box = document.getElementById('wallet-recent-warning');
-  if (!box) return;
-  const net = window.currentNetwork || 'TRC20';
-  const lastChange = window.walletLastChange[net];
-
-  if (!lastChange) { box.style.display = 'none'; box.innerHTML = ''; return; }
-
-  try {
-    const d = new Date(lastChange);
-    if (isNaN(d.getTime())) { box.style.display = 'none'; box.innerHTML = ''; return; }
-
-    const hoursAgo = (Date.now() - d.getTime()) / 3600000;
-    const t = window.currentLangData || LD.en;
-
-    /* اگر در ۷۲ ساعت گذشته تغییر کرده → بنر قرمز بزرگ */
-    if (hoursAgo < 72) {
-      box.style.cssText = 'display:block;background:rgba(239,68,68,.15);border:2px solid #ef4444;border-radius:10px;padding:14px;margin-bottom:10px;color:#fecaca;font-size:12px;line-height:1.7;box-shadow:0 0 20px rgba(239,68,68,.3);';
-      box.innerHTML = `
-        <div style="display:flex;align-items:flex-start;gap:10px;">
-          <i class="fas fa-exclamation-triangle" style="color:#ef4444;font-size:20px;margin-top:2px;flex-shrink:0;"></i>
-          <div>
-            <strong style="color:#ef4444;display:block;margin-bottom:4px;font-size:13px;">${escapeHtml(t.recentWarnTitle72 || '⚠ آدرس کیف پول اخیراً تغییر کرده است')}</strong>
-            <div>${escapeHtml(t.recentWarnBody72 || 'آدرس کیف پول در ۷۲ ساعت گذشته تغییر کرده است. قبل از واریز، لطفاً با پشتیبانی تماس بگیرید تا از صحت آن مطمئن شوید.')}</div>
-          </div>
-        </div>
-      `;
-      return;
-    }
-
-    /* اگر در ۷ روز گذشته تغییر کرده → بنر زرد کوچک‌تر */
-    if (hoursAgo < 168) {
-      box.style.cssText = 'display:block;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.3);border-radius:8px;padding:10px;margin-bottom:10px;color:#fbbf24;font-size:11px;line-height:1.6;';
-      box.innerHTML = `
-        <div style="display:flex;align-items:flex-start;gap:8px;">
-          <i class="fas fa-info-circle" style="color:#fbbf24;font-size:15px;margin-top:1px;flex-shrink:0;"></i>
-          <div>${escapeHtml(t.recentWarnBody7 || 'آدرس کیف پول در ۷ روز گذشته تغییر کرده است. لطفاً آدرس را با دقت بررسی کنید.')}</div>
-        </div>
-      `;
-      return;
-    }
-
-    /* بیش از ۷ روز → مخفی */
-    box.style.display = 'none';
-    box.innerHTML = '';
-  } catch (e) {
-    box.style.display = 'none';
-    box.innerHTML = '';
-  }
-};
+// ==========================================
+// 1. تنظیمات اولیه و اتصال به سوبابیس
+// ==========================================
+import { createClient } from 'https://cdn.jsdmirror.com/npm/@supabase/supabase-js@2/+esm';
+const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO";
 
 function escapeHtml(value) {
-  return String(value == null ? '' : value)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
 }
 
-const LD = {
-  fa: {
-    pageTitle:"زنیکس - واریز",home:"صفحه اصلی",quantification:"کوانتیفیکیشن",deposit:"واریز",receive:"برداشت",transactions:"تراکنش‌ها",profile:"پروفایل",support:"پشتیبانی",m_about:"درباره پلتفرم",logout:"خروج",
-    depositTitle:"واریز",depositSub:"شارژ حساب از شبکه بلاکچین",activeStatus:"فعال",calcTitle:"محاسبه مبلغ واریزی",finalCalcText:"مبلغ واریزی نهایی:",
-    txHashTitle:"هش تراکنش (TxID)",selectNetwork:"انتخاب شبکه و آدرس",scanQr:"اسکن جهت واریز مستقیم",
-    copyBtn:"کپی",copyWarning:"⚠️ برای نمایش و کپی آدرس کیف پول، ابتدا مبلغ واریزی را وارد کنید.",inquiryBtn:"استعلام و واریزی",
-    securityGuide:"راهنمای امنیتی مهم:",securityWarning:"* مبلغ واریزی باید دقیقاً با مبلغ محاسبه‌شده برابر باشد؛ در غیر این صورت کل مبلغ مسدود می‌شود و قابل بازگشت نیست.",sec1:"* لطفاً از واریز هرگونه ارزی غیر از USDT خودداری فرمایید.",sec2:"* تراکنش‌ها پس از تأیید گره‌های شبکه به‌صورت خودکار پردازش می‌شوند.",
-    txTiming:"تأیید تراکنش و شارژ حساب معمولاً بین ۵ تا ۱۵ دقیقه زمان می‌برد.",amountPlaceholder:"مبلغ به USDT",txHashPlaceholder:"مثال: 5f4d11... یا هش تراکنش",walletPlaceholder:"برای نمایش آدرس ابتدا مبلغ واریزی را وارد کنید…",
-    copiedMsg:"📋 آدرس کیف پول با موفقیت در کلیپ‌بورد کپی شد.",copyFailedMsg:"⚠ کپی ناموفق بود. لطفاً متن را دستی انتخاب و کپی کنید.",
-    loginErr:"❌ لطفاً ابتدا وارد حساب کاربری خود شوید.",fillReqErr:"❌ لطفاً مبلغ و هش تراکنش را به‌طور کامل وارد کنید.",
-    duplicateTxId:"❌ این هش تراکنش قبلاً ثبت شده است.",
-    minAmountErr:"❌ حداقل مبلغ واریز ۱۰ USDT است.",maxAmountErr:"❌ حداکثر مبلغ واریز ۱۰۰,۰۰۰ USDT است.",
-    invalidTxId:"❌ فرمت هش تراکنش نامعتبر است. باید ۶۴ کاراکتر هگز باشد.",
-    sendExactlyLabel:"دقیقاً ارسال کنید",
-    pendingSentMsg:"⏳ درخواست واریز شما ثبت شد و برای بررسی به مدیریت ارسال گردید.",netLbl:"آدرس کیف پول",
-    modalTitle:"صندوق پیام‌ها و اعلان‌ها",noMsg:"هیچ پیام جدیدی وجود ندارد.",tNode:"سرور فعال (US-East)",
-    tabAll:"همه",tabApproved:"تأیید درخواست",tabRejected:"لغو درخواست",tabAdmin:"پیام مدیریت",detailTitle:"مشاهده پیام",
-    helpTitle:"راهنمای صفحه واریز",helpSecurityTitle:"راهنمای امنیتی مهم:",helpSecurityText:"حتماً مبلغ واریزی با مبلغ محاسبه‌شده برابر باشد؛ در غیر این صورت کل مبلغ مسدود می‌شود و قابل بازگشت نیست.",
-    helpSelectNetworkTitle:"انتخاب شبکه و آدرس",helpSelectNetworkText:"ابتدا شبکه انتقال خود را انتخاب کنید. آدرس کیف پول مقصد بر اساس شبکه انتخابی تغییر می‌کند.",
-    helpCalcTitle:"محاسبه مبلغ واریزی",helpCalcText:"با وارد کردن مبلغ به USDT، آدرس کیف پول فعال می‌شود و می‌توانید آن را کپی کنید.",
-    helpTxTitle:"ثبت هش تراکنش (TxID)",helpTxText:"پس از انجام تراکنش، هش آن (TxID) را وارد کرده و دکمه استعلام واریز را بزنید.",
-    aboutTitle:"درباره پلتفرم Zenix (هدف، ماهیت و ساختار)",aboutDesc:"پلتفرم Zenix یک اکوسیستم مالی نوین برای دارایی‌های دیجیتال و پردازش تراکنش‌هاست.",
-    aboutL1Title:"هدف اصلی:",aboutL1Desc:"خودکارسازی فرایندهای معاملاتی با سیستم‌های هوش مصنوعی.",
-    aboutL2Title:"امنیت و زیرساخت:",aboutL2Desc:"استفاده از پروتکل‌های رمزنگاری و مدیریت یکپارچه دارایی‌ها.",
-    aboutL3Title:"معرفی و تیم چندسطحی:",aboutL3Desc:"شبکه معرفی دوستان تا کاربران از فعالیت زیرمجموعه‌ها پاداش دریافت کنند.",
-    aboutL4Title:"اطلاعات زنده پلتفرم:",aboutL4Desc:"نمایش بازار رمزارزها، شاخص‌های حجم معاملات و اعلان‌های سیستم.",
-    noMsgCategory:"در این دسته‌بندی پیامی وجود ندارد.",systemMessage:"پیام سیستم",
-    tagAdmin:"پیام مدیریت",tagApproved:"تأیید درخواست",tagRejected:"لغو درخواست",badgeNew:"جدید",badgeRead:"خوانده‌شده",
-    supportFollowup:"پیگیری از پشتیبانی",unreadTitle:"خوانده‌نشده",elapsedTime:"زمان سپری‌شده:",requesting:"در حال ثبت درخواست…",requestPending:"درخواست در حال بررسی…",
-    depositError:"❌ خطا در ثبت درخواست واریز:",copyFinalTitle:"کپی مبلغ نهایی",
-    lastChangeLabel:"⏱ آخرین تغییر آدرس:",lastChangeJustNow:"همین حالا",lastChangeMinAgo:"X دقیقه پیش",lastChangeHourAgo:"X ساعت پیش",lastChangeDayAgo:"X روز پیش",
-    cooldownErr:"⏳ لطفاً X ثانیه صبر کنید و دوباره تلاش کنید (ضد اسپم).",
-    rateLimitErr:"❌ حداکثر ۵ درخواست واریز در ۲۴ ساعت مجاز است.",
-    recentWarnTitle72:"⚠ آدرس کیف پول اخیراً تغییر کرده است",
-    recentWarnBody72:"آدرس کیف پول در ۷۲ ساعت گذشته تغییر کرده است. قبل از واریز، لطفاً با پشتیبانی تماس بگیرید تا از صحت آن مطمئن شوید.",
-    recentWarnBody7:"آدرس کیف پول در ۷ روز گذشته تغییر کرده است. لطفاً آدرس را با دقت بررسی کنید.",
-    dir:"rtl"
-  },
-  en: {
-    pageTitle:"Deposit | Zenix",home:"Home",quantification:"Quantification",deposit:"Deposit",receive:"Withdraw",transactions:"Transactions",profile:"Profile",support:"Support",m_about:"About platform",logout:"Log out",
-    depositTitle:"Deposit",depositSub:"Top up your account through the blockchain network",activeStatus:"Active",calcTitle:"Deposit amount calculator",finalCalcText:"Final deposit amount:",
-    txHashTitle:"Transaction hash (TxID)",selectNetwork:"Select network and address",scanQr:"Scan to deposit directly",
-    copyBtn:"Copy",copyWarning:"⚠ Enter the deposit amount first to display and copy the wallet address.",inquiryBtn:"Check deposit",
-    securityGuide:"Important security notice:",securityWarning:"* The deposit amount must exactly match the calculated amount. Otherwise, the entire deposit will be locked and cannot be refunded.",sec1:"* Do not deposit any currency other than USDT.",sec2:"* Transactions are processed automatically after network nodes confirm them.",
-    txTiming:"Transaction confirmation and account crediting usually take 5–15 minutes.",amountPlaceholder:"Amount in USDT",txHashPlaceholder:"Example: 5f4d11... or transaction hash",walletPlaceholder:"Enter the deposit amount first to display the address…",
-    copiedMsg:"📋 Wallet address copied to the clipboard.",copyFailedMsg:"⚠ Copy failed. Please select and copy manually.",
-    loginErr:"❌ Please log in to your account first.",fillReqErr:"❌ Enter both the amount and transaction hash.",
-    duplicateTxId:"❌ This transaction hash has already been submitted.",
-    minAmountErr:"❌ Minimum deposit amount is 10 USDT.",maxAmountErr:"❌ Maximum deposit amount is 100,000 USDT.",
-    invalidTxId:"❌ Invalid transaction hash format. Must be 64 hex characters.",
-    sendExactlyLabel:"Send exactly",
-    pendingSentMsg:"⏳ Your deposit request has been submitted to the administrator for review.",netLbl:"Wallet address",
-    modalTitle:"Notifications and messages",noMsg:"No new messages.",tNode:"Server active (US-East)",
-    tabAll:"All",tabApproved:"Approved",tabRejected:"Rejected",tabAdmin:"Admin message",detailTitle:"View message",
-    helpTitle:"Deposit page guide",helpSecurityTitle:"Important security notice:",helpSecurityText:"The deposit amount must exactly match the calculated amount.",
-    helpSelectNetworkTitle:"Choose network and address",helpSelectNetworkText:"Choose your transfer network. The wallet address depends on the selected network.",
-    helpCalcTitle:"Calculate deposit amount",helpCalcText:"Enter an amount in USDT to enable and copy the wallet address.",
-    helpTxTitle:"Submit transaction hash (TxID)",helpTxText:"After making the transfer, enter the transaction hash and check the deposit.",
-    aboutTitle:"About Zenix",aboutDesc:"Zenix is a modern financial ecosystem for digital assets.",
-    aboutL1Title:"Main purpose:",aboutL1Desc:"Automate trading processes with AI systems.",
-    aboutL2Title:"Security and infrastructure:",aboutL2Desc:"Uses encryption protocols and unified asset management.",
-    aboutL3Title:"Multi-level referrals:",aboutL3Desc:"Users can receive rewards from referrals.",
-    aboutL4Title:"Live platform data:",aboutL4Desc:"Live crypto markets and system notices.",
-    noMsgCategory:"No messages in this category.",systemMessage:"System message",
-    tagAdmin:"Admin message",tagApproved:"Request approved",tagRejected:"Request rejected",badgeNew:"New",badgeRead:"Read",
-    supportFollowup:"Contact support",unreadTitle:"Unread",elapsedTime:"Elapsed time:",requesting:"Submitting request…",requestPending:"Request under review…",
-    depositError:"❌ Error submitting deposit request:",copyFinalTitle:"Copy final amount",
-    lastChangeLabel:"⏱ Last address change:",lastChangeJustNow:"just now",lastChangeMinAgo:"X minutes ago",lastChangeHourAgo:"X hours ago",lastChangeDayAgo:"X days ago",
-    cooldownErr:"⏳ Please wait X seconds before trying again (anti-spam).",
-    rateLimitErr:"❌ Maximum 5 deposit requests per 24 hours.",
-    recentWarnTitle72:"⚠ Wallet address recently changed",
-    recentWarnBody72:"The wallet address has changed within the last 72 hours. Please contact support to verify before depositing.",
-    recentWarnBody7:"The wallet address has changed within the last 7 days. Please verify the address carefully.",
-    dir:"ltr"
-  },
-  ar: {
-    pageTitle:"Zenix - إيداع",home:"الرئيسية",quantification:"التداول الكمي",deposit:"إيداع",receive:"سحب",transactions:"المعاملات",profile:"الملف الشخصي",support:"الدعم",m_about:"حول المنصة",logout:"تسجيل الخروج",
-    depositTitle:"إيداع",depositSub:"شحن الحساب عبر شبكة البلوك تشين",activeStatus:"نشط",calcTitle:"حاسبة مبلغ الإيداع",finalCalcText:"مبلغ الإيداع النهائي:",
-    txHashTitle:"معرّف المعاملة (TxID)",selectNetwork:"اختيار الشبكة والعنوان",scanQr:"امسح للإيداع المباشر",
-    copyBtn:"نسخ",copyWarning:"⚠ أدخل مبلغ الإيداع أولاً.",inquiryBtn:"التحقق من الإيداع",
-    securityGuide:"تنبيه أمني مهم:",securityWarning:"* يجب أن يطابق مبلغ الإيداع المبلغ المحسوب تماماً.",sec1:"* لا تودع أي عملة غير USDT.",sec2:"* تُعالج المعاملات تلقائياً.",
-    txTiming:"يستغرق تأكيد المعاملة 5 إلى 15 دقيقة.",amountPlaceholder:"المبلغ بـ USDT",txHashPlaceholder:"مثال: 5f4d11... أو معرّف المعاملة",walletPlaceholder:"أدخل مبلغ الإيداع أولاً…",
-    copiedMsg:"📋 تم نسخ عنوان المحفظة.",copyFailedMsg:"⚠ فشل النسخ.",
-    loginErr:"❌ يرجى تسجيل الدخول أولاً.",fillReqErr:"❌ يرجى إدخال المبلغ والمعرّف بالكامل.",
-    duplicateTxId:"❌ تم إرسال معرّف هذه المعاملة مسبقاً.",
-    minAmountErr:"❌ الحد الأدنى 10 USDT.",maxAmountErr:"❌ الحد الأقصى 100,000 USDT.",
-    invalidTxId:"❌ صيغة غير صالحة. 64 حرفاً سداسياً.",
-    sendExactlyLabel:"أرسل بالضبط",
-    pendingSentMsg:"⏳ تم إرسال طلب الإيداع للمراجعة.",netLbl:"عنوان المحفظة",
-    modalTitle:"الإشعارات والرسائل",noMsg:"لا توجد رسائل جديدة.",tNode:"الخادم نشط (US-East)",
-    tabAll:"الكل",tabApproved:"تمت الموافقة",tabRejected:"مرفوض",tabAdmin:"رسالة الإدارة",detailTitle:"عرض الرسالة",
-    helpTitle:"دليل صفحة الإيداع",helpSecurityTitle:"تنبيه أمني مهم:",helpSecurityText:"يجب أن يطابق مبلغ الإيداع المبلغ المحسوب.",
-    helpSelectNetworkTitle:"اختيار الشبكة والعنوان",helpSelectNetworkText:"اختر شبكة التحويل. عنوان المحفظة يتغير بحسب الشبكة.",
-    helpCalcTitle:"حساب مبلغ الإيداع",helpCalcText:"أدخل المبلغ بـ USDT لتفعيل عنوان المحفظة.",
-    helpTxTitle:"إرسال معرّف المعاملة (TxID)",helpTxText:"بعد التحويل، أدخل المعرّف واضغط التحقق.",
-    aboutTitle:"حول منصة Zenix",aboutDesc:"Zenix منظومة مالية حديثة للأصول الرقمية.",
-    aboutL1Title:"الهدف الرئيسي:",aboutL1Desc:"أتمتة التداول بالذكاء الاصطناعي.",
-    aboutL2Title:"الأمان والبنية:",aboutL2Desc:"بروتوكولات تشفير وإدارة موحدة للأصول.",
-    aboutL3Title:"الإحالات:",aboutL3Desc:"مكافآت من نشاط الإحالات.",
-    aboutL4Title:"بيانات مباشرة:",aboutL4Desc:"أسواق ومؤشرات وإشعارات.",
-    noMsgCategory:"لا توجد رسائل.",systemMessage:"رسالة النظام",
-    tagAdmin:"رسالة الإدارة",tagApproved:"تمت الموافقة",tagRejected:"تم الرفض",badgeNew:"جديد",badgeRead:"مقروء",
-    supportFollowup:"التواصل مع الدعم",unreadTitle:"غير مقروء",elapsedTime:"الوقت المنقضي:",requesting:"جارٍ الإرسال…",requestPending:"قيد المراجعة…",
-    depositError:"❌ خطأ في الإرسال:",copyFinalTitle:"نسخ المبلغ",
-    lastChangeLabel:"⏱ آخر تغيير:",lastChangeJustNow:"الآن",lastChangeMinAgo:"منذ X دقيقة",lastChangeHourAgo:"منذ X ساعة",lastChangeDayAgo:"منذ X يوم",
-    cooldownErr:"⏳ يرجى الانتظار X ثانية قبل المحاولة مجدداً.",
-    rateLimitErr:"❌ الحد الأقصى 5 طلبات في 24 ساعة.",
-    recentWarnTitle72:"⚠ تم تغيير عنوان المحفظة مؤخراً",
-    recentWarnBody72:"تم تغيير عنوان المحفظة خلال الـ 72 ساعة الماضية. يرجى التواصل مع الدعم للتحقق قبل الإيداع.",
-    recentWarnBody7:"تم تغيير عنوان المحفظة خلال الـ 7 أيام الماضية. يرجى التحقق من العنوان بعناية.",
-    dir:"rtl"
-  },
-  tr: {
-    pageTitle:"Zenix - Para Yatırma",home:"Ana sayfa",quantification:"Kantifikasyon",deposit:"Para yatır",receive:"Para çek",transactions:"İşlemler",profile:"Profil",support:"Destek",m_about:"Platform hakkında",logout:"Çıkış yap",
-    depositTitle:"Para yatır",depositSub:"Blokzincir ağı üzerinden hesaba para yükleyin",activeStatus:"Aktif",calcTitle:"Yatırma tutarı hesaplayıcı",finalCalcText:"Nihai yatırma tutarı:",
-    txHashTitle:"İşlem özeti (TxID)",selectNetwork:"Ağ ve adres seçin",scanQr:"Doğrudan yatırmak için tarayın",
-    copyBtn:"Kopyala",copyWarning:"⚠ Önce yatırma tutarını girin.",inquiryBtn:"Yatırmayı kontrol et",
-    securityGuide:"Önemli güvenlik uyarısı:",securityWarning:"* Tutar hesaplanan tutarla eşleşmelidir.",sec1:"* Sadece USDT.",sec2:"* İşlemler otomatik işlenir.",
-    txTiming:"Onay 5–15 dakika sürer.",amountPlaceholder:"USDT tutarı",txHashPlaceholder:"Örnek: 5f4d11...",walletPlaceholder:"Önce tutarı girin…",
-    copiedMsg:"📋 Cüzdan adresi kopyalandı.",copyFailedMsg:"⚠ Kopyalama başarısız.",
-    loginErr:"❌ Önce giriş yapın.",fillReqErr:"❌ Tutarı ve özeti girin.",
-    duplicateTxId:"❌ Bu işlem özeti zaten gönderildi.",
-    minAmountErr:"❌ Minimum 10 USDT.",maxAmountErr:"❌ Maksimum 100.000 USDT.",
-    invalidTxId:"❌ Geçersiz format. 64 hex karakter.",
-    sendExactlyLabel:"Tam gönderin",
-    pendingSentMsg:"⏳ Talebiniz incelemeye gönderildi.",netLbl:"Cüzdan adresi",
-    modalTitle:"Bildirimler",noMsg:"Yeni mesaj yok.",tNode:"Sunucu aktif (US-East)",
-    tabAll:"Tümü",tabApproved:"Onaylandı",tabRejected:"Reddedildi",tabAdmin:"Yönetici mesajı",detailTitle:"Mesajı görüntüle",
-    helpTitle:"Para yatırma rehberi",helpSecurityTitle:"Önemli uyarı:",helpSecurityText:"Tutar eşleşmelidir.",
-    helpSelectNetworkTitle:"Ağ ve adres",helpSelectNetworkText:"Ağ seçin. Adres ağa göre değişir.",
-    helpCalcTitle:"Tutar hesaplama",helpCalcText:"USDT tutarı girin.",
-    helpTxTitle:"TxID gönderme",helpTxText:"Transferden sonra özeti girin.",
-    aboutTitle:"Zenix hakkında",aboutDesc:"Modern finansal ekosistem.",
-    aboutL1Title:"Ana amaç:",aboutL1Desc:"AI ile otomasyon.",
-    aboutL2Title:"Güvenlik:",aboutL2Desc:"Şifreleme kullanılır.",
-    aboutL3Title:"Referanslar:",aboutL3Desc:"Çok düzeyli ödüller.",
-    aboutL4Title:"Canlı veriler:",aboutL4Desc:"Piyasalar ve bildirimler.",
-    noMsgCategory:"Bu kategoride mesaj yok.",systemMessage:"Sistem mesajı",
-    tagAdmin:"Yönetici mesajı",tagApproved:"Talep onaylandı",tagRejected:"Talep reddedildi",badgeNew:"Yeni",badgeRead:"Okundu",
-    supportFollowup:"Destekle iletişime geç",unreadTitle:"Okunmadı",elapsedTime:"Geçen süre:",requesting:"Gönderiliyor…",requestPending:"İnceleniyor…",
-    depositError:"❌ Hata:",copyFinalTitle:"Son tutarı kopyala",
-    lastChangeLabel:"⏱ Son değişiklik:",lastChangeJustNow:"az önce",lastChangeMinAgo:"X dakika önce",lastChangeHourAgo:"X saat önce",lastChangeDayAgo:"X gün önce",
-    cooldownErr:"⏳ Lütfen X saniye bekleyin.",
-    rateLimitErr:"❌ 24 saatte en fazla 5 talep.",
-    recentWarnTitle72:"⚠ Cüzdan adresi yakın zamanda değişti",
-    recentWarnBody72:"Cüzdan adresi son 72 saat içinde değişti. Para yatırmadan önce lütfen doğrulamak için destekle iletişime geçin.",
-    recentWarnBody7:"Cüzdan adresi son 7 gün içinde değişti. Lütfen adresi dikkatlice kontrol edin.",
-    dir:"ltr"
-  },
-  ru: {
-    pageTitle:"Zenix — Пополнение",home:"Главная",quantification:"Квантификация",deposit:"Пополнение",receive:"Вывод",transactions:"Транзакции",profile:"Профиль",support:"Поддержка",m_about:"О платформе",logout:"Выйти",
-    depositTitle:"Пополнение",depositSub:"Пополнение счёта через блокчейн-сеть",activeStatus:"Активно",calcTitle:"Калькулятор пополнения",finalCalcText:"Итоговая сумма:",
-    txHashTitle:"Хеш транзакции (TxID)",selectNetwork:"Выберите сеть и адрес",scanQr:"Сканируйте для пополнения",
-    copyBtn:"Копировать",copyWarning:"⚠ Сначала введите сумму.",inquiryBtn:"Проверить пополнение",
-    securityGuide:"Важное предупреждение:",securityWarning:"* Сумма должна точно совпадать.",sec1:"* Только USDT.",sec2:"* Обработка автоматическая.",
-    txTiming:"Подтверждение 5–15 минут.",amountPlaceholder:"Сумма в USDT",txHashPlaceholder:"Например: 5f4d11...",walletPlaceholder:"Сначала введите сумму…",
-    copiedMsg:"📋 Адрес скопирован.",copyFailedMsg:"⚠ Ошибка копирования.",
-    loginErr:"❌ Войдите в аккаунт.",fillReqErr:"❌ Укажите сумму и хеш.",
-    duplicateTxId:"❌ Этот хеш уже отправлен.",
-    minAmountErr:"❌ Минимум 10 USDT.",maxAmountErr:"❌ Максимум 100 000 USDT.",
-    invalidTxId:"❌ Неверный формат. 64 hex-символа.",
-    sendExactlyLabel:"Отправьте ровно",
-    pendingSentMsg:"⏳ Заявка отправлена на проверку.",netLbl:"Адрес кошелька",
-    modalTitle:"Уведомления",noMsg:"Нет сообщений.",tNode:"Сервер активен (US-East)",
-    tabAll:"Все",tabApproved:"Одобрено",tabRejected:"Отклонено",tabAdmin:"Сообщение админа",detailTitle:"Просмотр",
-    helpTitle:"Руководство по пополнению",helpSecurityTitle:"Важно:",helpSecurityText:"Сумма должна совпадать.",
-    helpSelectNetworkTitle:"Выбор сети",helpSelectNetworkText:"Выберите сеть перевода.",
-    helpCalcTitle:"Расчёт суммы",helpCalcText:"Введите сумму в USDT.",
-    helpTxTitle:"Отправка TxID",helpTxText:"После перевода введите хеш.",
-    aboutTitle:"О Zenix",aboutDesc:"Современная финансовая экосистема.",
-    aboutL1Title:"Цель:",aboutL1Desc:"Автоматизация через ИИ.",
-    aboutL2Title:"Безопасность:",aboutL2Desc:"Используется шифрование.",
-    aboutL3Title:"Приглашения:",aboutL3Desc:"Многоуровневые награды.",
-    aboutL4Title:"Данные:",aboutL4Desc:"Рынки и уведомления.",
-    noMsgCategory:"Нет сообщений.",systemMessage:"Системное сообщение",
-    tagAdmin:"Сообщение админа",tagApproved:"Заявка одобрена",tagRejected:"Заявка отклонена",badgeNew:"Новое",badgeRead:"Прочитано",
-    supportFollowup:"Обратиться в поддержку",unreadTitle:"Не прочитано",elapsedTime:"Время:",requesting:"Отправка…",requestPending:"На проверке…",
-    depositError:"❌ Ошибка:",copyFinalTitle:"Копировать сумму",
-    lastChangeLabel:"⏱ Последнее изменение:",lastChangeJustNow:"только что",lastChangeMinAgo:"X минут назад",lastChangeHourAgo:"X часов назад",lastChangeDayAgo:"X дней назад",
-    cooldownErr:"⏳ Подождите X секунд.",
-    rateLimitErr:"❌ Не более 5 заявок в 24 часа.",
-    recentWarnTitle72:"⚠ Адрес кошелька недавно изменился",
-    recentWarnBody72:"Адрес кошелька изменился в течение последних 72 часов. Пожалуйста, свяжитесь с поддержкой для проверки перед пополнением.",
-    recentWarnBody7:"Адрес кошелька изменился в течение последних 7 дней. Пожалуйста, внимательно проверьте адрес.",
-    dir:"ltr"
-  },
-  es: {
-    pageTitle:"Zenix - Depósito",home:"Inicio",quantification:"Cuantificación",deposit:"Depositar",receive:"Retirar",transactions:"Transacciones",profile:"Perfil",support:"Soporte",m_about:"Acerca de la plataforma",logout:"Cerrar sesión",
-    depositTitle:"Depósito",depositSub:"Recarga la cuenta mediante la red blockchain",activeStatus:"Activo",calcTitle:"Calculadora del depósito",finalCalcText:"Importe final:",
-    txHashTitle:"Hash de transacción (TxID)",selectNetwork:"Seleccionar red y dirección",scanQr:"Escanea para depositar",
-    copyBtn:"Copiar",copyWarning:"⚠ Introduce primero el importe.",inquiryBtn:"Consultar depósito",
-    securityGuide:"Aviso importante:",securityWarning:"* El importe debe coincidir exactamente.",sec1:"* Solo USDT.",sec2:"* Procesamiento automático.",
-    txTiming:"Confirmación en 5–15 minutos.",amountPlaceholder:"Importe en USDT",txHashPlaceholder:"Ejemplo: 5f4d11...",walletPlaceholder:"Introduce primero el importe…",
-    copiedMsg:"📋 Dirección copiada.",copyFailedMsg:"⚠ Error al copiar.",
-    loginErr:"❌ Inicia sesión primero.",fillReqErr:"❌ Introduce importe y hash.",
-    duplicateTxId:"❌ Este hash ya fue enviado.",
-    minAmountErr:"❌ Mínimo 10 USDT.",maxAmountErr:"❌ Máximo 100.000 USDT.",
-    invalidTxId:"❌ Formato inválido. 64 caracteres hex.",
-    sendExactlyLabel:"Envía exactamente",
-    pendingSentMsg:"⏳ Solicitud enviada para revisión.",netLbl:"Dirección de la cartera",
-    modalTitle:"Notificaciones",noMsg:"No hay mensajes.",tNode:"Servidor activo (US-East)",
-    tabAll:"Todos",tabApproved:"Aprobado",tabRejected:"Rechazado",tabAdmin:"Mensaje admin",detailTitle:"Ver mensaje",
-    helpTitle:"Guía de depósito",helpSecurityTitle:"Aviso:",helpSecurityText:"El importe debe coincidir.",
-    helpSelectNetworkTitle:"Elegir red",helpSelectNetworkText:"Elige la red de transferencia.",
-    helpCalcTitle:"Calcular importe",helpCalcText:"Introduce el importe en USDT.",
-    helpTxTitle:"Enviar TxID",helpTxText:"Después de transferir, introduce el hash.",
-    aboutTitle:"Acerca de Zenix",aboutDesc:"Ecosistema financiero moderno.",
-    aboutL1Title:"Objetivo:",aboutL1Desc:"Automatizar con IA.",
-    aboutL2Title:"Seguridad:",aboutL2Desc:"Protocolos de cifrado.",
-    aboutL3Title:"Referidos:",aboutL3Desc:"Recompensas multinivel.",
-    aboutL4Title:"Datos en vivo:",aboutL4Desc:"Mercados y avisos.",
-    noMsgCategory:"No hay mensajes.",systemMessage:"Mensaje del sistema",
-    tagAdmin:"Mensaje admin",tagApproved:"Solicitud aprobada",tagRejected:"Solicitud rechazada",badgeNew:"Nuevo",badgeRead:"Leído",
-    supportFollowup:"Contactar soporte",unreadTitle:"Sin leer",elapsedTime:"Tiempo:",requesting:"Enviando…",requestPending:"En revisión…",
-    depositError:"❌ Error:",copyFinalTitle:"Copiar importe",
-    lastChangeLabel:"⏱ Último cambio:",lastChangeJustNow:"ahora",lastChangeMinAgo:"hace X min",lastChangeHourAgo:"hace X h",lastChangeDayAgo:"hace X días",
-    cooldownErr:"⏳ Espera X segundos.",
-    rateLimitErr:"❌ Máximo 5 por 24 horas.",
-    recentWarnTitle72:"⚠ La dirección de la cartera cambió recientemente",
-    recentWarnBody72:"La dirección de la cartera ha cambiado en las últimas 72 horas. Contacta con soporte para verificar antes de depositar.",
-    recentWarnBody7:"La dirección de la cartera ha cambiado en los últimos 7 días. Verifica la dirección cuidadosamente.",
-    dir:"ltr"
-  },
-  fr: {
-    pageTitle:"Zenix - Dépôt",home:"Accueil",quantification:"Quantification",deposit:"Déposer",receive:"Retirer",transactions:"Transactions",profile:"Profil",support:"Assistance",m_about:"À propos de la plateforme",logout:"Déconnexion",
-    depositTitle:"Dépôt",depositSub:"Créditer le compte via le réseau blockchain",activeStatus:"Actif",calcTitle:"Calculateur de dépôt",finalCalcText:"Montant final :",
-    txHashTitle:"Hash de transaction (TxID)",selectNetwork:"Choisir le réseau et l’adresse",scanQr:"Scanner pour déposer",
-    copyBtn:"Copier",copyWarning:"⚠ Saisissez d’abord le montant.",inquiryBtn:"Vérifier le dépôt",
-    securityGuide:"Avertissement important :",securityWarning:"* Le montant doit correspondre exactement.",sec1:"* Uniquement USDT.",sec2:"* Traitement automatique.",
-    txTiming:"Confirmation en 5–15 minutes.",amountPlaceholder:"Montant en USDT",txHashPlaceholder:"Exemple : 5f4d11...",walletPlaceholder:"Saisissez d’abord le montant…",
-    copiedMsg:"📋 Adresse copiée.",copyFailedMsg:"⚠ Échec de la copie.",
-    loginErr:"❌ Connectez-vous d’abord.",fillReqErr:"❌ Saisissez montant et hash.",
-    duplicateTxId:"❌ Ce hash a déjà été soumis.",
-    minAmountErr:"❌ Minimum 10 USDT.",maxAmountErr:"❌ Maximum 100 000 USDT.",
-    invalidTxId:"❌ Format invalide. 64 caractères hex.",
-    sendExactlyLabel:"Envoyez exactement",
-    pendingSentMsg:"⏳ Demande envoyée pour examen.",netLbl:"Adresse du portefeuille",
-    modalTitle:"Notifications",noMsg:"Aucun message.",tNode:"Serveur actif (US-East)",
-    tabAll:"Tous",tabApproved:"Approuvé",tabRejected:"Rejeté",tabAdmin:"Message admin",detailTitle:"Afficher",
-    helpTitle:"Guide de dépôt",helpSecurityTitle:"Avertissement :",helpSecurityText:"Le montant doit correspondre.",
-    helpSelectNetworkTitle:"Choisir le réseau",helpSelectNetworkText:"Choisissez votre réseau de transfert.",
-    helpCalcTitle:"Calculer le montant",helpCalcText:"Saisissez un montant en USDT.",
-    helpTxTitle:"Envoyer le TxID",helpTxText:"Après le transfert, saisissez le hash.",
-    aboutTitle:"À propos de Zenix",aboutDesc:"Écosystème financier moderne.",
-    aboutL1Title:"Objectif :",aboutL1Desc:"Automatiser avec l’IA.",
-    aboutL2Title:"Sécurité :",aboutL2Desc:"Protocoles de chiffrement.",
-    aboutL3Title:"Parrainage :",aboutL3Desc:"Récompenses multiniveaux.",
-    aboutL4Title:"Données en direct :",aboutL4Desc:"Marchés et notifications.",
-    noMsgCategory:"Aucun message.",systemMessage:"Message système",
-    tagAdmin:"Message admin",tagApproved:"Demande approuvée",tagRejected:"Demande rejetée",badgeNew:"Nouveau",badgeRead:"Lu",
-    supportFollowup:"Contacter l’assistance",unreadTitle:"Non lu",elapsedTime:"Temps :",requesting:"Envoi…",requestPending:"En examen…",
-    depositError:"❌ Erreur :",copyFinalTitle:"Copier le montant",
-    lastChangeLabel:"⏱ Dernier changement :",lastChangeJustNow:"à l’instant",lastChangeMinAgo:"il y a X min",lastChangeHourAgo:"il y a X h",lastChangeDayAgo:"il y a X j",
-    cooldownErr:"⏳ Patientez X secondes.",
-    rateLimitErr:"❌ Maximum 5 par 24 heures.",
-    recentWarnTitle72:"⚠ L'adresse du portefeuille a récemment changé",
-    recentWarnBody72:"L'adresse du portefeuille a changé au cours des dernières 72 heures. Veuillez contacter l'assistance pour vérifier avant de déposer.",
-    recentWarnBody7:"L'adresse du portefeuille a changé au cours des 7 derniers jours. Veuillez vérifier l'adresse avec attention.",
-    dir:"ltr"
-  },
-  de: {
-    pageTitle:"Zenix - Einzahlung",home:"Startseite",quantification:"Quantifizierung",deposit:"Einzahlen",receive:"Auszahlen",transactions:"Transaktionen",profile:"Profil",support:"Support",m_about:"Über die Plattform",logout:"Abmelden",
-    depositTitle:"Einzahlung",depositSub:"Konto über das Blockchain-Netzwerk aufladen",activeStatus:"Aktiv",calcTitle:"Einzahlungsrechner",finalCalcText:"Endbetrag:",
-    txHashTitle:"Transaktions-Hash (TxID)",selectNetwork:"Netzwerk und Adresse",scanQr:"Für Einzahlung scannen",
-    copyBtn:"Kopieren",copyWarning:"⚠ Zuerst Betrag eingeben.",inquiryBtn:"Einzahlung prüfen",
-    securityGuide:"Wichtiger Hinweis:",securityWarning:"* Betrag muss genau übereinstimmen.",sec1:"* Nur USDT.",sec2:"* Automatische Verarbeitung.",
-    txTiming:"Bestätigung 5–15 Minuten.",amountPlaceholder:"Betrag in USDT",txHashPlaceholder:"Beispiel: 5f4d11...",walletPlaceholder:"Zuerst Betrag eingeben…",
-    copiedMsg:"📋 Adresse kopiert.",copyFailedMsg:"⚠ Kopieren fehlgeschlagen.",
-    loginErr:"❌ Bitte zuerst anmelden.",fillReqErr:"❌ Betrag und Hash eingeben.",
-    duplicateTxId:"❌ Dieser Hash wurde bereits eingereicht.",
-    minAmountErr:"❌ Minimum 10 USDT.",maxAmountErr:"❌ Maximum 100.000 USDT.",
-    invalidTxId:"❌ Ungültiges Format. 64 Hex-Zeichen.",
-    sendExactlyLabel:"Senden Sie genau",
-    pendingSentMsg:"⏳ Anfrage zur Prüfung gesendet.",netLbl:"Wallet-Adresse",
-    modalTitle:"Benachrichtigungen",noMsg:"Keine Nachrichten.",tNode:"Server aktiv (US-East)",
-    tabAll:"Alle",tabApproved:"Genehmigt",tabRejected:"Abgelehnt",tabAdmin:"Admin",detailTitle:"Anzeigen",
-    helpTitle:"Einzahlungs-Guide",helpSecurityTitle:"Hinweis:",helpSecurityText:"Betrag muss übereinstimmen.",
-    helpSelectNetworkTitle:"Netzwerk wählen",helpSelectNetworkText:"Transfernetzwerk auswählen.",
-    helpCalcTitle:"Betrag berechnen",helpCalcText:"USDT-Betrag eingeben.",
-    helpTxTitle:"TxID senden",helpTxText:"Nach Überweisung Hash eingeben.",
-    aboutTitle:"Über Zenix",aboutDesc:"Modernes Finanzökosystem.",
-    aboutL1Title:"Ziel:",aboutL1Desc:"Automatisierung mit KI.",
-    aboutL2Title:"Sicherheit:",aboutL2Desc:"Verschlüsselung.",
-    aboutL3Title:"Empfehlungen:",aboutL3Desc:"Mehrstufige Prämien.",
-    aboutL4Title:"Live-Daten:",aboutL4Desc:"Märkte und Meldungen.",
-    noMsgCategory:"Keine Nachrichten.",systemMessage:"Systemnachricht",
-    tagAdmin:"Admin-Nachricht",tagApproved:"Genehmigt",tagRejected:"Abgelehnt",badgeNew:"Neu",badgeRead:"Gelesen",
-    supportFollowup:"Support kontaktieren",unreadTitle:"Ungelesen",elapsedTime:"Zeit:",requesting:"Senden…",requestPending:"In Prüfung…",
-    depositError:"❌ Fehler:",copyFinalTitle:"Endbetrag kopieren",
-    lastChangeLabel:"⏱ Letzte Änderung:",lastChangeJustNow:"gerade eben",lastChangeMinAgo:"vor X Min",lastChangeHourAgo:"vor X Std",lastChangeDayAgo:"vor X Tagen",
-    cooldownErr:"⏳ Bitte X Sekunden warten.",
-    rateLimitErr:"❌ Maximal 5 pro 24 Stunden.",
-    recentWarnTitle72:"⚠ Wallet-Adresse kürzlich geändert",
-    recentWarnBody72:"Die Wallet-Adresse wurde in den letzten 72 Stunden geändert. Bitte kontaktieren Sie den Support zur Überprüfung vor der Einzahlung.",
-    recentWarnBody7:"Die Wallet-Adresse wurde in den letzten 7 Tagen geändert. Bitte überprüfen Sie die Adresse sorgfältig.",
-    dir:"ltr"
-  }
+function safeGetItem(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
+function safeSetItem(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
+
+const customStorage = {
+    getItem: (key) => safeGetItem(key),
+    setItem: (key, value) => safeSetItem(key, value),
+    removeItem: (key) => { try { localStorage.removeItem(key); } catch(e) {} }
 };
 
-const SUPPORTED_LANGUAGES = ['en','fa','ar','tr','ru','es','fr','de'];
-function readSavedLanguage(){
-  try { const saved = localStorage.getItem('zenix_lang'); return SUPPORTED_LANGUAGES.includes(saved) ? saved : 'en'; }
-  catch (e) { return 'en'; }
-}
-let currLang = readSavedLanguage();
-
-window.updateQR = function() {
-  const calcVal = parseFloat(document.getElementById('calc-input')?.value) || 0;
-  const qr = document.getElementById('qr-code-img');
-  const lbl = document.getElementById('qr-amount-label');
-  if (!qr) return;
-  const net = window.currentNetwork || 'TRC20';
-  const addr = window.wallets[net];
-  if (calcVal <= 0 || !addr) {
-    qr.style.display = 'none';
-    if (lbl) lbl.style.display = 'none';
-    return;
-  }
-  if (qr.getAttribute('data-current-addr') !== addr) {
-    qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=${encodeURIComponent(addr)}`;
-    qr.setAttribute('data-current-addr', addr);
-  }
-  qr.style.display = 'block';
-  if (lbl) {
-    const t = window.currentLangData || LD.en;
-    const sendAmt = (calcVal * FEE_RATE).toFixed(2);
-    lbl.style.display = 'block';
-    lbl.textContent = `⬇ ${t.sendExactlyLabel}: ${sendAmt} USDT (${net})`;
-  }
-};
-
-function setLang(l){
-  if (!SUPPORTED_LANGUAGES.includes(l)) l = 'en';
-  currLang = l;
-  const t = LD[l] || LD.en;
-  const direction = (l === 'fa' || l === 'ar') ? 'rtl' : 'ltr';
-  document.documentElement.setAttribute('dir', direction);
-  document.documentElement.setAttribute('lang', l);
-  try { localStorage.setItem('zenix_lang', l); } catch (e) {}
-  document.title = t.pageTitle || 'Zenix - Deposit';
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (Object.prototype.hasOwnProperty.call(t, key)) el.textContent = t[key];
-  });
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-    const key = el.getAttribute('data-i18n-placeholder');
-    if (Object.prototype.hasOwnProperty.call(t, key)) el.setAttribute('placeholder', t[key]);
-  });
-  document.querySelectorAll('[data-i18n-title]').forEach(el => {
-    const key = el.getAttribute('data-i18n-title');
-    if (Object.prototype.hasOwnProperty.call(t, key)) el.setAttribute('title', t[key]);
-  });
-  document.querySelectorAll('#lang-menu .mi[data-lang]').forEach(el => {
-    el.classList.toggle('active', el.getAttribute('data-lang') === l);
-  });
-  window.currentLangData = t;
-  const net = window.currentNetwork || 'TRC20';
-  const lbl = document.getElementById('wallet-label');
-  if (lbl) lbl.textContent = `${t.netLbl} (${net}):`;
-  const mTitle = document.getElementById('t-modal-title');
-  if (mTitle) mTitle.innerHTML = `<i class="fas fa-bell"></i> ${escapeHtml(t.modalTitle)}`;
-  const nodeEl = document.getElementById('t-node');
-  if (nodeEl) nodeEl.textContent = t.tNode;
-  if (window.__statusState && typeof window.__statusState.getText === 'function') {
-    const st = window.__statusState;
-    try {
-      const newText = st.getText(t);
-      showMsgRaw(newText, st.isErr, st.showTimer);
-      if (st.showTimer && window.__statusTimerStart) startTimer(window.__statusTimerStart);
-    } catch (e) {}
-  }
-  try { if (typeof window.updateQR === 'function') window.updateQR(); } catch(e) {}
-  try { if (typeof window.renderWalletLastChange === 'function') window.renderWalletLastChange(); } catch(e) {}
-  try { if (typeof window.renderRecentWarning === 'function') window.renderRecentWarning(); } catch(e) {}
-  if (document.body) document.body.classList.add('lang-ready');
-}
-
-function calculateDeposit(){
-  const rawInput = document.getElementById('calc-input').value;
-  const val = parseFloat(rawInput);
-  const safeVal = Number.isFinite(val) && val > 0 ? val : 0;
-  const result = safeVal * FEE_RATE;
-  document.getElementById('calc-result').innerText = result.toFixed(2) + ' USDT';
-  window.updateQR();
-  checkInputs();
-}
-
-function checkInputs(){
-  const calcInput = document.getElementById('calc-input');
-  const txInput = document.getElementById('tx-hash-input');
-  if(calcInput.readOnly || txInput.readOnly) return;
-
-  const calcVal = parseFloat(calcInput.value) || 0;
-  const txVal = txInput.value.trim();
-  const copyBtn = document.getElementById('copy-btn');
-  const walletInput = document.getElementById('wallet-address');
-  const copyWarning = document.getElementById('copy-warning');
-  const inquiryBtn = document.getElementById('inquiry-btn');
-  const warningEl = document.getElementById('wallet-warning');
-
-  const walletsReady = window.wallets.TRC20 && window.wallets.BEP20;
-  if (!walletsReady) {
-    if (warningEl) {
-      warningEl.style.display = 'block';
-      warningEl.style.background = 'rgba(239,68,68,.1)';
-      warningEl.style.borderColor = 'rgba(239,68,68,.35)';
-      warningEl.style.color = '#ef4444';
-      warningEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> خطا در بارگذاری آدرس کیف پول. لطفاً صفحه را رفرش کنید.';
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+        persistSession: true,
+        storage: customStorage,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
     }
-    walletInput.value = '';
-    copyBtn.disabled = true;
-    copyBtn.style.background = '#475569';
-    copyBtn.style.color = '#94a3b8';
-    copyBtn.style.cursor = 'not-allowed';
-    inquiryBtn.disabled = true;
-    inquiryBtn.style.background = '#475569';
-    inquiryBtn.style.color = '#94a3b8';
-    inquiryBtn.style.cursor = 'not-allowed';
-    return;
-  }
-
-  if(calcVal > 0){
-    walletInput.value = window.wallets[window.currentNetwork];
-    copyBtn.disabled = false;
-    copyBtn.style.background = '#38bdf8';
-    copyBtn.style.color = '#0f172a';
-    copyBtn.style.cursor = 'pointer';
-    walletInput.style.userSelect = 'text';
-    walletInput.style.webkitUserSelect = 'text';
-    copyWarning.style.display = 'none';
-    if (warningEl) {
-      warningEl.style.display = 'block';
-      warningEl.style.background = 'rgba(251,191,36,.08)';
-      warningEl.style.borderColor = 'rgba(251,191,36,.25)';
-      warningEl.style.color = '#fbbf24';
-      warningEl.innerHTML = '<i class="fas fa-shield-alt"></i> <strong>توجه:</strong> آدرس را با دقت بررسی کنید. فقط USDT در شبکه انتخاب‌شده بفرستید.';
-    }
-  } else {
-    walletInput.value = "";
-    copyBtn.disabled = true;
-    copyBtn.style.background = '#475569';
-    copyBtn.style.color = '#94a3b8';
-    copyBtn.style.cursor = 'not-allowed';
-    walletInput.style.userSelect = 'none';
-    walletInput.style.webkitUserSelect = 'none';
-    copyWarning.style.display = 'block';
-    if (warningEl) warningEl.style.display = 'none';
-  }
-
-  if(calcVal > 0 && txVal.length > 0){
-    inquiryBtn.disabled = false;
-    inquiryBtn.style.background = '#22c55e';
-    inquiryBtn.style.color = '#fff';
-    inquiryBtn.style.cursor = 'pointer';
-  } else {
-    inquiryBtn.disabled = true;
-    inquiryBtn.style.background = '#475569';
-    inquiryBtn.style.color = '#94a3b8';
-    inquiryBtn.style.cursor = 'not-allowed';
-  }
-}
-
-window.setNetwork=function(net){
-  const btn = document.getElementById(net === 'TRC20' ? 'net-trc20' : 'net-bep20');
-  if (btn && btn.classList.contains('net-locked')) return;
-  window.currentNetwork=net;
-  const trc=document.getElementById('net-trc20'),bep=document.getElementById('net-bep20'),addr=document.getElementById('wallet-address'),lbl=document.getElementById('wallet-label');
-  const t=window.currentLangData||LD.en;
-  if(net==='TRC20'){
-    trc.style.background='rgba(56,189,248,0.15)';trc.style.borderColor='#38bdf8';trc.style.color='#f8fafc';
-    bep.style.background='rgba(15,23,42,0.6)';bep.style.borderColor='rgba(255,255,255,0.1)';bep.style.color='#94a3b8';
-  }else{
-    bep.style.background='rgba(56,189,248,0.15)';bep.style.borderColor='#38bdf8';bep.style.color='#f8fafc';
-    trc.style.background='rgba(15,23,42,0.6)';trc.style.borderColor='rgba(255,255,255,0.1)';trc.style.color='#94a3b8';
-  }
-  lbl.textContent=`${t.netLbl} (${net}):`;
-  window.updateQR();
-  window.renderWalletLastChange();
-  window.renderRecentWarning();
-  const calcVal = parseFloat(document.getElementById('calc-input').value) || 0;
-  const newAddr = window.wallets[net];
-  if(calcVal > 0 && newAddr){ addr.value = newAddr; }
-}
-
-window.lockNetworks = function(lock) {
-  ['net-trc20','net-bep20'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    if (lock) el.classList.add('net-locked');
-    else el.classList.remove('net-locked');
-  });
-};
-
-window.copyAddress = async function(){
-  const calcVal = parseFloat(document.getElementById('calc-input').value) || 0;
-  if(calcVal <= 0) return;
-  const c = document.getElementById("wallet-address");
-  if (!c.value) return;
-  const t = window.currentLangData || LD.en;
-  try {
-    await navigator.clipboard.writeText(c.value);
-    showMsg(t.copiedMsg, false, false, tt => tt.copiedMsg);
-  } catch (err) {
-    try { c.removeAttribute('readonly'); c.select(); c.setAttribute('readonly', 'readonly'); } catch (e) {}
-    showMsg(t.copyFailedMsg, true, false, tt => tt.copyFailedMsg);
-  }
-};
-
-window.copyFinalAmount = async function(){
-  const resEl = document.getElementById('calc-result');
-  if(!resEl) return;
-  const amountOnly = resEl.innerText.replace(' USDT', '').trim();
-  if(!amountOnly || amountOnly === '0.00') return;
-  const btn = document.getElementById('copy-final-btn');
-  try {
-    await navigator.clipboard.writeText(amountOnly);
-    if(btn){
-      const origHTML = btn.innerHTML;
-      btn.innerHTML = '<i class="fas fa-check" style="color:#22c55e;"></i>';
-      setTimeout(() => { btn.innerHTML = origHTML; }, 1500);
-    }
-  } catch (err) {
-    if(btn){
-      const origHTML = btn.innerHTML;
-      btn.innerHTML = '<i class="fas fa-times" style="color:#ef4444;"></i>';
-      setTimeout(() => { btn.innerHTML = origHTML; }, 1500);
-    }
-  }
-};
-
-window.openHelpModal = () => document.getElementById('m-help')?.classList.add('show');
-window.closeHelpModal = () => document.getElementById('m-help')?.classList.remove('show');
-window.openMessageModal = () => document.getElementById('m-msg')?.classList.add('show');
-window.closeMessageModal = () => document.getElementById('m-msg')?.classList.remove('show');
-window.openAboutModal = () => document.getElementById('m-about')?.classList.add('show');
-window.closeAboutModal = () => document.getElementById('m-about')?.classList.remove('show');
-
-document.getElementById('help-btn')?.addEventListener('click', e => { e.stopPropagation(); window.openHelpModal(); });
-document.getElementById('bell-btn')?.addEventListener('click', e => { e.stopPropagation(); window.openMessageModal(); });
-
-const mB=document.getElementById('menu-btn'),nM=document.getElementById('nav-menu'),lB=document.getElementById('lang-btn'),lMenu=document.getElementById('lang-menu');
-document.querySelectorAll('#lang-menu .mi').forEach(el=>{el.onclick=(e)=>{e.stopPropagation();setLang(el.dataset.lang);lMenu.classList.remove('show');};});
-function tM(o,e){e.stopPropagation();[nM,lMenu].forEach(m=>{if(m!==o)m.classList.remove('show');});o.classList.toggle('show');}
-if(mB)mB.onclick=(e)=>tM(nM,e);if(lB)lB.onclick=(e)=>tM(lMenu,e);
-document.onclick=()=>{[nM,lMenu].forEach(m=>m.classList.remove('show'));};document.querySelectorAll('.menu').forEach(m=>m.onclick=(e)=>e.stopPropagation());
-
-(async () => {
-  await window.loadWallets();
-  await window.loadWalletLastChange('wallet_trc20');
-  await window.loadWalletLastChange('wallet_bep20');
-  try { setLang(currLang); } catch (e) { console.error('Initial setLang failed:', e); }
-  window.renderWalletLastChange();
-  window.renderRecentWarning();
-  if (document.body) document.body.classList.add('lang-ready');
-})();
-</script>
-
-<script type="module">
-import { createClient } from 'https://cdn.jsdmirror.com/npm/@supabase/supabase-js@2/+esm';
-
-const SUPABASE_URL_M = 'https://ujyenmqdgivuxvxptwyl.supabase.co';
-const SUPABASE_ANON_KEY_M = 'sb_publishable_tRJPNKN0KUFfcta6I3xsNw_icShZQhO';
-const supabase = createClient(SUPABASE_URL_M, SUPABASE_ANON_KEY_M);
-
-let timerInterval = null;
-let currentUser = null;
-
-function startTimer(startTimeISO) {
-  if (timerInterval) clearInterval(timerInterval);
-  window.__statusTimerStart = startTimeISO;
-  const startTime = new Date(startTimeISO).getTime();
-  function update() {
-    const now = new Date().getTime();
-    const diff = Math.max(0, Math.floor((now - startTime) / 1000));
-    const mins = String(Math.floor(diff / 60)).padStart(2, '0');
-    const secs = String(diff % 60).padStart(2, '0');
-    const timerEl = document.getElementById('timer-display');
-    if (timerEl) timerEl.textContent = `${mins}:${secs}`;
-  }
-  update();
-  timerInterval = setInterval(update, 1000);
-}
-
-function showMsgRaw(text, isErr, showTimer) {
-  const box = document.getElementById('status-box');
-  if (!box) return;
-  box.style.display = 'block';
-  box.style.background = isErr ? 'rgba(239,68,68,0.15)' : 'rgba(34,197,94,0.15)';
-  box.style.border = isErr ? '1px solid #ef4444' : '1px solid #22c55e';
-  box.style.color = isErr ? '#ef4444' : '#22c55e';
-  const safeText = escapeHtml(text);
-  const elapsedLabel = escapeHtml((window.currentLangData || LD.en).elapsedTime);
-  if (showTimer) {
-    box.innerHTML = `<div>${safeText}</div><div style="margin-top:8px;font-size:12px;color:#38bdf8;font-weight:bold;background:rgba(15,23,42,0.6);padding:6px 12px;border-radius:6px;display:inline-block;border:1px solid rgba(56,189,248,0.3);"><i class="fas fa-stopwatch" style="color:#fbbf24;"></i> ${elapsedLabel} <span id="timer-display" style="font-family:monospace;font-size:14px;color:#fbbf24;margin-right:4px;">00:00</span></div>`;
-  } else {
-    box.innerHTML = safeText;
-  }
-}
-
-function showMsg(text, isErr, showTimer = false, getTextFn = null) {
-  showMsgRaw(text, isErr, showTimer);
-  window.__statusState = getTextFn ? { getText: getTextFn, isErr, showTimer } : null;
-}
-
-function resetDepositForm() {
-  if (timerInterval) clearInterval(timerInterval);
-  window.__statusState = null;
-  window.__statusTimerStart = null;
-  const box = document.getElementById('status-box');
-  if (box) box.style.display = 'none';
-  const calcInput = document.getElementById('calc-input');
-  const txInput = document.getElementById('tx-hash-input');
-  const inquiryBtn = document.getElementById('inquiry-btn');
-  if (calcInput) { calcInput.readOnly = false; calcInput.value = ''; }
-  if (txInput) { txInput.readOnly = false; txInput.value = ''; }
-  if (inquiryBtn) {
-    inquiryBtn.disabled = true;
-    inquiryBtn.style.background = '#475569';
-    inquiryBtn.style.cursor = 'not-allowed';
-    inquiryBtn.innerHTML = '<i class="fas fa-sync-alt"></i> <span data-i18n="inquiryBtn">' + escapeHtml((window.currentLangData || LD.en).inquiryBtn) + '</span>';
-  }
-  if (typeof window.lockNetworks === 'function') window.lockNetworks(false);
-  if (typeof window.updateQR === 'function') window.updateQR();
-  checkInputs();
-}
-
-function resetInquiryButton() {
-  const t = window.currentLangData || LD.en;
-  const inquiryBtn = document.getElementById('inquiry-btn');
-  if (!inquiryBtn) return;
-  inquiryBtn.disabled = false;
-  inquiryBtn.style.background = '#22c55e';
-  inquiryBtn.style.color = '#fff';
-  inquiryBtn.style.cursor = 'pointer';
-  inquiryBtn.innerHTML = '<i class="fas fa-sync-alt"></i> <span>' + escapeHtml(t.inquiryBtn) + '</span>';
-}
-
-window.checkAutoDeposit = async function(){
-  const t = window.currentLangData || LD.en;
-  if(!currentUser){ showMsg(t.loginErr, true, false, tt => tt.loginErr); return; }
-
-  const calcVal = parseFloat(document.getElementById('calc-input').value) || 0;
-  const txVal = document.getElementById('tx-hash-input').value.trim();
-  if(calcVal <= 0 || !txVal){ showMsg(t.fillReqErr, true, false, tt => tt.fillReqErr); return; }
-  if (!Number.isFinite(calcVal) || calcVal < MIN_DEPOSIT) { showMsg(t.minAmountErr, true, false, tt => tt.minAmountErr); return; }
-  if (calcVal > MAX_DEPOSIT) { showMsg(t.maxAmountErr, true, false, tt => tt.maxAmountErr); return; }
-  if (!TXID_REGEX.test(txVal)) { showMsg(t.invalidTxId, true, false, tt => tt.invalidTxId); return; }
-  if (!window.wallets.TRC20 || !window.wallets.BEP20) {
-    showMsg('⚠ خطا در بارگذاری آدرس کیف پول. لطفاً صفحه را رفرش کنید.', true, false);
-    return;
-  }
-
-  const inquiryBtn = document.getElementById('inquiry-btn');
-  inquiryBtn.disabled = true;
-  inquiryBtn.style.background = '#475569';
-  inquiryBtn.style.cursor = 'not-allowed';
-  inquiryBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + escapeHtml(t.requesting);
-
-  try {
-    const { data: existing } = await supabase
-      .from('transactions').select('id').eq('type', 'deposit')
-      .filter('description', 'like', `%TxID: ${txVal}%`).limit(1);
-    if (existing && existing.length > 0) {
-      showMsg(t.duplicateTxId, true, false, tt => tt.duplicateTxId);
-      resetInquiryButton();
-      return;
-    }
-  } catch (chkErr) {
-    console.warn('Duplicate check skipped:', chkErr);
-  }
-
-  const nowISO = new Date().toISOString();
-  const amountWithFee = calcVal * FEE_RATE;
-
-  let insertErr = null;
-  try {
-    const res = await supabase.from('transactions').insert([{
-      user_id: currentUser.id,
-      amount: calcVal,
-      sent_amount: amountWithFee,
-      network: window.currentNetwork || 'TRC20',
-      tx_hash: txVal,
-      type: 'deposit',
-      status: 'pending',
-      currency: 'USDT',
-      title: `واریز ${window.currentNetwork || 'TRC20'}`,
-      description: `TxID: ${txVal} | Sent: ${amountWithFee.toFixed(2)} | Fee: 2.5%`,
-      created_at: nowISO
-    }]);
-    insertErr = res.error;
-  } catch (e) {
-    insertErr = e;
-  }
-
-  if (insertErr) {
-    console.error('Insert error:', insertErr);
-    const errMsg = (insertErr.message || '').toString();
-    let displayMsg;
-    if (errMsg.toLowerCase().includes('cooldown')) {
-      const match = errMsg.match(/(\d+)\s*seconds/i);
-      const secs = match ? match[1] : '';
-      displayMsg = (t.cooldownErr || '⏳ لطفاً X ثانیه صبر کنید و دوباره تلاش کنید.').replace('X', secs || '');
-    } else if (errMsg.toLowerCase().includes('rate limit')) {
-      displayMsg = t.rateLimitErr || '❌ حداکثر ۵ درخواست واریز در ۲۴ ساعت مجاز است.';
-    } else if (errMsg.toLowerCase().includes('duplicate') || errMsg.toLowerCase().includes('unique')) {
-      displayMsg = t.duplicateTxId;
-    } else {
-      displayMsg = (t.depositError || '❌ خطا:') + ' ' + errMsg;
-    }
-    showMsg(displayMsg, true, false);
-    resetInquiryButton();
-    return;
-  }
-
-  const pendingDepositObj = {
-    rawAmount: calcVal,
-    sentAmount: amountWithFee,
-    network: window.currentNetwork || 'TRC20',
-    txHash: txVal,
-    status: 'pending',
-    createdAt: nowISO
-  };
-  try { localStorage.setItem('zenix_pending_deposit_' + currentUser.id, JSON.stringify(pendingDepositObj)); } catch(e) {}
-
-  showMsg(t.pendingSentMsg, false, true, tt => tt.pendingSentMsg);
-  startTimer(nowISO);
-
-  const calcInput = document.getElementById('calc-input');
-  const txInput = document.getElementById('tx-hash-input');
-  if(calcInput) calcInput.readOnly = true;
-  if(txInput) txInput.readOnly = true;
-  if (typeof window.lockNetworks === 'function') window.lockNetworks(true);
-};
-
-window.cachedNotifications = [];
-window.currentFilteredNotifs = [];
-window.activeNotifFilter = 'all';
-
-window.formatGregorianDate = function(rawDate) {
-  if (!rawDate) return '';
-  const d = new Date(rawDate);
-  if (isNaN(d.getTime())) return '';
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-};
-
-window.getNotifCategory = function(n) {
-  const type = (n.type || '').toLowerCase();
-  const title = (n.title || '').toLowerCase();
-  if (type.includes('approved') || type.includes('confirm') || title.includes('تایید') || title.includes('موفق') || title.includes('شارژ شد')) return 'approved';
-  if (type.includes('rejected') || type.includes('canceled') || type.includes('cancel') || title.includes('رد') || title.includes('لغو') || title.includes('ناموفق')) return 'rejected';
-  return 'admin_message';
-};
-
-window.updateTabBadges = function() {
-  const notifs = window.cachedNotifications || [];
-  let a=0,r=0,m=0;
-  notifs.forEach(n => { const c=window.getNotifCategory(n); if(c==='approved')a++; else if(c==='rejected')r++; else m++; });
-  const ids = { 'cnt-tab-all': notifs.length, 'cnt-tab-approved': a, 'cnt-tab-rejected': r, 'cnt-tab-admin': m };
-  Object.entries(ids).forEach(([id,v]) => { const el=document.getElementById(id); if(el) el.innerText=v; });
-};
-
-window.updateBellBadge = function() {
-  const unreadCount = window.cachedNotifications.filter(n => !n.read && !n.isRead && !n.is_read).length;
-  const badge = document.getElementById('bell-badge');
-  if (badge) { badge.innerText = unreadCount; badge.classList.toggle('show', unreadCount > 0); }
-  window.updateTabBadges();
-};
-
-window.setNotifFilter = function(filter, element) {
-  window.activeNotifFilter = filter;
-  document.querySelectorAll('#notif-tabs .notif-tab').forEach(tab => tab.classList.remove('active'));
-  if (element) element.classList.add('active');
-  window.renderNotifications();
-};
-
-window.closeMsgDetailModal = function() { document.getElementById('m-msg-detail')?.classList.remove('show'); };
-
-window.openMsgDetail = async function(idx) {
-  const n = window.currentFilteredNotifs[idx];
-  if (!n) return;
-  const isUnread = !n.read && !n.isRead && !n.is_read;
-  if (isUnread) {
-    n.is_read = true; n.read = true; n.isRead = true;
-    window.updateBellBadge(); window.renderNotifications();
-    try {
-      const { error } = await supabase.from('notifications').update({ is_read: true }).eq('id', n.id);
-      if (error) await supabase.from('notifications').update({ read: true }).eq('id', n.id);
-    } catch (err) {}
-  }
-  const title = n.title || (window.currentLangData || LD.en).systemMessage;
-  const msg = n.message || n.text || n.body || '';
-  const category = window.getNotifCategory(n);
-  const dateStr = window.formatGregorianDate(n.created_at || n.date || n.created_date);
-  const detailTitle = document.getElementById('detail-msg-title');
-  const detailDate = document.getElementById('detail-msg-date');
-  const detailBody = document.getElementById('detail-msg-body');
-  const detailSupport = document.getElementById('detail-msg-support');
-  if (detailTitle) detailTitle.innerHTML = `<i class="fas fa-bell" style="color:#38bdf8"></i> ${escapeHtml(title)}`;
-  if (detailDate) {
-    if (dateStr) { detailDate.innerHTML = `<i class="far fa-clock" style="color:#38bdf8;margin-right:4px;"></i>${escapeHtml(dateStr)}`; detailDate.style.display = 'block'; }
-    else detailDate.style.display = 'none';
-  }
-  if (detailBody) detailBody.innerText = msg;
-  if (detailSupport) {
-    if (category === 'rejected') {
-      const supportText = escapeHtml((window.currentLangData || LD.en).supportFollowup);
-      detailSupport.innerHTML = `<div style="margin-top:15px;padding-top:10px;border-top:1px dashed rgba(239,68,68,0.3);display:flex;justify-content:flex-end;"><a href="support.html" onclick="sessionStorage.setItem('zenix_return_page', window.location.href);" style="display:inline-flex;align-items:center;gap:6px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f8fafc;padding:6px 12px;border-radius:6px;font-size:12px;text-decoration:none;font-weight:600;"><i class="fas fa-headset" style="color:#ef4444;"></i><span>${supportText}</span></a></div>`;
-    } else detailSupport.innerHTML = '';
-  }
-  document.getElementById('m-msg-detail')?.classList.add('show');
-};
-
-window.renderNotifications = function() {
-  window.updateTabBadges();
-  const container = document.getElementById('modal-msg-container');
-  if (!container) return;
-  const filtered = window.cachedNotifications.filter(n => window.activeNotifFilter === 'all' || window.getNotifCategory(n) === window.activeNotifFilter);
-  window.currentFilteredNotifs = filtered;
-  if (filtered.length === 0) {
-    const uiText = window.currentLangData || LD.en;
-    container.innerHTML = `<div style="text-align:center;padding:25px;color:#94a3b8;font-size:12px;"><i class="fas fa-inbox" style="font-size:24px;margin-bottom:8px;display:block;opacity:0.5;"></i>${escapeHtml(uiText.noMsgCategory)}</div>`;
-    return;
-  }
-  const uiText = window.currentLangData || LD.en;
-  let html = '';
-  filtered.forEach((n, idx) => {
-    const title = n.title || uiText.systemMessage;
-    const category = window.getNotifCategory(n);
-    const isUnread = !n.read && !n.isRead && !n.is_read;
-    const dateStr = window.formatGregorianDate(n.created_at || n.date || n.created_date);
-    let borderStyle="border:1px solid rgba(255,255,255,.08);",bgStyle="background:rgba(255,255,255,.02);",icon='<i class="fas fa-bullhorn" style="color:#38bdf8"></i>';
-    let tagHtml = `<span style="font-size:10px;background:rgba(56,189,248,0.2);color:#38bdf8;padding:2px 6px;border-radius:4px;font-weight:700;">${escapeHtml(uiText.tagAdmin)}</span>`;
-    if (category === 'approved') {
-      borderStyle = isUnread ? "border:1px solid rgba(34,197,94,0.6);" : "border:1px solid rgba(34,197,94,0.2);";
-      bgStyle = isUnread ? "background:rgba(34,197,94,0.12);" : "background:rgba(34,197,94,0.03);";
-      icon = '<i class="fas fa-check-circle" style="color:#22c55e"></i>';
-      tagHtml = `<span style="font-size:10px;background:rgba(34,197,94,0.2);color:#22c55e;padding:2px 6px;border-radius:4px;font-weight:700;">${escapeHtml(uiText.tagApproved)}</span>`;
-    } else if (category === 'rejected') {
-      borderStyle = isUnread ? "border:1px solid rgba(239,68,68,0.6);" : "border:1px solid rgba(239,68,68,0.2);";
-      bgStyle = isUnread ? "background:rgba(239,68,68,0.12);" : "background:rgba(239,68,68,0.03);";
-      icon = '<i class="fas fa-times-circle" style="color:#ef4444"></i>';
-      tagHtml = `<span style="font-size:10px;background:rgba(239,68,68,0.2);color:#ef4444;padding:2px 6px;border-radius:4px;font-weight:700;">${escapeHtml(uiText.tagRejected)}</span>`;
-    } else {
-      bgStyle = isUnread ? "background:rgba(56,189,248,0.12);" : "background:rgba(255,255,255,0.02);";
-      borderStyle = isUnread ? "border:1px solid rgba(56,189,248,0.5);" : "border:1px solid rgba(255,255,255,0.08);";
-    }
-    const opacityStyle = isUnread ? "opacity:1;" : "opacity:0.65;";
-    const unreadDot = isUnread ? `<span style="width:9px;height:9px;background:#ef4444;border-radius:50%;display:inline-block;box-shadow:0 0 8px #ef4444;" title="${escapeHtml(uiText.unreadTitle)}"></span>` : '';
-    const readBadge = isUnread
-      ? `<span style="font-size:10px;background:#ef4444;color:#fff;padding:2px 7px;border-radius:10px;font-weight:800;box-shadow:0 0 8px rgba(239,68,68,0.5);">${escapeHtml(uiText.badgeNew)}</span>`
-      : `<span style="font-size:10px;background:rgba(255,255,255,0.06);color:#94a3b8;padding:2px 6px;border-radius:10px;"><i class="fas fa-check" style="font-size:9px;color:#64748b;"></i> ${escapeHtml(uiText.badgeRead)}</span>`;
-    const dateDisplay = dateStr ? `<div style="font-size:11px;color:${isUnread?'#cbd5e1':'#64748b'};margin-top:6px;direction:ltr;text-align:left;"><i class="far fa-clock" style="margin-right:4px;"></i>${escapeHtml(dateStr)}</div>` : '';
-    html += `<div class="msg-body-box" style="${borderStyle} ${bgStyle} ${opacityStyle} cursor:pointer;position:relative;transition:all 0.2s;" onclick="window.openMsgDetail(${idx})">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-        <div class="msg-title-text" style="display:flex;align-items:center;gap:8px;font-weight:${isUnread?'800':'500'};color:${isUnread?'#f8fafc':'#cbd5e1'};">
-          ${unreadDot}${icon}<span>${escapeHtml(title)}</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;">${tagHtml}${readBadge}</div>
-      </div>${dateDisplay}</div>`;
-  });
-  container.innerHTML = html;
-};
-
-async function loadUserData(user) {
-  currentUser = user;
-  try {
-    let pendingDepositData = null;
-    const { data: txData } = await supabase
-      .from('transactions').select('*')
-      .eq('user_id', user.id).eq('type', 'deposit')
-      .order('created_at', { ascending: false }).limit(1);
-    if (txData && txData.length > 0) {
-      const p = txData[0];
-      const statusStr = String(p.status || '').toLowerCase();
-      if (statusStr === 'pending') {
-        const desc = p.description || '';
-        const txHashMatch = desc.match(/TxID:\s*([a-fA-F0-9x]+)/i);
-        const sentMatch = desc.match(/Sent:\s*([\d.]+)/i);
-        const creditedAmount = parseFloat(p.amount) || 0;
-        pendingDepositData = {
-          rawAmount: creditedAmount,
-          sentAmount: sentMatch ? parseFloat(sentMatch[1]) : creditedAmount * FEE_RATE,
-          txHash: txHashMatch ? txHashMatch[1] : '',
-          createdAt: p.created_at || p.createdAt
-        };
-      } else {
-        try { localStorage.removeItem('zenix_pending_deposit_' + user.id); } catch(e) {}
-      }
-    } else {
-      try { localStorage.removeItem('zenix_pending_deposit_' + user.id); } catch(e) {}
-    }
-    if (pendingDepositData) {
-      const t = window.currentLangData || LD.en;
-      showMsg(t.pendingSentMsg, false, true, tt => tt.pendingSentMsg);
-      startTimer(pendingDepositData.createdAt);
-      const calcInput = document.getElementById('calc-input');
-      const txInput = document.getElementById('tx-hash-input');
-      const inquiryBtn = document.getElementById('inquiry-btn');
-      if (calcInput && txInput) {
-        calcInput.value = pendingDepositData.rawAmount ? parseFloat(pendingDepositData.rawAmount).toFixed(2) : '';
-        txInput.value = pendingDepositData.txHash || '';
-        calcInput.readOnly = true;
-        txInput.readOnly = true;
-        const val = parseFloat(pendingDepositData.rawAmount) || 0;
-        document.getElementById('calc-result').innerText = (val * FEE_RATE).toFixed(2) + ' USDT';
-        if (typeof window.updateQR === 'function') window.updateQR();
-        const walletInput = document.getElementById('wallet-address');
-        const copyBtn = document.getElementById('copy-btn');
-        const copyWarning = document.getElementById('copy-warning');
-        if (walletInput && copyBtn) {
-          walletInput.value = window.wallets[window.currentNetwork] || '';
-          copyBtn.disabled = false;
-          copyBtn.style.background = '#38bdf8';
-          copyBtn.style.color = '#0f172a';
-          copyBtn.style.cursor = 'pointer';
-          if (copyWarning) copyWarning.style.display = 'none';
-        }
-      }
-      if (inquiryBtn) {
-        inquiryBtn.disabled = true;
-        inquiryBtn.style.background = '#475569';
-        inquiryBtn.style.cursor = 'not-allowed';
-        inquiryBtn.innerHTML = '<i class="fas fa-hourglass-half"></i> ' + escapeHtml(t.requestPending);
-      }
-      if (typeof window.lockNetworks === 'function') window.lockNetworks(true);
-    } else {
-      resetDepositForm();
-    }
-  } catch (err) { console.warn("User deposit data check warning:", err); }
-
-  try {
-    const { data: notifs, error: notifErr } = await supabase.from('notifications').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
-    if (!notifErr && notifs) { window.cachedNotifications = notifs; window.renderNotifications(); window.updateBellBadge(); }
-  } catch (err) { console.warn("Notifications load warning:", err); }
-}
-
-supabase.auth.onAuthStateChange((event, session) => {
-  if (session && session.user) loadUserData(session.user);
-  else window.location.href = 'index.html';
 });
 
-const logoutBtn = document.getElementById('logout-btn');
-if (logoutBtn) {
-  logoutBtn.addEventListener('click', async (e) => {
-    e.preventDefault();
-    await supabase.auth.signOut();
-    localStorage.clear();
-    window.location.href = 'index.html';
-  });
+let currentUserId = null;
+let currentUserName = '';
+let allMessages = [];
+let currentNotifFilter = 'all';
+
+function generateUIDDigits(userId) {
+    if (!userId) return '000000';
+    let hash = 5381;
+    let str = String(userId);
+    for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) + hash) + str.charCodeAt(i);
+    }
+    return (Math.abs(hash % 900000) + 100000).toString();
 }
-</script>
-</body>
-</html>
+
+// ==========================================
+// ★★ اصلاح ریشه‌ای مشکل دکمه‌های هدر روی موبایل
+// touch-action:none روی body.modal-open باعث می‌شود رویداد click در بسیاری
+// از مرورگرهای موبایل حتی روی دکمه‌های داخل مودال (از جمله دکمه بستن) تولید
+// نشود. در نتیجه کاربر نمی‌تواند مودال را ببندد و همه‌ی دکمه‌های صفحه، از جمله
+// دکمه‌های هدر، غیرفعال می‌مانند. اینجا touch-action را روی manipulation
+// می‌گذاریم (لمس را آزاد می‌کند، zoom دوتایی را می‌بندد) و pointer-events
+// هدر را هم برای اطمینان تقویت می‌کنیم.
+// ==========================================
+(function injectMobileInteractionFix() {
+    if (document.getElementById('zenix-mobile-fix')) return;
+    const style = document.createElement('style');
+    style.id = 'zenix-mobile-fix';
+    style.textContent = `
+        /* آکاردئون راهنما: انیمیشن grid-template-rows روی موبایل پله‌پله می‌شود */
+        @media (max-width: 768px) {
+            .help-acc-content,
+            .help-acc-inner {
+                transition: none !important;
+            }
+            .help-acc-arrow {
+                transition: transform .15s ease !important;
+            }
+        }
+        /* کوچک‌تر شدن کادر پیام‌ها در صندوق اعلان‌ها */
+        .msg-body-box {
+            margin-bottom: 0 !important;
+            padding: 8px 10px !important;
+        }
+        .msg-body-box.is-read:hover {
+            border-color: rgba(255,255,255,.05) !important;
+            opacity: .75 !important;
+        }
+        /* ★★ کلید رفع مشکل: جایگزینی touch-action:none با manipulation */
+        body.modal-open {
+            touch-action: manipulation !important;
+        }
+        /* ★★ تقویت کلیک‌پذیری هدر و دکمه‌های داخل آن */
+        header, header .hr, header .hr .wrap, header .hr .lb,
+        header .hr a.lb, header .hr button.lb {
+            pointer-events: auto !important;
+        }
+        /* اطمینان از اینکه پس‌زمینه مودال قابل لمس است */
+        .modal.show {
+            pointer-events: auto !important;
+        }
+    `;
+    document.head.appendChild(style);
+})();
+
+// ==========================================
+// 2. مدیریت مدال‌ها + قفل اسکرول
+// ==========================================
+function lockBody() { document.body.classList.add('modal-open'); }
+function unlockBody() {
+    setTimeout(() => {
+        const anyOpen = document.querySelector('.modal.show');
+        if (!anyOpen) document.body.classList.remove('modal-open');
+    }, 50);
+}
+
+// ★★ پاک‌سازی دفاعی: اگر در هر لحظه هیچ مودالی باز نیست ولی کلاس گیر کرده، حذفش کن
+setInterval(() => {
+    if (document.body.classList.contains('modal-open') && !document.querySelector('.modal.show')) {
+        document.body.classList.remove('modal-open');
+    }
+}, 500);
+
+window.openAboutModal = function() {
+    document.getElementById('m-about-modal')?.classList.add('show');
+    lockBody();
+    closeAllMenus();
+};
+window.closeAboutModal = function() {
+    document.getElementById('m-about-modal')?.classList.remove('show');
+    unlockBody();
+};
+window.openHelpModal = function() {
+    document.getElementById('m-help-modal')?.classList.add('show');
+    lockBody();
+    closeAllMenus();
+};
+window.closeHelpModal = function() {
+    document.getElementById('m-help-modal')?.classList.remove('show');
+    unlockBody();
+};
+window.openCasinoModal = function() {
+    document.getElementById('m-casino-modal')?.classList.add('show');
+    lockBody();
+    closeAllMenus();
+};
+window.closeCasinoModal = function() {
+    document.getElementById('m-casino-modal')?.classList.remove('show');
+    unlockBody();
+};
+window.toggleHelpAccordion = function(btn) {
+    const item = btn.closest('.help-accordion');
+    if (!item) return;
+    item.classList.toggle('open');
+};
+window.toggleAboutBox = function() {
+    const box = document.getElementById('platformInfoBox');
+    if (!box) return;
+    box.classList.toggle('expanded');
+    const toggleText = document.getElementById('t-about-toggle');
+    if (toggleText) {
+        const t = ld[currLang] || ld.en;
+        toggleText.textContent = box.classList.contains('expanded')
+            ? (t.aboutToggleClose || 'بستن')
+            : (t.aboutToggleOpen || 'مشاهده بیشتر');
+    }
+};
+
+// ==========================================
+// 3. بازار ارزهای دیجیتال
+// ==========================================
+async function fetchCryptoPrices() {
+    const tickerContainer = document.getElementById('crypto-ticker-list');
+    if (!tickerContainer) return;
+
+    try {
+        const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=30&page=1&sparkline=false');
+        if (!response.ok) throw new Error('خطا در دریافت قیمت ارزها');
+
+        const data = await response.json();
+        const top3 = data.slice(0, 3);
+
+        let html = '';
+        top3.forEach(coin => {
+            const price = coin.current_price >= 1 ? coin.current_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : coin.current_price.toFixed(4);
+            const change = coin.price_change_percentage_24h || 0;
+            const changeClass = change >= 0 ? 'price-up' : 'price-down';
+            const changeSign = change >= 0 ? '+' : '';
+            const safeSymbol = escapeHtml(coin.symbol.toUpperCase());
+            const safeName = escapeHtml(coin.name);
+            const safeImage = escapeHtml(coin.image);
+
+            html += `
+                <div class="crypto-row">
+                    <div class="crypto-info">
+                        <div class="crypto-icon">
+                            <img src="${safeImage}" alt="${safeSymbol}">
+                        </div>
+                        <div>
+                            <strong style="color:#fff;font-size:12px;">${safeSymbol}</strong>
+                            <span style="font-size:10px;color:#94a3b8;display:block;">${safeName}</span>
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="color:#fff;font-weight:bold;font-size:12px;">$${price}</div>
+                        <div class="${changeClass}" style="font-size:10px;">${changeSign}${change.toFixed(2)}%</div>
+                    </div>
+                </div>
+            `;
+        });
+
+        tickerContainer.innerHTML = html;
+    } catch (err) {
+        console.error('خطای دریافت قیمت ارزهای دیجیتال:', err);
+        tickerContainer.innerHTML = `
+            <div class="crypto-row">
+                <div class="crypto-info"><strong style="color:#fff;">BTC</strong></div>
+                <div style="text-align:right;"><span style="color:#fff;">$96,500.00</span><div class="price-up">+2.15%</div></div>
+            </div>
+            <div class="crypto-row">
+                <div class="crypto-info"><strong style="color:#fff;">ETH</strong></div>
+                <div style="text-align:right;"><span style="color:#fff;">$2,780.50</span><div class="price-up">+1.84%</div></div>
+            </div>
+            <div class="crypto-row">
+                <div class="crypto-info"><strong style="color:#fff;">SOL</strong></div>
+                <div style="text-align:right;"><span style="color:#fff;">$198.20</span><div class="price-down">-0.65%</div></div>
+            </div>
+        `;
+    }
+}
+
+fetchCryptoPrices();
+setInterval(fetchCryptoPrices, 30000);
+
+// ==========================================
+// 4. اعلان‌ها
+// ==========================================
+function getNotifCategory(m) {
+    let t = (m.type || '').toLowerCase();
+    let title = (m.subject || '').toLowerCase();
+    if (t.includes('approved') || title.includes('تایید') || title.includes('approved')) return 'approved';
+    if (t.includes('rejected') || title.includes('لغو') || title.includes('رد') || title.includes('rejected')) return 'rejected';
+    return 'admin_message';
+}
+
+function isWithdrawalMessage(m) {
+    if (!m) return false;
+    const combined = (((m.type || '') + ' ' + (m.subject || '')).toLowerCase());
+    const keywords = ['withdraw', 'برداشت', 'سحب', 'çekim', 'вывод', 'retiro', 'retrait', 'auszahlung', 'payout'];
+    return keywords.some(k => combined.includes(k));
+}
+
+async function fetchUserMessages(uid) {
+    try {
+        const { data } = await supabaseClient.from('notifications').select('*').eq('user_id', uid).order('created_at', { ascending: false });
+        return (data || []).map(dt => ({
+            id: dt.id,
+            subject: dt.title || dt.subject || 'اطلاعیه',
+            body: dt.message || dt.text || dt.body || '',
+            time: dt.created_at ? new Date(dt.created_at).toLocaleString() : '',
+            read: dt.read === true || dt.is_read === true,
+            type: dt.type || dt.category || 'admin_message'
+        }));
+    } catch (e) {
+        return [];
+    }
+}
+
+function updateNotifBadges() {
+    let unread = allMessages.filter(m => !m.read).length;
+    let b = document.getElementById('bell-badge');
+    if (b) {
+        b.textContent = unread;
+        b.classList.toggle('show', unread > 0);
+    }
+    let cntAll = document.getElementById('cnt-tab-all');
+    let cntApp = document.getElementById('cnt-tab-approved');
+    let cntRej = document.getElementById('cnt-tab-rejected');
+    let cntAdm = document.getElementById('cnt-tab-admin');
+
+    if (cntAll) cntAll.textContent = allMessages.length;
+    if (cntApp) cntApp.textContent = allMessages.filter(m => getNotifCategory(m) === 'approved').length;
+    if (cntRej) cntRej.textContent = allMessages.filter(m => getNotifCategory(m) === 'rejected').length;
+    if (cntAdm) cntAdm.textContent = allMessages.filter(m => getNotifCategory(m) === 'admin_message').length;
+}
+
+window.setNotifFilter = function(filter, el) {
+    currentNotifFilter = filter;
+    document.querySelectorAll('.notif-tab').forEach(b => b.classList.remove('active'));
+    if (el) el.classList.add('active');
+    renderMessageList();
+};
+
+window.openMessageModal = async () => {
+    if (currentUserId) {
+        allMessages = await fetchUserMessages(currentUserId);
+        updateNotifBadges();
+    }
+    renderMessageList();
+    document.getElementById('m-msg')?.classList.add('show');
+    lockBody();
+};
+
+function renderMessageList() {
+    let c = document.getElementById('modal-msg-container');
+    if (!c) return;
+    let t = ld[currLang] || ld.fa;
+    let list = allMessages;
+    if (currentNotifFilter !== 'all') {
+        list = allMessages.filter(m => getNotifCategory(m) === currentNotifFilter);
+    }
+
+    if (!list || list.length === 0) {
+        c.innerHTML = `<div style="text-align:center;padding:20px;color:#94a3b8">${t.noMsg || 'هیچ پیام جدیدی وجود ندارد.'}</div>`;
+        return;
+    }
+
+    let html = '<div style="display:flex;flex-direction:column;gap:6px;">';
+    list.forEach((m) => {
+        let realIdx = allMessages.indexOf(m);
+        let dTime = m.time || '';
+        let unread = !m.read;
+        let iconClass = 'fa-envelope-open-text';
+        let iconColor = '#38bdf8';
+        let cat = getNotifCategory(m);
+
+        if (cat === 'approved') { iconClass = 'fa-check-circle'; iconColor = '#22c55e'; }
+        else if (cat === 'rejected') { iconClass = 'fa-times-circle'; iconColor = '#ef4444'; }
+        else { iconClass = 'fa-bullhorn'; iconColor = '#38bdf8'; }
+
+        const safeSubject = escapeHtml(m.subject);
+        const safeTime = escapeHtml(dTime);
+
+        const boxStyle = unread
+            ? 'cursor:pointer;padding:8px 10px;margin-bottom:0;background:rgba(56,189,248,.09);border:1px solid rgba(56,189,248,.35);border-right:3px solid #38bdf8;border-radius:8px;'
+            : 'cursor:pointer;padding:8px 10px;margin-bottom:0;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:8px;opacity:.65;';
+
+        const titleStyle = unread
+            ? 'color:#fff;font-weight:800;font-size:12px;'
+            : 'color:#cbd5e1;font-weight:500;font-size:12px;';
+
+        html += `<div class="msg-body-box ${unread ? 'is-unread' : 'is-read'}" style="${boxStyle}" onclick="window.readAdminMessage(${realIdx})">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                <div class="msg-title-text" style="${titleStyle}"><i class="fas ${iconClass}" style="color:${iconColor};margin-left:5px;${unread ? '' : 'opacity:.7;'}"></i> ${safeSubject}</div>
+                ${unread ? `<span style="font-size:9px;background:#38bdf8;color:#0f172a;padding:2px 6px;border-radius:4px;font-weight:700;flex-shrink:0;">${t.newBadge || 'جدید'}</span>` : ''}
+            </div>
+            <div style="font-size:9.5px;color:#64748b;margin-top:3px;text-align:left" dir="ltr">${safeTime}</div>
+        </div>`;
+    });
+    c.innerHTML = html + '</div>';
+}
+
+window.readAdminMessage = async idx => {
+    let m = allMessages[idx]; if (!m) return;
+    allMessages[idx].read = true;
+    if (currentUserId && m.id) {
+        try {
+            await supabaseClient.from('notifications').update({ read: true, is_read: true }).eq('id', m.id);
+        } catch(e) {}
+    }
+    updateNotifBadges();
+    renderMessageList();
+
+    const t = ld[currLang] || ld.en;
+    const cat = getNotifCategory(m);
+    const isWithdrawalReject = (cat === 'rejected') && isWithdrawalMessage(m);
+
+    let titleEl = document.getElementById('detail-msg-title');
+    let dateEl = document.getElementById('detail-msg-date');
+    let bodyEl = document.getElementById('detail-msg-body');
+    let supportEl = document.getElementById('detail-msg-support');
+
+    if (titleEl) titleEl.innerHTML = `<i class="fas fa-envelope-open"></i> ${escapeHtml(m.subject)}`;
+    if (dateEl) {
+        dateEl.textContent = m.time || '';
+        dateEl.style.display = m.time ? 'block' : 'none';
+    }
+
+    let bodyText = '';
+    if (isWithdrawalReject) {
+        const defaultText = t.rejectWithdrawDefault || '';
+        const adminText = (m.body || '').trim();
+        bodyText = defaultText;
+        if (adminText && adminText.length > 15 && adminText !== defaultText) {
+            bodyText += '\n\n———\n\n' + adminText;
+        }
+    } else {
+        bodyText = m.body || '';
+    }
+    if (bodyEl) bodyEl.textContent = bodyText;
+
+    if (supportEl) {
+        if (cat === 'rejected') {
+            const supportUrl = isWithdrawalReject ? 'support.html?topic=withdraw' : 'support.html';
+            const supportLabel = escapeHtml(t.contactSupport || 'Contact Support');
+            supportEl.innerHTML = `
+                <a href="${supportUrl}" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;padding:11px 16px;background:linear-gradient(135deg,#a855f7,#ec4899);color:#fff;text-decoration:none;border-radius:10px;font-size:12.5px;font-weight:700;box-shadow:0 6px 20px rgba(168,85,247,.35);transition:transform .15s, box-shadow .2s;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 26px rgba(168,85,247,.5)';" onmouseout="this.style.transform='';this.style.boxShadow='0 6px 20px rgba(168,85,247,.35)';">
+                    <i class="fas fa-headset" style="font-size:13px;"></i>
+                    <span>${supportLabel}</span>
+                </a>`;
+        } else {
+            supportEl.innerHTML = '';
+        }
+    }
+
+    document.getElementById('m-msg-detail')?.classList.add('show');
+};
+
+window.closeMessageModal = () => {
+    document.getElementById('m-msg')?.classList.remove('show');
+    unlockBody();
+};
+window.closeMsgDetailModal = () => {
+    document.getElementById('m-msg-detail')?.classList.remove('show');
+    unlockBody();
+};
+
+document.getElementById('bell-btn')?.addEventListener('click', e => {
+    e.stopPropagation();
+    window.openMessageModal();
+});
+
+// ==========================================
+// 5. سیستم ترجمه
+// ==========================================
+const SUPPORTED_LANGUAGES = ['en', 'fa', 'ar', 'tr', 'ru', 'es', 'fr', 'de'];
+const savedLang = safeGetItem('zenix_lang');
+let currLang = SUPPORTED_LANGUAGES.includes(savedLang) ? savedLang : 'en';
+
+const ld = {
+    fa: {
+        m1: 'صفحه اصلی', m2: 'کوانتیفیکیشن', m3: 'واریز', m4: 'برداشت', m_team: 'تیم من', m5: 'تراکنش', m6: 'پروفایل', m7: 'پشتیبانی', m_about: 'درباره پلتفرم', m8: 'خروج',
+        wel: 'خوش آمدید', sub: 'پنل مدیریت کاربری', st: 'تایید شده',
+        ts1: 'موجودی', ts2: 'زیرمجموعه',
+        c1: 'کوانتیفیکیشن', d1: 'معاملات هوشمند',
+        c2: 'واریز', d2: 'شارژ حساب',
+        c3: 'برداشت', d3: 'برداشت دارایی',
+        c4: 'تیم', d4: 'زیرمجموعه‌ها',
+        c5: 'تراکنش‌ها', d5: 'تاریخچه مالی',
+        c6: 'پروفایل', d6: 'تنظیمات امنیت',
+        tmkt: 'بازار ارزهای دیجیتال (۳ ارز برتر از ۳۰ ارز رصد شده)', tlive: 'زنده',
+        aboutToggleOpen: 'مشاهده بیشتر', aboutToggleClose: 'بستن متن',
+        aboutTitle: 'درباره پلتفرم هوشمند زِنیکس (Zenix)',
+        aboutIntro: 'به زِنیکس (Zenix) خوش آمدید؛ جایی که افق‌های مالی دیجیتال و قدرت فناوری مدرن در هم می‌آمیزند تا مسیری به سوی آینده‌ای روشن‌تر را روشن کنند. زِنیکس بر پایه یک باور عمیق بنا شده است: دنیای دارایی‌های دیجیتال نباید یک هزارتوی پیچیده باشد، بلکه باید یک اکوسیستم شفاف، در دسترس و امن برای همه باشد.',
+        aboutDesc: 'در عصری که با شتاب بی‌وقفه تعریف می‌شود، جایی که بازارهای جهانی هرگز نمی‌خوابند و تغییر تنها ثابتِ آن است، داشتن یک همراه مطمئن و هوشمند امری حیاتی است. زِنیکس با تکیه بر معماری ابری پیشرفته، الگوریتم‌های کوانتیفیکیشن نوین و لایه‌های امنیتی چندگانه و نفوذناپذیر، پناهگاهی یکپارچه و یکدست برای مدیریت ثروت شما فراهم کرده است. ما فقط در حال ساختن یک پلتفرم نیستیم؛ ما در حال خلق محیطی هستیم که در آن فناوری در خدمت جاه‌طلبی‌های انسانی قرار می‌گیرد، موانع را از بین می‌برد و آنچه را که در اقتصاد دیجیتال ممکن است، بازتعریف می‌کند.',
+        aboutGoal: '<strong style="color:#38bdf8;">هدف ما:</strong> دموکراتیزه کردن امور استثنایی است. ما تلاش می‌کنیم همان ابزارهای مالی قدرتمندی که نخبگان نهادی از آن استفاده می‌کنند را در اختیار صاحبان دید روزمره قرار دهیم. چه در حال برداشتن اولین قدم خود باشید و چه یک متخصص کارکشته، زِنیکس به شما قدرت می‌دهد تا با اطمینان در بازارهای جهانی حرکت کنید، بدون نیاز به تخصص پیچیده، و تضمین می‌کند که سرمایه شما در محیطی از امنیت مطلق، شفافیت و پتانسیل پویا رشد کند.',
+        aboutStrategy: '<strong style="color:#38bdf8;">استراتژی ما:</strong> بر یک سه‌گانه ناگسستنی بنا شده است—امنیت بدون سازش، شفافیت رادیکال و نوآوری بی‌وقفه. با ادغام الگوریتم‌های پردازش داده پیشرفته، یک سیستم پاداش چندلایه پویا و زیرساخت‌های بی‌نهایت مقیاس‌پذیر، ما تجربه‌ای بی‌نقص، فوق‌العاده سریع و بسیار قابل اعتماد را مهندسی می‌کنیم. ما پیچیدگی‌ها را مدیریت می‌کنیم تا تمرکز شما تنها روی مهم‌ترین چیز باقی بماند: رشد و موفقیت شما.',
+        aboutConclusion: '<i class="fas fa-quote-right" style="color:#38bdf8;margin-left:4px;"></i> زِنیکس فراتر از تعریف یک پلتفرم صرف است؛ این یک اکوسیستم پرجنب‌وجوش است که در آن فناوری، سرمایه و جامعه‌ای از پیشروان اندیشه گرد هم می‌آیند. ما شریک استوار شما در این سفر هستیم و متعهد به هدایت شما به سوی آینده‌ای با آزادی مالی بیشتر، فرصت‌های بی‌کران و دستاوردهای عظیم هستیم. ما با هم نه تنها آینده را پیش‌بینی می‌کنیم—بلکه آن را می‌سازیم.',
+        floatingCasino: 'کازینو', floatingCasinoTitle: 'بازی‌های کازینو',
+        helpBtnTitle: 'راهنمای صفحه داشبورد',
+        detailMsgTitle: 'مشاهده پیام',
+        aboutModalTitle: '<i class="fas fa-info-circle"></i> درباره پلتفرم هوشمند زِنیکس',
+        modalTitle: 'صندوق پیام‌ها و اعلان‌ها', noMsg: 'هیچ پیام جدیدی وجود ندارد.', newBadge: 'جدید',
+        tabAll: 'همه', tabApproved: 'تایید درخواست', tabRejected: 'لغو درخواست', tabAdmin: 'پیام مدیریت',
+        rejectWithdrawDefault: 'درخواست برداشت شما توسط مدیریت لغو شد.\n\nاگر نیاز به بررسی مجدد یا کسب اطلاعات بیشتر درباره‌ی دلیل لغو دارید، می‌توانید از طریق دکمه‌ی زیر با تیم پشتیبانی زِنیکس در ارتباط باشید. پشتیبانی ما همواره آماده‌ی راهنمایی و همراهی شماست.',
+        contactSupport: 'ارتباط با پشتیبانی',
+        helpTitle: 'راهنمای جامع داشبورد زِنیکس',
+        helpSubtitle: 'راهنمای کامل استفاده از پنل',
+        helpIntro: 'به بخش مدیریت و داشبورد کاربری پلتفرم زِنیکس خوش آمدید. در این بخش می‌توانید خلاصه‌ای از عملکرد مالی و دسترسی سریع به بخش‌های اصلی داشته باشید.',
+        helpS1Title: 'آمار و موجودی',
+        helpS1Desc: 'در بالای صفحه، موجودی کل حساب (USDT) و تعداد اعضای زیرمجموعه به‌صورت زنده نمایش داده می‌شود. با هر تراکنش، موجودی به‌روز می‌شود.',
+        helpS2Title: 'دسترسی سریع (میانبرها)',
+        helpS2List: '<li><strong>کوانتیفیکیشن:</strong> ورود به معاملات هوشمند و رباتیک و دریافت سود روزانه.</li><li><strong>واریز:</strong> شارژ حساب با ولت‌های دیجیتال و تأیید شبکه.</li><li><strong>برداشت:</strong> ثبت درخواست برداشت به کیف پول شخصی.</li><li><strong>تیم:</strong> مشاهده اعضای زیرمجموعه (سطوح ۱ تا ۳) و لینک دعوت اختصاصی.</li><li><strong>تراکنش‌ها:</strong> تاریخچه کامل واریز، برداشت و سود.</li><li><strong>پروفایل:</strong> مدیریت امنیت، رمز عبور و تنظیمات.</li>',
+        helpS3Title: 'بازار ارزهای دیجیتال',
+        helpS3Desc: 'قیمت ۳ ارز برتر بازار به‌صورت زنده هر ۳۰ ثانیه به‌روزرسانی می‌شود. رنگ سبز نشان‌دهنده رشد و رنگ قرمز کاهش قیمت در ۲۴ ساعت گذشته است.',
+        helpS4Title: 'اعلان‌ها و پیام‌ها',
+        helpS4Desc: 'با کلیک روی آیکون زنگوله در هدر، پیام‌های مدیریت، تأیید یا لغو درخواست‌ها را ببینید. تعداد پیام‌های جدید روی آیکون زنگوله نمایش داده می‌شود.',
+        helpS5Title: 'بازی‌های کازینو',
+        helpS5Desc: 'با کلیک روی دکمه شناور گوشه صفحه، وارد بخش بازی‌های کازینو می‌شوید. رولت آنلاین و پلینکو در دسترس هستند و بازی‌ها با موجودی مجزا و به‌صورت دمو اجرا می‌شوند.',
+        helpS6Title: 'نکات امنیتی مهم',
+        helpS6Desc: 'هرگز رمز عبور خود را با کسی به اشتراک نگذارید. زِنیکس هرگز از شما رمز، کد تأیید یا کلید خصوصی نمی‌خواهد. برای برداشت، تأیید دو مرحله‌ای فعال کنید و از لینک‌های ناشناس وارد نشوید.',
+        helpFooter: 'در صورت نیاز به راهنمایی بیشتر، با پشتیبانی زِنیکس از طریق صفحه پشتیبانی در ارتباط باشید.',
+        casinoModalTitle: 'انتخاب بازی‌های کازینو',
+        casinoPoker: 'رولت آنلاین', casinoPokerDesc: 'بازی هیجان‌انگیز و شانس',
+        casinoPlinko: 'پلینکو (پاپالان)', casinoPlinkoDesc: 'بازی محبوب ریزش مهره‌ها'
+    },
+    en: {
+        m1: 'Home', m2: 'Quantification', m3: 'Deposit', m4: 'Withdraw', m_team: 'My Team', m5: 'Transactions', m6: 'Profile', m7: 'Support', m_about: 'About Platform', m8: 'Logout',
+        wel: 'Welcome', sub: 'User Management Panel', st: 'Verified',
+        ts1: 'Balance', ts2: 'Referrals',
+        c1: 'Quantification', d1: 'Smart Trading',
+        c2: 'Deposit', d2: 'Account Top-up',
+        c3: 'Withdraw', d3: 'Asset Withdrawal',
+        c4: 'Team', d4: 'Sub-accounts',
+        c5: 'Transactions', d5: 'Financial History',
+        c6: 'Profile', d6: 'Security Settings',
+        tmkt: 'Cryptocurrency Market (Top 3 of 30 tracked coins)', tlive: 'Live',
+        aboutToggleOpen: 'Show more', aboutToggleClose: 'Show less',
+        aboutTitle: 'About Zenix Smart Platform',
+        aboutIntro: 'Welcome to Zenix, where the horizons of digital finance and the power of modern technology intertwine to illuminate a path toward a brighter future. Zenix was founded on a profound belief: the world of digital assets should not be a labyrinth of complexity, but a transparent, accessible, and secure ecosystem for everyone.',
+        aboutDesc: 'In an era defined by relentless momentum, where global markets never sleep and change is the only constant, having a reliable and intelligent companion is paramount. Zenix, leveraging cutting-edge cloud architecture, advanced quantification algorithms, and impenetrable multi-layered security, provides you with a unified, seamless sanctuary for wealth management. We are not just building a platform; we are crafting an environment where technology serves human ambition, breaking down barriers and redefining what is possible in the digital economy.',
+        aboutGoal: '<strong style="color:#38bdf8;">Our Goal:</strong> To democratize the extraordinary. We strive to place the same powerful financial tools used by institutional elites into the hands of everyday visionaries. Whether you are taking your first step or are a seasoned expert, Zenix empowers you to navigate global markets with confidence, without the need for complex expertise, ensuring your capital grows in an environment of absolute security, transparency, and dynamic potential.',
+        aboutStrategy: '<strong style="color:#38bdf8;">Our Strategy:</strong> Built upon an unbreakable triad—uncompromising security, radical transparency, and relentless innovation. By integrating state-of-the-art data processing algorithms, a dynamic multi-tiered reward system, and infinitely scalable infrastructure, we engineer a flawless, lightning-fast, and highly reliable experience. We handle the complexities, so your focus remains solely on what matters most: your growth and success.',
+        aboutConclusion: '<i class="fas fa-quote-right" style="color:#38bdf8;margin-left:4px;"></i> Zenix transcends the definition of a mere platform; it is a vibrant ecosystem where technology, capital, and a community of forward-thinkers converge. We are your steadfast partner on this journey, committed to guiding you toward a future of greater financial freedom, boundless opportunities, and monumental achievements. Together, we are not just predicting the future—we are building it.',
+        floatingCasino: 'Casino', floatingCasinoTitle: 'Casino Games',
+        helpBtnTitle: 'Dashboard Help',
+        detailMsgTitle: 'View Message',
+        aboutModalTitle: '<i class="fas fa-info-circle"></i> About Zenix Smart Platform',
+        modalTitle: 'Notifications & Messages', noMsg: 'No new messages.', newBadge: 'NEW',
+        tabAll: 'All', tabApproved: 'Approved', tabRejected: 'Rejected', tabAdmin: 'Admin Msg',
+        rejectWithdrawDefault: 'Your withdrawal request has been cancelled by the management.\n\nIf you need a review or wish to know more about the reason for cancellation, you can reach out to the Zenix support team using the button below. Our support is always here to assist and guide you.',
+        contactSupport: 'Contact Support',
+        helpTitle: 'Zenix Dashboard Comprehensive Guide',
+        helpSubtitle: 'Complete guide to the panel',
+        helpIntro: 'Welcome to the Zenix user management dashboard. Here you can find a summary of your financial performance and quick access to core sections.',
+        helpS1Title: 'Stats & Balance',
+        helpS1Desc: 'At the top of the page, your total balance (USDT) and network referral count are displayed live. Balance updates with each transaction.',
+        helpS2Title: 'Quick Shortcuts',
+        helpS2List: '<li><strong>Quantification:</strong> Enter automated robotic trading to earn daily profit.</li><li><strong>Deposit:</strong> Top up your account via digital wallets.</li><li><strong>Withdraw:</strong> Request asset withdrawals to your crypto wallet.</li><li><strong>Team:</strong> View member stats and get your referral link (Levels 1-3).</li><li><strong>Transactions:</strong> Review full history of financial deposits and withdrawals.</li><li><strong>Profile:</strong> Manage account security, password, and settings.</li>',
+        helpS3Title: 'Crypto Market',
+        helpS3Desc: 'Top 3 crypto prices are updated live every 30 seconds. Green indicates growth and red indicates 24-hour price decline.',
+        helpS4Title: 'Notifications & Messages',
+        helpS4Desc: 'Click the bell icon on the header to view admin messages, approvals, or rejections. The number of new messages appears on the bell icon.',
+        helpS5Title: 'Casino Games',
+        helpS5Desc: 'Click the floating button on the corner of the page to enter casino games. Online roulette and plinko are available as demo games with separate balance.',
+        helpS6Title: 'Important Security Notes',
+        helpS6Desc: 'Never share your password with anyone. Zenix will never ask for your password, verification code, or private key. For withdrawals, enable two-factor authentication and avoid unknown links.',
+        helpFooter: 'For further assistance, contact Zenix Support through the support page.',
+        casinoModalTitle: 'Select Casino Games',
+        casinoPoker: 'Online Roulette', casinoPokerDesc: 'Exciting game of chance',
+        casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Popular dropping ball game'
+    },
+    ar: {
+        m1: 'الرئيسية', m2: 'التكميم', m3: 'إيداع', m4: 'سحب', m_team: 'فريقي', m5: 'المعاملات', m6: 'الملف الشخصي', m7: 'الدعم', m_about: 'حول المنصة', m8: 'تسجيل الخروج',
+        wel: 'أهلاً بك', sub: 'لوحة إدارة المستخدم', st: 'موثق',
+        ts1: 'الرصيد', ts2: 'الإحالات',
+        c1: 'التكميم', d1: 'التداول الذكي',
+        c2: 'إيداع', d2: 'شحن الحساب',
+        c3: 'سحب', d3: 'سحب الأصول',
+        c4: 'الفريق', d4: 'الإحالات',
+        c5: 'المعاملات', d5: 'السجل المالي',
+        c6: 'الملف الشخصي', d6: 'إعدادات الأمان',
+        tmkt: 'سوق العملات الرقمية (أفضل 3 من 30 عملة مراقبة)', tlive: 'مباشر',
+        aboutToggleOpen: 'عرض المزيد', aboutToggleClose: 'إظهار أقل',
+        aboutTitle: 'حول منصة Zenix الذكية',
+        aboutIntro: 'مرحباً بك في Zenix، حيث تتشابك آفاق التمويل الرقمي وقوة التكنولوجيا الحديثة لإضاءة طريق نحو مستقبل أكثر إشراقاً. تأسست Zenix على إيمان عميق: يجب ألا يكون عالم الأصول الرقمية متاهة معقدة، بل نظاماً بيئياً شفافاً وسهلاً وآمناً للجميع.',
+        aboutDesc: 'في عصر يتسم بالزخم الذي لا يلين، حيث لا تنام الأسواق العالمية أبداً والتغيير هو الثابت الوحيد، يعد وجود رفيق موثوق وذكي أمراً بالغ الأهمية. بناءً على بنية سحابية متطورة وخوارزميات تكميم متقدمة وطبقات أمان متعددة لا يمكن اختراقها، توفر لك Zenix ملاذاً موحداً وسلساً لإدارة الثروة. نحن لا نبني منصة فحسب؛ بل نصمم بيئة تخدم فيها التكنولوجيا الطموح البشري، وتكسر الحواجز وتعيد تعريف ما هو ممكن في الاقتصاد الرقمي.',
+        aboutGoal: '<strong style="color:#38bdf8;">هدفنا:</strong> إضفاء الطابع الديمقراطي على الاستثنائي. نحن نسعى جاهدين لوضع نفس الأدوات المالية القوية التي تستخدمها النخب المؤسسية في أيدي أصحاب الرؤى العاديين. سواء كنت تخطو خطوتك الأولى أو كنت خبيراً متمرساً، فإن Zenix يمكّنك من التنقل في الأسواق العالمية بثقة، دون الحاجة إلى خبرة معقدة، مما يضمن نمو رأس مالك في بيئة من الأمان المطلق والشفافية والإمكانات الديناميكية.',
+        aboutStrategy: '<strong style="color:#38bdf8;">استراتيجيتنا:</strong> مبنية على ثلاثية غير قابلة للكسر - أمان بلا هوادة، شفافية جذرية، وابتكار لا هوادة فيه. من خلال دمج خوارزميات معالجة البيانات الحديثة ونظام مكافآت ديناميكي متعدد المستويات وبنية تحتية قابلة للتطوير بلا حدود، نصمم تجربة لا تشوبها شائبة وسريعة للغاية وموثوقة للغاية. نحن نتعامل مع التعقيدات، لذلك يظل تركيزك فقط على ما يهم أكثر: نموك ونجاحك.',
+        aboutConclusion: '<i class="fas fa-quote-right" style="color:#38bdf8;margin-left:4px;"></i> تتجاوز Zenix تعريف مجرد منصة؛ إنها نظام بيئي نابض بالحياة حيث تتلاقى التكنولوجيا ورأس المال ومجتمع من المفكرين المتقدمين. نحن شريكك الثابت في هذه الرحلة، وملتزمون بإرشادك نحو مستقبل من حرية مالية أكبر وفرص لا حدود لها وإنجازات هائلة. معاً، نحن لا نتوقع المستقبل فقط — بل نبنيه.',
+        floatingCasino: 'كازينو', floatingCasinoTitle: 'ألعاب الكازينو',
+        helpBtnTitle: 'مساعدة لوحة التحكم',
+        detailMsgTitle: 'عرض الرسالة',
+        aboutModalTitle: '<i class="fas fa-info-circle"></i> حول منصة Zenix الذكية',
+        modalTitle: 'صندوق الرسائل والإشعارات', noMsg: 'لا توجد رسائل جديدة.', newBadge: 'جديد',
+        tabAll: 'الكل', tabApproved: 'طلبات مقبولة', tabRejected: 'طلبات مرفوضة', tabAdmin: 'رسائل الإدارة',
+        rejectWithdrawDefault: 'تم إلغاء طلب السحب الخاص بك من قبل الإدارة.\n\nإذا كنت بحاجة إلى إعادة النظر أو ترغب في معرفة المزيد حول سبب الإلغاء، يمكنك التواصل مع فريق دعم Zenix باستخدام الزر أدناه. فريق الدعم لدينا مستعد دائمًا لمساعدتك ومرافقتك.',
+        contactSupport: 'تواصل مع الدعم',
+        helpTitle: 'دليل لوحة تحكم Zenix الشامل',
+        helpSubtitle: 'دليل شامل للوحة التحكم',
+        helpIntro: 'مرحباً بك في لوحة تحكم إدارة المستخدمين في Zenix. يمكنك هنا العثور على ملخص لأدائك المالي والوصول السريع للأقسام الأساسية.',
+        helpS1Title: 'الإحصائيات والرصيد',
+        helpS1Desc: 'في أعلى الصفحة، يتم عرض إجمالي رصيدك (USDT) وعدد إحالات الشبكة بشكل مباشر. يتم تحديث الرصيد مع كل معاملة.',
+        helpS2Title: 'الاختصارات السريعة',
+        helpS2List: '<li><strong>التكميم:</strong> الدخول إلى التداول الآلي لكسب الأرباح اليومية.</li><li><strong>إيداع:</strong> شحن حسابك عبر المحافظ الرقمية.</li><li><strong>سحب:</strong> طلب سحب الأصول إلى محفظتك.</li><li><strong>الفريق:</strong> عرض إحصائيات الأعضاء ورابط الإحالة.</li><li><strong>المعاملات:</strong> مراجعة السجل الكامل.</li><li><strong>الملف الشخصي:</strong> إدارة الأمان والإعدادات.</li>',
+        helpS3Title: 'سوق العملات الرقمية',
+        helpS3Desc: 'يتم تحديث أسعار أفضل 3 عملات بشكل مباشر كل 30 ثانية. الأخضر يعني النمو والأحمر يعني الانخفاض.',
+        helpS4Title: 'الإشعارات والرسائل',
+        helpS4Desc: 'انقر على أيقونة الجرس لعرض رسائل الإدارة والموافقات أو الرفض. عدد الرسائل الجديدة يظهر على الأيقونة.',
+        helpS5Title: 'ألعاب الكازينو',
+        helpS5Desc: 'انقر على الزر العائم لفتح ألعاب الكازينو. الروليت والبلينكو متاحة كلعبة تجريبية برصيد منفصل.',
+        helpS6Title: 'ملاحظات أمنية هامة',
+        helpS6Desc: 'لا تشارك كلمة المرور مع أي شخص. لن تطلب منك Zenix أبدًا كلمة المرور أو رمز التحقق أو المفتاح الخاص. لتفعيل السحب، قم بتشغيل المصادقة الثنائية.',
+        helpFooter: 'للمزيد من المساعدة، تواصل مع دعم Zenix.',
+        casinoModalTitle: 'اختر ألعاب الكازينو',
+        casinoPoker: 'رولت مباشر', casinoPokerDesc: 'لعبة حظ مثيرة',
+        casinoPlinko: 'بلينكو', casinoPlinkoDesc: 'لعبة سقوط الكرات الشهيرة'
+    },
+    tr: {
+        m1: 'Ana Sayfa', m2: 'Kuantifikasyon', m3: 'Yatırım', m4: 'Çekim', m_team: 'Ekibim', m5: 'İşlemler', m6: 'Profil', m7: 'Destek', m_about: 'Platform Hakkında', m8: 'Çıkış',
+        wel: 'Hoş Geldiniz', sub: 'Kullanıcı Yönetim Paneli', st: 'Onaylandı',
+        ts1: 'Bakiye', ts2: 'Referanslar',
+        c1: 'Kuantifikasyon', d1: 'Akıllı İşlem',
+        c2: 'Yatırım', d2: 'Hesap Yükleme',
+        c3: 'Çekim', d3: 'Varlık Çekimi',
+        c4: 'Ekip', d4: 'Alt Hesaplar',
+        c5: 'İşlemler', d5: 'Finansal Geçmiş',
+        c6: 'Profil', d6: 'Güvenlik Ayarları',
+        tmkt: 'Kripto Para Piyasası (Takip edilen 30 coinden en iyi 3ü)', tlive: 'Canlı',
+        aboutToggleOpen: 'Daha fazla göster', aboutToggleClose: 'Daha az göster',
+        aboutTitle: 'Zenix Akıllı Platform Hakkında',
+        aboutIntro: 'Zenix\'e hoş geldiniz; dijital finansın ufukları ile modern teknolojinin gücünün, daha aydınlık bir geleceğe giden yolu aydınlatmak için iç içe geçtiği yer. Zenix, derin bir inanç üzerine kurulmuştur: dijital varlıklar dünyası karmaşık bir labirent değil, herkes için şeffaf, erişilebilir ve güvenli bir ekosistem olmalıdır.',
+        aboutDesc: 'Küresel piyasaların asla uyumadığı ve tek sabitin değişim olduğu, amansız bir ivmeyle tanımlanan bir çağda, güvenilir ve akıllı bir yol arkadaşına sahip olmak çok önemlidir. Zenix, en son bulut mimarisi, gelişmiş kuantifikasyon algoritmaları ve aşılamaz çok katmanlı güvenlikten yararlanarak size servet yönetimi için birleşik ve kusursuz bir sığınak sunar.',
+        aboutGoal: '<strong style="color:#38bdf8;">Hedefimiz:</strong> Olağanüstüyü demokratikleştirmek. Kurumsal seçkinlerin kullandığı aynı güçlü finansal araçları günlük vizyonerlerin eline vermeye çalışıyoruz.',
+        aboutStrategy: '<strong style="color:#38bdf8;">Stratejimiz:</strong> yıkılmaz bir üçlü üzerine inşa edilmiştir: ödünsüz güvenlik, radikal şeffaflık ve amansız inovasyon.',
+        aboutConclusion: '<i class="fas fa-quote-right" style="color:#38bdf8;margin-left:4px;"></i> Zenix, sadece bir platform tanımını aşar; teknolojinin, sermayenin ve ileri görüşlü bir topluluğun bir araya geldiği canlı bir ekosistemdir.',
+        floatingCasino: 'Casino', floatingCasinoTitle: 'Casino Oyunları',
+        helpBtnTitle: 'Panel Yardımı',
+        detailMsgTitle: 'Mesajı Görüntüle',
+        aboutModalTitle: '<i class="fas fa-info-circle"></i> Zenix Akıllı Platform Hakkında',
+        modalTitle: 'Bildirimler ve Mesajlar', noMsg: 'Yeni mesaj yok.', newBadge: 'YENİ',
+        tabAll: 'Tümü', tabApproved: 'Onaylanan', tabRejected: 'Reddedilen', tabAdmin: 'Yönetici',
+        rejectWithdrawDefault: 'Para çekme talebiniz yönetim tarafından iptal edildi.\n\nYeniden inceleme yapılmasına veya iptal nedenini öğrenmek istiyorsanız, aşağıdaki düğmeyi kullanarak Zenix destek ekibiyle iletişime geçebilirsiniz. Desteğimiz size yardımcı olmak ve sizinle birlikte olmak için her zaman hazırdır.',
+        contactSupport: 'Destek ile İletişim',
+        helpTitle: 'Zenix Kontrol Paneli Kapsamlı Rehberi',
+        helpSubtitle: 'Panel için kapsamlı rehber',
+        helpIntro: 'Zenix kullanıcı yönetim paneline hoş geldiniz. Burada finansal performansınızın bir özetini bulabilirsiniz.',
+        helpS1Title: 'İstatistikler ve Bakiye',
+        helpS1Desc: 'Sayfanın üst kısmında toplam bakiyeniz (USDT) ve ağ referans sayınız canlı olarak gösterilir. Bakiye her işlemde güncellenir.',
+        helpS2Title: 'Hızlı Kısayollar',
+        helpS2List: '<li><strong>Kuantifikasyon:</strong> Otomatik robotik ticarete girin.</li><li><strong>Yatırım:</strong> Dijital cüzdanlarla hesap yükleyin.</li><li><strong>Çekim:</strong> Kripto cüzdanınıza varlık çekin.</li><li><strong>Ekip:</strong> Üye istatistiklerini görüntüleyin.</li><li><strong>İşlemler:</strong> Tam finansal geçmişi inceleyin.</li><li><strong>Profil:</strong> Güvenlik ve ayarları yönetin.</li>',
+        helpS3Title: 'Kripto Piyasası',
+        helpS3Desc: 'En iyi 3 kripto fiyatı her 30 saniyede bir canlı olarak güncellenir. Yeşil büyümeyi, kırmızı 24 saatlik düşüşü gösterir.',
+        helpS4Title: 'Bildirimler ve Mesajlar',
+        helpS4Desc: 'Başlıktaki zil simgesine tıklayarak yönetici mesajlarını, onayları veya redleri görüntüleyin.',
+        helpS5Title: 'Casino Oyunları',
+        helpS5Desc: 'Sayfanın köşesindeki yüzen düğmeye tıklayarak casino oyunlarına girin. Rulet ve plinko demo olarak mevcuttur.',
+        helpS6Title: 'Önemli Güvenlik Notları',
+        helpS6Desc: 'Şifrenizi asla kimseyle paylaşmayın. Zenix sizden asla şifre, doğrulama kodu veya özel anahtar istemez.',
+        helpFooter: 'Daha fazla yardım için Zenix Desteği ile iletişime geçin.',
+        casinoModalTitle: 'Casino Oyunları Seçimi',
+        casinoPoker: 'Canlı Rulet', casinoPokerDesc: 'Heyecan verici şans oyunu',
+        casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Popüler top bırakma oyunu'
+    },
+    ru: {
+        m1: 'Главная', m2: 'Квантификация', m3: 'Депозит', m4: 'Вывод', m_team: 'Команда', m5: 'Транзакции', m6: 'Профиль', m7: 'Поддержка', m_about: 'О платформе', m8: 'Выход',
+        wel: 'Добро пожаловать', sub: 'Панель управления', st: 'Подтверждено',
+        ts1: 'Баланс', ts2: 'Рефералы',
+        c1: 'Квантификация', d1: 'Умная торговля',
+        c2: 'Депозит', d2: 'Пополнение счета',
+        c3: 'Вывод', d3: 'Вывод средств',
+        c4: 'Команда', d4: 'Рефералы',
+        c5: 'Транзакции', d5: 'История финансов',
+        c6: 'Профиль', d6: 'Настройки безопасности',
+        tmkt: 'Криптовалютный рынок (топ-3 из 30 монет)', tlive: 'Онлайн',
+        aboutToggleOpen: 'Показать больше', aboutToggleClose: 'Показать меньше',
+        aboutTitle: 'О смарт-платформе Zenix',
+        aboutIntro: 'Добро пожаловать в Zenix — место, где горизонты цифровых финансов и мощь современных технологий переплетаются, чтобы осветить путь к светлому будущему.',
+        aboutDesc: 'В эпоху, определяемую неустанным импульсом, когда мировые рынки никогда не спят и единственная константа — это перемены, наличие надежного и умного спутника имеет первостепенное значение.',
+        aboutGoal: '<strong style="color:#38bdf8;">Наша цель:</strong> демократизировать выдающееся. Мы стремимся вложить те же мощные финансовые инструменты в руки обычных мечтателей.',
+        aboutStrategy: '<strong style="color:#38bdf8;">Наша стратегия:</strong> построена на незыблемой триаде — бескомпромиссная безопасность, радикальная прозрачность и неустанные инновации.',
+        aboutConclusion: '<i class="fas fa-quote-right" style="color:#38bdf8;margin-left:4px;"></i> Zenix выходит за рамки определения простой платформы; это яркая экосистема.',
+        floatingCasino: 'Казино', floatingCasinoTitle: 'Игры казино',
+        helpBtnTitle: 'Помощь',
+        detailMsgTitle: 'Просмотр сообщения',
+        aboutModalTitle: '<i class="fas fa-info-circle"></i> О смарт-платформе Zenix',
+        modalTitle: 'Уведомления', noMsg: 'Нет новых сообщений.', newBadge: 'НОВОЕ',
+        tabAll: 'Все', tabApproved: 'Одобрено', tabRejected: 'Отклонено', tabAdmin: 'Админ',
+        rejectWithdrawDefault: 'Ваш запрос на вывод средств был отменён администрацией.\n\nЕсли вам нужна дополнительная проверка или вы хотите узнать причину отмены, вы можете связаться со службой поддержки Zenix с помощью кнопки ниже. Наша поддержка всегда готова помочь и сопровождать вас.',
+        contactSupport: 'Связаться с поддержкой',
+        helpTitle: 'Руководство панели управления Zenix',
+        helpSubtitle: 'Полное руководство по панели',
+        helpIntro: 'Добро пожаловать в панель управления Zenix.',
+        helpS1Title: 'Статистика и баланс',
+        helpS1Desc: 'В верхней части страницы отображается ваш общий баланс (USDT) и количество рефералов в реальном времени.',
+        helpS2Title: 'Быстрые ярлыки',
+        helpS2List: '<li><strong>Квантификация:</strong> Автоматическая роботизированная торговля.</li><li><strong>Депозит:</strong> Пополнение через цифровые кошельки.</li><li><strong>Вывод:</strong> Запрос вывода на криптокошелек.</li><li><strong>Команда:</strong> Статистика участников и реферальная ссылка.</li><li><strong>Транзакции:</strong> Полная история финансов.</li><li><strong>Профиль:</strong> Управление безопасностью и настройками.</li>',
+        helpS3Title: 'Криптовалютный рынок',
+        helpS3Desc: 'Цены топ-3 криптовалют обновляются каждые 30 секунд. Зеленый — рост, красный — падение за 24 часа.',
+        helpS4Title: 'Уведомления и сообщения',
+        helpS4Desc: 'Нажмите на иконку колокольчика, чтобы просмотреть сообщения администратора и статусы запросов.',
+        helpS5Title: 'Игры казино',
+        helpS5Desc: 'Нажмите на плавающую кнопку в углу страницы, чтобы войти в игры казино. Рулетка и плинко доступны как демо.',
+        helpS6Title: 'Важные меры безопасности',
+        helpS6Desc: 'Никогда не делитесь паролем. Zenix никогда не запрашивает пароль, код подтверждения или приватный ключ.',
+        helpFooter: 'За дополнительной помощью обращайтесь в поддержку Zenix.',
+        casinoModalTitle: 'Выбор игр казино',
+        casinoPoker: 'Онлайн Рулетка', casinoPokerDesc: 'Захватывающая игра',
+        casinoPlinko: 'Плинко', casinoPlinkoDesc: 'Популярная игра с шариками'
+    },
+    es: {
+        m1: 'Inicio', m2: 'Cuantificación', m3: 'Depósito', m4: 'Retiro', m_team: 'Equipo', m5: 'Transacciones', m6: 'Perfil', m7: 'Soporte', m_about: 'Sobre la plataforma', m8: 'Cerrar sesión',
+        wel: 'Bienvenido', sub: 'Panel de gestión de usuario', st: 'Verificado',
+        ts1: 'Saldo', ts2: 'Referidos',
+        c1: 'Cuantificación', d1: 'Comercio inteligente',
+        c2: 'Depósito', d2: 'Recarga de cuenta',
+        c3: 'Retiro', d3: 'Retiro de activos',
+        c4: 'Equipo', d4: 'Subcuentas',
+        c5: 'Transacciones', d5: 'Historial financiero',
+        c6: 'Perfil', d6: 'Configuración de seguridad',
+        tmkt: 'Mercado de criptomonedas (Top 3 de 30 monedas)', tlive: 'En vivo',
+        aboutToggleOpen: 'Ver más', aboutToggleClose: 'Ver menos',
+        aboutTitle: 'Sobre la plataforma inteligente Zenix',
+        aboutIntro: 'Bienvenido a Zenix, donde los horizontes de las finanzas digitales y el poder de la tecnología moderna se entrelazan para iluminar un camino hacia un futuro más brillante.',
+        aboutDesc: 'En una era definida por un impulso implacable, donde los mercados globales nunca duermen y el cambio es la única constante, contar con un compañero confiable e inteligente es primordial.',
+        aboutGoal: '<strong style="color:#38bdf8;">Nuestro objetivo:</strong> democratizar lo extraordinario.',
+        aboutStrategy: '<strong style="color:#38bdf8;">Nuestra estrategia:</strong> se basa en una tríada inquebrantable: seguridad sin concesiones, transparencia radical e innovación implacable.',
+        aboutConclusion: '<i class="fas fa-quote-right" style="color:#38bdf8;margin-left:4px;"></i> Zenix trasciende la definición de una mera plataforma; es un ecosistema vibrante.',
+        floatingCasino: 'Casino', floatingCasinoTitle: 'Juegos de Casino',
+        helpBtnTitle: 'Ayuda',
+        detailMsgTitle: 'Ver mensaje',
+        aboutModalTitle: '<i class="fas fa-info-circle"></i> Sobre la plataforma inteligente Zenix',
+        modalTitle: 'Notificaciones', noMsg: 'No hay mensajes nuevos.', newBadge: 'NUEVO',
+        tabAll: 'Todo', tabApproved: 'Aprobado', tabRejected: 'Rechazado', tabAdmin: 'Admin',
+        rejectWithdrawDefault: 'Su solicitud de retiro ha sido cancelada por la administración.\n\nSi necesita una revisión o desea saber más sobre el motivo de la cancelación, puede ponerse en contacto con el equipo de soporte de Zenix mediante el botón a continuación. Nuestro soporte siempre está listo para ayudarle y acompañarle.',
+        contactSupport: 'Contactar con soporte',
+        helpTitle: 'Guía de Zenix',
+        helpSubtitle: 'Guía completa del panel',
+        helpIntro: 'Bienvenido al panel de Zenix.',
+        helpS1Title: 'Estadísticas y saldo',
+        helpS1Desc: 'En la parte superior, su saldo total (USDT) y el número de referidos se muestran en vivo. Se actualiza con cada transacción.',
+        helpS2Title: 'Accesos rápidos',
+        helpS2List: '<li><strong>Cuantificación:</strong> Trading robótico automático.</li><li><strong>Depósito:</strong> Recarga vía billeteras digitales.</li><li><strong>Retiro:</strong> Retire activos a su billetera.</li><li><strong>Equipo:</strong> Estadísticas de miembros y enlace de referido.</li><li><strong>Transacciones:</strong> Historial financiero completo.</li><li><strong>Perfil:</strong> Gestión de seguridad y ajustes.</li>',
+        helpS3Title: 'Mercado de criptomonedas',
+        helpS3Desc: 'Los precios de las 3 principales criptos se actualizan cada 30 segundos. Verde indica crecimiento, rojo indica caída del 24h.',
+        helpS4Title: 'Notificaciones y mensajes',
+        helpS4Desc: 'Haga clic en la campana del encabezado para ver mensajes de administrador, aprobaciones o rechazos.',
+        helpS5Title: 'Juegos de casino',
+        helpS5Desc: 'Haga clic en el botón flotante para acceder a los juegos de casino. Ruleta online y plinko disponibles como demo.',
+        helpS6Title: 'Notas de seguridad importantes',
+        helpS6Desc: 'Nunca comparta su contraseña. Zenix nunca le pedirá contraseña, código de verificación o clave privada.',
+        helpFooter: 'Para más ayuda, contacte con Zenix Support.',
+        casinoModalTitle: 'Selección de Juegos de Casino',
+        casinoPoker: 'Ruleta Online', casinoPokerDesc: 'Emocionante juego de azar',
+        casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Popular juego de caída'
+    },
+    fr: {
+        m1: 'Accueil', m2: 'Quantification', m3: 'Dépôt', m4: 'Retrait', m_team: 'Équipe', m5: 'Transactions', m6: 'Profil', m7: 'Support', m_about: 'À propos', m8: 'Déconnexion',
+        wel: 'Bienvenue', sub: 'Panneau de gestion', st: 'Vérifié',
+        ts1: 'Solde', ts2: 'Parrainages',
+        c1: 'Quantification', d1: 'Trading intelligent',
+        c2: 'Dépôt', d2: 'Recharge de compte',
+        c3: 'Retrait', d3: 'Retrait d\'actifs',
+        c4: 'Équipe', d4: 'Sous-comptes',
+        c5: 'Transactions', d5: 'Historique financier',
+        c6: 'Profil', d6: 'Paramètres de sécurité',
+        tmkt: 'Marché des crypto-monnaies (Top 3 sur 30)', tlive: 'En direct',
+        aboutToggleOpen: 'Voir plus', aboutToggleClose: 'Voir moins',
+        aboutTitle: 'À propos de la plateforme intelligente Zenix',
+        aboutIntro: 'Bienvenue sur Zenix, où les horizons de la finance numérique et la puissance de la technologie moderne s\'entrelacent pour éclairer la voie vers un avenir plus radieux.',
+        aboutDesc: 'À une époque définie par un élan implacable, où les marchés mondiaux ne dorment jamais et où le changement est la seule constante, avoir un compagnon fiable et intelligent est primordial.',
+        aboutGoal: '<strong style="color:#38bdf8;">Notre objectif :</strong> démocratiser l\'extraordinaire.',
+        aboutStrategy: '<strong style="color:#38bdf8;">Notre stratégie :</strong> repose sur une triade indestructible : sécurité sans compromis, transparence radicale et innovation incessante.',
+        aboutConclusion: '<i class="fas fa-quote-right" style="color:#38bdf8;margin-left:4px;"></i> Zenix transcende la définition d\'une simple plateforme ; c\'est un écosystème dynamique.',
+        floatingCasino: 'Casino', floatingCasinoTitle: 'Jeux de casino',
+        helpBtnTitle: 'Aide',
+        detailMsgTitle: 'Voir le message',
+        aboutModalTitle: '<i class="fas fa-info-circle"></i> À propos de la plateforme intelligente Zenix',
+        modalTitle: 'Notifications', noMsg: 'Aucun nouveau message.', newBadge: 'NOUVEAU',
+        tabAll: 'Tout', tabApproved: 'Approuvé', tabRejected: 'Rejeté', tabAdmin: 'Admin',
+        rejectWithdrawDefault: 'Votre demande de retrait a été annulée par l\'administration.\n\nSi vous avez besoin d\'un réexamen ou si vous souhaitez en savoir plus sur le motif de l\'annulation, vous pouvez contacter l\'équipe d\'assistance Zenix à l\'aide du bouton ci-dessous. Notre support est toujours prêt à vous aider et à vous accompagner.',
+        contactSupport: 'Contacter le support',
+        helpTitle: 'Guide Zenix',
+        helpSubtitle: 'Guide complet du panneau',
+        helpIntro: 'Bienvenue sur le tableau de bord Zenix.',
+        helpS1Title: 'Statistiques et solde',
+        helpS1Desc: 'En haut de la page, votre solde total (USDT) et le nombre de filleuls sont affichés en direct.',
+        helpS2Title: 'Raccourcis rapides',
+        helpS2List: '<li><strong>Quantification:</strong> Trading robotique automatique.</li><li><strong>Dépôt:</strong> Recharger via portefeuilles numériques.</li><li><strong>Retrait:</strong> Retirer des actifs vers votre portefeuille.</li><li><strong>Équipe:</strong> Statistiques et lien de parrainage.</li><li><strong>Transactions:</strong> Historique financier complet.</li><li><strong>Profil:</strong> Sécurité et paramètres.</li>',
+        helpS3Title: 'Marché des cryptos',
+        helpS3Desc: 'Les prix des 3 meilleures cryptos sont mis à jour toutes les 30 secondes. Vert pour la croissance, rouge pour la baisse sur 24h.',
+        helpS4Title: 'Notifications et messages',
+        helpS4Desc: 'Cliquez sur la cloche dans l\'en-tête pour voir les messages admin et les approbations.',
+        helpS5Title: 'Jeux de casino',
+        helpS5Desc: 'Cliquez sur le bouton flottant pour accéder aux jeux de casino. Roulette et plinko disponibles en démo.',
+        helpS6Title: 'Notes de sécurité importantes',
+        helpS6Desc: 'Ne partagez jamais votre mot de passe. Zenix ne demande jamais de mot de passe, code de vérification ou clé privée.',
+        helpFooter: 'Pour plus d\'aide, contactez Zenix Support.',
+        casinoModalTitle: 'Sélection des Jeux de Casino',
+        casinoPoker: 'Roulette en ligne', casinoPokerDesc: 'Jeu de hasard excitant',
+        casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Jeu populaire de balles'
+    },
+    de: {
+        m1: 'Startseite', m2: 'Quantifizierung', m3: 'Einzahlung', m4: 'Auszahlung', m_team: 'Team', m5: 'Transaktionen', m6: 'Profil', m7: 'Unterstützung', m_about: 'Über die Plattform', m8: 'Abmelden',
+        wel: 'Willkommen', sub: 'Benutzer-Management-Panel', st: 'Verifiziert',
+        ts1: 'Guthaben', ts2: 'Empfehlungen',
+        c1: 'Quantifizierung', d1: 'Smart Trading',
+        c2: 'Einzahlung', d2: 'Konto aufladen',
+        c3: 'Auszahlung', d3: 'Vermögensauszahlung',
+        c4: 'Team', d4: 'Unterkonten',
+        c5: 'Transaktionen', d5: 'Finanzhistorie',
+        c6: 'Profil', d6: 'Sicherheitseinstellungen',
+        tmkt: 'Kryptowährungsmarkt (Top 3 von 30 Münzen)', tlive: 'Live',
+        aboutToggleOpen: 'Mehr anzeigen', aboutToggleClose: 'Weniger anzeigen',
+        aboutTitle: 'Über die intelligente Zenix-Plattform',
+        aboutIntro: 'Willkommen bei Zenix, wo die Horizonte der digitalen Finanzwelt und die Kraft moderner Technologie ineinandergreifen.',
+        aboutDesc: 'In einer Ära des unaufhaltsamen Wandels ist ein zuverlässiger und intelligenter Begleiter von größter Bedeutung.',
+        aboutGoal: '<strong style="color:#38bdf8;">Unser Ziel:</strong> Das Außergewöhnliche zu demokratisieren.',
+        aboutStrategy: '<strong style="color:#38bdf8;">Unsere Strategie:</strong> baut auf einer unzerbrechlichen Triade auf.',
+        aboutConclusion: '<i class="fas fa-quote-right" style="color:#38bdf8;margin-left:4px;"></i> Zenix geht über die Definition einer bloßen Plattform hinaus.',
+        floatingCasino: 'Casino', floatingCasinoTitle: 'Casino-Spiele',
+        helpBtnTitle: 'Hilfe',
+        detailMsgTitle: 'Nachricht anzeigen',
+        aboutModalTitle: '<i class="fas fa-info-circle"></i> Über die intelligente Zenix-Plattform',
+        modalTitle: 'Benachrichtigungen', noMsg: 'Keine neuen Nachrichten.', newBadge: 'NEU',
+        tabAll: 'Alle', tabApproved: 'Genehmigt', tabRejected: 'Abgelehnt', tabAdmin: 'Admin',
+        rejectWithdrawDefault: 'Ihre Auszahlungsanfrage wurde von der Verwaltung storniert.\n\nWenn Sie eine Überprüfung benötigen oder mehr über den Grund der Stornierung erfahren möchten, können Sie unser Zenix-Support-Team über die untenstehende Schaltfläche kontaktieren. Unser Support ist jederzeit bereit, Ihnen zu helfen und Sie zu begleiten.',
+        contactSupport: 'Support kontaktieren',
+        helpTitle: 'Zenix Leitfaden',
+        helpSubtitle: 'Vollständiger Leitfaden zum Panel',
+        helpIntro: 'Willkommen beim Zenix-Dashboard.',
+        helpS1Title: 'Statistiken und Guthaben',
+        helpS1Desc: 'Oben auf der Seite werden Ihr Gesamtguthaben (USDT) und die Anzahl der Empfehlungen live angezeigt.',
+        helpS2Title: 'Schnellzugriff',
+        helpS2List: '<li><strong>Quantifizierung:</strong> Automatischer Roboterhandel.</li><li><strong>Einzahlung:</strong> Aufladen über digitale Wallets.</li><li><strong>Auszahlung:</strong> Vermögenswerte abheben.</li><li><strong>Team:</strong> Mitgliederstatistiken und Empfehlungslink.</li><li><strong>Transaktionen:</strong> Vollständige Finanzhistorie.</li><li><strong>Profil:</strong> Sicherheit und Einstellungen.</li>',
+        helpS3Title: 'Krypto-Markt',
+        helpS3Desc: 'Die Preise der Top-3-Kryptos werden alle 30 Sekunden aktualisiert. Grün für Wachstum, rot für 24-Stunden-Rückgang.',
+        helpS4Title: 'Benachrichtigungen und Nachrichten',
+        helpS4Desc: 'Klicken Sie auf das Glockensymbol in der Kopfzeile, um Admin-Nachrichten und Status anzuzeigen.',
+        helpS5Title: 'Casino-Spiele',
+        helpS5Desc: 'Klicken Sie auf die schwebende Schaltfläche, um Casino-Spiele zu öffnen. Roulette und Plinko als Demo verfügbar.',
+        helpS6Title: 'Wichtige Sicherheitshinweise',
+        helpS6Desc: 'Teilen Sie niemals Ihr Passwort. Zenix fordert niemals Passwort, Bestätigungscode oder privaten Schlüssel an.',
+        helpFooter: 'Für weitere Hilfe wenden Sie sich an den Zenix-Support.',
+        casinoModalTitle: 'Casino-Spiele Auswahl',
+        casinoPoker: 'Online Roulette', casinoPokerDesc: 'Spannendes Glücksspiel',
+        casinoPlinko: 'Plinko', casinoPlinkoDesc: 'Beliebtes Ballspiel'
+    }
+};
+
+function setLang(l) {
+    if (!SUPPORTED_LANGUAGES.includes(l)) l = 'en';
+    currLang = l;
+    safeSetItem('zenix_lang', l);
+    let t = ld[l] || ld.en;
+    let r = l === 'fa' || l === 'ar';
+
+    document.documentElement.setAttribute('dir', r ? 'rtl' : 'ltr');
+    document.documentElement.setAttribute('lang', l);
+
+    document.querySelectorAll('#lang-menu .mi').forEach(item => {
+        if (item.dataset.lang === l) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
+
+    for (let i = 1; i <= 8; i++) {
+        let m = document.getElementById('m' + i);
+        if (m) m.textContent = t['m' + i] || '';
+    }
+
+    let mTeam = document.getElementById('m_team');
+    if (mTeam) mTeam.textContent = t.m_team;
+
+    let mAbout = document.getElementById('m_about');
+    if (mAbout) mAbout.textContent = t.m_about;
+
+    document.getElementById('help-btn')?.setAttribute('title', t.helpBtnTitle);
+    document.getElementById('floating-casino-btn')?.setAttribute('title', t.floatingCasinoTitle);
+
+    let detailMsgTitle = document.getElementById('detail-msg-title');
+    if (detailMsgTitle) detailMsgTitle.innerHTML = `<i class="fas fa-envelope-open"></i> ${t.detailMsgTitle}`;
+
+    const setTxt = (id, text) => {
+        const el = document.getElementById(id);
+        if (el && text) el.textContent = text;
+    };
+
+    const setHtml = (id, html) => {
+        const el = document.getElementById(id);
+        if (el && html) el.innerHTML = html;
+    };
+
+    const welEl = document.getElementById('t-wel');
+    if (welEl) welEl.textContent = currentUserName ? `${t.wel} ${currentUserName}` : t.wel;
+    setTxt('t-sub', t.sub);
+    setTxt('t-st', t.st);
+    setTxt('ts1', t.ts1);
+    setTxt('ts2', t.ts2);
+    setTxt('c1', t.c1); setTxt('d1', t.d1);
+    setTxt('c2', t.c2); setTxt('d2', t.d2);
+    setTxt('c3', t.c3); setTxt('d3', t.d3);
+    setTxt('c4', t.c4); setTxt('d4', t.d4);
+    setTxt('c5', t.c5); setTxt('d5', t.d5);
+    setTxt('c6', t.c6); setTxt('d6', t.d6);
+    setTxt('t-mkt', t.tmkt);
+    setTxt('t-live', t.tlive);
+
+    setTxt('t-about-box-title', t.aboutTitle);
+    setTxt('t-about-box-intro', t.aboutIntro);
+    setTxt('t-about-box-desc', t.aboutDesc);
+    setHtml('t-about-box-goal', t.aboutGoal);
+    setHtml('t-about-box-strategy', t.aboutStrategy);
+    setHtml('t-about-box-conclusion', t.aboutConclusion);
+    setTxt('t-about-toggle', t.aboutToggleOpen);
+
+    setHtml('t-about-modal-title', t.aboutModalTitle);
+    setTxt('t-about-modal-intro', t.aboutIntro);
+    setTxt('t-about-modal-desc', t.aboutDesc);
+    setHtml('t-about-modal-goal', t.aboutGoal);
+    setHtml('t-about-modal-strategy', t.aboutStrategy);
+    setHtml('t-about-modal-conclusion', t.aboutConclusion);
+
+    setHtml('t-help-modal-title', t.helpTitle);
+    setTxt('t-help-modal-subtitle', t.helpSubtitle);
+    setTxt('t-help-intro', t.helpIntro);
+    setTxt('t-help-s1-title', t.helpS1Title);
+    setTxt('t-help-s1-desc', t.helpS1Desc);
+    setTxt('t-help-s2-title', t.helpS2Title);
+    setHtml('t-help-s2-list', t.helpS2List);
+    setTxt('t-help-s3-title', t.helpS3Title);
+    setTxt('t-help-s3-desc', t.helpS3Desc);
+    setTxt('t-help-s4-title', t.helpS4Title);
+    setTxt('t-help-s4-desc', t.helpS4Desc);
+    setTxt('t-help-s5-title', t.helpS5Title);
+    setTxt('t-help-s5-desc', t.helpS5Desc);
+    setTxt('t-help-s6-title', t.helpS6Title);
+    setTxt('t-help-s6-desc', t.helpS6Desc);
+    setTxt('t-help-footer', t.helpFooter);
+
+    setHtml('t-casino-modal-title', `<i class="fas fa-dice" style="color:#f43f5e;"></i> ${t.casinoModalTitle}`);
+    setTxt('t-casino-poker', t.casinoPoker);
+    setTxt('t-casino-poker-desc', t.casinoPokerDesc);
+    setTxt('t-casino-plinko', t.casinoPlinko);
+    setTxt('t-casino-plinko-desc', t.casinoPlinkoDesc);
+
+    setTxt('t-floating-casino', t.floatingCasino);
+
+    let elModalTitle = document.getElementById('t-modal-title');
+    if (elModalTitle) elModalTitle.innerHTML = `<i class="fas fa-bell"></i> ${t.modalTitle}`;
+
+    setTxt('t-tab-all', t.tabAll);
+    setTxt('t-tab-approved', t.tabApproved);
+    setTxt('t-tab-rejected', t.tabRejected);
+    setTxt('t-tab-admin', t.tabAdmin);
+}
+
+document.querySelectorAll('#lang-menu .mi').forEach(i => {
+    i.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setLang(i.dataset.lang);
+        document.getElementById('lang-menu')?.classList.remove('show');
+    });
+});
+
+setLang(currLang);
+
+// ==========================================
+// 6. دریافت اطلاعات کاربر
+// ==========================================
+async function loadDashboardUserData(uid, sessionUser) {
+    try {
+        currentUserId = uid;
+        const { data: dbUser } = await supabaseClient.from('users').select('*').eq('id', uid).maybeSingle();
+        const { data: dbProfile } = await supabaseClient.from('profiles').select('*').eq('id', uid).maybeSingle();
+        const meta = sessionUser.user_metadata || {};
+
+        const userFullName =
+            dbUser?.fullname ||
+            dbUser?.full_name ||
+            dbProfile?.fullname ||
+            dbProfile?.full_name ||
+            meta.fullname ||
+            meta.full_name ||
+            '';
+        if (userFullName) {
+            currentUserName = userFullName;
+            const t = ld[currLang] || ld.en;
+            const welEl = document.getElementById('t-wel');
+            if (welEl) welEl.textContent = `${t.wel} ${currentUserName}`;
+        }
+
+        const balance = parseFloat(dbUser?.balance ?? dbProfile?.balance ?? meta.balance ?? 0);
+        const valBalance = document.getElementById('val-balance');
+        if (valBalance) {
+            valBalance.textContent = `$${balance.toFixed(2)}`;
+        }
+
+        let codeDigits = generateUIDDigits(uid);
+        let myRefCode = dbProfile?.referral_code || ('MS-' + codeDigits);
+
+        let rawList = [];
+        try {
+            const { data: dbProfiles } = await supabaseClient.from('profiles').select('*');
+            if (dbProfiles && Array.isArray(dbProfiles)) {
+                rawList.push(...dbProfiles);
+            }
+        } catch(e) {}
+
+        if (meta.team_members || meta.referrals || meta.invited_users) {
+            let metaTeam = meta.team_members || meta.referrals || meta.invited_users;
+            if (Array.isArray(metaTeam)) rawList.push(...metaTeam);
+        }
+
+        ['zenix_registered_users', 'zenix_users', 'zenix_referrals', 'zenix_team_' + uid, 'zenix_all_users'].forEach(k => {
+            try {
+                let item = safeGetItem(k);
+                if (item) {
+                    let parsed = JSON.parse(item);
+                    if (Array.isArray(parsed)) rawList.push(...parsed);
+                    else if (parsed && typeof parsed === 'object') rawList.push(parsed);
+                }
+            } catch(e) {}
+        });
+
+        let uniqueMap = new Map();
+        rawList.forEach(u => {
+            if (u) {
+                let key = u.user_id || u.id || u.email || u.username || JSON.stringify(u);
+                uniqueMap.set(key, u);
+            }
+        });
+        let allProfiles = Array.from(uniqueMap.values());
+
+        function isReferredBy(u, refUid, refCodeVal) {
+            if (!u) return false;
+            let uUid = u.user_id || u.id;
+            if (uUid === refUid) return false;
+
+            let digits = generateUIDDigits(refUid);
+            let defaultCode = 'MS-' + digits;
+            let legacyCode = 'SM-' + digits;
+
+            let refs = [
+                u.referred_by, u.referrer_id, u.invitation_code,
+                u.ref_code, u.inviter, u.referral_code, u.ref
+            ].map(x => x ? String(x).trim().toUpperCase() : '');
+
+            const targetCodes = [
+                String(refUid).toUpperCase(),
+                defaultCode.toUpperCase(),
+                legacyCode.toUpperCase(),
+                digits.toUpperCase()
+            ];
+            if (refCodeVal) targetCodes.push(String(refCodeVal).toUpperCase());
+
+            return refs.some(r => r && targetCodes.includes(r));
+        }
+
+        let lvl1Users = allProfiles.filter(u => isReferredBy(u, uid, myRefCode));
+        let lvl2Users = [];
+        if (lvl1Users.length > 0) {
+            lvl2Users = allProfiles.filter(u => {
+                let uUid = u.user_id || u.id;
+                if (uUid === uid || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid)) return false;
+                return lvl1Users.some(l1 => isReferredBy(u, l1.user_id || l1.id, l1.referral_code));
+            });
+        }
+
+        let lvl3Users = [];
+        if (lvl2Users.length > 0) {
+            lvl3Users = allProfiles.filter(u => {
+                let uUid = u.user_id || u.id;
+                if (uUid === uid || lvl1Users.some(l1 => (l1.user_id || l1.id) === uUid) || lvl2Users.some(l2 => (l2.user_id || l2.id) === uUid)) return false;
+                return lvl2Users.some(l2 => isReferredBy(u, l2.user_id || l2.id, l2.referral_code));
+            });
+        }
+
+        let l1Count = lvl1Users.length;
+        let l2Count = lvl2Users.length;
+        let l3Count = lvl3Users.length;
+
+        if (l1Count === 0 && (meta.referral_count || meta.invited_count)) {
+            l1Count = Number(meta.referral_count || meta.invited_count || 0);
+        }
+
+        let totalTeamCount = l1Count + l2Count + l3Count;
+        const valRef = document.getElementById('val-ref');
+        if (valRef) {
+            valRef.textContent = totalTeamCount;
+        }
+
+        allMessages = await fetchUserMessages(uid);
+        updateNotifBadges();
+
+    } catch (err) {
+        console.error("خطا در دریافت اطلاعات کاربر:", err);
+    }
+}
+
+// ==========================================
+// 6.b. احراز هویت — نسخه اصلاح‌شده (رفع باگ فلش داشبورد)
+// ==========================================
+
+// بررسی سریع و همزمان وجود توکن در localStorage
+function hasStoredAuthToken() {
+    try {
+        const keys = Object.keys(localStorage);
+        for (let i = 0; i < keys.length; i++) {
+            const k = keys[i];
+            if (k.indexOf('sb-') === 0 && k.indexOf('-auth-token') !== -1) {
+                const val = safeGetItem(k);
+                if (val && val.length > 20) return true;
+            }
+        }
+    } catch (e) {}
+    return false;
+}
+
+(async function initAuth() {
+    // اگر هیچ توکنی در localStorage نیست، بلافاصله بدون نیاز به Supabase redirect کن
+    if (!hasStoredAuthToken()) {
+        window.location.replace('index.html');
+        return;
+    }
+
+    try {
+        // خواندن سریع session از localStorage (+ تلاش برای refresh اگر منقضی شده)
+        const { data: { session }, error } = await supabaseClient.auth.getSession();
+
+        if (error || !session || !session.user) {
+            window.location.replace('index.html');
+            return;
+        }
+
+        // ✅ احراز هویت معتبر است — داشبورد را نمایش بده
+        document.body.classList.remove('zenix-auth-checking');
+        currentUserId = session.user.id;
+        loadDashboardUserData(session.user.id, session.user);
+
+    } catch (e) {
+        console.error('Auth check failed:', e);
+        window.location.replace('index.html');
+    }
+})();
+
+// گوش دادن به تغییرات احراز هویت در آینده (logout، انقضای توکن و ...)
+supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === 'INITIAL_SESSION') return;    // قبلاً در initAuth مدیریت شد
+    if (event === 'TOKEN_REFRESHED') return;    // فقط refresh است، کاری لازم نیست
+
+    if (!session || !session.user) {
+        window.location.replace('index.html');
+    } else {
+        currentUserId = session.user.id;
+        loadDashboardUserData(session.user.id, session.user);
+    }
+});
+
+// ==========================================
+// 7. منوهای هدر
+// ==========================================
+const menuBtn = document.getElementById('menu-btn');
+const navMenu = document.getElementById('nav-menu');
+const langBtn = document.getElementById('lang-btn');
+const langMenu = document.getElementById('lang-menu');
+const helpBtn = document.getElementById('help-btn');
+
+function closeAllMenus(except = '') {
+    if (except !== 'nav' && navMenu) navMenu.classList.remove('show');
+    if (except !== 'lang' && langMenu) langMenu.classList.remove('show');
+}
+
+if (menuBtn && navMenu) {
+    menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        navMenu.classList.toggle('show');
+        closeAllMenus('nav');
+    });
+}
+
+if (langBtn && langMenu) {
+    langBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        langMenu.classList.toggle('show');
+        closeAllMenus('lang');
+    });
+}
+
+if (helpBtn) {
+    helpBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeAllMenus();
+        window.openHelpModal();
+    });
+}
+
+document.addEventListener('click', (e) => {
+    if (navMenu && !navMenu.contains(e.target) && e.target !== menuBtn) navMenu.classList.remove('show');
+    if (langMenu && !langMenu.contains(e.target) && e.target !== langBtn) langMenu.classList.remove('show');
+});
+
+// بستن مدال با کلیک روی backdrop
+document.querySelectorAll('.modal').forEach(m => {
+    m.addEventListener('click', (e) => {
+        if (e.target === m) {
+            m.classList.remove('show');
+            unlockBody();
+        }
+    });
+});
+
+document.getElementById('logout-btn')?.addEventListener('click', async e => {
+    e.preventDefault();
+    try { await supabaseClient.auth.signOut(); } catch(e) {}
+    window.location.href = 'index.html';
+});
+// ==========================================
+// اعمال فوری SW جدید (در صورت وجود)
+// ==========================================
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js', {
+        updateViaCache: 'none',   // ★★ حیاتی: مرورگر خود sw.js را کش نکند
+        scope: './'
+    }).then(reg => {
+        // ۱. بررسی فوری آپدیت هنگام لود صفحه
+        reg.update().catch(() => {});
+
+        // ۲. اگر SW جدید پیدا شد، فوراً فعالش کن
+        reg.addEventListener('updatefound', () => {
+            const newWorker = reg.installing;
+            if (!newWorker) return;
+            newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                }
+            });
+        });
+
+        // ۳. بررسی آپدیت هر ۳۰ ثانیه
+        setInterval(() => reg.update().catch(() => {}), 30000);
+    }).catch(() => {});
+
+    // ۴. رفرش خودکار یک‌باره وقتی SW جدید کنترل را دست گرفت
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+    });
+}
