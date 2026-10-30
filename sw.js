@@ -3,16 +3,17 @@
 // استراتژی:
 //   - HTML (navigate): Network-First → همیشه آخرین نسخه‌ی صفحه‌ها
 //   - Assets (JS/CSS/تصاویر): Cache-First → سرعت بالا
-// نسخه: zenix-v4.2
+// نسخه: zenix-v4.3
 // ==========================================
 
-const CACHE_VERSION = 'zenix-v4.2';
+const CACHE_VERSION = 'zenix-v4.3';
 const STATIC_CACHE  = CACHE_VERSION + '-static';
 const HTML_CACHE    = CACHE_VERSION + '-html';
 
 const PRECACHE_URLS = [
     './',
-    './index.html'
+    './index.html',
+    './dashboard.html'
 ];
 
 // ── INSTALL ──
@@ -35,6 +36,13 @@ self.addEventListener('activate', (event) => {
             )
         ).then(() => self.clients.claim())
     );
+});
+
+// ── پیام skipWaiting از سمت کلاینت (اختیاری) ──
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
 });
 
 // ── FETCH ──
@@ -63,6 +71,23 @@ self.addEventListener('fetch', (event) => {
                         cached || caches.match('./index.html')
                     )
                 )
+        );
+        return;
+    }
+
+    // ── JS اصلی داشبورد: Network-First برای تضمین اجرای آخرین نسخه ──
+    // (فقط فایل اصلی dashboard.js — بقیه assets همچنان Cache-First)
+    if (url.pathname.endsWith('/dashboard.js')) {
+        event.respondWith(
+            fetch(req)
+                .then((res) => {
+                    if (res && res.ok && res.status === 200) {
+                        const copy = res.clone();
+                        caches.open(STATIC_CACHE).then((c) => c.put(req, copy));
+                    }
+                    return res;
+                })
+                .catch(() => caches.match(req))
         );
         return;
     }
