@@ -1,12 +1,12 @@
 // ==========================================
 // Zenix Service Worker — نسخه‌ی Aggressive Update
-// نسخه: zenix-v4.6
+// نسخه: zenix-v4.7
 // استراتژی:
 //   - HTML و dashboard.js و sw.js: Network-First + no-store
 //   - بقیه assets: Stale-While-Revalidate
 // ==========================================
 
-const CACHE_VERSION = 'zenix-v4.6';
+const CACHE_VERSION = 'zenix-v4.7';
 const STATIC_CACHE  = CACHE_VERSION + '-static';
 const HTML_CACHE    = CACHE_VERSION + '-html';
 
