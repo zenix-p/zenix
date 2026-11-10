@@ -895,3 +895,19 @@
 
         setLang(currLang);
     </script>
+        setLang(currLang);
+
+        // ============================================================
+        // ثبت Service Worker برای PWA و آپدیت نسخه
+        // ============================================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js?v=2.4')
+                    .then(reg => {
+                        console.log('✅ Service Worker registered:', reg.scope);
+                    })
+                    .catch(err => {
+                        console.warn('⚠️ Service Worker registration failed:', err);
+                    });
+            });
+        }
