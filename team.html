@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -16,45 +16,46 @@
 
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans','Vazirmatn',sans-serif}
+        html,body{overflow-x:hidden;max-width:100%;width:100%;position:relative}
         body{background:#030712;min-height:100vh;color:#f8fafc;display:flex;flex-direction:column}
-        header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1);padding:10px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
-        .logo{display:flex;align-items:center;gap:10px}
-        .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#0ea5e9,#9333ea);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;font-style:italic;transform:skewX(-6deg);box-shadow:0 0 15px rgba(14,165,233,.4)}
+        header{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(255,255,255,.1);padding:10px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);gap:8px}
+        .logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+        .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#0ea5e9,#9333ea);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;font-style:italic;transform:skewX(-6deg);box-shadow:0 0 15px rgba(14,165,233,.4);flex-shrink:0}
         .logo-text{font-family:'Orbitron',sans-serif;font-size:19px;font-weight:900;letter-spacing:2px;font-style:italic;transform:skewX(-6deg);background:linear-gradient(135deg,#38bdf8,#c084fc,#f43f5e);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 20px rgba(56,189,248,0.4)}
-        .hr{display:flex;align-items:center;gap:8px}
+        .hr{display:flex;align-items:center;gap:8px;flex-shrink:0}
         .wrap{position:relative}
-        .lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none}
+        .lb{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);height:36px;width:36px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:#38bdf8;text-decoration:none;flex-shrink:0}
         .badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;font-weight:700}
         .badge.show{display:flex}
-        .menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;width:max-content;min-width:max-content;padding:6px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8)}
+        .menu{display:none;position:absolute;top:42px;background:#0f172a;border:1px solid rgba(255,255,255,.2);border-radius:8px;width:max-content;min-width:max-content;max-width:calc(100vw - 16px);padding:6px;z-index:999;box-shadow:0 8px 25px rgba(0,0,0,.8)}
         [dir="rtl"] .wrap .menu{left:0}
         [dir="ltr"] .wrap .menu{right:0}
         .menu.show{display:block}
         .mi{padding:7px 10px;font-size:12px;color:#cbd5e1;cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap}
         .mi:hover,.mi.active{background:rgba(56,189,248,.15);color:#38bdf8!important;font-weight:700}
-        .c{max-width:900px;width:100%;margin:15px auto;padding:0 12px;flex:1}
-        .wel{background:linear-gradient(135deg,rgba(2,132,199,.15),rgba(147,51,234,.15));border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+        .c{max-width:900px;width:100%;margin:15px auto;padding:0 12px;flex:1;min-width:0}
+        .wel{background:linear-gradient(135deg,rgba(2,132,199,.15),rgba(147,51,234,.15));border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:15px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
         .wel h1{font-size:16px;margin-bottom:3px}
         .wel p{color:#94a3b8;font-size:11px}
-        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,.85);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(10px);padding:12px}
         .modal.show{display:flex}
         .modal-content{background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid rgba(56,189,248,.3);border-radius:20px;width:100%;max-width:460px;max-height:85vh;display:flex;flex-direction:column;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.9);overflow:hidden}
-        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;color:#38bdf8;font-weight:800;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;flex-shrink:0}
-        .modal-close{background:rgba(255,255,255,.05);border:none;color:#94a3b8;cursor:pointer;font-size:14px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;color:#38bdf8;font-weight:800;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;flex-shrink:0;gap:8px}
+        .modal-close{background:rgba(255,255,255,.05);border:none;color:#94a3b8;cursor:pointer;font-size:14px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
         .modal-close:hover{background:rgba(239,68,68,.2);color:#ef4444}
-        .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px;transition:0.2s}
+        .msg-body-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-bottom:10px;transition:0.2s;min-width:0}
         .msg-body-box:hover{border-color:rgba(56,189,248,.5)!important;opacity:1!important;}
-        .msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:0}
-        .msg-desc-text{font-size:12px;color:#cbd5e1;line-height:1.5}
+        .msg-title-text{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:0;word-break:break-word}
+        .msg-desc-text{font-size:12px;color:#cbd5e1;line-height:1.5;word-break:break-word}
 
         .notif-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
-        .notif-tab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#94a3b8;padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;white-space:nowrap;transition:0.2s;display:flex;align-items:center;justify-content:center;gap:5px;flex:1 1 auto}
+        .notif-tab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#94a3b8;padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;white-space:nowrap;transition:0.2s;display:flex;align-items:center;justify-content:center;gap:5px;flex:1 1 auto;min-width:0}
         .notif-tab:hover{background:rgba(56,189,248,.15);color:#38bdf8}
         .notif-tab.active{background:#38bdf8;color:#0f172a;font-weight:bold;border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.3)}
         .tab-badge{background:rgba(255,255,255,.15);color:inherit;padding:1px 6px;border-radius:10px;font-size:10px;font-weight:700;line-height:1.2;min-width:16px;text-align:center;display:inline-block}
         .notif-tab.active .tab-badge{background:rgba(15,23,42,.3);color:#0f172a}
 
-        #modal-msg-container{overflow-y:auto;padding-right:6px;flex:1;min-height:0}
+        #modal-msg-container{overflow-y:auto;padding-right:6px;flex:1;min-height:0;min-width:0}
 
         #modal-msg-container::-webkit-scrollbar,
         .modal-content div::-webkit-scrollbar { width: 5px; }
@@ -66,7 +67,95 @@
         .modal-content div::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.7); }
         #modal-msg-container, .modal-content div { scrollbar-width: thin; scrollbar-color: rgba(56, 189, 248, 0.35) rgba(15, 23, 42, 0.6); }
 
-        footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px}
+        footer{text-align:center;padding:10px;font-size:11px;color:#64748b;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto;width:100%;padding-left:12px;padding-right:12px;flex-wrap:wrap;gap:6px}
+
+        /* ============ Responsive - Tablet ============ */
+        @media (max-width: 768px) {
+            .c { padding: 0 10px; }
+        }
+
+        /* ============ Responsive - Mobile ============ */
+        @media (max-width: 480px) {
+            body { font-size: 12px; }
+            
+            /* هدر */
+            header { padding: 8px 10px; gap: 6px; }
+            .logo { gap: 6px; }
+            .logo-icon { width: 30px; height: 30px; font-size: 15px; border-radius: 8px; }
+            .logo-text { font-size: 14px; letter-spacing: 1px; }
+            .hr { gap: 4px; }
+            .lb { height: 30px; width: 30px; font-size: 11px; border-radius: 6px; }
+            .badge { width: 13px; height: 13px; font-size: 8px; top: -3px; right: -3px; }
+            .menu { top: 36px; padding: 5px; }
+            .mi { font-size: 11px; padding: 6px 8px; gap: 6px; }
+            
+            /* کارت خوشامد */
+            .c { padding: 0 8px; margin: 10px auto; }
+            .wel { padding: 10px 12px; gap: 6px; margin-bottom: 10px; }
+            .wel h1 { font-size: 13px; }
+            .wel p { font-size: 10px; }
+            .wel > div:last-child { 
+                font-size: 10px !important; 
+                padding: 5px 8px !important; 
+                width: 100%;
+                text-align: center;
+            }
+            
+            /* کارت آمار اصلی 3 ستونه */
+            #team-count, #team-volume, #team-daily { font-size: 13px !important; }
+            #t-c1, #t-c2, #t-c3 { font-size: 9px !important; }
+            
+            /* کارت اصلی */
+            .c > div:last-child { padding: 12px !important; }
+            
+            /* نسل‌ها */
+            #t-gen-title { font-size: 12px !important; margin-bottom: 8px !important; }
+            #t-l1-lbl, #t-l2-lbl, #t-l3-lbl { font-size: 10px !important; }
+            #lvl1-count, #lvl2-count, #lvl3-count { font-size: 11px !important; }
+            #lvl1-comm, #lvl2-comm, #lvl3-comm { font-size: 10px !important; }
+            
+            /* دکمه مشاهده در نسل‌ها */
+            a[href^="team-members.html"] { 
+                font-size: 10px !important; 
+                padding: 3px 7px !important; 
+                flex-shrink: 0;
+            }
+            
+            /* عنوان‌ها */
+            #t-invite-lbl { font-size: 12px !important; }
+            #t-rules-title { font-size: 11px !important; }
+            #t-rules-desc { font-size: 10px !important; line-height: 1.5 !important; }
+            
+            /* کادر لینک دعوت */
+            #invite-link { 
+                font-size: 10px !important; 
+                padding: 7px 9px !important; 
+                line-height: 1.35 !important;
+            }
+            #t-btn-copy { font-size: 10px !important; }
+            button[onclick="copyInviteLink()"] { padding: 0 9px !important; }
+            
+            /* مودال‌ها */
+            .modal { padding: 8px; }
+            .modal-content { padding: 16px; border-radius: 14px; max-height: 90vh; }
+            .modal-header { font-size: 12px; margin-bottom: 10px; padding-bottom: 8px; }
+            .modal-close { width: 26px; height: 26px; font-size: 12px; }
+            .notif-tab { font-size: 10px; padding: 4px 8px; gap: 3px; }
+            .tab-badge { font-size: 9px; padding: 0 5px; min-width: 14px; }
+            .msg-title-text { font-size: 12px; }
+            .msg-desc-text { font-size: 11px; }
+            .msg-body-box { padding: 10px; }
+            
+            /* footer */
+            footer { font-size: 10px; padding: 8px; }
+        }
+
+        @media (max-width: 360px) {
+            .logo-text { display: none; }
+            #team-count, #team-volume, #team-daily { font-size: 11px !important; }
+            #t-c1, #t-c2, #t-c3 { font-size: 8px !important; }
+            .notif-tab { font-size: 9px; padding: 3px 6px; }
+        }
     </style>
 </head>
 <body>
@@ -110,31 +199,31 @@
             <div id="status-box" style="display:none;padding:12px;border-radius:8px;font-size:12px;margin-bottom:12px;text-align:center;font-weight:600;"></div>
             
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;text-align:center;">
-                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;"><div style="font-size:11px;color:#94a3b8;margin-bottom:4px;" id="t-c1">اعضای کل تیم</div><div style="font-size:16px;color:#38bdf8;font-weight:bold;" id="team-count">0</div></div>
-                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;"><div style="font-size:11px;color:#94a3b8;margin-bottom:4px;" id="t-c2">حجم معاملات تیم</div><div style="font-size:16px;color:#22c55e;font-weight:bold;" id="team-volume">0.00$</div></div>
-                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;"><div style="font-size:11px;color:#94a3b8;margin-bottom:4px;" id="t-c3">کمیسیون امروز</div><div style="font-size:16px;color:#eab308;font-weight:bold;" id="team-daily">0.00$</div></div>
+                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 6px;min-width:0;"><div style="font-size:11px;color:#94a3b8;margin-bottom:4px;" id="t-c1">اعضای کل تیم</div><div style="font-size:16px;color:#38bdf8;font-weight:bold;word-break:break-all;" id="team-count">0</div></div>
+                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 6px;min-width:0;"><div style="font-size:11px;color:#94a3b8;margin-bottom:4px;" id="t-c2">حجم معاملات تیم</div><div style="font-size:16px;color:#22c55e;font-weight:bold;word-break:break-all;" id="team-volume">0.00$</div></div>
+                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 6px;min-width:0;"><div style="font-size:11px;color:#94a3b8;margin-bottom:4px;" id="t-c3">کمیسیون امروز</div><div style="font-size:16px;color:#eab308;font-weight:bold;word-break:break-all;" id="team-daily">0.00$</div></div>
             </div>
 
             <div style="font-size:14px;color:#38bdf8;font-weight:bold;margin-bottom:10px;" id="t-gen-title"><i class="fas fa-layer-group"></i> آمار نسل‌های تیم</div>
             <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
-                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;font-size:12px;">
-                    <div><span style="color:#38bdf8;font-weight:bold;" id="t-l1-lbl">نسل ۱ (۱۰٪):</span> <span id="lvl1-count">0</span> نفر</div>
-                    <div style="display:flex;align-items:center;gap:10px;"><div style="color:#22c55e;font-weight:bold;" id="lvl1-comm">0.00 USDT</div><a href="team-members.html?level=1" style="background:rgba(56,189,248,0.15);border:1px solid #38bdf8;color:#38bdf8;padding:4px 10px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:bold;"><i class="fas fa-eye"></i> مشاهده</a></div>
+                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;font-size:12px;gap:8px;flex-wrap:wrap;">
+                    <div style="min-width:0;"><span style="color:#38bdf8;font-weight:bold;" id="t-l1-lbl">نسل ۱ (۱۰٪):</span> <span id="lvl1-count">0</span> نفر</div>
+                    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;"><div style="color:#22c55e;font-weight:bold;" id="lvl1-comm">0.00 USDT</div><a href="team-members.html?level=1" style="background:rgba(56,189,248,0.15);border:1px solid #38bdf8;color:#38bdf8;padding:4px 10px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:bold;white-space:nowrap;"><i class="fas fa-eye"></i> مشاهده</a></div>
                 </div>
-                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;font-size:12px;">
-                    <div><span style="color:#38bdf8;font-weight:bold;" id="t-l2-lbl">نسل ۲ (۷٪):</span> <span id="lvl2-count">0</span> نفر</div>
-                    <div style="display:flex;align-items:center;gap:10px;"><div style="color:#22c55e;font-weight:bold;" id="lvl2-comm">0.00 USDT</div><a href="team-members.html?level=2" style="background:rgba(56,189,248,0.15);border:1px solid #38bdf8;color:#38bdf8;padding:4px 10px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:bold;"><i class="fas fa-eye"></i> مشاهده</a></div>
+                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;font-size:12px;gap:8px;flex-wrap:wrap;">
+                    <div style="min-width:0;"><span style="color:#38bdf8;font-weight:bold;" id="t-l2-lbl">نسل ۲ (۷٪):</span> <span id="lvl2-count">0</span> نفر</div>
+                    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;"><div style="color:#22c55e;font-weight:bold;" id="lvl2-comm">0.00 USDT</div><a href="team-members.html?level=2" style="background:rgba(56,189,248,0.15);border:1px solid #38bdf8;color:#38bdf8;padding:4px 10px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:bold;white-space:nowrap;"><i class="fas fa-eye"></i> مشاهده</a></div>
                 </div>
-                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;font-size:12px;">
-                    <div><span style="color:#38bdf8;font-weight:bold;" id="t-l3-lbl">نسل ۳ (۳٪):</span> <span id="lvl3-count">0</span> نفر</div>
-                    <div style="display:flex;align-items:center;gap:10px;"><div style="color:#22c55e;font-weight:bold;" id="lvl3-comm">0.00 USDT</div><a href="team-members.html?level=3" style="background:rgba(56,189,248,0.15);border:1px solid #38bdf8;color:#38bdf8;padding:4px 10px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:bold;"><i class="fas fa-eye"></i> مشاهده</a></div>
+                <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;font-size:12px;gap:8px;flex-wrap:wrap;">
+                    <div style="min-width:0;"><span style="color:#38bdf8;font-weight:bold;" id="t-l3-lbl">نسل ۳ (۳٪):</span> <span id="lvl3-count">0</span> نفر</div>
+                    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;"><div style="color:#22c55e;font-weight:bold;" id="lvl3-comm">0.00 USDT</div><a href="team-members.html?level=3" style="background:rgba(56,189,248,0.15);border:1px solid #38bdf8;color:#38bdf8;padding:4px 10px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:bold;white-space:nowrap;"><i class="fas fa-eye"></i> مشاهده</a></div>
                 </div>
             </div>
 
             <div style="font-size:14px;color:#38bdf8;font-weight:bold;margin-bottom:10px;" id="t-invite-lbl"><i class="fas fa-link"></i> لینک دعوت اختصاصی شما</div>
-            <div style="display:flex;background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:8px;overflow:hidden;margin-bottom:16px;">
-                <input type="text" id="invite-link" value="" readonly onclick="this.select()" style="flex:1;min-width:0;width:100%;background:transparent;border:none;color:#f8fafc;padding:10px 12px;font-size:12px;outline:none;direction:ltr;text-align:left;text-overflow:ellipsis;">
-                <button type="button" onclick="copyInviteLink()" style="background:linear-gradient(135deg,#38bdf8,#0284c7);border:none;color:#fff;padding:0 18px;cursor:pointer;font-weight:bold;font-size:13px;display:flex;align-items:center;gap:6px;white-space:nowrap;"><i class="fas fa-clone"></i> <span id="t-btn-copy">کپی لینک</span></button>
+            <div style="display:flex;background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:8px;overflow:hidden;margin-bottom:16px;align-items:stretch;">
+                <textarea id="invite-link" readonly rows="2" onclick="this.select()" style="flex:1;min-width:0;width:100%;background:transparent;border:none;color:#f8fafc;padding:8px 10px;font-size:11px;outline:none;direction:ltr;text-align:left;resize:none;word-break:break-all;overflow:hidden;font-family:'Courier New',monospace;line-height:1.4;"></textarea>
+                <button type="button" onclick="copyInviteLink()" style="background:linear-gradient(135deg,#38bdf8,#0284c7);border:none;color:#fff;padding:0 10px;cursor:pointer;font-weight:bold;font-size:11px;display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;"><i class="fas fa-clone" style="font-size:10px"></i> <span id="t-btn-copy">کپی لینک</span></button>
             </div>
 
             <div style="background:rgba(30,41,59,0.5);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;font-size:11px;color:#94a3b8;line-height:1.6;">
@@ -168,7 +257,7 @@
             </div>
             <div style="overflow-y:auto;padding-right:6px">
                 <div id="detail-msg-date" style="font-size:11px;color:#94a3b8;direction:ltr;text-align:left;margin-bottom:10px;display:none;"></div>
-                <div id="detail-msg-body" style="font-size:13px;color:#cbd5e1;line-height:1.7;white-space:pre-wrap;margin-bottom:12px;"></div>
+                <div id="detail-msg-body" style="font-size:13px;color:#cbd5e1;line-height:1.7;white-space:pre-wrap;margin-bottom:12px;word-break:break-word;"></div>
                 <div id="detail-msg-support"></div>
             </div>
         </div>
@@ -209,9 +298,9 @@
         <p>&copy; 2026 Zenix. All rights reserved.</p>
     </footer>
 
-    <!-- ========================================================== -->
-    <!-- بخش ۲: کد JavaScript کامل با ۸ زبان - در پیام بعدی می‌آید -->
-    <!-- ========================================================== -->
+    <!-- ========================= -->
+    <!-- مرحله ۲: JavaScript کامل -->
+    <!-- ========================= -->
 </body>
 </html>
     <script>
@@ -494,6 +583,7 @@
             wrapper.style.display = 'flex';
             wrapper.style.flexDirection = 'column';
             wrapper.style.gap = '10px';
+            wrapper.style.minWidth = '0';
 
             list.forEach((m) => {
                 let realIdx = allMessages.indexOf(m);
@@ -516,9 +606,14 @@
                 head.style.display = 'flex';
                 head.style.justifyContent = 'space-between';
                 head.style.alignItems = 'center';
+                head.style.gap = '6px';
+                head.style.minWidth = '0';
 
                 const title = document.createElement('div');
                 title.className = 'msg-title-text';
+                title.style.minWidth = '0';
+                title.style.overflow = 'hidden';
+                title.style.textOverflow = 'ellipsis';
                 if (unread) { title.style.color = '#fff'; title.style.fontWeight = '800'; }
                 const icon = document.createElement('i');
                 icon.className = 'fas ' + iconClass;
@@ -536,6 +631,7 @@
                     badge.style.padding = '2px 6px';
                     badge.style.borderRadius = '4px';
                     badge.style.fontWeight = '700';
+                    badge.style.flexShrink = '0';
                     badge.textContent = t.newBadge;
                     head.appendChild(badge);
                 }
@@ -844,20 +940,20 @@
                 if (elD) elD.textContent = t['abL' + i + 'D'];
             }
 
-            // ترجمه دکمه "مشاهده" و "نفر" در بخش نسل‌ها
+            // ترجمه دکمه "مشاهده" در بخش نسل‌ها
             document.querySelectorAll('a[href^="team-members.html"]').forEach(a => {
-                const icon = a.querySelector('i');
                 a.textContent = '';
-                if (icon) { const ic = icon.cloneNode(true); a.appendChild(ic); a.appendChild(document.createTextNode(' ')); }
-                a.appendChild(document.createTextNode(t.viewBtn));
+                const icon = document.createElement('i');
+                icon.className = 'fas fa-eye';
+                a.appendChild(icon);
+                a.appendChild(document.createTextNode(' ' + t.viewBtn));
             });
 
-            // ترجمه واحد "نفر" کنار شمارنده‌ها (اگر وجود داشته باشد)
+            // ترجمه واحد "نفر" کنار شمارنده‌ها
             ['lvl1-count', 'lvl2-count', 'lvl3-count'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el && el.parentElement) {
                     const parent = el.parentElement;
-                    // حذف متن قبلی بعد از span شمارنده
                     Array.from(parent.childNodes).forEach(n => {
                         if (n.nodeType === 3 && n.textContent.trim()) n.textContent = '';
                     });
@@ -887,14 +983,21 @@
         window.copyInviteLink = function() {
             const c = document.getElementById("invite-link");
             if(!c || !c.value) return;
+            c.focus();
             c.select();
-            navigator.clipboard.writeText(c.value);
+            c.setSelectionRange(0, c.value.length);
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(c.value).catch(err => {
+                    console.warn('clipboard failed, fallback to execCommand:', err);
+                    try { document.execCommand('copy'); } catch(e2) {}
+                });
+            } else {
+                try { document.execCommand('copy'); } catch(e2) {}
+            }
             const t = ld[currLang] || ld.fa;
             window.showMsg(t.copySuccess, false);
         };
 
-        setLang(currLang);
-    </script>
         setLang(currLang);
 
         // ============================================================
@@ -902,7 +1005,7 @@
         // ============================================================
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=4.8')
+                navigator.serviceWorker.register('sw.js?v=4.9')
                     .then(reg => {
                         console.log('✅ Service Worker registered:', reg.scope);
                     })
@@ -911,3 +1014,4 @@
                     });
             });
         }
+    </script>
