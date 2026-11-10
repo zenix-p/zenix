@@ -184,6 +184,54 @@
                 padding-bottom: max(10px, env(safe-area-inset-bottom));
             }
         }
+
+        /* ============ App-like: No Page Scroll (Mobile/Tablet) ============ */
+        @media (max-width: 768px) {
+            html, body {
+                height: 100vh;
+                height: 100dvh;
+                max-height: 100vh;
+                max-height: 100dvh;
+                overflow: hidden;
+                overscroll-behavior: none;
+            }
+
+            body {
+                display: flex;
+                flex-direction: column;
+                min-height: 0;
+            }
+
+            header {
+                flex-shrink: 0;
+            }
+
+            .c {
+                flex: 1 1 auto;
+                min-height: 0;
+                overflow-y: auto;
+                overflow-x: hidden;
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior: contain;
+            }
+
+            footer {
+                flex-shrink: 0;
+            }
+
+            .modal {
+                position: fixed;
+            }
+        }
+
+        /* ============ iOS fallback برای 100dvh ============ */
+        @supports (-webkit-touch-callout: none) {
+            @media (max-width: 768px) {
+                html, body {
+                    height: -webkit-fill-available;
+                }
+            }
+        }
     </style>
 </head>
 <body>
@@ -1031,7 +1079,7 @@
         // ============================================================
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=5')
+                navigator.serviceWorker.register('sw.js?v=5.1')
                     .then(reg => {
                         console.log('✅ Service Worker registered:', reg.scope);
                     })
