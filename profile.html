@@ -416,8 +416,7 @@
         <p>&copy; 2026 Zenix. All rights reserved.</p>
         <p style="color:#22c55e;"><i class="fas fa-circle" style="font-size:6px;"></i> <span>سرور فعال (US-East)</span></p>
     </footer>
-
-    <script>
+        <script>
         function escapeHtml(value) {
             return String(value == null ? '' : value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
@@ -593,6 +592,7 @@
             window.addEventListener('click', (e) => { if (!e.target.closest('#welcome-c-dropdown') && !e.target.closest('#welcome-c-list')) list.classList.remove('show'); }, true);
         }
 
+        // ★ تابع اصلاح‌شده برای ثبت شماره تلفن با استفاده از upsert
         window.saveWelcomePhone = async function() {
             const phoneInput = document.getElementById('welcome-phone-input');
             const errEl = document.getElementById('welcome-phone-err');
@@ -606,17 +606,41 @@
                 if (errEl) { errEl.textContent = 'شماره باید ۱۰ رقم و بدون صفر باشد'; errEl.style.display = 'block'; }
                 return;
             }
+            
             if (saveBtn) { saveBtn.disabled = true; saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال ذخیره...'; }
+            if (errEl) errEl.style.display = 'none';
+
             const fullPhone = code + phone;
+            
             try {
-                const { error } = await supabaseClient.from('users').update({ phone: fullPhone }).eq('id', currentUser.id);
+                const fullNameVal = currentUser.user_metadata?.fullname || currentUser.user_metadata?.full_name || currentUser.email;
+                
+                // ۱. ابتدا تلاش برای آپدیت می‌کنیم
+                let { data, error } = await supabaseClient.from('users').update({ phone: fullPhone }).eq('id', currentUser.id).select();
+                
+                // ۲. اگر دیتایی برگشت داده نشد (یعنی کاربر در جدول users نبود)، با upsert می‌سازیم
+                if (!error && (!data || data.length === 0)) {
+                    const upsertRes = await supabaseClient.from('users').upsert({ 
+                        id: currentUser.id, 
+                        phone: fullPhone, 
+                        email: currentUser.email, 
+                        fullname: fullNameVal 
+                    }, { onConflict: 'id' });
+                    error = upsertRes.error;
+                }
+                
                 if (error) throw error;
+                
                 document.getElementById('m-welcome').classList.remove('show');
                 window.showToast('✅ شماره تماس ثبت شد.', 'success', 5000);
+                
+                // برگرداندن دکمه به حالت اولیه
+                if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '<i class="fas fa-check"></i> ثبت شماره و ورود به پلتفرم'; }
+                
                 await loadUserData(currentUser);
             } catch (e) {
                 if (errEl) { errEl.textContent = 'خطا: ' + (e.message || 'نامشخص'); errEl.style.display = 'block'; }
-                if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '<i class="fas fa-check"></i> ثبت شماره'; }
+                if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '<i class="fas fa-check"></i> ثبت شماره و ورود به پلتفرم'; }
             }
         };
 
@@ -687,7 +711,6 @@
             container.innerHTML = html;
         };
 
-        // OTP از چت پشتیبانی
         window.requestOtpViaChat = async function(btnEl, targetFieldId) {
             if (!currentUser) { window.showToast('ابتدا وارد حساب خود شوید', 'error', 4000); return; }
             const origText = btnEl ? btnEl.textContent : 'دریافت کد از پشتیبانی';
@@ -871,11 +894,9 @@
             const userIdEl = document.getElementById('user-id');
             if (userIdEl) userIdEl.textContent = 'UID: SM-' + generateUIDDigits(user.id);
 
-            // نمایش ایمیل (read-only)
             const emailDisplay = document.getElementById('user-email-display');
             if (emailDisplay) emailDisplay.textContent = user.email || data.email || '-';
 
-            // ★ به‌روزرسانی فیلد «ایمیل فعلی» در کارت تغییر ایمیل
             const emailCurrInput = document.getElementById('email-curr');
             if (emailCurrInput) emailCurrInput.value = user.email || data.email || '';
 
@@ -989,11 +1010,9 @@
             currentUser = session.user; currentUserId = session.user.id;
             await updateNotificationBadge();
 
-            // ★ نمایش ایمیل فعلی در فیلد تغییر ایمیل
             const emailCurrInput = document.getElementById('email-curr');
             if (emailCurrInput) emailCurrInput.value = session.user.email || '';
 
-            // ★ نمایش ایمیل در باکس بالای صفحه
             const emailDisplay = document.getElementById('user-email-display');
             if (emailDisplay) emailDisplay.textContent = session.user.email || '-';
 
