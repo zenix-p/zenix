@@ -368,7 +368,8 @@
             }
         }
     </script>
-        <script type="module">
+
+    <script type="module">
         import { createClient } from 'https://cdn.jsdmirror.com/npm/@supabase/supabase-js@2/+esm';
 
         const SUPABASE_URL = "https://ujyenmqdgivuxvxptwyl.supabase.co";
@@ -477,7 +478,7 @@
             return re.test(email);
         }
 
-        // 🔥 تابع جدید برای بررسی رمز عبور (حداقل 6 کاراکتر + حروف + اعداد)
+        // 🔥 تابع بررسی رمز عبور: حداقل ۶ کاراکتر + شامل حروف و اعداد
         function isValidPassword(pass) {
             if (pass.length < 6) return false;
             const hasLetter = /[A-Za-z]/.test(pass);
@@ -489,7 +490,6 @@
             const emailOk = isValidEmailFormat(emailIn.value.trim());
             const nameOk = nameIn.value.trim().length >= 2;
             
-            // 🔥 استفاده از تابع جدید برای رمز عبور و تکرار آن
             const passOk = isValidPassword(passIn.value);
             const confirmOk = isValidPassword(confirmPassIn.value) && passIn.value === confirmPassIn.value;
             
@@ -527,7 +527,6 @@
             e.preventDefault();
             const t = langData[currentLang] || langData.en;
             
-            // 🔥 استفاده از تابع جدید در زمان ارسال فرم
             if (!isValidPassword(passIn.value)) { msg.textContent = t.lenErr; msg.className = 'err show'; return; }
             if (passIn.value !== confirmPassIn.value) { msg.textContent = t.passErr; msg.className = 'err show'; return; }
             
