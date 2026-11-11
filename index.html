@@ -287,13 +287,16 @@
             #user::placeholder, #pass::placeholder { font-size: 13px !important; }
         }
 
+        /* ── Mobile fullscreen: تمام صفحه با محتوای کشسان ── */
         @media (max-width: 480px) {
+            html { min-height: 100vh; min-height: 100dvh; }
             body {
                 padding: 0;
                 align-items: stretch;
                 background: linear-gradient(180deg,#1a2744 0%,#0f172a 100%);
             }
             .auth-card {
+                width: 100%;
                 max-width: 100%;
                 min-height: 100vh;
                 min-height: 100dvh;
@@ -302,14 +305,23 @@
                 box-shadow: none;
                 backdrop-filter: none;
                 background: transparent;
-                padding: max(20px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+                padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                gap: 0;
+            }
+            /* فرم کشسان می‌شود و محتوایش در وسط فضای باقی‌مانده تراز می‌شود */
+            #form {
+                flex: 1 1 auto;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
             }
+            #msg { flex: 0 0 auto; }
             .glow-1, .glow-2 { display: none; }
-            .header-actions { margin-bottom: 8px; }
-            .logo { margin-bottom: 14px; }
+            .header-actions { margin-bottom: 10px; }
+            .logo { margin-bottom: 18px; }
             .mark-wrap,.mark-shape,.mark-shape svg{width:58px;height:58px}
             .orbit-a{width:70px;height:70px;margin:-35px 0 0 -35px}
             .orbit-b{width:80px;height:80px;margin:-40px 0 0 -40px}
@@ -323,7 +335,7 @@
             html[dir="ltr"] .group input { padding-left: 36px; padding-right: 36px; }
             .extra-links { font-size: 10px; margin-bottom: 12px; }
             .btn { font-size: 12px; padding: 11px; }
-            .footer { font-size: 11px; margin-top: 12px; }
+            .footer { font-size: 11px; margin-top: 14px; }
             #msg { font-size: 11px; padding: 10px; }
             .lb { height: 34px; width: 34px; font-size: 12px; }
             .mi { font-size: 11px; padding: 6px 10px; }
@@ -854,7 +866,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {
-                navigator.serviceWorker.register('sw.js?v=5.2').then(function (reg) {
+                navigator.serviceWorker.register('sw.js?v=5.3').then(function (reg) {
                     setInterval(function () {
                         reg.update().catch(function () {});
                     }, 60000);
