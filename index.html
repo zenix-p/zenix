@@ -37,22 +37,21 @@
 
         html{
             background:#0f172a;
-            height:100vh;
-            height:100dvh;
-            overflow:hidden;
+            min-height:100vh;
+            min-height:100dvh;
         }
         body{
             background:linear-gradient(165deg,#1e293b 0%,#16213d 50%,#0f172a 100%);
-            height:100vh;
-            height:100dvh;
+            min-height:100vh;
+            min-height:100dvh;
             display:flex;
             justify-content:center;
             align-items:center;
             color:#f8fafc;
             padding:max(15px, env(safe-area-inset-top)) max(15px, env(safe-area-inset-right)) max(15px, env(safe-area-inset-bottom)) max(15px, env(safe-area-inset-left));
             position:relative;
-            overflow:hidden;
             box-sizing:border-box;
+            overscroll-behavior-y:auto;
             -webkit-text-size-adjust:100%;
             -moz-text-size-adjust:100%;
             text-size-adjust:100%;
@@ -75,14 +74,7 @@
             backdrop-filter:blur(10px);
             opacity:1;
             transition:opacity .2s ease-in-out;
-            max-height:100%;
-            overflow-y:auto;
-            scrollbar-width:thin;
-            scrollbar-color:rgba(56,189,248,.3) transparent;
         }
-        .auth-card::-webkit-scrollbar{width:4px}
-        .auth-card::-webkit-scrollbar-track{background:transparent}
-        .auth-card::-webkit-scrollbar-thumb{background:rgba(56,189,248,.3);border-radius:2px}
 
         .header-actions{position:relative;z-index:20;display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-bottom:12px}
         .wrap{position:relative}
@@ -169,18 +161,40 @@
         .group label{display:block;margin-bottom:6px;font-size:12px;color:#cbd5e1}
         .req{color:#ef4444;font-weight:700;margin-inline-start:3px}
         .wrap-input{position:relative;display:flex;align-items:center}
-        .wrap-input i.f-icon{position:absolute;color:#64748b;font-size:14px;z-index:2}
+        .wrap-input i.f-icon{position:absolute;color:#94a3b8;font-size:14px;z-index:2}
         html[dir="rtl"] .wrap-input i.f-icon{right:14px}
         html[dir="ltr"] .wrap-input i.f-icon{left:14px}
-        .eye-btn{position:absolute;background:none;border:none;color:#64748b;cursor:pointer;font-size:14px;padding:4px;z-index:2}
+        .eye-btn{position:absolute;background:none;border:none;color:#94a3b8;cursor:pointer;font-size:14px;padding:4px;z-index:2}
         html[dir="rtl"] .eye-btn{left:12px}
         html[dir="ltr"] .eye-btn{right:12px}
-        .group input{width:100%;padding:12px 14px;background:rgba(15,23,42,.65)!important;border:1px solid rgba(255,255,255,.12);border-radius:12px;color:#fff!important;font-size:13px;outline:0;-webkit-text-fill-color:#fff!important;transition:background-color 5000s ease-in-out 0s}
+        .group input{
+            width:100%;
+            padding:12px 14px;
+            background:#2a3a52!important;
+            border:1.5px solid rgba(148,163,184,.32);
+            border-radius:12px;
+            color:#fff!important;
+            font-size:13px;
+            outline:0;
+            -webkit-text-fill-color:#fff!important;
+            transition:background-color 5000s ease-in-out 0s, border-color .2s ease, box-shadow .2s ease;
+        }
         html[dir="rtl"] .group input{padding-right:40px;padding-left:40px}
         html[dir="ltr"] .group input{padding-left:40px;padding-right:40px}
-        .group input:-webkit-autofill,.group input:-webkit-autofill:hover,.group input:-webkit-autofill:focus,.group input:-webkit-autofill:active{-webkit-box-shadow:0 0 0 30px rgba(15,23,42,.95) inset!important;-webkit-text-fill-color:#fff!important;caret-color:#fff}
-        #user::placeholder,#pass::placeholder{color:#64748b !important;opacity:.55 !important;font-size:12px !important;}
-        .group input:focus{border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.2)}
+        .group input:focus{
+            background:#334155!important;
+            border-color:#38bdf8;
+            box-shadow:0 0 0 3px rgba(56,189,248,.18);
+        }
+        .group input:-webkit-autofill,
+        .group input:-webkit-autofill:hover,
+        .group input:-webkit-autofill:focus,
+        .group input:-webkit-autofill:active{
+            -webkit-box-shadow:0 0 0 100px #2a3a52 inset!important;
+            -webkit-text-fill-color:#fff!important;
+            caret-color:#fff;
+        }
+        #user::placeholder,#pass::placeholder{color:#94a3b8 !important;opacity:.75 !important;font-size:12px !important;}
         ::spelling-error {text-decoration: none !important;-webkit-text-decoration: none !important;text-decoration-line: none !important;-webkit-text-decoration-line: none !important;background: transparent !important;}
         ::grammar-error {text-decoration: none !important;-webkit-text-decoration: none !important;text-decoration-line: none !important;-webkit-text-decoration-line: none !important;background: transparent !important;}
         #user,#pass,.group input,.group input:hover,.group input:focus,.group input:active,.group input:valid,.group input:invalid,.group input:placeholder-shown,.group input:-webkit-autofill {text-decoration: none !important;-webkit-text-decoration: none !important;text-decoration-line: none !important;-webkit-text-decoration-line: none !important;text-decoration-style: none !important;text-decoration-color: transparent !important;-webkit-text-decorations-in-effect: none !important;border-bottom: none !important;outline: none;}
@@ -274,17 +288,21 @@
         }
 
         @media (max-width: 480px) {
-            body { padding: 0; }
+            body {
+                padding: 0;
+                align-items: stretch;
+                background: linear-gradient(180deg,#1a2744 0%,#0f172a 100%);
+            }
             .auth-card {
                 max-width: 100%;
-                max-height: 100%;
-                height: 100%;
+                min-height: 100vh;
+                min-height: 100dvh;
                 border-radius: 0;
                 border: none;
                 box-shadow: none;
                 backdrop-filter: none;
-                background: linear-gradient(180deg,#1a2744 0%,#0f172a 100%);
-                padding: 20px 18px;
+                background: transparent;
+                padding: max(20px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
@@ -836,7 +854,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {
-                navigator.serviceWorker.register('sw.js?v=1.8').then(function (reg) {
+                navigator.serviceWorker.register('sw.js?v=5.2').then(function (reg) {
                     setInterval(function () {
                         reg.update().catch(function () {});
                     }, 60000);
